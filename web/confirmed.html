@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PomoSprint — Derin Odaklanma & Eşzamanlı Sanal Kütüphane</title>
+  <meta name="description" content="PomoSprint ile Pomodoro seansları düzenleyin, sanal kütüphanelerde arkadaşlarınızla eşzamanlı çalışın, karakterlerinizi açın ve liderlik tablosunda üst sıralara tırmanın.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Icons -->
+  <script src="https://unpkg.com/@lucide/web"></script>
+
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-card: rgba(18, 26, 43, 0.75);
+      --bg-card-hover: rgba(30, 43, 70, 0.85);
+      --primary: #FF6B35;
+      --primary-glow: rgba(255, 107, 53, 0.35);
+      --primary-dark: #E85D04;
+      --emerald: #10B981;
+      --emerald-glow: rgba(16, 185, 129, 0.3);
+      --indigo: #6366F1;
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-active: rgba(255, 107, 53, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    h1, h2, h3, .font-heading {
+      font-family: 'Outfit', sans-serif;
+    }
+
+    /* Ambient Background Glows */
+    .glow-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .glow-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.22;
+      animation: floatGlow 14s ease-in-out infinite alternate;
+    }
+
+    .glow-1 {
+      top: -10%;
+      left: 20%;
+      width: 500px;
+      height: 500px;
+      background: var(--primary);
+    }
+
+    .glow-2 {
+      bottom: 10%;
+      right: 10%;
+      width: 600px;
+      height: 600px;
+      background: var(--indigo);
+    }
+
+    .glow-3 {
+      top: 40%;
+      left: -10%;
+      width: 450px;
+      height: 450px;
+      background: var(--emerald);
+    }
+
+    @keyframes floatGlow {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(40px, 30px) scale(1.1); }
+      100% { transform: translate(-30px, 50px) scale(0.95); }
+    }
+
+    /* Floating Header */
+    header {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 40px);
+      max-width: 1140px;
+      z-index: 100;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-main);
+      font-weight: 800;
+      font-size: 20px;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-icon {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+
+    nav a:hover {
+      color: var(--text-main);
+    }
+
+    .btn-cta {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 10px 22px;
+      border-radius: 100px;
+      box-shadow: 0 4px 16px var(--primary-glow);
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px var(--primary-glow);
+    }
+
+    /* Container */
+    .container {
+      width: 100%;
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Hero Section */
+    .hero-section {
+      padding-top: 170px;
+      padding-bottom: 100px;
+      text-align: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 107, 53, 0.1);
+      border: 1px solid rgba(255, 107, 53, 0.3);
+      color: var(--primary);
+      padding: 8px 18px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+
+    .hero-title {
+      font-size: 56px;
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+      margin-bottom: 24px;
+      background: linear-gradient(180deg, #FFFFFF 0%, #CBD5E1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-title span {
+      background: linear-gradient(135deg, var(--primary) 0%, #FF9F1C 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-desc {
+      font-size: 18px;
+      color: var(--text-muted);
+      max-width: 680px;
+      margin: 0 auto 36px;
+      line-height: 1.7;
+    }
+
+    .hero-btns {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 15px;
+      padding: 12px 26px;
+      border-radius: 100px;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Scroll Interactive Hourglass Section */
+    .hourglass-scroll-section {
+      padding: 120px 0;
+      position: relative;
+      text-align: center;
+    }
+
+    .section-tag {
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .section-heading {
+      font-size: 40px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+
+    .section-sub {
+      color: var(--text-muted);
+      font-size: 16px;
+      max-width: 580px;
+      margin: 0 auto 60px;
+    }
+
+    .hourglass-stage-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 340px 1fr;
+      align-items: center;
+      gap: 40px;
+      margin-top: 40px;
+    }
+
+    /* 3D Scroll-Driven Rotating Hourglass */
+    .hourglass-3d-box {
+      width: 280px;
+      height: 340px;
+      margin: 0 auto;
+      position: relative;
+      perspective: 1000px;
+    }
+
+    .hourglass-svg-wrap {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.15s cubic-bezier(0.2, 0, 0.2, 1);
+      filter: drop-shadow(0 20px 40px rgba(255, 107, 53, 0.25));
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 28px;
+      border-radius: 24px;
+      text-align: left;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .feature-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-active);
+      transform: translateY(-6px);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+    }
+
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      color: white;
+    }
+
+    .icon-orange { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); }
+    .icon-emerald { background: linear-gradient(135deg, var(--emerald) 0%, #059669 100%); }
+    .icon-indigo { background: linear-gradient(135deg, var(--indigo) 0%, #4F46E5 100%); }
+
+    .feature-card h3 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .feature-card p {
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* Characters Roster Showcase */
+    .characters-section {
+      padding: 100px 0;
+      background: linear-gradient(180deg, transparent 0%, rgba(18, 26, 43, 0.4) 50%, transparent 100%);
+    }
+
+    .char-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 24px;
+      margin-top: 50px;
+    }
+
+    .char-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .char-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 20px 40px -10px var(--primary-glow);
+    }
+
+    .char-avatar-img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 auto 16px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+      transition: transform 0.3s ease;
+    }
+
+    .char-card:hover .char-avatar-img {
+      transform: scale(1.1) rotate(4deg);
+      border-color: var(--primary);
+    }
+
+    .char-name {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .char-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    .char-tag {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--primary);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 100px;
+    }
+
+    /* Virtual Library Live Section */
+    .library-live-section {
+      padding: 100px 0;
+    }
+
+    .live-preview-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 32px;
+      padding: 40px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.6);
+    }
+
+    .preview-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--emerald);
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--emerald);
+      animation: pulseDot 1.5s infinite;
+    }
+
+    @keyframes pulseDot {
+      0% { opacity: 0.4; }
+      50% { opacity: 1; }
+      100% { opacity: 0.4; }
+    }
+
+    .tables-demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .table-demo-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px;
+      transition: all 0.2s ease;
+    }
+
+    .table-demo-card:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .seat-avatars {
+      display: flex;
+      align-items: center;
+      gap: -8px;
+      margin-top: 14px;
+    }
+
+    .seat-mini {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 2px solid var(--bg-dark);
+      background: #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      overflow: hidden;
+    }
+
+    .seat-mini img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Verification Modal (Deep Link Redirect) */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(9, 13, 22, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.4s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-active);
+      border-radius: 32px;
+      padding: 48px 36px;
+      max-width: 460px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+      transform: scale(0.9);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .modal-overlay.active .modal-card {
+      transform: scale(1);
+    }
+
+    .modal-icon {
+      width: 88px;
+      height: 88px;
+      background: linear-gradient(135deg, var(--emerald) 0%, #059669 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      color: white;
+      box-shadow: 0 12px 30px var(--emerald-glow);
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 60px 0 30px;
+      background: rgba(9, 13, 22, 0.9);
+      text-align: center;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .footer-copy {
+      color: #64748B;
+      font-size: 13px;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .hourglass-stage-wrapper {
+        grid-template-columns: 1fr;
+      }
+      .hero-title {
+        font-size: 40px;
+      }
+      nav {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Background Glows -->
+  <div class="glow-bg">
+    <div class="glow-blob glow-1"></div>
+    <div class="glow-blob glow-2"></div>
+    <div class="glow-blob glow-3"></div>
+  </div>
+
+  <!-- Floating Header Navigation -->
+  <header>
+    <a href="#" class="logo">
+      <div class="logo-icon">
+        <i data-lucide="zap"></i>
+      </div>
+      <span>PomoSprint</span>
+    </a>
+    <nav>
+      <a href="#features">Özellikler</a>
+      <a href="#library">Sanal Kütüphane</a>
+      <a href="#characters">Karakterler</a>
+      <a href="#download">İndir</a>
+    </nav>
+    <a href="https://pomosprint.app" class="btn-cta">
+      <span>Uygulamayı Aç</span>
+      <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+    </a>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="hero-badge">
+        <i data-lucide="sparkles" style="width: 14px; height: 14px;"></i>
+        <span>Derin Odaklanma & Canlı Masa Maratonu</span>
+      </div>
+      
+      <h1 class="hero-title">
+        Odaklanma Maratonuna<br>
+        <span>PomoSprint</span> İle Başla!
+      </h1>
+      
+      <p class="hero-desc">
+        Sanal kütüphanelerde masa arkadaşlarınla eşzamanlı çalış, Pomodoro sprint seanslarını tamamla, puan topla ve karakterlerinin kilitlerini aç.
+      </p>
+      
+      <div class="hero-btns">
+        <a href="io.supabase.pomosprint://login-callback" class="btn-cta" style="padding: 14px 32px; font-size: 16px;">
+          <span>Uygulamayı Başlat 🚀</span>
+        </a>
+        <a href="#library" class="btn-secondary">
+          <span>Kütüphaneyi İncele</span>
+          <i data-lucide="chevron-down" style="width: 16px; height: 16px;"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Scroll-Driven Rotating Hourglass Section -->
+  <section class="hourglass-scroll-section" id="features">
+    <div class="container">
+      <span class="section-tag">DİNAMİK POMODORO MİMARİSİ</span>
+      <h2 class="section-heading">Zamanı Yönetme, Zamana Hükmet</h2>
+      <p class="section-sub">Sayfayı aşağı kaydırdıkça kum saatinin akışını ve PomoSprint'in odaklanma döngüsünü deneyimleyin.</p>
+
+      <div class="hourglass-stage-wrapper">
+        <!-- Feature 1 Left -->
+        <div class="feature-card">
+          <div class="feature-icon icon-orange">
+            <i data-lucide="timer"></i>
+          </div>
+          <h3>25 Dk Odaklanma Sprinti</h3>
+          <p>25 dakika tam odaklanma, 5 dakika kısa mola ve 3 seans sonunda 15 dakikalık uzun mola ritmi ile zihnini taze tut.</p>
+        </div>
+
+        <!-- Center 3D Interactive Rotating Hourglass -->
+        <div class="hourglass-3d-box">
+          <div class="hourglass-svg-wrap" id="rotatingHourglass">
+            <svg viewBox="0 0 200 260" width="220" height="280" style="margin: 0 auto; display: block;">
+              <!-- Outer Frame Glass Glow -->
+              <defs>
+                <linearGradient id="glassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="rgba(255, 255, 255, 0.25)" />
+                  <stop offset="100%" stop-color="rgba(255, 107, 53, 0.05)" />
+                </linearGradient>
+                <linearGradient id="sandGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#FF9F1C" />
+                  <stop offset="100%" stop-color="#FF6B35" />
+                </linearGradient>
+              </defs>
+
+              <!-- Top & Bottom Frame Caps -->
+              <rect x="25" y="10" width="150" height="16" rx="8" fill="#1E293B" stroke="#334155" stroke-width="2"/>
+              <rect x="25" y="234" width="150" height="16" rx="8" fill="#1E293B" stroke="#334155" stroke-width="2"/>
+
+              <!-- Glass Body Path -->
+              <path d="M 40 26 C 40 90, 85 110, 100 130 C 115 110, 160 90, 160 26 Z" fill="url(#glassGrad)" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+              <path d="M 40 234 C 40 170, 85 150, 100 130 C 115 150, 160 170, 160 234 Z" fill="url(#glassGrad)" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+
+              <!-- Sand Top Reservoir -->
+              <path id="sandTop" d="M 50 60 C 50 90, 85 115, 100 130 C 115 115, 150 90, 150 60 Z" fill="url(#sandGrad)"/>
+              
+              <!-- Falling Sand Stream -->
+              <line x1="100" y1="130" x2="100" y2="210" stroke="#FF9F1C" stroke-width="3" stroke-dasharray="6,4">
+                <animate attributeName="stroke-dashoffset" from="0" to="20" dur="0.5s" repeatCount="indefinite" />
+              </line>
+
+              <!-- Sand Bottom Pile -->
+              <path id="sandBottom" d="M 55 234 C 65 210, 135 210, 145 234 Z" fill="url(#sandGrad)"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Feature 2 Right -->
+        <div class="feature-card">
+          <div class="feature-icon icon-emerald">
+            <i data-lucide="users"></i>
+          </div>
+          <h3>Canlı Masa Arkadaşları</h3>
+          <p>Sanal kütüphanede masalara otur, masa arkadaşlarının sayaç ilerlemesini canlı takip et ve eşzamanlı çalışmanın motivasyonunu hisset.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Virtual Library Live Preview Section -->
+  <section class="library-live-section" id="library">
+    <div class="container">
+      <div class="live-preview-box">
+        <div class="preview-header">
+          <div>
+            <span class="section-tag" style="margin: 0;">SANAL KÜTÜPHANE ODALARI</span>
+            <h3 style="font-size: 24px; font-weight: 800; margin-top: 4px;">Aktif Masa Seansları</h3>
+          </div>
+          <div class="live-badge">
+            <div class="live-dot"></div>
+            <span>CANLI CANLI CANLI</span>
+          </div>
+        </div>
+
+        <div class="tables-demo-grid">
+          <!-- Table 1 -->
+          <div class="table-demo-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-weight: 800; font-size: 15px;">Sessiz Masa A1</span>
+              <span style="font-size: 12px; color: var(--emerald); font-weight: 700;">2/2 DOLU</span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-muted);">Sessiz Çalışma Alanı • Derin Odak</p>
+            <div class="seat-avatars">
+              <div class="seat-mini"><img src="avatars/avatar_1_gamer.png" alt="Gamer"></div>
+              <div class="seat-mini"><img src="avatars/avatar_7_scholar.png" alt="Scholar"></div>
+            </div>
+          </div>
+
+          <!-- Table 2 -->
+          <div class="table-demo-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-weight: 800; font-size: 15px;">Grup Odak Masası 1</span>
+              <span style="font-size: 12px; color: var(--primary); font-weight: 700;">3/4 DOLU</span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-muted);">Genel Çalışma • Maraton Seansı</p>
+            <div class="seat-avatars">
+              <div class="seat-mini"><img src="avatars/avatar_3_gentleman.png" alt="Gentleman"></div>
+              <div class="seat-mini"><img src="avatars/avatar_9_viking.png" alt="Viking"></div>
+              <div class="seat-mini"><img src="avatars/avatar_11_doctor.png" alt="Doctor"></div>
+              <div class="seat-mini" style="border: 2px dashed var(--primary); color: var(--primary); font-weight: 800;">+</div>
+            </div>
+          </div>
+
+          <!-- Table 3 -->
+          <div class="table-demo-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-weight: 800; font-size: 15px;">Kahve & Mola Masası</span>
+              <span style="font-size: 12px; color: var(--emerald); font-weight: 700;">1/4 DOLU</span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-muted);">Dinlenme & Kahve Molası</p>
+            <div class="seat-avatars">
+              <div class="seat-mini"><img src="avatars/avatar_15_athlete.png" alt="Athlete"></div>
+              <div class="seat-mini" style="border: 2px dashed rgba(255,255,255,0.2); color: var(--text-muted);">+</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Characters Showcase Section -->
+  <section class="characters-section" id="characters">
+    <div class="container">
+      <div style="text-align: center;">
+        <span class="section-tag">OYUNLAŞTIRILMIŞ İLERLEME</span>
+        <h2 class="section-heading">Karakterlerini Aç, Seviyeni Yükselt</h2>
+        <p class="section-sub">Tamamladığın Pomodoro seansları ve odaklanma dakikalarıyla benzersiz karakterlerin kilitlerini aç.</p>
+      </div>
+
+      <div class="char-grid">
+        <!-- Character 1 -->
+        <div class="char-card">
+          <img src="avatars/avatar_1_gamer.png" alt="Gamer Apprentice" class="char-avatar-img">
+          <div class="char-name">Gamer Çırağı</div>
+          <div class="char-desc">Başlangıç karakteri. 1 Seans tamamla.</div>
+          <div class="char-tag">⚡ Açık</div>
+        </div>
+
+        <!-- Character 2 -->
+        <div class="char-card">
+          <img src="avatars/avatar_7_scholar.png" alt="Gözlüklü Bilgin" class="char-avatar-img">
+          <div class="char-name">Gözlüklü Bilgin</div>
+          <div class="char-desc">5 Seans tamamlayarak kilidi aç.</div>
+          <div class="char-tag">🎓 Seviye 2</div>
+        </div>
+
+        <!-- Character 3 -->
+        <div class="char-card">
+          <img src="avatars/avatar_3_gentleman.png" alt="Gentleman" class="char-avatar-img">
+          <div class="char-name">Centilmen</div>
+          <div class="char-desc">10 Seans tamamlayarak kilidi aç.</div>
+          <div class="char-tag">🎩 Seviye 3</div>
+        </div>
+
+        <!-- Character 4 -->
+        <div class="char-card">
+          <img src="avatars/avatar_9_viking.png" alt="Viking Savaşçısı" class="char-avatar-img">
+          <div class="char-name">Viking Odakçı</div>
+          <div class="char-desc">15 Seans tamamlayarak kilidi aç.</div>
+          <div class="char-tag">🛡️ Seviye 4</div>
+        </div>
+
+        <!-- Character 5 -->
+        <div class="char-card">
+          <img src="avatars/avatar_11_doctor.png" alt="Uzman Doktor" class="char-avatar-img">
+          <div class="char-name">Uzman Doktor</div>
+          <div class="char-desc">20 Seans tamamlayarak kilidi aç.</div>
+          <div class="char-tag">🩺 Seviye 5</div>
+        </div>
+
+        <!-- Character 6 -->
+        <div class="char-card">
+          <img src="avatars/avatar_13_pilot.png" alt="Kaptan Pilot" class="char-avatar-img">
+          <div class="char-name">Kaptan Pilot</div>
+          <div class="char-desc">30 Seans tamamlayarak kilidi aç.</div>
+          <div class="char-tag">✈️ Efsanevi</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Download & CTA Section -->
+  <section class="hero-section" id="download" style="padding-top: 60px;">
+    <div class="container">
+      <div style="background: linear-gradient(135deg, rgba(255, 107, 53, 0.15) 0%, rgba(99, 102, 241, 0.15) 100%); border: 1px solid var(--border-active); border-radius: 36px; padding: 60px 32px; text-align: center;">
+        <h2 style="font-size: 42px; font-weight: 900; margin-bottom: 16px;">Bugün Odaklanmaya Başla!</h2>
+        <p style="color: var(--text-muted); font-size: 18px; max-width: 600px; margin: 0 auto 36px;">
+          PomoSprint'i iOS veya Android cihazında kullan, hedeflerine bir adım daha yaklaş.
+        </p>
+        <div class="hero-btns">
+          <a href="io.supabase.pomosprint://login-callback" class="btn-cta" style="padding: 16px 36px; font-size: 16px;">
+            <span>PomoSprint Uygulamasını Aç 🚀</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal Overlay (Email Verification Redirect) -->
+  <div class="modal-overlay" id="verifyModal">
+    <div class="modal-card">
+      <div class="modal-icon">
+        <i data-lucide="check-circle-2" style="width: 48px; height: 48px;"></i>
+      </div>
+      <h2 style="font-size: 26px; font-weight: 800; margin-bottom: 12px;">E-postanız Başarıyla Doğrulandı! 🎉</h2>
+      <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 28px; line-height: 1.6;">
+        PomoSprint hesabınız başarıyla aktifleştirildi. Artık eşzamanlı çalışma masalarına katılabilir ve odaklanmaya başlayabilirsiniz.
+      </p>
+      <a href="io.supabase.pomosprint://login-callback" class="btn-cta" style="width: 100%; justify-content: center; padding: 16px; font-size: 16px;">
+        <span>PomoSprint Uygulamasını Aç 🚀</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-links">
+        <a href="#features">Özellikler</a>
+        <a href="#library">Sanal Kütüphane</a>
+        <a href="#characters">Karakterler</a>
+        <a href="mailto:destek@pomosprint.app">Destek & İletişim</a>
+      </div>
+      <div class="footer-copy">
+        © 2026 PomoSprint (pomosprint.app). Tüm hakları saklıdır.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // 1. Interactive Scroll-Driven Hourglass Rotation
+    const hourglassSvg = document.getElementById('rotatingHourglass');
+    window.addEventListener('scroll', () => {
+      const scrollPos = window.scrollY;
+      // Smooth rotation based on scroll distance
+      const rotationDegree = (scrollPos / 5) % 360;
+      hourglassSvg.style.transform = `rotate(${rotationDegree}deg)`;
+    });
+
+    // 2. Email Verification Deep Link Hash Detection
+    window.addEventListener('DOMContentLoaded', () => {
+      const hash = window.location.hash;
+      const search = window.location.search;
+      
+      if (hash.includes('access_token') || hash.includes('type=signup') || search.includes('type=signup')) {
+        const modal = document.getElementById('verifyModal');
+        modal.classList.add('active');
+
+        // Automatically trigger app open after 1 second
+        setTimeout(() => {
+          window.location.href = "io.supabase.pomosprint://login-callback" + hash;
+        }, 1200);
+      }
+    });
+  </script>
+</body>
+</html>
