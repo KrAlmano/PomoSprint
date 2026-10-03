@@ -14,7 +14,7 @@
 -- gövdeden CREATE OR REPLACE yazmak canlıyı GERİLETİR.
 --
 -- ADIMLAR
---  1. Ön koşul: supabase/migrations/20261003120000_audit_fixes.sql canlıda
+--  1. Ön koşul: supabase/proposed/11_audit_fixes_unapplied.sql (canlıda YOK) canlıda
 --     uygulanmış olmalı (study_day_of, study_day_start, completed_at
 --     trigger'ı, study_sessions_user_completed_at_idx).
 --  2. Canlı gövdeyi alın:

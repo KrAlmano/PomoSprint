@@ -6,7 +6,7 @@
 // yapılacak bir değişiklikle sessizce bozulmadığını tek komutla
 // doğrulamak.
 //
-// Bazı senaryolar supabase/migrations/20261003120000_audit_fixes.sql ve
+// Bazı senaryolar supabase/proposed/11_audit_fixes_unapplied.sql (canlıda YOK) ve
 // unsubscribe Edge Function'ının yeni sürümü canlıya alınmadan BAŞARISIZ
 // olur; bu beklenen durumdur ve neyin eksik olduğunu gösterir.
 //

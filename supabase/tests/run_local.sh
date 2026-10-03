@@ -8,7 +8,11 @@
 #
 # Kullanım: supabase/tests/run_local.sh
 # Sıra: stub (baseline) -> supabase/migrations/*.sql (isim sırasıyla) ->
-#       helpers.sql -> security_hardening_test.sql -> audit_fixes_test.sql
+#       proposed/11_audit_fixes_unapplied.sql (canlıda YOK; yalnızca bu
+#       yerel test için uygulanır) -> helpers.sql -> security_hardening_test.sql
+#       -> audit_fixes_test.sql
+# Not: Repodaki 2026-08 / 2026-09 migration'ları canlı geçmişte yok; bu
+# zincir canlıyı değil, o dosyaların kendi tutarlılığını sınar.
 #
 # SKIP_MIGRATIONS (boşlukla ayrılmış dosya adları) repo zincirinde
 # kurulamayan migration'ları atlar. Varsayılan:
@@ -48,6 +52,8 @@ for f in "$ROOT"/supabase/migrations/*.sql; do
   echo "-> $name"
   "${PSQL[@]}" -f "$f"
 done
+echo "-> proposed/11_audit_fixes_unapplied.sql (yalnızca yerel test)"
+"${PSQL[@]}" -f "$ROOT/supabase/proposed/11_audit_fixes_unapplied.sql"
 "${PSQL[@]}" -f "$ROOT/supabase/tests/helpers.sql"
 "${PSQL[@]}" -f "$ROOT/supabase/tests/security_hardening_test.sql"
 "${PSQL[@]}" -f "$ROOT/supabase/tests/audit_fixes_test.sql"

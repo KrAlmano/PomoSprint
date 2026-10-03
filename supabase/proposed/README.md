@@ -29,7 +29,7 @@ dağıtıyor). Canlı gövdeyi bilmeden repodaki eski sürümden
 
 ## Dosyalar ve uygulama sırası
 
-Ön koşul (hepsi için): `supabase/migrations/20261003120000_audit_fixes.sql`
+Ön koşul (hepsi için): `supabase/proposed/11_audit_fixes_unapplied.sql (canlıda YOK)`
 canlıda uygulanmış olmalı (`my_friend_ids`, `study_day_of`,
 `study_day_start`, `category_limit`, completed_at trigger'ı).
 
@@ -72,7 +72,7 @@ uygulamadan önce aşağıdaki tabloya göre ayıklayın:
 ## Bilinen bağımlılıklar
 
 - `07`'deki activity_feed politikası `my_friend_ids()`'e bağlanır;
-  `rollbacks/20261003120000_audit_fixes_down.sql` bu durumda `my_friend_ids`'i
+  `proposed/11_audit_fixes_unapplied_down.sql` bu durumda `my_friend_ids`'i
   silemez (bağımlılık hatası verir, sessizce bozulmaz). Önce politikayı geri
   alın.
 - `01`'deki PS00x SQLSTATE değişikliği istemcinin seans hatası

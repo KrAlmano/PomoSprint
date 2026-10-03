@@ -1,34 +1,98 @@
 # PomoSprint
 
-Pomodoro tekniğini oyunlaştıran bir Flutter çalışma uygulaması: 25/50 dakikalık odak seansları, ders kategorileri, raporlar, seri bonusu, haftalık ligler, avatarlar ve arkadaşlarla sosyal akış. Backend Supabase (Postgres, Auth, RPC'ler, Edge Functions).
+Pomodoro tekniğini oyunlaştıran Flutter çalışma uygulaması: 25/50 dakikalık odak seansları, ders kategorileri, raporlar, seri bonusu, **14 günlük** ligler, avatarlar ve arkadaşlar. Backend Supabase (Postgres, Auth, RPC'ler, Edge Functions); site `pomosprint.app`.
 
-Mimari ve ekranların ayrıntılı açıklaması için: [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md)
+| Belge | İçerik |
+|---|---|
+| [AGENTS.md](AGENTS.md) | Ayrıntılı ve güncel geliştirici / AI rehberi (sözleşmeler, kurallar, açık konular) |
+| [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md) | Kısa ürün ve mimari özeti |
+| [supabase/README.md](supabase/README.md) | Canlı veritabanı durumu ve migration akışı |
+| [landing/README.md](landing/README.md) | Site kuralları |
+
+## Desteklenen platformlar
+
+| Platform | Durum |
+|---|---|
+| Android | Destekleniyor (`com.pomosprint.app`) |
+| iOS | Destekleniyor (min. iOS 15.0, `com.pomosprint.app`) |
+| macOS, Linux, Windows, Web | `flutter create` şablonları; **çalışmıyor**, bakımı yapılmıyor |
+
+## Kurulum
+
+1. Flutter 3.44+ (Dart ^3.12) kurulu olmalı.
+2. Kök dizinde `.env` oluştur. Anahtarlar:
+
+   | Anahtar | Zorunlu | Not |
+   |---|---|---|
+   | `SUPABASE_URL` | Evet | Yoksa uygulama bulutsuz (yalnızca yerel) açılır |
+   | `SUPABASE_ANON_KEY` | Evet | Public anon key |
+   | `SENTRY_DSN` | Hayır | Boşsa Sentry kapalı |
+
+   Bu dosya APK/IPA içine düz metin gömülür. **Service role veya Resend anahtarı koyma.** Onlar yalnızca `scripts/.env`'de durur (şablon: `scripts/.env.example`; anahtarlar `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`).
+3. Komutlar:
+
+   ```bash
+   flutter pub get
+   flutter gen-l10n        # lib/l10n/*.arb değiştiyse
+   flutter run             # debug: sayaç 5/10 sn, sunucu bu seansları reddeder
+   flutter run --profile   # gerçek seans ve puan testi
+   ```
+
+4. Android release AAB için `android/key.properties` ve upload keystore gerekir. Yoksa `bundleRelease` bilerek hata verir; release APK ise uyarıyla debug anahtarıyla imzalanır.
+
+## Kontrol ve testler
+
+```bash
+flutter analyze   # beklenen: No issues found!
+flutter test      # test/ altındaki 8 birim test dosyası
+```
+
+- Yeni metinler `lib/l10n/app_tr.arb` ve `app_en.arb` dosyalarına eklenir, ardından `flutter gen-l10n`. `app_localizations*.dart` elle düzenlenmez.
+- SQL davranış testleri (yalnızca yerel, tek kullanımlık Postgres): `supabase/tests/run_local.sh`.
+- Canlı projeye karşı regresyon testi gerçek test hesapları açıp siler: `cd scripts && npm install && node security_regression_test.js`. Yalnızca bilerek çalıştır.
 
 ## Klasörler
 
 | Klasör | İçerik |
 |---|---|
-| `lib/` | Flutter uygulaması (`screens/`, `services/`, `models/`, `widgets/`, `l10n/`) |
-| `supabase/migrations/` | Veritabanı migration'ları (up/down) |
-| `supabase/functions/` | Edge Function'lar |
-| `supabase/tests/` | Migration'lar için yerel SQL davranış testleri |
-| `scripts/` | Güvenlik regresyon testi ve bülten gönderimi (Node) |
+| `lib/app/` | Açılış sonrası kabuk: yönlendirme kapısı (`app_gate`), ana sekmeler (`main_shell`), tema, Sentry |
+| `lib/screens/` | Ekranlar |
+| `lib/services/` | Supabase veri katmanı, çevrimdışı seans kuyruğu, süren seans kaydı, bildirim, dil |
+| `lib/models/`, `lib/utils/`, `lib/widgets/` | Modeller, yardımcılar (çalışma günü, istatistik), ortak widget'lar |
+| `lib/l10n/` | ARB çevirileri ve üretilen yerelleştirme kodu |
+| `test/` | Birim testleri |
+| `supabase/migrations/` | İleri migration'lar (yalnızca `20261003150000_live_audit_fixes` canlıda) |
+| `supabase/rollbacks/`, `supabase/proposed/` | Geri alma betikleri; canlıya uygulanmamış öneriler |
+| `supabase/functions/` | Edge Functions: `unsubscribe`, `send-welcome-email` |
+| `supabase/tests/` | Yerel SQL testleri ve canlı DRYRUN betikleri |
+| `scripts/` | Güvenlik regresyon testi, bülten gönderimi (Node) |
 | `landing/` | Tanıtım sitesi (pomosprint.app) |
+| `android/`, `ios/` | Platform yapılandırması |
+| `analiz/` | Denetim raporları |
 
-## Kurulum
+## Supabase akışı
 
-1. Kök dizinde `.env` oluştur: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, isteğe bağlı `SENTRY_DSN`. Bu dosya uygulamaya gömülür; içine **asla** service role anahtarı koyma.
-2. `flutter pub get`
-3. `flutter run`
+Canlı veritabanı (`eoosnyakvxmifmexpgxa`) gerçeğin kaynağıdır ve repodaki eski migration'larla eşleşmez. **`supabase db push` / `db reset` çalıştırma.** Değişiklik akışı (canlı tanımı oku → migration + rollback + DRYRUN → önce DRYRUN, sonra migration, SQL Editor'de) ve baseline adımları: [supabase/README.md](supabase/README.md).
 
-Android release AAB için `android/key.properties` gerekir; yoksa `bundleRelease` bilerek hata verir.
-
-## Testler
+Edge Function'lar JWT doğrulaması kapalı deploy edilir:
 
 ```bash
-flutter analyze
-flutter test
+supabase functions deploy unsubscribe --no-verify-jwt
+supabase functions deploy send-welcome-email --no-verify-jwt
 ```
 
-Veritabanı güvenlik kuralları için yerel SQL testleri: `supabase/tests/security_hardening_test.sql` başlığına bak.
-Canlı projeye karşı regresyon testi (geçici test hesapları açar ve siler): `cd scripts && node security_regression_test.js`
+## Landing deploy
+
+```bash
+cd landing
+python3 tools/sync_partials.py --check   # fark varsa önce: python3 tools/sync_partials.py
+wrangler deploy
+```
+
+Statik site, derleme adımı yok. `worker.js` http → https ve www → apex yönlendirmesini yapar; güvenlik başlıkları `_headers`'ta. Kurallar: [landing/README.md](landing/README.md).
+
+## Lig
+
+- Dönem **14 gün**; Pazartesi 00:01 (TR) civarında çalışan cron dönemi biten ligleri işler.
+- 5 kademe (Bronz, Gümüş, Altın, Safir, Elmas), odada en fazla 30 kişi.
+- Dönem sonunda puanı olan üst sıralar terfi eder, alt sıralar düşer; ilk 3'e ödül avatarı verilir.
