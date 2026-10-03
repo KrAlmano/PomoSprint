@@ -161,9 +161,17 @@
 -- supabase/proposed/ CLI tarafından UYGULANMAZ; bu dosya doğrudan
 -- çalıştırılmaz (\quit).
 --
+-- UYGULAMA SIRASI (supabase/proposed/README.md "Dosyalar ve uygulama sırası"):
+--   12 → 15 → 16 → 19 → 13 → 14. 13, 14'ten ÖNCE gelir: 14 handle_new_user
+--   ve add_friend_by_code'u 13'ün gövdesi üzerine kurar ve ön koşulunda
+--   13 uygulanmış md5'leri bekler. Dosyanın ilk adımı (0) aşağıdaki md5'leri
+--   kendisi denetler; 14 önce uygulanmışsa hiçbir şey yapmadan durur.
+--   Geri alma ters sırada: 14_down → 13_down → 19_down → 16_down → 15_down → 12_down.
+--
 -- ADIMLAR (SQL Editor, sırayla)
 --  0. (Önerilir) Yedek: supabase db dump --schema public -f yedek.sql
---  1. Canlı gövdelerin bu dosya yazılırken okunanlarla aynı olduğunu doğrulayın:
+--  1. Canlı gövdelerin bu dosya yazılırken okunanlarla aynı olduğunu doğrulayın
+--     (dosyanın 0. adımı da aynı denetimi yapar):
 --       select p.oid::regprocedure, md5(pg_get_functiondef(p.oid))
 --         from pg_proc p where p.pronamespace = 'public'::regnamespace
 --          and p.proname in ('complete_study_session','handle_new_user',
@@ -177,6 +185,7 @@
 --       process_weekly_leagues()                3d547d20a94f32e3cf531a7c3888d536
 --       start_study_session(integer,text)       706f87a96d7b6d7d6c776aa64ecb3772
 --     Farklıysa DURUN: bu dosya o gövdelere göre yeniden yazılmalı.
+--     (12, 15, 16, 19 bu altı fonksiyona dokunmaz; onlardan sonra da aynıdır.)
 --  2. Kuru çalıştırma: supabase/tests/proposed_13_sunucu_butunluk_dryrun.sql
 --     (sonda DRYRUN_RESULT hatası beklenir; her satır 'true' olmalı). Birkaç
 --     saniye profiles/categories/leagues tablolarını kilitler; az trafikli
@@ -187,7 +196,8 @@
 --     kullanır; dosya adını değiştirirseniz orayı da değiştirin).
 --  4. Doğrulama: select public.get_app_config(); ve 1. adımdaki sorgu
 --     (değişen gövdeler artık farklı md5 verir), AGENTS.md §2.3 sorguları.
---  5. Geri alma: supabase/proposed/13_sunucu_butunluk_down.sql
+--  5. Geri alma: supabase/proposed/13_sunucu_butunluk_down.sql (14 uygulandıysa
+--     önce 14_gizlilik_sosyal_down.sql; 13_down bunu denetler)
 --  6. Ürün kararı sonrası (istemci güncellemesi + minimum sürüm):
 --       update public.app_config set value = '4', updated_at = now()
 --        where key = 'unverified_session_daily_cap';
@@ -199,6 +209,43 @@
 \quit
 
 BEGIN;
+
+-- ---------------------------------------------------------------------------
+-- 0) Ön koşul: değiştirilecek canlı gövdeler 3 Ekim 2026'dakiyle aynı mı?
+-- ---------------------------------------------------------------------------
+-- md5(pg_get_functiondef) canlıdan okundu (ADIMLAR 1'deki tablo). Farklıysa
+-- hiçbir şey yapılmadan durulur. Özellikle proposed/14 13'ten ÖNCE
+-- uygulanmışsa (handle_new_user ve add_friend_by_code'u değiştirir) 13 onun
+-- engel / onay / nötr ad değişikliklerini sessizce ezmesin diye durur.
+-- 12, 15, 16 ve 19 bu fonksiyonlara dokunmaz; önce ya da sonra olabilirler.
+DO $pre$
+DECLARE
+    v_expected constant jsonb := '{
+        "add_friend_by_code(text)": "d59affef7f113a3072d2de604bb9506f",
+        "complete_study_session(uuid,uuid,integer,boolean,integer,timestamp with time zone)": "592ede066173f30b64006f02b5141756",
+        "ensure_user_in_league(uuid,integer)": "e5674f687157135f7c5feaba2de56a7e",
+        "handle_new_user()": "ae6cedf2e0e0995ec759b69e20ada604",
+        "process_weekly_leagues()": "3d547d20a94f32e3cf531a7c3888d536",
+        "start_study_session(integer,text)": "706f87a96d7b6d7d6c776aa64ecb3772"
+    }';
+    r record;
+    v_bad text[] := '{}';
+BEGIN
+    FOR r IN SELECT key, value FROM jsonb_each_text(v_expected) LOOP
+        IF to_regprocedure('public.' || r.key) IS NULL
+           OR md5(pg_get_functiondef(to_regprocedure('public.' || r.key))) IS DISTINCT FROM r.value THEN
+            v_bad := v_bad || r.key;
+        END IF;
+    END LOOP;
+    IF to_regnamespace('ops') IS NOT NULL OR to_regclass('public.user_blocks') IS NOT NULL THEN
+        v_bad := v_bad || 'proposed/14 uygulanmış görünüyor (13, 14''ten ÖNCE uygulanmalı; önce 14_down)'::text;
+    END IF;
+    IF array_length(v_bad, 1) > 0 THEN
+        RAISE EXCEPTION 'proposed/13 ön koşulu: canlı tanım beklenenden farklı: %. Dosyayı yeni gövdeye uyarlayın.',
+            array_to_string(v_bad, ', ');
+    END IF;
+END
+$pre$;
 
 -- ---------------------------------------------------------------------------
 -- A) UX-08: app_config + get_app_config
@@ -1168,7 +1215,11 @@ $function$;
 
 -- ---------------------------------------------------------------------------
 -- H) HİJYEN: search_path'e pg_temp (gövdeye dokunmadan). handle_new_user ve
--- add_friend_by_code yukarıda yeniden yazıldı.
+-- add_friend_by_code yukarıda yeniden yazıldı. delete_own_account: proposed/12
+-- (sırada 13'ten önce) gövdeyi zaten pg_temp'li yazar, bu satır o zaman
+-- etkisizdir; 12 uygulanmadıysa canlı gövdeye pg_temp ekler (13_down o
+-- durumda geri alır). handle_newsletter_subscription ve
+-- respond_friend_request'i proposed/14 sonra pg_temp'li gövdeyle yeniden yazar.
 -- ---------------------------------------------------------------------------
 ALTER FUNCTION public.cleanup_unconfirmed_duplicate_identity(text) SET search_path TO 'public', 'pg_temp';
 ALTER FUNCTION public.delete_own_account() SET search_path TO 'public', 'pg_temp';

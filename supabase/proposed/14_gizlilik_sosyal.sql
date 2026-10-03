@@ -11,17 +11,27 @@
 --
 -- 3 Ekim 2026'da CANLI tanımlar okunarak yazıldı (pg_get_functiondef,
 -- pg_policies, information_schema yetkileri, pg_default_acl, cron.job,
--- pg_trigger; canlı PostgreSQL 17.6). Değiştirilen her fonksiyonun canlı
--- gövdesi 14_gizlilik_sosyal_down.sql içinde birebir duruyor. Dosyanın
--- ilk adımı canlı gövdelerin md5'ini denetler: araya başka bir değişiklik
+-- pg_trigger; canlı PostgreSQL 17.6) ve proposed/13 UYGULANMIŞ duruma göre
+-- yeniden temellendirildi: handle_new_user ve add_friend_by_code 13'ün
+-- gövdesi üzerine kurulur (13'ün değişiklikleri korunur, 14'ünkiler
+-- eklenir); handle_newsletter_subscription ve respond_friend_request'in
+-- yeni gövdeleri 13'ün eklediği pg_temp'i taşır. Değiştirilen her
+-- fonksiyonun 13 uygulanmış hâldeki gövdesi 14_gizlilik_sosyal_down.sql
+-- içinde birebir duruyor. Dosyanın ilk adımı 13'ün uygulandığını ve
+-- gövdelerin md5'ini denetler: 13 yoksa ya da araya başka bir değişiklik
 -- girdiyse hiçbir şey yapmadan hata verir.
+--
+-- UYGULAMA SIRASI: 12 → 15 → 16 → 19 → 13 → 14 (supabase/proposed/README.md
+-- "Dosyalar ve uygulama sırası"). Geri alma ters sırada; 14_down 13
+-- uygulanmış hâle döner.
 --
 -- supabase/proposed/ CLI tarafından UYGULANMAZ; bu dosya doğrudan
 -- çalıştırılmaz (\quit).
 --
--- ADIMLAR (SQL Editor, kullanıcı çalıştırır)
+-- ADIMLAR (SQL Editor, kullanıcı çalıştırır; 13 uygulandıktan SONRA)
 --  1. Kuru çalıştırma: supabase/tests/proposed_14_gizlilik_sosyal_dryrun.sql
---     Sonda DRYRUN_RESULT hatası beklenir; her satır 'true' olmalı.
+--     Sonda DRYRUN_RESULT hatası beklenir; her satır 'true' olmalı. 13
+--     uygulanmamışsa 'proposed/14 ön koşulu: önce proposed/13 ...' hatası.
 --  2. Ürün kararlarını verin (aşağıda ÜRÜN ETKİSİ ve İSTEMCİ ÖN KOŞULU).
 --     Karar 'hayır' olan bölümü çıkarın ya da down dosyasındaki karşılığıyla
 --     değiştirin (o zaman DRYRUN'u da aynı biçimde düzeltip yeniden koşun).
@@ -54,7 +64,8 @@
 --    açık seçim) varsayılanı aşar. Aylık liste ve site listesi zamanla
 --    seyrekleşir; onboarding'e bir "Sıralamalarda görün" adımı önerilir.
 --  * ACC-06: Yeni hesaplarda görünen ad e-postanın yerel kısmından
---    türetilmez; ad yoksa (ya da istemcinin boş ad yedeği olan e-posta
+--    türetilmez; ad yoksa (ya da proposed/13'ün listesindeki yasaklı bir
+--    ifadeyi içeriyorsa ya da istemcinin boş ad yedeği olan e-posta
 --    yerel kısmıyla birebir aynıysa) 'Pomo 1234' biçiminde nötr bir ad
 --    yazılır (arkadaş kodundan türetilmez; kod gizli kalır). Google/Apple'da
 --    adın yalnızca ilk kelimesi alınır. Mevcut kullanıcıların adları
@@ -92,10 +103,16 @@
 --    saklama süreleri yazılmalı.
 --
 -- İLİŞKİLER (diğer öneriler)
+--  * proposed/13 (sunucu bütünlüğü): ZORUNLU ön koşul, 14'ten ÖNCE. 14
+--    13'ün yardımcılarını kullanır ve iki fonksiyonunu onun üzerine kurar.
+--    13 14'ten sonra uygulanamaz (13'ün ön koşulu durur); 13_down da 14
+--    yerindeyken durur (önce 14_down).
 --  * proposed/15 (aylık sıralama = çalışma ayı): 14 hem canlı hem 15
 --    uygulanmış gövdeyi tanır ve aylık sıralamayı o ay kuralıyla kurar.
---    15 istenirse 14'ten ÖNCE uygulanmalı; 14'ten SONRA uygulanamaz
---    (dönüş tipi farklı, CREATE OR REPLACE hata verir) ve gerekmez.
+--    Sırada 14'ten ÖNCE; 14'ten SONRA uygulanamaz (dönüş tipi farklı,
+--    CREATE OR REPLACE hata verir) ve gerekmez.
+--  * proposed/16 ve 19: çakışma yok (kategoriler / bekleme listesi
+--    kolonları); sırada 13'ten önce.
 --  * proposed/11 §2 (arkadaş RPC'leri): remove_friend, cancel_friend_request,
 --    get_outgoing_friend_requests burada CANLIYA UYUMLU gövdeyle (my_friend_ids
 --    gerekmeden, engel filtresiyle) ve 11 ile AYNI yanıt sözleşmesiyle
@@ -108,10 +125,10 @@
 --    engel filtresini kaldırır. UYGULAMAYIN.
 --  * proposed/03: aylık sıralama ve maskeleme REFERANS gövdesi; 14 kapsar.
 --  * proposed/12 (delete_own_account): çakışma yok; 14 delete_own_account'a
---    dokunmaz. Bekleme listesinin hesap silmede temizlenmesi (ACC-13'ün o
---    kısmı) 12'de. 12 uygulanırsa user_id'siz abonelik satırının silinmesi
---    onay kaydına 'unsubscribe_or_admin' kaynağıyla düşer; istenirse 12'deki
---    o DELETE'ten önce
+--    dokunmaz (sırada 12 ilk adım). Bekleme listesinin hesap silmede
+--    temizlenmesi (ACC-13'ün o kısmı) 12'de. 12 ile user_id'siz abonelik
+--    satırının silinmesi onay kaydına 'unsubscribe_or_admin' kaynağıyla
+--    düşer; istenirse 12'deki o DELETE'ten önce
 --    `PERFORM set_config('pomosprint.consent_source', 'account_deleted', true);`
 --    eklenebilir. Hesaba bağlı abonelik satırı cascade ile silinince kaynak
 --    zaten 'account_deleted' olur.
@@ -123,17 +140,25 @@
 BEGIN;
 
 -- ============================================================
--- 0) Ön koşul: değiştirilecek canlı gövdeler 3 Ekim 2026'dakiyle aynı mı?
+-- 0) Ön koşul: proposed/13 uygulanmış mı, değiştirilecek gövdeler
+--    beklenen hâlde mi?
 -- ============================================================
--- md5(pg_get_functiondef) canlıdan okundu. Farklıysa (araya başka bir
--- migration girdiyse) hiçbir şey yapılmadan durulur: bu dosyayı yeni
--- gövdeye uyarlayın. Aylık sıralama canlı ya da proposed/15 uygulanmış
+-- Uygulama sırası 12 → 15 → 16 → 19 → 13 → 14. Bu dosya handle_new_user ve
+-- add_friend_by_code'u 13'ün gövdesi üzerine kurar ve 13'ün yardımcılarını
+-- (clean_display_text, display_text_is_allowed, generate_friend_code,
+-- normalize_friend_code, app_config_int, friend_code_attempts) kullanır.
+-- md5(pg_get_functiondef) değerleri: dört fonksiyon için 13 UYGULANMIŞ hâl
+-- (handle_new_user ve add_friend_by_code 13'ün gövdesi;
+-- handle_newsletter_subscription ve respond_friend_request canlı gövde +
+-- 13'ün ALTER ... SET search_path 'public','pg_temp'i), diğerleri canlı
+-- (3 Ekim 2026; 12, 16, 19 ve 13 onlara dokunmaz). Farklıysa hiçbir şey
+-- yapılmadan durulur. Aylık sıralama canlı ya da proposed/15 uygulanmış
 -- hâlde olabilir (E bölümü ikisini de tanır).
 DO $pre$
 DECLARE
     v_expected constant jsonb := '{
-        "add_friend_by_code(text)": "d59affef7f113a3072d2de604bb9506f",
-        "respond_friend_request(uuid,boolean)": "461b0959105c85cde71d50a25d1d5074",
+        "add_friend_by_code(text)": "eab30b000bbd223a3eef0af8e9900b30",
+        "respond_friend_request(uuid,boolean)": "785731c7b2c628d65a5f9e84a60be5d5",
         "get_my_friends()": "c914de18b0e6f080c7b3fe4f4fead8b2",
         "get_incoming_friend_requests()": "de9f1fd811b87172bd7f59aff204bf66",
         "get_live_friends()": "174841fa81aff71912908ebcfe0935ff",
@@ -141,8 +166,8 @@ DECLARE
         "get_league_ranking(uuid)": "81232005815cf301aa8ce29e882d5139",
         "get_my_league_ranking()": "cdcb245dd779a9eb7b651ec5a27426c5",
         "get_public_alltime_leaderboard(integer)": "60aac1f74b39ab6af9c5399cf285c607",
-        "handle_new_user()": "ae6cedf2e0e0995ec759b69e20ada604",
-        "handle_newsletter_subscription()": "d909d0550cfd1894844757e2f0318609",
+        "handle_new_user()": "92dcc142fbec96ca2fb79a7aa3d14289",
+        "handle_newsletter_subscription()": "ecf943e2d250d60989ca04bd79e90152",
         "sanitize_profile_insert()": "c1eab282e0d125d278be390a2a187ea9"
     }';
     v_monthly_ok constant text[] := ARRAY[
@@ -152,6 +177,15 @@ DECLARE
     r record;
     v_bad text[] := '{}';
 BEGIN
+    IF to_regclass('public.app_config') IS NULL
+       OR to_regclass('public.friend_code_attempts') IS NULL
+       OR to_regprocedure('public.clean_display_text(text)') IS NULL
+       OR to_regprocedure('public.display_text_is_allowed(text)') IS NULL
+       OR to_regprocedure('public.generate_friend_code(integer)') IS NULL
+       OR to_regprocedure('public.normalize_friend_code(text)') IS NULL
+       OR to_regprocedure('public.app_config_int(text)') IS NULL THEN
+        RAISE EXCEPTION 'proposed/14 ön koşulu: önce proposed/13_sunucu_butunluk.sql uygulanmalı (sıra: 12 → 15 → 16 → 19 → 13 → 14).';
+    END IF;
     FOR r IN SELECT key, value FROM jsonb_each_text(v_expected) LOOP
         IF md5(pg_get_functiondef(to_regprocedure('public.' || r.key))) IS DISTINCT FROM r.value THEN
             v_bad := v_bad || r.key;
@@ -363,8 +397,8 @@ CREATE TRIGGER log_marketing_subscription_change
     AFTER INSERT OR DELETE ON public.marketing_subscribers
     FOR EACH ROW EXECUTE FUNCTION public.log_marketing_subscription_change();
 
--- Canlı gövde + kaynak/sürüm bilgisi + search_path pg_temp. Sözleşme aynı:
--- yalnızca 'newsletter' = 'true' okunur.
+-- Canlı gövde (proposed/13 yalnızca search_path'ine pg_temp eklemişti) +
+-- kaynak/sürüm bilgisi. Sözleşme aynı: yalnızca 'newsletter' = 'true' okunur.
 CREATE OR REPLACE FUNCTION public.handle_newsletter_subscription()
  RETURNS trigger
  LANGUAGE plpgsql
@@ -643,6 +677,15 @@ SELECT u.id, ops.email_hash(u.email), k.kind, true,
 -- ============================================================
 ALTER TABLE public.profiles ALTER COLUMN show_in_social_feed SET DEFAULT false;
 
+-- proposed/13'ün gövdesi üzerine kurulur; 13'ten KORUNANLAR: friend_code
+-- çakışmasında yeniden deneme (8 deneme), Crockford kod
+-- (generate_friend_code, uzunluk app_config'ten), adın temizlenmesi
+-- (clean_display_text) ve yasaklıysa sıradaki adaya düşülmesi
+-- (display_text_is_allowed), e-posta kopyası yazılmaması (KVKK-20),
+-- search_path'te pg_temp. 14'ün EKLEDİKLERİ: ad e-postadan türetilmez
+-- (ACC-06; aday yoksa nötr ad), Google/Apple'da yalnızca ilk kelime,
+-- görünürlük yalnızca açık seçimle (KVKK-01), kayıt onaylarının deftere
+-- yazılması (KVKK-10).
 CREATE OR REPLACE FUNCTION public.handle_new_user()
  RETURNS trigger
  LANGUAGE plpgsql
@@ -653,49 +696,75 @@ declare
   v_meta jsonb := coalesce(new.raw_user_meta_data, '{}'::jsonb);
   v_provider text := coalesce(nullif(new.raw_app_meta_data->>'provider', ''), 'email');
   v_local text := lower(split_part(btrim(coalesce(new.email, '')), '@', 1));
+  v_candidates text[];
+  v_candidate text;
+  v_clean text;
   v_name text;
+  v_code text;
+  v_code_length integer;
+  v_constraint text;
   v_terms text;
   v_privacy text;
   v_marketing boolean;
   v_occurred timestamptz;
 begin
   -- Görünen ad (ACC-06): e-postadan TÜRETİLMEZ. E-posta kaydında formdaki
-  -- ad; Google/Apple'da yalnızca ilk kelime. Ad yoksa ya da istemcinin
-  -- boş ad yedeği olan e-posta yerel kısmıyla birebir aynıysa nötr ad.
+  -- ad (name, full_name); Google/Apple'da yalnızca ilk kelime (given_name,
+  -- full_name, name). Her aday temizlenir ve 50 karaktere kısaltılır
+  -- (proposed/13); boşsa, yasaklı bir ifade içeriyorsa ya da istemcinin
+  -- boş ad yedeği olan e-posta yerel kısmıyla birebir aynıysa sıradaki
+  -- adaya geçilir. Hiçbiri uygun değilse nötr ad ('Pomo 1234').
   if v_provider = 'email' then
-    v_name := coalesce(nullif(btrim(v_meta->>'name'), ''), nullif(btrim(v_meta->>'full_name'), ''));
+    v_candidates := array[v_meta->>'name', v_meta->>'full_name'];
   else
-    v_name := nullif((regexp_split_to_array(
-                coalesce(nullif(btrim(v_meta->>'given_name'), ''),
-                         nullif(btrim(v_meta->>'full_name'), ''),
-                         nullif(btrim(v_meta->>'name'), ''), ''), '\s+'))[1], '');
+    v_candidates := array[v_meta->>'given_name', v_meta->>'full_name', v_meta->>'name'];
   end if;
-  if v_name is not null and v_local <> '' and v_name = v_local then
-    v_name := null;
-  end if;
-  v_name := left(coalesce(v_name, ops.neutral_display_name()), 50);
+  foreach v_candidate in array v_candidates loop
+    v_clean := public.clean_display_text(v_candidate);
+    if v_provider <> 'email' then
+      v_clean := (regexp_split_to_array(coalesce(v_clean, ''), '\s+'))[1];
+    end if;
+    v_clean := btrim(left(v_clean, 50));
+    if v_clean <> '' and v_clean <> v_local and public.display_text_is_allowed(v_clean) then
+      v_name := v_clean;
+      exit;
+    end if;
+  end loop;
+  v_name := coalesce(v_name, ops.neutral_display_name());
 
-  insert into public.profiles (id, name, email, avatar_id, total_minutes, lifetime_points, friend_code,
-                               show_in_social_feed)
-  values (
-    new.id,
-    v_name,
-    new.email,
-    -- Yalnızca varsayılan (ücretsiz) avatarlar kayıtta seçilebilir;
-    -- önceden 200 kumluk avatar_1_gamer bedava takılıyordu.
-    coalesce(
-      (select a.id from public.avatars a
-        where a.id = v_meta->>'avatar_id' and a.is_default and a.is_active),
-      'avatar_16_basic'),
-    0,
-    0,
-    upper(substr(replace(gen_random_uuid()::text,'-',''),1,6)),
-    -- KVKK-01: herkese açık görünürlük yalnızca açık seçimle.
-    coalesce(v_meta->>'show_in_social_feed', '') = 'true'
-  )
-  on conflict (id) do update set
-    email = excluded.email,
-    name = coalesce(excluded.name, public.profiles.name);
+  v_code_length := coalesce(public.app_config_int('friend_code_length'), 6);
+
+  for v_attempt in 1..8 loop
+    -- Kod alt işlemin dışında üretilir; çakışmada yalnızca INSERT geri alınır.
+    v_code := public.generate_friend_code(v_code_length);
+    begin
+      insert into public.profiles (id, name, avatar_id, total_minutes, lifetime_points, friend_code,
+                                   show_in_social_feed)
+      values (
+        new.id,
+        v_name,
+        -- Yalnızca varsayılan (ücretsiz) avatarlar kayıtta seçilebilir;
+        -- önceden 200 kumluk avatar_1_gamer bedava takılıyordu.
+        coalesce(
+          (select a.id from public.avatars a
+            where a.id = v_meta->>'avatar_id' and a.is_default and a.is_active),
+          'avatar_16_basic'),
+        0,
+        0,
+        v_code,
+        -- KVKK-01: herkese açık görünürlük yalnızca açık seçimle.
+        coalesce(v_meta->>'show_in_social_feed', '') = 'true'
+      )
+      on conflict (id) do update set
+        name = coalesce(excluded.name, public.profiles.name);
+      exit;
+    exception when unique_violation then
+      get stacked diagnostics v_constraint = constraint_name;
+      if v_constraint is distinct from 'profiles_friend_code_key' or v_attempt = 8 then
+        raise;
+      end if;
+    end;
+  end loop;
 
   -- KVKK-10: kayıt formundaki onaylar. Kayıt yazılamazsa kayıt BOZULMAZ.
   begin
@@ -725,12 +794,18 @@ end;
 $function$;
 
 -- İstemcinin yedek profil oluşturma yolu (normalde handle_new_user yazar):
--- e-postanın yerel kısmı ad olarak kabul edilmez.
+-- e-postanın yerel kısmı ad olarak kabul edilmez. E-posta, isteğin JWT'sinden
+-- okunur: proposed/13'ün discard_profile_email trigger'ı (adı alfabetik
+-- olarak önce, yani önce çalışır) NEW.email'i zaten boşaltır ve KVKK-20'nin
+-- 2. aşamasında kolon kalkar. Trigger SECURITY DEFINER değil; authenticated
+-- auth.users'ı okuyamaz, JWT'deki 'email' talebini okuyabilir.
 CREATE OR REPLACE FUNCTION public.sanitize_profile_insert()
  RETURNS trigger
  LANGUAGE plpgsql
  SET search_path TO 'public', 'pg_temp'
 AS $function$
+DECLARE
+    v_email text;
 BEGIN
     IF current_user IN ('authenticated', 'anon') THEN
         IF NEW.avatar_id IS NULL OR NOT EXISTS (
@@ -739,8 +814,9 @@ BEGIN
         ) THEN
             NEW.avatar_id := 'avatar_16_basic';
         END IF;
-        IF NEW.name IS NOT NULL AND NEW.email IS NOT NULL
-           AND btrim(NEW.name) = lower(split_part(btrim(NEW.email), '@', 1)) THEN
+        v_email := btrim(coalesce(auth.jwt() ->> 'email', ''));
+        IF NEW.name IS NOT NULL AND v_email <> ''
+           AND btrim(NEW.name) = lower(split_part(v_email, '@', 1)) THEN
             NEW.name := 'Pomo ' || lpad((floor(random() * 10000))::integer::text, 4, '0');
         END IF;
     END IF;
@@ -752,9 +828,10 @@ $function$;
 -- yerel kısmıyla birebir aynı olan (canlı handle_new_user'ın ya da istemci
 -- yedeğinin ürettiği) mevcut profillere nötr ad verir. Büyük harfle
 -- yazılmış ad ('Ahmet' / ahmet@...) kullanıcının seçimi sayılır, dokunulmaz.
--- Önizleme: select count(*) from public.profiles p
---           where p.name in (left(split_part(btrim(p.email), '@', 1), 50),
---                            left(lower(split_part(btrim(p.email), '@', 1)), 50));
+-- E-posta auth.users'tan okunur (proposed/13 sonrası profiles.email boş).
+-- Önizleme: select count(*) from public.profiles p join auth.users u on u.id = p.id
+--           where p.name in (left(split_part(btrim(u.email), '@', 1), 50),
+--                            left(lower(split_part(btrim(u.email), '@', 1)), 50));
 CREATE FUNCTION ops.neutralize_email_derived_names()
  RETURNS integer
  LANGUAGE plpgsql
@@ -765,8 +842,10 @@ DECLARE
 BEGIN
     UPDATE public.profiles p
        SET name = ops.neutral_display_name()
-     WHERE p.name IN (left(split_part(btrim(p.email), '@', 1), 50),
-                      left(lower(split_part(btrim(p.email), '@', 1)), 50));
+      FROM auth.users u
+     WHERE u.id = p.id
+       AND p.name IN (left(split_part(btrim(u.email), '@', 1), 50),
+                      left(lower(split_part(btrim(u.email), '@', 1)), 50));
     GET DIAGNOSTICS v_count = ROW_COUNT;
     RETURN v_count;
 END;
@@ -798,9 +877,14 @@ CREATE TABLE public.friend_request_rejections (
 ALTER TABLE public.friend_request_rejections ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON public.friend_request_rejections FROM PUBLIC, anon, authenticated;
 
--- Canlı gövde + engel, ret bekleme süresi, hız sınırı, kod normalizasyonu,
--- makine-okunur 'code' (istemci friends_sheet.dart bu kodları tanıyor;
--- tanımadığı kodda Türkçe arayüzde 'message' gösterir).
+-- proposed/13'ün gövdesi üzerine kurulur; 13'ten KORUNANLAR: saatlik deneme
+-- sınırı (friend_code_attempts, app_config), Crockford normalizasyonu
+-- (normalize_friend_code), makine-okunur 'code', kabul edilmeden yanıtta
+-- karşı tarafın id'si dönmemesi (KVKK-17). 14'ün EKLEDİKLERİ: engel (seni
+-- engelleyen 'not_found' görür, engellediğin 'blocked'), iki yönlü
+-- 'already_friends', ret sonrası 7 gün bekleme ('cooldown'), saatte 20
+-- bekleyen istek ('rate_limited'). İstemci friends_sheet.dart bu kodları
+-- tanıyor; tanımadığı kodda Türkçe arayüzde 'message' gösterir.
 CREATE OR REPLACE FUNCTION public.add_friend_by_code(p_code text)
  RETURNS jsonb
  LANGUAGE plpgsql
@@ -812,13 +896,32 @@ declare
   v_code text;
   v_target record;
   v_reverse_pending boolean;
+  v_limit integer;
+  v_attempts integer;
   v_recent integer;
 begin
   if v_uid is null then
     raise exception 'not authenticated';
   end if;
 
-  v_code := upper(regexp_replace(coalesce(p_code, ''), '\s', '', 'g'));
+  -- proposed/13: deneme sayacı RAISE ile değil normal dönüşle biter; işlemle birlikte kalıcıdır.
+  v_limit := coalesce(public.app_config_int('friend_code_attempts_per_hour'), 20);
+  insert into public.friend_code_attempts as a (user_id, window_started_at, attempts)
+  values (v_uid, now(), 1)
+  on conflict (user_id) do update set
+    window_started_at = case when a.window_started_at <= now() - interval '1 hour'
+                             then now() else a.window_started_at end,
+    attempts = case when a.window_started_at <= now() - interval '1 hour'
+                    then 1 else a.attempts + 1 end
+  returning a.attempts into v_attempts;
+
+  if v_attempts > v_limit then
+    return jsonb_build_object('success', false, 'code', 'rate_limited',
+      'message', 'Çok fazla deneme yaptın. Lütfen bir süre sonra tekrar dene.');
+  end if;
+
+  -- proposed/13: boşluk, tire, alt çizgi, nokta atılır; O→0, I/L→1.
+  v_code := public.normalize_friend_code(p_code);
 
   select id, name, avatar_id, lifetime_points, total_minutes
     into v_target
@@ -896,17 +999,20 @@ begin
   insert into public.friendships (user_id, friend_id, status) values (v_uid, v_target.id, 'pending')
     on conflict (user_id, friend_id) do update set status = 'pending';
 
+  -- proposed/13: kabul edilmeden karşı tarafın kimliği dönmez (KVKK-17).
   return jsonb_build_object(
     'success', true,
     'code', 'request_sent',
     'auto_accepted', false,
-    'friend', jsonb_build_object('id', v_target.id, 'name', v_target.name, 'avatar_id', v_target.avatar_id)
+    'friend', jsonb_build_object('name', v_target.name, 'avatar_id', v_target.avatar_id)
   );
 end;
 $function$;
 REVOKE ALL ON FUNCTION public.add_friend_by_code(text) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.add_friend_by_code(text) TO authenticated, service_role;
 
+-- Canlı gövde (proposed/13 yalnızca search_path'ine pg_temp eklemişti) +
+-- engel kontrolü, makine-okunur 'code', ret kaydı (cooldown için).
 CREATE OR REPLACE FUNCTION public.respond_friend_request(p_from_user_id uuid, p_accept boolean)
  RETURNS jsonb
  LANGUAGE plpgsql

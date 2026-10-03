@@ -1,8 +1,9 @@
 -- ============================================================
 -- GERİ ALMA: 16_categories_order_and_privileges
 -- create_category ve setup_onboarding_categories'i 3 Ekim 2026 CANLI
--- tanımlarına döndürür, trigger'ı kaldırır, DELETE politikası ve tablo
--- düzeyi UPDATE/DELETE yetkilerini geri verir.
+-- tanımlarına (md5 birebir; satır sonu boşlukları dahil) döndürür,
+-- trigger'ı kaldırır, DELETE politikası ve tablo düzeyi UPDATE/DELETE
+-- yetkilerini geri verir (16'nın kolon bazlı UPDATE yetkileri kalkar).
 -- C bölümündeki tek seferlik yeniden numaralandırma GERİ ALINMAZ (görünen
 -- sırayı değiştirmediği için gerek yok).
 -- Çalıştırmak için \echo ve \quit satırlarını silin.
@@ -44,8 +45,8 @@ BEGIN
     END IF;
 
     -- Check current active count
-    SELECT count(*) INTO v_active_count
-    FROM public.categories
+    SELECT count(*) INTO v_active_count 
+    FROM public.categories 
     WHERE user_id = v_uid AND is_archived = false;
 
     IF v_active_count >= v_limit THEN
@@ -58,7 +59,7 @@ BEGIN
 
     -- Check for exact active name duplicate
     IF EXISTS (
-        SELECT 1 FROM public.categories
+        SELECT 1 FROM public.categories 
         WHERE user_id = v_uid AND name = p_name AND is_archived = false
     ) THEN
         RAISE EXCEPTION 'Bu isimde aktif bir kategori zaten var.';
@@ -104,8 +105,8 @@ BEGIN
     END IF;
 
     -- Get current active count
-    SELECT count(*) INTO v_active_count
-    FROM public.categories
+    SELECT count(*) INTO v_active_count 
+    FROM public.categories 
     WHERE user_id = v_uid AND is_archived = false;
 
     -- Insert loop
@@ -118,15 +119,15 @@ BEGIN
 
         -- Ignore duplicates silently
         IF NOT EXISTS (
-            SELECT 1 FROM public.categories
+            SELECT 1 FROM public.categories 
             WHERE user_id = v_uid AND name = v_cat->>'name' AND is_archived = false
         ) THEN
             INSERT INTO public.categories (user_id, name, color_hex, icon_name, sort_order)
             VALUES (
-                v_uid,
-                v_cat->>'name',
-                v_cat->>'color_hex',
-                v_cat->>'icon_name',
+                v_uid, 
+                v_cat->>'name', 
+                v_cat->>'color_hex', 
+                v_cat->>'icon_name', 
                 v_active_count
             );
             v_active_count := v_active_count + 1;
@@ -144,6 +145,9 @@ GRANT EXECUTE ON FUNCTION public.setup_onboarding_categories(jsonb) TO authentic
 DROP TRIGGER IF EXISTS place_unarchived_category_last ON public.categories;
 DROP FUNCTION IF EXISTS public.place_unarchived_category_last();
 
+-- 16'nın kolon bazlı UPDATE yetkileri tablo düzeyi REVOKE ile birlikte kalkar;
+-- ardından canlıdaki tablo düzeyi UPDATE/DELETE geri verilir.
+REVOKE UPDATE ON public.categories FROM authenticated;
 GRANT UPDATE, DELETE ON public.categories TO authenticated;
 DROP POLICY IF EXISTS "Categories delete policy" ON public.categories;
 CREATE POLICY "Categories delete policy" ON public.categories
