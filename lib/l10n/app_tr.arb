@@ -247,6 +247,20 @@
   "statsOtherCategory": "Diğer",
   "statsShowAsDuration": "Süre olarak göster",
   "statsShowAsPercent": "Yüzde olarak göster",
+  "statsOfflinePendingOnly": "Sunucuya bağlanılamadı; yalnızca bu cihazda senkron bekleyen seanslar gösteriliyor.",
+  "statsOtherCategories": "Diğer kategoriler",
+  "statsMoreCategories": "+{count} kategori daha",
+  "@statsMoreCategories": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "statsGoalReached": "Bugünkü hedefine ulaştın, tebrikler!",
+  "statsTipFocusBlock": "Seansa başlamadan önce o seansta bitireceğin tek bir işi belirle.",
+  "statsWeekNotStarted": "Henüz başlamadın",
+  "statsWeekChangeSame": "Önceki haftanın aynı günleriyle aynı",
+  "statsGoalPomodorosNeeded": "Hedef için {count} Pomodoro",
+  "@statsGoalPomodorosNeeded": {
+    "placeholders": { "count": { "type": "int" } }
+  },
   "authErrWeakPassword": "Şifren çok zayıf. En az 1 küçük harf (a-z), 1 büyük harf (A-Z) ve 1 rakam (0-9) içermeli.",
   "authErrEmailExistsResent": "Bu e-posta adresi zaten kayıtlı! Doğrulama bağlantısı e-postana tekrar gönderildi.",
   "authErrInvalidCredentials": "E-posta adresi veya şifre hatalı ya da hesabın henüz onaylanmamış olabilir. Şifreni kontrol et; sorun sürerse aşağıdan onay e-postasını tekrar gönderebilirsin.",
@@ -490,6 +504,7 @@
   "archivedCategoriesHeader": "Arşivlenmiş Kategoriler",
   "archivedCategoriesDesc": "Bu kategoriler ders seçicide görünmez ama geçmiş raporlarda yer alır.",
   "unarchiveTooltip": "Arşivi Aç",
+  "categoryLastActiveRequired": "En az bir aktif kategorin olmalı. Önce yeni bir kategori ekle ya da arşivden birini çıkar.",
   "timerResetBtn": "Sıfırla",
   "timerResetConfirmTitle": "Seans sıfırlansın mı?",
   "timerResetConfirmBody": "Bu seans kaydedilmeden silinecek; puan ve kum kazanmayacaksın. Bu işlem geri alınamaz.",

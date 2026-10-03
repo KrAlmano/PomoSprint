@@ -4,6 +4,7 @@ import '../l10n/app_localizations.dart';
 import '../theme.dart';
 import '../utils/responsive.dart';
 import 'shell_stat_pill.dart';
+import 'study_day_builder.dart';
 
 /// Ana kabuğun üst çubuğu: seri (yalnızca Pomo sekmesinde), Puan ve Kum
 /// rozetleri, arkadaşlar ve profil düğmeleri.
@@ -13,6 +14,9 @@ import 'shell_stat_pill.dart';
 AppBar buildShellAppBar(
   BuildContext context, {
   required int? streakDays,
+  /// Verilirse seri bununla ve her çalışma günü dönümünde (04:00) yeniden
+  /// hesaplanır; [streakDays] yok sayılır.
+  int Function(DateTime now)? streakAt,
   required int points,
   required int coins,
   required VoidCallback onStatsTap,
@@ -34,8 +38,8 @@ AppBar buildShellAppBar(
     elevation: 0,
     toolbarHeight: toolbarHeight,
     titleSpacing: 16,
-    // Seri yalnızca Pomo sekmesinde gösterilir (streakDays null değilse).
-    title: streakDays != null
+    // Seri yalnızca Pomo sekmesinde gösterilir (streakDays/streakAt null değilse).
+    title: (streakDays != null || streakAt != null)
         ? FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
@@ -44,13 +48,15 @@ AppBar buildShellAppBar(
               children: [
                 const Icon(Icons.local_fire_department, color: Colors.deepOrange, size: 24),
                 const SizedBox(width: 6),
-                Text(
-                  '$streakDays',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? AppColors.darkPrimary : AppColors.primary,
-                    letterSpacing: -0.5,
+                StudyDayBuilder(
+                  builder: (context, now) => Text(
+                    '${streakAt != null ? streakAt(now) : streakDays}',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? AppColors.darkPrimary : AppColors.primary,
+                      letterSpacing: -0.5,
+                    ),
                   ),
                 ),
               ],

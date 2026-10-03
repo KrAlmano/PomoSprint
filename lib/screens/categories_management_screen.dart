@@ -15,14 +15,18 @@ import '../widgets/auth/category_name_dialog.dart';
 class CategoriesManagementScreen extends StatefulWidget {
   final bool isPremium;
 
-  const CategoriesManagementScreen({super.key, this.isPremium = false});
+  /// Testte sahte servis verilir; uygulamada [SupabaseService.instance].
+  @visibleForTesting
+  final SupabaseService? service;
+
+  const CategoriesManagementScreen({super.key, this.isPremium = false, this.service});
 
   @override
   State<CategoriesManagementScreen> createState() => _CategoriesManagementScreenState();
 }
 
 class _CategoriesManagementScreenState extends State<CategoriesManagementScreen> {
-  final _service = SupabaseService.instance;
+  late final SupabaseService _service = widget.service ?? SupabaseService.instance;
   List<CourseCategory> _activeCategories = [];
   List<CourseCategory> _archivedCategories = [];
   bool _isLoading = true;
@@ -48,7 +52,9 @@ class _CategoriesManagementScreenState extends State<CategoriesManagementScreen>
 
   void _onCategoriesChanged() => _loadCategories(showSpinner: false);
 
-  Future<void> _loadCategories({bool showSpinner = true}) async {
+  /// [silent]: başarısızlıkta 'yüklenemedi' uyarısı gösterilmez (ör. kaydetme
+  /// hatasından sonraki eşitleme okuması 'kaydedilemedi' uyarısını ezmesin).
+  Future<void> _loadCategories({bool showSpinner = true, bool silent = false}) async {
     // Üst üste gelen yüklemelerde yalnızca en sonuncunun sonucu uygulanır.
     final generation = ++_loadGeneration;
     if (showSpinner) {
@@ -74,7 +80,7 @@ class _CategoriesManagementScreenState extends State<CategoriesManagementScreen>
         _isLoading = false;
         _loadFailed = true;
       });
-      if (_hasLoaded) _showSnack(AppLocalizations.of(context)!.categoriesLoadError);
+      if (_hasLoaded && !silent) _showSnack(AppLocalizations.of(context)!.categoriesLoadError);
     }
   }
 
@@ -93,9 +99,10 @@ class _CategoriesManagementScreenState extends State<CategoriesManagementScreen>
   }
 
   /// Bir kategori değişikliğini çalıştırır. Başarıda liste, servisin
-  /// categoriesRevision bildirimiyle yenilenir; hatada mesaj gösterilir ve
-  /// (iyimser değişiklikleri geri almak için) liste sunucudan tekrar okunur.
-  Future<void> _mutate(Future<void> Function() action) async {
+  /// categoriesRevision bildirimiyle yenilenir. Hatada iyimser değişiklik
+  /// geri alınır ([rollback]), 'kaydedilemedi' mesajı gösterilir ve liste
+  /// sunucudaki hâliyle (kısmen yazılmış olabilir) sessizce yeniden okunur.
+  Future<void> _mutate(Future<void> Function() action, {VoidCallback? rollback}) async {
     if (_isBusy) return;
     setState(() => _isBusy = true);
     try {
@@ -103,8 +110,9 @@ class _CategoriesManagementScreenState extends State<CategoriesManagementScreen>
     } catch (e) {
       debugPrint('Kategori işlemi başarısız: $e');
       if (!mounted) return;
+      if (rollback != null) setState(rollback);
       _showSnack(_errorText(AppLocalizations.of(context)!, e));
-      await _loadCategories(showSpinner: false);
+      await _loadCategories(showSpinner: false, silent: true);
     } finally {
       if (mounted) setState(() => _isBusy = false);
     }
@@ -117,13 +125,16 @@ class _CategoriesManagementScreenState extends State<CategoriesManagementScreen>
       return;
     }
 
+    // Diyalogda ad arayüz dilinde gösterilir (ör. 'Matematik' → 'Mathematics').
+    final shownName = cat == null ? null : LanguageService.instance.translateCatName(cat.name);
     final result = await CategoryNameDialog.show(
       context,
       title: cat == null ? l10n.newCategoryDialogTitle : l10n.editCategoryDialogTitle,
       confirmLabel: cat == null ? l10n.addBtn : l10n.save,
       hintText: l10n.categoryNameHint,
-      initialName: cat == null ? null : LanguageService.instance.translateCatName(cat.name),
-      initialColorHex: cat?.colorHex,
+      initialName: shownName,
+      // Yeni kategori, aktiflerde kullanılmayan ilk palet rengiyle açılır.
+      initialColorHex: cat?.colorHex ?? firstUnusedPaletteColor(_activeCategories.map((c) => c.colorHex)),
       // Sunucu kuralıyla aynı: ad yalnızca aktif kategoriler arasında benzersiz.
       takenNames: _activeCategories.where((c) => c.id != cat?.id).map((c) => c.name),
     );
@@ -133,20 +144,34 @@ class _CategoriesManagementScreenState extends State<CategoriesManagementScreen>
       if (cat == null) {
         await _service.createCategory(result.name, result.colorHex, 'book');
       } else {
-        // Ad değişmediyse (yalnızca çeviri gösterildiyse) sunucudaki ad korunur.
-        final unchanged = categoryNameKey(result.name) == categoryNameKey(cat.name);
-        await _service.updateCategory(cat.id, unchanged ? cat.name : result.name, result.colorHex, cat.iconName);
+        final name = categoryNameToSave(storedName: cat.name, shownName: shownName!, editedName: result.name);
+        await _service.updateCategory(cat.id, name, result.colorHex, cat.iconName);
       }
     });
   }
 
   Future<void> _reorder(int oldIndex, int newIndex) async {
+    final previous = List.of(_activeCategories);
     setState(() {
       final item = _activeCategories.removeAt(oldIndex);
       _activeCategories.insert(newIndex, item);
     });
     final orderedIds = _activeCategories.map((e) => e.id).toList();
-    await _mutate(() => _service.updateCategoryOrders(orderedIds));
+    await _mutate(
+      () => _service.updateCategoryOrders(orderedIds),
+      rollback: () => _activeCategories = previous,
+    );
+  }
+
+  // Son aktif kategori arşivlenmez: sayaçta seçilecek kategori kalmaz ve
+  // kabuk boş listeyi doldurmak için arşivlenen kategorinin kopyasını
+  // açıyordu.
+  void _archive(CourseCategory c) {
+    if (_activeCategories.length <= 1) {
+      _showSnack(AppLocalizations.of(context)!.categoryLastActiveRequired);
+      return;
+    }
+    _mutate(() => _service.archiveCategory(c.id));
   }
 
   @override
@@ -206,7 +231,7 @@ class _CategoriesManagementScreenState extends State<CategoriesManagementScreen>
                                 IconButton(icon: const Icon(Icons.edit), onPressed: () => _showCategoryDialog(cat: c)),
                                 IconButton(
                                   icon: const Icon(Icons.archive),
-                                  onPressed: () => _mutate(() => _service.archiveCategory(c.id)),
+                                  onPressed: () => _archive(c),
                                   tooltip: l10n.archiveCategoryTooltip,
                                 ),
                                 const Icon(Icons.drag_handle, color: Colors.grey),

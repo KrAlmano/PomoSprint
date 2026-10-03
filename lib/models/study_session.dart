@@ -6,6 +6,13 @@ class StudySession {
   final String categoryName;
   final String? categoryId;
   final String? colorHex;
+
+  /// Kategorinin sunucudaki ikonu (arşivlenmiş kategoriler dahil).
+  final String? iconName;
+
+  /// İstemcinin seansa verdiği kimlik (idempotency anahtarı). Kuyrukta hâlâ
+  /// bekleyen bir kayıtla aynı seans olup olmadığını anlamak için.
+  final String? clientUuid;
   final int minutes;         // Maps to 'duration_minutes' in DB
   final int pomodoros;       // Computed locally from minutes
 
@@ -23,6 +30,8 @@ class StudySession {
     required this.categoryName,
     this.categoryId,
     this.colorHex,
+    this.iconName,
+    this.clientUuid,
     required this.minutes,
     required this.pomodoros,
     this.startedAt,
@@ -45,9 +54,12 @@ class StudySession {
     return StudySession(
       id: json['id'] as String,
       userId: json['user_id'] as String,
-      categoryName: joinedName ?? json['category'] as String? ?? 'Diğer',
+      // category sütunu NOT NULL; boş ad yalnızca bozuk kayıtta (ekranda 'Diğer').
+      categoryName: joinedName ?? json['category'] as String? ?? '',
       categoryId: json['category_id'] as String?,
       colorHex: categories is Map ? categories['color_hex'] as String? : null,
+      iconName: categories is Map ? categories['icon_name'] as String? : null,
+      clientUuid: json['client_uuid'] as String?,
       minutes: duration,
       pomodoros: duration > 0 ? (duration ~/ 25) : 0,
       startedAt: startedRaw == null ? null : DateTime.parse(startedRaw).toLocal(),

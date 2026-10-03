@@ -99,9 +99,11 @@ class SupabaseService {
       'show_in_social_feed, user_segment, daily_goal_minutes, birth_year, '
       'onboarding_completed_at';
 
+  // client_uuid: kuyrukta kalmış ama sunucuya ulaşmış seans istatistikte iki
+  // kez sayılmasın diye. icon_name: arşivlenmiş kategorinin ikonu için.
   static const String _studySessionColumns =
-      'id, user_id, category, category_id, duration_minutes, started_at, completed_at, '
-      'categories(name, color_hex)';
+      'id, user_id, category, category_id, duration_minutes, started_at, completed_at, client_uuid, '
+      'categories(name, color_hex, icon_name)';
 
   static const String _savedUserKey = 'saved_user';
   static const String _avatarCatalogKey = 'avatar_catalog_v1';
@@ -1307,7 +1309,12 @@ class SupabaseService {
           .select('id, name, color_hex, icon_name, sort_order, is_archived')
           .eq('user_id', uid);
       if (!includeArchived) query = query.eq('is_archived', false);
-      return query.order('sort_order', ascending: true);
+      // sort_order canlıda çakışabiliyor (create_category aktif sayısını
+      // yazıyor); eşitlikte sıra deterministik olsun diye ek anahtarlar.
+      return query
+          .order('sort_order', ascending: true)
+          .order('created_at', ascending: true)
+          .order('id', ascending: true);
     });
     return rows.map(CourseCategory.fromServerRow).toList();
   }

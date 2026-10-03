@@ -50,7 +50,7 @@
 | `flutter pub get` | İlk kurulum | Hata yok |
 | `flutter gen-l10n` | Her `.arb` değişikliğinden sonra | `lib/l10n/app_localizations*.dart` yeniden üretilir |
 | `flutter analyze` | Her değişiklikten sonra | `No issues found!` |
-| `flutter test` | Her değişiklikten sonra | Hepsi yeşil (8 dosya: session_queue, session_sync, server_clock, study_day, stats_calculator, timer_persistence, user_model, avatar_model) |
+| `flutter test` | Her değişiklikten sonra | Hepsi yeşil (birim + widget testleri; raporlar için `reports_correctness_test`, `reports_findings_test`, kategoriler için `categories_findings_test`). Gün hesabına dokunduysan `TZ=America/New_York flutter test` ile de çalıştır |
 | `flutter run --profile` / `--release` | Gerçek seans ve puan testi | Debug build'de sayaç 5/10 sn'dir, sunucu bu seansları reddeder |
 | `supabase/tests/run_local.sh` | SQL değişikliği; **yalnızca yerel Postgres** | ASSERT'ler geçer. `live_audit_fixes` varsayılan olarak atlanır |
 | `python3 landing/tools/sync_partials.py --check` | Site değişikliğinden sonra | Çıkış kodu 0 |
@@ -119,7 +119,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 | `lib/models/` | `UserModel`, `CourseCategory`, `StudySession`, `AvatarCharacter` (gömülü yedek katalog dahil) |
 | `lib/widgets/` | `stats/`, `social/`, `auth/` alt klasörleri; kum saati, avatar, lig bilgi sayfası, shell rozetleri |
 | `lib/l10n/` | `app_tr.arb` (şablon), `app_en.arb` ve **üretilen** `app_localizations*.dart` (elle düzenlenmez) |
-| `test/` | 8 birim test dosyası (widget ve E2E testi yok) |
+| `test/` | Birim ve widget testleri (E2E yok). `test/support/fake_supabase_service.dart`: Raporlar ve Kategorilerim'e `service:` ile verilen sahte servis |
 | `supabase/migrations/` | İleri migration'lar. Yalnızca `20261003150000_live_audit_fixes` canlıda (§4.6) |
 | `supabase/rollbacks/` | Down betikleri; CLI uygulamaz |
 | `supabase/proposed/` | Canlıya uygulanmamış öneriler (`01`–`11`). Her dosya `\quit` ile başlar |
@@ -179,7 +179,8 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 - `ownProfileColumns` `email` içermez; e-posta oturumdan gelir. `profiles`'ı e-postayla filtreleme, `id` ile güncelle.
 
 **Tuzaklar**
-- PGRST202 yedekleri: `fetchFriends` / `fetchPendingFriendRequests` (RPC canlıda var, yedek ölü kod) ve `updateCategoryOrders` (`reorder_categories` canlıda **yok**, her zaman tek upsert'e düşer; limit üstü aktif kategorisi olan kullanıcıda hata verebilir).
+- PGRST202 yedekleri: `fetchFriends` / `fetchPendingFriendRequests` (RPC canlıda var, yedek ölü kod).
+- `updateCategoryOrders` aktif kategoriler için **paralel** `update(sort_order)` yapar; `reorder_categories` çağrılmaz (canlıda yok), upsert de yok. Kısmi başarısızlıkta sıra karışabilir: Kategorilerim hata olunca iyimser sırayı geri alır ve listeyi sessizce yeniden okur. `sort_order` canlıda çakışabilir (`create_category` aktif sayısını yazıyor); istemci `sort_order, created_at, id` ile sıralar. Kalıcı düzeltme `proposed/13`.
 - Prefs anahtarları: `saved_user`, `saved_categories_<email>`, `pending_sessions_uid_<uid>` (eski `pending_sessions_<email>` ilk erişimde taşınır), `rejected_sessions_uid_<uid>`, `rejected_sessions_unseen_uid_<uid>`, `active_session_uid_<key>`, `avatar_catalog_v1`, `daily_pomo_goal` (eski, bir kez taşınır), `league_info_shown_<uid>`, `hidden_users_uid_<uid>` (gizlenen kullanıcılar), `app_language_code`, `theme_mode`, `notifications_enabled`, `notification_permission_asked`.
 - Hesap silme (`deleteUserAccount` → `clearDeletedAccountLocalData`) kullanıcıya bağlı tüm anahtarları siler ve `TimerPersistence.retireOwner(uid)` ile sayaç ekranının dispose'da seansı yeniden yazmasını engeller. Yeni kullanıcıya bağlı anahtar eklersen oraya da ekle (`test/user_safety_test.dart`).
 - Avatar: `AvatarCharacter.byId` ve `allAvatars()` asla fırlatmaz / boş dönmez. Yine de listelerde korumasız `.first` kullanma.
@@ -192,14 +193,24 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 - Veriyi yalnızca `ReportsScreen` çeker; Haftalık ve Aylık ekranlar parametre alır.
 - Gün = çalışma günü, sınır yerel 04:00 (`studyDayOf`). Üçüncü bir gün kuralı icat etme.
 - Hafta Pazartesi-Pazar (`mondayOf`). Takvim adımı `DateTime(y, m, d + n)` / `addDays`; `Duration(days:)` kullanma (DST).
-- Bekleyen (kuyruktaki) seanslar istatistiğe `StatSession.fromPending` ile eklenir.
-- Günlük hedefin kaynağı `profiles.daily_goal_minutes` (`showDailyGoalSheet` → `updateDailyGoalMinutes`). Varsayılan 200 dk.
-- Kategori adları DB'de Türkçe saklanır; gösterirken `translateCatName`. 50 dk = 2 pomodoro.
+- Sunucu ve kuyruk seansları yalnızca `mergeStatSessions(remote, pendingStatSessions(queue), categories)` ile birleşir:
+  - `client_uuid`'si sunucu listesinde olan bekleyen seans atılır (yanıtı kaybolmuş seans iki kez sayılmaz). `_studySessionColumns` bu yüzden `client_uuid` içerir.
+  - `lastError == 'overlap'` olan bekleyen seans sayılmaz (sunucu onu hiç kabul etmez); kuyrukta ve bantta kalır.
+  - Bekleyen seansın günü kuyruğun gönderdiği düzeltilmiş saatle: `startedAt + clockOffsetMs` (yoksa o anki fark). Raporların "bugün"ü de sunucu saatiyle.
+  - Bekleyen seansın kategorisi kimlikle (yer tutucuda dilden bağımsız adla, `categoryMatchKey`) çözülür; ad, renk, ikon sunucu birleşiminden (arşivlenmiş dahil), yoksa aktif listeden.
+- Kategori toplamları **kimlikle** gruplanır (`statGroupKey`); yeniden adlandırma satırı bölmez. Kimliksiz kayıtlar adla.
+- Kuyruk sunucu okumasından önce ve ondan bağımsız okunur: çevrimdışıyken de bekleyenler görünür. Uzak okuma başarısız olunca, kuyruktan çıkmış (reddedilmemiş) seanslar sunucu seansı olarak tutulur; toplam düşmez.
+- `ReportsScreen` `categoriesRevision`'ı dinler (görünürse hemen, değilse dönüşte yenilenir).
+- Günlük hedefin kaynağı `profiles.daily_goal_minutes` (`showDailyGoalSheet` → `updateDailyGoalMinutes`). Varsayılan 200 dk. Hedef sayfasındaki pomodoro sayısı yukarı yuvarlanır (hedefe ulaşmak için gereken).
+- Yüzde gösterimi: dağılım lejantı `roundedPercents` (toplam 100); verimlilik kartı `goalProgressPercent` (kırpılmaz), halkalar `goalPercent` (en çok 100). Haftalık verimlilik etiketi geçen günlerin hedefine göre (`elapsedWeekGoalPercent`).
+- Kategori adları DB'de çoğunlukla Türkçe, İngilizce onboarding'de İngilizce saklanır; gösterirken `translateCatName`, eşlemede `categoryMatchKey` (tablo: `utils/category_names.dart`). 50 dk = 2 pomodoro.
 
 **Tuzaklar**
 - Debug build'de istatistiklerin boş görünmesi beklenen durum.
-- Sunucu gün hesabında `profiles.timezone` (fiilen herkes için `Europe/Istanbul`), istemci cihaz saatini kullanır. Farklı saat dilimindeki kullanıcıda gün ataması sapar.
-- Yenileme ve gün dönümü zamanlayıcısı TickerMode'a bağlı; sekme görünmezken durur.
+- Gün kuralı istemcide de sunucuda da **profil diliminde** 04:00 (`studyDayOf`, `setStudyTimeZone`; `currentUser.timezone` değişince otomatik). `profiles.timezone` istemciden yazılmadığı için fiilen herkes `Europe/Istanbul`: cihazı başka dilimde olan kullanıcı günleri İstanbul'a göre görür (sunucuyla tutarlı, kullanıcının yerel günüyle değil; §10).
+- Sıralama > Aylık (`get_public_monthly_leaderboard`) ayı canlıda `completed_at` + İstanbul gece yarısıyla sayıyor, Raporlar > Aylık `started_at` + 04:00 ile. Düzeltme `proposed/12`; uygulanınca `ranking_models.dart` `nextMonthlyLeaderboardReset` 04:00'e çekilmeli.
+- Yenileme ve gün dönümü zamanlayıcısı TickerMode'a bağlı; sekme görünmezken durur. Üst çubuktaki seri `StudyDayBuilder` ile 04:00'te kendiliğinden tazelenir.
+- Testler: `test/reports_correctness_test.dart` (sabit veri setiyle tüm metrikler), `test/reports_findings_test.dart`, `test/support/fake_supabase_service.dart` (ekranlara `service:` ile verilir).
 
 ### 4.4 SOCIAL: lig, sıralama, avatar, profil, arkadaşlar
 **Dosyalar:** `ranking_screen.dart`, `widgets/social/*`, `league_info_sheet.dart`, `social_screen.dart`, `friends_sheet.dart`, `profile_screen.dart`, `character_collection_screen.dart`, `avatar_model.dart`
@@ -305,7 +316,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 | `get_league_ranking` | `p_user_id uuid` (yalnızca kendi id'si) | Yukarıdakiyle aynı | Kullanılmıyor | Hayır |
 | `get_league_zones` | `p_member_count int` | `promotion_zone_end, demotion_zone_start` | Kullanılmıyor (servis metodu var) | Evet |
 | `get_points_config` | — | jsonb (puan sabitleri) | Lig bilgi sayfası | Evet |
-| `get_public_monthly_leaderboard` | `p_limit int` (vars. 10, en çok 100) | `name, avatar_id, total_points, total_minutes, is_me` | Ranking Aylık (50), landing (10, anon) | Evet |
+| `get_public_monthly_leaderboard` | `p_limit int` (vars. 10, en çok 100) | `name, avatar_id, total_points, total_minutes, is_me`. Ay: canlıda `completed_at >= İstanbul ay başı 00:00` (Raporlar'dan farklı; `proposed/12` çalışma ayına çeker) | Ranking Aylık (50), landing (10, anon) | Evet |
 | `get_public_alltime_leaderboard` | `p_limit int` (vars. 50, en çok 100) | `name, avatar_id, total_minutes, lifetime_points, is_premium, is_me` | Kullanılmıyor | Evet |
 | `get_my_friends` | — | `id, name, avatar_id, lifetime_points, total_minutes` | FriendsSheet, Ranking | Hayır |
 | `get_incoming_friend_requests` | — | yukarıdaki + `created_at` (`id` = gönderen) | FriendsSheet | Hayır |
@@ -321,7 +332,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 | `get_friends_feed` | `int` | — | Kullanılmıyor | Hayır |
 | `process_weekly_leagues`, `ensure_user_in_league` | — | — | Yalnızca cron ve sunucu içi | Hayır |
 
-İstemci `reorder_categories(p_ids uuid[])`'i de çağırır; canlıda olmadığı için PGRST202 alır ve upsert'e düşer.
+İstemci `reorder_categories`'i çağırmaz (canlıda yok); sıralama satır başına paralel `update(sort_order)` ile yazılır (§4.2).
 
 ### 5.2 `complete_study_session` kuralları
 - İlk kontrol idempotency: aynı `(user_id, client_uuid)` → `duplicate:true`, puan ve kum 0.
@@ -354,7 +365,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 | Tablo | İstemcinin yapabildiği |
 |---|---|
 | `profiles` | Kendi satırını SELECT. UPDATE yalnızca 7 kolon (§7). INSERT yalnızca yedek akışta `(id, email, name, avatar_id)` |
-| `categories` | Kendi satırlarında SELECT, UPDATE (ad/renk/ikon/arşiv/sıra), upsert |
+| `categories` | Kendi satırlarında SELECT, UPDATE (ad/renk/ikon/arşiv/sıra). Canlıda DELETE politikası/yetkisi ve tüm kolonlarda UPDATE yetkisi hâlâ açık; `proposed/13` kapatır. İstemci silmez |
 | `study_sessions` | Kendi satırlarında SELECT. Yazma yalnızca RPC ile |
 | `avatars`, `avatar_unlocks` | SELECT |
 | `friendships` | Yalnızca PGRST202 yedek yolunda SELECT (ölü kod) |
@@ -515,6 +526,7 @@ curl -sI https://pomosprint.app/reset-password | grep -i cache-control   # no-st
 | P2 | Kullanıcı engelleme sunucuda değil | Gizleme cihazda; arkadaşlıktan çıkarma RPC'si (`remove_friend`) canlıda yok |
 | P1 | Supabase Auth panel ayarları repoda yok | Redirect URLs (`/reset-password`, `/confirmed`, `.html`'li hâlleri; `io.supabase.pomosprint://` silinmeli), Reset Password şablonu `token_hash`, Leaked password protection, Apple provider (Client ID `com.pomosprint.app`) |
 | P2 | `proposed/11` RPC'leri canlıda yok | Arkadaş silme/iptal UI'ı ve toplu kategori sıralaması bunlara bağlı |
+| P2 | `proposed/12` (aylık sıralama = çalışma ayı) ve `proposed/13` (kategori sırası, silme/kolon yetkileri) uygulanmadı | Her ikisinin DRYRUN'u yerel taklitte doğrulandı; kullanıcı SQL Editor'de önce DRYRUN, sonra dosyayı çalıştırır |
 | P2 | `proposed/01`–`10` kalan maddeler | Puan sabitleri tek kaynak, `purchase_avatar` kilidi (05), `activity_feed` RLS ve `get_friends_feed` (07), `profiles` kolon bazlı SELECT (06), kategori ad kuralları (09), varsayılan yetkiler (08), veri temizliği (10) |
 | P2 | Herkese açık sıralama oturum açıkken tam ad döndürüyor | Ürün kararı (`proposed/README.md`, 03 satırı) |
 | P2 | `profiles.timezone` istemciden yazılmıyor | Yetki ve doğrulama canlıda hazır; `set_my_timezone` yok. Cihaz IANA adı için ek paket (`flutter_timezone`) gerekir |

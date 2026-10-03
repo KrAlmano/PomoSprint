@@ -1106,6 +1106,54 @@ abstract class AppLocalizations {
   /// **'Yüzde olarak göster'**
   String get statsShowAsPercent;
 
+  /// No description provided for @statsOfflinePendingOnly.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sunucuya bağlanılamadı; yalnızca bu cihazda senkron bekleyen seanslar gösteriliyor.'**
+  String get statsOfflinePendingOnly;
+
+  /// No description provided for @statsOtherCategories.
+  ///
+  /// In tr, this message translates to:
+  /// **'Diğer kategoriler'**
+  String get statsOtherCategories;
+
+  /// No description provided for @statsMoreCategories.
+  ///
+  /// In tr, this message translates to:
+  /// **'+{count} kategori daha'**
+  String statsMoreCategories(int count);
+
+  /// No description provided for @statsGoalReached.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugünkü hedefine ulaştın, tebrikler!'**
+  String get statsGoalReached;
+
+  /// No description provided for @statsTipFocusBlock.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seansa başlamadan önce o seansta bitireceğin tek bir işi belirle.'**
+  String get statsTipFocusBlock;
+
+  /// No description provided for @statsWeekNotStarted.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz başlamadın'**
+  String get statsWeekNotStarted;
+
+  /// No description provided for @statsWeekChangeSame.
+  ///
+  /// In tr, this message translates to:
+  /// **'Önceki haftanın aynı günleriyle aynı'**
+  String get statsWeekChangeSame;
+
+  /// No description provided for @statsGoalPomodorosNeeded.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedef için {count} Pomodoro'**
+  String statsGoalPomodorosNeeded(int count);
+
   /// No description provided for @authErrWeakPassword.
   ///
   /// In tr, this message translates to:
@@ -2449,6 +2497,12 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Arşivi Aç'**
   String get unarchiveTooltip;
+
+  /// No description provided for @categoryLastActiveRequired.
+  ///
+  /// In tr, this message translates to:
+  /// **'En az bir aktif kategorin olmalı. Önce yeni bir kategori ekle ya da arşivden birini çıkar.'**
+  String get categoryLastActiveRequired;
 
   /// No description provided for @timerResetBtn.
   ///

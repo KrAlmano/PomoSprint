@@ -93,9 +93,12 @@ class StatsErrorView extends StatelessWidget {
 
 /// Yenileme başarısız olduğunda, eski veriler gösterilirken üstte çıkan uyarı.
 class StatsStaleBanner extends StatelessWidget {
-  const StatsStaleBanner({super.key, required this.onRetry});
+  const StatsStaleBanner({super.key, required this.onRetry, this.message});
 
   final VoidCallback onRetry;
+
+  /// Verilmezse 'son yüklenen veriler gösteriliyor' metni.
+  final String? message;
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +120,7 @@ class StatsStaleBanner extends StatelessWidget {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                l10n.statsStaleNotice,
+                message ?? l10n.statsStaleNotice,
                 style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: fg),
               ),
             ),

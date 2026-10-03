@@ -7,6 +7,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import '../l10n/app_localizations.dart';
 import '../models/category_model.dart';
 import '../services/language_service.dart';
+import '../services/server_clock.dart';
 import '../services/supabase_service.dart';
 import '../theme.dart';
 import '../utils/responsive.dart';
@@ -28,10 +29,15 @@ class ReportsScreen extends StatefulWidget {
   final List<CourseCategory> categories;
   final VoidCallback? onStartTimer;
 
+  /// Testte sahte servis verilir; uygulamada [SupabaseService.instance].
+  @visibleForTesting
+  final SupabaseService? service;
+
   const ReportsScreen({
     super.key,
     required this.categories,
     this.onStartTimer,
+    this.service,
   });
 
   @override
@@ -41,17 +47,33 @@ class ReportsScreen extends StatefulWidget {
 class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserver {
   // Sekme yeniden görünür olduğunda veriler bu süreden eskiyse yenilenir.
   static const Duration _staleAfter = Duration(seconds: 30);
-  static final Future<void> _dateFormatting = Future.wait([
-    initializeDateFormatting('tr_TR', null),
-    initializeDateFormatting('en_US', null),
-  ]);
+  // Tarih biçimleri bir kez yüklenir. (Önbelleğe alınmış tek bir Future
+  // yerine bayrak: Future onu oluşturan zone'a bağlı kalıyordu.)
+  static bool _dateFormattingReady = false;
+
+  static Future<void> _ensureDateFormatting() async {
+    if (_dateFormattingReady) return;
+    await Future.wait([
+      initializeDateFormatting('tr_TR', null),
+      initializeDateFormatting('en_US', null),
+    ]);
+    _dateFormattingReady = true;
+  }
 
   int _activeTab = 0; // 0: Günlük Çalışma, 1: Haftalık Çalışma, 2: Aylık Takip
   bool _showDistributionPercent = false;
 
   List<StatSession> _remoteSessions = const [];
-  List<StatSession> _pendingSessions = const [];
+
+  /// Cihazdaki bekleyen seans kuyruğu (ham). İstatistiğe girenler build'de
+  /// [pendingStatSessions] ile seçilir.
+  List<PendingSession> _pendingQueue = const [];
+
+  /// Gösterilecek veri var (sunucu verisi ya da en azından bekleyenler).
   bool _hasLoaded = false;
+
+  /// Sunucu verisi en az bir kez yüklendi.
+  bool _remoteLoaded = false;
   ServiceErrorCode? _loadError;
   DateTime? _loadedAt;
   Future<void>? _inflight;
@@ -59,20 +81,29 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
   bool _dirty = false;
 
   bool _visible = false;
-  DateTime _today = studyDayOf(DateTime.now());
+  late DateTime _today = studyDayOf(_now());
   Timer? _dayTimer;
-  String? _userId = SupabaseService.instance.currentUser.value?.id;
+  String? _userId;
 
   bool get _isLoading => _inflight != null;
+
+  SupabaseService get _service => widget.service ?? SupabaseService.instance;
+
+  // 'Bugün' sunucu saatiyle: bekleyen seansın günü de kuyruğun gönderdiği
+  // düzeltilmiş saatle hesaplanıyor; ikisi aynı saate bakmalı.
+  DateTime _now() => DateTime.now().add(ServerClock.correctionFor(_service.serverClockOffset));
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    final service = SupabaseService.instance;
+    final service = _service;
+    _userId = service.currentUser.value?.id;
     service.addStatsChangedListener(_onStatsChanged);
     service.pendingSessionCount.addListener(_onPendingCountChanged);
     service.currentUser.addListener(_onUserChanged);
+    // Kategori adı/rengi değişince sunucu birleşimi (ad, renk, ikon) bayatlar.
+    service.categoriesRevision.addListener(_onCategoriesChanged);
   }
 
   @override
@@ -95,10 +126,11 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    final service = SupabaseService.instance;
+    final service = _service;
     service.removeStatsChangedListener(_onStatsChanged);
     service.pendingSessionCount.removeListener(_onPendingCountChanged);
     service.currentUser.removeListener(_onUserChanged);
+    service.categoriesRevision.removeListener(_onCategoriesChanged);
     _cancelDayTimer();
     super.dispose();
   }
@@ -121,7 +153,7 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
   }
 
   void _syncToday() {
-    final today = studyDayOf(DateTime.now());
+    final today = studyDayOf(_now());
     if (!isSameDay(today, _today) && mounted) setState(() => _today = today);
   }
 
@@ -130,7 +162,7 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
   void _scheduleDayRollover() {
     _cancelDayTimer();
     final nextDayStart = studyDayStart(addDays(_today, 1));
-    var wait = nextDayStart.difference(DateTime.now());
+    var wait = nextDayStart.difference(_now());
     if (wait.isNegative) wait = Duration.zero;
     _dayTimer = Timer(wait + const Duration(seconds: 1), () {
       _dayTimer = null;
@@ -154,6 +186,10 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
     }
   }
 
+  // Kategori eklendi, adı/rengi değişti, arşivlendi: görünürse hemen,
+  // değilse sekmeye dönüşte (30 sn beklemeden) yenilenir.
+  void _onCategoriesChanged() => _onStatsChanged();
+
   void _onPendingCountChanged() {
     if (_visible && _hasLoaded) {
       unawaited(_reloadPending());
@@ -164,13 +200,14 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
 
   void _onUserChanged() {
     if (!mounted) return;
-    final userId = SupabaseService.instance.currentUser.value?.id;
+    final userId = _service.currentUser.value?.id;
     if (userId != _userId) {
       // Hesap değişti: önceki kullanıcının verisi gösterilmez.
       _userId = userId;
       _remoteSessions = const [];
-      _pendingSessions = const [];
+      _pendingQueue = const [];
       _hasLoaded = false;
+      _remoteLoaded = false;
       _loadError = null;
       _loadedAt = null;
       _dirty = true;
@@ -209,14 +246,18 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
   Future<void> _load() async {
     _dirty = false;
     final userId = _userId;
-    final today = studyDayOf(DateTime.now());
+    final today = studyDayOf(_now());
+    // Kuyruk uzak okumadan ÖNCE ve ondan bağımsız okunur: (1) çevrimdışıyken
+    // de bekleyen seanslar görünür; (2) bu arada gönderilen seans iki listede
+    // birden olursa client_uuid ile tekilleşir, hiçbirinde olmama durumu
+    // oluşmaz.
+    final queue = await _readQueue();
     try {
-      await _dateFormatting;
+      await _ensureDateFormatting();
       // Aylık sekme önceki ayın aynı dönemini ve ayın ilk haftasının
       // kıyasını da kullandığı için önceki ayın başından itibaren çekilir.
       final since = studyDayStart(DateTime(today.year, today.month - 1, 1));
-      final remote = await SupabaseService.instance.fetchStudySessions(since: since);
-      final pending = await _readPending();
+      final remote = await _service.fetchStudySessions(since: since);
       if (!mounted) return;
       if (userId != _userId) {
         _reloadQueued = true;
@@ -224,8 +265,9 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
       }
       setState(() {
         _remoteSessions = remote.map(StatSession.fromStudySession).toList(growable: false);
-        _pendingSessions = pending;
+        _pendingQueue = queue;
         _hasLoaded = true;
+        _remoteLoaded = true;
         _loadError = null;
         _loadedAt = DateTime.now();
         _today = today;
@@ -233,28 +275,73 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
     } catch (e) {
       // Mevcut veriler silinmez; hata durumu ve 'Tekrar Dene' gösterilir.
       debugPrint('İstatistikler yüklenemedi: $e');
-      if (mounted && userId == _userId) setState(() => _loadError = serviceErrorCodeOf(e));
+      if (!mounted || userId != _userId) return;
+      final delivered = await _deliveredSince(queue);
+      if (!mounted || userId != _userId) return;
+      setState(() {
+        _loadError = serviceErrorCodeOf(e);
+        _pendingQueue = queue;
+        if (delivered.isNotEmpty) _remoteSessions = [..._remoteSessions, ...delivered];
+        // Sunucu verisi hiç alınamadıysa bekleyenler yine de gösterilir.
+        if (!_hasLoaded && queue.isNotEmpty) {
+          _hasLoaded = true;
+          _today = today;
+        }
+      });
     }
   }
 
-  Future<List<StatSession>> _readPending() async {
+  Future<List<PendingSession>> _readQueue() async {
     try {
-      final pending = await SupabaseService.instance.getPendingSessions();
-      return pending.map(StatSession.fromPending).toList(growable: false);
+      return await _service.getPendingSessions();
     } catch (e) {
       debugPrint('Bekleyen seanslar okunamadı: $e');
-      return const [];
+      return _pendingQueue;
     }
   }
 
+  /// Ekranda bekleyen olarak gösterilip artık kuyrukta olmayan seanslar
+  /// sunucuya ulaşmıştır (kalıcı reddedilenler hariç). Uzak liste
+  /// yenilenemediğinde toplam düşmesin diye bunlar sunucu seansı olarak
+  /// tutulur; bir sonraki başarılı yükleme listeyi baştan kurar.
+  Future<List<StatSession>> _deliveredSince(List<PendingSession> queueNow) async {
+    final stillQueued = {for (final p in queueNow) p.clientUuid};
+    final gone = _pendingQueue.where((p) => !stillQueued.contains(p.clientUuid)).toList();
+    if (gone.isEmpty) return const [];
+    final Set<String> rejected;
+    try {
+      rejected = {for (final r in await _service.getRejectedSessions()) r.clientUuid};
+    } catch (e) {
+      debugPrint('Reddedilen seanslar okunamadı: $e');
+      return const [];
+    }
+    final known = {
+      for (final s in _remoteSessions)
+        if (s.clientUuid != null) s.clientUuid!.toLowerCase(),
+    };
+    return [
+      for (final s in pendingStatSessions(gone, clockOffset: _service.serverClockOffset))
+        if (!rejected.contains(s.clientUuid) && !known.contains(s.clientUuid!.toLowerCase())) s.copyWith(pending: false),
+    ];
+  }
+
+  /// Kuyruk değişince (yerel, ucuz okuma). Bir seans kuyruktan çıktıysa
+  /// gönderilmiştir: bekleyen ve sunucu verisi birlikte yenilenir; aksi
+  /// halde toplam önce düşüp uzak okuma bitince geri gelirdi.
   Future<void> _reloadPending() async {
     final userId = _userId;
-    final pending = await _readPending();
-    if (mounted && userId == _userId) setState(() => _pendingSessions = pending);
+    final queue = await _readQueue();
+    if (!mounted || userId != _userId) return;
+    final now = {for (final p in queue) p.clientUuid};
+    if (_pendingQueue.any((p) => !now.contains(p.clientUuid))) {
+      unawaited(_refresh());
+      return;
+    }
+    setState(() => _pendingQueue = queue);
   }
 
   int get _dailyGoalMinutes =>
-      effectiveDailyGoalMinutes(SupabaseService.instance.currentUser.value?.dailyGoalMinutes);
+      effectiveDailyGoalMinutes(_service.currentUser.value?.dailyGoalMinutes);
 
   @override
   Widget build(BuildContext context) {
@@ -291,7 +378,10 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
                 if (_hasLoaded && _loadError != null && !_isLoading)
                   ContentWidth(
                     maxWidth: ContentWidth.dashboard,
-                    child: StatsStaleBanner(onRetry: _refresh),
+                    child: StatsStaleBanner(
+                      onRetry: _refresh,
+                      message: _remoteLoaded ? null : AppLocalizations.of(context)!.statsOfflinePendingOnly,
+                    ),
                   ),
                 Expanded(child: _buildTabContent(lang)),
               ],
@@ -310,7 +400,11 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
       return Center(child: CircularProgressIndicator(color: isDark ? AppColors.darkPrimary : AppColors.primary));
     }
 
-    final sessions = [..._remoteSessions, ..._pendingSessions];
+    final sessions = mergeStatSessions(
+      remote: _remoteSessions,
+      pending: pendingStatSessions(_pendingQueue, clockOffset: _service.serverClockOffset),
+      categories: widget.categories,
+    );
     final goalMinutes = _dailyGoalMinutes;
     return switch (_activeTab) {
       0 => DailyReportView(
@@ -318,7 +412,7 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
           today: _today,
           dailyGoalMinutes: goalMinutes,
           // Tam boş durum yalnızca hiç çalışmamış kullanıcıya gösterilir.
-          hasHistory: sessions.isNotEmpty || (SupabaseService.instance.currentUser.value?.totalMinutes ?? 0) > 0,
+          hasHistory: sessions.isNotEmpty || (_service.currentUser.value?.totalMinutes ?? 0) > 0,
           categories: widget.categories,
           onRefresh: _refresh,
           showDistributionPercent: _showDistributionPercent,
@@ -492,7 +586,7 @@ class DailyReportView extends StatelessWidget {
 
           // 0. Günlük Hedef  1. Verimlilik Skoru  4. Verimlilik İpucu
           final goalCard = _buildDailyGoalCard(context, todayMinutes, todayPomodoros, pendingToday);
-          final efficiencyCard = _buildEfficiencyCard(context, goalPercent(todayMinutes, dailyGoalMinutes));
+          final efficiencyCard = _buildEfficiencyCard(context, todayMinutes);
           final tip = _buildEfficiencyTip(context);
           // Geniş ekranda ipucu da özet satırına katılır (3 sütun).
           final tipInSummary = layout.isExpanded;
@@ -693,8 +787,21 @@ class DailyReportView extends StatelessWidget {
   }
 
   // ─── 1. VERİMLİLİK SKORU KARTI ───
-  Widget _buildEfficiencyCard(BuildContext context, int score) {
+  // Yüzde hedefin ne kadarının yapıldığıdır ve kırpılmaz (300 / 200 dk →
+  // %150); halka %100'de dolar. Önceki dönemle kıyas olmadığı için trend oku
+  // yok; hedefe ulaşılınca onay ikonu.
+  Widget _buildEfficiencyCard(BuildContext context, int todayMinutes) {
     final lang = LanguageService.instance;
+    final l10n = AppLocalizations.of(context)!;
+    final score = goalProgressPercent(todayMinutes, dailyGoalMinutes);
+    final reached = todayMinutes >= dailyGoalMinutes;
+    final message = todayMinutes > dailyGoalMinutes
+        ? lang.translate('efficiency_msg_exceeded')
+        : reached
+            ? l10n.statsGoalReached
+            : score >= 50
+                ? lang.translate('efficiency_msg_close')
+                : lang.translate('efficiency_msg_low');
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -743,25 +850,19 @@ class DailyReportView extends StatelessWidget {
                           height: 1,
                         ),
                       ),
-                      const SizedBox(width: 6),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 6),
-                        child: Icon(
-                          score >= 50 ? Icons.trending_up_rounded : Icons.trending_down_rounded,
-                          color: Colors.white,
-                          size: 22,
+                      if (reached) ...[
+                        const SizedBox(width: 6),
+                        const Padding(
+                          padding: EdgeInsets.only(bottom: 6),
+                          child: Icon(Icons.check_circle_rounded, color: Colors.white, size: 22),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  score >= 100
-                      ? lang.translate('efficiency_msg_exceeded')
-                      : score >= 50
-                          ? lang.translate('efficiency_msg_close')
-                          : lang.translate('efficiency_msg_low'),
+                  message,
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
@@ -778,7 +879,7 @@ class DailyReportView extends StatelessWidget {
               height: 80,
               child: CustomPaint(
                 painter: ProgressRingPainter(
-                  progress: score / 100,
+                  progress: goalPercent(todayMinutes, dailyGoalMinutes) / 100,
                   trackColor: Colors.white.withValues(alpha: 0.2),
                   progressColor: Colors.white,
                   strokeWidth: 6,
@@ -837,8 +938,13 @@ class DailyReportView extends StatelessWidget {
         name: cat.name,
         categoryId: cat.categoryId,
         colorHex: cat.colorHex,
+        iconName: cat.iconName,
         categories: categories,
       );
+
+  // En fazla 4 kart: 4'ten fazla ders varsa ilk 3'ü ve kalanların toplamı
+  // ("+N kategori daha"); kartların toplamı her zaman bugünün toplamıdır.
+  static const int _maxSubjectCards = 4;
 
   // ─── 2b. DERS KARTLARI ───
   // [width] ızgaranın genişliği. Telefonda ([keepAspect]) kartlar bugünkü
@@ -852,7 +958,9 @@ class DailyReportView extends StatelessWidget {
     required bool keepAspect,
   }) {
     const spacing = 12.0;
-    final displayCats = categoryStats.take(4).toList(); // En fazla 4 ders
+    final overflow = categoryStats.length > _maxSubjectCards;
+    final displayCats = categoryStats.take(overflow ? _maxSubjectCards - 1 : _maxSubjectCards).toList();
+    final rest = overflow ? categoryStats.skip(_maxSubjectCards - 1).toList() : const <CategoryStat>[];
     final cellWidth = statsCellWidth(width, columns, spacing);
     final minHeight = keepAspect ? cellWidth / 1.5 : min(cellWidth / 1.5, 110.0);
 
@@ -860,13 +968,32 @@ class DailyReportView extends StatelessWidget {
       columns: columns,
       spacing: spacing,
       runSpacing: spacing,
-      children: [for (final cat in displayCats) _buildSubjectCard(context, cat, minHeight)],
+      children: [
+        for (final cat in displayCats) _buildSubjectCard(context, cat, minHeight),
+        if (rest.isNotEmpty)
+          _buildSubjectCard(
+            context,
+            CategoryStat(
+              name: AppLocalizations.of(context)!.statsMoreCategories(rest.length),
+              minutes: _sumOf(rest, (c) => c.minutes),
+              sessions: _sumOf(rest, (c) => c.sessions),
+              pomodoros: _sumOf(rest, (c) => c.pomodoros),
+              pendingSessions: _sumOf(rest, (c) => c.pendingSessions),
+            ),
+            minHeight,
+            aggregate: true,
+          ),
+      ],
     );
   }
 
-  Widget _buildSubjectCard(BuildContext context, CategoryStat cat, double minHeight) {
+  static int _sumOf(List<CategoryStat> list, int Function(CategoryStat c) f) => list.fold(0, (a, c) => a + f(c));
+
+  Widget _buildSubjectCard(BuildContext context, CategoryStat cat, double minHeight, {bool aggregate = false}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final style = _styleOf(cat);
+    final style = aggregate
+        ? const CategoryStyle(color: kStatsNeutralColor, icon: Icons.more_horiz_rounded)
+        : _styleOf(cat);
 
     return MergeSemantics(
       child: Container(
@@ -894,7 +1021,7 @@ class DailyReportView extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    StatsText.categoryName(context, cat.name),
+                    aggregate ? cat.name : StatsText.categoryName(context, cat.name),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -934,21 +1061,25 @@ class DailyReportView extends StatelessWidget {
     final lang = LanguageService.instance;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final segments = categoryStats
-        .map((cat) => _DonutSegment(
-              label: StatsText.categoryName(context, cat.name),
-              minutes: cat.minutes,
-              percentage: totalMinutes > 0 ? cat.minutes / totalMinutes : 0.0,
-              color: _styleOf(cat).color,
-            ))
-        .toList();
+    // Lejant yüzdeleri tek tek yuvarlanmaz; toplamları tam 100 olur.
+    final percents = roundedPercents([for (final cat in categoryStats) cat.minutes]);
+    final segments = [
+      for (var i = 0; i < categoryStats.length; i++)
+        _DonutSegment(
+          label: StatsText.categoryName(context, categoryStats[i].name),
+          minutes: categoryStats[i].minutes,
+          percentage: totalMinutes > 0 ? categoryStats[i].minutes / totalMinutes : 0.0,
+          roundedPercent: percents[i],
+          color: _styleOf(categoryStats[i]).color,
+        ),
+    ];
     String valueOf(_DonutSegment seg) => showDistributionPercent
-        ? StatsText.percent(context, (seg.percentage * 100).round())
+        ? StatsText.percent(context, seg.roundedPercent)
         : StatsText.duration(seg.minutes);
     final title = lang.translate('weekly_dist_title');
     final summary = '$title, ${lang.translate('total_label')} ${StatsText.duration(totalMinutes)}: '
         '${segments.map((s) => '${s.label} ${StatsText.duration(s.minutes)} '
-            '${StatsText.percent(context, (s.percentage * 100).round())}').join(', ')}';
+            '${StatsText.percent(context, s.roundedPercent)}').join(', ')}';
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -1159,8 +1290,9 @@ class DailyReportView extends StatelessWidget {
   Widget _buildEfficiencyTip(BuildContext context) {
     final lang = LanguageService.instance;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    // İlk ipucu eskiden kaynaksız bir yüzde iddiası içeriyordu ('tip_1').
     final tips = [
-      lang.translate('tip_1'),
+      AppLocalizations.of(context)!.statsTipFocusBlock,
       lang.translate('tip_2'),
       lang.translate('tip_3'),
       lang.translate('tip_4'),
@@ -1304,12 +1436,16 @@ class _DonutSegment {
   final String label;
   final int minutes;
   final double percentage;
+
+  /// Lejantta gösterilen tamsayı yüzde (tüm dilimlerin toplamı 100).
+  final int roundedPercent;
   final Color color;
 
   const _DonutSegment({
     required this.label,
     required this.minutes,
     required this.percentage,
+    required this.roundedPercent,
     required this.color,
   });
 }

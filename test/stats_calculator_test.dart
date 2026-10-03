@@ -3,10 +3,13 @@
 //   TZ=Europe/Berlin flutter test test/stats_calculator_test.dart
 //   TZ=America/New_York flutter test test/stats_calculator_test.dart
 import 'package:flutter_test/flutter_test.dart';
+import 'package:pomodoro/models/category_model.dart';
 import 'package:pomodoro/models/study_session.dart';
 import 'package:pomodoro/services/session_queue.dart';
+import 'package:pomodoro/utils/category_names.dart';
 import 'package:pomodoro/utils/stats_calculator.dart';
 import 'package:pomodoro/utils/stats_format.dart';
+import 'package:pomodoro/widgets/auth/category_name_dialog.dart';
 
 StatSession _s(DateTime day, int minutes, {String cat = 'Matematik', String? hex, bool pending = false}) =>
     StatSession(day: day, minutes: minutes, categoryName: cat, colorHex: hex, pending: pending);
@@ -238,8 +241,8 @@ void main() {
         categoryName: 'Fizik',
         minutes: 50,
         pomodoros: 2,
-        startedAt: DateTime(2026, 10, 3, 2, 30),
-        completedAt: DateTime(2026, 10, 5, 12),
+        startedAt: DateTime.utc(2026, 10, 2, 23, 30), // İstanbul 3 Eki 02:30
+        completedAt: DateTime.utc(2026, 10, 5, 9),
       );
       final stat = StatSession.fromStudySession(session);
       expect(stat.day, DateTime(2026, 10, 2));
@@ -255,8 +258,8 @@ void main() {
         minutes: 25,
         wasPaused: false,
         foregroundSeconds: 1500,
-        startedAt: DateTime(2026, 10, 3, 9).toUtc(),
-        queuedAt: DateTime(2026, 10, 3, 9, 25).toUtc(),
+        startedAt: DateTime.utc(2026, 10, 3, 6), // İstanbul 09:00
+        queuedAt: DateTime.utc(2026, 10, 3, 6, 25),
       );
       final stat = StatSession.fromPending(pending);
       expect(stat.day, DateTime(2026, 10, 3));
@@ -277,6 +280,173 @@ void main() {
     test('formatPercent yerel ayara uyar', () {
       expect(formatPercent(50, 'tr'), '%50');
       expect(formatPercent(50, 'en'), '50%');
+    });
+  });
+
+  group('yüzdeler ve hedef', () {
+    test('roundedPercents toplamı her zaman 100 (en büyük kalan)', () {
+      expect(roundedPercents([25, 25, 25]), [34, 33, 33]);
+      expect(roundedPercents(List.filled(6, 25)), [17, 17, 17, 17, 16, 16]);
+      expect(roundedPercents([75, 25, 25]), [60, 20, 20]);
+      expect(roundedPercents([1, 1, 98]), [1, 1, 98]);
+      expect(roundedPercents([0, 0]), [0, 0]);
+      expect(roundedPercents(const []), isEmpty);
+      for (final values in [
+        [7, 11, 13],
+        [1, 2, 3, 4, 5, 6, 7],
+        [50, 25, 25, 25, 25],
+      ]) {
+        expect(roundedPercents(values).fold<int>(0, (a, b) => a + b), 100, reason: '$values');
+      }
+    });
+
+    test('goalProgressPercent kırpılmaz, goalPercent kırpılır', () {
+      expect(goalProgressPercent(300, 200), 150);
+      expect(goalProgressPercent(199, 200), 99);
+      expect(goalProgressPercent(0, 200), 0);
+      expect(goalProgressPercent(10, 0), 0);
+      expect(goalPercent(300, 200), 100);
+    });
+
+    test('elapsedWeekGoalPercent geçen günlerin hedefine göre', () {
+      final monday = DateTime(2026, 10, 12);
+      expect(elapsedWeekGoalPercent(200, 200, monday, monday), 100);
+      expect(elapsedWeekGoalPercent(200, 200, monday, DateTime(2026, 10, 13)), 50);
+      expect(elapsedWeekGoalPercent(1400, 200, monday, DateTime(2026, 10, 18)), 100);
+      expect(elapsedWeekGoalPercent(0, 200, monday, monday), 0);
+    });
+  });
+
+  group('kuyruk ve birleştirme', () {
+    const id = 'aaaaaaaa-0000-4000-8000-000000000001';
+    PendingSession pending(String uuid, {String? categoryId = id, String name = 'Matematik', String? lastError, int? offsetMs}) =>
+        PendingSession(
+          clientUuid: uuid,
+          categoryId: categoryId,
+          categoryName: name,
+          minutes: 25,
+          wasPaused: false,
+          foregroundSeconds: 1500,
+          startedAt: DateTime.utc(2026, 10, 14, 6), // İstanbul 09:00
+          queuedAt: DateTime.utc(2026, 10, 14, 6, 25),
+          clockOffsetMs: offsetMs,
+          lastError: lastError,
+        );
+
+    test('pendingStatSessions overlap seansını atar, saat farkını uygular', () {
+      final list = pendingStatSessions([
+        pending('a'),
+        pending('b', lastError: SessionReason.overlap),
+        pending('c', lastError: SessionReason.timeout),
+      ]);
+      expect(list.map((s) => s.clientUuid), ['a', 'c']);
+      // Cihaz 6 saat ileri: sunucuya göre 03:00 (04:00 öncesi) → önceki gün.
+      final shifted = StatSession.fromPending(pending('d', offsetMs: -6 * 3600 * 1000));
+      expect(shifted.day, DateTime(2026, 10, 13));
+      // Kayıtta fark yoksa o anki fark kullanılır.
+      expect(StatSession.fromPending(pending('e'), clockOffset: const Duration(hours: -6)).day, DateTime(2026, 10, 13));
+    });
+
+    test('mergeStatSessions: kopya atılır, kategori kimlik/adla çözülür', () {
+      final day = DateTime(2026, 10, 14);
+      final remote = [
+        StatSession(day: day, minutes: 50, categoryName: 'Calculus', categoryId: id, colorHex: '#3B82F6', iconName: 'science', clientUuid: 'A-1'),
+      ];
+      final merged = mergeStatSessions(
+        remote: remote,
+        pending: [
+          StatSession.fromPending(pending('a-1')), // büyük/küçük harf farklı aynı client_uuid
+          StatSession.fromPending(pending('p-1')), // aynı kategori, eski ad
+          StatSession.fromPending(pending('p-2', categoryId: '1', name: 'calculus')), // yer tutucu
+        ],
+      );
+      expect(merged, hasLength(3));
+      expect(merged.skip(1).map((s) => (s.categoryId, s.categoryName, s.colorHex, s.iconName)).toSet(), {
+        (id, 'Calculus', '#3B82F6', 'science'),
+      });
+      final stats = totalsByCategory(merged);
+      expect(stats.single.minutes, 100);
+      expect(stats.single.pendingSessions, 2);
+    });
+
+    test('mergeStatSessions: yalnız aktif listede olan kategori (dilden bağımsız ad)', () {
+      final physics = CourseCategory.fromServerRow({
+        'id': 'aaaaaaaa-0000-4000-8000-000000000002',
+        'name': 'Physics',
+        'color_hex': '#3B82F6',
+        'icon_name': 'science',
+      });
+      final merged = mergeStatSessions(
+        remote: const [],
+        pending: [StatSession.fromPending(pending('p', categoryId: '2', name: 'Fizik'))],
+        categories: [physics],
+      );
+      expect(merged.single.categoryId, physics.id);
+      expect(merged.single.categoryName, 'Physics');
+      expect(merged.single.colorHex, '#3B82F6');
+    });
+
+    test('totalsByCategory kimlikle gruplar; aynı adlı farklı kategoriler ayrı', () {
+      final day = DateTime(2026, 10, 14);
+      final stats = totalsByCategory([
+        StatSession(day: day, minutes: 25, categoryName: 'Matematik', categoryId: id),
+        StatSession(day: day, minutes: 25, categoryName: 'Matematik', categoryId: 'aaaaaaaa-0000-4000-8000-000000000009'),
+        StatSession(day: day, minutes: 25, categoryName: 'Eski', categoryId: null),
+        StatSession(day: day, minutes: 25, categoryName: 'Eski', categoryId: null),
+      ]);
+      expect(stats.map((c) => c.minutes), [50, 25, 25]);
+    });
+
+    test('StudySession.fromJson client_uuid ve ikon okur; ad yoksa boş', () {
+      final s = StudySession.fromJson({
+        'id': 'x',
+        'user_id': 'u',
+        'category': 'Fizik',
+        'category_id': id,
+        'duration_minutes': 25,
+        'started_at': '2026-10-14T06:00:00Z',
+        'completed_at': '2026-10-14T06:25:00Z',
+        'client_uuid': 'c-1',
+        'categories': {'name': 'Fizik', 'color_hex': '#3B82F6', 'icon_name': 'science'},
+      });
+      expect(s.clientUuid, 'c-1');
+      expect(s.iconName, 'science');
+      final orphan = StudySession.fromJson({
+        'id': 'y',
+        'user_id': 'u',
+        'duration_minutes': 25,
+        'completed_at': '2026-10-14T06:25:00Z',
+      });
+      expect(orphan.categoryName, '');
+    });
+  });
+
+  group('kategori adları', () {
+    test('categoryMatchKey dilden ve büyük/küçük harften bağımsız', () {
+      expect(categoryMatchKey('Fizik'), categoryMatchKey('physics'));
+      expect(categoryMatchKey(' İngilizce '), categoryMatchKey('English'));
+      expect(categoryMatchKey('ingilizce'), categoryMatchKey('İngilizce'));
+      expect(categoryMatchKey('Kendi Dersim'), 'kendi dersim');
+      expect(categoryMatchKey('Fizik'), isNot(categoryMatchKey('Kimya')));
+    });
+
+    test('localizedKnownCategoryName', () {
+      expect(localizedKnownCategoryName('İngilizce', turkish: false), 'English');
+      expect(localizedKnownCategoryName('Mathematics', turkish: true), 'Matematik');
+      expect(localizedKnownCategoryName('Kendi Dersim', turkish: false), 'Kendi Dersim');
+    });
+
+    test('firstUnusedPaletteColor', () {
+      expect(firstUnusedPaletteColor(const []), kCategoryPalette.first);
+      expect(firstUnusedPaletteColor(['#ef4444']), '#3B82F6');
+      expect(firstUnusedPaletteColor(['#EF4444', '#3B82F6']), '#10B981');
+      expect(kCategoryPalette, contains(firstUnusedPaletteColor(kCategoryPalette)));
+    });
+
+    test('categoryNameToSave: harf düzeltmesi kaydedilir, dokunulmamış çeviri korunur', () {
+      expect(categoryNameToSave(storedName: 'kimya ödevi', shownName: 'kimya ödevi', editedName: 'Kimya Ödevi'), 'Kimya Ödevi');
+      expect(categoryNameToSave(storedName: 'Matematik', shownName: 'Mathematics', editedName: 'Mathematics'), 'Matematik');
+      expect(categoryNameToSave(storedName: 'Matematik', shownName: 'Mathematics', editedName: ' Calculus '), 'Calculus');
     });
   });
 }
