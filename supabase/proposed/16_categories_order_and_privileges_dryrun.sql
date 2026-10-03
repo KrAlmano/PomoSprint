@@ -1,5 +1,5 @@
 -- ============================================================================
--- KURU ÇALIŞTIRMA: 13_categories_order_and_privileges
+-- KURU ÇALIŞTIRMA: 16_categories_order_and_privileges
 -- Canlıda hiçbir şeyi kalıcı DEĞİŞTİRMEZ. Supabase Dashboard > SQL Editor'e
 -- yapıştırıp çalıştırın. Önce sentetik bir kullanıcıya çakışan sort_order'lı
 -- kategoriler yazılır, sonra değişiklik uygulanır ve senaryolar çalışır; en
@@ -18,7 +18,7 @@ FROM dry13, (VALUES ('S-A', 0, interval '4 days'), ('S-B', 2, interval '3 days')
                     ('S-C', 2, interval '2 days'), ('S-D', 5, interval '1 day')) AS v(name, ord, age);
 
 -- ---------------------------------------------------------------------------
--- 13_categories_order_and_privileges (BEGIN/COMMIT ve geçmiş kaydı hariç)
+-- 16_categories_order_and_privileges (BEGIN/COMMIT ve geçmiş kaydı hariç)
 -- ---------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION public.create_category(p_name text, p_color_hex text, p_icon_name text)
  RETURNS uuid

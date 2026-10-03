@@ -23,11 +23,11 @@
 --    updateCategoryOrders). RPC'ler SECURITY DEFINER olduğundan etkilenmez.
 --
 -- ADIMLAR
---  1. 13_categories_order_and_privileges_dryrun.sql'i SQL Editor'de çalıştırın
+--  1. 16_categories_order_and_privileges_dryrun.sql'i SQL Editor'de çalıştırın
 --     (sonda DRYRUN_RESULT hatası; her satır 'true').
 --  2. Bu dosyanın \echo ve \quit satırlarını silip çalıştırın (ya da
 --     supabase/migrations/20261003181000_categories_order_and_privileges.sql
---     olarak kopyalayın). Geri alma: 13_categories_order_and_privileges_down.sql.
+--     olarak kopyalayın). Geri alma: 16_categories_order_and_privileges_down.sql.
 --  3. Doğrulama:
 --       select grantee, privilege_type from information_schema.role_table_grants
 --        where table_schema='public' and table_name='categories' and grantee='authenticated';
@@ -35,7 +35,7 @@
 --  4. AGENTS.md §5.4 / §7.1 categories satırlarını güncelleyin.
 -- ============================================================
 
-\echo 'supabase/proposed/13: doğrudan çalıştırılmaz, dosya başındaki ADIMLAR bölümüne bakın.'
+\echo 'supabase/proposed/16: doğrudan çalıştırılmaz, dosya başındaki ADIMLAR bölümüne bakın.'
 \quit
 
 BEGIN;

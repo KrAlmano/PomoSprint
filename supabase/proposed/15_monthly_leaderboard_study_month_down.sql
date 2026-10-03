@@ -1,11 +1,11 @@
 -- ============================================================
--- GERİ ALMA: 12_monthly_leaderboard_study_month
+-- GERİ ALMA: 15_monthly_leaderboard_study_month
 -- get_public_monthly_leaderboard'u 3 Ekim 2026 CANLI tanımına döndürür
 -- (ay = completed_at, İstanbul gece yarısı). Veri değiştirmez.
 -- Çalıştırmak için \echo ve \quit satırlarını silin.
 -- ============================================================
 
-\echo 'supabase/proposed/12 geri alma: doğrudan çalıştırılmaz, dosya başına bakın.'
+\echo 'supabase/proposed/15 geri alma: doğrudan çalıştırılmaz, dosya başına bakın.'
 \quit
 
 BEGIN;

@@ -1,5 +1,5 @@
 -- ============================================================================
--- KURU ÇALIŞTIRMA: 12_monthly_leaderboard_study_month
+-- KURU ÇALIŞTIRMA: 15_monthly_leaderboard_study_month
 -- Canlıda hiçbir şeyi kalıcı DEĞİŞTİRMEZ. Supabase Dashboard > SQL Editor'e
 -- yapıştırıp çalıştırın. Değişiklik + senaryolar sentetik kullanıcılarla
 -- çalışır, en sonda bilinçli bir hata (DRYRUN_RESULT) fırlatılır ve tüm işlem

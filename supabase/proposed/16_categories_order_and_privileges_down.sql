@@ -1,5 +1,5 @@
 -- ============================================================
--- GERİ ALMA: 13_categories_order_and_privileges
+-- GERİ ALMA: 16_categories_order_and_privileges
 -- create_category ve setup_onboarding_categories'i 3 Ekim 2026 CANLI
 -- tanımlarına döndürür, trigger'ı kaldırır, DELETE politikası ve tablo
 -- düzeyi UPDATE/DELETE yetkilerini geri verir.
@@ -8,7 +8,7 @@
 -- Çalıştırmak için \echo ve \quit satırlarını silin.
 -- ============================================================
 
-\echo 'supabase/proposed/13 geri alma: doğrudan çalıştırılmaz, dosya başına bakın.'
+\echo 'supabase/proposed/16 geri alma: doğrudan çalıştırılmaz, dosya başına bakın.'
 \quit
 
 BEGIN;

@@ -23,11 +23,11 @@
 --   mask_public_name; show_in_social_feed filtresi; sıralama ve LIMIT aynı.
 --
 -- ADIMLAR
---  1. 12_monthly_leaderboard_study_month_dryrun.sql'i SQL Editor'de çalıştırın.
+--  1. 15_monthly_leaderboard_study_month_dryrun.sql'i SQL Editor'de çalıştırın.
 --     Sonda 'DRYRUN_RESULT >> ...' hatası beklenir; her satır 'true' olmalı.
 --  2. Bu dosyanın \echo ve \quit satırlarını silerek SQL Editor'de çalıştırın
 --     (ya da gövdeyi supabase/migrations/20261003180000_monthly_leaderboard_study_month.sql
---     olarak kopyalayın). Geri alma: 12_monthly_leaderboard_study_month_down.sql.
+--     olarak kopyalayın). Geri alma: 15_monthly_leaderboard_study_month_down.sql.
 --  3. Uygulandıktan SONRA istemcide lib/widgets/social/ranking_models.dart
 --     nextMonthlyLeaderboardReset ayın 1'i 04:00'e (İstanbul) çekilmeli; önce
 --     değiştirmeyin, geri sayım canlı sunucuyla çelişir.
@@ -35,7 +35,7 @@
 --     (started_at, profil dilimi, 04:00)" notunu ekleyin.
 -- ============================================================
 
-\echo 'supabase/proposed/12: doğrudan çalıştırılmaz, dosya başındaki ADIMLAR bölümüne bakın.'
+\echo 'supabase/proposed/15: doğrudan çalıştırılmaz, dosya başındaki ADIMLAR bölümüne bakın.'
 \quit
 
 BEGIN;
