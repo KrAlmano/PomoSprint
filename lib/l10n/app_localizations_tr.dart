@@ -177,6 +177,23 @@ class AppLocalizationsTr extends AppLocalizations {
   String get confirmSelection => 'Seçimi Onayla';
 
   @override
+  String get leagueAwardsTitle => 'Lig Kazanımları';
+
+  @override
+  String get leagueAwardsSub =>
+      'Bir lig döneminde 1., 2. veya 3. olarak bitirerek kazanılır.';
+
+  @override
+  String get leagueAwardLockedTitle => 'Bu Avatar Kilitli';
+
+  @override
+  String get leagueAwardLockedBody =>
+      'Bu avatarı kazanmak için bir lig döneminde bu kademede 1., 2. veya 3. sırayla bitirmen gerekiyor. Parayla satın alınamaz.';
+
+  @override
+  String get leagueAwardLockedOk => 'Anladım';
+
+  @override
   String get lockedCharacter => 'Kilitli Karakter';
 
   @override
@@ -217,7 +234,12 @@ class AppLocalizationsTr extends AppLocalizations {
       '📬 Doğrulama bağlantısı tekrar gönderildi. Lütfen e-postanızı kontrol edin.';
 
   @override
-  String get passwordResetMsg => 'Şifre sıfırlama bağlantısı gönderildi.';
+  String get passwordResetMsg =>
+      'E-posta adresine bir şifre sıfırlama bağlantısı gönderdik. Gelen kutunu (ve spam klasörünü) kontrol et.';
+
+  @override
+  String get errEnterEmailForReset =>
+      'Şifreni sıfırlamak için önce e-posta adresini gir.';
 
   @override
   String get createAccountTitle => 'Yeni Hesap Oluştur';
@@ -237,6 +259,27 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get termsAgree =>
       'Kullanım Koşullarını ve Gizlilik Politikasını okudum, onaylıyorum.';
+
+  @override
+  String get termsAgreePrefix => '';
+
+  @override
+  String get termsLinkTerms => 'Kullanım Şartları\'nı';
+
+  @override
+  String get termsAgreeConnector => ' ve ';
+
+  @override
+  String get termsLinkPrivacy => 'Gizlilik Politikası\'nı';
+
+  @override
+  String get termsAgreeSuffix => ' okudum, onaylıyorum.';
+
+  @override
+  String get privacyPolicyLink => 'Gizlilik Politikası';
+
+  @override
+  String get termsOfServiceLink => 'Kullanım Şartları';
 
   @override
   String get updatesAgree =>
@@ -524,4 +567,117 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get tip4 =>
       'Zorlu konuları sabah saatlerinde çalışmak verimliliği artırır.';
+
+  @override
+  String get addBtn => 'Ekle';
+
+  @override
+  String get onboardingSelectOptionError => 'Lütfen bir seçenek seçin.';
+
+  @override
+  String get onboardingTimeoutError =>
+      'Bağlantı zaman aşımına uğradı. Lütfen internetini kontrol edip tekrar dene.';
+
+  @override
+  String onboardingGenericError(Object error) {
+    return 'Bir şeyler ters gitti, lütfen tekrar dene: $error';
+  }
+
+  @override
+  String get onboardingAddCategoryTitle => 'Kategori Ekle';
+
+  @override
+  String get onboardingCategoryHint => 'Kategori adı';
+
+  @override
+  String get onboardingMaxCategoriesMsg => 'En fazla 8 kategori seçebilirsin.';
+
+  @override
+  String get onboardingWelcomeTitle => 'Hoş geldin! 👋';
+
+  @override
+  String get onboardingWelcomeBody =>
+      'Ben senin odaklanma arkadaşınım. Sana eşlik etmeden önce doğum yılını öğrenebilir miyim?';
+
+  @override
+  String get onboardingSegmentTitle => 'Peki, hangi yolculuktasın?';
+
+  @override
+  String get onboardingSegmentBody =>
+      'Beraber neye çalışacağız? Sana en uygun kategorileri seçeyim.';
+
+  @override
+  String get onboardingSegmentLgs => '🎓  LGS';
+
+  @override
+  String get onboardingSegmentYks => '📚  YKS';
+
+  @override
+  String get onboardingSegmentUniversity => '🏛️  Üniversite';
+
+  @override
+  String get onboardingSegmentWork => '💼  İş & Kişisel Gelişim';
+
+  @override
+  String get onboardingCategoryStepTitle => 'Harika seçim! 🎉';
+
+  @override
+  String get onboardingCategoryStepBody =>
+      'Şimdi çalışacağın dersleri/alanları seç — istediğin zaman değiştirebilirsin. Ücretsiz planda en fazla 8 tane olur.';
+
+  @override
+  String get onboardingCreateOwnCategory => '+ Kendi kategorimi oluştur';
+
+  @override
+  String get onboardingGoalStepTitle => 'Son bir adım kaldı! 🚀';
+
+  @override
+  String get onboardingGoalStepBody =>
+      'Günde ne kadar birlikte odaklanmak istersin?';
+
+  @override
+  String get onboardingGoal1h => '1 Saat';
+
+  @override
+  String get onboardingGoal2h => '2 Saat';
+
+  @override
+  String get onboardingGoal3h => '3 Saat';
+
+  @override
+  String get onboardingGoal4hPlus => '4 Saat+';
+
+  @override
+  String get onboardingFinishBtn => 'Bitir';
+
+  @override
+  String get categoriesManagementTitle => 'Kategorilerim';
+
+  @override
+  String categoryLimitReachedMsg(int limit) {
+    return 'Limitinize ulaştınız. En fazla $limit kategori ekleyebilirsiniz.';
+  }
+
+  @override
+  String get newCategoryDialogTitle => 'Yeni Kategori';
+
+  @override
+  String get editCategoryDialogTitle => 'Kategori Düzenle';
+
+  @override
+  String get activeCategoryCountLabel => 'Aktif Kategori Sayısı';
+
+  @override
+  String get archiveCategoryTooltip =>
+      'Arşivle (Silmek yerine geçmiş raporlar için saklanır)';
+
+  @override
+  String get archivedCategoriesHeader => 'Arşivlenmiş Kategoriler';
+
+  @override
+  String get archivedCategoriesDesc =>
+      'Bu kategoriler ders seçicide görünmez ama geçmiş raporlarda yer alır.';
+
+  @override
+  String get unarchiveTooltip => 'Arşivi Aç';
 }

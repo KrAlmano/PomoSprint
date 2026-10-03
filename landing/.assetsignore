@@ -1,0 +1,10 @@
+# Worker'ın statik dosya olarak YAYINLAMAMASI gerekenler
+.assetsignore
+.gitignore
+.claude
+.vercel
+.wrangler
+node_modules
+package.json
+package-lock.json
+wrangler.jsonc

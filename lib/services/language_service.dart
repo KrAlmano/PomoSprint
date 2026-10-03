@@ -62,6 +62,51 @@ class LanguageService extends ChangeNotifier {
     if (lower == 'ingilizce' || lower == 'english') {
       return isTurkish ? 'İngilizce' : 'English';
     }
+    if (lower == 'türkçe' || lower == 'turkish') {
+      return isTurkish ? 'Türkçe' : 'Turkish';
+    }
+    // Onboarding'de önerilen ek kategoriler (segment bazlı öneriler).
+    // Kaydedilen kategori adı her zaman Türkçe kalır — burada sadece
+    // görüntüleme metni değişir, translateCatName'in geri kalanıyla aynı
+    // desen. 'İ' harfi içeren karşılaştırmalarda Dart'ın toLowerCase()'i
+    // Türkçe'ye özgü olmadığı için, sabit küçük harf yazmak yerine
+    // orijinal string'i runtime'da toLowerCase() ile karşılaştırıyoruz.
+    if (lower == 'fen bilimleri' || lower == 'science') {
+      return isTurkish ? 'Fen Bilimleri' : 'Science';
+    }
+    if (lower == 'din kültürü' || lower == 'religious culture') {
+      return isTurkish ? 'Din Kültürü' : 'Religious Culture';
+    }
+    if (lower == 'coğrafya' || lower == 'geography') {
+      return isTurkish ? 'Coğrafya' : 'Geography';
+    }
+    if (lower == 'felsefe' || lower == 'philosophy') {
+      return isTurkish ? 'Felsefe' : 'Philosophy';
+    }
+    if (lower == 'ders çalışma' || lower == 'studying') {
+      return isTurkish ? 'Ders Çalışma' : 'Studying';
+    }
+    if (lower == 'ödev' || lower == 'homework') {
+      return isTurkish ? 'Ödev' : 'Homework';
+    }
+    if (lower == 'proje' || lower == 'project') {
+      return isTurkish ? 'Proje' : 'Project';
+    }
+    if (lower == 'sınav hazırlık' || lower == 'exam prep') {
+      return isTurkish ? 'Sınav Hazırlık' : 'Exam Prep';
+    }
+    if (lower == 'derin çalışma' || lower == 'deep work') {
+      return isTurkish ? 'Derin Çalışma' : 'Deep Work';
+    }
+    if (lower == 'okuma' || lower == 'reading') {
+      return isTurkish ? 'Okuma' : 'Reading';
+    }
+    if (lower == 'öğrenme' || lower == 'learning') {
+      return isTurkish ? 'Öğrenme' : 'Learning';
+    }
+    if (lower == 'T.C. İnkılap Tarihi'.toLowerCase() || lower == 'turkish revolution history') {
+      return isTurkish ? 'T.C. İnkılap Tarihi' : 'Turkish Revolution History';
+    }
     return catName;
   }
 
@@ -99,7 +144,7 @@ class LanguageService extends ChangeNotifier {
       'title_timer': {AppLanguage.tr: 'PomoSprint', AppLanguage.en: 'PomoSprint'},
       'title_reports': {AppLanguage.tr: 'Ders Raporları & Geçmiş', AppLanguage.en: 'Study Reports & History'},
       'title_ranking': {AppLanguage.tr: 'Liderlik Tablosu', AppLanguage.en: 'Leaderboard'},
-      'title_social': {AppLanguage.tr: 'Sanal Kütüphane & Masalar', AppLanguage.en: 'Virtual Library & Tables'},
+      'title_social': {AppLanguage.tr: 'Canlı Odaklanma', AppLanguage.en: 'Live Focus'},
       'title_categories': {AppLanguage.tr: 'Ders Kategorileri', AppLanguage.en: 'Course Categories'},
 
       // --- Timer Screen ---
@@ -128,8 +173,9 @@ class LanguageService extends ChangeNotifier {
       'active_session': {AppLanguage.tr: 'Aktif Seans', AppLanguage.en: 'Active Session'},
       'hours_unit': {AppLanguage.tr: 's', AppLanguage.en: 'h'},
       'minutes_unit_short': {AppLanguage.tr: 'dk', AppLanguage.en: 'min'},
-      'reports_tab_subject': {AppLanguage.tr: 'Ders Raporları', AppLanguage.en: 'Subject Reports'},
-      'reports_tab_history': {AppLanguage.tr: 'Çalışma Geçmişi', AppLanguage.en: 'Study History'},
+      'reports_tab_subject': {AppLanguage.tr: 'Günlük Çalışma', AppLanguage.en: 'Daily Focus'},
+      'reports_tab_history': {AppLanguage.tr: 'Haftalık Çalışma', AppLanguage.en: 'Weekly Focus'},
+      'reports_tab_monthly': {AppLanguage.tr: 'Aylık Takip', AppLanguage.en: 'Monthly Tracking'},
       'total_focus_time': {AppLanguage.tr: 'Toplam Odaklanma Süresi', AppLanguage.en: 'Total Focus Time'},
       'subject_distribution': {AppLanguage.tr: 'Ders Odaklanma Dağılımı', AppLanguage.en: 'Subject Focus Breakdown'},
       'no_data_yet': {AppLanguage.tr: 'Henüz kayıtlı çalışma bulunmuyor', AppLanguage.en: 'No study sessions recorded yet'},
@@ -198,15 +244,26 @@ class LanguageService extends ChangeNotifier {
       'view_avatar_gallery': {AppLanguage.tr: 'Avatar galerisini gör', AppLanguage.en: 'View avatar gallery'},
       'manage_categories': {AppLanguage.tr: 'Kategori Ekle / Yönet', AppLanguage.en: 'Manage Categories'},
       'manage_categories_sub': {AppLanguage.tr: 'Ders ve çalışma kategorilerini düzenle', AppLanguage.en: 'Add & edit study categories'},
+      'categories_section_title': {AppLanguage.tr: 'KATEGORİLERİM', AppLanguage.en: 'MY CATEGORIES'},
+      'manage_categories_tile_title': {AppLanguage.tr: 'Kategorileri Yönet', AppLanguage.en: 'Manage Categories'},
+      'manage_categories_tile_sub': {AppLanguage.tr: 'Kategori ekle, düzenle, sırala ve arşivle', AppLanguage.en: 'Add, edit, reorder & archive categories'},
       'total_study': {AppLanguage.tr: 'toplam çalışma', AppLanguage.en: 'total study'},
       'total_points': {AppLanguage.tr: 'Kazanılan Puan', AppLanguage.en: 'Total Points'},
       'streak_days': {AppLanguage.tr: 'Günlük Seri', AppLanguage.en: 'Streak Days'},
       'delete_account': {AppLanguage.tr: 'Hesabımı Sil', AppLanguage.en: 'Delete Account'},
+      'delete_account_error': {AppLanguage.tr: '⚠️ Hesabınız silinirken bir hata oluştu', AppLanguage.en: '⚠️ An error occurred while deleting your account'},
+      'privacy_policy': {AppLanguage.tr: 'Gizlilik Politikası', AppLanguage.en: 'Privacy Policy'},
+      'terms_of_service': {AppLanguage.tr: 'Kullanım Şartları', AppLanguage.en: 'Terms of Service'},
       'logout': {AppLanguage.tr: 'Çıkış Yap', AppLanguage.en: 'Log Out'},
       'save': {AppLanguage.tr: 'Kaydet', AppLanguage.en: 'Save'},
       'cancel': {AppLanguage.tr: 'İptal', AppLanguage.en: 'Cancel'},
       'notifications': {AppLanguage.tr: 'Bildirimler', AppLanguage.en: 'Notifications'},
       'dark_mode': {AppLanguage.tr: 'Karanlık Mod', AppLanguage.en: 'Dark Mode'},
+      'social_visibility': {AppLanguage.tr: 'Sosyal Listede Görün', AppLanguage.en: 'Show in Social List'},
+      'social_visibility_sub': {
+        AppLanguage.tr: 'Odaklanırken diğer kullanıcılar seni canlı listede görebilsin',
+        AppLanguage.en: 'Let other users see you in the live list while you focus',
+      },
       'preferences': {AppLanguage.tr: 'Tercihler', AppLanguage.en: 'Preferences'},
       'name_updated_success': {AppLanguage.tr: 'Profil adınız başarıyla güncellendi!', AppLanguage.en: 'Profile name updated successfully!'},
 
@@ -248,8 +305,16 @@ class LanguageService extends ChangeNotifier {
       'efficiency_msg_low': {AppLanguage.tr: 'Bugün biraz daha çalışabilirsin', AppLanguage.en: 'You could study a bit more today'},
       'today_studies_header': {AppLanguage.tr: 'Bugünkü Çalışmalar', AppLanguage.en: "Today's Studies"},
       'details_link': {AppLanguage.tr: 'Detaylar', AppLanguage.en: 'Details'},
-      'weekly_dist_title': {AppLanguage.tr: 'Haftalık Dağılım', AppLanguage.en: 'Weekly Distribution'},
-      'weekly_dist_sub': {AppLanguage.tr: 'Son 7 günün özeti', AppLanguage.en: 'Summary of the last 7 days'},
+      'weekly_dist_title': {AppLanguage.tr: 'Bugünün Dağılımı', AppLanguage.en: "Today's Distribution"},
+      'weekly_dist_sub': {AppLanguage.tr: 'Bugünün özeti', AppLanguage.en: 'Summary of today'},
+      'month_intensity_suffix': {AppLanguage.tr: 'Yoğunluğu', AppLanguage.en: 'Intensity'},
+      'heatmap_less': {AppLanguage.tr: 'Az', AppLanguage.en: 'Less'},
+      'heatmap_more': {AppLanguage.tr: 'Çok', AppLanguage.en: 'More'},
+      'topic_comparison_title': {AppLanguage.tr: 'Konu Karşılaştırması', AppLanguage.en: 'Topic Comparison'},
+      'weekly_summary_title': {AppLanguage.tr: 'Haftalık Özet', AppLanguage.en: 'Weekly Summary'},
+      'new_week_label': {AppLanguage.tr: 'Yeni', AppLanguage.en: 'New'},
+      'week_day_breakdown_title': {AppLanguage.tr: 'Gün Gün Döküm', AppLanguage.en: 'Day-by-Day Breakdown'},
+      'no_study_this_day': {AppLanguage.tr: 'Bu gün çalışma yok', AppLanguage.en: 'No study this day'},
       'hour_toggle': {AppLanguage.tr: 'Saat', AppLanguage.en: 'Hours'},
       'total_label': {AppLanguage.tr: 'Toplam', AppLanguage.en: 'Total'},
       'efficiency_tip_header': {AppLanguage.tr: 'Verimlilik İpucu', AppLanguage.en: 'Efficiency Tip'},

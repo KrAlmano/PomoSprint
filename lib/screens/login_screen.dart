@@ -45,6 +45,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final user = await SupabaseService.instance.loginUser(email, password);
+      // loginUser() beklenirken (örn. global auth-state listener'ın
+      // farklı bir navigasyon tetiklemesi yüzünden) bu ekran dispose
+      // edilmiş olabilir — setState() öncesi mounted kontrolü şart.
+      if (!mounted) return;
       setState(() => _isLoading = false);
       if (user != null) {
         widget.onLoginSuccess(user);
@@ -54,12 +58,22 @@ class _LoginScreenState extends State<LoginScreen> {
         });
       }
     } catch (e) {
+      if (!mounted) return;
       final errStr = e.toString().toLowerCase();
-      final isUnconfirmed = errStr.contains('doğrulama') || errStr.contains('confirmed');
+      // Supabase, "yanlış şifre" ile "e-posta henüz onaylanmadı" durumlarını
+      // hesap keşfini (enumeration) önlemek için AYNI genel "invalid
+      // credentials" hatasıyla döndürür — ikisini kesin ayırt edemeyiz.
+      // Bu yüzden "onaylanmadı" ihtimalini de kapsayacak şekilde, invalid
+      // credentials hatasında da yeniden gönder butonunu gösteriyoruz.
+      final mightBeUnconfirmed = errStr.contains('doğrulama') ||
+          errStr.contains('confirmed') ||
+          errStr.contains('invalid login credentials') ||
+          errStr.contains('invalid_credentials') ||
+          errStr.contains('invalid_grant');
       setState(() {
         _isLoading = false;
         _errorMessage = SupabaseService.instance.parseAuthError(e);
-        _showResendButton = isUnconfirmed;
+        _showResendButton = mightBeUnconfirmed;
       });
     }
   }
@@ -89,6 +103,46 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         );
       }
+    }
+  }
+
+  Future<void> _handleForgotPassword() async {
+    final l10n = AppLocalizations.of(context)!;
+    final email = _emailController.text.trim();
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.errEnterEmailForReset),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+    setState(() => _isLoading = true);
+    try {
+      await SupabaseService.instance.resetPassword(email);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.passwordResetMsg),
+            backgroundColor: AppColors.primary,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('⚠️ $e'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -288,11 +342,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(l10n.passwordResetMsg)),
-                      );
-                    },
+                    onPressed: _isLoading ? null : _handleForgotPassword,
                     child: Text(
                       l10n.forgotPassword,
                       style: const TextStyle(

@@ -17,7 +17,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
-  <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 
@@ -153,8 +152,8 @@
             <div class="feature-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
             </div>
-            <h3>Liderlik Tablosu</h3>
-            <p>Haftalık sıralamada yüksel; tatlı bir rekabet motivasyonunu hep taze tutar.</p>
+            <h3>Lig Sistemi</h3>
+            <p>14 günlük dönemlerde benzer seviyendeki 30 kişiyle yarış; üst lige terfi et.</p>
           </article>
           <article class="feature-card">
             <div class="feature-icon">
@@ -200,6 +199,50 @@
             <h3>Odaklan</h3>
             <p>Zamanlayıcıyı başlat; kum akarken sen de akışa gir.</p>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CANLI LİG SIRALAMASI ============ -->
+    <section class="section section-deep" id="siralama">
+      <div class="container">
+        <div class="section-head" data-reveal>
+          <h2>Bu ayın ilk 10'u</h2>
+        </div>
+        <div class="leaderboard-live" data-reveal>
+          <div class="lb-countdown" id="lb-countdown">
+            <span class="lb-countdown-icon">⏱️</span>
+            <span class="lb-countdown-label">Aylık sıfırlanmaya kalan süre:</span>
+            <span class="lb-countdown-time" id="lb-countdown-time">—</span>
+          </div>
+
+          <div class="lb-podium" id="lb-podium" hidden>
+            <div class="lb-podium-slot lb-podium-1" id="lb-podium-1">
+              <span class="lb-podium-medal">🥇</span>
+              <img class="lb-podium-avatar" alt="" loading="lazy" width="80" height="80">
+              <span class="lb-podium-name"></span>
+              <span class="lb-podium-points"></span>
+            </div>
+            <div class="lb-podium-slot lb-podium-2" id="lb-podium-2">
+              <span class="lb-podium-medal">🥈</span>
+              <img class="lb-podium-avatar" alt="" loading="lazy" width="64" height="64">
+              <span class="lb-podium-name"></span>
+              <span class="lb-podium-points"></span>
+            </div>
+            <div class="lb-podium-slot lb-podium-3" id="lb-podium-3">
+              <span class="lb-podium-medal">🥉</span>
+              <img class="lb-podium-avatar" alt="" loading="lazy" width="56" height="56">
+              <span class="lb-podium-name"></span>
+              <span class="lb-podium-points"></span>
+            </div>
+          </div>
+
+          <ol class="lb-list" id="lb-list" aria-live="polite" start="4">
+            <li class="lb-item lb-skeleton" aria-hidden="true"></li>
+            <li class="lb-item lb-skeleton" aria-hidden="true"></li>
+            <li class="lb-item lb-skeleton" aria-hidden="true"></li>
+          </ol>
+          <p class="lb-empty" id="lb-empty" hidden>Bu ay henüz kimse odaklanmaya başlamadı — kütüphane açıldığında ilk sen ol!</p>
         </div>
       </div>
     </section>
@@ -318,6 +361,7 @@
         <ul>
           <li><a href="mailto:destek@pomosprint.app">destek@pomosprint.app</a></li>
           <li><a href="privacy.html">Gizlilik Politikası</a></li>
+          <li><a href="terms.html">Kullanım Şartları</a></li>
         </ul>
       </div>
     </div>

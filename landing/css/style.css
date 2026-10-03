@@ -1537,3 +1537,197 @@ main, .site-footer { position: relative; z-index: 1; }
   /* Pomodoro Nedir sayfası animasyonları */
   .tt-hand, .fb-ring, .fb-card { animation: none; }
 }
+
+/* ---------------- Canlı Lig Sıralaması (index.html) ---------------- */
+
+.leaderboard-live {
+  max-width: 640px;
+  margin: 0 auto;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 12px;
+}
+
+.lb-countdown {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  background: var(--bg-deep);
+  border-radius: calc(var(--radius) - 8px);
+  border: 1px solid var(--line);
+}
+
+.lb-countdown-icon { font-size: 1.05rem; line-height: 1; }
+
+.lb-countdown-label {
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.lb-countdown-time {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--coral-dark);
+  font-variant-numeric: tabular-nums;
+}
+
+.lb-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lb-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 14px;
+}
+
+.lb-item:nth-child(odd) { background: var(--bg-deep); }
+
+.lb-podium {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 14px;
+  padding: 10px 4px 18px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+}
+
+.lb-podium-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 0 1 110px;
+  text-align: center;
+}
+
+.lb-podium-1 { order: 2; margin-bottom: 16px; }
+.lb-podium-2 { order: 1; }
+.lb-podium-3 { order: 3; }
+
+.lb-podium-avatar {
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--sand-soft);
+  border: 3px solid var(--bg);
+  box-shadow: var(--shadow-sm);
+}
+
+.lb-podium-1 .lb-podium-avatar { border-color: #F5C242; box-shadow: 0 0 0 2px #F5C242, var(--shadow-md); }
+.lb-podium-2 .lb-podium-avatar { border-color: #C7CCD6; }
+.lb-podium-3 .lb-podium-avatar { border-color: #DDA15E; }
+
+.lb-podium-medal { font-size: 1.4rem; line-height: 1; }
+.lb-podium-1 .lb-podium-medal { font-size: 1.7rem; }
+
+.lb-podium-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ink);
+  max-width: 104px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lb-podium-1 .lb-podium-name { font-size: 0.95rem; }
+
+.lb-podium-points {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--coral-dark);
+  background: var(--coral-tint);
+  padding: 3px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.lb-rank {
+  flex: none;
+  width: 30px;
+  text-align: center;
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--muted);
+}
+
+.lb-item.lb-top1 .lb-rank,
+.lb-item.lb-top2 .lb-rank,
+.lb-item.lb-top3 .lb-rank { font-size: 1.3rem; }
+
+.lb-avatar {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--sand-soft);
+  border: 2px solid var(--bg);
+  object-fit: cover;
+}
+
+.lb-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-weight: 700;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lb-points {
+  flex: none;
+  font-weight: 800;
+  color: var(--coral-dark);
+  background: var(--coral-tint);
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.92rem;
+  white-space: nowrap;
+}
+
+.lb-skeleton {
+  height: 64px;
+  background: linear-gradient(90deg, var(--bg-deep) 25%, var(--line) 37%, var(--bg-deep) 63%);
+  background-size: 400% 100%;
+  animation: lb-shimmer 1.4s ease infinite;
+}
+
+@keyframes lb-shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+.lb-empty {
+  text-align: center;
+  color: var(--ink-soft);
+  padding: 32px 16px;
+  font-size: 1rem;
+}
+
+@media (max-width: 520px) {
+  .lb-name { font-size: 0.95rem; }
+  .lb-points { font-size: 0.85rem; padding: 4px 10px; }
+  .lb-podium { gap: 6px; }
+  .lb-podium-slot { flex-basis: 92px; }
+  .lb-podium-1 .lb-podium-avatar { width: 64px !important; height: 64px !important; }
+  .lb-podium-2 .lb-podium-avatar { width: 52px !important; height: 52px !important; }
+  .lb-podium-3 .lb-podium-avatar { width: 46px !important; height: 46px !important; }
+  .lb-podium-name { max-width: 88px; font-size: 0.78rem; }
+  .lb-podium-1 .lb-podium-name { font-size: 0.85rem; }
+  .lb-podium-points { font-size: 0.68rem; padding: 2px 8px; }
+}

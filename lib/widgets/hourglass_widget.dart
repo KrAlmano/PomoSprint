@@ -30,18 +30,42 @@ class HourglassWidget extends StatefulWidget {
 }
 
 class _HourglassWidgetState extends State<HourglassWidget>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late final AnimationController _lottieController;
+  late final AnimationController _shakeController;
+  late final Animation<double> _shakeAnimation;
 
   @override
   void initState() {
     super.initState();
     _lottieController = AnimationController(vsync: this);
+    
+    _shakeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+
+    // Simple shake sequence (left, right, left, right, center)
+    _shakeAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: -0.05), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: -0.05, end: 0.05), weight: 2),
+      TweenSequenceItem(tween: Tween(begin: 0.05, end: -0.05), weight: 2),
+      TweenSequenceItem(tween: Tween(begin: -0.05, end: 0.05), weight: 2),
+      TweenSequenceItem(tween: Tween(begin: 0.05, end: 0.0), weight: 1),
+    ]).animate(CurvedAnimation(
+      parent: _shakeController,
+      curve: Curves.easeInOut,
+    ));
   }
 
   @override
   void didUpdateWidget(covariant HourglassWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.sandColor != widget.sandColor) {
+      // Trigger shake animation when color (category) changes
+      _shakeController.forward(from: 0.0);
+    }
 
     if (widget.isRunning) {
       if (!_lottieController.isAnimating) {
@@ -61,6 +85,7 @@ class _HourglassWidgetState extends State<HourglassWidget>
   @override
   void dispose() {
     _lottieController.dispose();
+    _shakeController.dispose();
     super.dispose();
   }
 
@@ -70,7 +95,15 @@ class _HourglassWidgetState extends State<HourglassWidget>
       width: widget.size,
       height: widget.size * 1.05,
       child: Center(
-        child: Lottie.asset(
+        child: AnimatedBuilder(
+          animation: _shakeAnimation,
+          builder: (context, child) {
+            return Transform.rotate(
+              angle: _shakeAnimation.value,
+              child: child,
+            );
+          },
+          child: Lottie.asset(
           'assets/sand_timer.json',
           controller: _lottieController,
           width: widget.size,
@@ -85,6 +118,18 @@ class _HourglassWidgetState extends State<HourglassWidget>
               _lottieController.value = 0.0;
             }
           },
+          delegates: LottieDelegates(
+            values: [
+              if (widget.sandColor != null)
+                ValueDelegate.colorFilter(
+                  ['**'],
+                  value: ColorFilter.mode(
+                    widget.sandColor!,
+                    BlendMode.srcATop,
+                  ),
+                ),
+            ],
+          ),
           errorBuilder: (context, error, stackTrace) {
             return Icon(
               Icons.hourglass_bottom_rounded,
@@ -92,6 +137,7 @@ class _HourglassWidgetState extends State<HourglassWidget>
               color: Theme.of(context).primaryColor,
             );
           },
+        ),
         ),
       ),
     );

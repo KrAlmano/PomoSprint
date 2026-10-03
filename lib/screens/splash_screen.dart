@@ -6,6 +6,7 @@ import '../theme.dart';
 import '../models/user_model.dart';
 import '../models/category_model.dart';
 import '../services/supabase_service.dart';
+import '../models/avatar_model.dart';
 
 class SplashScreen extends StatefulWidget {
   final ValueChanged<UserModel?> onInitialized;
@@ -51,6 +52,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   Future<void> _initializeAppAndNavigate() async {
     final startTime = DateTime.now();
 
+
     UserModel? initialUser;
     List<CourseCategory> loadedCategories = CourseCategory.initialCategories();
 
@@ -63,7 +65,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     if (savedUserStr != null && savedUserStr.isNotEmpty) {
       try {
         initialUser = UserModel.fromMap(jsonDecode(savedUserStr));
-      } catch (_) {}
+      } catch (e) {
+        debugPrint('[AUTH] saved_user parse hatası: $e');
+      }
     }
 
     final localCatKey = initialUser != null ? 'saved_categories_${initialUser.email}' : 'saved_categories';
@@ -74,7 +78,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         loadedCategories = decoded
             .map((item) => CourseCategory.fromJson(item as Map<String, dynamic>))
             .toList();
-      } catch (_) {}
+      } catch (e) {
+        debugPrint('[SPLASH] saved_categories parse hatası: $e');
+      }
     }
 
     // 2. Supabase'i başlat ve (varsa) bulut verisiyle tazele — ama bu SINIRLI
@@ -83,13 +89,50 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     try {
       await SupabaseService.instance.initialize().timeout(const Duration(seconds: 5));
 
+      // Sunucudan avatarları çek
+      try {
+        final avatars = await SupabaseService.instance.getAvatars();
+        if (avatars.isNotEmpty) {
+          AvatarCharacter.setCachedAvatars(avatars);
+        }
+      } catch (e) {
+        debugPrint('[SPLASH] getAvatars hatası: $e');
+      }
+
       if (SupabaseService.instance.isCloudActive) {
         final session = Supabase.instance.client.auth.currentSession;
+        if (session == null) {
+          debugPrint('[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek');
+          // KRİTİK: currentSession null ise (oturum hiç yok ya da geçersiz
+          // hale geldi), yereldeki eski 'saved_user' önbelleğine ASLA
+          // güvenilmez — aksi halde tamamen kimliksiz bir cihaz, eski
+          // önbellek sayesinde onboarding/ana ekrana düşebilir. Bu satır
+          // olmadan initialUser burada dokunulmadan kalıyor ve aşağıda
+          // olduğu gibi kullanılıyordu.
+          initialUser = null;
+        } else {
+          final expiresAt = session.expiresAt;
+          final expiryStr = expiresAt != null
+              ? DateTime.fromMillisecondsSinceEpoch(expiresAt * 1000).toIso8601String()
+              : 'bilinmiyor';
+          debugPrint('[AUTH] Splash: currentSession VAR (email=${session.user.email}, expiresAt=$expiryStr)');
+        }
         if (session != null) {
+          // Önbellekteki kullanıcı bu oturumdan FARKLI bir hesaba aitse
+          // (cihazda daha önce başka bir test hesabı kullanılmış olabilir)
+          // ona güvenmeyelim. Aşağıdaki taze profil çekimi başarısız
+          // olursa (ağ/timeout), yanlış hesabın verisiyle (özellikle
+          // onboarding_completed_at ile) devam etmek yerine null kalsın —
+          // bu durumda en kötü ihtimalle Login ekranı gösterilir, asla
+          // başka bir hesabın onboarding durumu yanlışlıkla kullanılmaz.
+          if (initialUser != null &&
+              initialUser.email.toLowerCase() != (session.user.email ?? '').toLowerCase()) {
+            initialUser = null;
+          }
           try {
             final profile = await Supabase.instance.client
                 .from('profiles')
-                .select()
+                .select(SupabaseService.ownProfileColumns)
                 .eq('id', session.user.id)
                 .maybeSingle()
                 .timeout(const Duration(seconds: 5));
@@ -102,24 +145,22 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 final today = DateTime.now();
                 final todayDate = DateTime(today.year, today.month, today.day);
                 if (todayDate.difference(lastStudy).inDays > 1) {
-                  streak = 0; // broken streak
+                  streak = 0;
                 }
               }
 
-              initialUser = UserModel(
-                name: profile['name'] ?? session.user.email?.split('@').first ?? 'Kullanıcı',
-                email: session.user.email ?? '',
-                password: '',
-                avatarId: profile['avatar_id'] ?? 'avatar_1_gamer',
-                totalMinutes: profile['total_minutes'] ?? 0,
-                points: profile['points'] ?? 0,
-                streakDays: streak,
-                lastStudyDate: lastStudyStr,
-              );
+              // UserModel.fromMap kullanarak TÜM alanları oku (onboarding_completed_at dahil)
+              initialUser = UserModel.fromMap({
+                ...profile,
+                'email': session.user.email ?? '',
+                'current_streak': streak,
+              });
               // Save fresh profile to prefs
               await prefs.setString('saved_user', jsonEncode(initialUser.toMap()));
             }
-          } catch (_) {}
+          } catch (e) {
+            debugPrint('[AUTH] Splash: profil çekme hatası (currentSession vardı ama profil alınamadı): $e');
+          }
         }
 
         // Kategorileri buluttan tazele (yine timeout korumalı)
@@ -134,11 +175,14 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               // Bulut boş ama yerelde kategori var: buluta senkronize et (arka planda, beklemeden)
               SupabaseService.instance.upsertCategories(loadedCategories);
             }
-          } catch (_) {}
+          } catch (e) {
+            debugPrint('[SPLASH] fetchUserCategories hatası: $e');
+          }
         }
       }
-    } catch (_) {
+    } catch (e) {
       // Ağ yok / timeout: yukarıda yüklenen yerel veriyle devam edilir.
+      debugPrint('[AUTH] Splash: SupabaseService.initialize() başarısız (ağ/timeout) — oturum tazelenemedi: $e');
     }
 
     // Ensure minimum 1.8 seconds display for smooth logo animation
@@ -233,15 +277,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                         color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
                       ),
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Sprint into deep focus',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant).withValues(alpha: 0.7),
-                      ),
-                    ),
+
                   ],
                 ),
               ),

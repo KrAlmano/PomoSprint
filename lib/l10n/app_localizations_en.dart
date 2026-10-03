@@ -177,6 +177,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirmSelection => 'Confirm Selection';
 
   @override
+  String get leagueAwardsTitle => 'League Achievements';
+
+  @override
+  String get leagueAwardsSub =>
+      'Earned by finishing 1st, 2nd, or 3rd in a league period.';
+
+  @override
+  String get leagueAwardLockedTitle => 'This Avatar Is Locked';
+
+  @override
+  String get leagueAwardLockedBody =>
+      'To earn this avatar, you need to finish 1st, 2nd, or 3rd in this tier during a league period. It can\'t be purchased.';
+
+  @override
+  String get leagueAwardLockedOk => 'Got It';
+
+  @override
   String get lockedCharacter => 'Locked Character';
 
   @override
@@ -217,7 +234,12 @@ class AppLocalizationsEn extends AppLocalizations {
       '📬 Verification link resent. Please check your inbox.';
 
   @override
-  String get passwordResetMsg => 'Password reset link sent.';
+  String get passwordResetMsg =>
+      'We sent a password reset link to your email. Check your inbox (and spam folder).';
+
+  @override
+  String get errEnterEmailForReset =>
+      'Enter your email address first to reset your password.';
 
   @override
   String get createAccountTitle => 'Create New Account';
@@ -237,6 +259,27 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get termsAgree =>
       'I agree to the Terms of Service and Privacy Policy.';
+
+  @override
+  String get termsAgreePrefix => 'I agree to the ';
+
+  @override
+  String get termsLinkTerms => 'Terms of Service';
+
+  @override
+  String get termsAgreeConnector => ' and ';
+
+  @override
+  String get termsLinkPrivacy => 'Privacy Policy';
+
+  @override
+  String get termsAgreeSuffix => '.';
+
+  @override
+  String get privacyPolicyLink => 'Privacy Policy';
+
+  @override
+  String get termsOfServiceLink => 'Terms of Service';
 
   @override
   String get updatesAgree => 'I want to receive updates and new features.';
@@ -522,4 +565,117 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get tip4 =>
       'Studying difficult topics in the morning improves productivity.';
+
+  @override
+  String get addBtn => 'Add';
+
+  @override
+  String get onboardingSelectOptionError => 'Please select an option.';
+
+  @override
+  String get onboardingTimeoutError =>
+      'Connection timed out. Please check your internet and try again.';
+
+  @override
+  String onboardingGenericError(Object error) {
+    return 'Something went wrong, please try again: $error';
+  }
+
+  @override
+  String get onboardingAddCategoryTitle => 'Add Category';
+
+  @override
+  String get onboardingCategoryHint => 'Category name';
+
+  @override
+  String get onboardingMaxCategoriesMsg => 'You can select up to 8 categories.';
+
+  @override
+  String get onboardingWelcomeTitle => 'Welcome! 👋';
+
+  @override
+  String get onboardingWelcomeBody =>
+      'I\'m your focus companion. Before I join you, can I know your birth year?';
+
+  @override
+  String get onboardingSegmentTitle => 'So, which journey are you on?';
+
+  @override
+  String get onboardingSegmentBody =>
+      'What will we study together? Let me pick the best categories for you.';
+
+  @override
+  String get onboardingSegmentLgs => '🎓  LGS';
+
+  @override
+  String get onboardingSegmentYks => '📚  YKS';
+
+  @override
+  String get onboardingSegmentUniversity => '🏛️  University';
+
+  @override
+  String get onboardingSegmentWork => '💼  Work & Personal Growth';
+
+  @override
+  String get onboardingCategoryStepTitle => 'Great choice! 🎉';
+
+  @override
+  String get onboardingCategoryStepBody =>
+      'Now pick the subjects/areas you\'ll study — you can change them anytime. Free plan allows up to 8.';
+
+  @override
+  String get onboardingCreateOwnCategory => '+ Create my own category';
+
+  @override
+  String get onboardingGoalStepTitle => 'One last step! 🚀';
+
+  @override
+  String get onboardingGoalStepBody =>
+      'How much do you want to focus together each day?';
+
+  @override
+  String get onboardingGoal1h => '1 Hour';
+
+  @override
+  String get onboardingGoal2h => '2 Hours';
+
+  @override
+  String get onboardingGoal3h => '3 Hours';
+
+  @override
+  String get onboardingGoal4hPlus => '4 Hours+';
+
+  @override
+  String get onboardingFinishBtn => 'Finish';
+
+  @override
+  String get categoriesManagementTitle => 'My Categories';
+
+  @override
+  String categoryLimitReachedMsg(int limit) {
+    return 'You\'ve reached your limit. You can add up to $limit categories.';
+  }
+
+  @override
+  String get newCategoryDialogTitle => 'New Category';
+
+  @override
+  String get editCategoryDialogTitle => 'Edit Category';
+
+  @override
+  String get activeCategoryCountLabel => 'Active Category Count';
+
+  @override
+  String get archiveCategoryTooltip =>
+      'Archive (kept for past reports instead of deleting)';
+
+  @override
+  String get archivedCategoriesHeader => 'Archived Categories';
+
+  @override
+  String get archivedCategoriesDesc =>
+      'These categories won\'t appear in the subject picker but remain in past reports.';
+
+  @override
+  String get unarchiveTooltip => 'Unarchive';
 }

@@ -356,7 +356,7 @@ class _FriendsSheetState extends State<FriendsSheet> {
                           ),
                         )
                       else
-                        ...(_friends..sort((a, b) => (b['points'] as int? ?? 0).compareTo(a['points'] as int? ?? 0)))
+                        ...(_friends..sort((a, b) => (b['lifetime_points'] as int? ?? 0).compareTo(a['lifetime_points'] as int? ?? 0)))
                             .map((f) {
                           final avatar = _getAvatar(f['avatar_id']?.toString());
                           return Container(
@@ -392,7 +392,7 @@ class _FriendsSheetState extends State<FriendsSheet> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Text(
-                                    '${f['points'] ?? 0}',
+                                    '${f['lifetime_points'] ?? 0}',
                                     style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.onPrimaryFixed),
                                   ),
                                 ),

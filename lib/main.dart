@@ -1,31 +1,59 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show kReleaseMode;
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'theme.dart';
 import 'models/category_model.dart';
-import 'models/avatar_model.dart';
 import 'models/user_model.dart';
-import 'widgets/avatar_widget.dart';
+import 'models/avatar_model.dart';
 import 'screens/timer_screen.dart';
 import 'screens/ranking_screen.dart';
 import 'screens/reports_screen.dart';
+import 'screens/social_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/friends_sheet.dart';
-import 'utils/points.dart';
 import 'screens/login_screen.dart';
 import 'screens/splash_screen.dart';
+import 'screens/post_auth_onboarding_screen.dart';
 import 'services/supabase_service.dart';
 import 'services/language_service.dart';
+import 'services/notification_service.dart';
+import 'widgets/avatar_widget.dart';
+import 'widgets/league_info_sheet.dart';
 
 import 'l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // .env burada erkenden yükleniyor ki Sentry DSN'ine erişebilelim;
+  // SupabaseService.initialize() aynı dosyayı kendi ihtiyacı için tekrar
+  // yükler, bu zararsızdır. DSN boşsa Sentry SDK kendini otomatik devre
+  // dışı bırakır — .env'de SENTRY_DSN olmaması uygulamayı bozmaz.
+  String sentryDsn = '';
+  try {
+    await dotenv.load(fileName: ".env");
+    sentryDsn = dotenv.env['SENTRY_DSN'] ?? '';
+  } catch (_) {
+    // .env okunamazsa (ör. asset eksik) Sentry'siz devam et.
+  }
+
+  await NotificationService.instance.initialize();
   await LanguageService.instance.init();
-  runApp(const PomodoroApp());
+
+  await SentryFlutter.init(
+    (options) {
+      options.dsn = sentryDsn;
+      options.tracesSampleRate = 0.2;
+      options.environment = kReleaseMode ? 'production' : 'debug';
+    },
+    appRunner: () => runApp(const PomodoroApp()),
+  );
 }
 
 class PomodoroApp extends StatefulWidget {
@@ -37,11 +65,47 @@ class PomodoroApp extends StatefulWidget {
 
 class _PomodoroAppState extends State<PomodoroApp> {
   ThemeMode _themeMode = ThemeMode.light;
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
 
   void _toggleDarkMode(bool isDark) {
-    setState(() {
-      _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
-    });
+    setState(() => _themeMode = isDark ? ThemeMode.dark : ThemeMode.light);
+  }
+
+  // Giriş başarılı olduktan veya onboarding bittikten sonra bir sonraki
+  // ekrana geçer. BİLİNÇLİ OLARAK SplashScreen'i yeniden TETİKLEMEZ:
+  // eskiden bu iki durumda da SplashScreen key'i değiştirilip tamamen
+  // yeniden mount ediliyordu, bu da SplashScreen.initState() içindeki
+  // SupabaseService.instance.initialize() (yani Supabase.initialize())
+  // çağrısının aynı process içinde İKİNCİ kez tetiklenmesine yol
+  // açıyordu. Bu ikinci çağrı, az önce tamamlanan girişin oturumunun
+  // henüz diske tam yazılmamış olabileceği bir anda currentSession'ı
+  // yeniden okuyup ara sıra "oturum yokmuş gibi" davranıyordu — kullanıcı
+  // "Giriş Yap"a bassa da ekran geçmiyor, onboarding'de "Bitir" sonsuza
+  // kadar dönüyor, ama uygulamayı kapatıp açınca (gerçek bir soğuk
+  // başlangıçta Supabase.initialize() sadece BİR kez ve oturum diske
+  // tam yazıldıktan sonra çalıştığı için) düzeliyordu. Artık elimizdeki
+  // güncel UserModel ile doğrudan ilerliyoruz, Supabase'i yeniden
+  // başlatmaya hiç gerek yok.
+  void _goToPostAuthScreen(UserModel user, List<CourseCategory> categories) {
+    _navigatorKey.currentState?.pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => user.onboardingCompletedAt == null
+            ? PostAuthOnboardingScreen(
+                onCompleted: () {
+                  _goToPostAuthScreen(
+                    user.copyWith(onboardingCompletedAt: DateTime.now()),
+                    categories,
+                  );
+                },
+              )
+            : MainNavigationShell(
+                isDarkMode: _themeMode == ThemeMode.dark,
+                onDarkModeChanged: _toggleDarkMode,
+                initialUser: user,
+                initialCategories: categories,
+              ),
+      ),
+    );
   }
 
   @override
@@ -50,6 +114,7 @@ class _PomodoroAppState extends State<PomodoroApp> {
       listenable: LanguageService.instance,
       builder: (context, _) {
         return MaterialApp(
+          navigatorKey: _navigatorKey,
           title: 'PomoSprint - Pomodoro',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
@@ -61,6 +126,38 @@ class _PomodoroAppState extends State<PomodoroApp> {
           home: SplashScreen(
             onInitialized: (_) {},
             onNavigate: (user, categories) {
+              // ── Kullanıcı YOK → Doğrudan Login (veya Register) ──
+              if (user == null) {
+                return LoginScreen(
+                  onLoginSuccess: (loggedUser) async {
+                    // loginUser() zaten profili sunucudan taze çekip
+                    // döndürdü; burada sadece kategorileri tazeliyoruz.
+                    List<CourseCategory> freshCategories;
+                    try {
+                      freshCategories = await SupabaseService.instance
+                          .fetchUserCategories()
+                          .timeout(const Duration(seconds: 5));
+                    } catch (_) {
+                      freshCategories = CourseCategory.initialCategories();
+                    }
+                    _goToPostAuthScreen(loggedUser, freshCategories);
+                  },
+                );
+              }
+
+              // ── Kullanıcı VAR + onboarding bitmemiş → Post-Auth 4 adım ──
+              if (user.onboardingCompletedAt == null) {
+                return PostAuthOnboardingScreen(
+                  onCompleted: () {
+                    _goToPostAuthScreen(
+                      user.copyWith(onboardingCompletedAt: DateTime.now()),
+                      categories,
+                    );
+                  },
+                );
+              }
+
+              // ── Kullanıcı VAR + onboarding tamamlandı → Ana ekran ──
               return MainNavigationShell(
                 isDarkMode: _themeMode == ThemeMode.dark,
                 onDarkModeChanged: _toggleDarkMode,
@@ -98,6 +195,8 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
   late List<CourseCategory> _categories;
   UserModel? _currentUser;
   int _pendingSessionCount = 0;
+  bool _isTimerRunning = false;
+  bool _isRankingLeagueTabActive = true;
 
   StreamSubscription<AuthState>? _authStateSubscription;
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
@@ -110,8 +209,16 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     _listenAuthChanges();
     _refreshPendingSessionCount();
     _trySyncPendingSessions();
+    // Açılışta bulut erişilemediyse yer tutucu kategorilerle başlamış
+    // olabiliriz; gerçek kategorileri tekrar çekmeyi dene.
+    if (_currentUser != null && _hasPlaceholderCategories) {
+      _loadCategoriesForUser(_currentUser!.email);
+    }
     _connectivitySubscription = Connectivity().onConnectivityChanged.listen((results) {
       if (!results.contains(ConnectivityResult.none)) {
+        if (_currentUser != null && _hasPlaceholderCategories) {
+          _loadCategoriesForUser(_currentUser!.email);
+        }
         _trySyncPendingSessions();
       }
     });
@@ -130,11 +237,12 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     final email = _currentUser?.email;
     if (email == null || email.isEmpty) return;
     if (!SupabaseService.instance.isCloudActive) return;
+    final previousCount = _pendingSessionCount;
     final remaining = await SupabaseService.instance.syncPendingSessions(email);
     if (mounted) {
       setState(() => _pendingSessionCount = remaining);
     }
-    if (remaining < _pendingSessionCount) {
+    if (remaining < previousCount) {
       // Senkronize edilen seanslar sunucudaki güncel puan/dakikayı yansıtsın diye
       // profili tazeleyelim (basit yaklaşım: mevcut oturum verisini yeniden çek).
       _refreshCurrentUserFromServer();
@@ -147,11 +255,12 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     final userId = client.auth.currentUser?.id;
     if (userId == null) return;
     try {
-      final profile = await client.from('profiles').select().eq('id', userId).maybeSingle();
+      final profile = await client.from('profiles').select('total_minutes, lifetime_points, coins').eq('id', userId).maybeSingle();
       if (profile != null && mounted && _currentUser != null) {
         final updated = _currentUser!.copyWith(
           totalMinutes: profile['total_minutes'] ?? _currentUser!.totalMinutes,
-          points: profile['points'] ?? _currentUser!.points,
+          lifetimePoints: profile['lifetime_points'] ?? _currentUser!.lifetimePoints,
+          coins: profile['coins'] ?? _currentUser!.coins,
         );
         setState(() => _currentUser = updated);
         _saveUserToPrefs(updated);
@@ -164,19 +273,15 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
       _authStateSubscription = Supabase.instance.client.auth.onAuthStateChange.listen((data) async {
         final event = data.event;
         final session = data.session;
+        debugPrint('[AUTH] onAuthStateChange: $event (${DateTime.now().toIso8601String()}, session=${session != null ? "var" : "yok"})');
 
         if ((event == AuthChangeEvent.signedIn || event == AuthChangeEvent.tokenRefreshed) && session != null) {
           try {
             final profile = await Supabase.instance.client
                 .from('profiles')
-                .select()
+                .select(SupabaseService.ownProfileColumns)
                 .eq('id', session.user.id)
                 .maybeSingle();
-
-            final name = profile?['name'] ?? session.user.userMetadata?['name'] ?? session.user.email?.split('@').first ?? 'Kullanıcı';
-            final avatarId = profile?['avatar_id'] ?? session.user.userMetadata?['avatar_id'] ?? 'avatar_1_gamer';
-            final totalMins = profile?['total_minutes'] ?? 0;
-            final points = profile?['points'] ?? 0;
 
             int streak = profile?['current_streak'] ?? 0;
             final String? lastStudyStr = profile?['last_study_date'];
@@ -185,30 +290,35 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
               final today = DateTime.now();
               final todayDate = DateTime(today.year, today.month, today.day);
               if (todayDate.difference(lastStudy).inDays > 1) {
-                streak = 0; // broken streak
+                streak = 0;
               }
             }
 
-            final loggedInUser = UserModel(
-              name: name,
-              email: session.user.email ?? '',
-              password: '',
-              avatarId: avatarId,
-              totalMinutes: totalMins,
-              points: points,
-              streakDays: streak,
-              lastStudyDate: lastStudyStr,
-            );
+            // UserModel.fromMap kullan → onboarding_completed_at okunur
+            final loggedInUser = profile != null
+                ? UserModel.fromMap({
+                    ...profile,
+                    'email': session.user.email ?? '',
+                    'current_streak': streak,
+                  })
+                : UserModel(
+                    name: session.user.userMetadata?['name'] ?? session.user.email?.split('@').first ?? 'Kullanıcı',
+                    email: session.user.email ?? '',
+                  );
 
             if (mounted) {
-              setState(() {
-                _currentUser = loggedInUser;
-              });
+              setState(() => _currentUser = loggedInUser);
               _saveUserToPrefs(loggedInUser);
               _loadCategoriesForUser(loggedInUser.email);
             }
-          } catch (_) {}
+          } catch (e) {
+            debugPrint('[AUTH] onAuthStateChange($event): profil çekme hatası: $e');
+          }
         } else if (event == AuthChangeEvent.signedOut) {
+          // GoTrue, arka planda token yenileme (refresh) başarısız olduğunda
+          // da bu olayı üretir — yani bu dal aynı zamanda "yenileme başarısız
+          // oldu" durumunu da kapsar.
+          debugPrint('[AUTH] signedOut olayı alındı — oturum kapandı (kullanıcı eylemi veya başarısız token yenileme)');
           if (mounted) {
             setState(() {
               _currentUser = null;
@@ -237,20 +347,30 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     } catch (_) {}
   }
 
+  bool get _hasPlaceholderCategories =>
+      _categories.any((c) => !SupabaseService.isServerCategoryId(c.id));
+
   Future<void> _loadCategoriesForUser(String email) async {
     try {
-      // 1. Try Supabase first
+      // 1. Bulut asıl kaynaktır. Hata olursa (ağ yok) yerel önbelleğe düş,
+      // ama buluta hiçbir şey YAZMA: eski yerel veri başka bir cihazda
+      // yapılmış değişiklikleri ezebilir.
+      List<CourseCategory>? cloudCats;
       if (SupabaseService.instance.isCloudActive) {
-        final cloudCats = await SupabaseService.instance.fetchUserCategories();
-        if (cloudCats.isNotEmpty) {
-          if (mounted) {
-            setState(() {
-              _categories = cloudCats;
-            });
-          }
-          await _saveCategoriesToPrefs(); // Update local cache
-          return;
+        try {
+          cloudCats = await SupabaseService.instance.fetchUserCategories();
+        } catch (e) {
+          debugPrint('fetchUserCategories hatası, yerel önbelleğe düşülüyor: $e');
         }
+      }
+      if (cloudCats != null && cloudCats.isNotEmpty) {
+        if (mounted) {
+          setState(() {
+            _categories = cloudCats!;
+          });
+        }
+        await _saveCategoriesToPrefs(); // Update local cache
+        return;
       }
 
       // 2. Fallback to Local Prefs
@@ -270,16 +390,11 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
           _categories = loaded;
         });
       }
-      
-      // If we loaded local but cloud is active, upsert to cloud
-      if (SupabaseService.instance.isCloudActive && loaded.isNotEmpty) {
-        final synced = await SupabaseService.instance.upsertCategories(loaded);
-        if (synced.isNotEmpty && mounted) {
-          setState(() {
-            _categories = synced;
-          });
-          await _saveCategoriesToPrefs();
-        }
+
+      // 3. Bulut erişilebilir ama kullanıcının hiç aktif kategorisi yoksa
+      // (eski sürümden gelen hesap), yerel kategorileri buluta taşı.
+      if (cloudCats != null && cloudCats.isEmpty && loaded.isNotEmpty) {
+        await SupabaseService.instance.upsertCategories(loaded);
       }
     } catch (_) {}
   }
@@ -311,18 +426,31 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     });
     _saveCategoriesToPrefs();
 
-    // Sync to Supabase
+    // Sync to Supabase (limit ve isim kontrolü sunucuda yapılır)
     if (SupabaseService.instance.isCloudActive) {
-      final syncedCat = await SupabaseService.instance.insertCategory(newCategory);
-      if (syncedCat != null && mounted) {
+      try {
+        final syncedCat = await SupabaseService.instance.insertCategory(newCategory);
+        if (syncedCat != null && mounted) {
+          setState(() {
+            // Replace local temp ID with Supabase UUID
+            final index = _categories.indexWhere((c) => c.id == newCategory.id);
+            if (index != -1) {
+              _categories[index] = syncedCat;
+            }
+          });
+          _saveCategoriesToPrefs();
+        }
+      } catch (e) {
+        // Sunucu reddetti (ör. kategori limiti): yerel eklemeyi geri al.
+        if (!mounted) return;
         setState(() {
-          // Replace local temp ID with Supabase UUID
-          final index = _categories.indexWhere((c) => c.id == newCategory.id);
-          if (index != -1) {
-            _categories[index] = syncedCat;
-          }
+          _categories.removeWhere((c) => c.id == newCategory.id);
         });
         _saveCategoriesToPrefs();
+        final message = e is PostgrestException ? e.message : e.toString();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+        );
       }
     }
   }
@@ -338,64 +466,6 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     if (SupabaseService.instance.isCloudActive) {
       await SupabaseService.instance.deleteCategory(id);
     }
-  }
-
-  void _showPointsInfoDialog() {
-    final isTurkish = LanguageService.instance.isTurkish;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? AppColors.darkSurfaceContainerHigh : AppColors.surfaceContainerHigh,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: [
-            const Icon(Icons.stars_rounded, color: Colors.amber, size: 26),
-            const SizedBox(width: 8),
-            Text(
-              isTurkish ? 'Puanlama Nasıl Çalışır?' : 'How Scoring Works',
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: isDark ? AppColors.darkOnSurface : AppColors.onSurface),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _PointsInfoRow(
-              icon: Icons.timer_outlined,
-              text: isTurkish ? '25 dk Pomodoro = 20 Puan' : '25 min Pomodoro = 20 Points',
-            ),
-            const SizedBox(height: 10),
-            _PointsInfoRow(
-              icon: Icons.timer_outlined,
-              text: isTurkish ? '50 dk Pomodoro = 40 Puan' : '50 min Pomodoro = 40 Points',
-            ),
-            const SizedBox(height: 14),
-            const Divider(),
-            const SizedBox(height: 10),
-            _PointsInfoRow(
-              icon: Icons.local_fire_department,
-              iconColor: Colors.deepOrange,
-              text: isTurkish
-                  ? 'Günlük Seri (🔥): Her gün giriş yapıp en az 1 Pomodoro tamamladığında serin devam eder.'
-                  : 'Daily Streak (🔥): Log in and complete at least 1 Pomodoro each day to keep your streak going.',
-            ),
-          ],
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () => Navigator.pop(ctx),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryContainer,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-            child: Text(isTurkish ? 'Anladım' : 'Got it'),
-          ),
-        ],
-      ),
-    );
   }
 
   void _openFriendsSheet() {
@@ -417,11 +487,20 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
           userEmail: _currentUser!.email,
           currentAvatarId: _currentUser!.avatarId,
           totalStudyMinutes: _currentUser!.totalMinutes,
-          userPoints: _currentUser!.points,
+          userPoints: _currentUser!.lifetimePoints,
+          userCoins: _currentUser!.coins,
+          isPremium: _currentUser!.isPremium,
+          unlockedAvatars: _currentUser!.unlockedAvatars,
           isDarkMode: widget.isDarkMode,
           categories: _categories,
           onAddCategory: _addCategory,
           onDeleteCategory: _deleteCategory,
+          onCoinsChanged: (newCoins) {
+            setState(() {
+              _currentUser = _currentUser?.copyWith(coins: newCoins);
+            });
+            _saveUserToPrefs(_currentUser);
+          },
           onAvatarChanged: (newAvatarId) async {
             final messenger = ScaffoldMessenger.of(context);
             final userKey = _currentUser?.email ?? _currentUser?.name ?? '';
@@ -435,7 +514,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
 
             if (userKey.isNotEmpty) {
               try {
-                await SupabaseService.instance.updateUserAvatar(userKey, newAvatarId);
+                await SupabaseService.instance.setEquippedAvatar(newAvatarId);
               } catch (e) {
                 setState(() {
                   if (oldAvatarId != null) {
@@ -457,6 +536,10 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
           },
           onDarkModeChanged: widget.onDarkModeChanged,
           onLogout: () async {
+            // Sırayla: Google native oturumu + Supabase oturumu kapat,
+            // sonra yerel state/önbelleği temizle. Eskiden sadece yerel
+            // state temizleniyordu, gerçek oturum canlı kalıyordu.
+            await SupabaseService.instance.signOutFully();
             setState(() {
               _currentUser = null;
               _currentIndex = 0;
@@ -471,6 +554,8 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
   @override
   Widget build(BuildContext context) {
     final lang = LanguageService.instance;
+    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    final hideUI = isLandscape && _isTimerRunning && _currentIndex == 0;
 
     // Show Login Screen if no user logged in
     if (_currentUser == null) {
@@ -487,57 +572,177 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
       );
     }
 
+    // Kullanıcı var ama onboarding'i tamamlamamış (ör. logout sonrası bu
+    // ekrandan çıkmadan yeni bir hesapla giriş/kayıt yapıldıysa) — Splash'in
+    // ilk açılıştaki yönlendirmesiyle AYNI kapıyı burada da uygula.
+    if (_currentUser!.onboardingCompletedAt == null) {
+      return PostAuthOnboardingScreen(
+        onCompleted: () {
+          setState(() {
+            _currentUser = _currentUser!.copyWith(onboardingCompletedAt: DateTime.now());
+          });
+          _saveUserToPrefs(_currentUser);
+          // Onboarding sırasında seçilen kategoriler sunucuya kaydedildi;
+          // _categories hâlâ eski/varsayılan listeyi tutuyor olabilir —
+          // taze kategorileri çek ki kullanıcı kendi seçtiklerini görsün.
+          _loadCategoriesForUser(_currentUser!.email);
+        },
+      );
+    }
+
     final screens = [
       TimerScreen(
         categories: _categories,
         onOpenSettings: _openProfile, // Open Profile & Settings
-        onSessionCompleted: (catId, minutes) async {
-          final addedPoints = pointsForMinutes(minutes);
+        onTimerStateChanged: (isRunning, categoryName, loggedMinutes) {
+          if (mounted) {
+            setState(() {
+              _isTimerRunning = isRunning;
+            });
+          }
+          if (_currentUser == null) return; // Yerel/misafir kullanıcı: sosyal listeye katılmaz
+          if (isRunning) {
+            SupabaseService.instance.startStudySession(
+              durationMinutes: loggedMinutes,
+              categoryName: categoryName,
+            );
+          } else {
+            SupabaseService.instance.cancelStudySession();
+          }
+        },
+        onSessionCompleted: (catId, minutes, wasPaused, isVerified, startedAt, clientUuid) async {
           final isLoggedIn = _currentUser != null;
 
-          final updatedUser = _currentUser?.copyWith(
-            totalMinutes: (_currentUser?.totalMinutes ?? 0) + minutes,
-            points: (_currentUser?.points ?? 0) + addedPoints,
-          );
-
+          // Optimistically update local state (will be corrected by server response)
           setState(() {
-            _currentUser = updatedUser;
             final catIndex = _categories.indexWhere((c) => c.id == catId);
             if (catIndex != -1) {
               _categories[catIndex].sessionsCount += 1;
               _categories[catIndex].totalMinutes += minutes;
-            } else {
-              debugPrint('⚠️ Hata: catId ($catId) yerel kategorilerde bulunamadı!');
             }
           });
 
-          _saveUserToPrefs(updatedUser);
           _saveCategoriesToPrefs();
 
           if (isLoggedIn) {
-            String catName = 'Bilinmeyen Ders';
-            final catIndex = _categories.indexWhere((c) => c.id == catId);
-            if (catIndex != -1) {
-              catName = _categories[catIndex].name;
-            }
-
             try {
-              // study_sessions insert + profiles update TEK transaction'da (atomik).
-              await SupabaseService.instance.logPomodoroSession(
-                categoryName: catName,
-                minutes: minutes,
-                addedPoints: addedPoints,
+              final result = await SupabaseService.instance.completeStudySession(
+                clientUuid: clientUuid,
+                categoryId: catId,
+                durationMinutes: minutes,
+                wasPaused: wasPaused,
+                isVerified: isVerified,
+                startedAt: startedAt,
               );
+
+              if (result != null && result['error'] != null) {
+                // Sunucu seansı reddetti (örn. 'overlap' / 'hourly_limit') —
+                // hiçbir profil güncellemesi/kayıt yapılmadı. Yerel state'i
+                // yanlışlıkla ilerletmeyelim, kullanıcıyı bilgilendirelim.
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        LanguageService.instance.isTurkish
+                            ? '⚠️ Bu seans kaydedilemedi (sunucu reddetti: ${result['error']}).'
+                            : '⚠️ This session could not be saved (server rejected: ${result['error']}).',
+                      ),
+                      backgroundColor: Colors.orange.shade800,
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              } else if (result != null) {
+                final totalPts = result['total_points'] as int? ?? 0;
+                final basePts = result['base_points'] as int? ?? 0;
+                final bonusPts = result['bonus_points'] as int? ?? 0;
+                final streak = result['streak'] as int? ?? 0;
+                final bonusPct = result['bonus_pct'] as int? ?? 0;
+                // Sunucu artık kum tanesini puandan bağımsız, sabit bir
+                // oranla veriyor (complete_study_session'daki v_coins_earned);
+                // yerel önbelleği totalPts değil, sunucunun döndürdüğü gerçek
+                // coins_earned değeriyle eşitliyoruz.
+                final coinsEarned = result['coins_earned'] as int? ?? totalPts;
+
+                final updatedUser = _currentUser?.copyWith(
+                  totalMinutes: (_currentUser?.totalMinutes ?? 0) + minutes,
+                  lifetimePoints: (_currentUser?.lifetimePoints ?? 0) + totalPts,
+                  coins: (_currentUser?.coins ?? 0) + coinsEarned,
+                  streakDays: streak,
+                );
+                setState(() => _currentUser = updatedUser);
+                _saveUserToPrefs(updatedUser);
+
+                // Show point breakdown snackbar
+                if (context.mounted && bonusPts > 0) {
+                  ScaffoldMessenger.of(context).clearSnackBars();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        LanguageService.instance.isTurkish
+                            ? '🔥 $basePts puan + $bonusPts seri bonusu (%$bonusPct) = $totalPts puan!'
+                            : '🔥 $basePts pts + $bonusPts streak bonus ($bonusPct%) = $totalPts pts!',
+                      ),
+                      backgroundColor: Colors.green.shade700,
+                      behavior: SnackBarBehavior.floating,
+                      duration: const Duration(seconds: 4),
+                    ),
+                  );
+                }
+
+                final isDailyLimitReached = result['daily_limit_reached'] as bool? ?? false;
+
+                // Show daily limit reached message
+                if (context.mounted && isDailyLimitReached) {
+                  Future.delayed(const Duration(seconds: 1), () {
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          LanguageService.instance.isTurkish
+                              ? 'Bugünlük lig puanı sınırına ulaştın (16 pomodoro). Çalışman kaydedilmeye devam ediyor.'
+                              : 'You have reached today\'s league points limit (16 pomodoros). Your work continues to be saved.',
+                        ),
+                        backgroundColor: AppColors.primaryContainer,
+                        behavior: SnackBarBehavior.floating,
+                        duration: const Duration(seconds: 5),
+                      ),
+                    );
+                  });
+                }
+              }
             } catch (e) {
-              // Ağ/sunucu hatası: seansı cihazda "bekleyen" olarak sakla,
-              // bağlantı gelince otomatik tekrar denenecek (kalıcı kaybolmaz).
+              if (SupabaseService.isPermanentSessionError(e)) {
+                // Sunucu seansı doğrulamadan geçirmedi (ör. süre dolmadan
+                // gönderildi, başka bir seansla çakışıyor). Tekrar denemenin
+                // anlamı yok; kuyruğa almak yerine kullanıcıyı bilgilendir.
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        LanguageService.instance.isTurkish
+                            ? '⚠️ Bu seans kaydedilemedi: sunucu doğrulamasından geçmedi.'
+                            : '⚠️ This session could not be saved: it failed server validation.',
+                      ),
+                      backgroundColor: Colors.orange.shade800,
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+                return;
+              }
+              // Offline: save pending session for later sync
               final email = _currentUser?.email;
               if (email != null && email.isNotEmpty) {
                 await SupabaseService.instance.addPendingSession(
                   userEmail: email,
-                  categoryName: catName,
+                  categoryId: catId,
+                  categoryName: _categories.firstWhere((c) => c.id == catId, orElse: () => _categories.first).name,
                   minutes: minutes,
-                  addedPoints: addedPoints,
+                  wasPaused: wasPaused,
+                  isVerified: isVerified,
+                  startedAt: startedAt.toIso8601String(),
+                  clientUuid: clientUuid,
                 );
                 await _refreshPendingSessionCount();
               }
@@ -557,21 +762,31 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
             }
           }
         },
-        userPoints: _currentUser?.points ?? 0,
+        userPoints: _currentUser?.lifetimePoints ?? 0,
         streakDays: _currentUser?.streakDays ?? 0,
+        userSegment: _currentUser?.userSegment,
       ),
       ReportsScreen(
         categories: _categories,
 
         onStartTimer: () => setState(() => _currentIndex = 0),
       ),
-      RankingScreen(currentUser: _currentUser),
+      RankingScreen(
+        currentUser: _currentUser,
+        onLeagueTabActive: (active) {
+          if (_isRankingLeagueTabActive != active) {
+            setState(() => _isRankingLeagueTabActive = active);
+          }
+        },
+      ),
+      const SocialScreen(),
     ];
 
     final titles = [
       'Pomo',
       lang.translate('title_reports'),
       lang.translate('title_ranking'),
+      lang.translate('title_social'),
     ];
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -581,13 +796,15 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
       builder: (context, _) {
         return Scaffold(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          appBar: AppBar(
+          appBar: hideUI ? null : AppBar(
             backgroundColor: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.85),
             surfaceTintColor: Colors.transparent,
             elevation: 0,
             toolbarHeight: 76,
             titleSpacing: 16,
-            title: FittedBox(
+            title: (_currentIndex == 1 || _currentIndex == 2 || _currentIndex == 3)
+                ? const SizedBox.shrink()
+                : FittedBox(
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerLeft,
               child: _currentIndex == 0
@@ -611,65 +828,157 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                         ),
                       ],
                     )
-                  : Text(
-                      titles[_currentIndex],
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? AppColors.darkPrimary : AppColors.primary,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-            ),
-            actions: [
-              // Puan Rozeti (büyütülmüş + "?" bilgi ikonu)
-              InkWell(
-                onTap: _showPointsInfoDialog,
-                borderRadius: BorderRadius.circular(18),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryFixed,
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            lang.translate('points_caption'),
-                            style: const TextStyle(
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.onPrimaryFixed,
-                              letterSpacing: 0.5,
-                            ),
+                  : Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          titles[_currentIndex],
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? AppColors.darkPrimary : AppColors.primary,
+                            letterSpacing: -0.5,
                           ),
-                          Text(
-                            '${_currentUser?.points ?? 0}',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.onPrimaryFixed,
+                        ),
+                        if (_currentIndex == 2 && _isRankingLeagueTabActive) ...[
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: () => showLeagueInfoSheet(context),
+                            child: Container(
+                              width: 22,
+                              height: 22,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: AppColors.primaryContainer.withValues(alpha: 0.15),
+                              ),
+                              child: Icon(
+                                Icons.question_mark_rounded,
+                                size: 13,
+                                color: isDark ? AppColors.darkPrimary : AppColors.primary,
+                              ),
                             ),
                           ),
                         ],
-                      ),
-                      const SizedBox(width: 6),
-                      Container(
-                        width: 16,
-                        height: 16,
-                        decoration: BoxDecoration(
-                          color: AppColors.onPrimaryFixed.withValues(alpha: 0.25),
-                          shape: BoxShape.circle,
+                      ],
+                    ),
+            ),
+            actions: [
+              // Puan + Kum Tanesi rozetleri: yan yana, ayrı kutular. Taşma
+              // riskine karşı (ekran genişliği dar olduğunda) bu ikili
+              // kendi içinde yatay kaydırılabilir; geri kalan actions
+              // öğeleri (arkadaş/profil) etkilenmez.
+              Flexible(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const ClampingScrollPhysics(),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      InkWell(
+                        onTap: () => showLeagueInfoSheet(context),
+                        borderRadius: BorderRadius.circular(18),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryFixed,
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    lang.translate('points_caption'),
+                                    style: const TextStyle(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.onPrimaryFixed,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${_currentUser?.lifetimePoints ?? 0}',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.onPrimaryFixed,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(width: 6),
+                              Container(
+                                width: 16,
+                                height: 16,
+                                decoration: BoxDecoration(
+                                  color: AppColors.onPrimaryFixed.withValues(alpha: 0.25),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.question_mark_rounded,
+                                  size: 10,
+                                  color: AppColors.onPrimaryFixed,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        child: const Icon(
-                          Icons.question_mark_rounded,
-                          size: 10,
-                          color: AppColors.onPrimaryFixed,
+                      ),
+                      const SizedBox(width: 8),
+                      InkWell(
+                        onTap: () => showLeagueInfoSheet(context),
+                        borderRadius: BorderRadius.circular(18),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFE7A8),
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    '🪙 KUM',
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF7A5A00),
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${_currentUser?.coins ?? 0}',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF7A5A00),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(width: 6),
+                              Container(
+                                width: 16,
+                                height: 16,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF7A5A00).withValues(alpha: 0.2),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.question_mark_rounded,
+                                  size: 10,
+                                  color: Color(0xFF7A5A00),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ],
@@ -704,9 +1013,8 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
               // User Profile Avatar (Clickable to open Profile & Settings)
               Padding(
                 padding: const EdgeInsets.only(right: 16),
-                child: InkWell(
+                child: GestureDetector(
                   onTap: _openProfile,
-                  borderRadius: BorderRadius.circular(32),
                   child: AvatarWidget(
                     avatar: _currentAvatar,
                     size: 60,
@@ -754,7 +1062,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
           ),
 
           // 3-Tab Bottom Navigation Bar (Pomo, Raporlar, Sıralama)
-          bottomNavigationBar: NavigationBar(
+          bottomNavigationBar: hideUI ? null : NavigationBar(
             selectedIndex: _currentIndex,
             onDestinationSelected: (index) {
               if (index == _currentIndex) return;
@@ -783,6 +1091,11 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                 selectedIcon: const Icon(Icons.leaderboard, color: AppColors.onPrimaryFixed),
                 label: lang.translate('nav_ranking'),
               ),
+              NavigationDestination(
+                icon: const Icon(Icons.groups_outlined),
+                selectedIcon: const Icon(Icons.groups, color: AppColors.onPrimaryFixed),
+                label: lang.translate('nav_social'),
+              ),
             ],
           ),
         );
@@ -791,36 +1104,3 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
   }
 }
 
-class _PointsInfoRow extends StatelessWidget {
-  final IconData icon;
-  final String text;
-  final Color? iconColor;
-
-  const _PointsInfoRow({
-    required this.icon,
-    required this.text,
-    this.iconColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, size: 20, color: iconColor ?? AppColors.primaryContainer),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Text(
-            text,
-            style: TextStyle(
-              fontSize: 13,
-              color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
-              height: 1.4,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}

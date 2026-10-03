@@ -46,11 +46,18 @@
       statusEl.classList.toggle("is-ok", !!ok);
     };
 
+    var EMAIL_RE = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+
     notifyForm.addEventListener("submit", function (e) {
       e.preventDefault();
       var input = document.getElementById("notify-email");
       var email = ((input && input.value) || "").trim().toLowerCase();
       if (!email) return;
+      if (!EMAIL_RE.test(email) || email.length > 254) {
+        showStatus("Geçerli bir e-posta adresi girer misin?", false);
+        if (input) input.focus();
+        return;
+      }
       if (!sbClient) {
         showStatus("Bir şeyler ters gitti, tekrar dener misin?", false);
         return;
@@ -74,11 +81,151 @@
             notifyForm.reset();
           } else if (res.error.code === "23505") {
             showStatus("Bu e-posta zaten listede ✓", true);
+          } else if (res.error.code === "23514") {
+            showStatus("Geçerli bir e-posta adresi girer misin?", false);
           } else {
             showStatus("Bir şeyler ters gitti, tekrar dener misin?", false);
           }
         });
     });
+  }
+
+  /* ---------- Canlı Lig Sıralaması (index.html) ----------
+     Herkese açık, oturum gerektirmeyen get_public_monthly_leaderboard
+     RPC'sini çağırır. E-posta/kullanıcı id'si hiç dönmez; yalnızca
+     isim, avatar ve bu ayki lig puanı. */
+  var lbList = document.getElementById("lb-list");
+  if (lbList) {
+    var LB_SUPABASE_URL = "https://eoosnyakvxmifmexpgxa.supabase.co";
+    var LB_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVvb3NueWFrdnhtaWZtZXhwZ3hhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUxODYxNTYsImV4cCI6MjEwMDc2MjE1Nn0.W1_L04jD_cP-HuvSAOc2sb0ov5o5jsqpD6DyS7khd3Y";
+    var lbClient = (window.supabase && window.supabase.createClient)
+      ? window.supabase.createClient(LB_SUPABASE_URL, LB_SUPABASE_ANON_KEY)
+      : null;
+    var lbEmpty = document.getElementById("lb-empty");
+    var lbPodium = document.getElementById("lb-podium");
+
+    var fillPodiumSlot = function (rank, row) {
+      var slot = document.getElementById("lb-podium-" + rank);
+      if (!slot) return;
+      if (!row) {
+        slot.hidden = true;
+        return;
+      }
+      slot.hidden = false;
+      var img = slot.querySelector(".lb-podium-avatar");
+      img.src = "avatars/" + (row.avatar_id || "avatar_16_basic") + ".webp";
+      img.onerror = function () { img.src = "avatars/avatar_16_basic.webp"; img.onerror = null; };
+      slot.querySelector(".lb-podium-name").textContent = row.name || "PomoSprint kullanıcısı";
+      slot.querySelector(".lb-podium-points").textContent = (row.total_points || 0) + " puan";
+    };
+
+    var renderLeaderboard = function (rows) {
+      lbList.innerHTML = "";
+      if (!rows || !rows.length) {
+        lbList.hidden = true;
+        if (lbPodium) lbPodium.hidden = true;
+        if (lbEmpty) lbEmpty.hidden = false;
+        return;
+      }
+
+      if (lbPodium) {
+        lbPodium.hidden = false;
+        fillPodiumSlot(1, rows[0]);
+        fillPodiumSlot(2, rows[1]);
+        fillPodiumSlot(3, rows[2]);
+      }
+
+      var rest = rows.slice(3);
+      if (!rest.length) {
+        lbList.hidden = true;
+        return;
+      }
+      lbList.hidden = false;
+      rest.forEach(function (row, i) {
+        var li = document.createElement("li");
+        li.className = "lb-item";
+
+        var rank = document.createElement("span");
+        rank.className = "lb-rank";
+        rank.textContent = String(i + 4);
+        li.appendChild(rank);
+
+        var img = document.createElement("img");
+        img.className = "lb-avatar";
+        img.alt = "";
+        img.loading = "lazy";
+        img.width = 40;
+        img.height = 40;
+        img.src = "avatars/" + (row.avatar_id || "avatar_16_basic") + ".webp";
+        img.onerror = function () { img.src = "avatars/avatar_16_basic.webp"; img.onerror = null; };
+        li.appendChild(img);
+
+        var name = document.createElement("span");
+        name.className = "lb-name";
+        name.textContent = row.name || "PomoSprint kullanıcısı";
+        li.appendChild(name);
+
+        var pts = document.createElement("span");
+        pts.className = "lb-points";
+        pts.textContent = (row.total_points || 0) + " puan";
+        li.appendChild(pts);
+
+        lbList.appendChild(li);
+      });
+    };
+
+    if (lbClient) {
+      lbClient
+        .rpc("get_public_monthly_leaderboard", { p_limit: 10 })
+        .then(function (res) {
+          if (res.error) {
+            if (lbEmpty) {
+              lbEmpty.hidden = false;
+              lbEmpty.textContent = "Sıralama şu an yüklenemedi, sayfayı yenilemeyi dener misin?";
+            }
+            lbList.hidden = true;
+            if (lbPodium) lbPodium.hidden = true;
+            return;
+          }
+          renderLeaderboard(res.data);
+        });
+    } else if (lbEmpty) {
+      lbList.hidden = true;
+      if (lbPodium) lbPodium.hidden = true;
+      lbEmpty.hidden = false;
+    }
+  }
+
+  /* ---------- Aylık Sıfırlanma Sayacı ----------
+     Uygulamadaki "Aylık Sıfırlanmaya Kalan Süre" sayacıyla birebir aynı
+     mantık: bir sonraki ayın 1'i, gece yarısı (cihazın yerel saatine göre). */
+  var lbCountdownTime = document.getElementById("lb-countdown-time");
+  if (lbCountdownTime) {
+    var nextMonthlyReset = function () {
+      var now = new Date();
+      return new Date(now.getFullYear(), now.getMonth() + 1, 1, 0, 0, 0);
+    };
+
+    var formatRemaining = function (target) {
+      var diffMs = target.getTime() - Date.now();
+      if (diffMs <= 0) return "Sıfırlanıyor…";
+
+      var totalSeconds = Math.floor(diffMs / 1000);
+      var days = Math.floor(totalSeconds / 86400);
+      var hours = Math.floor((totalSeconds % 86400) / 3600);
+      var minutes = Math.floor((totalSeconds % 3600) / 60);
+      var seconds = totalSeconds % 60;
+
+      if (days > 0) return days + " gün " + hours + " saat " + minutes + " dk";
+      return hours + " saat " + minutes + " dk " + seconds + " sn";
+    };
+
+    var target = nextMonthlyReset();
+    var tickCountdown = function () {
+      lbCountdownTime.textContent = formatRemaining(target);
+    };
+    tickCountdown();
+    setInterval(tickCountdown, 1000);
   }
 
   /* ---------- SSS akordiyonu (tek açık) ---------- */

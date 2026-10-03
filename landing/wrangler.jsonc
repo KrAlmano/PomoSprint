@@ -1,0 +1,13 @@
+{
+  "name": "pomosprint-website",
+  "compatibility_date": "2026-08-04",
+  "assets": {
+    "directory": "."
+  },
+  // Alan adları yapılandırmada tutuluyor: her `wrangler deploy` bunları
+  // aktif zone'a yeniden bağlar (zone silinip yeniden eklense bile).
+  "routes": [
+    { "pattern": "pomosprint.app", "custom_domain": true },
+    { "pattern": "www.pomosprint.app", "custom_domain": true }
+  ]
+}

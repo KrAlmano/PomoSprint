@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/avatar_model.dart';
 import '../widgets/avatar_widget.dart';
+import '../widgets/league_info_sheet.dart';
 import '../services/supabase_service.dart';
 import '../services/language_service.dart';
 import '../theme.dart';
@@ -9,10 +12,12 @@ import '../models/user_model.dart';
 
 class RankingScreen extends StatefulWidget {
   final UserModel? currentUser;
+  final ValueChanged<bool>? onLeagueTabActive;
 
   const RankingScreen({
     super.key,
     this.currentUser,
+    this.onLeagueTabActive,
   });
 
   @override
@@ -24,12 +29,21 @@ class _RankingScreenState extends State<RankingScreen> {
   int _selectedTab = 0;
   List<Map<String, dynamic>> _realUsers = [];
   bool _isLoading = true;
+  int _currentLeagueTier = 1;
+  DateTime? _leagueEndDate;
+
 
   Timer? _countdownTimer;
+
+  int _promotionZoneEnd = 7;
+  int _demotionZoneStart = 24;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.onLeagueTabActive?.call(_selectedTab == 0);
+    });
     _loadRankingData();
     SupabaseService.instance.addRankingListener(_onRankingUpdate);
     _startLiveCountdownTimer();
@@ -59,7 +73,7 @@ class _RankingScreenState extends State<RankingScreen> {
   void didUpdateWidget(covariant RankingScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.currentUser?.totalMinutes != widget.currentUser?.totalMinutes ||
-        oldWidget.currentUser?.points != widget.currentUser?.points ||
+        oldWidget.currentUser?.lifetimePoints != widget.currentUser?.lifetimePoints ||
         oldWidget.currentUser?.avatarId != widget.currentUser?.avatarId) {
       _loadRankingData();
     }
@@ -109,25 +123,51 @@ class _RankingScreenState extends State<RankingScreen> {
     if (mounted) setState(() => _isLoading = true);
     List<Map<String, dynamic>> users = [];
     try {
-      users = _selectedTab == 2
-          ? await SupabaseService.instance.fetchFriends()
-          : await SupabaseService.instance.getRankingUsers();
+      if (_selectedTab == 0) {
+        users = await SupabaseService.instance.getLeagueRanking();
+        if (users.isNotEmpty) {
+          _currentLeagueTier = users.first['tier'] ?? 1;
+          _promotionZoneEnd = users.first['promotion_zone_end'] ?? 7;
+          _demotionZoneStart = users.first['demotion_zone_start'] ?? 24;
+          if (users.first['end_date'] != null) {
+            _leagueEndDate = DateTime.tryParse(users.first['end_date']);
+          }
+        }
+        // get_league_ranking RPC'si 'weekly_points' döndürüyor ama alttaki
+        // podyum/liste UI'ı her sekmede ortak 'lifetime_points' anahtarını
+        // okuyor. Eşleme yapılmazsa lig üyeleri her zaman 0 puanlı görünüp
+        // podyumdan/listeden tamamen kayboluyordu.
+        for (final u in users) {
+          u['lifetime_points'] = u['weekly_points'];
+        }
+      } else if (_selectedTab == 2) {
+        users = await SupabaseService.instance.fetchFriends();
+      } else {
+        users = await SupabaseService.instance.getRankingUsers();
+      }
     } catch (_) {}
 
-    // Active currentUser verisini birleştir / güncelle (Arkadaşlar sekmesinde
-    // kendini de listeye ekleriz ki arkadaşlarınla kendi sıranı görebilesin)
-    if (widget.currentUser != null) {
+    // Active currentUser verisini birleştir / güncelle (Arkadaşlar sekmesinde)
+    if (widget.currentUser != null && _selectedTab != 0) {
       final cur = widget.currentUser!;
+      // Kendi satırımızı e-posta ile değil kullanıcı ID'si (veya sunucunun
+      // döndürdüğü is_me) ile buluyoruz: sıralama uç noktaları başka
+      // kullanıcıların e-postalarını döndürmemeli.
+      final myId = SupabaseService.instance.isCloudActive
+          ? Supabase.instance.client.auth.currentUser?.id
+          : null;
       final index = users.indexWhere(
-        (u) => (u['email']?.toString().toLowerCase() == cur.email.toLowerCase() ||
-                u['name']?.toString().toLowerCase() == cur.name.toLowerCase()),
+        (u) => u['is_me'] == true ||
+            (myId != null && u['id'] == myId) ||
+            u['name']?.toString().toLowerCase() == cur.name.toLowerCase(),
       );
 
       final userMap = {
+        'id': myId,
         'name': cur.name,
-        'email': cur.email,
+        'is_me': true,
         'total_minutes': cur.totalMinutes,
-        'points': cur.points,
+        'lifetime_points': cur.lifetimePoints,
         'avatar_id': cur.avatarId,
         'is_friend': true,
       };
@@ -139,18 +179,46 @@ class _RankingScreenState extends State<RankingScreen> {
       }
     }
 
-    // Puana göre azalan sıralama (eşitlikte toplam çalışma süresi)
-    users.sort((a, b) {
-      final byPoints = (b['points'] as int? ?? 0).compareTo(a['points'] as int? ?? 0);
-      if (byPoints != 0) return byPoints;
-      return (b['total_minutes'] as int? ?? 0).compareTo(a['total_minutes'] as int? ?? 0);
-    });
+    if (_selectedTab != 0) {
+      users.sort((a, b) {
+        final byPoints = (b['lifetime_points'] as int? ?? 0).compareTo(a['lifetime_points'] as int? ?? 0);
+        if (byPoints != 0) return byPoints;
+        return (b['total_minutes'] as int? ?? 0).compareTo(a['total_minutes'] as int? ?? 0);
+      });
+    }
+
+    // Aylık sekmede gerçek bir lig odası/taşıma yok; sadece görsel terfi/düşüş
+    // vurgusu için mevcut liste boyutuna göre aynı sunucu kuralı (get_league_zones)
+    // uygulanır.
+    if (_selectedTab == 1 && users.isNotEmpty) {
+      final zones = await SupabaseService.instance.getLeagueZones(users.length);
+      _promotionZoneEnd = zones['promotion_zone_end'] ?? 3;
+      _demotionZoneStart = zones['demotion_zone_start'] ?? 999;
+    }
 
     if (mounted) {
       setState(() {
         _realUsers = users;
         _isLoading = false;
       });
+    }
+
+    if (_selectedTab == 0 && users.isNotEmpty) {
+      _maybeAutoShowLeagueInfo();
+    }
+  }
+
+  // Kullanıcı ilk kez bir lige atandığında popup'ı bir defaya mahsus
+  // otomatik açar; sonrasında sadece "?" ikonuyla erişilebilir.
+  Future<void> _maybeAutoShowLeagueInfo() async {
+    final email = widget.currentUser?.email;
+    if (email == null || email.isEmpty) return;
+    final prefs = await SharedPreferences.getInstance();
+    final key = 'league_info_shown_$email';
+    if (prefs.getBool(key) ?? false) return;
+    await prefs.setBool(key, true);
+    if (mounted) {
+      showLeagueInfoSheet(context);
     }
   }
 
@@ -159,6 +227,17 @@ class _RankingScreenState extends State<RankingScreen> {
     list = List.from(_realUsers);
     // Limit to max 50 users
     return list.take(50).toList();
+  }
+
+  String _getLeagueName(int tier, bool isTurkish) {
+    switch(tier) {
+      case 1: return isTurkish ? '🥉 Bronz Kum Saati Ligi' : '🥉 Bronze Hourglass League';
+      case 2: return isTurkish ? '🥈 Gümüş Kum Saati Ligi' : '🥈 Silver Hourglass League';
+      case 3: return isTurkish ? '🥇 Altın Kum Saati Ligi' : '🥇 Gold Hourglass League';
+      case 4: return isTurkish ? '💎 Safir Kum Saati Ligi' : '💎 Sapphire Hourglass League';
+      case 5: return isTurkish ? '👑 Elmas Kum Saati Ligi' : '👑 Diamond Hourglass League';
+      default: return isTurkish ? '🥉 Bronz Kum Saati Ligi' : '🥉 Bronze Hourglass League';
+    }
   }
 
   AvatarCharacter _getAvatar(String avatarId) {
@@ -205,7 +284,7 @@ class _RankingScreenState extends State<RankingScreen> {
                       ),
                       child: Row(
                         children: [
-                          _buildTabItem(0, lang.translate('weekly')),
+                          _buildTabItem(0, lang.isTurkish ? 'Lig' : 'League'),
                           _buildTabItem(1, lang.translate('monthly')),
                           _buildTabItem(2, lang.isTurkish ? 'Arkadaşlar' : 'Friends'),
                         ],
@@ -286,15 +365,25 @@ class _RankingScreenState extends State<RankingScreen> {
                               final userIndex = index + 3; // Starts from 4th place (index 3)
                               final u = currentList[userIndex];
                               final avatar = _getAvatar(u['avatar_id']?.toString() ?? '');
-                              final points = u['points'] as int? ?? 0;
+                              final points = u['lifetime_points'] as int? ?? 0;
                               final minutes = u['total_minutes'] as int? ?? 0;
                               final rankNumber = userIndex + 1;
+                              
+                              final bool isPromotion = (_selectedTab == 1 || (_selectedTab == 0 && _currentLeagueTier < 5)) &&
+                                  rankNumber <= _promotionZoneEnd;
+                              final bool isDemotion = (_selectedTab == 1 || (_selectedTab == 0 && _currentLeagueTier > 1)) &&
+                                  rankNumber >= _demotionZoneStart;
+                              final Color bgColor = isPromotion 
+                                  ? Colors.green.withValues(alpha: 0.15) 
+                                  : (isDemotion ? Colors.red.withValues(alpha: 0.15) : Colors.transparent);
 
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 12),
-                                child: Row(
-                                  children: [
+                              return Container(
+                                color: bgColor,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 12),
+                                  child: Row(
+                                    children: [
                                     // Rank Number Badge (4, 5, 6...)
                                     Container(
                                       width: 28,
@@ -361,9 +450,10 @@ class _RankingScreenState extends State<RankingScreen> {
                                     ),
                                   ],
                                 ),
-                              );
-                            },
-                          ),
+                              ),
+                            );
+                          },
+                        ),
                         ),
                     ],
 
@@ -381,10 +471,10 @@ class _RankingScreenState extends State<RankingScreen> {
   Widget _buildCountdownBanner(bool isDark, LanguageService lang) {
     if (_selectedTab == 2) return const SizedBox.shrink(); // Friends tab: no countdown
 
-    final targetDate = _selectedTab == 0 ? _nextWeeklyReset : _nextMonthlyReset;
+    final targetDate = _selectedTab == 0 && _leagueEndDate != null ? _leagueEndDate! : (_selectedTab == 0 ? _nextWeeklyReset : _nextMonthlyReset);
     final timeString = _getRemainingTimeString(targetDate, lang.isTurkish);
     final titleText = _selectedTab == 0
-        ? (lang.isTurkish ? 'Haftalık Sıfırlanmaya Kalan Süre' : 'Weekly Reset Counter')
+        ? _getLeagueName(_currentLeagueTier, lang.isTurkish)
         : (lang.isTurkish ? 'Aylık Sıfırlanmaya Kalan Süre' : 'Monthly Reset Counter');
 
     return Container(
@@ -445,6 +535,23 @@ class _RankingScreenState extends State<RankingScreen> {
               ],
             ),
           ),
+          if (_selectedTab == 0)
+            GestureDetector(
+              onTap: () => showLeagueInfoSheet(context),
+              child: Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.primaryContainer.withValues(alpha: 0.15),
+                ),
+                child: Icon(
+                  Icons.question_mark_rounded,
+                  size: 15,
+                  color: isDark ? AppColors.darkPrimary : AppColors.primary,
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -457,6 +564,7 @@ class _RankingScreenState extends State<RankingScreen> {
       child: GestureDetector(
         onTap: () {
           setState(() => _selectedTab = index);
+          widget.onLeagueTabActive?.call(_selectedTab == 0);
           _loadRankingData();
         },
         child: AnimatedContainer(
@@ -557,7 +665,7 @@ class _RankingScreenState extends State<RankingScreen> {
   }) {
     final avatar = _getAvatar(userMap['avatar_id']?.toString() ?? '');
     final name = userMap['name']?.toString() ?? 'Kullanıcı';
-    final points = userMap['points'] as int? ?? 0;
+    final points = userMap['lifetime_points'] as int? ?? 0;
 
     return Column(
       mainAxisSize: MainAxisSize.min,

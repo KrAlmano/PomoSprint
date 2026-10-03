@@ -6,12 +6,14 @@ import '../services/language_service.dart';
 
 class CategoriesScreen extends StatefulWidget {
   final List<CourseCategory> categories;
+  final bool isPremium;
   final Function(CourseCategory) onAddCategory;
   final Function(String) onDeleteCategory;
 
   const CategoriesScreen({
     super.key,
     required this.categories,
+    required this.isPremium,
     required this.onAddCategory,
     required this.onDeleteCategory,
   });
@@ -37,6 +39,13 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   void _handleAdd() {
     if (_isAdding) return; // çift tıklama koruması
+    
+    final limit = widget.isPremium ? 15 : 8;
+    if (widget.categories.length >= limit) {
+      _showLimitReachedDialog(limit);
+      return;
+    }
+
     final l10n = AppLocalizations.of(context)!;
     final text = _nameController.text.trim();
     if (text.isEmpty) return;
@@ -69,6 +78,33 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     _nameController.dispose();
     super.dispose();
   }
+
+  void _showLimitReachedDialog(int limit) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.warning, color: Colors.amber),
+            SizedBox(width: 8),
+            Text('Maksimum Limit'),
+          ],
+        ),
+        content: Text(
+          widget.isPremium 
+              ? 'Premium hesap ile en fazla $limit kategori oluşturabilirsiniz.'
+              : 'Standart hesap ile en fazla $limit kategori oluşturabilirsiniz. Daha fazlası için Premium\'a geçmelisiniz.'
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Anladım'),
+          ),
+        ],
+      ),
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {

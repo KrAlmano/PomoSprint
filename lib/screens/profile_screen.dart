@@ -1,4 +1,7 @@
+import 'categories_management_screen.dart';
+
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../models/avatar_model.dart';
 import '../widgets/avatar_widget.dart';
 import '../models/category_model.dart';
@@ -6,15 +9,18 @@ import '../theme.dart';
 import '../services/supabase_service.dart';
 import '../services/language_service.dart';
 import 'character_collection_screen.dart';
-import 'categories_screen.dart';
 class ProfileScreen extends StatefulWidget {
   final String userName;
   final String userEmail;
   final String currentAvatarId;
   final int totalStudyMinutes;
   final int userPoints;
+  final int userCoins;
+  final bool isPremium;
+  final List<String> unlockedAvatars;
   final bool isDarkMode;
   final ValueChanged<String> onAvatarChanged;
+  final ValueChanged<int>? onCoinsChanged;
   final ValueChanged<String>? onNameChanged;
   final ValueChanged<bool> onDarkModeChanged;
   final VoidCallback onLogout;
@@ -29,8 +35,12 @@ class ProfileScreen extends StatefulWidget {
     required this.currentAvatarId,
     required this.totalStudyMinutes,
     required this.userPoints,
+    required this.userCoins,
+    required this.isPremium,
+    required this.unlockedAvatars,
     required this.isDarkMode,
     required this.onAvatarChanged,
+    this.onCoinsChanged,
     this.onNameChanged,
     required this.onDarkModeChanged,
     required this.onLogout,
@@ -47,6 +57,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late String _avatarId;
   bool _notificationsEnabled = true;
   late bool _darkModeEnabled;
+  bool _socialVisibilityEnabled = true;
   late TextEditingController _nameController;
   late TextEditingController _emailController;
   bool _isSavingName = false;
@@ -59,44 +70,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _darkModeEnabled = widget.isDarkMode;
     _nameController = TextEditingController(text: widget.userName);
     _emailController = TextEditingController(text: widget.userEmail);
+    _loadSocialVisibility();
   }
 
-  void _openCategoryManagementSheet() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) {
-        return Container(
-          height: MediaQuery.of(context).size.height * 0.85,
-          decoration: BoxDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          child: Column(
-            children: [
-              Container(
-                margin: const EdgeInsets.only(top: 12, bottom: 8),
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              Expanded(
-                child: CategoriesScreen(
-                  categories: widget.categories,
-                  onAddCategory: widget.onAddCategory,
-                  onDeleteCategory: widget.onDeleteCategory,
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
+  Future<void> _loadSocialVisibility() async {
+    final value = await SupabaseService.instance.getSocialVisibility();
+    if (mounted) setState(() => _socialVisibilityEnabled = value);
   }
 
   @override
@@ -307,74 +286,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                 const SizedBox(height: 20),
 
-                // Category Management Banner Button
-                InkWell(
-                  onTap: _openCategoryManagementSheet,
-                  borderRadius: BorderRadius.circular(16),
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? AppColors.darkSurfaceContainerLow
-                          : AppColors.surfaceContainerLow,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: (isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant).withValues(alpha: 0.5),
+                // Categories Management
+                _buildSectionCard(
+                  title: lang.translate('categories_section_title'),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(
+                      lang.translate('manage_categories_tile_title'),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
                       ),
                     ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 44,
-                          height: 44,
-                          decoration: const BoxDecoration(
-                            color: AppColors.primaryContainer,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.category_rounded,
-                            color: Colors.white,
-                            size: 24,
-                          ),
-                        ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                lang.translate('manage_categories'),
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                lang.translate('manage_categories_sub'),
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Icon(
-                          Icons.chevron_right,
-                          color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
-                        ),
-                      ],
+                    subtitle: Text(
+                      lang.translate('manage_categories_tile_sub'),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                      ),
+                    ),
+                    trailing: Icon(
+                      Icons.chevron_right,
+                      color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                    ),
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (_) => CategoriesManagementScreen(isPremium: widget.isPremium),
+                      )).then((_) {
+                        // No refresh needed here
+                      });
+                    },
                     ),
                   ),
                 ),
-
-                const SizedBox(height: 12),
-
-
-
                 const SizedBox(height: 20),
-
                 // Profile Information Form Card (Editable Name with Pencil Icon)
                 _buildSectionCard(
                   title: lang.translate('edit_profile').toUpperCase(),
@@ -584,12 +532,70 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           activeThumbColor: AppColors.primary,
                           contentPadding: EdgeInsets.zero,
                         ),
+                        const Divider(height: 16),
+                        SwitchListTile(
+                          value: _socialVisibilityEnabled,
+                          onChanged: (val) {
+                            setState(() => _socialVisibilityEnabled = val);
+                            SupabaseService.instance.setSocialVisibility(val);
+                          },
+                          title: Text(
+                            lang.translate('social_visibility'),
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          subtitle: Text(
+                            lang.translate('social_visibility_sub'),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                            ),
+                          ),
+                          secondary: Icon(Icons.groups_outlined,
+                              color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
+                          activeThumbColor: AppColors.primary,
+                          contentPadding: EdgeInsets.zero,
+                        ),
                       ],
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
+
+                // Legal Links (Privacy Policy / Terms of Service)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextButton(
+                      onPressed: () => _openLegalUrl('privacy.html'),
+                      child: Text(
+                        lang.translate('privacy_policy'),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                    Text('·', style: TextStyle(color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant)),
+                    TextButton(
+                      onPressed: () => _openLegalUrl('terms.html'),
+                      child: Text(
+                        lang.translate('terms_of_service'),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 4),
 
                 // Sign Out Button
                 SizedBox(
@@ -708,14 +714,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
       MaterialPageRoute(
         builder: (context) => CharacterCollectionScreen(
           selectedAvatarId: _avatarId,
-          totalStudyMinutes: widget.totalStudyMinutes,
+          userCoins: widget.userCoins,
+          isPremium: widget.isPremium,
+          unlockedAvatars: widget.unlockedAvatars,
           onAvatarSelected: (newId) {
             setState(() => _avatarId = newId);
             widget.onAvatarChanged(newId);
           },
+          onCoinsChanged: widget.onCoinsChanged,
         ),
       ),
     );
+  }
+
+  Future<void> _openLegalUrl(String path) async {
+    final uri = Uri.parse('https://pomosprint.app/$path');
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
   void _confirmDeleteAccount() {
@@ -761,7 +775,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 if (mounted) {
                   messenger.showSnackBar(
                     SnackBar(
-                      content: Text('⚠️ Hesabınız silinirken bir hata oluştu: $e'),
+                      content: Text('${lang.translate('delete_account_error')}: $e'),
                       backgroundColor: Colors.red,
                       behavior: SnackBarBehavior.floating,
                     ),

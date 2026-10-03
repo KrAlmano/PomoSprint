@@ -9,7 +9,7 @@ Bu proje, kullanıcıların odaklanma sürelerini (Pomodoro tekniği) ölçen, �
 1. **Açılış (Splash):** Kullanıcı uygulamayı açar, `SplashScreen` Supabase'de aktif oturum (session) var mı diye kontrol eder.
 2. **Kimlik Doğrulama (Auth):** Oturum yoksa kullanıcı `LoginScreen`'e yönlendirilir. E-posta/şifre veya Google Sign-In ile giriş yapar.
 3. **Zamanlayıcı (Timer):** Giriş sonrası ana ekran `TimerScreen`'dir. Kullanıcı çalışmak istediği dersi (`CategoriesScreen` üzerinden) seçer ve pomodoro sayacını başlatır.
-4. **Çalışmanın Kaydedilmesi:** Sayaç sıfırlandığında, çalışılan süre `study_sessions` tablosuna kaydedilir ve kullanıcının `profiles` tablosundaki toplam puanı & çalışma süresi (`increment_user_stats` fonksiyonu aracılığıyla) artırılır.
+4. **Çalışmanın Kaydedilmesi:** Süre dolduğunda `complete_study_session` RPC'si çağrılır. Puan, seri bonusu ve lig puanı sunucuda hesaplanır; seans `study_sessions` tablosuna yazılır. Ağ yoksa seans cihazda kuyruğa alınır ve bağlantı gelince gönderilir (`syncPendingSessions`).
 5. **Raporlama ve Oyunlaştırma:** Kullanıcı `ReportsScreen`'de detaylı analizlerini görür. Kazandığı puanlarla `CharacterCollectionScreen`'de yeni avatarların kilidini açar ve `RankingScreen`'de global liderlik tablosunda yer edinir.
 
 ---
@@ -73,9 +73,6 @@ Tüm dış iletişim bu katmandan (`lib/services/`) geçer:
 2. **`language_service.dart`:**
    - **Görevi:** Uygulamanın çoklu dil (i18n / Yerelleştirme) desteğini yönetir. Kullanıcının seçtiği dile göre metinlerin anlık değişmesini sağlar.
 
-3. **`database_helper.dart`:**
-   - **Görevi:** Supabase entegrasyonu öncesinde yerel (local) veritabanı veya önbellekleme süreçleri için yazılmış yardımcı bir sınıftır.
-
 ---
 
 ## 5. Modeller (Models) Katmanı
@@ -91,9 +88,12 @@ Supabase'den dönen JSON verilerinin Dart objelerine dönüştürüldüğü sın
 ## 6. Veritabanı (Supabase) ve Güvenlik (RLS) Durumu
 Uygulamanın veri güvenliği doğrudan PostgreSQL katmanında, **Row Level Security (RLS)** ile sağlanır.
 - **Kişisel Veri Koruması:** `study_sessions` ve `categories` tablolarında kesin bir `user_id = auth.uid()` kuralı vardır. Bir kullanıcı istese bile kod değiştirerek başkasının çalışma kayıtlarını göremez, silemez.
-- **RPC Fonksiyonları:** Supabase'de `increment_user_stats` isimli bir Stored Procedure (RPC) mevcuttur. Puan hesaplaması client'ta (telefonda) değil, güvenli bir şekilde sunucuda işlenir (3 parametreli: `added_minutes, added_points, local_date_str`).
+- **RPC Fonksiyonları:** Puan/coin/seri/lig güncellemeleri yalnızca `SECURITY DEFINER` RPC'lerle yapılır (`complete_study_session`, `purchase_avatar`, `set_equipped_avatar`, `create_category`, `setup_onboarding_categories`, `get_my_league_ranking` ...). İstemcinin `profiles` üzerindeki yazma yetkisi kolon bazlıdır (isim, sosyal görünürlük, onboarding alanları); `study_sessions` tablosuna doğrudan yazamaz.
+- **Seans doğrulaması:** `study_sessions` üzerindeki trigger, seansın süresinin gerçekten dolmuş olmasını ve aynı kullanıcının başka bir seansıyla çakışmamasını zorunlu kılar (bkz. `supabase/migrations/20260928120000_security_hardening_up.sql`). Debug build'lerde sayaç 5/10 saniyeye kısaltıldığı için bu seanslar sunucuda reddedilir; bu beklenen davranıştır.
+- **Kategori limiti:** Ücretsiz 8 / Premium 15 aktif kategori sınırı veritabanı trigger'ı ile her yazma yolunda uygulanır.
 - **Google Sign-In Nonce Bypass:** iOS cihazlarda `google_sign_in` paketinin `nonce` göndermemesi sebebiyle Supabase'in "Skip nonce checks" güvenlik ayarı Google provider için açık (true) bırakılmıştır. Aksi takdirde iOS'te Google OAuth çalışmaz.
-- **Sadeleştirme:** Geçmişteki "Sanal Kütüphane / Arkadaşlık" gibi sosyal özelliklerin tüm kodları ve veritabanı tabloları (`friendships`, `table_seats` vb.) güvenlik ve odaklanma amacıyla tamamen silinmiştir.
+- **Sosyal özellikler:** Sanal kütüphane masaları (`table_seats`) kaldırıldı. Arkadaşlık sistemi (`friendships`, arkadaşlık kodu), "şu an çalışanlar" (`get_live_friends`) ve aktivite akışı (`activity_feed`, `get_friends_feed`) aktif olarak kullanılıyor.
+- **Migration senkronu:** Repodaki migration'lar canlı veritabanının tamamını içermiyor (ör. `get_points_config`, `delete_own_account`, `get_public_alltime_leaderboard` repoda yok). Yeni bir değişiklikten önce canlı şemayı `supabase db dump --schema public` ile alıp bir baseline migration olarak eklemek gerekiyor. O zamana kadar mevcut fonksiyon gövdelerini repodaki eski sürümlerden yeniden YAZMAYIN.
 
 ---
 

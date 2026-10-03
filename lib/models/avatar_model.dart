@@ -2,192 +2,102 @@ import 'package:flutter/material.dart';
 
 class AvatarCharacter {
   final String id;
-  final String name;
+  final String nameTr;
   final String nameEn;
-  final String emoji;
   final String imagePath;
-  final Color backgroundColor;
-  final int requiredMinutes; // Kilitsiz seçim için 0
-  final String accessoryDescription;
+  final int requiredCoins;
+  final bool isPremiumOnly;
+  final bool isDefault;
+  final bool isLeagueAward;
 
   const AvatarCharacter({
     required this.id,
-    required this.name,
+    required this.nameTr,
     required this.nameEn,
-    required this.emoji,
     required this.imagePath,
-    required this.backgroundColor,
-    required this.requiredMinutes,
-    required this.accessoryDescription,
+    this.requiredCoins = 0,
+    this.isPremiumOnly = false,
+    this.isDefault = false,
+    this.isLeagueAward = false,
   });
 
-  bool isUnlocked(int totalStudyMinutes) => true; // Tüm 16 avatar kilitsiz!
+  factory AvatarCharacter.fromMap(Map<String, dynamic> map) {
+    return AvatarCharacter(
+      id: map['id'] as String,
+      nameTr: map['name_tr'] as String,
+      nameEn: map['name_en'] as String,
+      imagePath: map['asset_key'] as String,
+      requiredCoins: map['cost_coins'] as int? ?? 0,
+      isPremiumOnly: map['is_premium_only'] as bool? ?? false,
+      isDefault: map['is_default'] as bool? ?? false,
+      isLeagueAward: map['is_league_award'] as bool? ?? false,
+    );
+  }
 
-  String get unlockLabel => 'Açık';
+  String getName(bool isTurkish) => isTurkish ? nameTr : nameEn;
 
-  /// Dil seçimine göre avatarın görünen adını döndürür.
-  String getName(bool isTurkish) => isTurkish ? name : nameEn;
+  bool isUnlocked(int userCoins, bool isPremium, List<String> unlockedAvatars) {
+    if (unlockedAvatars.contains(id)) return true;
+    // Lig ödülü avatarları jetonla/premium ile ASLA açılmaz — cost_coins=0
+    // olduğu için aşağıdaki "userCoins >= requiredCoins" kontrolü herkes
+    // için yanlışlıkla true dönerdi. Bu yüzden erken çıkış şart.
+    if (isLeagueAward) return false;
+    if (isPremiumOnly && !isPremium) return false;
+    return userCoins >= requiredCoins;
+  }
 
-  static List<AvatarCharacter> allAvatars() => const [
-        AvatarCharacter(
-          id: 'avatar_1_gamer',
-          name: 'Oyuncu Kum Saati',
-          nameEn: 'Gamer Hourglass',
-          emoji: '🎧',
-          imagePath: 'assets/avatars/avatar_1_gamer.png',
-          backgroundColor: Color(0xFFE0F2FE),
-          requiredMinutes: 0,
-          accessoryDescription: 'Kulaklıklı Oyuncu',
-        ),
-        AvatarCharacter(
-          id: 'avatar_2_glasses',
-          name: 'Gözlüklü Kum Saati',
-          nameEn: 'Glasses Hourglass',
-          emoji: '👓',
-          imagePath: 'assets/avatars/avatar_2_glasses.png',
-          backgroundColor: Color(0xFFDCFCE7),
-          requiredMinutes: 0,
-          accessoryDescription: 'Yuvarlak Gözlüklü',
-        ),
-        AvatarCharacter(
-          id: 'avatar_3_gentleman',
-          name: 'Centilmen Kum Saati',
-          nameEn: 'Gentleman Hourglass',
-          emoji: '🎩',
-          imagePath: 'assets/avatars/avatar_3_gentleman.png',
-          backgroundColor: Color(0xFFFFEDD5),
-          requiredMinutes: 0,
-          accessoryDescription: 'Şapkalı & Bıyıklı',
-        ),
-        AvatarCharacter(
-          id: 'avatar_4_bowtie',
-          name: 'Hakim Kum Saati',
-          nameEn: 'Judge Hourglass',
-          emoji: '⚖️',
-          imagePath: 'assets/avatars/avatar_4_bowtie.png',
-          backgroundColor: Color(0xFFFEF9C3),
-          requiredMinutes: 0,
-          accessoryDescription: 'Hakim Tokmaklı',
-        ),
-        AvatarCharacter(
-          id: 'avatar_5_flower',
-          name: 'Çiçekli Kum Saati',
-          nameEn: 'Flower Hourglass',
-          emoji: '🌸',
-          imagePath: 'assets/avatars/avatar_5_flower.png',
-          backgroundColor: Color(0xFFFCE7F3),
-          requiredMinutes: 0,
-          accessoryDescription: 'Çiçek Taçlı',
-        ),
-        AvatarCharacter(
-          id: 'avatar_6_cool',
-          name: 'Süslü Kum Saati',
-          nameEn: 'Glam Hourglass',
-          emoji: '💅',
-          imagePath: 'assets/avatars/avatar_6_cool.png',
-          backgroundColor: Color(0xFFFEF08A),
-          requiredMinutes: 0,
-          accessoryDescription: 'Süslü Gözlüklü',
-        ),
-        AvatarCharacter(
-          id: 'avatar_7_scholar',
-          name: 'Mezun Kum Saati',
-          nameEn: 'Graduate Hourglass',
-          emoji: '🎓',
-          imagePath: 'assets/avatars/avatar_7_scholar.png',
-          backgroundColor: Color(0xFFDBEAFE),
-          requiredMinutes: 0,
-          accessoryDescription: 'Kepli & Akademik',
-        ),
-        AvatarCharacter(
-          id: 'avatar_8_striped',
-          name: 'Sevimli Kum Saati',
-          nameEn: 'Cute Hourglass',
-          emoji: '👔',
-          imagePath: 'assets/avatars/avatar_8_striped.png',
-          backgroundColor: Color(0xFFE0E7FF),
-          requiredMinutes: 0,
-          accessoryDescription: 'Çizgili Papyonlu',
-        ),
-        AvatarCharacter(
-          id: 'avatar_9_viking',
-          name: 'Viking Kum Saati',
-          nameEn: 'Viking Hourglass',
-          emoji: '🛡️',
-          imagePath: 'assets/avatars/avatar_9_viking.png',
-          backgroundColor: Color(0xFFFFE4E6),
-          requiredMinutes: 0,
-          accessoryDescription: 'Viking Miğferli',
-        ),
-        AvatarCharacter(
-          id: 'avatar_10_dentist',
-          name: 'Dişçi Kum Saati',
-          nameEn: 'Dentist Hourglass',
-          emoji: '🦷',
-          imagePath: 'assets/avatars/avatar_10_dentist.png',
-          backgroundColor: Color(0xFFE0F2FE),
-          requiredMinutes: 0,
-          accessoryDescription: 'Dişçi Kum Saati',
-        ),
-        AvatarCharacter(
-          id: 'avatar_11_doctor',
-          name: 'Doktor Kum Saati',
-          nameEn: 'Doctor Hourglass',
-          emoji: '🩺',
-          imagePath: 'assets/avatars/avatar_11_doctor.png',
-          backgroundColor: Color(0xFFCCFBF1),
-          requiredMinutes: 0,
-          accessoryDescription: 'Stetoskoplu Doktor',
-        ),
-        AvatarCharacter(
-          id: 'avatar_12_builder',
-          name: 'Mimar Kum Saati',
-          nameEn: 'Architect Hourglass',
-          emoji: '🪖',
-          imagePath: 'assets/avatars/avatar_12_builder.png',
-          backgroundColor: Color(0xFFFEF3C7),
-          requiredMinutes: 0,
-          accessoryDescription: 'Sarı Baretli Mimar',
-        ),
-        AvatarCharacter(
-          id: 'avatar_13_pilot',
-          name: 'Pilot Kum Saati',
-          nameEn: 'Pilot Hourglass',
-          emoji: '✈️',
-          imagePath: 'assets/avatars/avatar_13_pilot.png',
-          backgroundColor: Color(0xFFE0F2FE),
-          requiredMinutes: 0,
-          accessoryDescription: 'Kanatlı Pilot Şapkalı',
-        ),
-        AvatarCharacter(
-          id: 'avatar_14_teacher',
-          name: 'Öğretmen Kum Saati',
-          nameEn: 'Teacher Hourglass',
-          emoji: '📚',
-          imagePath: 'assets/avatars/avatar_14_teacher.png',
-          backgroundColor: Color(0xFFFDE68A),
-          requiredMinutes: 0,
-          accessoryDescription: 'Gözlüklü & Kepli Öğretmen',
-        ),
-        AvatarCharacter(
-          id: 'avatar_15_athlete',
-          name: 'Sporcu Kum Saati',
-          nameEn: 'Athlete Hourglass',
-          emoji: '⚽',
-          imagePath: 'assets/avatars/avatar_15_athlete.png',
-          backgroundColor: Color(0xFFDCFCE7),
-          requiredMinutes: 0,
-          accessoryDescription: 'Dinamik Sporcu',
-        ),
-        AvatarCharacter(
-          id: 'avatar_16_basic',
-          name: 'Klasik Kum Saati',
-          nameEn: 'Classic Hourglass',
-          emoji: '⌛',
-          imagePath: 'assets/avatars/avatar_16_basic.png',
-          backgroundColor: Color(0xFFF3F4F6),
-          requiredMinutes: 0,
-          accessoryDescription: 'Sade & Klasik Kum Saati',
-        ),
-      ];
+  String unlockLabel(bool isPremium) {
+    if (isLeagueAward) return '';
+    if (isPremiumOnly && !isPremium) return 'Premium';
+    return '$requiredCoins';
+  }
+
+  // Caching mechanism to prevent breaking existing synchronous code
+  static List<AvatarCharacter> _cachedAvatars = [];
+  
+  static void setCachedAvatars(List<AvatarCharacter> avatars) {
+    _cachedAvatars = avatars;
+  }
+
+  static List<AvatarCharacter> allAvatars() {
+    return _cachedAvatars;
+  }
+
+  // Fallback visual properties mapped by id
+  Color get backgroundColor {
+    return _visuals[id]?['color'] as Color? ?? const Color(0xFFF3F4F6);
+  }
+
+  String get emoji {
+    return _visuals[id]?['emoji'] as String? ?? '⌛';
+  }
+
+  static const Map<String, Map<String, dynamic>> _visuals = {
+    'avatar_1_gamer': {'color': Color(0xFFE0F2FE), 'emoji': '🎧'},
+    'avatar_2_glasses': {'color': Color(0xFFDCFCE7), 'emoji': '👓'},
+    'avatar_3_gentleman': {'color': Color(0xFFFFEDD5), 'emoji': '🎩'},
+    'avatar_4_bowtie': {'color': Color(0xFFFEF9C3), 'emoji': '⚖️'},
+    'avatar_5_flower': {'color': Color(0xFFFCE7F3), 'emoji': '🌸'},
+    'avatar_6_cool': {'color': Color(0xFFFEF08A), 'emoji': '💅'},
+    'avatar_7_scholar': {'color': Color(0xFFDBEAFE), 'emoji': '🎓'},
+    'avatar_8_striped': {'color': Color(0xFFE0E7FF), 'emoji': '👔'},
+    'avatar_9_viking': {'color': Color(0xFFFFE4E6), 'emoji': '🛡️'},
+    'avatar_10_dentist': {'color': Color(0xFFE0F2FE), 'emoji': '🦷'},
+    'avatar_11_doctor': {'color': Color(0xFFCCFBF1), 'emoji': '🩺'},
+    'avatar_12_builder': {'color': Color(0xFFFEF3C7), 'emoji': '🪖'},
+    'avatar_13_pilot': {'color': Color(0xFFE0F2FE), 'emoji': '✈️'},
+    'avatar_14_teacher': {'color': Color(0xFFFDE68A), 'emoji': '📚'},
+    'avatar_15_athlete': {'color': Color(0xFFDCFCE7), 'emoji': '⚽'},
+    'avatar_16_basic': {'color': Color(0xFFF3F4F6), 'emoji': '⌛'},
+    'league_bronze_monthly': {'color': Color(0xFFF0DDC8), 'emoji': '🏆'},
+    'league_bronze_weekly': {'color': Color(0xFFF0DDC8), 'emoji': '🥉'},
+    'league_silver_monthly': {'color': Color(0xFFE4E7EB), 'emoji': '🏆'},
+    'league_silver_weekly': {'color': Color(0xFFE4E7EB), 'emoji': '🥈'},
+    'league_gold_monthly': {'color': Color(0xFFFDEBB0), 'emoji': '🏆'},
+    'league_gold_weekly': {'color': Color(0xFFFDEBB0), 'emoji': '🥇'},
+    'league_sapphire_monthly': {'color': Color(0xFFD3E4FD), 'emoji': '🏆'},
+    'league_sapphire_weekly': {'color': Color(0xFFD3E4FD), 'emoji': '💎'},
+    'league_diamond_monthly': {'color': Color(0xFFE0F7FA), 'emoji': '🏆'},
+    'league_diamond_weekly': {'color': Color(0xFFE0F7FA), 'emoji': '👑'},
+  };
 }

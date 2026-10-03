@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Abonelikten Çık — PomoSprint</title>
+  <style>
+    body { font-family: sans-serif; background: #F6F0EA; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; }
+    .box { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+    h1 { color: #EE6C55; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div class="box" id="content">
+    <h1>İşleniyor...</h1>
+    <p>Aboneliğiniz iptal ediliyor, lütfen bekleyin.</p>
+  </div>
+  <script>
+    // These keys are public
+    const _supabaseUrl = 'https://eoosnyakvxmifmexpgxa.supabase.co';
+    const _supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVvb3NueWFrdnhtaWZtZXhwZ3hhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUxODYxNTYsImV4cCI6MjEwMDc2MjE1Nn0.W1_L04jD_cP-HuvSAOc2sb0ov5o5jsqpD6DyS7khd3Y';
+
+    window.onload = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const email = urlParams.get('email');
+      const content = document.getElementById('content');
+
+      if (!email) {
+        content.innerHTML = '<h1>Hata</h1><p>Geçersiz istek.</p>';
+        return;
+      }
+
+      try {
+        const token = urlParams.get('token') || '';
+        const res = await fetch(_supabaseUrl + '/functions/v1/unsubscribe?email=' + encodeURIComponent(email) + '&token=' + encodeURIComponent(token), {
+          method: 'GET'
+        });
+
+        if (res.ok) {
+          // E-posta URL'den geldiği için asla HTML olarak basılmaz (XSS).
+          content.innerHTML = '<h1>✅ Abonelikten Çıkıldı</h1><p><b></b> adresi bülten listemizden başarıyla silindi.</p>';
+          content.querySelector('b').textContent = email;
+        } else {
+          content.innerHTML = '<h1>Hata</h1><p>İşlem gerçekleştirilemedi.</p>';
+        }
+      } catch (err) {
+        content.innerHTML = '<h1>Hata</h1><p>Bir bağlantı hatası oluştu.</p>';
+      }
+    };
+  </script>
+</body>
+</html>

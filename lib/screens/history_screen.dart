@@ -26,9 +26,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
   bool _isLoading = true;
   List<StudySession> _sessions = [];
   
-  // Weekly Data (Last 7 Days)
+  // Weekly Data (İçinde bulunulan hafta: Pazartesi-Pazar)
   List<Map<String, dynamic>> _weeklyData = [];
-  int _activeDayIndex = 6; // Default to today (last index in 7 days)
+  int _activeDayIndex = DateTime.now().weekday - 1; // Varsayılan: bugün (Pzt=0..Paz=6)
   int _totalWeeklyMinutes = 0;
   String _mostEfficientDay = '-';
   int _mostEfficientMinutes = 0;
@@ -86,10 +86,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
   void _processData() {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    
-    // Create last 7 days array
+    // İçinde bulunulan haftanın Pazartesi'si (Türkiye standardı: Pzt-Paz).
+    final monday = today.subtract(Duration(days: today.weekday - 1));
+
+    // Create current Mon-Sun week array
     _weeklyData = List.generate(7, (index) {
-      final d = today.subtract(Duration(days: 6 - index));
+      final d = monday.add(Duration(days: index));
       return {
         'date': d,
         'label': DateFormat('E', _dateLocale).format(d), // Pzt, Sal vb. / Mon, Tue etc.
@@ -101,30 +103,27 @@ class _HistoryScreenState extends State<HistoryScreen> {
     _totalWeeklyMinutes = 0;
     _mostEfficientMinutes = 0;
     _mostEfficientDay = '-';
-    
+
     Map<String, int> subjectMinutes = {};
 
     for (var s in _sessions) {
       final localDate = s.createdAt.toLocal();
       final sDate = DateTime(localDate.year, localDate.month, localDate.day);
-      final diff = today.difference(sDate).inDays;
-      
-      // Process Weekly Data (Last 7 days only)
-      if (diff >= 0 && diff < 7) {
-        final index = 6 - diff;
+      final daysSinceMonday = sDate.difference(monday).inDays;
+
+      // Process Weekly Data (bu Pazartesi-Pazar haftası)
+      if (daysSinceMonday >= 0 && daysSinceMonday < 7) {
+        final index = daysSinceMonday;
         _weeklyData[index]['minutes'] += s.minutes;
         _weeklyData[index]['pomodoros'] += s.pomodoros;
         _totalWeeklyMinutes += s.minutes;
-        
+
         // Track most efficient day
         if (_weeklyData[index]['minutes'] > _mostEfficientMinutes) {
           _mostEfficientMinutes = _weeklyData[index]['minutes'] as int;
           _mostEfficientDay = DateFormat('EEEE', _dateLocale).format(sDate);
         }
-      }
 
-      // Process Subject Data (All time or last 7 days depending on requirement)
-      if (diff >= 0 && diff < 7) {
         subjectMinutes[s.categoryName] = (subjectMinutes[s.categoryName] ?? 0) + s.minutes;
       }
     }
@@ -160,6 +159,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
               // 2. Focus Efficiency
               _buildEfficiencyCard(),
+              const SizedBox(height: 16),
+              
+              // 2.5 Weekly Goal Setting
+              _buildWeeklyGoalSetting(),
               const SizedBox(height: 16),
 
               // 3. Stats Bento
@@ -703,6 +706,294 @@ class _HistoryScreenState extends State<HistoryScreen> {
             );
           }),
         ],
+      ),
+    );
+  }
+
+  Widget _buildWeeklyGoalSetting() {
+    final lang = LanguageService.instance;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final weeklyGoal = _dailyGoal * 7;
+    final goalMinutes = weeklyGoal * 25;
+    final goalHours = goalMinutes ~/ 60;
+    final goalMins = goalMinutes % 60;
+    
+    final hourAbbr = lang.translate('hour_abbr');
+    final minAbbr = lang.translate('min_abbr');
+    final goalTimeStr = goalHours > 0
+        ? '$goalHours$hourAbbr${goalMins > 0 ? ' $goalMins$minAbbr' : ''}'
+        : '$goalMins$minAbbr';
+
+    return GestureDetector(
+      onTap: _showGoalSettingSheet,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkSurfaceContainerLowest : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: (isDark ? Colors.black : const Color(0xFFD9DADC)).withValues(alpha: 0.2),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppColors.primaryContainer.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(
+                Icons.flag_rounded,
+                color: isDark ? AppColors.darkPrimary : AppColors.primary,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    lang.isTurkish ? 'Haftalık Hedef' : 'Weekly Goal',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '$weeklyGoal Pomodoro ($goalTimeStr)',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: AppColors.primaryContainer.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                Icons.edit_rounded,
+                size: 18,
+                color: isDark ? AppColors.darkPrimary : AppColors.primary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showGoalSettingSheet() {
+    int tempGoal = _dailyGoal;
+    final lang = LanguageService.instance;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final hourAbbr = lang.translate('hour_abbr');
+    final minAbbr = lang.translate('min_abbr');
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: isDark ? AppColors.darkSurfaceContainerLowest : Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            final goalMinutes = tempGoal * 25;
+            final goalHours = goalMinutes ~/ 60;
+            final goalMins = goalMinutes % 60;
+            final goalTimeStr = goalHours > 0
+                ? '$goalHours$hourAbbr${goalMins > 0 ? ' $goalMins$minAbbr' : ''}'
+                : '$goalMins$minAbbr';
+
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Handle bar
+                  Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.darkSurfaceContainerHighest : AppColors.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    lang.translate('set_daily_goal_title'),
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    lang.translate('set_daily_goal_sub'),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+
+                  // Pomodoro counter
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _goalButton(
+                        icon: Icons.remove_rounded,
+                        onTap: () {
+                          if (tempGoal > 1) {
+                            setSheetState(() => tempGoal--);
+                          }
+                        },
+                      ),
+                      const SizedBox(width: 32),
+                      Column(
+                        children: [
+                          Text(
+                            '$tempGoal',
+                            style: TextStyle(
+                              fontSize: 48,
+                              fontWeight: FontWeight.w700,
+                              color: isDark ? AppColors.darkPrimary : AppColors.primary,
+                              height: 1,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            goalTimeStr,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(width: 32),
+                      _goalButton(
+                        icon: Icons.add_rounded,
+                        onTap: () {
+                          if (tempGoal < 20) {
+                            setSheetState(() => tempGoal++);
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Quick presets
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [4, 6, 8, 10, 12].map((preset) {
+                      final isSelected = tempGoal == preset;
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: GestureDetector(
+                          onTap: () => setSheetState(() => tempGoal = preset),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? (isDark ? AppColors.darkPrimary : AppColors.primary)
+                                  : (isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              '$preset',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: isSelected
+                                    ? Colors.white
+                                    : (isDark ? AppColors.darkOnSurface : AppColors.onSurface),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 28),
+
+                  // Save button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.setInt('daily_pomo_goal', tempGoal);
+                        if (mounted) {
+                          setState(() {
+                            _dailyGoal = tempGoal;
+                          });
+                        }
+                        if (ctx.mounted) {
+                          Navigator.pop(ctx);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isDark ? AppColors.darkPrimary : AppColors.primary,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      child: Text(
+                        lang.translate('save_goal_btn'),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _goalButton({required IconData icon, required VoidCallback onTap}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 48,
+        height: 48,
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: (isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant).withValues(alpha: 0.3),
+          ),
+        ),
+        child: Icon(icon, color: isDark ? AppColors.darkPrimary : AppColors.primary, size: 24),
       ),
     );
   }

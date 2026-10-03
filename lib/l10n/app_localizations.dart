@@ -428,6 +428,36 @@ abstract class AppLocalizations {
   /// **'Seçimi Onayla'**
   String get confirmSelection;
 
+  /// No description provided for @leagueAwardsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lig Kazanımları'**
+  String get leagueAwardsTitle;
+
+  /// No description provided for @leagueAwardsSub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir lig döneminde 1., 2. veya 3. olarak bitirerek kazanılır.'**
+  String get leagueAwardsSub;
+
+  /// No description provided for @leagueAwardLockedTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu Avatar Kilitli'**
+  String get leagueAwardLockedTitle;
+
+  /// No description provided for @leagueAwardLockedBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu avatarı kazanmak için bir lig döneminde bu kademede 1., 2. veya 3. sırayla bitirmen gerekiyor. Parayla satın alınamaz.'**
+  String get leagueAwardLockedBody;
+
+  /// No description provided for @leagueAwardLockedOk.
+  ///
+  /// In tr, this message translates to:
+  /// **'Anladım'**
+  String get leagueAwardLockedOk;
+
   /// No description provided for @lockedCharacter.
   ///
   /// In tr, this message translates to:
@@ -509,8 +539,14 @@ abstract class AppLocalizations {
   /// No description provided for @passwordResetMsg.
   ///
   /// In tr, this message translates to:
-  /// **'Şifre sıfırlama bağlantısı gönderildi.'**
+  /// **'E-posta adresine bir şifre sıfırlama bağlantısı gönderdik. Gelen kutunu (ve spam klasörünü) kontrol et.'**
   String get passwordResetMsg;
+
+  /// No description provided for @errEnterEmailForReset.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifreni sıfırlamak için önce e-posta adresini gir.'**
+  String get errEnterEmailForReset;
 
   /// No description provided for @createAccountTitle.
   ///
@@ -547,6 +583,48 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Kullanım Koşullarını ve Gizlilik Politikasını okudum, onaylıyorum.'**
   String get termsAgree;
+
+  /// No description provided for @termsAgreePrefix.
+  ///
+  /// In tr, this message translates to:
+  /// **''**
+  String get termsAgreePrefix;
+
+  /// No description provided for @termsLinkTerms.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kullanım Şartları\'nı'**
+  String get termsLinkTerms;
+
+  /// No description provided for @termsAgreeConnector.
+  ///
+  /// In tr, this message translates to:
+  /// **' ve '**
+  String get termsAgreeConnector;
+
+  /// No description provided for @termsLinkPrivacy.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gizlilik Politikası\'nı'**
+  String get termsLinkPrivacy;
+
+  /// No description provided for @termsAgreeSuffix.
+  ///
+  /// In tr, this message translates to:
+  /// **' okudum, onaylıyorum.'**
+  String get termsAgreeSuffix;
+
+  /// No description provided for @privacyPolicyLink.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gizlilik Politikası'**
+  String get privacyPolicyLink;
+
+  /// No description provided for @termsOfServiceLink.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kullanım Şartları'**
+  String get termsOfServiceLink;
 
   /// No description provided for @updatesAgree.
   ///
@@ -1075,6 +1153,210 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Zorlu konuları sabah saatlerinde çalışmak verimliliği artırır.'**
   String get tip4;
+
+  /// No description provided for @addBtn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ekle'**
+  String get addBtn;
+
+  /// No description provided for @onboardingSelectOptionError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lütfen bir seçenek seçin.'**
+  String get onboardingSelectOptionError;
+
+  /// No description provided for @onboardingTimeoutError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bağlantı zaman aşımına uğradı. Lütfen internetini kontrol edip tekrar dene.'**
+  String get onboardingTimeoutError;
+
+  /// No description provided for @onboardingGenericError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir şeyler ters gitti, lütfen tekrar dene: {error}'**
+  String onboardingGenericError(Object error);
+
+  /// No description provided for @onboardingAddCategoryTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategori Ekle'**
+  String get onboardingAddCategoryTitle;
+
+  /// No description provided for @onboardingCategoryHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategori adı'**
+  String get onboardingCategoryHint;
+
+  /// No description provided for @onboardingMaxCategoriesMsg.
+  ///
+  /// In tr, this message translates to:
+  /// **'En fazla 8 kategori seçebilirsin.'**
+  String get onboardingMaxCategoriesMsg;
+
+  /// No description provided for @onboardingWelcomeTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hoş geldin! 👋'**
+  String get onboardingWelcomeTitle;
+
+  /// No description provided for @onboardingWelcomeBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ben senin odaklanma arkadaşınım. Sana eşlik etmeden önce doğum yılını öğrenebilir miyim?'**
+  String get onboardingWelcomeBody;
+
+  /// No description provided for @onboardingSegmentTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Peki, hangi yolculuktasın?'**
+  String get onboardingSegmentTitle;
+
+  /// No description provided for @onboardingSegmentBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Beraber neye çalışacağız? Sana en uygun kategorileri seçeyim.'**
+  String get onboardingSegmentBody;
+
+  /// No description provided for @onboardingSegmentLgs.
+  ///
+  /// In tr, this message translates to:
+  /// **'🎓  LGS'**
+  String get onboardingSegmentLgs;
+
+  /// No description provided for @onboardingSegmentYks.
+  ///
+  /// In tr, this message translates to:
+  /// **'📚  YKS'**
+  String get onboardingSegmentYks;
+
+  /// No description provided for @onboardingSegmentUniversity.
+  ///
+  /// In tr, this message translates to:
+  /// **'🏛️  Üniversite'**
+  String get onboardingSegmentUniversity;
+
+  /// No description provided for @onboardingSegmentWork.
+  ///
+  /// In tr, this message translates to:
+  /// **'💼  İş & Kişisel Gelişim'**
+  String get onboardingSegmentWork;
+
+  /// No description provided for @onboardingCategoryStepTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Harika seçim! 🎉'**
+  String get onboardingCategoryStepTitle;
+
+  /// No description provided for @onboardingCategoryStepBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şimdi çalışacağın dersleri/alanları seç — istediğin zaman değiştirebilirsin. Ücretsiz planda en fazla 8 tane olur.'**
+  String get onboardingCategoryStepBody;
+
+  /// No description provided for @onboardingCreateOwnCategory.
+  ///
+  /// In tr, this message translates to:
+  /// **'+ Kendi kategorimi oluştur'**
+  String get onboardingCreateOwnCategory;
+
+  /// No description provided for @onboardingGoalStepTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Son bir adım kaldı! 🚀'**
+  String get onboardingGoalStepTitle;
+
+  /// No description provided for @onboardingGoalStepBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günde ne kadar birlikte odaklanmak istersin?'**
+  String get onboardingGoalStepBody;
+
+  /// No description provided for @onboardingGoal1h.
+  ///
+  /// In tr, this message translates to:
+  /// **'1 Saat'**
+  String get onboardingGoal1h;
+
+  /// No description provided for @onboardingGoal2h.
+  ///
+  /// In tr, this message translates to:
+  /// **'2 Saat'**
+  String get onboardingGoal2h;
+
+  /// No description provided for @onboardingGoal3h.
+  ///
+  /// In tr, this message translates to:
+  /// **'3 Saat'**
+  String get onboardingGoal3h;
+
+  /// No description provided for @onboardingGoal4hPlus.
+  ///
+  /// In tr, this message translates to:
+  /// **'4 Saat+'**
+  String get onboardingGoal4hPlus;
+
+  /// No description provided for @onboardingFinishBtn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bitir'**
+  String get onboardingFinishBtn;
+
+  /// No description provided for @categoriesManagementTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategorilerim'**
+  String get categoriesManagementTitle;
+
+  /// No description provided for @categoryLimitReachedMsg.
+  ///
+  /// In tr, this message translates to:
+  /// **'Limitinize ulaştınız. En fazla {limit} kategori ekleyebilirsiniz.'**
+  String categoryLimitReachedMsg(int limit);
+
+  /// No description provided for @newCategoryDialogTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni Kategori'**
+  String get newCategoryDialogTitle;
+
+  /// No description provided for @editCategoryDialogTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategori Düzenle'**
+  String get editCategoryDialogTitle;
+
+  /// No description provided for @activeCategoryCountLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aktif Kategori Sayısı'**
+  String get activeCategoryCountLabel;
+
+  /// No description provided for @archiveCategoryTooltip.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arşivle (Silmek yerine geçmiş raporlar için saklanır)'**
+  String get archiveCategoryTooltip;
+
+  /// No description provided for @archivedCategoriesHeader.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arşivlenmiş Kategoriler'**
+  String get archivedCategoriesHeader;
+
+  /// No description provided for @archivedCategoriesDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu kategoriler ders seçicide görünmez ama geçmiş raporlarda yer alır.'**
+  String get archivedCategoriesDesc;
+
+  /// No description provided for @unarchiveTooltip.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arşivi Aç'**
+  String get unarchiveTooltip;
 }
 
 class _AppLocalizationsDelegate

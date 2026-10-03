@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../l10n/app_localizations.dart';
 import '../models/avatar_model.dart';
 import '../widgets/avatar_widget.dart';
@@ -30,10 +32,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _isLoading = false;
   String? _errorMessage;
 
-  String _selectedAvatarId = 'avatar_1_gamer';
-  final List<AvatarCharacter> _allAvatars = AvatarCharacter.allAvatars();
+  String _selectedAvatarId = 'avatar_16_basic';
+  // Lig ödülü avatarları (cost_coins=0 olduğu için bu filtreden normalde
+  // geçerdi) kayıt ekranında ASLA seçilebilir olmamalı — yalnızca lig
+  // sıralamasında ilk 3'e girerek kazanılırlar.
+  final List<AvatarCharacter> _allAvatars = AvatarCharacter.allAvatars()
+      .where((a) => !a.isPremiumOnly && a.requiredCoins == 0 && !a.isLeagueAward)
+      .toList();
 
-  AvatarCharacter get _selectedAvatar {
+  // Not: _allAvatars sunucudan (avatars tablosu) gelen listeye bağlı.
+  // Ağ sorunu ya da geçici bir gecikme yüzünden boş kalırsa .first çağrısı
+  // çökmesin diye null döndürüp seçici bölümünü UI'da tamamen gizliyoruz —
+  // kayıt olma akışı avatar seçmeden de sorunsuz devam edebilmeli.
+  AvatarCharacter? get _selectedAvatar {
+    if (_allAvatars.isEmpty) return null;
     return _allAvatars.firstWhere(
       (a) => a.id == _selectedAvatarId,
       orElse: () => _allAvatars.first,
@@ -42,6 +54,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
 
   bool _isVerificationSent = false;
+
+  Future<void> _openLegalUrl(String path) async {
+    final uri = Uri.parse('https://pomosprint.app/$path');
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
 
   Future<void> _handleRegister() async {
     final l10n = AppLocalizations.of(context)!;
@@ -63,6 +80,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
+    if (!_termsAccepted) {
+      setState(() {
+        final isTurkish = Localizations.localeOf(context).languageCode == 'tr';
+        _errorMessage = isTurkish 
+            ? 'Lütfen Kullanım Şartları ve Gizlilik Politikasını kabul edin.' 
+            : 'Please accept the Terms of Service and Privacy Policy.';
+      });
+      return;
+    }
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -74,8 +101,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
         password: password,
         avatarId: _selectedAvatarId,
         name: name.isNotEmpty ? name : null,
+        wantsNewsletter: _newsletterAccepted,
       );
 
+      // registerUser() beklenirken bu ekran dispose edilmiş olabilir
+      // (örn. global auth-state listener'ın tetiklediği navigasyon) —
+      // setState() öncesi mounted kontrolü şart.
+      if (!mounted) return;
       setState(() => _isLoading = false);
 
       if (response?.session != null) {
@@ -84,7 +116,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         final user = UserModel(
           name: displayName,
           email: email,
-          password: password,
           avatarId: _selectedAvatarId,
         );
         if (mounted) {
@@ -98,6 +129,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         });
       }
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
         _errorMessage = SupabaseService.instance.parseAuthError(e);
@@ -130,22 +162,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ? _buildVerificationSentView()
                   : Column(
                       children: [
-                        // Hourglass Icon Header
-                        Container(
-                          width: 80,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: isDark ? AppColors.darkSurfaceContainerHigh : AppColors.surfaceContainerHigh,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Center(
-                            child: Icon(
-                              Icons.hourglass_bottom_rounded,
-                              size: 40,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                        ),
+                        // Seçili karakteri gösteren avatar başlığı (avatar
+                        // listesi boşsa — örn. ağ sorunu — genel kum saati
+                        // ikonuna düşer).
+                        _selectedAvatar != null
+                            ? AvatarWidget(avatar: _selectedAvatar!, size: 80)
+                            : Container(
+                                width: 80,
+                                height: 80,
+                                decoration: BoxDecoration(
+                                  color: isDark ? AppColors.darkSurfaceContainerHigh : AppColors.surfaceContainerHigh,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.hourglass_bottom_rounded,
+                                    size: 40,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ),
                         const SizedBox(height: 16),
 
                         Text(
@@ -197,6 +233,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ],
 
                         // Avatar Picker Section (Set of 9 avatars)
+                        // Sunucudan avatar listesi gelmediyse (ör. geçici ağ sorunu)
+                        // bu bölüm tamamen atlanır — kayıt olma avatar seçmeden de devam eder.
+                        if (_allAvatars.isNotEmpty)
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(16),
@@ -212,7 +251,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               Row(
                                 children: [
                                   AvatarWidget(
-                                    avatar: _selectedAvatar,
+                                    avatar: _selectedAvatar!,
                                     size: 40,
                                   ),
                                   const SizedBox(width: 12),
@@ -229,7 +268,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                           ),
                                         ),
                                         Text(
-                                          _selectedAvatar.getName(LanguageService.instance.isTurkish),
+                                          _selectedAvatar!.getName(LanguageService.instance.isTurkish),
                                           style: TextStyle(
                                             fontSize: 12,
                                             color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
@@ -369,11 +408,37 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   activeColor: AppColors.primary,
                                   contentPadding: EdgeInsets.zero,
                                   controlAffinity: ListTileControlAffinity.leading,
-                                  title: Text(
-                                    l10n.termsAgree,
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                                  title: Text.rich(
+                                    TextSpan(
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                                      ),
+                                      children: [
+                                        TextSpan(text: l10n.termsAgreePrefix),
+                                        TextSpan(
+                                          text: l10n.termsLinkTerms,
+                                          style: const TextStyle(
+                                            color: AppColors.primary,
+                                            fontWeight: FontWeight.bold,
+                                            decoration: TextDecoration.underline,
+                                          ),
+                                          recognizer: TapGestureRecognizer()
+                                            ..onTap = () => _openLegalUrl('terms.html'),
+                                        ),
+                                        TextSpan(text: l10n.termsAgreeConnector),
+                                        TextSpan(
+                                          text: l10n.termsLinkPrivacy,
+                                          style: const TextStyle(
+                                            color: AppColors.primary,
+                                            fontWeight: FontWeight.bold,
+                                            decoration: TextDecoration.underline,
+                                          ),
+                                          recognizer: TapGestureRecognizer()
+                                            ..onTap = () => _openLegalUrl('privacy.html'),
+                                        ),
+                                        TextSpan(text: l10n.termsAgreeSuffix),
+                                      ],
                                     ),
                                   ),
                                 ),

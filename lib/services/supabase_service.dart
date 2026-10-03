@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/foundation.dart';
@@ -5,20 +6,119 @@ import 'package:flutter/material.dart' show IconData;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:crypto/crypto.dart';
+
 import '../models/user_model.dart';
+import '../models/avatar_model.dart';
 import '../models/study_session.dart';
 import '../models/category_model.dart';
 import 'language_service.dart';
 
 class SupabaseService {
+
+  Future<UserModel> _buildUserModel(Map<String, dynamic> profileData, String email, String userId) async {
+    List<String> unlockedAvatars = [];
+    try {
+      final client = Supabase.instance.client;
+      final unlockRes = await client.from('avatar_unlocks').select('avatar_id').eq('user_id', userId);
+      unlockedAvatars = (unlockRes as List<dynamic>).map((e) => e['avatar_id'].toString()).toList();
+    } catch (_) {}
+    
+    profileData['unlocked_avatars'] = unlockedAvatars;
+    
+    return UserModel.fromMap({
+      ...profileData,
+      'email': profileData['email'] ?? email,
+    });
+  }
+
   static final SupabaseService instance = SupabaseService._init();
 
   bool _isCloudActive = false;
 
+  // 'email' kasıtlı olarak dışarıda bırakıldı: e-posta değeri her zaman
+  // Supabase Auth oturumundan (session.user.email) geliyor, profiles
+  // tablosundan hiç okunmasına gerek yok. Bu sayede 'email' kolonunun
+  // authenticated rolünden REVOKE edilmesi (bkz. ilgili migration) bu
+  // "kendi profilini oku" çağrılarını bozmuyor.
+  static const String ownProfileColumns =
+      'id, name, avatar_id, total_minutes, created_at, friend_code, '
+      'current_streak, last_study_date, is_premium, league_tier, '
+      'lifetime_points, coins, longest_streak, timezone, '
+      'active_session_ends_at, active_session_category_name, '
+      'show_in_social_feed, user_segment, daily_goal_minutes, birth_year, '
+      'onboarding_completed_at';
+
   SupabaseService._init();
 
+  /// Kullanıcının profil satırını okur; satır GERÇEKTEN yoksa oluşturur.
+  ///
+  /// Okuma ağ/sunucu hatasıyla başarısız olursa profil oluşturulmaz, hata
+  /// yukarı fırlatılır. Eskiden okuma hatası "profil yok" gibi yorumlanıp
+  /// `total_minutes: 0, lifetime_points: 0` içeren bir upsert yapılıyordu;
+  /// bu da anlık bir bağlantı kopmasında mevcut kullanıcının tüm
+  /// istatistiklerini sıfırlayabiliyordu. Oluşturma artık
+  /// `ignoreDuplicates` ile yapılıyor: satır o arada oluşmuşsa dokunulmaz,
+  /// istatistik kolonları hiç gönderilmez (veritabanı varsayılanı 0).
+  Future<Map<String, dynamic>?> _fetchOrCreateProfile({
+    required SupabaseClient client,
+    required String userId,
+    required String email,
+    required String name,
+    required String avatarId,
+  }) async {
+    final existing = await client
+        .from('profiles')
+        .select(ownProfileColumns)
+        .eq('id', userId)
+        .maybeSingle();
+    if (existing != null) return existing;
+
+    await client.from('profiles').upsert({
+      'id': userId,
+      'email': email,
+      'name': name,
+      'avatar_id': avatarId,
+    }, onConflict: 'id', ignoreDuplicates: true);
+
+    return await client
+        .from('profiles')
+        .select(ownProfileColumns)
+        .eq('id', userId)
+        .maybeSingle();
+  }
+
   bool get isCloudActive => _isCloudActive;
+
+  // Tek bir GoogleSignIn örneği: her çağrıda yeniden oluşturmak,
+  // paketin sessiz oturum önbelleğini (signInSilently) sıfırlıyordu.
+  static const String _googleWebClientId = '722417205043-d7t27n7usp9nrfeuh8o97fald6a5v9ku.apps.googleusercontent.com';
+  static const String _googleIosClientId = '722417205043-luq0knjdncu1aitpg9udbfgmo2qdtced.apps.googleusercontent.com';
+  late final GoogleSignIn _googleSignIn = GoogleSignIn(
+    serverClientId: _googleWebClientId,
+    clientId: _googleIosClientId,
+  );
+
+  // Hem Supabase oturumunu hem de Google'ın cihazdaki native oturum
+  // önbelleğini kapatır. Apple ile giriş yapmış bir kullanıcıda
+  // GoogleSignIn().signOut() hata verebilir (hiç Google oturumu yok) —
+  // bu beklenen bir durum, try/catch ile yutulur.
+  Future<void> signOutFully() async {
+    try {
+      await _googleSignIn.signOut();
+    } catch (e) {
+      debugPrint('[AUTH] GoogleSignIn signOut hatası (Apple kullanıcısı için normal): $e');
+    }
+    try {
+      await Supabase.instance.client.auth.signOut();
+      debugPrint('[AUTH] Supabase signOut başarılı');
+    } catch (e) {
+      debugPrint('[AUTH] Supabase signOut hatası: $e');
+    }
+  }
 
   Future<void> initialize() async {
     String url = '';
@@ -71,6 +171,7 @@ class SupabaseService {
     required String password,
     required String avatarId,
     String? name,
+    bool wantsNewsletter = false,
   }) async {
     final cleanEmail = email.trim().toLowerCase();
     final displayName = (name != null && name.trim().isNotEmpty)
@@ -89,10 +190,11 @@ class SupabaseService {
       final response = await client.auth.signUp(
         email: cleanEmail,
         password: password,
-        emailRedirectTo: 'https://pomosprint-verify.vercel.app',
+        emailRedirectTo: 'https://pomosprint.app/confirmed.html',
         data: {
           'name': displayName,
           'avatar_id': avatarId,
+          'newsletter': wantsNewsletter,
         },
       );
 
@@ -145,53 +247,24 @@ class SupabaseService {
     if (user != null) {
       Map<String, dynamic>? profileData;
       try {
-        profileData = await client
-            .from('profiles')
-            .select()
-            .eq('id', user.id)
-            .single();
+        profileData = await _fetchOrCreateProfile(
+          client: client,
+          userId: user.id,
+          email: user.email ?? cleanEmail,
+          name: user.userMetadata?['name'] ?? cleanEmail.split('@').first,
+          avatarId: user.userMetadata?['avatar_id'] ?? 'avatar_1_gamer',
+        );
       } catch (e) {
-        if (e is PostgrestException && e.code == 'PGRST116') {
-          // Sadece 'satır bulunamadı' ise yeni kayıt oluştur.
-          final name = user.userMetadata?['name'] ?? cleanEmail.split('@').first;
-          final avatarId = user.userMetadata?['avatar_id'] ?? 'avatar_1_gamer';
-
-          try {
-            await client.from('profiles').upsert({
-              'id': user.id,
-              'email': user.email ?? cleanEmail,
-              'name': name,
-              'avatar_id': avatarId,
-              'total_minutes': 0,
-              'points': 0,
-            });
-
-            profileData = await client
-                .from('profiles')
-                .select()
-                .eq('id', user.id)
-                .single();
-          } catch (upsertError) {
-            if (kDebugMode) print('Profile upsert error in login: $upsertError');
-            throw AuthException('Profil oluşturulurken bir hata oluştu: $upsertError');
-          }
-        } else {
-          if (kDebugMode) print('Profile fetch error in login: $e');
-          throw AuthException('Profil bilgileri alınırken bir hata oluştu (Ağ, RLS veya Timeout olabilir): $e');
-        }
+        if (kDebugMode) print('Profile fetch/create error in login: $e');
+        throw AuthException('Profil yüklenirken bir hata oluştu: $e');
       }
 
-      return UserModel(
-        name: profileData?['name'] ?? 'Google User',
-        email: profileData?['email'] ?? user.email ?? cleanEmail,
-        password: password,
-        avatarId: profileData?['avatar_id'] ?? 'avatar_1_gamer',
-        totalMinutes: profileData?['total_minutes'] ?? 0,
-        points: profileData?['points'] ?? 0,
-      );
+      return await _buildUserModel(profileData ?? {}, user.email ?? cleanEmail, user.id);
     }
     return null;
   }
+
+
 
   // Google Sign-In
   Future<UserModel?> signInWithGoogle() async {
@@ -202,14 +275,17 @@ class SupabaseService {
     }
 
     try {
-      final webClientId = '722417205043-d7t27n7usp9nrfeuh8o97fald6a5v9ku.apps.googleusercontent.com';
-      final iosClientId = '722417205043-luq0knjdncu1aitpg9udbfgmo2qdtced.apps.googleusercontent.com';
-      final GoogleSignIn googleSignIn = GoogleSignIn(
-        serverClientId: webClientId,
-        clientId: iosClientId,
-      );
-
-      final googleUser = await googleSignIn.signIn();
+      // Önce sessiz oturum denenir (kullanıcı daha önce izin verdiyse
+      // Google hesap seçici/onay ekranı hiç gösterilmez, yeni bir "erişim
+      // verildi" bildirimi de gitmez). Sadece null dönerse interaktif
+      // signIn()'e düşülür.
+      GoogleSignInAccount? googleUser = await _googleSignIn.signInSilently();
+      if (googleUser != null) {
+        debugPrint('[AUTH] GoogleSignIn: signInSilently başarılı (${googleUser.email})');
+      } else {
+        debugPrint('[AUTH] GoogleSignIn: signInSilently null döndü, interaktif signIn deneniyor');
+        googleUser = await _googleSignIn.signIn();
+      }
       if (googleUser == null) {
         // User canceled the sign-in flow
         return null;
@@ -224,6 +300,7 @@ class SupabaseService {
       }
 
       final client = Supabase.instance.client;
+      debugPrint('[AUTH] signInWithIdToken çağrılıyor (google, email=${googleUser.email})');
       final response = await client.auth.signInWithIdToken(
         provider: OAuthProvider.google,
         idToken: idToken,
@@ -231,15 +308,92 @@ class SupabaseService {
       );
 
       final user = response.user;
+      if (user == null) {
+        debugPrint('[AUTH] signInWithIdToken(google): response.user null döndü (auth başarısız)');
+        return null;
+      }
+
+      debugPrint('[AUTH] signInWithIdToken(google) BAŞARILI (uid=${user.id}). Profil sağlama adımına geçiliyor — buradan sonraki hatalar artık girişi engellemeyecek.');
+
+      // NOT: Buradan itibaren Supabase oturumu ZATEN kurulmuş ve kalıcı
+      // durumda. Aşağıdaki profil sağlama adımlarından biri başarısız
+      // olursa bile fırlatmıyoruz — aksi halde kullanıcı ekranda "takılı"
+      // kalıyor, oysa oturumu aslında geçerli (uygulamayı kapatıp açınca
+      // giriş yapmış görünmesinin sebebi buydu).
+      final loginEmail = user.email ?? googleUser.email;
+      try {
+        await client.rpc('cleanup_unconfirmed_duplicate_identity', params: {
+          'p_email': loginEmail,
+        });
+      } catch (e) {
+        debugPrint('[AUTH] cleanup_unconfirmed_duplicate_identity hatası (yok sayılıyor): $e');
+      }
+
+      Map<String, dynamic>? profileData;
+      try {
+        profileData = await _fetchOrCreateProfile(
+          client: client,
+          userId: user.id,
+          email: user.email ?? googleUser.email,
+          name: user.userMetadata?['full_name'] ?? user.email?.split('@').first ?? 'Google User',
+          avatarId: user.userMetadata?['avatar_id'] ?? 'avatar_1_gamer',
+        );
+      } catch (e) {
+        debugPrint('[AUTH] Profil çekme/oluşturma hatası (yok sayılıyor, minimal profille devam edilecek): $e');
+      }
+
+      // profileData hâlâ null olabilir (upsert de başarısız olduysa) — bu
+      // durumda dahi auth.users'daki bilgilerden minimal bir UserModel
+      // döndürülür, kullanıcı asla "giriş yapıldı ama ekranda takılı kaldı"
+      // durumuna düşmez. Eksik profil verisi bir sonraki splash/senkronda
+      // tamamlanır.
+      return await _buildUserModel(
+        profileData ?? {'id': user.id, 'email': user.email ?? googleUser.email, 'name': user.userMetadata?['full_name'] ?? googleUser.email},
+        user.email ?? googleUser.email,
+        user.id,
+      );
+    } catch (e) {
+      debugPrint('[AUTH] Google Sign-In hatası (auth adımından ÖNCE, gerçek bir hata): $e');
+      throw AuthException(e.toString());
+    }
+  }
+
+  // Apple Sign-In
+  Future<UserModel?> signInWithApple() async {
+    if (!_isCloudActive) {
+      throw AuthException(LanguageService.instance.isTurkish
+          ? 'Sunucuya bağlanılamadı. Lütfen internet bağlantınızı kontrol edin.'
+          : 'Unable to connect to the cloud server. Please check your internet connection.');
+    }
+
+    try {
+      final client = Supabase.instance.client;
+      final rawNonce = client.auth.generateRawNonce();
+      final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
+
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        nonce: hashedNonce,
+      );
+
+      final idToken = credential.identityToken;
+      if (idToken == null) {
+        throw AuthException('No ID Token found.');
+      }
+
+      debugPrint('[AUTH] signInWithIdToken çağrılıyor (apple)');
+      final response = await client.auth.signInWithIdToken(
+        provider: OAuthProvider.apple,
+        idToken: idToken,
+        nonce: rawNonce,
+      );
+
+      final user = response.user;
       if (user != null) {
-        // BUG FIX: aynı e-postayla önce email/şifreyle kayıt olup hesabını
-        // ONAYLAMAMIŞ kullanıcılar için Supabase'in "Automatic Linking"
-        // mekanizması devreye giremez (hedef hesap onaysız) ve GoTrue bu
-        // Google girişi için AYRI bir kullanıcı oluşturur. Google girişi
-        // gerçek/onaylı bir e-postayı doğruladığına göre, aynı e-postaya ait
-        // TERK EDİLMİŞ (hiç onaylanmamış, dolayısıyla gerçek veri barındırmayan)
-        // diğer hesapları güvenle temizleriz — onaylı hesaplara asla dokunulmaz.
-        final loginEmail = user.email ?? googleUser.email;
+        final loginEmail = user.email ?? 'apple_user_${user.id}@hidden.apple.com';
         try {
           await client.rpc('cleanup_unconfirmed_duplicate_identity', params: {
             'p_email': loginEmail,
@@ -248,78 +402,128 @@ class SupabaseService {
           if (kDebugMode) print('cleanup_unconfirmed_duplicate_identity error: $e');
         }
 
+        final firstName = credential.givenName ?? '';
+        final lastName = credential.familyName ?? '';
+        final fullName = (firstName.isEmpty && lastName.isEmpty)
+            ? (user.email?.split('@').first ?? 'Apple User')
+            : '$firstName $lastName'.trim();
+
         Map<String, dynamic>? profileData;
         try {
-          profileData = await client
-              .from('profiles')
-              .select()
-              .eq('id', user.id)
-              .single();
+          profileData = await _fetchOrCreateProfile(
+            client: client,
+            userId: user.id,
+            email: loginEmail,
+            name: fullName,
+            avatarId: user.userMetadata?['avatar_id'] ?? 'avatar_1_gamer',
+          );
         } catch (e) {
-          if (e is PostgrestException && e.code == 'PGRST116') {
-            // Profil tablosunda kaydı yoksa (örneğin sadece profile tablosundan silinmişse veya trigger çalışmamışsa),
-            // client tarafında GARANTİ bir satır oluşturuyoruz.
-            final name = user.userMetadata?['full_name'] ?? user.email?.split('@').first ?? 'Google User';
-            final avatarId = user.userMetadata?['avatar_id'] ?? 'avatar_1_gamer';
-            
-            try {
-              await client.from('profiles').upsert({
-                'id': user.id,
-                'email': user.email ?? googleUser.email,
-                'name': name,
-                'avatar_id': avatarId,
-                'total_minutes': 0,
-                'points': 0,
-              });
-              
-              profileData = await client
-                  .from('profiles')
-                  .select()
-                  .eq('id', user.id)
-                  .single();
-            } catch (upsertError) {
-              if (kDebugMode) print('Profile upsert error: $upsertError');
-              throw AuthException('Profil oluşturulurken bir hata oluştu: $upsertError');
-            }
-          } else {
-            if (kDebugMode) print('Profile fetch error: $e');
-            // SESSİZCE yutmak yerine hatayı fırlatıyoruz ki kullanıcı uyarı görsün
-            throw AuthException('Profil bilgileri alınırken bir hata oluştu (Ağ, RLS veya Timeout olabilir): $e');
-          }
+          if (kDebugMode) print('Profile fetch/create error: $e');
+          throw AuthException('Profil yüklenirken bir hata oluştu: $e');
         }
 
-        return UserModel(
-          name: profileData?['name'] ?? 'Google User',
-          email: profileData?['email'] ?? user.email ?? googleUser.email,
-          password: '',
-          avatarId: profileData?['avatar_id'] ?? 'avatar_1_gamer',
-          totalMinutes: profileData?['total_minutes'] ?? 0,
-          points: profileData?['points'] ?? 0,
-        );
+        return await _buildUserModel(profileData ?? {}, user.email ?? loginEmail, user.id);
       }
       return null;
     } catch (e) {
-      if (kDebugMode) print('Google Sign-In Error: $e');
+      if (kDebugMode) print('Apple Sign-In Error: $e');
       throw AuthException(e.toString());
     }
   }
 
   // Get Leaderboard Ranking Users
+  // Güvenlik: profiles tablosuna doğrudan erişim yerine SECURITY DEFINER
+  // RPC kullanılır — böylece client'lar diğer kullanıcıların email/
+  // birth_year gibi hassas sütunlarına asla erişemez, sadece güvenli
+  // alt küme (isim, avatar, süre, puan, premium) döner.
   Future<List<Map<String, dynamic>>> getRankingUsers() async {
     if (_isCloudActive) {
       try {
         final client = Supabase.instance.client;
-        final List<dynamic> response = await client
-            .from('profiles')
-            .select('name, email, avatar_id, total_minutes, points')
-            .order('points', ascending: false)
-            .limit(50);
+        final List<dynamic> response = await client.rpc(
+          'get_public_alltime_leaderboard',
+          params: {'p_limit': 50},
+        );
         return response.cast<Map<String, dynamic>>();
       } catch (e) {
         if (kDebugMode) print('Supabase getRankingUsers Error: $e');
       }
     }
     return [];
+  }
+
+  // Get Duolingo-style League Ranking
+  Future<List<Map<String, dynamic>>> getLeagueRanking() async {
+    if (_isCloudActive) {
+      try {
+        final client = Supabase.instance.client;
+        final uid = client.auth.currentUser?.id;
+        if (uid == null) return [];
+
+        // get_my_league_ranking: oturum sahibinin ligini e-posta kolonları
+        // olmadan döndürür. Sunucuya henüz uygulanmamışsa (PGRST202:
+        // fonksiyon bulunamadı) eski uç noktaya düşülür.
+        List<dynamic> response;
+        try {
+          response = await client.rpc('get_my_league_ranking');
+        } on PostgrestException catch (e) {
+          if (e.code != 'PGRST202') rethrow;
+          response = await client.rpc(
+            'get_league_ranking',
+            params: {'p_user_id': uid},
+          );
+          for (final row in response) {
+            (row as Map).remove('email');
+          }
+        }
+        return response.cast<Map<String, dynamic>>();
+      } catch (e) {
+        if (kDebugMode) print('Supabase getLeagueRanking Error: $e');
+      }
+    }
+    return [];
+  }
+
+  // Aylık sıralama listesi bir "lig odası" değildir (gerçek terfi/düşüş
+  // taşıması yapılmaz), ama listedeki kişi sayısına göre aynı sunucu
+  // kuralıyla (get_league_zones) hangi sıraların görsel olarak terfi/düşüş
+  // bölgesinde sayılacağını hesaplar. Sayılar burada da hardcode edilmez.
+  Future<Map<String, int>> getLeagueZones(int memberCount) async {
+    if (_isCloudActive && memberCount > 0) {
+      try {
+        final client = Supabase.instance.client;
+        final List<dynamic> response = await client.rpc(
+          'get_league_zones',
+          params: {'p_member_count': memberCount},
+        );
+        if (response.isNotEmpty) {
+          final row = response.first as Map<String, dynamic>;
+          return {
+            'promotion_zone_end': row['promotion_zone_end'] as int? ?? 3,
+            'demotion_zone_start': row['demotion_zone_start'] as int? ?? 999,
+          };
+        }
+      } catch (e) {
+        if (kDebugMode) print('Supabase getLeagueZones Error: $e');
+      }
+    }
+    return {'promotion_zone_end': 3, 'demotion_zone_start': 999};
+  }
+
+  // Puan hesabında kullanılan sabitleri sunucudan okur (bkz. get_points_config
+  // RPC'si). Bu değerler complete_study_session RPC'sinin gövdesindeki
+  // sabitlerle aynı tutulmalıdır; UI tarafında asla hardcode edilmez.
+  Future<Map<String, dynamic>> getPointsConfig() async {
+    if (_isCloudActive) {
+      try {
+        final client = Supabase.instance.client;
+        final response = await client.rpc('get_points_config');
+        return Map<String, dynamic>.from(response as Map);
+      } catch (e) {
+        if (kDebugMode) print('Supabase getPointsConfig Error: $e');
+      }
+    }
+    return {};
   }
 
   // Resend Email Confirmation Link
@@ -330,6 +534,7 @@ class SupabaseService {
       await client.auth.resend(
         type: OtpType.signup,
         email: cleanEmail,
+        emailRedirectTo: 'https://pomosprint.app/confirmed.html',
       );
       if (kDebugMode) {
         print('📬 Onay e-postası tekrar gönderildi: $cleanEmail');
@@ -337,24 +542,25 @@ class SupabaseService {
     }
   }
 
-  // Update Avatar
-  Future<void> updateUserAvatar(String userEmailOrId, String avatarId) async {
-    final clean = userEmailOrId.trim().toLowerCase();
+  // Şifre sıfırlama e-postası gönderir. Supabase, hesap keşfini (enumeration)
+  // önlemek için e-posta kayıtlı olsun ya da olmasın aynı şekilde davranır —
+  // yani bu çağrı "başarılı" dönse bile e-postanın gerçekten var olduğu
+  // anlamına gelmez, bu Supabase'in kasıtlı güvenlik tasarımıdır.
+  Future<void> resetPassword(String email) async {
+    final cleanEmail = email.trim().toLowerCase();
     if (_isCloudActive) {
-      try {
-        final client = Supabase.instance.client;
-        await client
-            .from('profiles')
-            .update({'avatar_id': avatarId})
-            .or('email.eq.$clean,name.eq.$clean');
-        if (kDebugMode) {
-          print('✅ Avatar Supabase veritabanında başarıyla güncellendi ($clean -> $avatarId)');
-        }
-      } catch (e) {
-        if (kDebugMode) print('Supabase Update Avatar Error: $e');
+      final client = Supabase.instance.client;
+      await client.auth.resetPasswordForEmail(
+        cleanEmail,
+        redirectTo: 'https://pomosprint.app/reset-password.html',
+      );
+      if (kDebugMode) {
+        print('🔑 Şifre sıfırlama e-postası gönderildi: $cleanEmail');
       }
     }
   }
+
+
 
   // Update User Profile Name
   Future<void> updateUserName(String email, String newName) async {
@@ -402,67 +608,65 @@ class SupabaseService {
     return true;
   }
 
-  // Insert Study Session
-  Future<void> insertStudySession({
-    required String categoryName,
-    required int minutes,
+  /// NEW: Server-side point calculation. Returns a result map with
+  /// base_points, bonus_points, total_points, streak, bonus_pct, duplicate.
+  Future<Map<String, dynamic>?> completeStudySession({
+    required String clientUuid,
+    required String categoryId,
+    required int durationMinutes,
+    required bool wasPaused,
+    required int isVerified,
+    required DateTime startedAt,
   }) async {
-    if (_isCloudActive) {
-      try {
-        final client = Supabase.instance.client;
-        final userId = client.auth.currentUser?.id;
-
-        if (userId == null) {
-          throw Exception('Kullanıcı oturumu bulunamadı.');
-        }
-
-        await client.from('study_sessions').insert({
-          'user_id': userId,
-          'category': categoryName,
-          'duration_minutes': minutes,
-        });
-
-        if (kDebugMode) {
-          print('✅ Supabase Study Session eklendi: $categoryName ($minutes dk)');
-        }
-      } catch (e) {
-        if (kDebugMode) print('❌ Supabase insertStudySession hatası: $e');
-        rethrow;
-      }
-    }
-  }
-
-  // Log Pomodoro Session (ATOMIC: study_sessions insert + profiles update
-  // tek bir RPC/transaction içinde yapılır — biri yazılıp diğeri yazılmama
-  // riski ortadan kalkar).
-  Future<void> logPomodoroSession({
-    required String categoryName,
-    required int minutes,
-    required int addedPoints,
-  }) async {
-    if (!_isCloudActive) return;
+    if (!_isCloudActive) return null;
     final client = Supabase.instance.client;
-    final localDateStr = DateTime.now().toLocal().toIso8601String().substring(0, 10);
-    await client.rpc('log_pomodoro_session', params: {
-      'p_category': categoryName,
-      'p_minutes': minutes,
-      'p_points': addedPoints,
-      'p_local_date_str': localDateStr,
-    });
-    if (kDebugMode) {
-      print('✅ log_pomodoro_session tamamlandı: $categoryName (+$minutes dk, +$addedPoints puan)');
+    try {
+      final result = await client.rpc('complete_study_session', params: {
+        'p_client_uuid': clientUuid,
+        'p_category_id': categoryId,
+        'p_duration_minutes': durationMinutes,
+        'p_was_paused': wasPaused,
+        'p_is_verified': isVerified,
+        'p_started_at': startedAt.toUtc().toIso8601String(),
+      });
+      if (kDebugMode) {
+        print('✅ complete_study_session: $result');
+      }
+      await _broadcastStatsUpdated();
+      if (result is Map) {
+        return Map<String, dynamic>.from(result);
+      }
+      return null;
+    } catch (e) {
+      if (kDebugMode) print('❌ complete_study_session error: $e');
+      rethrow;
     }
-    await _broadcastStatsUpdated();
   }
 
   // ---- BEKLEYEN (SENKRONİZE EDİLMEMİŞ) SEANSLAR — Offline Dayanıklılık ----
   // Ağ yokken tamamlanan seanslar cihazda saklanır, bağlantı gelince otomatik gönderilir.
 
-  String _pendingSessionsKey(String userEmail) => 'pending_sessions_${userEmail.trim().toLowerCase()}';
+  // Kuyruk kullanıcı ID'sine göre saklanır (e-posta değişebilir). Eski
+  // sürümler e-postaya göre sakladığı için, eski anahtardaki kayıtlar ilk
+  // erişimde yeni anahtara taşınır.
+  String _legacyPendingSessionsKey(String userEmail) => 'pending_sessions_${userEmail.trim().toLowerCase()}';
 
-  Future<List<Map<String, dynamic>>> getPendingSessions(String userEmail) async {
-    final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString(_pendingSessionsKey(userEmail));
+  Future<String> _pendingSessionsKey(SharedPreferences prefs, String userEmail) async {
+    final uid = _isCloudActive ? Supabase.instance.client.auth.currentUser?.id : null;
+    final legacyKey = _legacyPendingSessionsKey(userEmail);
+    if (uid == null) return legacyKey;
+
+    final key = 'pending_sessions_uid_$uid';
+    final legacyRaw = prefs.getString(legacyKey);
+    if (legacyRaw != null && legacyRaw.isNotEmpty) {
+      final merged = [..._decodeSessions(prefs.getString(key)), ..._decodeSessions(legacyRaw)];
+      await prefs.setString(key, jsonEncode(merged));
+      await prefs.remove(legacyKey);
+    }
+    return key;
+  }
+
+  List<Map<String, dynamic>> _decodeSessions(String? raw) {
     if (raw == null || raw.isEmpty) return [];
     try {
       final List<dynamic> decoded = jsonDecode(raw);
@@ -472,22 +676,46 @@ class SupabaseService {
     }
   }
 
+  Future<List<Map<String, dynamic>>> getPendingSessions(String userEmail) async {
+    final prefs = await SharedPreferences.getInstance();
+    return _decodeSessions(prefs.getString(await _pendingSessionsKey(prefs, userEmail)));
+  }
+
   Future<void> _savePendingSessions(String userEmail, List<Map<String, dynamic>> sessions) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_pendingSessionsKey(userEmail), jsonEncode(sessions));
+    await prefs.setString(await _pendingSessionsKey(prefs, userEmail), jsonEncode(sessions));
+  }
+
+  /// Sunucunun seansı KALICI olarak reddettiğini (tekrar denemenin anlamı
+  /// olmadığını) gösteren hatalar: RPC içindeki RAISE EXCEPTION (P0001),
+  /// veri/kısıt hataları (22xxx, 23xxx). Ağ hataları, zaman aşımları ve
+  /// süresi dolmuş oturum (JWT) gibi durumlar geçicidir; seans kuyrukta
+  /// kalıp sonra yeniden denenir.
+  static bool isPermanentSessionError(Object e) {
+    if (e is! PostgrestException) return false;
+    final code = e.code ?? '';
+    return code == 'P0001' || code.startsWith('22') || code.startsWith('23');
   }
 
   Future<void> addPendingSession({
     required String userEmail,
+    required String categoryId,
     required String categoryName,
     required int minutes,
-    required int addedPoints,
+    required bool wasPaused,
+    required int isVerified,
+    required String startedAt,
+    required String clientUuid,
   }) async {
     final sessions = await getPendingSessions(userEmail);
     sessions.add({
-      'category': categoryName,
+      'category_id': categoryId,
+      'category_name': categoryName,
       'minutes': minutes,
-      'points': addedPoints,
+      'was_paused': wasPaused,
+      'is_verified': isVerified,
+      'started_at': startedAt,
+      'client_uuid': clientUuid,
       'queued_at': DateTime.now().toIso8601String(),
     });
     await _savePendingSessions(userEmail, sessions);
@@ -499,8 +727,9 @@ class SupabaseService {
   bool _isSyncingPending = false;
 
   /// Bekleyen tüm seansları buluta göndermeyi dener.
-  /// Başarılı olanları listeden çıkarır. Kalan (hâlâ senkronize edilememiş)
-  /// seans sayısını döndürür.
+  /// Başarılı olanları ve sunucunun kalıcı olarak reddettiklerini listeden
+  /// çıkarır; yalnızca geçici hatayla gönderilemeyenler kalır. Kalan seans
+  /// sayısını döndürür.
   Future<int> syncPendingSessions(String userEmail) async {
     if (!_isCloudActive) return (await getPendingSessions(userEmail)).length;
     if (_isSyncingPending) {
@@ -513,17 +742,58 @@ class SupabaseService {
       final sessions = await getPendingSessions(userEmail);
       if (sessions.isEmpty) return 0;
 
-      final remaining = <Map<String, dynamic>>[];
-      for (final session in sessions) {
+      // Eski sürümlerden kalan, kategori ID'si veya başlangıç zamanı
+      // olmayan kayıtlar sunucu tarafından asla kabul edilemez (eskiden
+      // sahte bir kategori ID'siyle sonsuza kadar yeniden deneniyordu).
+      // Sıralı gönderim, sunucudaki çakışma kontrolünün doğru çalışması
+      // için önemli.
+      final valid = sessions
+          .where((s) => s['category_id'] is String && s['started_at'] is String && s['minutes'] is int)
+          .toList()
+        ..sort((a, b) => (a['started_at'] as String).compareTo(b['started_at'] as String));
+
+      // Yer tutucu (UUID olmayan) kategoriyle tamamlanmış seansları, aynı
+      // isimli bulut kategorisine eşle; eşleşme yoksa sunucu zaten
+      // reddedeceği için bırak.
+      if (valid.any((s) => !isServerCategoryId(s['category_id'] as String))) {
         try {
-          await logPomodoroSession(
-            categoryName: session['category'] as String,
-            minutes: session['minutes'] as int,
-            addedPoints: session['points'] as int,
-          );
+          final cloudCats = await fetchUserCategories(includeArchived: true);
+          final byName = {for (final c in cloudCats) c.name.trim().toLowerCase(): c.id};
+          for (final s in valid) {
+            if (isServerCategoryId(s['category_id'] as String)) continue;
+            final name = (s['category_name'] as String? ?? '').trim().toLowerCase();
+            final mapped = byName[name];
+            if (mapped != null) s['category_id'] = mapped;
+          }
         } catch (e) {
-          if (kDebugMode) print('⏳ Bekleyen seans senkronize edilemedi (ağ hâlâ yok olabilir): $e');
-          remaining.add(session);
+          // Kategoriler alınamadıysa ağ hâlâ yok demektir; hepsini beklet.
+          if (kDebugMode) print('⏳ Kategoriler alınamadı, senkron ertelendi: $e');
+          return sessions.length;
+        }
+        valid.removeWhere((s) => !isServerCategoryId(s['category_id'] as String));
+      }
+
+      final remaining = <Map<String, dynamic>>[];
+      for (final session in valid) {
+        try {
+          final result = await completeStudySession(
+            clientUuid: session['client_uuid'] as String? ?? const Uuid().v4(),
+            categoryId: session['category_id'] as String,
+            durationMinutes: session['minutes'] as int,
+            wasPaused: session['was_paused'] as bool? ?? false,
+            isVerified: session['is_verified'] as int? ?? 0,
+            startedAt: DateTime.parse(session['started_at'] as String),
+          );
+          if (result?['error'] != null) {
+            debugPrint('⚠️ Bekleyen seans sunucu tarafından reddedildi: ${result?['error']}');
+          }
+        } catch (e) {
+          if (isPermanentSessionError(e)) {
+            if (kDebugMode) print('⚠️ Bekleyen seans kalıcı olarak reddedildi, kuyruktan çıkarılıyor: $e');
+          } else {
+            if (kDebugMode) print('⏳ Bekleyen seans senkronize edilemedi (ağ hâlâ yok olabilir): $e');
+            remaining.add(session);
+          }
         }
       }
       await _savePendingSessions(userEmail, remaining);
@@ -540,7 +810,7 @@ class SupabaseService {
         final client = Supabase.instance.client;
         final response = await client
             .from('study_sessions')
-            .select()
+            .select('*, categories(name, color_hex)')
             .order('completed_at', ascending: false);
             
         return (response as List<dynamic>)
@@ -551,33 +821,6 @@ class SupabaseService {
       }
     }
     return [];
-  }
-
-  // Increment User Stats (Atomic RPC strictly via Supabase Cloud)
-  // Güvenlik: hedef kullanıcı client'tan ALINMAZ; RPC sunucuda auth.uid()
-  // oturumuna göre çalışır, yani yalnızca giriş yapan kullanıcının kaydını günceller.
-  Future<void> updateUserStats({
-    required int addedMinutes,
-    required int addedPoints,
-  }) async {
-    if (_isCloudActive) {
-      try {
-        final client = Supabase.instance.client;
-        final localDateStr = DateTime.now().toLocal().toIso8601String().substring(0, 10);
-        await client.rpc('increment_user_stats', params: {
-          'added_minutes': addedMinutes,
-          'added_points': addedPoints,
-          'local_date_str': localDateStr,
-        });
-        if (kDebugMode) {
-          print('✅ Supabase RPC increment_user_stats tamamlandı (+ $addedMinutes dk, + $addedPoints puan)');
-        }
-        await _broadcastStatsUpdated();
-      } catch (e) {
-        if (kDebugMode) print('❌ Supabase updateUserStats hatası: $e');
-        rethrow;
-      }
-    }
   }
 
   // ---- SIRALAMA GERÇEK ZAMANLI GÜNCELLEME (Broadcast) ----
@@ -613,7 +856,7 @@ class SupabaseService {
   Future<void> _broadcastStatsUpdated() async {
     // 1. Önce cihaz içindeki (yerel) sayfaları anında güncelle
     _notifyLocalListeners();
-    
+
     // 2. Ardından diğer cihazlardaki kullanıcılar için buluta sinyal gönder
     if (!_isCloudActive) return;
     try {
@@ -627,77 +870,202 @@ class SupabaseService {
     }
   }
 
+// ---- CANLI ODAKLANMA VE SOSYAL AKIŞ ----
+  
+  bool? _socialVisibleCache;
 
-  // --- KATEGORI YONETIMI (Supabase user_categories tablosu) ---
-
-  /// Kullanıcının tüm kategorilerini Supabase'den çeker.
-  /// Eğer Supabase aktif değilse boş liste döndürür.
-  Future<List<CourseCategory>> fetchUserCategories() async {
-    if (!_isCloudActive) return [];
+  /// Kullanıcının "sosyal listede görün" tercihini döndürür.
+  Future<bool> getSocialVisibility() async {
+    if (!_isCloudActive) return true;
+    if (_socialVisibleCache != null) return _socialVisibleCache!;
+    
     try {
       final client = Supabase.instance.client;
-      final response = await client
-          .from('user_categories')
-          .select()
-          .order('sort_order', ascending: true)
-          .order('created_at', ascending: true);
+      final userId = client.auth.currentUser?.id;
+      if (userId == null) return true;
 
-      return (response as List<dynamic>).map((row) {
-        final map = row as Map<String, dynamic>;
-        return CourseCategory(
-          id: map['id'] as String,
-          name: map['name'] as String,
-          color: Color(map['color_value'] as int),
-          icon: IconData(map['icon_code'] as int, fontFamily: 'MaterialIcons'),
-        );
-      }).toList();
+      // 1) Sunucudan değeri al
+      final response = await client.from('profiles').select('show_in_social_feed').eq('id', userId).maybeSingle();
+      
+      // 2) Yereldeki eski ayar ile taşıma (Migration)
+      final prefs = await SharedPreferences.getInstance();
+      final hasMigrated = prefs.getBool('social_visibility_migrated') ?? false;
+
+      if (!hasMigrated) {
+        final localPref = prefs.getBool('social_visible');
+        if (localPref != null && response != null && response['show_in_social_feed'] != localPref) {
+           // Yereldeki ayar farklıysa sunucuya yaz
+           await client.from('profiles').update({'show_in_social_feed': localPref}).eq('id', userId);
+           _socialVisibleCache = localPref;
+        } else {
+           _socialVisibleCache = response != null ? response['show_in_social_feed'] as bool : true;
+        }
+        await prefs.setBool('social_visibility_migrated', true);
+      } else {
+        _socialVisibleCache = response != null ? response['show_in_social_feed'] as bool : true;
+      }
+      
+      return _socialVisibleCache!;
     } catch (e) {
-      if (kDebugMode) print('❌ fetchUserCategories error: $e');
+      if (kDebugMode) print('❌ getSocialVisibility error: $e');
+      return true;
+    }
+  }
+
+  Future<void> setSocialVisibility(bool value) async {
+    _socialVisibleCache = value;
+    if (!_isCloudActive) return;
+    try {
+      final client = Supabase.instance.client;
+      final userId = client.auth.currentUser?.id;
+      if (userId == null) return;
+      await client.from('profiles').update({'show_in_social_feed': value}).eq('id', userId);
+    } catch (e) {
+      if (kDebugMode) print('❌ setSocialVisibility error: $e');
+    }
+  }
+
+  Future<void> startStudySession({
+    required int durationMinutes,
+    required String categoryName,
+  }) async {
+    if (!_isCloudActive) return;
+    if (!await getSocialVisibility()) return;
+    try {
+      await Supabase.instance.client.rpc('start_study_session', params: {
+        'p_duration_minutes': durationMinutes,
+        'p_category_name': categoryName,
+      });
+    } catch (e) {
+      if (kDebugMode) print('❌ startStudySession error: $e');
+    }
+  }
+
+  Future<void> cancelStudySession() async {
+    if (!_isCloudActive) return;
+    try {
+      await Supabase.instance.client.rpc('cancel_study_session');
+    } catch (e) {
+      if (kDebugMode) print('❌ cancelStudySession error: $e');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getLiveFriends() async {
+    if (!_isCloudActive) return [];
+    try {
+      final response = await Supabase.instance.client.rpc('get_live_friends');
+      return List<Map<String, dynamic>>.from(response as List);
+    } catch (e) {
+      if (kDebugMode) print('❌ getLiveFriends error: $e');
       return [];
     }
   }
 
-  /// Yeni bir kategori ekler ve oluşturulan Supabase kaydının UUID'sini döndürür.
-  Future<CourseCategory?> insertCategory(CourseCategory cat) async {
-    if (!_isCloudActive) return null;
+  Future<List<Map<String, dynamic>>> getFriendsFeed({int limit = 50}) async {
+    if (!_isCloudActive) return [];
     try {
-      final client = Supabase.instance.client;
-      final userId = client.auth.currentUser?.id;
-      if (userId == null) return null;
-
-      final response = await client.from('user_categories').insert({
-        'user_id': userId,
-        'name': cat.name,
-        'color_value': cat.color.toARGB32(),
-        'icon_code': cat.icon.codePoint,
-      }).select().single();
-
-      return CourseCategory(
-        id: response['id'] as String,
-        name: response['name'] as String,
-        color: Color(response['color_value'] as int),
-        // ignore: non_const_argument_for_const_parameter
-        icon: IconData(response['icon_code'] as int, fontFamily: 'MaterialIcons'),
-      );
+      final response = await Supabase.instance.client.rpc('get_friends_feed', params: {
+        'p_limit': limit,
+      });
+      return List<Map<String, dynamic>>.from(response as List);
     } catch (e) {
-      if (kDebugMode) print('❌ insertCategory error: $e');
-      return null;
+      if (kDebugMode) print('❌ getFriendsFeed error: $e');
+      return [];
     }
   }
 
-  /// Bir kategoriyi Supabase'den siler.
+// --- KATEGORI YONETIMI (Supabase public.categories) ---
+
+  /// Kullanıcının tüm kategorilerini Supabase'den çeker.
+  static final RegExp _uuidPattern =
+      RegExp(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', caseSensitive: false);
+
+  /// Sunucuda gerçekten var olabilecek (UUID biçiminde) bir kategori ID'si mi?
+  /// Yerel yer tutucu kategorilerin ID'leri ('1', '2', ...) bu kontrolü geçmez.
+  static bool isServerCategoryId(String id) => _uuidPattern.hasMatch(id);
+
+  /// Kullanıcının buluttaki kategorilerini döndürür.
+  ///
+  /// Ağ/sunucu hatasında hata FIRLATILIR; çağıran taraf yerel önbelleğe
+  /// düşmelidir. (Eskiden hata durumunda sahte ID'li "başlangıç"
+  /// kategorileri döndürülüyordu; bunlarla tamamlanan seanslar sunucuda
+  /// asla kabul edilmiyordu.) Bulutta hiç kategori yoksa boş liste döner.
+  Future<List<CourseCategory>> fetchUserCategories({bool includeArchived = false}) async {
+    if (!_isCloudActive) return [];
+    final client = Supabase.instance.client;
+    final userId = client.auth.currentUser?.id;
+    if (userId == null) return [];
+
+    var query = client
+        .from('categories')
+        .select('id, name, color_hex, icon_name, sort_order, is_archived')
+        .eq('user_id', userId);
+    if (!includeArchived) {
+      query = query.eq('is_archived', false);
+    }
+    final List<dynamic> rows = await query.order('sort_order', ascending: true);
+
+    return rows.map((row) {
+      String colorHex = (row['color_hex'] as String? ?? '#000000').toUpperCase();
+      String hexStr = colorHex.startsWith('#') ? colorHex.substring(1) : colorHex;
+      if (hexStr.length == 6) hexStr = 'FF$hexStr';
+      final colorValue = int.tryParse(hexStr, radix: 16) ?? 0xFF000000;
+      // Diyaloglar 6 haneli (#RRGGBB) renk bekliyor.
+      final displayHex = '#${hexStr.substring(hexStr.length - 6)}';
+
+      return CourseCategory(
+        id: row['id'] as String,
+        name: row['name'] as String,
+        color: Color(colorValue),
+        icon: const IconData(0xe112, fontFamily: 'MaterialIcons'),
+        isArchived: row['is_archived'] as bool? ?? false,
+        colorHex: displayHex,
+        iconName: row['icon_name'] as String? ?? 'book',
+      );
+    }).toList();
+  }
+
+  static String _colorToHex(Color color) =>
+      '#${color.toARGB32().toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}';
+
+  /// Yeni bir kategori ekler. Sunucudaki `create_category` RPC'si
+  /// kullanılır: kategori limiti (ücretsiz 8 / Premium 15) ve aynı isim
+  /// kontrolü sunucuda uygulanır, ID'yi sunucu üretir. Limit gibi bir
+  /// nedenle reddedilirse hata fırlatılır.
+  Future<CourseCategory?> insertCategory(CourseCategory cat) async {
+    if (!_isCloudActive) return null;
+    final newId = await createCategory(cat.name, _colorToHex(cat.color), cat.iconName);
+    if (newId == null) return null;
+    return CourseCategory(
+      id: newId,
+      name: cat.name,
+      color: cat.color,
+      icon: cat.icon,
+      colorHex: _colorToHex(cat.color),
+      iconName: cat.iconName,
+    );
+  }
+
+  /// Bir kategoriyi siler (archived)
   Future<void> deleteCategory(String categoryId) async {
     if (!_isCloudActive) return;
     try {
       final client = Supabase.instance.client;
-      await client.from('user_categories').delete().eq('id', categoryId);
+      final userId = client.auth.currentUser?.id;
+      if (userId == null) return;
+
+      await client.from('categories').update({
+        'is_archived': true,
+      }).eq('id', categoryId).eq('user_id', userId);
     } catch (e) {
       if (kDebugMode) print('❌ deleteCategory error: $e');
     }
   }
 
-  /// Mevcut kategori listesini Supabase'e toplu yazar (migration için).
-  /// Mevcut tüm kategorileri siler, sonra yeniden ekler.
+  /// Yerel kategori listesini buluta tek istekte yazar. Yalnızca sunucuda
+  /// geçerli olabilecek (UUID) ID'ler gönderilir; yer tutucular atlanır.
+  /// Yalnızca bulutta hiç aktif kategori yokken çağrılmalıdır; aksi halde
+  /// başka bir cihazda yapılan değişiklikleri eski yerel veriyle ezer.
   Future<List<CourseCategory>> upsertCategories(List<CourseCategory> cats) async {
     if (!_isCloudActive) return cats;
     try {
@@ -705,42 +1073,29 @@ class SupabaseService {
       final userId = client.auth.currentUser?.id;
       if (userId == null) return cats;
 
-      // Var olanları sil
-      await client.from('user_categories').delete().eq('user_id', userId);
-
-      if (cats.isEmpty) return [];
-
-      // Yeniden ekle
-      final rows = cats.asMap().entries.map((entry) => {
-        'user_id': userId,
-        'name': entry.value.name,
-        'color_value': entry.value.color.toARGB32(),
-        'icon_code': entry.value.icon.codePoint,
-        'sort_order': entry.key,
-      }).toList();
-
-      final response = await client
-          .from('user_categories')
-          .insert(rows)
-          .select();
-
-      return (response as List<dynamic>).map((row) {
-        final map = row as Map<String, dynamic>;
-        return CourseCategory(
-          id: map['id'] as String,
-          name: map['name'] as String,
-          color: Color(map['color_value'] as int),
-          icon: IconData(map['icon_code'] as int, fontFamily: 'MaterialIcons'),
-        );
-      }).toList();
+      final rows = <Map<String, dynamic>>[];
+      for (var i = 0; i < cats.length; i++) {
+        final cat = cats[i];
+        if (!isServerCategoryId(cat.id)) continue;
+        rows.add({
+          'id': cat.id,
+          'user_id': userId,
+          'name': cat.name,
+          'color_hex': _colorToHex(cat.color),
+          'icon_name': cat.iconName,
+          'sort_order': i,
+        });
+      }
+      if (rows.isNotEmpty) {
+        await client.from('categories').upsert(rows);
+      }
+      return cats;
     } catch (e) {
       if (kDebugMode) print('❌ upsertCategories error: $e');
       return cats;
     }
   }
 
-
-  
   // ---- ARKADAŞLAR ----
 
   /// Kullanıcının kendi arkadaşlık kodunu döndürür (profilde her zaman dolu olmalı).
@@ -794,7 +1149,7 @@ class SupabaseService {
 
       final profiles = await client
           .from('profiles')
-          .select('id, name, email, avatar_id, points, total_minutes')
+          .select('id, name, avatar_id, lifetime_points, total_minutes, is_premium')
           .inFilter('id', friendIds);
       return (profiles as List<dynamic>).cast<Map<String, dynamic>>();
     } catch (e) {
@@ -890,12 +1245,15 @@ class SupabaseService {
     }
 
     // 3. Invalid Login Credentials
+    // Not: Supabase, "şifre yanlış" ile "e-posta henüz onaylanmadı"
+    // durumlarını hesap keşfini önlemek için AYNI genel hatayla döndürür,
+    // bu yüzden mesaj her iki ihtimali de belirtiyor.
     if (lower.contains('invalid login credentials') ||
         lower.contains('invalid_credentials') ||
         lower.contains('invalid_grant')) {
       return isTurkish
-          ? 'E-posta adresi veya şifre hatalı. Lütfen kontrol edip tekrar deneyin.'
-          : 'Invalid email or password. Please check your credentials and try again.';
+          ? 'E-posta adresi veya şifre hatalı — ya da hesabınız henüz onaylanmamış olabilir. Şifrenizi kontrol edin; sorun devam ederse aşağıdan onay mailini tekrar gönderebilirsiniz.'
+          : 'Invalid email or password — or your account may not be confirmed yet. Double-check your password; if the problem continues, you can resend the confirmation email below.';
     }
 
     // 4. Email Not Confirmed
@@ -945,4 +1303,159 @@ class SupabaseService {
         .replaceAll(RegExp(r'statusCode:?\s*\d+,\s*'), '')
         .trim();
   }
+
+  // --- Avatar Economy ---
+  Future<List<AvatarCharacter>> getAvatars() async {
+    try {
+      final client = Supabase.instance.client;
+      final response = await client.from('avatars').select().eq('is_active', true).order('sort_order', ascending: true);
+      
+      final avatars = (response as List<dynamic>)
+          .map((item) => AvatarCharacter.fromMap(item as Map<String, dynamic>))
+          .toList();
+      return avatars;
+    } catch (e) {
+      if (kDebugMode) print('❌ getAvatars error: $e');
+      return [];
+    }
+  }
+
+  Future<int?> purchaseAvatar(String avatarId) async {
+    try {
+      final client = Supabase.instance.client;
+      final response = await client.rpc('purchase_avatar', params: {'p_avatar_id': avatarId});
+      return response as int; // Returns new coins balance
+    } catch (e) {
+      if (kDebugMode) print('❌ purchaseAvatar error: $e');
+      return null;
+    }
+  }
+
+  Future<bool> setEquippedAvatar(String avatarId) async {
+    try {
+      final client = Supabase.instance.client;
+      await client.rpc('set_equipped_avatar', params: {'p_avatar_id': avatarId});
+      return true;
+    } catch (e) {
+      if (kDebugMode) print('❌ setEquippedAvatar error: $e');
+      return false;
+    }
+  }
+
+  // ---- ONBOARDING VE KATEGORİ YÖNETİMİ ----
+
+  Future<void> updateOnboardingCompleted() async {
+    if (!_isCloudActive) return;
+    try {
+      final client = Supabase.instance.client;
+      final userId = client.auth.currentUser?.id;
+      if (userId == null) return;
+      await client.from('profiles').update({
+        'onboarding_completed_at': DateTime.now().toUtc().toIso8601String(),
+      }).eq('id', userId);
+    } catch (e) {
+      if (kDebugMode) print('❌ updateOnboardingCompleted hatası: $e');
+    }
+  }
+
+  Future<String?> createCategory(String name, String colorHex, String iconName) async {
+    if (!_isCloudActive) return null;
+    try {
+      final client = Supabase.instance.client;
+      final result = await client.rpc('create_category', params: {
+        'p_name': name,
+        'p_color_hex': colorHex,
+        'p_icon_name': iconName,
+      });
+      return result as String?;
+    } catch (e) {
+      if (kDebugMode) print('❌ createCategory hatası: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> setupOnboardingCategories(List<Map<String, dynamic>> categories) async {
+    if (!_isCloudActive) return;
+    try {
+      final client = Supabase.instance.client;
+      await client.rpc('setup_onboarding_categories', params: {
+        'p_categories': categories,
+      }).timeout(const Duration(seconds: 12));
+    } catch (e) {
+      if (kDebugMode) print('❌ setupOnboardingCategories hatası: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> archiveCategory(String categoryId) async {
+    if (!_isCloudActive) return;
+    try {
+      final client = Supabase.instance.client;
+      await client.from('categories').update({
+        'is_archived': true,
+      }).eq('id', categoryId);
+    } catch (e) {
+      if (kDebugMode) print('❌ archiveCategory hatası: $e');
+      rethrow;
+    }
+  }
+  
+  Future<void> unarchiveCategory(String categoryId) async {
+    if (!_isCloudActive) return;
+    try {
+      // Bu kontrol yalnızca kullanıcıya anlaşılır bir mesaj göstermek için;
+      // asıl limit veritabanındaki categories trigger'ı ile zorunlu kılınır.
+      final client = Supabase.instance.client;
+      final userId = client.auth.currentUser?.id;
+      if (userId == null) return;
+      
+      final activeCountResp = await client.from('categories').select('id').eq('user_id', userId).eq('is_archived', false);
+      final activeCount = (activeCountResp as List).length;
+      
+      final profile = await client.from('profiles').select('is_premium').eq('id', userId).maybeSingle();
+      final isPremium = profile != null ? (profile['is_premium'] as bool? ?? false) : false;
+      
+      if (activeCount >= (isPremium ? 15 : 8)) {
+        throw Exception(isPremium ? 'Premium planda en fazla 15 kategori aktif olabilir.' : 'Ücretsiz planda en fazla 8 kategori aktif olabilir.');
+      }
+      
+      await client.from('categories').update({
+        'is_archived': false,
+      }).eq('id', categoryId);
+    } catch (e) {
+      if (kDebugMode) print('❌ unarchiveCategory hatası: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> updateCategory(String categoryId, String name, String colorHex, String iconName) async {
+    if (!_isCloudActive) return;
+    try {
+      final client = Supabase.instance.client;
+      await client.from('categories').update({
+        'name': name,
+        'color_hex': colorHex,
+        'icon_name': iconName,
+      }).eq('id', categoryId);
+    } catch (e) {
+      if (kDebugMode) print('❌ updateCategory hatası: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> updateCategoryOrders(List<String> orderedIds) async {
+    if (!_isCloudActive) return;
+    try {
+      final client = Supabase.instance.client;
+      await Future.wait([
+        for (int i = 0; i < orderedIds.length; i++)
+          client.from('categories').update({'sort_order': i}).eq('id', orderedIds[i]),
+      ]);
+    } catch (e) {
+      if (kDebugMode) print('❌ updateCategoryOrders hatası: $e');
+      rethrow;
+    }
+  }
+
+  // ---- END ONBOARDING ----
 }

@@ -7,6 +7,7 @@ import '../services/language_service.dart';
 import '../services/supabase_service.dart';
 import '../theme.dart';
 import 'history_screen.dart';
+import 'monthly_tracking_screen.dart';
 
 class ReportsScreen extends StatefulWidget {
   final List<CourseCategory> categories;
@@ -23,7 +24,7 @@ class ReportsScreen extends StatefulWidget {
 }
 
 class _ReportsScreenState extends State<ReportsScreen> {
-  int _activeTab = 0; // 0: Ders Raporları, 1: Çalışma Geçmişi
+  int _activeTab = 0; // 0: Günlük Çalışma, 1: Haftalık Çalışma, 2: Aylık Takip
   int _dailyGoal = 8; // Varsayılan günlük hedef: 8 pomodoro
   
   bool _isLoading = true;
@@ -105,7 +106,14 @@ class _ReportsScreenState extends State<ReportsScreen> {
         IconData catIcon = Icons.book;
         String catId = catName;
         
-        if (match.isNotEmpty) {
+        // Use color from session directly (it comes from the DB JOIN)
+        if (session.colorHex != null) {
+          String hexStr = session.colorHex!;
+          if (hexStr.startsWith('#')) hexStr = hexStr.substring(1);
+          if (hexStr.length == 6) hexStr = 'FF$hexStr';
+          int colorValue = int.tryParse(hexStr, radix: 16) ?? AppColors.primary.toARGB32();
+          catColor = Color(colorValue);
+        } else if (match.isNotEmpty) {
           catColor = match.first.color;
           catIcon = match.first.icon;
           catId = match.first.id;
@@ -146,11 +154,11 @@ class _ReportsScreenState extends State<ReportsScreen> {
                       _buildTabBar(lang),
                       // Tab Content
                       Expanded(
-                        child: _activeTab == 0
-                            ? _buildReportsBody(activeCategories, effectiveTotalMinutes, lang)
-                            : HistoryScreen(
-                                onStartTimer: widget.onStartTimer,
-                              ),
+                        child: switch (_activeTab) {
+                          0 => _buildReportsBody(activeCategories, effectiveTotalMinutes, lang),
+                          1 => HistoryScreen(onStartTimer: widget.onStartTimer),
+                          _ => MonthlyTrackingScreen(categories: widget.categories),
+                        },
                       ),
                     ],
                   ),
@@ -172,20 +180,30 @@ class _ReportsScreenState extends State<ReportsScreen> {
           ),
         ),
       ),
-      child: Row(
-        children: [
-          _buildTabItem(
-            label: lang.translate('reports_tab_subject'),
-            isActive: _activeTab == 0,
-            onTap: () => setState(() => _activeTab = 0),
-          ),
-          const SizedBox(width: 24),
-          _buildTabItem(
-            label: lang.translate('reports_tab_history'),
-            isActive: _activeTab == 1,
-            onTap: () => setState(() => _activeTab = 1),
-          ),
-        ],
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        child: Row(
+          children: [
+            _buildTabItem(
+              label: lang.translate('reports_tab_subject'),
+              isActive: _activeTab == 0,
+              onTap: () => setState(() => _activeTab = 0),
+            ),
+            const SizedBox(width: 24),
+            _buildTabItem(
+              label: lang.translate('reports_tab_history'),
+              isActive: _activeTab == 1,
+              onTap: () => setState(() => _activeTab = 1),
+            ),
+            const SizedBox(width: 24),
+            _buildTabItem(
+              label: lang.translate('reports_tab_monthly'),
+              isActive: _activeTab == 2,
+              onTap: () => setState(() => _activeTab = 2),
+            ),
+          ],
+        ),
       ),
     );
   }

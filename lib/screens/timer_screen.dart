@@ -1,18 +1,22 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 import '../theme.dart';
+import '../utils/text_util.dart';
 import '../models/category_model.dart';
 import '../widgets/hourglass_widget.dart';
 import '../services/language_service.dart';
-import '../utils/points.dart';
+import '../services/notification_service.dart';
 
 class TimerScreen extends StatefulWidget {
   final List<CourseCategory> categories;
   final VoidCallback onOpenSettings;
-  final Function(String categoryId, int minutes)? onSessionCompleted;
-  final ValueChanged<bool>? onTimerStateChanged;
+  final Function(String categoryId, int minutes, bool wasPaused, int isVerified, DateTime startedAt, String clientUuid)? onSessionCompleted;
+  final void Function(bool isRunning, String categoryName, int loggedMinutes)? onTimerStateChanged;
   final int userPoints;
   final int streakDays;
+  final String? userSegment;
 
   const TimerScreen({
     super.key,
@@ -20,6 +24,7 @@ class TimerScreen extends StatefulWidget {
     required this.onOpenSettings,
     this.onSessionCompleted,
     this.onTimerStateChanged,
+    this.userSegment,
     this.userPoints = 0,
     this.streakDays = 0,
   });
@@ -28,12 +33,19 @@ class TimerScreen extends StatefulWidget {
   State<TimerScreen> createState() => _TimerScreenState();
 }
 
-class _TimerScreenState extends State<TimerScreen> {
-  // GEÇİCİ TEST MODU: 25 dk -> 5 sn, 50 dk -> 10 sn olarak sayılıyor
-  // (gerçek süre yerine hızlı test için). loggedMinutes, seans bittiğinde
-  // sanki gerçek 25/50 dakika çalışılmış gibi puan/kayıt için kullanılır.
-  int totalSeconds = 5; // Varsayılan: 25 dk (test: 5 sn)
-  int remaining = 5;
+class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
+  // Sadece debug build'lerde (flutter run, --release DEĞİL) test için süre
+  // kısaltılır; gerçek kullanıcılara giden release build'de her zaman
+  // gerçek 25/50 dakika çalışır. Bkz. _durationSeconds.
+  static int _durationSeconds(int minutes) {
+    if (kDebugMode) {
+      return minutes == 25 ? 5 : 10;
+    }
+    return minutes * 60;
+  }
+
+  int totalSeconds = _durationSeconds(25);
+  int remaining = _durationSeconds(25);
   int loggedMinutes = 25;
   bool isRunning = false;
   bool _isStarting = false; // BAŞLAT butonuna çift tıklama koruması
@@ -44,10 +56,88 @@ class _TimerScreenState extends State<TimerScreen> {
   int pauseCredits = 1;
   int pauseUsedCount = 0;
 
+  // Sayaç çalışırken seansın biteceği an. Kalan süre her tick'te bundan
+  // hesaplanır; böylece Timer.periodic kayması veya uygulamanın arka
+  // planda askıya alınması süreyi bozmaz.
+  DateTime? _endsAt;
+
+  // Session tracking for server-side scoring
+  DateTime? _sessionStartedAt;
+  String? _sessionClientUuid;
+  int _foregroundSeconds = 0;
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _validateSelectedCategory();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Arka plandayken periyodik timer durur; öne gelince kalan süreyi
+    // bitiş anından yeniden hesapla (süre dolduysa seans tamamlanır).
+    if (state == AppLifecycleState.resumed && isRunning) {
+      _tick(countForeground: false);
+    }
+  }
+
+  int _secondsUntilEnd() {
+    final ms = _endsAt!.difference(DateTime.now()).inMilliseconds;
+    return ms <= 0 ? 0 : (ms / 1000).ceil();
+  }
+
+  void _tick({bool countForeground = true}) {
+    if (!isRunning || _endsAt == null || !mounted) return;
+    final left = _secondsUntilEnd();
+    if (left > 0) {
+      setState(() {
+        remaining = left;
+        if (countForeground) _foregroundSeconds++; // Track active time
+      });
+    } else {
+      _completeSession();
+    }
+  }
+
+  /// Süre dolduğunda seansı kapatır ve sonucu üst bileşene bildirir.
+  void _completeSession() {
+    _timer?.cancel();
+    NotificationService.instance.cancelAllNotifications();
+
+    final catId = selectedCategoryId;
+    final categoryName = _selectedCategoryName;
+    final minsLogged = loggedMinutes;
+    final wasPaused = pauseUsedCount > 0;
+    final isVerified = _foregroundSeconds; // Pass total foreground time
+    final startedAt = _sessionStartedAt ?? DateTime.now().subtract(Duration(minutes: minsLogged));
+    final clientUuid = _sessionClientUuid ?? const Uuid().v4();
+
+    setState(() {
+      isRunning = false;
+      remaining = totalSeconds;
+      pauseCredits = 1; // Reset pause credit on finish
+      pauseUsedCount = 0;
+      _resetSessionTracking();
+    });
+
+    widget.onTimerStateChanged?.call(false, categoryName, minsLogged);
+    widget.onSessionCompleted?.call(catId, minsLogged, wasPaused, isVerified, startedAt, clientUuid);
+    _showSessionCompletedDialog();
+  }
+
+  void _resetSessionTracking() {
+    _endsAt = null;
+    _sessionStartedAt = null;
+    _sessionClientUuid = null;
+    _foregroundSeconds = 0;
   }
 
   @override
@@ -57,11 +147,17 @@ class _TimerScreenState extends State<TimerScreen> {
   }
 
   void _validateSelectedCategory() {
-    if (widget.categories.isNotEmpty && !widget.categories.any((c) => c.id == selectedCategoryId)) {
+    final activeCategories = widget.categories.where((c) => !c.isArchived).toList();
+    if (activeCategories.isNotEmpty && !activeCategories.any((c) => c.id == selectedCategoryId)) {
       setState(() {
-        selectedCategoryId = widget.categories.first.id;
+        selectedCategoryId = activeCategories.first.id;
       });
     }
+  }
+
+  String get _selectedCategoryName {
+    final match = widget.categories.where((c) => c.id == selectedCategoryId);
+    return match.isNotEmpty ? match.first.name : '';
   }
 
   void _toggleTimer() {
@@ -70,12 +166,15 @@ class _TimerScreenState extends State<TimerScreen> {
       if (pauseCredits > 0) {
         // 1st Pause allowed!
         _timer?.cancel();
+        NotificationService.instance.cancelAllNotifications();
         setState(() {
+          if (_endsAt != null) remaining = _secondsUntilEnd();
+          _endsAt = null;
           isRunning = false;
           pauseCredits--;
           pauseUsedCount++;
         });
-        widget.onTimerStateChanged?.call(false);
+        widget.onTimerStateChanged?.call(false, _selectedCategoryName, loggedMinutes);
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -126,28 +225,23 @@ class _TimerScreenState extends State<TimerScreen> {
 
   void _startTimerPeriodic() {
     _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 1), (t) {
-      setState(() {
-        if (remaining > 0) {
-          remaining--;
-        } else {
-          t.cancel();
-          isRunning = false;
-          widget.onTimerStateChanged?.call(false);
-          remaining = totalSeconds;
-          pauseCredits = 1; // Reset pause credit on finish
-          pauseUsedCount = 0;
-          widget.onSessionCompleted?.call(selectedCategoryId, loggedMinutes);
-          _showSessionCompletedDialog();
-        }
-      });
-    });
 
     setState(() {
       isRunning = true;
       _isStarting = false;
+      _endsAt = DateTime.now().add(Duration(seconds: remaining));
+      // Başlangıç zamanı ve seans kimliği yalnızca YENİ bir seansta
+      // atanır. Duraklatıp devam edince korunmalı: aksi halde sunucuya
+      // giden başlangıç zamanı devam etme anı olur ve seans, gerçekte
+      // geçen süreden kısa görünür.
+      _sessionStartedAt ??= DateTime.now();
+      _sessionClientUuid ??= const Uuid().v4();
     });
-    widget.onTimerStateChanged?.call(true);
+
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) => _tick());
+
+    NotificationService.instance.scheduleTimerCompletionNotification(remaining, _selectedCategoryName);
+    widget.onTimerStateChanged?.call(true, _selectedCategoryName, loggedMinutes);
   }
 
   void _showPauseLimitDialog() {
@@ -187,13 +281,15 @@ class _TimerScreenState extends State<TimerScreen> {
               Navigator.pop(ctx);
               // Option A: Reset Progress completely
               _timer?.cancel();
+              NotificationService.instance.cancelAllNotifications();
               setState(() {
                 isRunning = false;
                 remaining = totalSeconds;
                 pauseCredits = 1;
                 pauseUsedCount = 0;
+                _resetSessionTracking();
               });
-              widget.onTimerStateChanged?.call(false);
+              widget.onTimerStateChanged?.call(false, _selectedCategoryName, loggedMinutes);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(LanguageService.instance.translate('session_reset')),
@@ -234,7 +330,6 @@ class _TimerScreenState extends State<TimerScreen> {
 
   void _showSessionCompletedDialog() {
     final displayMinutes = loggedMinutes;
-    final earnedPoints = pointsForMinutes(displayMinutes);
     final isTurkish = LanguageService.instance.isTurkish;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -260,8 +355,8 @@ class _TimerScreenState extends State<TimerScreen> {
         ),
         content: Text(
           isTurkish
-              ? '$displayMinutes dakikalık odaklanma seansını\nbaşarıyla tamamladın ve +$earnedPoints Puan kazandın!'
-              : 'You successfully completed a $displayMinutes-minute\nfocus session and earned +$earnedPoints Points!',
+              ? '$displayMinutes dakikalık odaklanma seansını\nbaşarıyla tamamladın! ⏳'
+              : 'You successfully completed a $displayMinutes-minute\nfocus session! ⏳',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 14,
@@ -295,11 +390,7 @@ class _TimerScreenState extends State<TimerScreen> {
     );
   }
 
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
+  // dispose removed since it is handled above in the chunks
 
   @override
   Widget build(BuildContext context) {
@@ -312,111 +403,106 @@ class _TimerScreenState extends State<TimerScreen> {
         final isDark = Theme.of(context).brightness == Brightness.dark;
 
         return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: [
-            // Not: Streak ve Puan göstergeleri artık üst AppBar'da (main.dart)
-            // tek yerden gösteriliyor; burada tekrar etmesin diye kaldırıldı.
+          body: SafeArea(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
 
-            // Content Fitted on Single Screen
-            Center(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.only(top: 48, bottom: 16, left: 16, right: 16),
-                child: Column(
+                final hourglassWidget = HourglassWidget(
+                  size: 220,
+                  progress: progress,
+                  isRunning: isRunning,
+                  totalSeconds: totalSeconds,
+                  remainingSeconds: remaining,
+                  sandColor: widget.categories.where((c) => !c.isArchived).isNotEmpty 
+                      ? widget.categories.firstWhere(
+                          (c) => c.id == selectedCategoryId, 
+                          orElse: () => widget.categories.where((c) => !c.isArchived).first,
+                        ).color 
+                      : null,
+                );
+
+                final controlsWidget = Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Hourglass Container (Yukarı Çekilmiş ve Uyumlu Boyutlandırılmış)
-                    SizedBox(
-                      width: 220,
-                      height: 230,
-                      child: HourglassWidget(
-                        size: 220,
-                        progress: progress,
-                        isRunning: isRunning,
-                        totalSeconds: totalSeconds,
-                        remainingSeconds: remaining,
-                      ),
-                    ),
-
-                    const SizedBox(height: 8),
-
                     // Subject Chips Section
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          LanguageService.instance.translate('select_subject'),
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 1.5,
-                            color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                    if (!isLandscape) ...[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            TextUtil.getCategorySelectionLabel(widget.userSegment),
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 1.5,
+                              color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 6),
-                        GestureDetector(
-                          onTap: widget.onOpenSettings,
-                          child: const Icon(
-                            Icons.edit_outlined,
-                            size: 13,
-                            color: AppColors.primaryContainer,
+                          const SizedBox(width: 6),
+                          GestureDetector(
+                            onTap: widget.onOpenSettings,
+                            child: const Icon(
+                              Icons.edit_outlined,
+                              size: 13,
+                              color: AppColors.primaryContainer,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+                    
                     // Active Category Pills
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      physics: const BouncingScrollPhysics(),
-                      child: Row(
-                        children: widget.categories.map((cat) {
-                          final isSelected = cat.id == selectedCategoryId;
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4),
-                            child: FilterChip(
-                              label: Text(LanguageService.instance.translateCatName(cat.name)),
-                              selected: isSelected,
-                              onSelected: isRunning
-                                  ? null
-                                  : (val) {
-                                      if (val) {
-                                        setState(() => selectedCategoryId = cat.id);
-                                      }
-                                    },
-                              avatar: CircleAvatar(
-                                backgroundColor: cat.color,
-                                radius: 5,
-                              ),
-                              showCheckmark: false,
-                              selectedColor: cat.color.withValues(alpha: 0.2),
-                              backgroundColor: isDark
-                                  ? AppColors.darkSurfaceContainerLow
-                                  : AppColors.surfaceContainerLow,
-                              labelStyle: TextStyle(
-                                fontSize: 13,
-                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                color: isSelected
-                                    ? cat.color
-                                    : (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                side: BorderSide(
+                    if (!isLandscape) ...[
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        physics: const BouncingScrollPhysics(),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: widget.categories.where((cat) => !cat.isArchived).map((cat) {
+                            final isSelected = cat.id == selectedCategoryId;
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 4),
+                              child: FilterChip(
+                                label: Text(LanguageService.instance.translateCatName(cat.name)),
+                                selected: isSelected,
+                                onSelected: (isRunning || (remaining < totalSeconds && remaining > 0))
+                                    ? null
+                                    : (val) {
+                                        if (val) {
+                                          setState(() => selectedCategoryId = cat.id);
+                                        }
+                                      },
+                                avatar: CircleAvatar(
+                                  backgroundColor: cat.color,
+                                  radius: 5,
+                                ),
+                                showCheckmark: false,
+                                selectedColor: cat.color.withValues(alpha: 0.2),
+                                backgroundColor: isDark
+                                    ? AppColors.darkSurfaceContainerLow
+                                    : AppColors.surfaceContainerLow,
+                                labelStyle: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                                   color: isSelected
                                       ? cat.color
-                                      : Colors.transparent,
+                                      : (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  side: BorderSide(
+                                    color: isSelected ? cat.color : Colors.transparent,
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        }).toList(),
+                            );
+                          }).toList(),
+                        ),
                       ),
-                    ),
-
-                    const SizedBox(height: 16),
+                      const SizedBox(height: 16),
+                    ],
 
                     // Time Display
                     Text(
@@ -428,63 +514,64 @@ class _TimerScreenState extends State<TimerScreen> {
                         color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
                       ),
                     ),
-
                     const SizedBox(height: 10),
 
                     // Süre Seçimi: 25 dk / 50 dk
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [25, 50].map((mins) {
-                        final isSel = loggedMinutes == mins;
-                        // GEÇİCİ TEST: gerçek süre yerine 25dk->5sn, 50dk->10sn
-                        final testSeconds = mins == 25 ? 5 : 10;
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 6),
-                          child: GestureDetector(
-                            onTap: isRunning
-                                ? null
-                                : () {
-                                    setState(() {
-                                      loggedMinutes = mins;
-                                      totalSeconds = testSeconds;
-                                      remaining = testSeconds;
-                                      pauseCredits = 1;
-                                      pauseUsedCount = 0;
-                                    });
-                                  },
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-                              decoration: BoxDecoration(
-                                color: isSel
-                                    ? AppColors.primaryContainer
-                                    : (isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow),
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
+                    if (!isLandscape) ...[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [25, 50].map((mins) {
+                          final isSel = loggedMinutes == mins;
+                          final durationSeconds = _durationSeconds(mins);
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 6),
+                            child: GestureDetector(
+                              onTap: isRunning
+                                  ? null
+                                  : () {
+                                      setState(() {
+                                        loggedMinutes = mins;
+                                        totalSeconds = durationSeconds;
+                                        remaining = durationSeconds;
+                                        pauseCredits = 1;
+                                        pauseUsedCount = 0;
+                                        // Duraklatılmış bir seans varsa süre değişince sıfırlanır.
+                                        _resetSessionTracking();
+                                      });
+                                    },
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                                decoration: BoxDecoration(
                                   color: isSel
                                       ? AppColors.primaryContainer
-                                      : (isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant),
+                                      : (isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: isSel
+                                        ? AppColors.primaryContainer
+                                        : (isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant),
+                                  ),
                                 ),
-                              ),
-                              child: Text(
-                                '$mins ${LanguageService.instance.translate('minutes_unit')}',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: isSel
-                                      ? Colors.white
-                                      : (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
+                                child: Text(
+                                  '$mins ${LanguageService.instance.translate('minutes_unit_short')}',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: isSel
+                                        ? Colors.white
+                                        : (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 20),
+                    ],
 
-                    const SizedBox(height: 10),
-
-                    // Pause Limit Indicator Badge
+                    // Duraklatma Hakkı (Pause Limit)
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                       decoration: BoxDecoration(
@@ -524,10 +611,9 @@ class _TimerScreenState extends State<TimerScreen> {
                         ],
                       ),
                     ),
-
                     const SizedBox(height: 14),
 
-                    // Primary Start/Pause Button (Tek Sayfaya Tam Oturan Buton)
+                    // Primary Start/Pause Button
                     ElevatedButton(
                       onPressed: _toggleTimer,
                       style: ElevatedButton.styleFrom(
@@ -554,14 +640,54 @@ class _TimerScreenState extends State<TimerScreen> {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 24),
                   ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+                );
+                
+                final double hourglassTop = isLandscape ? (constraints.maxHeight - 230) / 2 : 48.0;
+                final double hourglassLeft = isLandscape ? (constraints.maxWidth * 0.25 - 110) : (constraints.maxWidth - 220) / 2;
+                
+                final double controlsTop = isLandscape ? 16.0 : 300.0;
+                final double controlsLeft = isLandscape ? constraints.maxWidth * 0.5 : 0.0;
+                final double controlsWidth = isLandscape ? constraints.maxWidth * 0.5 : constraints.maxWidth;
+
+                return Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    AnimatedPositioned(
+                      duration: const Duration(milliseconds: 600),
+                      curve: Curves.easeInOutCubic,
+                      top: hourglassTop,
+                      left: hourglassLeft,
+                      child: SizedBox(
+                        width: 220,
+                        height: 230,
+                        child: hourglassWidget,
+                      ),
+                    ),
+                    AnimatedPositioned(
+                      duration: const Duration(milliseconds: 600),
+                      curve: Curves.easeInOutCubic,
+                      top: controlsTop,
+                      bottom: 0.0,
+                      left: controlsLeft,
+                      width: controlsWidth,
+                      child: Center(
+                        child: SingleChildScrollView(
+                          physics: const BouncingScrollPhysics(),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: controlsWidget,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }
+            )
+          ),
+        );
   },
 );
   }
