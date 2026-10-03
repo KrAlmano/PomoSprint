@@ -16,31 +16,37 @@
   <meta property="og:image" content="https://pomosprint.app/og-image.png">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="theme-color" content="#F6F0EA">
+  <meta name="color-scheme" content="light">
   <link rel="icon" href="/favicon.ico" sizes="32x32">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=20261003">
-  <link rel="stylesheet" href="/css/auth.css?v=20261003">
+  <link rel="stylesheet" href="/css/style.css?v=20261003b">
+  <link rel="stylesheet" href="/css/auth.css?v=20261003b">
 </head>
 <body class="auth-page">
-  <a href="/" class="brand" aria-label="PomoSprint ana sayfa">
+  <a href="/" class="brand" aria-label="PomoSprint ana sayfa" data-i18n-aria="home">
     <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#EE6C55"/><path d="M10 8h12M10 24h12M11.5 8c0 4 2.5 5.8 4.5 8-2 2.2-4.5 4-4.5 8M20.5 8c0 4-2.5 5.8-4.5 8 2 2.2 4.5 4 4.5 8" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg>
     <span class="brand-name">Pomo<em>Sprint</em></span>
   </a>
 
   <main class="auth-card">
-    <div class="auth-icon" id="icon" aria-hidden="true">✉️</div>
-    <h1 id="title">E-posta Onayı</h1>
-    <p class="auth-message" id="message" role="status" aria-live="polite">Bu sayfa, PomoSprint'ten gelen onay e-postasındaki bağlantıyla açılır. Hesabını onaylamak için e-postandaki bağlantıya dokun.</p>
-    <a class="btn btn-primary" href="/" id="home-link">Ana sayfaya git</a>
+    <div class="auth-icon" id="icon" data-icon="mail" aria-hidden="true">
+      <svg class="ai ai-mail" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="m3 7 9 6 9-6"/></svg>
+      <svg class="ai ai-warn" viewBox="0 0 24 24"><path d="M10.3 3.9 2.4 17.6a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+      <svg class="ai ai-ok" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+    </div>
+    <h1 id="title" data-i18n="title">E-posta Onayı</h1>
+    <p class="auth-message" id="message" role="status" aria-live="polite" data-i18n="intro">Bu sayfa, PomoSprint'ten gelen onay e-&#8288;postasındaki bağlantıyla açılır. Hesabını onaylamak için e-&#8288;postandaki bağlantıya dokun.</p>
+    <a class="btn btn-primary" href="/" id="home-link" data-i18n="home_link">Ana sayfaya git</a>
   </main>
 
-  <p class="auth-foot">Sorun mu yaşıyorsun? <a href="mailto:destek@pomosprint.app">destek@pomosprint.app</a></p>
+  <p class="auth-foot"><span data-i18n="foot">Sorun mu yaşıyorsun?</span> <a href="mailto:destek@pomosprint.app">destek@pomosprint.app</a></p>
 
   <script src="/js/config.js?v=20261003" defer></script>
-  <script src="/js/confirmed.js?v=20261003" defer></script>
+  <script src="/js/auth-i18n.js?v=20261003b" defer></script>
+  <script src="/js/confirmed.js?v=20261003b" defer></script>
 </body>
 </html>

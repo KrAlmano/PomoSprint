@@ -22,14 +22,15 @@
   <meta name="twitter:image" content="https://pomosprint.app/og-image.png">
   <!-- partial:head -->
   <meta name="theme-color" content="#F6F0EA">
+  <meta name="color-scheme" content="light">
   <link rel="icon" href="/favicon.ico" sizes="32x32">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=20261003">
-  <script src="/js/boot.js?v=20261003"></script>
+  <link rel="stylesheet" href="/css/style.css?v=20261003b">
+  <script src="/js/boot.js?v=20261003b"></script>
   <!-- /partial:head -->
   <script type="application/ld+json">
   {
@@ -50,7 +51,7 @@
         "inLanguage": ["tr", "en"],
         "url": "https://pomosprint.app/",
         "image": "https://pomosprint.app/og-image.png",
-        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "TRY" },
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "TRY", "availability": "https://schema.org/PreOrder" },
         "publisher": {
           "@type": "Organization",
           "name": "PomoSprint",
@@ -65,7 +66,8 @@
 </head>
 <body data-page="home">
 
-  <!-- Sabit arka plan kum saati: kum, sayfa kaydırıldıkça akar / geri dolar -->
+  <!-- Sabit arka plan kum saati: hero bittikten sonra soluk olarak belirir;
+       kum, sayfa kaydırıldıkça akar / geri dolar (hero'daki kum saatiyle eş zamanlı) -->
   <div class="hg-backdrop" id="hg-backdrop" aria-hidden="true">
     <div class="hourglass" id="hourglass">
       <svg viewBox="0 0 220 300">
@@ -81,18 +83,18 @@
         <path class="hg-glass" d="M62 38 L158 38 C158 88 132 118 116 142 L116 158 C132 182 158 212 158 262 L62 262 C62 212 88 182 104 158 L104 142 C88 118 62 88 62 38 Z"/>
 
         <g clip-path="url(#hgClipTop)">
-          <path class="hg-sand" id="hg-sand-top" d="M 56 48 Q 110 60 164 48 L 164 162 L 56 162 Z"/>
+          <path class="hg-sand hg-sand-top" d="M 56 48 Q 110 60 164 48 L 164 162 L 56 162 Z"/>
         </g>
 
-        <line class="hg-stream" id="hg-stream" x1="110" y1="156" x2="110" y2="248"/>
-        <g id="hg-grains">
+        <line class="hg-stream" x1="110" y1="156" x2="110" y2="248"/>
+        <g class="hg-grains">
           <circle class="hg-grain" cx="110" cy="172" r="2.2"/>
           <circle class="hg-grain" cx="107.5" cy="198" r="1.7"/>
           <circle class="hg-grain" cx="112.5" cy="224" r="2"/>
         </g>
 
         <g clip-path="url(#hgClipBottom)">
-          <path class="hg-sand hg-sand-pile" id="hg-sand-pile" d="M 54 258 Q 82 256 104 255 Q 110 254 116 255 Q 138 256 166 258 L 166 262 L 54 262 Z"/>
+          <path class="hg-sand hg-sand-pile" d="M 54 258 Q 82 256 104 255 Q 110 254 116 255 Q 138 256 166 258 L 166 262 L 54 262 Z"/>
         </g>
 
         <rect class="hg-cap" x="42" y="16" width="136" height="18" rx="9"/>
@@ -105,6 +107,7 @@
 
   <!-- ============ HEADER ============ -->
   <!-- partial:header -->
+  <a class="skip-link" href="#main">İçeriğe geç</a>
   <header class="site-header">
     <div class="container header-inner">
       <a href="/" class="brand" aria-label="PomoSprint ana sayfa">
@@ -125,33 +128,25 @@
   </header>
   <!-- /partial:header -->
 
-  <main>
+  <main id="main" tabindex="-1">
     <!-- ============ HERO ============ -->
     <section class="hero">
       <div class="container hero-inner">
         <div class="hero-text">
           <span class="hero-chip" data-hero>🍅 Pomodoro tekniği, arkadaşlarınla birlikte</span>
-          <h1 data-hero>Odaklanmanın en <span class="hl">keyifli</span> hali</h1>
+          <h1 data-hero-title>Odaklanmanın en <span class="hl">keyifli</span> hali</h1>
           <p class="hero-sub" data-hero>
             PomoSprint ile 25 ya da 50 dakikalık odak seansları başlat, arkadaşlarının
             şu an çalıştığını gör, liglerde yüksel. Ertelemeyi bırak — kumu akıt.
           </p>
-          <div class="store-badges" data-hero>
-            <a href="/#yakinda" class="store-badge is-soon" aria-label="Yakında App Store'da — haberdar olmak için erken erişim bölümüne git">
-              <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11.182.008C11.148-.03 9.923.023 8.857 1.18c-1.066 1.156-.902 2.482-.878 2.516.024.034 1.52.087 2.475-1.258.955-1.345.762-2.391.728-2.43Zm3.314 11.733c-.048-.096-2.325-1.234-2.113-3.422.212-2.189 1.675-2.789 1.698-2.854.023-.065-.597-.79-1.254-1.157a3.692 3.692 0 0 0-1.563-.434c-.108-.003-.483-.095-1.254.116-.508.139-1.653.589-1.968.607-.316.018-1.256-.522-2.267-.665-.647-.125-1.333.131-1.824.328-.49.196-1.422.754-2.074 2.237-.652 1.482-.311 3.83-.067 4.56.244.729.625 1.924 1.273 2.796.576.984 1.34 1.667 1.659 1.899.319.232 1.219.386 1.843.067.502-.308 1.408-.485 1.766-.472.357.013 1.061.154 1.782.539.571.197 1.111.115 1.652-.105.541-.221 1.324-1.059 2.238-2.758.347-.79.505-1.217.473-1.282Z"/></svg>
-              <span class="sb-text"><span class="sb-small">Yakında</span><span class="sb-big">App Store</span></span>
-              <span class="sb-soon" aria-hidden="true">Yakında</span>
-            </a>
-            <a href="/#yakinda" class="store-badge is-soon" aria-label="Yakında Google Play'de — haberdar olmak için erken erişim bölümüne git">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path fill="#00C3FF" d="M4.3 1.6C4.1 1.9 4 2.3 4 2.7v18.6c0 .4.1.8.3 1.1L14.9 12 4.3 1.6Z"/>
-                <path fill="#00E571" d="M4.3 1.6c.4-.4 1.1-.6 1.8-.3l12.1 7.4-3.3 3.3L4.3 1.6Z"/>
-                <path fill="#FFC900" d="M18.2 8.7 21 10.3c.6.3 1 1 1 1.7s-.4 1.4-1 1.7l-2.8 1.6-3.3-3.3 3.3-3.3Z"/>
-                <path fill="#FF3A44" d="M4.3 22.4c.4.4 1.1.6 1.8.3l12.1-7.4-3.3-3.3L4.3 22.4Z"/>
-              </svg>
-              <span class="sb-text"><span class="sb-small">Yakında</span><span class="sb-big">Google Play</span></span>
-              <span class="sb-soon" aria-hidden="true">Yakında</span>
-            </a>
+          <div class="hero-actions" data-hero>
+            <a href="#yakinda" class="btn btn-primary btn-lg">Yayınlanınca haber ver</a>
+            <p class="platforms">
+              <span class="pf"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11.182.008C11.148-.03 9.923.023 8.857 1.18c-1.066 1.156-.902 2.482-.878 2.516.024.034 1.52.087 2.475-1.258.955-1.345.762-2.391.728-2.43Zm3.314 11.733c-.048-.096-2.325-1.234-2.113-3.422.212-2.189 1.675-2.789 1.698-2.854.023-.065-.597-.79-1.254-1.157a3.692 3.692 0 0 0-1.563-.434c-.108-.003-.483-.095-1.254.116-.508.139-1.653.589-1.968.607-.316.018-1.256-.522-2.267-.665-.647-.125-1.333.131-1.824.328-.49.196-1.422.754-2.074 2.237-.652 1.482-.311 3.83-.067 4.56.244.729.625 1.924 1.273 2.796.576.984 1.34 1.667 1.659 1.899.319.232 1.219.386 1.843.067.502-.308 1.408-.485 1.766-.472.357.013 1.061.154 1.782.539.571.197 1.111.115 1.652-.105.541-.221 1.324-1.059 2.238-2.758.347-.79.505-1.217.473-1.282Z"/></svg>iOS</span>
+              <span class="pf-sep" aria-hidden="true">·</span>
+              <span class="pf"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.3 1.6C4.1 1.9 4 2.3 4 2.7v18.6c0 .4.1.8.3 1.1L14.9 12 4.3 1.6Z"/><path fill-opacity=".7" d="M4.3 1.6c.4-.4 1.1-.6 1.8-.3l12.1 7.4-3.3 3.3L4.3 1.6Z"/><path fill-opacity=".85" d="M18.2 8.7 21 10.3c.6.3 1 1 1 1.7s-.4 1.4-1 1.7l-2.8 1.6-3.3-3.3 3.3-3.3Z"/><path fill-opacity=".55" d="M4.3 22.4c.4.4 1.1.6 1.8.3l12.1-7.4-3.3-3.3L4.3 22.4Z"/></svg>Android</span>
+              <span class="pf-soon">Yakında</span>
+            </p>
           </div>
           <div class="hero-proof" data-hero>
             <div class="avatar-stack" aria-hidden="true">
@@ -160,14 +155,46 @@
               <img src="/avatars/avatar_7_scholar.webp" alt="" width="42" height="42">
               <img src="/avatars/avatar_1_gamer.webp" alt="" width="42" height="42">
             </div>
-            <p>Lansman yaklaşıyor — <a href="/#yakinda">ilk haber alanlardan ol</a></p>
+            <p>Lansman yaklaşıyor — PomoSprint ücretsiz olacak.</p>
           </div>
         </div>
 
-        <!-- Kum saati arka plandadır (body başındaki .hg-backdrop); burada yalnızca rozetler durur -->
-        <div class="hourglass-stage" data-hero>
-          <span class="hg-chip hg-chip-1"><span id="hg-timer">25:00</span> · Odak</span>
-          <span class="hg-chip hg-chip-2">Seans bitti · +5 puan 🏆</span>
+        <!-- Hero'nun kum saati: rozetler ona göre konumlanır. Kum, sayfa
+             kaydırıldıkça akar; hero bitince sabit arka plan kopyası devralır. -->
+        <div class="hourglass-stage" data-hero aria-hidden="true">
+          <div class="hg-hero">
+            <div class="hourglass hourglass-hero">
+              <svg viewBox="0 0 220 300">
+                <defs>
+                  <clipPath id="hgHeroClipTop">
+                    <path d="M69 46 L151 46 C151 90 128 116 112 140 L108 140 C92 116 69 90 69 46 Z"/>
+                  </clipPath>
+                  <clipPath id="hgHeroClipBottom">
+                    <path d="M108 160 L112 160 C128 184 151 210 151 254 L69 254 C69 210 92 184 108 160 Z"/>
+                  </clipPath>
+                </defs>
+                <path class="hg-glass" d="M62 38 L158 38 C158 88 132 118 116 142 L116 158 C132 182 158 212 158 262 L62 262 C62 212 88 182 104 158 L104 142 C88 118 62 88 62 38 Z"/>
+                <g clip-path="url(#hgHeroClipTop)">
+                  <path class="hg-sand hg-sand-top" d="M 56 48 Q 110 60 164 48 L 164 162 L 56 162 Z"/>
+                </g>
+                <line class="hg-stream" x1="110" y1="156" x2="110" y2="248"/>
+                <g class="hg-grains">
+                  <circle class="hg-grain" cx="110" cy="172" r="2.2"/>
+                  <circle class="hg-grain" cx="107.5" cy="198" r="1.7"/>
+                  <circle class="hg-grain" cx="112.5" cy="224" r="2"/>
+                </g>
+                <g clip-path="url(#hgHeroClipBottom)">
+                  <path class="hg-sand hg-sand-pile" d="M 54 258 Q 82 256 104 255 Q 110 254 116 255 Q 138 256 166 258 L 166 262 L 54 262 Z"/>
+                </g>
+                <rect class="hg-cap" x="42" y="16" width="136" height="18" rx="9"/>
+                <rect class="hg-cap" x="42" y="266" width="136" height="18" rx="9"/>
+                <rect class="hg-post" x="46" y="26" width="9" height="248" rx="4.5"/>
+                <rect class="hg-post" x="165" y="26" width="9" height="248" rx="4.5"/>
+              </svg>
+            </div>
+            <span class="hg-chip hg-chip-1"><span id="hg-timer">25:00</span> · Odak</span>
+            <span class="hg-chip hg-chip-2">Seans bitti · +5 puan 🏆</span>
+          </div>
         </div>
       </div>
     </section>
@@ -176,7 +203,7 @@
     <section class="section section-deep">
       <div class="container">
         <div class="section-head" data-reveal>
-          <span class="eyebrow">Neden PomoSprint?</span>
+          <span class="eyebrow">Neden <span lang="en">PomoSprint</span>?</span>
           <h2>Odak için ihtiyacın olan her şey</h2>
           <p>Basit bir zamanlayıcıdan fazlası: arkadaşlarınla birlikte çalıştığın, keyifle geliştiğin bir odak alanı.</p>
         </div>
@@ -200,7 +227,7 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
             </div>
             <h3>Lig Sistemi</h3>
-            <p>14 günlük dönemlerde benzer seviyedeki kullanıcılarla yarış; dönem sonunda üst lige çık.</p>
+            <p>14 günlük dönemlerde en fazla 30 kişilik odanda yarış; dönemi üst sıralarda bitirirsen bir üst lige çık, ilk 3'e girersen ödül karakterini kazan.</p>
           </article>
           <article class="feature-card">
             <div class="feature-icon">
@@ -228,7 +255,7 @@
               <span class="step-num">1</span>
             </div>
             <h3>Kaydol</h3>
-            <p>E-postanla ya da Google veya Apple hesabınla saniyeler içinde ücretsiz hesabını oluştur.</p>
+            <p>E-postanla, Google hesabınla ya da iPhone'da Apple ile ücretsiz hesabını oluştur.</p>
           </div>
           <div class="step">
             <div class="step-bubble">
@@ -236,7 +263,7 @@
               <span class="step-num">2</span>
             </div>
             <h3>Ders Seç</h3>
-            <p>Ne çalışacağını seç, günlük hedefini belirle.</p>
+            <p>Hangi yolculukta olduğunu (LGS, YKS, üniversite ya da iş) seç; sana uygun dersler hazır gelsin. Sonra günlük hedefini belirle.</p>
           </div>
           <div class="step">
             <div class="step-bubble">
@@ -250,8 +277,10 @@
       </div>
     </section>
 
-    <!-- ============ CANLI LİG SIRALAMASI ============ -->
-    <section class="section section-deep" id="siralama">
+    <!-- ============ CANLI AYLIK SIRALAMA ============
+         Lansman öncesi boş liste "kimse kullanmıyor" izlenimi vermesin diye
+         bölüm gizli başlar; en az 3 kişi puan topladığında JS görünür yapar. -->
+    <section class="section section-deep" id="siralama" hidden>
       <div class="container">
         <div class="section-head" data-reveal>
           <span class="eyebrow">Canlı sıralama</span>
@@ -292,13 +321,12 @@
             <li class="lb-item lb-skeleton" aria-hidden="true"></li>
             <li class="lb-item lb-skeleton" aria-hidden="true"></li>
           </ol>
-          <p class="lb-empty" id="lb-empty" hidden>Bu ay henüz kimse puan toplamadı. İlk seansını tamamlayan listenin zirvesine yerleşir!</p>
         </div>
-        <p class="lb-note" data-reveal>Sıralamada yalnızca kısaltılmış görünen ad (ör. “Elif Y.”), karakter ve puan yer alır. Ayrıntılar <a href="/privacy#siralama">Gizlilik Politikası</a>'nda.</p>
+        <p class="lb-note" data-reveal>Sıralamada yalnızca kısaltılmış görünen ad (ör. “Elif&nbsp;Y.”; tek kelimelik adlar olduğu gibi), karakter ve puan yer alır; “Sosyal Listede Görün” ayarını kapatanlar listelenmez. Ayrıntılar <a href="/privacy#siralama">Gizlilik Politikası</a>'nda.</p>
       </div>
     </section>
 
-    <!-- ============ YAKINDA / ERKEN ERİŞİM ============ -->
+    <!-- ============ YAKINDA / ERKEN ERİŞİM (sayfanın son aksiyonu) ============ -->
     <section class="section section-flush" id="yakinda">
       <div class="container">
         <div class="library-band" data-reveal>
@@ -306,10 +334,11 @@
             <span class="library-eyebrow">Çok yakında</span>
             <h2>İlk kum tanesi düşmek üzere</h2>
             <p class="library-lead">
-              PomoSprint henüz mağazalarda değil — son rötuşlar yapılıyor.
-              App Store ve Google Play'de yayınlandığında ilk öğrenenlerden ol.
+              PomoSprint henüz mağazalarda değil — son rötuşlar yapılıyor. Ücretsiz olacak;
+              App Store ve Google Play'e geldiği gün sana tek bir
+              <span class="nowrap">e-postayla</span> haber verelim.
             </p>
-            <form class="notify-form" id="notify-form">
+            <form class="notify-form" id="notify-form" novalidate>
               <label class="sr-only" for="notify-email">E-posta adresin</label>
               <input type="email" id="notify-email" name="email" required maxlength="254"
                      placeholder="eposta@ornek.com" autocomplete="email">
@@ -319,6 +348,10 @@
               </div>
               <button type="submit" class="btn btn-primary">Yayınlanınca haber ver</button>
             </form>
+            <div class="notify-success" id="notify-success" tabindex="-1" hidden>
+              <span class="ns-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>
+              <p><strong>Listedesin!</strong> Yayın günü haber vereceğiz.</p>
+            </div>
             <p class="notify-status" id="notify-status" role="status" aria-live="polite"></p>
             <p class="notify-note">Adresini yalnızca lansman haberi için kullanırız — spam yok, söz. <a href="/privacy#bekleme-listesi">Gizlilik Politikası</a></p>
           </div>
@@ -361,32 +394,6 @@
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ LANSMAN CTA ============ -->
-    <section class="section section-deep cta-section" id="indir">
-      <div class="container" data-reveal>
-        <span class="eyebrow">Yakında yayında</span>
-        <h2>İlk pomodoro'nu birlikte başlatalım</h2>
-        <p>PomoSprint ücretsiz olacak. Yukarıdan e-postanı bırak; App Store ve Google Play'e geldiği gün sana haber verelim.</p>
-        <div class="store-badges">
-          <a href="/#yakinda" class="store-badge is-soon" aria-label="Yakında App Store'da — haberdar olmak için erken erişim bölümüne git">
-            <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M11.182.008C11.148-.03 9.923.023 8.857 1.18c-1.066 1.156-.902 2.482-.878 2.516.024.034 1.52.087 2.475-1.258.955-1.345.762-2.391.728-2.43Zm3.314 11.733c-.048-.096-2.325-1.234-2.113-3.422.212-2.189 1.675-2.789 1.698-2.854.023-.065-.597-.79-1.254-1.157a3.692 3.692 0 0 0-1.563-.434c-.108-.003-.483-.095-1.254.116-.508.139-1.653.589-1.968.607-.316.018-1.256-.522-2.267-.665-.647-.125-1.333.131-1.824.328-.49.196-1.422.754-2.074 2.237-.652 1.482-.311 3.83-.067 4.56.244.729.625 1.924 1.273 2.796.576.984 1.34 1.667 1.659 1.899.319.232 1.219.386 1.843.067.502-.308 1.408-.485 1.766-.472.357.013 1.061.154 1.782.539.571.197 1.111.115 1.652-.105.541-.221 1.324-1.059 2.238-2.758.347-.79.505-1.217.473-1.282Z"/></svg>
-            <span class="sb-text"><span class="sb-small">Yakında</span><span class="sb-big">App Store</span></span>
-            <span class="sb-soon" aria-hidden="true">Yakında</span>
-          </a>
-          <a href="/#yakinda" class="store-badge is-soon" aria-label="Yakında Google Play'de — haberdar olmak için erken erişim bölümüne git">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path fill="#00C3FF" d="M4.3 1.6C4.1 1.9 4 2.3 4 2.7v18.6c0 .4.1.8.3 1.1L14.9 12 4.3 1.6Z"/>
-              <path fill="#00E571" d="M4.3 1.6c.4-.4 1.1-.6 1.8-.3l12.1 7.4-3.3 3.3L4.3 1.6Z"/>
-              <path fill="#FFC900" d="M18.2 8.7 21 10.3c.6.3 1 1 1 1.7s-.4 1.4-1 1.7l-2.8 1.6-3.3-3.3 3.3-3.3Z"/>
-              <path fill="#FF3A44" d="M4.3 22.4c.4.4 1.1.6 1.8.3l12.1-7.4-3.3-3.3L4.3 22.4Z"/>
-            </svg>
-            <span class="sb-text"><span class="sb-small">Yakında</span><span class="sb-big">Google Play</span></span>
-            <span class="sb-soon" aria-hidden="true">Yakında</span>
-          </a>
         </div>
       </div>
     </section>
@@ -433,7 +440,7 @@
   <!-- partial:scripts -->
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js" integrity="sha384-HOvlOYPIs/zjoIkWUGXkVmXsjr8GuZLV+Q+rcPwmJOVZVpvTSXQChiN4t9Euv9Vc" crossorigin="anonymous" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js" integrity="sha384-P8VzCVnT9NBUkMrpcIZrJbA7EBjJvh/fJS6PmP+4nLIM284DtsImIv8D0fFjIkeh" crossorigin="anonymous" defer></script>
-  <script src="/js/main.js?v=20261003" defer></script>
+  <script src="/js/main.js?v=20261003b" defer></script>
   <!-- /partial:scripts -->
 </body>
 </html>

@@ -13,3 +13,7 @@ tools
 *.md
 wrangler.jsonc
 worker.js
+# Eski arayüzü gösteren kayıtlar: güncel kayıt gelene kadar yayınlanmaz
+# (main.js SHOT_VIDEOS listesinde değiller)
+videos/leaderboard.mp4
+videos/reports.mp4

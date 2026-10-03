@@ -25,19 +25,21 @@
   <meta name="twitter:image" content="https://pomosprint.app/og-image.png">
   <!-- partial:head -->
   <meta name="theme-color" content="#F6F0EA">
+  <meta name="color-scheme" content="light">
   <link rel="icon" href="/favicon.ico" sizes="32x32">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=20261003">
-  <script src="/js/boot.js?v=20261003"></script>
+  <link rel="stylesheet" href="/css/style.css?v=20261003b">
+  <script src="/js/boot.js?v=20261003b"></script>
   <!-- /partial:head -->
 </head>
 <body data-page="privacy">
 
   <!-- partial:header -->
+  <a class="skip-link" href="#main">İçeriğe geç</a>
   <header class="site-header">
     <div class="container header-inner">
       <a href="/" class="brand" aria-label="PomoSprint ana sayfa">
@@ -58,7 +60,7 @@
   </header>
   <!-- /partial:header -->
 
-  <main>
+  <main id="main" tabindex="-1">
     <section class="page-hero">
       <div class="container">
         <span class="eyebrow">Yasal</span>
@@ -71,6 +73,28 @@
       <div class="container prose">
         <p class="updated">Son güncelleme: 3 Ekim 2026</p>
 
+        <details class="toc">
+          <summary>İçindekiler</summary>
+          <nav aria-label="İçindekiler">
+            <ol>
+              <li><a href="#veri-sorumlusu">1. Veri Sorumlusu ve İletişim</a></li>
+              <li><a href="#toplanan-veriler">2. Topladığımız Veriler</a></li>
+              <li><a href="#kullanim">3. Verileri Nasıl Kullanıyoruz?</a></li>
+              <li><a href="#siralama">4. Sıralamalar ve Sosyal Görünürlük</a></li>
+              <li><a href="#bekleme-listesi">5. Bekleme Listesi</a></li>
+              <li><a href="#ucuncu-taraflar">6. Üçüncü Taraf Hizmetler</a></li>
+              <li><a href="#veri-aktarimi">7. Uluslararası Veri Aktarımı</a></li>
+              <li><a href="#saklama-silme">8. Verilerin Saklanması ve Silinmesi</a></li>
+              <li><a href="#guvenlik">9. Veri Güvenliği</a></li>
+              <li><a href="#cocuklar">10. Çocukların Gizliliği</a></li>
+              <li><a href="#bildirimler">11. Bildirimler</a></li>
+              <li><a href="#haklariniz">12. Haklarınız</a></li>
+              <li><a href="#degisiklikler">13. Bu Politikadaki Değişiklikler</a></li>
+              <li><a href="#iletisim">14. İletişim</a></li>
+            </ol>
+          </nav>
+        </details>
+
         <p>
           Bu Gizlilik Politikası, PomoSprint mobil uygulamasını ("Uygulama") ve
           pomosprint.app web sitesini ("Site") kullandığınızda kişisel verilerinizin
@@ -78,7 +102,7 @@
           korunduğunu açıklar.
         </p>
 
-        <h2>1. Veri Sorumlusu ve İletişim</h2>
+        <h2 id="veri-sorumlusu">1. Veri Sorumlusu ve İletişim</h2>
         <p>
           6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") ve ilgili
           mevzuat uyarınca, PomoSprint Uygulaması ve Sitesi üzerinden işlenen
@@ -99,15 +123,15 @@
           iletilir.
         </p>
 
-        <h2>2. Topladığımız Veriler</h2>
+        <h2 id="toplanan-veriler">2. Topladığımız Veriler</h2>
         <p>PomoSprint, yalnızca hizmeti sunmak için gereken veriyi toplar:</p>
         <ul>
           <li><strong>Hesap bilgileri:</strong> E-posta adresi ve şifre (şifre yalnızca tek yönlü özet — hash — biçiminde saklanır, tarafımızca hiçbir zaman düz metin olarak görülmez). Google veya Apple ile giriş yaptığınızda bu sağlayıcıların ilettiği ad ve e-posta adresi (Apple, gerçek adresiniz yerine gizli bir aktarım adresi iletebilir).</li>
           <li><strong>Profil bilgileri:</strong> Görünen adınız, seçtiğiniz kum saati karakteri (avatar) ve arkadaşlık kodunuz.</li>
-          <li><strong>Başlangıç (onboarding) bilgileri:</strong> Doğum yılınız (yaş sınırını uygulamak ve deneyimi yaşınıza uygun kılmak için), çalışma durumunuz (LGS, YKS, üniversite ya da iş ve kişisel gelişim), seçtiğiniz ders kategorileri ve günlük çalışma hedefiniz.</li>
-          <li><strong>Çalışma verileri:</strong> Tamamladığınız seanslar (başlangıç zamanı, süre, kategori), seri (streak) bilgisi, puanlarınız, kum tanesi bakiyeniz, açtığınız karakterler, lig ve sıralama bilgileriniz.</li>
-          <li><strong>Sosyal veriler:</strong> Arkadaşlık bağlantılarınız ve istekleriniz; "Sosyal Listede Görün" ayarı açıkken arkadaşlarınıza gösterilen anlık çalışma durumunuz ("şu an odaklanıyor") ve arkadaşlarınızla paylaşılan günlük çalışma özetiniz (toplam süre ve en çok çalıştığınız ders).</li>
-          <li><strong>Bildirim tercihi:</strong> Uygulama bildirimlerini açıp açmadığınız. Bildirimler tamamen cihazınızda zamanlanır.</li>
+          <li><strong>Başlangıç (onboarding) bilgileri:</strong> Doğum yılınız (yalnızca 13 yaş sınırını uygulamak için), çalışma durumunuz (LGS, YKS, üniversite ya da iş ve kişisel gelişim; size uygun ders kategorilerini önermek için), seçtiğiniz ders kategorileri ve günlük çalışma hedefiniz.</li>
+          <li><strong>Çalışma verileri:</strong> Tamamladığınız seanslar (başlangıç zamanı, süre, kategori, duraklatılıp duraklatılmadığı ve uygulamanın açık kaldığı süre), seri (streak) bilgisi, puanlarınız, kum tanesi bakiyeniz, açtığınız karakterler, lig ve sıralama bilgileriniz.</li>
+          <li><strong>Sosyal veriler:</strong> Arkadaşlık bağlantılarınız ve istekleriniz; "Sosyal Listede Görün" ayarı açıkken arkadaşlarınıza gösterilen anlık çalışma durumunuz ("şu an odaklanıyor" ve çalıştığınız ders) ile arkadaşlarınızın görebildiği günlük çalışma özetiniz (toplam süre, seans sayısı, en çok çalıştığınız ders) ve seri, günde 4 saat gibi kilometre taşlarınız. Lig yükselmeleriniz de arkadaşlarınızın akışında kilometre taşı olarak gösterilebilir.</li>
+          <li><strong>Cihazda kalan tercihler:</strong> Bildirim ve dil tercihiniz yalnızca cihazınızda saklanır, sunucularımıza gönderilmez. Bildirimler tamamen cihazınızda zamanlanır.</li>
           <li><strong>Teknik ve hata verileri:</strong> Uygulama sürümü, cihaz modeli, işletim sistemi ve sürümü; uygulama bir hata verdiğinde veya çöktüğünde oluşan hata kaydı (hata mesajı, ilgili kod satırları, hatadan önceki teknik olaylar) ve örneklenmiş performans ölçümleri.</li>
           <li><strong>Bekleme listesi (Site):</strong> Sitedeki "Yayınlanınca haber ver" formuna yazdığınız e-posta adresi.</li>
           <li><strong>Bülten:</strong> Bültenimize abone olduysanız e-posta adresiniz; her bültendeki bağlantıyla abonelikten çıkabilirsiniz.</li>
@@ -118,7 +142,7 @@
           reklam/izleme (tracking) amaçlı üçüncü taraf SDK'sı bulunmaz.
         </p>
 
-        <h2>3. Verileri Nasıl Kullanıyoruz?</h2>
+        <h2 id="kullanim">3. Verileri Nasıl Kullanıyoruz?</h2>
         <ul>
           <li>Hesabınızı oluşturmak, doğrulamak ve yönetmek,</li>
           <li>Seanslarınızı kaydetmek, puan, seri, kum tanesi ve raporlarınızı hesaplamak, verilerinizi cihazlarınız arasında senkronize etmek,</li>
@@ -136,18 +160,18 @@
 
         <h2 id="siralama">4. Sıralamalar ve Sosyal Görünürlük</h2>
         <p>
-          Görünen adınız, karakteriniz ve puanınız; arkadaşlarınıza, Uygulamadaki
-          lig ve genel sıralamalarda diğer kullanıcılara görünür. Bir ayın en çok
+          Görünen adınız, karakteriniz ve puanınız; arkadaşlarınıza ve Uygulamadaki
+          lig ve aylık sıralamalarda diğer kullanıcılara görünür. Bir ayın en çok
           puan toplayan ilk 10 kullanıcısı arasına girerseniz görünen adınız
-          (soyadınız baş harfiyle kısaltılarak, ör. “Elif Y.”), karakteriniz ve
-          aylık puanınız pomosprint.app ana sayfasındaki <strong>herkese açık
+          (ilk kelimesi ve ikinci kelimenin baş harfiyle, ör. <span class="nowrap">“Elif Y.”</span>;
+          tek kelimelik bir ad olduğu gibi), karakteriniz ve aylık puanınız pomosprint.app ana sayfasındaki <strong>herkese açık
           sıralamada</strong> da (oturum açmadan herkesin görebileceği şekilde)
           gösterilir. E-posta adresiniz, doğum yılınız ve
           diğer hesap bilgileriniz hiçbir sıralamada gösterilmez.
         </p>
         <ul>
           <li>Google veya Apple ile giriş yaptığınızda görünen adınız başlangıçta sağlayıcının ilettiği addır. Bunu dilediğiniz zaman <strong>Profil</strong> ekranından değiştirebilirsiniz.</li>
-          <li>Profil'deki <strong>"Sosyal Listede Görün"</strong> ayarını kapatarak arkadaşlarınızın "Şu An Çalışanlar" listesinde, Uygulamadaki genel ve aylık sıralamalarda ve sitedeki herkese açık sıralamada görünmeyi durdurabilirsiniz. Lig grubunuzdaki kullanıcılar, lig sıralamasında adınızı ve karakterinizi görmeye devam eder.</li>
+          <li>Profil'deki <strong>"Sosyal Listede Görün"</strong> ayarını kapatarak arkadaşlarınızın "Şu An Çalışanlar" listesinde, Uygulamadaki aylık sıralamada ve sitedeki herkese açık sıralamada görünmeyi durdurabilirsiniz. Lig odanızdaki kullanıcılar lig sıralamasında; arkadaşlarınız ise arkadaş listesinde ve Sıralama → Arkadaşlar sekmesinde adınızı, karakterinizi ve toplam puanınızı görmeye devam eder.</li>
         </ul>
 
         <h2 id="bekleme-listesi">5. Bekleme Listesi</h2>
@@ -159,7 +183,7 @@
           adresine yazarak isteyebilirsiniz.
         </p>
 
-        <h2>6. Üçüncü Taraf Hizmetler</h2>
+        <h2 id="ucuncu-taraflar">6. Üçüncü Taraf Hizmetler</h2>
         <p>PomoSprint, hizmeti sunabilmek için aşağıdaki hizmet sağlayıcılarla çalışır. Bu sağlayıcılar verilerinizi yalnızca bize hizmet sunmak amacıyla işler.</p>
         <ul>
           <li><strong>Supabase</strong> — veritabanı, kimlik doğrulama ve sunucu fonksiyonları. Hesap bilgileriniz, çalışma verileriniz ve bekleme listesi kayıtları Avrupa Birliği sınırları içindeki (Stockholm, İsveç) sunucularda saklanır. (<a href="https://supabase.com/privacy" target="_blank" rel="noopener">Supabase Gizlilik Politikası</a>)</li>
@@ -178,7 +202,7 @@
           amaçlı çerez kullanmaz.
         </p>
 
-        <h2>7. Uluslararası Veri Aktarımı</h2>
+        <h2 id="veri-aktarimi">7. Uluslararası Veri Aktarımı</h2>
         <p>
           Ana verileriniz (hesap, çalışma verileri ve bekleme listesi) Avrupa
           Birliği sınırları içinde barındırılır. Sentry, Google, Apple, Resend,
@@ -190,7 +214,7 @@
           yapılır.
         </p>
 
-        <h2>8. Verilerin Saklanması ve Silinmesi</h2>
+        <h2 id="saklama-silme">8. Verilerin Saklanması ve Silinmesi</h2>
         <p>
           Verileriniz, hesabınız aktif olduğu sürece saklanır. Hesabınızı
           dilediğiniz zaman, üçüncü bir tarafa ihtiyaç duymadan
@@ -209,7 +233,7 @@
           etmeniz ya da abonelikten çıkmanız halinde silinir.
         </p>
 
-        <h2>9. Veri Güvenliği</h2>
+        <h2 id="guvenlik">9. Veri Güvenliği</h2>
         <p>
           Verileriniz aktarım sırasında TLS/HTTPS ile şifrelenir, şifreler
           tek yönlü özetleme (hashing) ile saklanır. Veritabanı erişimi, satır
@@ -220,7 +244,7 @@
           bilgilendiririz.
         </p>
 
-        <h2>10. Çocukların Gizliliği</h2>
+        <h2 id="cocuklar">10. Çocukların Gizliliği</h2>
         <p>
           PomoSprint 13 yaşın altındaki çocuklara yönelik değildir ve bilerek 13
           yaş altı kullanıcılardan kişisel veri toplamayız. Bir çocuğun bize
@@ -228,7 +252,7 @@
           geçin; ilgili verileri sileriz.
         </p>
 
-        <h2>11. Bildirimler</h2>
+        <h2 id="bildirimler">11. Bildirimler</h2>
         <p>
           Uygulama, siz izin verdiğinizde seansınızın tamamlandığını haber veren
           yerel bildirimler gönderir. İzin, ilk seansınızı başlattığınızda
@@ -238,7 +262,7 @@
           ya da cihaz ayarlarından istediğiniz zaman kapatabilirsiniz.
         </p>
 
-        <h2>12. Haklarınız</h2>
+        <h2 id="haklariniz">12. Haklarınız</h2>
         <p>
           KVKK madde 11 ve (Avrupa Birliği'ndeki kullanıcılar için) GDPR
           kapsamında; verilerinizin işlenip işlenmediğini öğrenme, işlenmişse
@@ -253,14 +277,14 @@
           sonuçlandırılır.
         </p>
 
-        <h2>13. Bu Politikadaki Değişiklikler</h2>
+        <h2 id="degisiklikler">13. Bu Politikadaki Değişiklikler</h2>
         <p>
           Bu politikayı zaman zaman güncelleyebiliriz. Önemli değişikliklerde,
           güncellenen politikayı bu sayfada yayımlar ve "Son güncelleme"
           tarihini yenileriz.
         </p>
 
-        <h2>14. İletişim</h2>
+        <h2 id="iletisim">14. İletişim</h2>
         <p>
           Gizlilikle ilgili her türlü soru ve talebiniz için:
           <a href="mailto:destek@pomosprint.app">destek@pomosprint.app</a>
@@ -269,6 +293,8 @@
         <p class="cta-actions">
           <a href="/terms">Kullanım Şartları</a> sayfamızı da inceleyebilirsiniz.
         </p>
+
+        <p class="back-top"><a href="#top">Başa dön ↑</a></p>
       </div>
     </section>
   </main>
@@ -312,7 +338,7 @@
   <!-- partial:scripts -->
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js" integrity="sha384-HOvlOYPIs/zjoIkWUGXkVmXsjr8GuZLV+Q+rcPwmJOVZVpvTSXQChiN4t9Euv9Vc" crossorigin="anonymous" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js" integrity="sha384-P8VzCVnT9NBUkMrpcIZrJbA7EBjJvh/fJS6PmP+4nLIM284DtsImIv8D0fFjIkeh" crossorigin="anonymous" defer></script>
-  <script src="/js/main.js?v=20261003" defer></script>
+  <script src="/js/main.js?v=20261003b" defer></script>
   <!-- /partial:scripts -->
 </body>
 </html>

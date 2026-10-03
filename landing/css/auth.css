@@ -26,11 +26,37 @@
   padding: 36px 28px 30px;
 }
 
+/* Durum ikonu: logo gibi mercan yuvarlak kare üzerinde beyaz çizgi.
+   JS data-icon değerini değiştirir (key, mail, unsub, ok, warn). */
 .auth-icon {
-  font-size: 3.4rem;
-  line-height: 1;
-  margin-bottom: 14px;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 16px;
+  border-radius: 16px;
+  background: var(--coral);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 18px rgba(238, 108, 85, 0.3);
 }
+
+.auth-icon .ai {
+  display: none;
+  width: 30px;
+  height: 30px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.auth-icon[data-icon="key"] .ai-key,
+.auth-icon[data-icon="mail"] .ai-mail,
+.auth-icon[data-icon="unsub"] .ai-unsub,
+.auth-icon[data-icon="ok"] .ai-ok,
+.auth-icon[data-icon="warn"] .ai-warn { display: block; }
 
 .auth-card h1 {
   font-size: clamp(1.55rem, 6vw, 1.85rem);
@@ -72,10 +98,13 @@
   font-weight: 600;
   color: var(--ink);
   background: #fff;
-  border: 2px solid var(--line);
+  /* Beyaz zeminde en az 3:1 kontrast (WCAG 1.4.11) */
+  border: 2px solid #9C8C7E;
   border-radius: 14px;
   padding: 12px 16px;
 }
+
+.auth-field input:hover { border-color: #8C7D70; }
 
 .auth-field input:focus-visible {
   outline: none;
@@ -106,6 +135,9 @@
   text-align: center;
 }
 
+/* Hata yokken kartın altında boşluk kalmasın (role=alert öğesi DOM'da kalır) */
+.auth-error:empty { min-height: 0; margin: 0; }
+
 .auth-foot {
   max-width: 420px;
   font-size: 0.88rem;
@@ -116,4 +148,14 @@
 .auth-foot a {
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+/* Telefon yatay (kısa ekran): kart üstten başlar, buton ilk ekranda kalır */
+@media (max-height: 500px) and (orientation: landscape) {
+  .auth-page { justify-content: flex-start; gap: 12px; padding-top: 16px; padding-bottom: 16px; }
+  .auth-card { padding: 20px 24px 22px; }
+  .auth-icon { width: 44px; height: 44px; border-radius: 13px; margin-bottom: 10px; }
+  .auth-icon .ai { width: 24px; height: 24px; }
+  .auth-card h1 { margin-bottom: 6px; }
+  .auth-message { margin-bottom: 14px; }
 }
