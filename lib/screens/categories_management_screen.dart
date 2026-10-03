@@ -1,8 +1,11 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../models/category_model.dart';
 import '../services/language_service.dart';
 import '../services/supabase_service.dart';
+import '../utils/responsive.dart';
 import '../widgets/auth/category_name_dialog.dart';
 
 /// Kategorilerim: ekleme, düzenleme, arşivleme ve sıralama. Tüm değişiklikler
@@ -150,6 +153,8 @@ class _CategoriesManagementScreenState extends State<CategoriesManagementScreen>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final lang = LanguageService.instance;
+    // Liste tüm genişlikte kayar; içerik geniş ekranda okuma genişliğinde ortalanır.
+    final horizontalPadding = math.max(16.0, (MediaQuery.sizeOf(context).width - ContentWidth.reading) / 2);
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.categoriesManagementTitle),
@@ -164,7 +169,7 @@ class _CategoriesManagementScreenState extends State<CategoriesManagementScreen>
               : AbsorbPointer(
                   absorbing: _isBusy,
                   child: ListView(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 16),
                     children: [
                       Container(
                         padding: const EdgeInsets.all(16),
@@ -176,8 +181,10 @@ class _CategoriesManagementScreenState extends State<CategoriesManagementScreen>
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(l10n.activeCategoryCountLabel,
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                            Flexible(
+                              child: Text(l10n.activeCategoryCountLabel,
+                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                            ),
                             Text('${_activeCategories.length} / $_limit',
                                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue)),
                           ],
@@ -220,18 +227,40 @@ class _CategoriesManagementScreenState extends State<CategoriesManagementScreen>
                       const SizedBox(height: 10),
                       Text(l10n.archivedCategoriesDesc, style: const TextStyle(color: Colors.grey)),
                       const SizedBox(height: 10),
-                      ..._archivedCategories.map((c) => ListTile(
-                            title: Text(lang.translateCatName(c.name)),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.unarchive),
-                              // Limit sunucudaki trigger ile zorunlu; aşılırsa hata mesajı gösterilir.
-                              onPressed: () => _mutate(() => _service.unarchiveCategory(c.id)),
-                              tooltip: l10n.unarchiveTooltip,
-                            ),
-                          )),
+                      _buildArchivedGrid(l10n, lang),
                     ],
                   ),
                 ),
+    );
+  }
+
+  /// Arşivdeki kategoriler: telefonda tek sütun liste, geniş ekranda iki
+  /// sütun. Hücre yüksekliği içeriğe göre (büyük yazı ölçeğinde taşmaz).
+  Widget _buildArchivedGrid(AppLocalizations l10n, LanguageService lang) {
+    final columns = Responsive.of(context).columns(compact: 1, medium: 2, expanded: 2);
+    Widget tile(CourseCategory c) => ListTile(
+          title: Text(lang.translateCatName(c.name)),
+          trailing: IconButton(
+            icon: const Icon(Icons.unarchive),
+            // Limit sunucudaki trigger ile zorunlu; aşılırsa hata mesajı gösterilir.
+            onPressed: () => _mutate(() => _service.unarchiveCategory(c.id)),
+            tooltip: l10n.unarchiveTooltip,
+          ),
+        );
+    if (columns == 1) {
+      return Column(children: [for (final c in _archivedCategories) tile(c)]);
+    }
+    const spacing = 8.0;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final itemWidth = (constraints.maxWidth - spacing * (columns - 1)) / columns;
+        return Wrap(
+          spacing: spacing,
+          children: [
+            for (final c in _archivedCategories) SizedBox(width: itemWidth, child: tile(c)),
+          ],
+        );
+      },
     );
   }
 

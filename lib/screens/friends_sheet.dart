@@ -9,6 +9,19 @@ import '../widgets/social/load_error_view.dart';
 import '../widgets/social/social_error_text.dart';
 import '../services/supabase_service.dart';
 import '../theme.dart';
+import '../utils/responsive.dart';
+
+/// [FriendsSheet]'i alttan açar. Tablette ve yatay telefonda sheet tam
+/// genişliğe yayılmaz (Material 3 varsayılanıyla aynı sınır, açıkça).
+Future<void> showFriendsSheet(BuildContext context) {
+  return showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    constraints: const BoxConstraints(maxWidth: 640),
+    builder: (context) => const FriendsSheet(),
+  );
+}
 
 /// Arkadaş ekleme ve arkadaş listesi pop-up ekranı.
 /// Ana ekranın sağ üstündeki dairesel "arkadaşlar" butonuna basılınca açılır.
@@ -184,76 +197,122 @@ class _FriendsSheetState extends State<FriendsSheet> {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final muted = isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant;
+    final shortHeight = Responsive.of(context).isShortHeight;
 
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.85,
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+    final handle = Center(
+      child: Container(
+        margin: const EdgeInsets.only(top: 12, bottom: 8),
+        width: 40,
+        height: 4,
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant,
+          borderRadius: BorderRadius.circular(2),
+        ),
       ),
-      child: Column(
+    );
+    final header = Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Container(
-            margin: const EdgeInsets.only(top: 12, bottom: 8),
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant,
-              borderRadius: BorderRadius.circular(2),
+          Flexible(
+            child: Text(
+              l10n.friendsTitle,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  l10n.friendsTitle,
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: _isLoading && !_hasLoaded
-                ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
-                : ListView(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-                    children: [
-                      _buildMyCodeCard(l10n, muted),
-                      const SizedBox(height: 20),
-                      ..._buildAddByCode(l10n, isDark),
-                      if (!_hasLoaded) ...[
-                        const SizedBox(height: 24),
-                        LoadErrorView(message: l10n.friendsLoadError, onRetry: _loadData),
-                      ] else ...[
-                        if (_loadFailed) ...[
-                          const SizedBox(height: 12),
-                          StaleDataNotice(onRetry: _loadData),
-                        ],
-                        ..._buildPendingRequests(l10n),
-                        const SizedBox(height: 24),
-                        Text(
-                          l10n.friendsYourFriends(_friends.length),
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 8),
-                        if (_friends.isEmpty)
-                          _buildEmptyFriends(l10n, isDark, muted)
-                        else
-                          for (final f in _friends) _buildFriendTile(f, l10n, isDark, muted),
-                      ],
-                    ],
-                  ),
+          IconButton(
+            icon: const Icon(Icons.close),
+            tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+            onPressed: () => Navigator.pop(context),
           ),
         ],
       ),
     );
+    const loader = Center(child: CircularProgressIndicator(color: AppColors.primary));
+    final isFirstLoad = _isLoading && !_hasLoaded;
+
+    final Widget content;
+    if (shortHeight) {
+      // Yatay telefonda sabit başlık listeye neredeyse yer bırakmaz (klavye
+      // açıkken hiç bırakmaz): tutamaç ve başlık da listeyle birlikte kayar.
+      content = ListView(
+        padding: const EdgeInsets.only(bottom: 24),
+        children: [
+          handle,
+          header,
+          if (isFirstLoad)
+            const Padding(padding: EdgeInsets.all(24), child: loader)
+          else
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: _buildContent(l10n, isDark, muted),
+              ),
+            ),
+        ],
+      );
+    } else {
+      content = Column(
+        children: [
+          handle,
+          header,
+          Expanded(
+            child: isFirstLoad
+                ? loader
+                : ListView(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+                    children: _buildContent(l10n, isDark, muted),
+                  ),
+          ),
+        ],
+      );
+    }
+
+    final sheet = Container(
+      height: MediaQuery.sizeOf(context).height * 0.85,
+      decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: content,
+    );
+    if (!shortHeight) return sheet;
+    // Yatay telefonda klavye sheet'in çoğunu örter: sheet klavyenin üstüne
+    // alınır, kod alanı görünür kalır ve kalan alanda içerik kaydırılır.
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+      child: sheet,
+    );
+  }
+
+  List<Widget> _buildContent(AppLocalizations l10n, bool isDark, Color muted) {
+    return [
+      _buildMyCodeCard(l10n, muted),
+      const SizedBox(height: 20),
+      ..._buildAddByCode(l10n, isDark),
+      if (!_hasLoaded) ...[
+        const SizedBox(height: 24),
+        LoadErrorView(message: l10n.friendsLoadError, onRetry: _loadData),
+      ] else ...[
+        if (_loadFailed) ...[
+          const SizedBox(height: 12),
+          StaleDataNotice(onRetry: _loadData),
+        ],
+        ..._buildPendingRequests(l10n),
+        const SizedBox(height: 24),
+        Text(
+          l10n.friendsYourFriends(_friends.length),
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        if (_friends.isEmpty)
+          _buildEmptyFriends(l10n, isDark, muted)
+        else
+          for (final f in _friends) _buildFriendTile(f, l10n, isDark, muted),
+      ],
+    ];
   }
 
   Widget _buildMyCodeCard(AppLocalizations l10n, Color muted) {
@@ -275,11 +334,20 @@ class _FriendsSheetState extends State<FriendsSheet> {
           const SizedBox(height: 6),
           Row(
             children: [
-              Text(
-                _myCode ?? '------',
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: 2, color: AppColors.primary),
+              // Büyük metin ölçeğinde kod tek satırda küçülür, kopyala düğmesi
+              // sağda kalır.
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      _myCode ?? '------',
+                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: 2, color: AppColors.primary),
+                    ),
+                  ),
+                ),
               ),
-              const Spacer(),
               IconButton(
                 icon: const Icon(Icons.copy_rounded, size: 20, color: AppColors.primary),
                 tooltip: l10n.friendsCopyCode,

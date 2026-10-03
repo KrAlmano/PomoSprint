@@ -6,6 +6,7 @@ import '../theme.dart';
 import '../models/user_model.dart';
 import '../models/category_model.dart';
 import '../services/supabase_service.dart';
+import '../utils/responsive.dart';
 
 /// Açılış ekranı: önce cihazdaki veriyi, sonra (sınırlı sürede) buluttaki
 /// oturumu yükler. Kullanıcı SupabaseService.currentUser'a konur;
@@ -151,8 +152,29 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   }
 
   @override
+  Widget build(BuildContext context) => SplashView(fade: _fadeAnim, scale: _scaleAnim);
+}
+
+/// Açılış ekranının görünümü (logo, başlık, yükleniyor göstergesi). Her
+/// ekran boyutunda ortalı ve taşmasızdır; yatay telefonda ölçüler küçülür.
+class SplashView extends StatelessWidget {
+  final Animation<double> fade;
+  final Animation<double> scale;
+
+  const SplashView({
+    super.key,
+    this.fade = kAlwaysCompleteAnimation,
+    this.scale = kAlwaysCompleteAnimation,
+  });
+
+  @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    // Yatay telefonda logo ve alttaki yükleniyor göstergesi üst üste
+    // binmesin diye ölçüler küçülür; dikey telefonda ve tablette aynıdır.
+    final short = Responsive.of(context).isShortHeight;
+    final logoSize = short ? 72.0 : 100.0;
+    final glowSize = short ? 200.0 : 260.0;
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
@@ -161,8 +183,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
           // Background subtle gradient glow
           Center(
             child: Container(
-              width: 260,
-              height: 260,
+              width: glowSize,
+              height: glowSize,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
@@ -175,48 +197,54 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             ),
           ),
 
-          // Center Logo & Title
+          // Center Logo & Title (sığmazsa orantılı küçülür)
           Center(
             child: FadeTransition(
-              opacity: _fadeAnim,
+              opacity: fade,
               child: ScaleTransition(
-                scale: _scaleAnim,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 100,
-                      height: 100,
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryContainer,
-                        borderRadius: BorderRadius.circular(28),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primary.withValues(alpha: 0.35),
-                            blurRadius: 24,
-                            offset: const Offset(0, 10),
+                scale: scale,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Padding(
+                    // Alttaki marka bloğunun payı: logo onunla çakışmaz.
+                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: short ? 64 : 96),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: logoSize,
+                          height: logoSize,
+                          padding: EdgeInsets.all(logoSize * 0.2),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryContainer,
+                            borderRadius: BorderRadius.circular(logoSize * 0.28),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primary.withValues(alpha: 0.35),
+                                blurRadius: 24,
+                                offset: const Offset(0, 10),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.hourglass_bottom_rounded,
-                        size: 56,
-                        color: Colors.white,
-                      ),
+                          child: Icon(
+                            Icons.hourglass_bottom_rounded,
+                            size: logoSize * 0.56,
+                            color: Colors.white,
+                          ),
+                        ),
+                        SizedBox(height: short ? 16 : 24),
+                        Text(
+                          'PomoSprint',
+                          style: TextStyle(
+                            fontSize: short ? 28 : 32,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: -0.8,
+                            color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 24),
-                    Text(
-                      'PomoSprint',
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: -0.8,
-                        color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
-                      ),
-                    ),
-
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -224,12 +252,13 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
           // Bottom Branding
           Positioned(
-            bottom: 40,
+            bottom: short ? 12 : 40,
             left: 0,
             right: 0,
             child: FadeTransition(
-              opacity: _fadeAnim,
+              opacity: fade,
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   const SizedBox(
                     width: 24,
@@ -239,9 +268,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                       valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: short ? 10 : 16),
                   Text(
                     'POMOSPRINT',
+                    maxLines: 1,
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,

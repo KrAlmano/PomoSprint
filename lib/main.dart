@@ -12,6 +12,7 @@ import 'screens/splash_screen.dart';
 import 'services/language_service.dart';
 import 'services/notification_service.dart';
 import 'theme.dart';
+import 'widgets/snackbar_width_scope.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -70,6 +71,8 @@ class PomodoroApp extends StatelessWidget {
           locale: LanguageService.instance.currentLocale,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
+          // Tablette ve yatay telefonda SnackBar'lar tam genişliğe yayılmaz.
+          builder: (context, child) => SnackBarWidthScope(child: child!),
           // Splash yalnızca bir kez çalışır (Supabase.initialize tek sefer);
           // giriş, onboarding ve çıkış yönlendirmelerinin tamamı AppGate'te.
           home: SplashScreen(

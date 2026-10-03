@@ -4,7 +4,9 @@ import '../../l10n/app_localizations.dart';
 import '../../services/language_service.dart';
 import '../../services/supabase_service.dart';
 import '../../theme.dart';
+import '../../utils/responsive.dart';
 import '../../utils/stats_calculator.dart';
+import 'stats_layout.dart';
 import 'stats_text.dart';
 
 const int kMinDailyGoalMinutes = kPomodoroMinutes;
@@ -19,6 +21,8 @@ Future<void> showDailyGoalSheet(BuildContext context, {required int initialGoalM
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
+    // Tablette tam genişliğe yayılmaz.
+    constraints: const BoxConstraints(maxWidth: kStatsSheetMaxWidth),
     backgroundColor: isDark ? AppColors.darkSurfaceContainerLowest : Colors.white,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -83,10 +87,12 @@ class _DailyGoalSheetState extends State<_DailyGoalSheet> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final accent = isDark ? AppColors.darkPrimary : AppColors.primary;
     final pomodoros = (_goal / kPomodoroMinutes).round();
+    // Yatay telefonda dikey alan kıt: boşluklar sıkılaşır, içerik kaydırılır.
+    final short = Responsive.of(context).isShortHeight;
 
     return SafeArea(
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(24, 16, 24, 24 + MediaQuery.viewInsetsOf(context).bottom),
+      child: SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(24, 16, 24, (short ? 16 : 24) + MediaQuery.viewInsetsOf(context).bottom),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -98,9 +104,10 @@ class _DailyGoalSheetState extends State<_DailyGoalSheet> {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: short ? 12 : 20),
             Text(
               lang.translate('set_daily_goal_title'),
+              textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
@@ -116,7 +123,7 @@ class _DailyGoalSheetState extends State<_DailyGoalSheet> {
                 color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: 28),
+            SizedBox(height: short ? 16 : 28),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -164,7 +171,7 @@ class _DailyGoalSheetState extends State<_DailyGoalSheet> {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: short ? 12 : 20),
             Wrap(
               alignment: WrapAlignment.center,
               spacing: 8,
@@ -219,7 +226,7 @@ class _DailyGoalSheetState extends State<_DailyGoalSheet> {
                 ),
               ),
             ],
-            const SizedBox(height: 24),
+            SizedBox(height: short ? 16 : 24),
             SizedBox(
               width: double.infinity,
               height: 50,

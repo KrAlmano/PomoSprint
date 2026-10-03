@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import '../l10n/app_localizations.dart';
 import '../services/supabase_service.dart';
 import '../models/user_model.dart';
 import '../utils/auth_error_text.dart';
+import '../utils/responsive.dart';
 import '../theme.dart';
 import '../widgets/auth/auth_error_banner.dart';
 import '../widgets/auth/legal_links.dart';
@@ -212,13 +214,19 @@ class _LoginScreenState extends State<LoginScreen> {
       borderSide: BorderSide.none,
     );
 
+    // Form tablette ortalanmış form genişliğinde kalır (kaydırma tüm
+    // genişlikte çalışır); yatay telefonda klavye açıkken de kayar.
+    final screen = Responsive.of(context);
+    final availableWidth = screen.width - MediaQuery.paddingOf(context).horizontal;
+    final horizontalPadding = math.max(28.0, (availableWidth - ContentWidth.form) / 2);
+
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: screen.isShortHeight ? 12 : 24),
             child: AutofillGroup(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -467,9 +475,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   const SizedBox(height: 32),
 
-                  // Register link
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  // Register link (dar ekranda ya da büyük yazıda alt satıra geçer)
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       Text(
                         l10n.noAccountText,

@@ -9,12 +9,14 @@ import '../models/category_model.dart';
 import '../services/language_service.dart';
 import '../services/supabase_service.dart';
 import '../theme.dart';
+import '../utils/responsive.dart';
 import '../utils/stats_calculator.dart';
 import '../utils/study_day.dart';
 import '../widgets/stats/category_style.dart';
 import '../widgets/stats/daily_goal_sheet.dart';
 import '../widgets/stats/progress_ring.dart';
 import '../widgets/stats/stats_empty_card.dart';
+import '../widgets/stats/stats_layout.dart';
 import '../widgets/stats/stats_load_state.dart';
 import '../widgets/stats/stats_text.dart';
 import 'history_screen.dart';
@@ -267,21 +269,30 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
           body: SafeArea(
             child: Column(
               children: [
-                _buildTabBar(lang),
-                SizedBox(
-                  height: 2,
-                  child: (_isLoading && _hasLoaded)
-                      ? Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24),
-                          child: LinearProgressIndicator(
-                            minHeight: 2,
-                            color: isDark ? AppColors.darkPrimary : AppColors.primary,
-                            backgroundColor: Colors.transparent,
-                          ),
-                        )
-                      : null,
+                // Sekme çubuğu, yükleme çizgisi ve uyarı geniş ekranda pano
+                // genişliğinde ortalanır.
+                ContentWidth(maxWidth: ContentWidth.dashboard, child: _buildTabBar(lang)),
+                ContentWidth(
+                  maxWidth: ContentWidth.dashboard,
+                  child: SizedBox(
+                    height: 2,
+                    child: (_isLoading && _hasLoaded)
+                        ? Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            child: LinearProgressIndicator(
+                              minHeight: 2,
+                              color: isDark ? AppColors.darkPrimary : AppColors.primary,
+                              backgroundColor: Colors.transparent,
+                            ),
+                          )
+                        : null,
+                  ),
                 ),
-                if (_hasLoaded && _loadError != null && !_isLoading) StatsStaleBanner(onRetry: _refresh),
+                if (_hasLoaded && _loadError != null && !_isLoading)
+                  ContentWidth(
+                    maxWidth: ContentWidth.dashboard,
+                    child: StatsStaleBanner(onRetry: _refresh),
+                  ),
                 Expanded(child: _buildTabContent(lang)),
               ],
             ),
@@ -302,7 +313,19 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
     final sessions = [..._remoteSessions, ..._pendingSessions];
     final goalMinutes = _dailyGoalMinutes;
     return switch (_activeTab) {
-      0 => _buildDailyTab(sessions, goalMinutes, lang),
+      0 => DailyReportView(
+          sessions: sessions,
+          today: _today,
+          dailyGoalMinutes: goalMinutes,
+          // Tam boş durum yalnızca hiç çalışmamış kullanıcıya gösterilir.
+          hasHistory: sessions.isNotEmpty || (SupabaseService.instance.currentUser.value?.totalMinutes ?? 0) > 0,
+          categories: widget.categories,
+          onRefresh: _refresh,
+          showDistributionPercent: _showDistributionPercent,
+          onDistributionModeChanged: (percent) => setState(() => _showDistributionPercent = percent),
+          onShowDetails: () => setState(() => _activeTab = 1),
+          onStartTimer: widget.onStartTimer,
+        ),
       1 => HistoryScreen(
           sessions: sessions,
           today: _today,
@@ -322,8 +345,10 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
 
   Widget _buildTabBar(LanguageService lang) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    // Yatay telefonda dikey alan kıt: çubuk daha az yer kaplar.
+    final short = Responsive.of(context).isShortHeight;
     return Container(
-      margin: const EdgeInsets.fromLTRB(24, 12, 24, 8),
+      margin: EdgeInsets.fromLTRB(24, short ? 4 : 12, 24, short ? 4 : 8),
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
@@ -332,29 +357,39 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
           ),
         ),
       ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
-        child: Row(
-          children: [
-            _buildTabItem(
-              label: lang.translate('reports_tab_subject'),
-              isActive: _activeTab == 0,
-              onTap: () => setState(() => _activeTab = 0),
+      // Sekmeler sığıyorsa ortalanır (geniş ekran), sığmıyorsa yatay kaydırılır.
+      child: LayoutBuilder(
+        builder: (context, constraints) => SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minWidth: constraints.maxWidth),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildTabItem(
+                  label: lang.translate('reports_tab_subject'),
+                  isActive: _activeTab == 0,
+                  short: short,
+                  onTap: () => setState(() => _activeTab = 0),
+                ),
+                const SizedBox(width: 24),
+                _buildTabItem(
+                  label: lang.translate('reports_tab_history'),
+                  isActive: _activeTab == 1,
+                  short: short,
+                  onTap: () => setState(() => _activeTab = 1),
+                ),
+                const SizedBox(width: 24),
+                _buildTabItem(
+                  label: lang.translate('reports_tab_monthly'),
+                  isActive: _activeTab == 2,
+                  short: short,
+                  onTap: () => setState(() => _activeTab = 2),
+                ),
+              ],
             ),
-            const SizedBox(width: 24),
-            _buildTabItem(
-              label: lang.translate('reports_tab_history'),
-              isActive: _activeTab == 1,
-              onTap: () => setState(() => _activeTab = 1),
-            ),
-            const SizedBox(width: 24),
-            _buildTabItem(
-              label: lang.translate('reports_tab_monthly'),
-              isActive: _activeTab == 2,
-              onTap: () => setState(() => _activeTab = 2),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -363,6 +398,7 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
   Widget _buildTabItem({
     required String label,
     required bool isActive,
+    required bool short,
     required VoidCallback onTap,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -373,7 +409,7 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.only(bottom: 12),
+          padding: EdgeInsets.only(bottom: short ? 8 : 12),
           decoration: BoxDecoration(
             border: Border(
               bottom: BorderSide(
@@ -396,71 +432,150 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
       ),
     );
   }
+}
 
-  Widget _buildDailyTab(List<StatSession> sessions, int goalMinutes, LanguageService lang) {
-    final todaySessions = sessionsBetween(sessions, _today, _today).toList();
-    final user = SupabaseService.instance.currentUser.value;
-    // Tam boş durum yalnızca hiç çalışmamış kullanıcıya gösterilir.
-    final hasHistory = sessions.isNotEmpty || (user?.totalMinutes ?? 0) > 0;
-    if (!hasHistory) return _buildFirstRunState(lang);
+/// Raporlar > Günlük Çalışma. Veriler [ReportsScreen]'den gelir; ekran
+/// Supabase'e doğrudan bağlı değildir (yalnızca hedef sayfası kaydederken).
+///
+/// Düzen: dikey telefonda tek sütun (ders kartları 2'li). Orta genişlikte
+/// özet kartları 2'li, ders kartları 4'lü; geniş ekranda özet kartları 3'lü,
+/// ders kartları ile dağılım grafiği yan yana.
+class DailyReportView extends StatelessWidget {
+  const DailyReportView({
+    super.key,
+    required this.sessions,
+    required this.today,
+    required this.dailyGoalMinutes,
+    required this.hasHistory,
+    required this.categories,
+    required this.onRefresh,
+    required this.showDistributionPercent,
+    required this.onDistributionModeChanged,
+    this.onShowDetails,
+    this.onStartTimer,
+  });
 
-    final categories = totalsByCategory(todaySessions);
+  final List<StatSession> sessions;
+
+  /// Bugünün çalışma günü (04:00 kuralı).
+  final DateTime today;
+  final int dailyGoalMinutes;
+
+  /// false ise kullanıcı hiç çalışmamıştır: ilk kullanım durumu gösterilir.
+  final bool hasHistory;
+  final List<CourseCategory> categories;
+  final Future<void> Function() onRefresh;
+
+  /// Dağılım lejantı yüzde mi (true) süre mi (false) gösteriyor.
+  final bool showDistributionPercent;
+  final ValueChanged<bool> onDistributionModeChanged;
+  final VoidCallback? onShowDetails;
+  final VoidCallback? onStartTimer;
+
+  @override
+  Widget build(BuildContext context) {
+    final lang = LanguageService.instance;
+    if (!hasHistory) return _buildFirstRunState(context, lang);
+
+    final todaySessions = sessionsBetween(sessions, today, today).toList();
+    final categoryStats = totalsByCategory(todaySessions);
     final todayMinutes = sumMinutes(todaySessions);
     final todayPomodoros = todaySessions.fold<int>(0, (sum, s) => sum + s.pomodoros);
     final pendingToday = todaySessions.where((s) => s.pending).length;
     final l10n = AppLocalizations.of(context)!;
 
     return RefreshIndicator(
-      onRefresh: _refresh,
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 0. Günlük Hedef
-            _buildDailyGoalCard(todayMinutes, todayPomodoros, goalMinutes, pendingToday),
-            const SizedBox(height: 16),
+      onRefresh: onRefresh,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final layout = StatsLayout.of(context, constraints.maxWidth);
 
-            // 1. Verimlilik Skoru
-            _buildEfficiencyCard(goalPercent(todayMinutes, goalMinutes)),
-            const SizedBox(height: 24),
+          // 0. Günlük Hedef  1. Verimlilik Skoru  4. Verimlilik İpucu
+          final goalCard = _buildDailyGoalCard(context, todayMinutes, todayPomodoros, pendingToday);
+          final efficiencyCard = _buildEfficiencyCard(context, goalPercent(todayMinutes, dailyGoalMinutes));
+          final tip = _buildEfficiencyTip(context);
+          // Geniş ekranda ipucu da özet satırına katılır (3 sütun).
+          final tipInSummary = layout.isExpanded;
 
-            // 2. Bugünkü Çalışmalar
-            _buildTodayHeader(lang),
-            const SizedBox(height: 12),
-            if (categories.isEmpty)
-              StatsEmptyCard(
-                icon: Icons.wb_sunny_outlined,
-                title: l10n.statsNoStudyTodayTitle,
-                description: l10n.statsNoStudyTodayDesc,
-                actionLabel: lang.translate('start_studying_now'),
-                onAction: widget.onStartTimer,
-              )
-            else ...[
-              _buildSubjectGrid(categories),
+          // 2-3. Bugünkü çalışmalar ve dağılım
+          final Widget todayContent;
+          if (categoryStats.isEmpty) {
+            todayContent = StatsEmptyCard(
+              icon: Icons.wb_sunny_outlined,
+              title: l10n.statsNoStudyTodayTitle,
+              description: l10n.statsNoStudyTodayDesc,
+              actionLabel: lang.translate('start_studying_now'),
+              onAction: onStartTimer,
+            );
+          } else if (layout.isExpanded) {
+            // Ders kartları (2x2) ile dağılım grafiği yan yana, eşit yükseklikte.
+            todayContent = StatsGrid(
+              columns: 2,
+              children: [
+                _buildSubjectGrid(
+                  context,
+                  categoryStats,
+                  columns: 2,
+                  width: statsCellWidth(layout.contentWidth, 2, 16),
+                  keepAspect: false,
+                ),
+                _buildTodayDistribution(context, categoryStats, todayMinutes),
+              ],
+            );
+          } else {
+            todayContent = Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSubjectGrid(
+                  context,
+                  categoryStats,
+                  columns: layout.columns(compact: 2, medium: 4, expanded: 4),
+                  width: layout.contentWidth,
+                  keepAspect: !layout.isWide,
+                ),
+                const SizedBox(height: 24),
+                _buildTodayDistribution(context, categoryStats, todayMinutes),
+              ],
+            );
+          }
+
+          return StatsScrollView(
+            layout: layout,
+            maxWidth: ContentWidth.dashboard,
+            children: [
+              if (layout.isWide)
+                StatsGrid(
+                  columns: tipInSummary ? 3 : 2,
+                  children: [goalCard, efficiencyCard, if (tipInSummary) tip],
+                )
+              else ...[
+                goalCard,
+                const SizedBox(height: 16),
+                efficiencyCard,
+              ],
               const SizedBox(height: 24),
-
-              // 3. Bugünün Dağılımı (Donut)
-              _buildTodayDistribution(categories, todayMinutes),
+              _buildTodayHeader(context, lang),
+              const SizedBox(height: 12),
+              todayContent,
+              if (!tipInSummary) ...[
+                const SizedBox(height: 24),
+                tip,
+              ],
+              const SizedBox(height: 24),
             ],
-            const SizedBox(height: 24),
-
-            // 4. Verimlilik İpucu
-            _buildEfficiencyTip(),
-            const SizedBox(height: 24),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
 
   // ─── 0. GÜNLÜK HEDEF KARTI ───
-  Widget _buildDailyGoalCard(int todayMinutes, int todayPomodoros, int goalMinutes, int pendingToday) {
+  Widget _buildDailyGoalCard(BuildContext context, int todayMinutes, int todayPomodoros, int pendingToday) {
     final lang = LanguageService.instance;
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final variant = isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant;
+    final goalMinutes = dailyGoalMinutes;
 
     return MergeSemantics(
       child: Semantics(
@@ -501,12 +616,18 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
                           backgroundColor: (isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant).withValues(alpha: 0.3),
                           valueColor: AlwaysStoppedAnimation<Color>(isDark ? AppColors.darkPrimary : AppColors.primary),
                         ),
-                        Text(
-                          '$todayPomodoros',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                        Padding(
+                          padding: const EdgeInsets.all(6),
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              '$todayPomodoros',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -516,6 +637,7 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
@@ -571,7 +693,7 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
   }
 
   // ─── 1. VERİMLİLİK SKORU KARTI ───
-  Widget _buildEfficiencyCard(int score) {
+  Widget _buildEfficiencyCard(BuildContext context, int score) {
     final lang = LanguageService.instance;
     return Container(
       width: double.infinity,
@@ -592,6 +714,7 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
         children: [
           Expanded(
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
@@ -604,28 +727,33 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
                   ),
                 ),
                 const SizedBox(height: 8),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      StatsText.percent(context, score),
-                      style: const TextStyle(
-                        fontSize: 40,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                        height: 1,
+                // Dar kartta ya da büyük yazı boyutunda sığmazsa küçülür.
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        StatsText.percent(context, score),
+                        style: const TextStyle(
+                          fontSize: 40,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          height: 1,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 6),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 6),
-                      child: Icon(
-                        score >= 50 ? Icons.trending_up_rounded : Icons.trending_down_rounded,
-                        color: Colors.white,
-                        size: 22,
+                      const SizedBox(width: 6),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: Icon(
+                          score >= 50 ? Icons.trending_up_rounded : Icons.trending_down_rounded,
+                          color: Colors.white,
+                          size: 22,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Text(
@@ -671,23 +799,26 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
   }
 
   // ─── 2. BUGÜNKÜ ÇALIŞMALAR BAŞLIĞI ───
-  Widget _buildTodayHeader(LanguageService lang) {
+  Widget _buildTodayHeader(BuildContext context, LanguageService lang) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          lang.translate('today_studies_header'),
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+        Expanded(
+          child: Text(
+            lang.translate('today_studies_header'),
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+            ),
           ),
         ),
+        const SizedBox(width: 12),
         Semantics(
           button: true,
           child: GestureDetector(
-            onTap: () => setState(() => _activeTab = 1),
+            onTap: onShowDetails,
             child: Text(
               lang.translate('details_link'),
               style: TextStyle(
@@ -706,95 +837,104 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
         name: cat.name,
         categoryId: cat.categoryId,
         colorHex: cat.colorHex,
-        categories: widget.categories,
+        categories: categories,
       );
 
   // ─── 2b. DERS KARTLARI ───
-  Widget _buildSubjectGrid(List<CategoryStat> categories) {
+  // [width] ızgaranın genişliği. Telefonda ([keepAspect]) kartlar bugünkü
+  // gibi 3:2; geniş ekranda gereksiz uzamaz. Büyük yazı boyutunda kartlar
+  // birlikte uzar.
+  Widget _buildSubjectGrid(
+    BuildContext context,
+    List<CategoryStat> categoryStats, {
+    required int columns,
+    required double width,
+    required bool keepAspect,
+  }) {
+    const spacing = 12.0;
+    final displayCats = categoryStats.take(4).toList(); // En fazla 4 ders
+    final cellWidth = statsCellWidth(width, columns, spacing);
+    final minHeight = keepAspect ? cellWidth / 1.5 : min(cellWidth / 1.5, 110.0);
+
+    return StatsGrid(
+      columns: columns,
+      spacing: spacing,
+      runSpacing: spacing,
+      children: [for (final cat in displayCats) _buildSubjectCard(context, cat, minHeight)],
+    );
+  }
+
+  Widget _buildSubjectCard(BuildContext context, CategoryStat cat, double minHeight) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final displayCats = categories.take(4).toList(); // En fazla 4 ders
+    final style = _styleOf(cat);
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 1.5,
-      ),
-      itemCount: displayCats.length,
-      itemBuilder: (context, index) {
-        final cat = displayCats[index];
-        final style = _styleOf(cat);
-
-        return MergeSemantics(
-          child: Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return MergeSemantics(
+      child: Container(
+        constraints: BoxConstraints(minHeight: minHeight),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
               children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: style.color.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(style.icon, size: 18, color: style.color),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        StatsText.categoryName(context, cat.name),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
-                        ),
-                      ),
-                    ),
-                    if (cat.pendingSessions > 0)
-                      Icon(
-                        Icons.cloud_upload_outlined,
-                        size: 16,
-                        color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
-                        semanticLabel: AppLocalizations.of(context)!.statsPendingSessions(cat.pendingSessions),
-                      ),
-                  ],
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: style.color.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(style.icon, size: 18, color: style.color),
                 ),
-                Text(
-                  StatsText.duration(cat.minutes),
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
-                    color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
-                    height: 1.2,
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    StatsText.categoryName(context, cat.name),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                    ),
                   ),
                 ),
+                if (cat.pendingSessions > 0)
+                  Icon(
+                    Icons.cloud_upload_outlined,
+                    size: 16,
+                    color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                    semanticLabel: AppLocalizations.of(context)!.statsPendingSessions(cat.pendingSessions),
+                  ),
               ],
             ),
-          ),
-        );
-      },
+            const SizedBox(height: 8),
+            Text(
+              StatsText.duration(cat.minutes),
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
+                color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                height: 1.2,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
   // ─── 3. BUGÜNÜN DAĞILIMI (DONUT) ───
-  Widget _buildTodayDistribution(List<CategoryStat> categories, int totalMinutes) {
+  Widget _buildTodayDistribution(BuildContext context, List<CategoryStat> categoryStats, int totalMinutes) {
     final lang = LanguageService.instance;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final segments = categories
+    final segments = categoryStats
         .map((cat) => _DonutSegment(
               label: StatsText.categoryName(context, cat.name),
               minutes: cat.minutes,
@@ -802,7 +942,7 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
               color: _styleOf(cat).color,
             ))
         .toList();
-    String valueOf(_DonutSegment seg) => _showDistributionPercent
+    String valueOf(_DonutSegment seg) => showDistributionPercent
         ? StatsText.percent(context, (seg.percentage * 100).round())
         : StatsText.duration(seg.minutes);
     final title = lang.translate('weekly_dist_title');
@@ -853,7 +993,7 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
                   ],
                 ),
               ),
-              _buildDistributionToggle(),
+              _buildDistributionToggle(context),
             ],
           ),
           const SizedBox(height: 20),
@@ -870,27 +1010,34 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
                       segments: segments,
                       emptyColor: isDark ? AppColors.darkSurfaceContainerHighest : AppColors.surfaceContainerHighest,
                     ),
-                    child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            lang.translate('total_label'),
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
-                            ),
+                    // Halkanın içine sığmazsa (büyük yazı boyutu) küçülür.
+                    child: Padding(
+                      padding: const EdgeInsets.all(18),
+                      child: Center(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                lang.translate('total_label'),
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                                ),
+                              ),
+                              Text(
+                                StatsText.duration(totalMinutes),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
                           ),
-                          Text(
-                            StatsText.duration(totalMinutes),
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
@@ -923,12 +1070,20 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
                               ),
                             ),
                             const SizedBox(width: 8),
-                            Text(
-                              valueOf(seg),
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                            // Dar kartta ya da büyük yazı boyutunda değer küçülür.
+                            ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 100),
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerRight,
+                                child: Text(
+                                  valueOf(seg),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                                  ),
+                                ),
                               ),
                             ),
                           ],
@@ -946,20 +1101,20 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
   }
 
   // Lejantı süre ya da yüzde olarak gösterir.
-  Widget _buildDistributionToggle() {
+  Widget _buildDistributionToggle(BuildContext context) {
     final lang = LanguageService.instance;
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     Widget option({required String text, required String semanticLabel, required bool percent}) {
-      final selected = _showDistributionPercent == percent;
+      final selected = showDistributionPercent == percent;
       return Semantics(
         button: true,
         selected: selected,
         label: semanticLabel,
         excludeSemantics: true,
         child: GestureDetector(
-          onTap: () => setState(() => _showDistributionPercent = percent),
+          onTap: () => onDistributionModeChanged(percent),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: selected
@@ -1001,7 +1156,7 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
   }
 
   // ─── 4. VERİMLİLİK İPUCU ───
-  Widget _buildEfficiencyTip() {
+  Widget _buildEfficiencyTip(BuildContext context) {
     final lang = LanguageService.instance;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final tips = [
@@ -1010,7 +1165,7 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
       lang.translate('tip_3'),
       lang.translate('tip_4'),
     ];
-    final tip = tips[_today.day % tips.length];
+    final tip = tips[today.day % tips.length];
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -1040,6 +1195,7 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
           const SizedBox(width: 16),
           Expanded(
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
@@ -1069,69 +1225,74 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
   }
 
   // ─── İLK KULLANIM (hiç seans yok) ───
-  Widget _buildFirstRunState(LanguageService lang) {
+  Widget _buildFirstRunState(BuildContext context, LanguageService lang) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 90,
-              height: 90,
-              decoration: BoxDecoration(
-                color: AppColors.primaryContainer.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.analytics_outlined,
-                size: 48,
-                color: isDark ? AppColors.darkPrimary : AppColors.primaryContainer,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              lang.translate('no_reports_title'),
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              lang.translate('no_reports_desc'),
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: 28),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton.icon(
-                onPressed: widget.onStartTimer,
-                icon: const Icon(Icons.play_arrow_rounded, size: 22),
-                label: Text(
-                  lang.translate('start_studying_now'),
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        // Geniş ekranda düğme ve metin form genişliğinde ortalanır.
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: ContentWidth.form),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 90,
+                height: 90,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryContainer.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
                 ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF5C4D),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+                child: Icon(
+                  Icons.analytics_outlined,
+                  size: 48,
+                  color: isDark ? AppColors.darkPrimary : AppColors.primaryContainer,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                lang.translate('no_reports_title'),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                lang.translate('no_reports_desc'),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 28),
+              // En az 50 px; büyük yazı boyutunda düğme birlikte uzar.
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: onStartTimer,
+                  icon: const Icon(Icons.play_arrow_rounded, size: 22),
+                  label: Text(
+                    lang.translate('start_studying_now'),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                  elevation: 0,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFF5C4D),
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size.fromHeight(50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    elevation: 0,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

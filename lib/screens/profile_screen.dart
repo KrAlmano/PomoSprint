@@ -10,6 +10,7 @@ import '../models/user_model.dart';
 import '../widgets/avatar_widget.dart';
 import '../widgets/social/social_error_text.dart';
 import '../theme.dart';
+import '../utils/responsive.dart';
 import '../services/supabase_service.dart';
 import '../services/language_service.dart';
 import '../services/notification_service.dart';
@@ -243,149 +244,159 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ],
           ),
-          body: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: Column(
-              children: [
-                _buildHeader(lang, l10n, isDark, muted),
-                const SizedBox(height: 20),
-
-                // Kategori yönetimi: değişiklikler servisteki categoriesRevision
-                // ile ana ekrana yansır; dönüşte ayrıca bir şey yapılmaz.
-                _buildSectionCard(
-                  title: lang.translate('categories_section_title'),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: Text(
-                        lang.translate('manage_categories_tile_title'),
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
-                        ),
-                      ),
-                      subtitle: Text(
-                        lang.translate('manage_categories_tile_sub'),
-                        style: TextStyle(fontSize: 13, color: muted),
-                      ),
-                      trailing: Icon(Icons.chevron_right, color: muted),
-                      onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                        builder: (_) => CategoriesManagementScreen(isPremium: user?.isPremium ?? false),
-                      )),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                _buildProfileForm(lang, l10n, isDark, muted),
-                const SizedBox(height: 20),
-
-                // Language Selection Card with Flags 🇹🇷 / 🇬🇧
-                _buildSectionCard(
-                  title: lang.translate('app_language').toUpperCase(),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: _buildLanguageTile(
-                          flag: '🇹🇷',
-                          label: 'Türkçe',
-                          isSelected: lang.isTurkish,
-                          onTap: () => lang.setLanguage(AppLanguage.tr),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildLanguageTile(
-                          flag: '🇬🇧',
-                          label: 'English',
-                          isSelected: !lang.isTurkish,
-                          onTap: () => lang.setLanguage(AppLanguage.en),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-                _buildPreferences(lang, isDark, muted),
-                const SizedBox(height: 20),
-
-                // Yasal metinler: İngilizce arayüzde /en/ sürümleri açılır.
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+          // Yatay telefonda çentik tarafındaki içerik kenar boşluğuyla
+          // korunur; tablette kartlar okunabilir genişlikte ortalanır.
+          body: SafeArea(
+            top: false,
+            bottom: false,
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              child: ContentWidth(
+                child: Column(
                   children: [
-                    TextButton(
-                      onPressed: () => _openLegalUrl('privacy'),
-                      child: Text(
-                        lang.translate('privacy_policy'),
-                        style: TextStyle(fontSize: 12, color: muted, decoration: TextDecoration.underline),
+                    _buildHeader(lang, l10n, isDark, muted),
+                    const SizedBox(height: 20),
+
+                    // Kategori yönetimi: değişiklikler servisteki categoriesRevision
+                    // ile ana ekrana yansır; dönüşte ayrıca bir şey yapılmaz.
+                    _buildSectionCard(
+                      title: lang.translate('categories_section_title'),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          title: Text(
+                            lang.translate('manage_categories_tile_title'),
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                            ),
+                          ),
+                          subtitle: Text(
+                            lang.translate('manage_categories_tile_sub'),
+                            style: TextStyle(fontSize: 13, color: muted),
+                          ),
+                          trailing: Icon(Icons.chevron_right, color: muted),
+                          onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                            builder: (_) => CategoriesManagementScreen(isPremium: user?.isPremium ?? false),
+                          )),
+                        ),
                       ),
                     ),
-                    Text('·', style: TextStyle(color: muted)),
-                    TextButton(
-                      onPressed: () => _openLegalUrl('terms'),
-                      child: Text(
-                        lang.translate('terms_of_service'),
-                        style: TextStyle(fontSize: 12, color: muted, decoration: TextDecoration.underline),
+                    const SizedBox(height: 20),
+                    _buildProfileForm(lang, l10n, isDark, muted),
+                    const SizedBox(height: 20),
+
+                    // Language Selection Card with Flags 🇹🇷 / 🇬🇧
+                    _buildSectionCard(
+                      title: lang.translate('app_language').toUpperCase(),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: _buildLanguageTile(
+                              flag: '🇹🇷',
+                              label: 'Türkçe',
+                              isSelected: lang.isTurkish,
+                              onTap: () => lang.setLanguage(AppLanguage.tr),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildLanguageTile(
+                              flag: '🇬🇧',
+                              label: 'English',
+                              isSelected: !lang.isTurkish,
+                              onTap: () => lang.setLanguage(AppLanguage.en),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
+
+                    const SizedBox(height: 20),
+                    _buildPreferences(lang, isDark, muted),
+                    const SizedBox(height: 20),
+
+                    // Yasal metinler: İngilizce arayüzde /en/ sürümleri açılır.
+                    // Büyük metin ölçeğinde bağlantılar alt satıra geçer.
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        TextButton(
+                          onPressed: () => _openLegalUrl('privacy'),
+                          child: Text(
+                            lang.translate('privacy_policy'),
+                            style: TextStyle(fontSize: 12, color: muted, decoration: TextDecoration.underline),
+                          ),
+                        ),
+                        Text('·', style: TextStyle(color: muted)),
+                        TextButton(
+                          onPressed: () => _openLegalUrl('terms'),
+                          child: Text(
+                            lang.translate('terms_of_service'),
+                            style: TextStyle(fontSize: 12, color: muted, decoration: TextDecoration.underline),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 4),
+
+                    SizedBox(
+                      width: double.infinity,
+                      child: TextButton.icon(
+                        onPressed: _isDeleting
+                            ? null
+                            : () {
+                                Navigator.pop(context);
+                                widget.onLogout();
+                              },
+                        icon: const Icon(Icons.logout, color: AppColors.primary),
+                        label: Text(
+                          lang.translate('logout'),
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: _isDeleting ? null : _confirmDeleteAccount,
+                        icon: const Icon(Icons.delete_forever_rounded, color: Colors.red),
+                        label: Text(
+                          l10n.deleteAccount,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red,
+                          ),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          side: const BorderSide(color: Colors.red, width: 1.5),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 32),
                   ],
                 ),
-
-                const SizedBox(height: 4),
-
-                SizedBox(
-                  width: double.infinity,
-                  child: TextButton.icon(
-                    onPressed: _isDeleting
-                        ? null
-                        : () {
-                            Navigator.pop(context);
-                            widget.onLogout();
-                          },
-                    icon: const Icon(Icons.logout, color: AppColors.primary),
-                    label: Text(
-                      lang.translate('logout'),
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 12),
-
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: _isDeleting ? null : _confirmDeleteAccount,
-                    icon: const Icon(Icons.delete_forever_rounded, color: Colors.red),
-                    label: Text(
-                      l10n.deleteAccount,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red,
-                      ),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      side: const BorderSide(color: Colors.red, width: 1.5),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 32),
-              ],
+              ),
             ),
           ),
         );
@@ -482,9 +493,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                lang.translate('name_surname'),
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: muted),
+              Flexible(
+                child: Text(
+                  lang.translate('name_surname'),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: muted),
+                ),
               ),
               IconButton(
                 onPressed: _isSavingName ? null : _toggleNameEditing,
@@ -549,9 +562,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                lang.translate('email'),
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: muted),
+              Flexible(
+                child: Text(
+                  lang.translate('email'),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: muted),
+                ),
               ),
               Icon(Icons.lock_outline, size: 16, color: muted),
             ],
@@ -651,26 +666,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
             width: isSelected ? 2.0 : 1.0,
           ),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(flag, style: const TextStyle(fontSize: 22)),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                color: isSelected
-                    ? AppColors.onPrimaryContainer
-                    : (isDark ? AppColors.darkOnSurface : AppColors.onSurface),
+        // Büyük metin ölçeğinde ya da dar karoda içerik tek satırda küçülür.
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(flag, style: const TextStyle(fontSize: 22)),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                  color: isSelected
+                      ? AppColors.onPrimaryContainer
+                      : (isDark ? AppColors.darkOnSurface : AppColors.onSurface),
+                ),
               ),
-            ),
-            if (isSelected) ...[
-              const SizedBox(width: 6),
-              const Icon(Icons.check_circle, size: 18, color: AppColors.primary),
+              if (isSelected) ...[
+                const SizedBox(width: 6),
+                const Icon(Icons.check_circle, size: 18, color: AppColors.primary),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -695,6 +714,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
+        // Kısa ekranda (yatay telefon) başlık ve metin kaydırılır; tablette
+        // diyalog uzun metinle ekran boyunca genişlemez.
+        scrollable: true,
+        constraints: const BoxConstraints(minWidth: 280, maxWidth: ContentWidth.form),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [

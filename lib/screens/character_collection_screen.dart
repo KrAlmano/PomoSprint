@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
@@ -8,6 +9,7 @@ import '../widgets/avatar_widget.dart';
 import '../widgets/social/social_error_text.dart';
 import '../services/supabase_service.dart';
 import '../theme.dart';
+import '../utils/responsive.dart';
 
 /// Avatar koleksiyonu: sahip olunan avatar kuşanılır, sahip olunmayan
 /// satın alınır (bakiyenin yetmesi sahiplik sayılmaz). Satın alma ve kuşanma
@@ -33,6 +35,15 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
       AvatarCharacter.allAvatars().where((a) => a.isLeagueAward).toList();
   bool _isSaving = false;
   String? _purchasingId;
+
+  // Izgara ~120 px hücrelerle kurulur: dikey telefonda bugünkü gibi 3 sütun,
+  // yatay telefonda ve tablette genişliğe göre daha fazla sütun.
+  static const double _maxTileExtent = 120;
+  static const double _tileSpacing = 12;
+  static const double _tileAspectRatio = 0.82;
+
+  // Diyaloglar tablette ekran boyunca genişlemez (Material 3 en dar 280).
+  static const BoxConstraints _dialogConstraints = BoxConstraints(minWidth: 280, maxWidth: ContentWidth.form);
 
   @override
   void initState() {
@@ -105,10 +116,15 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
     final premiumUnlock = avatar.canUnlockWithPremium(widget.user.isPremium);
     final affordable = premiumUnlock || avatar.canAfford(_coins);
     final textColor = isDark ? Colors.white70 : Colors.black87;
+    final shortHeight = Responsive.of(context).isShortHeight;
 
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
+        // Kısa ekranda (yatay telefon) içerik kaydırılır; tablette diyalog
+        // uzun metinle ekran boyunca genişlemez.
+        scrollable: true,
+        constraints: _dialogConstraints,
         backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         title: Text(
           premiumUnlock ? l10n.avatarPremiumTitle : l10n.avatarPurchaseTitle,
@@ -117,7 +133,7 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _dialogAvatar(avatar),
+            _dialogAvatar(avatar, small: shortHeight),
             const SizedBox(height: 16),
             Text(
               premiumUnlock
@@ -210,15 +226,18 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
   Future<void> _showInfoDialog(AvatarCharacter avatar, String title, String body) {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final shortHeight = Responsive.of(context).isShortHeight;
     return showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
+        scrollable: true,
+        constraints: _dialogConstraints,
         backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         title: Text(title, style: TextStyle(color: isDark ? Colors.white : Colors.black)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _dialogAvatar(avatar),
+            _dialogAvatar(avatar, small: shortHeight),
             const SizedBox(height: 16),
             Text(
               body,
@@ -238,11 +257,29 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
     );
   }
 
-  Widget _dialogAvatar(AvatarCharacter avatar) {
+  // Yatay telefonda diyalog avatarı küçülür; metin ve eylemlere yer kalır.
+  Widget _dialogAvatar(AvatarCharacter avatar, {bool small = false}) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(small ? 8 : 12),
       decoration: BoxDecoration(color: avatar.backgroundColor, shape: BoxShape.circle),
-      child: AvatarWidget(avatar: avatar, size: 88),
+      child: AvatarWidget(avatar: avatar, size: small ? 56 : 88),
+    );
+  }
+
+  /// [width] genişliğindeki ızgara için ~[_maxTileExtent] px hücreli düzen
+  /// (SliverGridDelegateWithMaxCrossAxisExtent ile aynı sütun hesabı).
+  /// Hücre yüksekliği en-boy oranından gelir; büyük metin ölçeğinde iki
+  /// satırlık ismin sığacağı yüksekliğin altına inmez.
+  SliverGridDelegate _gridDelegate(double width, TextScaler textScaler) {
+    final count = math.max(1, (width / (_maxTileExtent + _tileSpacing)).ceil());
+    final tileWidth = (width - _tileSpacing * (count - 1)) / count;
+    // Kart: 8 px kenar + 54 px avatar + 6 px boşluk + iki satır isim + pay.
+    final contentHeight = 2 * 8 + 54 + 6 + 2 * textScaler.scale(12) * 1.15 + 12;
+    return SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: count,
+      crossAxisSpacing: _tileSpacing,
+      mainAxisSpacing: _tileSpacing,
+      mainAxisExtent: math.max(tileWidth / _tileAspectRatio, contentHeight),
     );
   }
 
@@ -252,12 +289,8 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final onSurface = isDark ? AppColors.darkOnSurface : AppColors.onSurface;
     final muted = isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant;
-    const gridDelegate = SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 3,
-      crossAxisSpacing: 12,
-      mainAxisSpacing: 12,
-      childAspectRatio: 0.82,
-    );
+    final shortHeight = Responsive.of(context).isShortHeight;
+    final textScaler = MediaQuery.textScalerOf(context);
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
@@ -297,109 +330,141 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: Text(
-              l10n.selectCharacterSub,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, color: muted, height: 1.5),
-            ),
-          ),
-          Expanded(
-            child: CustomScrollView(
-              physics: const BouncingScrollPhysics(),
-              slivers: [
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  sliver: SliverGrid.builder(
-                    gridDelegate: gridDelegate,
-                    itemCount: _shopAvatars.length,
-                    itemBuilder: (context, index) => _buildAvatarCard(_shopAvatars[index]),
-                  ),
+      // Yatay telefonda çentik tarafı korunur; tablette ızgara pano
+      // genişliğinde ortalanır ve sütun sayısı genişliğe göre artar.
+      body: SafeArea(
+        top: false,
+        bottom: false,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final side = math.max(24.0, (constraints.maxWidth - ContentWidth.dashboard) / 2);
+            final gridDelegate = _gridDelegate(constraints.maxWidth - 2 * side, textScaler);
+            final subtitle = ContentWidth(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                child: Text(
+                  l10n.selectCharacterSub,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, color: muted, height: 1.5),
                 ),
-                if (_leagueAwards.isNotEmpty) ...[
-                  SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(24, 28, 24, 4),
-                    sliver: SliverToBoxAdapter(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Icon(Icons.emoji_events_rounded, color: AppColors.primary, size: 22),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Column(
+              ),
+            );
+            return Column(
+              children: [
+                // Kısa ekranda açıklama ızgarayla birlikte kayar; sabit
+                // kalınca ızgaraya birkaç satır kalıyordu.
+                if (!shortHeight) subtitle,
+                Expanded(
+                  child: CustomScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    slivers: [
+                      if (shortHeight) SliverToBoxAdapter(child: subtitle),
+                      SliverPadding(
+                        padding: EdgeInsets.symmetric(horizontal: side),
+                        sliver: SliverGrid.builder(
+                          gridDelegate: gridDelegate,
+                          itemCount: _shopAvatars.length,
+                          itemBuilder: (context, index) => _buildAvatarCard(_shopAvatars[index]),
+                        ),
+                      ),
+                      if (_leagueAwards.isNotEmpty) ...[
+                        SliverPadding(
+                          padding: EdgeInsets.fromLTRB(side, 28, side, 4),
+                          sliver: SliverToBoxAdapter(
+                            child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  l10n.leagueAwardsTitle,
-                                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: onSurface),
+                                const Icon(Icons.emoji_events_rounded, color: AppColors.primary, size: 22),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        l10n.leagueAwardsTitle,
+                                        style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: onSurface),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(l10n.leagueAwardsSub, style: TextStyle(fontSize: 12, color: muted)),
+                                    ],
+                                  ),
                                 ),
-                                const SizedBox(height: 2),
-                                Text(l10n.leagueAwardsSub, style: TextStyle(fontSize: 12, color: muted)),
                               ],
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
-                    sliver: SliverGrid.builder(
-                      gridDelegate: gridDelegate,
-                      itemCount: _leagueAwards.length,
-                      itemBuilder: (context, index) => _buildAvatarCard(_leagueAwards[index]),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
-            decoration: BoxDecoration(
-              color: isDark ? AppColors.darkSurface : AppColors.surface,
-              border: Border(
-                top: BorderSide(
-                  color: isDark ? AppColors.darkSurfaceContainerHighest : AppColors.surfaceContainerHighest,
-                  width: 1,
-                ),
-              ),
-            ),
-            child: SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton(
-                onPressed: _isSaving || _purchasingId != null ? null : _confirmSelection,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: AppColors.onPrimary,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-                  elevation: 0,
-                ),
-                child: _isSaving
-                    ? const SizedBox(
-                        width: 22,
-                        height: 22,
-                        child: CircularProgressIndicator(strokeWidth: 2.5, color: AppColors.onPrimary),
-                      )
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            l10n.confirmSelection,
-                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                        ),
+                        SliverPadding(
+                          padding: EdgeInsets.fromLTRB(side, 8, side, 24),
+                          sliver: SliverGrid.builder(
+                            gridDelegate: gridDelegate,
+                            itemCount: _leagueAwards.length,
+                            itemBuilder: (context, index) => _buildAvatarCard(_leagueAwards[index]),
                           ),
-                          const SizedBox(width: 8),
-                          const Icon(Icons.arrow_forward, size: 18),
-                        ],
-                      ),
-              ),
-            ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                _buildConfirmBar(l10n, isDark, shortHeight),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  // Alt onay çubuğu. Tablette düğme form genişliğinde ortalanır; yatay
+  // telefonda daha ince tutulur (ızgaraya yer kalır).
+  Widget _buildConfirmBar(AppLocalizations l10n, bool isDark, bool shortHeight) {
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
+    return Container(
+      padding: EdgeInsets.fromLTRB(24, shortHeight ? 8 : 16, 24, shortHeight ? math.max(8.0, bottomInset) : 32),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurface : AppColors.surface,
+        border: Border(
+          top: BorderSide(
+            color: isDark ? AppColors.darkSurfaceContainerHighest : AppColors.surfaceContainerHighest,
+            width: 1,
           ),
-        ],
+        ),
+      ),
+      child: ContentWidth(
+        maxWidth: ContentWidth.form,
+        child: SizedBox(
+          width: double.infinity,
+          height: shortHeight ? 48 : 56,
+          child: ElevatedButton(
+            onPressed: _isSaving || _purchasingId != null ? null : _confirmSelection,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: AppColors.onPrimary,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+              elevation: 0,
+            ),
+            child: _isSaving
+                ? const SizedBox(
+                    width: 22,
+                    height: 22,
+                    child: CircularProgressIndicator(strokeWidth: 2.5, color: AppColors.onPrimary),
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          l10n.confirmSelection,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.arrow_forward, size: 18),
+                    ],
+                  ),
+          ),
+        ),
       ),
     );
   }

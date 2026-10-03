@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import '../l10n/app_localizations.dart';
@@ -5,6 +7,7 @@ import '../models/category_model.dart';
 import '../theme.dart';
 import '../services/language_service.dart';
 import '../services/supabase_service.dart';
+import '../utils/responsive.dart';
 import '../widgets/auth/category_name_dialog.dart';
 
 class PostAuthOnboardingScreen extends StatefulWidget {
@@ -184,6 +187,8 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
+        scrollable: true,
+        constraints: const BoxConstraints(minWidth: 280, maxWidth: 440),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(l10n.deleteAccount, style: const TextStyle(fontWeight: FontWeight.bold)),
         content: Text(l10n.profileDeleteConfirm, style: const TextStyle(fontSize: 14, height: 1.4)),
@@ -258,6 +263,10 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? AppColors.darkOnSurface : AppColors.onSurface;
     final l10n = AppLocalizations.of(context)!;
+    // Yatay telefonda adımlar iki sütuna bölünür (solda maskot ve başlık,
+    // sağda seçim); dikeyde bugünkü tek sütun korunur.
+    final r = Responsive.of(context);
+    final sideBySide = r.isShortHeight && r.isLandscape;
 
     // Android geri tuşu önce önceki adıma döner; ilk adımda uygulamayı kapatır.
     return PopScope(
@@ -268,86 +277,125 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
       child: Scaffold(
         backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
         body: SafeArea(
-          child: Column(
-            children: [
-              // Progress bar
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: Row(
-                  children: [
-                    if (_currentPage > 0)
-                      IconButton(
-                        icon: Icon(Icons.arrow_back, color: textColor),
-                        onPressed: _isSaving ? null : _prevPage,
-                      )
-                    else
-                      // Yanlış hesapla giren kullanıcı onboarding'i bitirmeden çıkabilir.
-                      IconButton(
-                        icon: Icon(Icons.logout, color: textColor),
-                        tooltip: l10n.logout,
-                        onPressed: _isSaving ? null : () => _signOut(),
-                      ),
-                    Expanded(
-                      child: LinearProgressIndicator(
-                        value: (_currentPage + 1) / _totalSteps,
-                        backgroundColor: isDark ? Colors.grey[800] : Colors.grey[300],
-                        valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 48,
-                      child: Text(
-                        '${_currentPage + 1}/$_totalSteps',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 12, color: textColor.withValues(alpha: 0.5)),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              Expanded(
-                child: PageView(
-                  controller: _pageController,
-                  physics: const NeverScrollableScrollPhysics(),
-                  onPageChanged: (i) => setState(() => _currentPage = i),
-                  children: [
-                    _buildAgeStep(isDark, textColor),
-                    _buildSegmentStep(isDark, textColor),
-                    _buildCategoryStep(isDark, textColor),
-                    _buildGoalStep(isDark, textColor),
-                  ],
-                ),
-              ),
-
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 30),
-                child: ElevatedButton(
-                  onPressed: _isSaving ? null : _nextPage,
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 54),
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  ),
-                  child: _isSaving
-                      ? const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+          // Tablette içerik ortalanmış okuma genişliğinde kalır.
+          child: ContentWidth(
+            maxWidth: ContentWidth.reading,
+            child: Column(
+              children: [
+                // Progress bar
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: sideBySide ? 2 : 10),
+                  child: Row(
+                    children: [
+                      if (_currentPage > 0)
+                        IconButton(
+                          icon: Icon(Icons.arrow_back, color: textColor),
+                          onPressed: _isSaving ? null : _prevPage,
                         )
-                      : Text(
-                          _currentPage == _totalSteps - 1 ? l10n.onboardingFinishBtn : l10n.continueBtn,
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      else
+                        // Yanlış hesapla giren kullanıcı onboarding'i bitirmeden çıkabilir.
+                        IconButton(
+                          icon: Icon(Icons.logout, color: textColor),
+                          tooltip: l10n.logout,
+                          onPressed: _isSaving ? null : () => _signOut(),
                         ),
+                      Expanded(
+                        child: LinearProgressIndicator(
+                          value: (_currentPage + 1) / _totalSteps,
+                          backgroundColor: isDark ? Colors.grey[800] : Colors.grey[300],
+                          valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 48,
+                        child: Text(
+                          '${_currentPage + 1}/$_totalSteps',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 12, color: textColor.withValues(alpha: 0.5)),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+
+                Expanded(
+                  child: PageView(
+                    controller: _pageController,
+                    physics: const NeverScrollableScrollPhysics(),
+                    onPageChanged: (i) => setState(() => _currentPage = i),
+                    children: [
+                      _buildAgeStep(isDark, textColor, sideBySide),
+                      _buildSegmentStep(isDark, textColor, sideBySide),
+                      _buildCategoryStep(isDark, textColor, sideBySide),
+                      _buildGoalStep(isDark, textColor, sideBySide),
+                    ],
+                  ),
+                ),
+
+                Padding(
+                  padding: EdgeInsets.fromLTRB(20, sideBySide ? 4 : 0, 20, sideBySide ? 8 : 30),
+                  child: ContentWidth(
+                    maxWidth: ContentWidth.form,
+                    child: ElevatedButton(
+                      onPressed: _isSaving ? null : _nextPage,
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: Size(double.infinity, sideBySide ? 46 : 54),
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      ),
+                      child: _isSaving
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                            )
+                          : Text(
+                              _currentPage == _totalSteps - 1 ? l10n.onboardingFinishBtn : l10n.continueBtn,
+                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
+
+  /// Yatay telefondaki adım düzeni: solda [header] (maskot, başlık, açıklama),
+  /// sağda [content] (seçim). İki sütun da kendi içinde dikeyde ortalanır ve
+  /// sığmazsa kayar. [content], sağ sütunun yüksekliğini alır (ör. yıl
+  /// seçicisini sığdırmak için).
+  Widget _sideBySideStep({
+    required List<Widget> header,
+    required List<Widget> Function(double columnHeight) content,
+  }) {
+    Widget column(List<Widget> children, double height) => SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: math.max(0, height - 16)),
+            child: Center(
+              child: Column(mainAxisSize: MainAxisSize.min, children: children),
+            ),
+          ),
+        );
+
+    return LayoutBuilder(
+      builder: (context, constraints) => Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(flex: 5, child: column(header, constraints.maxHeight)),
+          Expanded(flex: 6, child: column(content(constraints.maxHeight), constraints.maxHeight)),
+        ],
+      ),
+    );
+  }
+
+  /// Seçenek düğmeleri ve çipler tablette form genişliğini aşmaz.
+  Widget _formWidth(Widget child) => ContentWidth(maxWidth: ContentWidth.form, child: child);
 
   Widget _buildMascotAvatar({double size = 92}) {
     return Container(
@@ -374,108 +422,150 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
     );
   }
 
-  Widget _buildAgeStep(bool isDark, Color textColor) {
+  Widget _buildAgeStep(bool isDark, Color textColor, bool sideBySide) {
     final l10n = AppLocalizations.of(context)!;
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          _buildMascotAvatar(),
-          const SizedBox(height: 20),
-          Text(
-            l10n.onboardingWelcomeTitle,
-            style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: textColor),
-          ),
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
-            child: Text(
-              l10n.onboardingWelcomeBody,
-              style: TextStyle(fontSize: 14, color: textColor.withValues(alpha: 0.6)),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const SizedBox(height: 32),
-          SizedBox(
-            height: 220,
-            child: CupertinoPicker(
-              itemExtent: 52,
-              scrollController: _yearController,
-              onSelectedItemChanged: (i) {
-                setState(() => _birthYear = _currentYear - i);
-              },
-              children: List.generate(_birthYearCount, (i) {
-                return Center(
-                  child: Text(
-                    (_currentYear - i).toString(),
-                    style: TextStyle(
-                      fontSize: 22,
-                      color: textColor,
-                      fontWeight: FontWeight.w500,
-                    ),
+    Widget title(double fontSize) => Text(
+          l10n.onboardingWelcomeTitle,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold, color: textColor),
+        );
+    final body = Text(
+      l10n.onboardingWelcomeBody,
+      style: TextStyle(fontSize: 14, color: textColor.withValues(alpha: 0.6)),
+      textAlign: TextAlign.center,
+    );
+    Widget picker(double height) => SizedBox(
+          height: height,
+          child: CupertinoPicker(
+            itemExtent: 52,
+            scrollController: _yearController,
+            onSelectedItemChanged: (i) {
+              setState(() => _birthYear = _currentYear - i);
+            },
+            children: List.generate(_birthYearCount, (i) {
+              return Center(
+                child: Text(
+                  (_currentYear - i).toString(),
+                  style: TextStyle(
+                    fontSize: 22,
+                    color: textColor,
+                    fontWeight: FontWeight.w500,
                   ),
-                );
-              }),
-            ),
+                ),
+              );
+            }),
           ),
-          if (_isUnderMinimumAge) ...[
-            Padding(
-              padding: const EdgeInsets.fromLTRB(32, 12, 32, 0),
-              child: Text(
-                l10n.onboardingUnder13Error,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 13, color: Colors.red.shade700, fontWeight: FontWeight.w600),
-              ),
+        );
+    final underAge = [
+      if (_isUnderMinimumAge) ...[
+        Padding(
+          padding: EdgeInsets.fromLTRB(sideBySide ? 8 : 32, 12, sideBySide ? 8 : 32, 0),
+          child: Text(
+            l10n.onboardingUnder13Error,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 13, color: Colors.red.shade700, fontWeight: FontWeight.w600),
+          ),
+        ),
+        // Yaş sınırına takılan kullanıcı burada kalmaz: çıkabilir ya da
+        // hesabını silebilir (geri tuşu uygulamayı kapatıyordu).
+        const SizedBox(height: 8),
+        Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 8,
+          children: [
+            TextButton.icon(
+              onPressed: _isSaving ? null : () => _signOut(),
+              icon: const Icon(Icons.logout, size: 18),
+              label: Text(l10n.logout),
             ),
-            // Yaş sınırına takılan kullanıcı burada kalmaz: çıkabilir ya da
-            // hesabını silebilir (geri tuşu uygulamayı kapatıyordu).
-            const SizedBox(height: 8),
-            Wrap(
-              alignment: WrapAlignment.center,
-              spacing: 8,
-              children: [
-                TextButton.icon(
-                  onPressed: _isSaving ? null : () => _signOut(),
-                  icon: const Icon(Icons.logout, size: 18),
-                  label: Text(l10n.logout),
-                ),
-                TextButton.icon(
-                  onPressed: _isSaving ? null : _confirmDeleteAccount,
-                  icon: Icon(Icons.delete_outline, size: 18, color: Colors.red.shade700),
-                  label: Text(l10n.deleteAccount, style: TextStyle(color: Colors.red.shade700)),
-                ),
-              ],
+            TextButton.icon(
+              onPressed: _isSaving ? null : _confirmDeleteAccount,
+              icon: Icon(Icons.delete_outline, size: 18, color: Colors.red.shade700),
+              label: Text(l10n.deleteAccount, style: TextStyle(color: Colors.red.shade700)),
             ),
           ],
+        ),
+      ],
+    ];
+
+    if (sideBySide) {
+      return _sideBySideStep(
+        header: [
+          _buildMascotAvatar(size: 64),
+          const SizedBox(height: 12),
+          title(24),
+          const SizedBox(height: 6),
+          body,
         ],
+        // Yıl seçicisi sağ sütuna sığacak kadar kısalır (en fazla bugünkü 220).
+        content: (height) => [
+          picker((height - 24).clamp(120.0, 220.0)),
+          ...underAge,
+        ],
+      );
+    }
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: _formWidth(
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildMascotAvatar(),
+            const SizedBox(height: 20),
+            title(28),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: body,
+            ),
+            const SizedBox(height: 32),
+            picker(220),
+            ...underAge,
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildSegmentStep(bool isDark, Color textColor) {
+  Widget _buildSegmentStep(bool isDark, Color textColor, bool sideBySide) {
     final l10n = AppLocalizations.of(context)!;
+    final title = Text(l10n.onboardingSegmentTitle,
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: sideBySide ? 22 : 26, fontWeight: FontWeight.bold, color: textColor));
+    final body = Text(l10n.onboardingSegmentBody,
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 14, color: textColor.withValues(alpha: 0.6)));
+    final options = [
+      _optionButton(l10n.onboardingSegmentLgs, _userSegment == 'lgs', () => _selectSegment('lgs'), isDark, textColor),
+      _optionButton(l10n.onboardingSegmentYks, _userSegment == 'yks', () => _selectSegment('yks'), isDark, textColor),
+      _optionButton(l10n.onboardingSegmentUniversity, _userSegment == 'university',
+          () => _selectSegment('university'), isDark, textColor),
+      _optionButton(l10n.onboardingSegmentWork, _userSegment == 'work', () => _selectSegment('work'), isDark, textColor),
+    ];
+
+    if (sideBySide) {
+      return _sideBySideStep(
+        header: [_buildMascotAvatar(size: 64), const SizedBox(height: 12), title, const SizedBox(height: 6), body],
+        content: (_) => options,
+      );
+    }
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          _buildMascotAvatar(),
-          const SizedBox(height: 20),
-          Text(l10n.onboardingSegmentTitle,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: textColor)),
-          const SizedBox(height: 8),
-          Text(l10n.onboardingSegmentBody,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: textColor.withValues(alpha: 0.6))),
-          const SizedBox(height: 32),
-          _optionButton(l10n.onboardingSegmentLgs, _userSegment == 'lgs', () => _selectSegment('lgs'), isDark, textColor),
-          _optionButton(l10n.onboardingSegmentYks, _userSegment == 'yks', () => _selectSegment('yks'), isDark, textColor),
-          _optionButton(l10n.onboardingSegmentUniversity, _userSegment == 'university',
-              () => _selectSegment('university'), isDark, textColor),
-          _optionButton(l10n.onboardingSegmentWork, _userSegment == 'work', () => _selectSegment('work'), isDark, textColor),
-        ],
+      child: _formWidth(
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildMascotAvatar(),
+            const SizedBox(height: 20),
+            title,
+            const SizedBox(height: 8),
+            body,
+            const SizedBox(height: 32),
+            ...options,
+          ],
+        ),
       ),
     );
   }
@@ -511,7 +601,7 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
     );
   }
 
-  Widget _buildCategoryStep(bool isDark, Color textColor) {
+  Widget _buildCategoryStep(bool isDark, Color textColor, bool sideBySide) {
     final l10n = AppLocalizations.of(context)!;
     final lang = LanguageService.instance;
     final limit = _categoryLimit;
@@ -521,6 +611,55 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
           selectedColor: AppColors.primary.withValues(alpha: 0.2),
           onSelected: (val) => _toggleCategory(name, val),
         );
+    final title = Text(l10n.onboardingCategoryStepTitle,
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: sideBySide ? 22 : 26, fontWeight: FontWeight.bold, color: textColor));
+    final body = Text(
+      l10n.onboardingCategoryStepBodyLimit(limit),
+      textAlign: TextAlign.center,
+      style: TextStyle(fontSize: 13, color: textColor.withValues(alpha: 0.6)),
+    );
+    final counter = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        '${_selectedCategoryNames.length} / $limit',
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.primary),
+      ),
+    );
+    // Çipler satırlara sarılır; geniş ekranda satır başına daha çok çip düşer.
+    final chips = Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      alignment: WrapAlignment.center,
+      children: [
+        for (final name in [..._recommendedCategoryNames, ..._customCategoryNames]) chip(name),
+      ],
+    );
+    // Metin '+' içerdiği için ayrıca ikon kullanılmaz.
+    final addButton = TextButton(
+      onPressed: _showAddCategoryDialog,
+      child: Text(l10n.onboardingCreateOwnCategory),
+    );
+
+    if (sideBySide) {
+      return _sideBySideStep(
+        header: [
+          _buildMascotAvatar(size: 56),
+          const SizedBox(height: 10),
+          title,
+          const SizedBox(height: 4),
+          body,
+          const SizedBox(height: 8),
+          counter,
+        ],
+        content: (_) => [chips, const SizedBox(height: 8), addButton],
+      );
+    }
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
@@ -528,78 +667,66 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
           const SizedBox(height: 20),
           _buildMascotAvatar(size: 76),
           const SizedBox(height: 16),
-          Text(l10n.onboardingCategoryStepTitle,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: textColor)),
+          title,
           const SizedBox(height: 4),
-          Text(
-            l10n.onboardingCategoryStepBodyLimit(limit),
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 13, color: textColor.withValues(alpha: 0.6)),
-          ),
+          body,
           const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              '${_selectedCategoryNames.length} / $limit',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.primary),
-            ),
-          ),
+          counter,
           const SizedBox(height: 20),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            alignment: WrapAlignment.center,
-            children: [
-              for (final name in [..._recommendedCategoryNames, ..._customCategoryNames]) chip(name),
-            ],
-          ),
+          chips,
           const SizedBox(height: 16),
-          // Metin '+' içerdiği için ayrıca ikon kullanılmaz.
-          TextButton(
-            onPressed: _showAddCategoryDialog,
-            child: Text(l10n.onboardingCreateOwnCategory),
-          ),
+          addButton,
           const SizedBox(height: 40),
         ],
       ),
     );
   }
 
-  Widget _buildGoalStep(bool isDark, Color textColor) {
+  Widget _buildGoalStep(bool isDark, Color textColor, bool sideBySide) {
     final l10n = AppLocalizations.of(context)!;
+    final title = Text(
+      l10n.onboardingGoalStepTitle,
+      style: TextStyle(fontSize: sideBySide ? 22 : 24, fontWeight: FontWeight.bold, color: textColor),
+      textAlign: TextAlign.center,
+    );
+    final body = Text(
+      l10n.onboardingGoalStepBody,
+      style: TextStyle(fontSize: 14, color: textColor.withValues(alpha: 0.6)),
+      textAlign: TextAlign.center,
+    );
+    final options = [
+      for (final (label, minutes) in [
+        (l10n.onboardingGoal1h, 60),
+        (l10n.onboardingGoal2h, 120),
+        (l10n.onboardingGoal3h, 180),
+        (l10n.onboardingGoal4hPlus, 240),
+      ])
+        _optionButton(label, _dailyGoalMinutes == minutes, () => setState(() => _dailyGoalMinutes = minutes),
+            isDark, textColor),
+    ];
+
+    if (sideBySide) {
+      return _sideBySideStep(
+        header: [_buildMascotAvatar(size: 64), const SizedBox(height: 12), title, const SizedBox(height: 6), body],
+        content: (_) => options,
+      );
+    }
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          _buildMascotAvatar(),
-          const SizedBox(height: 20),
-          Text(
-            l10n.onboardingGoalStepTitle,
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: textColor),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            l10n.onboardingGoalStepBody,
-            style: TextStyle(fontSize: 14, color: textColor.withValues(alpha: 0.6)),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 32),
-          for (final (label, minutes) in [
-            (l10n.onboardingGoal1h, 60),
-            (l10n.onboardingGoal2h, 120),
-            (l10n.onboardingGoal3h, 180),
-            (l10n.onboardingGoal4hPlus, 240),
-          ])
-            _optionButton(label, _dailyGoalMinutes == minutes, () => setState(() => _dailyGoalMinutes = minutes),
-                isDark, textColor),
-        ],
+      child: _formWidth(
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildMascotAvatar(),
+            const SizedBox(height: 20),
+            title,
+            const SizedBox(height: 8),
+            body,
+            const SizedBox(height: 32),
+            ...options,
+          ],
+        ),
       ),
     );
   }

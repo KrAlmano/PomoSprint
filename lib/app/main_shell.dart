@@ -20,11 +20,11 @@ import '../services/language_service.dart';
 import '../services/notification_service.dart';
 import '../services/supabase_service.dart';
 import '../services/timer_persistence.dart';
-import '../theme.dart';
 import '../widgets/avatar_widget.dart';
 import '../widgets/league_info_sheet.dart';
+import '../widgets/shell_app_bar.dart';
+import '../widgets/shell_navigation.dart';
 import '../widgets/shell_pending_banner.dart';
-import '../widgets/shell_stat_pill.dart';
 import 'category_cache.dart';
 import 'session_feedback.dart';
 import 'theme_controller.dart';
@@ -295,14 +295,8 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
     await _service.signOutFully();
   }
 
-  void _openFriendsSheet() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => const FriendsSheet(),
-    );
-  }
+  // Tablette ve yatay telefonda sayfa genişliğe yayılmaz (bkz. showFriendsSheet).
+  void _openFriendsSheet() => unawaited(showFriendsSheet(context));
 
   // Profil, kullanıcıyı SupabaseService.currentUser'dan okur; isim, avatar ve
   // bakiye değişiklikleri oradan AppGate üzerinden buraya yansır.
@@ -330,6 +324,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
     final leave = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
+        scrollable: true,
         title: Text(l10n.leaveWhileRunningTitle),
         content: Text(l10n.leaveWhileRunningBody),
         actions: [
@@ -351,7 +346,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
   @override
   Widget build(BuildContext context) {
     final user = _user;
-    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    final isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
     final hideUI = isLandscape && _isTimerRunning && _currentIndex == 0;
     final ownerEmail = user.email.toLowerCase();
 
@@ -377,113 +372,49 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
       listenable: LanguageService.instance,
       builder: (context, _) {
         final lang = LanguageService.instance;
-        final l10n = AppLocalizations.of(context)!;
-        final isDark = Theme.of(context).brightness == Brightness.dark;
 
         return PopScope(
           canPop: _currentIndex == 0 && !_isTimerRunning,
           onPopInvokedWithResult: (didPop, _) {
             if (!didPop) unawaited(_onBackPressed());
           },
-          child: Scaffold(
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          // Dikey telefonda alt çubuk; tablette ve yatay telefonda solda ray.
+          child: ShellNavigationScaffold(
+            showNavigation: !hideUI,
+            selectedIndex: _currentIndex,
+            onDestinationSelected: (index) => setState(() => _currentIndex = index),
+            destinations: [
+              const ShellDestination(icon: Icons.timer_outlined, selectedIcon: Icons.timer, label: 'Pomo'),
+              ShellDestination(
+                icon: Icons.analytics_outlined,
+                selectedIcon: Icons.analytics,
+                label: lang.translate('nav_reports'),
+              ),
+              ShellDestination(
+                icon: Icons.leaderboard_outlined,
+                selectedIcon: Icons.leaderboard,
+                label: lang.translate('nav_ranking'),
+              ),
+              ShellDestination(
+                icon: Icons.groups_outlined,
+                selectedIcon: Icons.groups,
+                label: lang.translate('nav_social'),
+              ),
+            ],
             appBar: hideUI
                 ? null
-                : AppBar(
-                    backgroundColor: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.85),
-                    surfaceTintColor: Colors.transparent,
-                    elevation: 0,
-                    toolbarHeight: 76,
-                    titleSpacing: 16,
-                    // Seri yalnızca Pomo sekmesinde gösterilir.
-                    title: _currentIndex == 0
-                        ? FittedBox(
-                            fit: BoxFit.scaleDown,
-                            alignment: Alignment.centerLeft,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(Icons.local_fire_department, color: Colors.deepOrange, size: 24),
-                                const SizedBox(width: 6),
-                                Text(
-                                  '${user.streakDays}',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: isDark ? AppColors.darkPrimary : AppColors.primary,
-                                    letterSpacing: -0.5,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        : const SizedBox.shrink(),
-                    actions: [
-                      // Puan + Kum Tanesi rozetleri: dar ekranda kendi içinde
-                      // yatay kaydırılır; arkadaş/profil düğmeleri etkilenmez.
-                      Flexible(
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          physics: const ClampingScrollPhysics(),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              ShellStatPill(
-                                label: l10n.pointsCaption,
-                                value: user.lifetimePoints,
-                                background: AppColors.primaryFixed,
-                                foreground: AppColors.onPrimaryFixed,
-                                onTap: () => showLeagueInfoSheet(context),
-                              ),
-                              const SizedBox(width: 8),
-                              ShellStatPill(
-                                label: l10n.coinsCaption,
-                                value: user.coins,
-                                background: const Color(0xFFFFE7A8),
-                                foreground: const Color(0xFF7A5A00),
-                                onTap: () => showLeagueInfoSheet(context),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-
-                      // Arkadaş Ekle/Görüntüle Butonu (Dairesel, avatardan biraz büyük)
-                      InkWell(
-                        onTap: _openFriendsSheet,
-                        borderRadius: BorderRadius.circular(32),
-                        child: Container(
-                          width: 63,
-                          height: 63,
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryContainer.withValues(alpha: 0.15),
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: AppColors.primaryContainer.withValues(alpha: 0.4),
-                            ),
-                          ),
-                          child: const Icon(
-                            Icons.people_alt_rounded,
-                            color: AppColors.primaryContainer,
-                            size: 33,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-
-                      // Profil avatarı (Profil & Ayarlar'ı açar)
-                      Padding(
-                        padding: const EdgeInsets.only(right: 16),
-                        child: GestureDetector(
-                          onTap: _openProfile,
-                          child: AvatarWidget(
-                            avatar: AvatarCharacter.byId(user.avatarId),
-                            size: 60,
-                          ),
-                        ),
-                      ),
-                    ],
+                : buildShellAppBar(
+                    context,
+                    streakDays: _currentIndex == 0 ? user.streakDays : null,
+                    points: user.lifetimePoints,
+                    coins: user.coins,
+                    onStatsTap: () => showLeagueInfoSheet(context),
+                    onFriendsTap: _openFriendsSheet,
+                    onProfileTap: _openProfile,
+                    avatarBuilder: (size) => AvatarWidget(
+                      avatar: AvatarCharacter.byId(user.avatarId),
+                      size: size,
+                    ),
                   ),
             body: Column(
               children: [
@@ -506,41 +437,6 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
                 ),
               ],
             ),
-            bottomNavigationBar: hideUI
-                ? null
-                : NavigationBar(
-                    selectedIndex: _currentIndex,
-                    onDestinationSelected: (index) {
-                      if (index == _currentIndex) return;
-                      setState(() => _currentIndex = index);
-                    },
-                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                    indicatorColor: AppColors.primaryFixed,
-                    elevation: 4,
-                    height: 68,
-                    destinations: [
-                      const NavigationDestination(
-                        icon: Icon(Icons.timer_outlined),
-                        selectedIcon: Icon(Icons.timer, color: AppColors.onPrimaryFixed),
-                        label: 'Pomo',
-                      ),
-                      NavigationDestination(
-                        icon: const Icon(Icons.analytics_outlined),
-                        selectedIcon: const Icon(Icons.analytics, color: AppColors.onPrimaryFixed),
-                        label: lang.translate('nav_reports'),
-                      ),
-                      NavigationDestination(
-                        icon: const Icon(Icons.leaderboard_outlined),
-                        selectedIcon: const Icon(Icons.leaderboard, color: AppColors.onPrimaryFixed),
-                        label: lang.translate('nav_ranking'),
-                      ),
-                      NavigationDestination(
-                        icon: const Icon(Icons.groups_outlined),
-                        selectedIcon: const Icon(Icons.groups, color: AppColors.onPrimaryFixed),
-                        label: lang.translate('nav_social'),
-                      ),
-                    ],
-                  ),
           ),
         );
       },

@@ -110,59 +110,61 @@ class _CategoryNameDialogState extends State<CategoryNameDialog> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final onSurface = Theme.of(context).colorScheme.onSurface;
+    // Yatay telefonda klavye açıkken başlık ve alanlar birlikte kayar;
+    // tablette diyalog makul genişlikte kalır.
     return AlertDialog(
+      scrollable: true,
+      constraints: const BoxConstraints(minWidth: 280, maxWidth: 440),
       title: Text(widget.title),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextField(
-              controller: _nameCtrl,
-              autofocus: true,
-              maxLength: kCategoryNameMaxLength,
-              textCapitalization: TextCapitalization.sentences,
-              textInputAction: TextInputAction.done,
-              onChanged: (_) {
-                if (_error != null) setState(() => _error = null);
-              },
-              onSubmitted: (_) => _submit(),
-              decoration: InputDecoration(hintText: widget.hintText, errorText: _error),
-            ),
-            if (widget.showColorPicker) ...[
-              const SizedBox(height: 12),
-              Text(l10n.chooseColor, style: const TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: _swatches.map((hex) {
-                  final color = colorFromHex(hex);
-                  final isSelected = hex == _colorHex;
-                  return GestureDetector(
-                    onTap: () => setState(() => _colorHex = hex),
-                    child: Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        color: color,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: isSelected ? onSurface : Colors.transparent, width: 2),
-                      ),
-                      child: isSelected
-                          ? Icon(
-                              Icons.check,
-                              size: 16,
-                              color: color.computeLuminance() > 0.5 ? Colors.black : Colors.white,
-                            )
-                          : null,
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextField(
+            controller: _nameCtrl,
+            autofocus: true,
+            maxLength: kCategoryNameMaxLength,
+            textCapitalization: TextCapitalization.sentences,
+            textInputAction: TextInputAction.done,
+            onChanged: (_) {
+              if (_error != null) setState(() => _error = null);
+            },
+            onSubmitted: (_) => _submit(),
+            decoration: InputDecoration(hintText: widget.hintText, errorText: _error),
+          ),
+          if (widget.showColorPicker) ...[
+            const SizedBox(height: 12),
+            Text(l10n.chooseColor, style: const TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: _swatches.map((hex) {
+                final color = colorFromHex(hex);
+                final isSelected = hex == _colorHex;
+                return GestureDetector(
+                  onTap: () => setState(() => _colorHex = hex),
+                  child: Container(
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      color: color,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: isSelected ? onSurface : Colors.transparent, width: 2),
                     ),
-                  );
-                }).toList(),
-              ),
-            ],
+                    child: isSelected
+                        ? Icon(
+                            Icons.check,
+                            size: 16,
+                            color: color.computeLuminance() > 0.5 ? Colors.black : Colors.white,
+                          )
+                        : null,
+                  ),
+                );
+              }).toList(),
+            ),
           ],
-        ),
+        ],
       ),
       actions: [
         TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),

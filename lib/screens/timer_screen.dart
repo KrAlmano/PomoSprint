@@ -1,14 +1,20 @@
 import 'dart:async';
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../l10n/app_localizations.dart';
 import '../theme.dart';
+import '../utils/responsive.dart';
 import '../utils/text_util.dart';
 import '../models/category_model.dart';
 import '../widgets/hourglass_widget.dart';
 import '../services/language_service.dart';
 import '../services/notification_service.dart';
 import '../services/timer_persistence.dart';
+
+/// Sayaç diyalogları geniş ekranda tam genişliğe yayılmaz.
+const BoxConstraints kTimerDialogConstraints = BoxConstraints(minWidth: 280, maxWidth: 440);
 
 class TimerScreen extends StatefulWidget {
   final List<CourseCategory> categories;
@@ -321,6 +327,8 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
+        scrollable: true,
+        constraints: kTimerDialogConstraints,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(l10n.timerResetConfirmTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
         content: Text(l10n.timerResetConfirmBody, style: const TextStyle(fontSize: 14, height: 1.4)),
@@ -359,7 +367,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
       barrierDismissible: false,
       barrierColor: Colors.black.withValues(alpha: 0.85),
       builder: (ctx) {
-        return _CountdownDialog(
+        return TimerCountdownDialog(
           onComplete: () {
             if (ctx.mounted && Navigator.of(ctx).canPop()) {
               Navigator.of(ctx).pop();
@@ -417,18 +425,22 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
+        scrollable: true,
+        constraints: kTimerDialogConstraints,
         backgroundColor: isDark ? AppColors.darkSurfaceContainerHigh : AppColors.surfaceContainerHigh,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
             const Icon(Icons.warning_amber_rounded, color: AppColors.primary, size: 28),
             const SizedBox(width: 8),
-            Text(
-              LanguageService.instance.translate('pause_limit_title'),
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+            Flexible(
+              child: Text(
+                LanguageService.instance.translate('pause_limit_title'),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                ),
               ),
             ),
           ],
@@ -484,63 +496,9 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
   }
 
   void _showSessionCompletedDialog(int displayMinutes) {
-    final isTurkish = LanguageService.instance.isTurkish;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? AppColors.darkSurfaceContainerHigh : AppColors.surfaceContainerHigh,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: Column(
-          children: [
-            const Icon(Icons.stars_rounded, color: Colors.amber, size: 48),
-            const SizedBox(height: 16),
-            Text(
-              isTurkish ? 'Tebrikler! 🎉' : 'Congratulations! 🎉',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 22,
-                color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-        content: Text(
-          isTurkish
-              ? '$displayMinutes dakikalık odaklanma seansını\nbaşarıyla tamamladın! ⏳'
-              : 'You successfully completed a $displayMinutes-minute\nfocus session! ⏳',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 14,
-            color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
-            height: 1.5,
-          ),
-        ),
-        actionsAlignment: MainAxisAlignment.center,
-        actions: [
-          SizedBox(
-            width: double.infinity,
-            height: 48,
-            child: ElevatedButton(
-              onPressed: () => Navigator.pop(ctx),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryContainer,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                elevation: 0,
-              ),
-              child: Text(
-                isTurkish ? 'Harika!' : 'Awesome!',
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-        ],
-      ),
+      builder: (ctx) => SessionCompletedDialog(minutes: displayMinutes),
     );
   }
 
@@ -561,157 +519,167 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
           body: SafeArea(
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+                final layout = _TimerLayout.of(constraints);
+                final dense = layout.dense;
+                final large = layout.large;
 
                 final hourglassWidget = HourglassWidget(
-                  size: 220,
+                  size: layout.hourglassSize,
                   isRunning: isRunning,
                   totalSeconds: totalSeconds,
                   remainingSeconds: remaining,
                   sandColor: displayCategory?.color ?? activeCategories.firstOrNull?.color,
                 );
 
+                Widget categoryChip(CourseCategory cat) {
+                  final isSelected = cat.id == displayCategory?.id;
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: FilterChip(
+                      label: Text(LanguageService.instance.translateCatName(cat.name)),
+                      selected: isSelected,
+                      // Seans sürerken/duraklatılmışken kategori kilitli.
+                      onSelected: _hasSession
+                          ? null
+                          : (val) {
+                              if (val) {
+                                setState(() {
+                                  selectedCategoryId = cat.id;
+                                  selectedCategoryName = cat.name;
+                                });
+                              }
+                            },
+                      avatar: CircleAvatar(backgroundColor: cat.color, radius: 5),
+                      showCheckmark: false,
+                      selectedColor: cat.color.withValues(alpha: 0.2),
+                      backgroundColor: isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow,
+                      labelStyle: TextStyle(
+                        fontSize: 13,
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        color: isSelected
+                            ? cat.color
+                            : (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        side: BorderSide(color: isSelected ? cat.color : Colors.transparent),
+                      ),
+                    ),
+                  );
+                }
+
+                final categoryChips = [for (final cat in activeCategories) categoryChip(cat)];
+
+                // Ders/kategori başlığı ve düzenleme kısayolu. [inline]: yatay
+                // kaydırılan çip satırının başında (genişlik sınırsız).
+                Widget categoryHeader({required bool inline}) {
+                  final label = Text(
+                    TextUtil.getCategorySelectionLabel(widget.userSegment),
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 1.5,
+                      color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                    ),
+                  );
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: inline ? MainAxisSize.min : MainAxisSize.max,
+                    children: [
+                      if (inline) label else Flexible(child: label),
+                      const SizedBox(width: 6),
+                      GestureDetector(
+                        onTap: widget.onOpenSettings,
+                        child: const Icon(Icons.edit_outlined, size: 13, color: AppColors.primaryContainer),
+                      ),
+                    ],
+                  );
+                }
+
                 final controlsWidget = Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Subject Chips Section
-                    if (!isLandscape) ...[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            TextUtil.getCategorySelectionLabel(widget.userSegment),
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 1.5,
-                              color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          GestureDetector(
-                            onTap: widget.onOpenSettings,
-                            child: const Icon(
-                              Icons.edit_outlined,
-                              size: 13,
-                              color: AppColors.primaryContainer,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                    ],
+                    // Subject Chips Section. Dikey alanı kıt ekranda başlık
+                    // ayrı satır yerine çiplerin başında durur.
+                    if (!dense) ...[categoryHeader(inline: false), const SizedBox(height: 12)],
 
-                    // Active Category Pills
-                    if (!isLandscape) ...[
+                    // Active Category Pills: telefonda yatay kaydırılır,
+                    // tablette ortalanmış satırlara sarılır.
+                    if (large)
+                      Wrap(alignment: WrapAlignment.center, runSpacing: 4, children: categoryChips)
+                    else
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         physics: const BouncingScrollPhysics(),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: activeCategories.map((cat) {
-                            final isSelected = cat.id == displayCategory?.id;
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 4),
-                              child: FilterChip(
-                                label: Text(LanguageService.instance.translateCatName(cat.name)),
-                                selected: isSelected,
-                                // Seans sürerken/duraklatılmışken kategori kilitli.
-                                onSelected: _hasSession
-                                    ? null
-                                    : (val) {
-                                        if (val) {
-                                          setState(() {
-                                            selectedCategoryId = cat.id;
-                                            selectedCategoryName = cat.name;
-                                          });
-                                        }
-                                      },
-                                avatar: CircleAvatar(
-                                  backgroundColor: cat.color,
-                                  radius: 5,
-                                ),
-                                showCheckmark: false,
-                                selectedColor: cat.color.withValues(alpha: 0.2),
-                                backgroundColor: isDark
-                                    ? AppColors.darkSurfaceContainerLow
-                                    : AppColors.surfaceContainerLow,
-                                labelStyle: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                  color: isSelected
-                                      ? cat.color
-                                      : (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  side: BorderSide(
-                                    color: isSelected ? cat.color : Colors.transparent,
-                                  ),
-                                ),
-                              ),
-                            );
-                          }).toList(),
+                          children: [
+                            if (dense) Padding(padding: const EdgeInsets.only(left: 4, right: 6), child: categoryHeader(inline: true)),
+                            ...categoryChips,
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 16),
-                    ],
+                    SizedBox(height: dense ? 8 : 16),
 
-                    // Time Display
-                    Text(
-                      '$minutes:$seconds',
-                      style: TextStyle(
-                        fontSize: 52,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: -1.5,
-                        color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                    // Time Display (dar sütunda ya da büyük yazı ölçeğinde
+                    // satır kırmadan küçülür)
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        '$minutes:$seconds',
+                        maxLines: 1,
+                        style: TextStyle(
+                          fontSize: large ? 60 : (dense ? 42 : 52),
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: -1.5,
+                          color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    SizedBox(height: dense ? 4 : 10),
 
                     // Süre Seçimi: 25 dk / 50 dk
-                    if (!isLandscape) ...[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [25, 50].map((mins) {
-                          final isSel = loggedMinutes == mins;
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 6),
-                            child: GestureDetector(
-                              // Seans varken kilitli (bkz. _selectDuration).
-                              onTap: () => _selectDuration(mins),
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 200),
-                                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-                                decoration: BoxDecoration(
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      runSpacing: 8,
+                      children: [25, 50].map((mins) {
+                        final isSel = loggedMinutes == mins;
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 6),
+                          child: GestureDetector(
+                            // Seans varken kilitli (bkz. _selectDuration).
+                            onTap: () => _selectDuration(mins),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              padding: EdgeInsets.symmetric(horizontal: dense ? 16 : 18, vertical: dense ? 6 : 10),
+                              decoration: BoxDecoration(
+                                color: isSel
+                                    ? AppColors.primaryContainer
+                                    : (isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
                                   color: isSel
                                       ? AppColors.primaryContainer
-                                      : (isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow),
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color: isSel
-                                        ? AppColors.primaryContainer
-                                        : (isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant),
-                                  ),
+                                      : (isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant),
                                 ),
-                                child: Text(
-                                  '$mins ${LanguageService.instance.translate('minutes_unit_short')}',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: isSel
-                                        ? Colors.white
-                                        : (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant)
+                              ),
+                              child: Text(
+                                '$mins ${LanguageService.instance.translate('minutes_unit_short')}',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: isSel
+                                      ? Colors.white
+                                      : (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant)
                                             .withValues(alpha: _hasSession ? 0.45 : 1),
-                                  ),
                                 ),
                               ),
                             ),
-                          );
-                        }).toList(),
-                      ),
-                      const SizedBox(height: 20),
-                    ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    SizedBox(height: dense ? 10 : 20),
 
                     // Duraklatma Hakkı (Pause Limit)
                     Container(
@@ -738,20 +706,23 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                                 : AppColors.primary,
                           ),
                           const SizedBox(width: 6),
-                          Text(
-                            hasPauseCredit ? l10n.pauseCreditAvailable : l10n.pauseCreditUsed,
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: hasPauseCredit
-                                  ? (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant)
-                                  : AppColors.primary,
+                          Flexible(
+                            child: Text(
+                              hasPauseCredit ? l10n.pauseCreditAvailable : l10n.pauseCreditUsed,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: hasPauseCredit
+                                    ? (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant)
+                                    : AppColors.primary,
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 14),
+                    SizedBox(height: dense ? 8 : 14),
 
                     // Primary Start/Pause Button
                     ElevatedButton(
@@ -763,26 +734,22 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                         foregroundColor: isRunning
                             ? (isDark ? AppColors.darkOnSurface : AppColors.onSurface)
                             : Colors.white,
-                        minimumSize: const Size(200, 48),
+                        minimumSize: large ? const Size(240, 52) : Size(200, dense ? 44 : 48),
                         elevation: isRunning ? 0 : 4,
                         shadowColor: const Color(0x40FF5C4D),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                       ),
                       child: Text(
                         isRunning
                             ? LanguageService.instance.translate('btn_pause')
                             : LanguageService.instance.translate('btn_start'),
-                        style: const TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: large ? 18 : 17, fontWeight: FontWeight.bold),
                       ),
                     ),
                     // Süren ya da duraklatılmış seansı onayla bırakma.
                     if (_hasSession) ...[
-                      const SizedBox(height: 6),
+                      SizedBox(height: dense ? 2 : 6),
                       TextButton.icon(
                         onPressed: _confirmDiscardSession,
                         icon: const Icon(Icons.restart_alt_rounded, size: 18),
@@ -791,47 +758,38 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                           foregroundColor: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: dense ? 4 : 12),
                     ] else
-                      const SizedBox(height: 24),
+                      SizedBox(height: dense ? 8 : 24),
                   ],
                 );
 
-                final double hourglassTop = isLandscape ? (constraints.maxHeight - 230) / 2 : 48.0;
-                final double hourglassLeft = isLandscape ? (constraints.maxWidth * 0.25 - 110) : (constraints.maxWidth - 220) / 2;
-
-                final double controlsTop = isLandscape ? 16.0 : 300.0;
-                final double controlsLeft = isLandscape ? constraints.maxWidth * 0.5 : 0.0;
-                final double controlsWidth = isLandscape ? constraints.maxWidth * 0.5 : constraints.maxWidth;
-
+                // Konumlar canlandırılır: telefon döndürülünce kum saati ve
+                // kontroller yeni yerlerine kayar.
                 return Stack(
                   clipBehavior: Clip.none,
                   children: [
                     AnimatedPositioned(
                       duration: const Duration(milliseconds: 600),
                       curve: Curves.easeInOutCubic,
-                      top: hourglassTop,
-                      left: hourglassLeft,
-                      child: SizedBox(
-                        width: 220,
-                        height: 230,
-                        child: hourglassWidget,
-                      ),
+                      top: layout.hourglassTop,
+                      left: layout.hourglassLeft,
+                      width: layout.hourglassSize,
+                      height: layout.hourglassHeight,
+                      child: hourglassWidget,
                     ),
                     AnimatedPositioned(
                       duration: const Duration(milliseconds: 600),
                       curve: Curves.easeInOutCubic,
-                      top: controlsTop,
+                      top: layout.controlsTop,
                       bottom: 0.0,
-                      left: controlsLeft,
-                      width: controlsWidth,
-                      child: Center(
+                      left: layout.controlsLeft,
+                      width: layout.controlsWidth,
+                      child: Align(
+                        alignment: layout.controlsAlignment,
                         child: SingleChildScrollView(
                           physics: const BouncingScrollPhysics(),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                            child: controlsWidget,
-                          ),
+                          child: Padding(padding: const EdgeInsets.symmetric(horizontal: 16.0), child: controlsWidget),
                         ),
                       ),
                     ),
@@ -846,18 +804,214 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
   }
 }
 
-/// Separate StatefulWidget for the 3-2-1 countdown to properly
-/// manage its own Timer lifecycle without spawning duplicates.
-class _CountdownDialog extends StatefulWidget {
-  final VoidCallback onComplete;
+/// Sayaç ekranının yerleşimi; ekranın değil sayaca kalan alanın (yan
+/// gezinme ve güvenli alan düşülmüş) ölçüsünden hesaplanır.
+///
+/// * Dikey telefon: bugünkü konumlar (kum saati üstte 220, kontroller altta).
+///   Çok alçak dikey ekranda kum saati küçülür, aralıklar sıkışır.
+/// * Yatay (genişlik > yükseklik): kum saati solda, kontroller sağda; sağ
+///   sütun sığmazsa kendi içinde kayar. Geniş ekranda iki sütun ortalanmış
+///   bir grup olarak kalır.
+/// * Tablet dikey: kum saati ve kontroller ortada, ekrana göre ölçekli ama
+///   [_maxHourglass]'ı aşmadan.
+@immutable
+class _TimerLayout {
+  const _TimerLayout({
+    required this.dense,
+    required this.large,
+    required this.hourglassSize,
+    required this.hourglassHeight,
+    required this.hourglassTop,
+    required this.hourglassLeft,
+    required this.controlsTop,
+    required this.controlsLeft,
+    required this.controlsWidth,
+    required this.controlsAlignment,
+  });
 
-  const _CountdownDialog({required this.onComplete});
+  static const double _phoneHourglass = 220;
+  static const double _maxHourglass = 300;
+  static const double _minHourglass = 64;
+  static const double _shortPortraitHeight = 540;
+  static const double _denseHeight = 420;
+  static const double _maxTwoColumnWidth = 960;
+  static const double _maxCenteredControlsWidth = 560;
 
-  @override
-  State<_CountdownDialog> createState() => _CountdownDialogState();
+  /// Tablet dikeyde kum saati ve kontrolleri dikeyde ortalamak için
+  /// kontrollerin yaklaşık yüksekliği (yanılırsa yalnızca ortalama kayar).
+  static const double _estimatedControlsHeight = 420;
+
+  factory _TimerLayout.of(BoxConstraints constraints) {
+    final w = constraints.maxWidth;
+    final h = constraints.maxHeight;
+    final large = math.min(w, h) >= Responsive.mediumMinWidth;
+
+    if (w > h) {
+      final groupWidth = math.min(w, _maxTwoColumnWidth);
+      final groupLeft = (w - groupWidth) / 2;
+      // Kontroller (çipler, süre seçimi) biraz daha geniş sütun alır.
+      final columnWidth = groupWidth * 0.45;
+      final size = math.max(_minHourglass, math.min(_maxHourglass, math.min(columnWidth * 0.8, (h - 24) / 1.05)));
+      return _TimerLayout(
+        dense: h < _denseHeight,
+        large: large,
+        hourglassSize: size,
+        hourglassHeight: size * 1.05,
+        hourglassTop: (h - size * 1.05) / 2,
+        hourglassLeft: groupLeft + (columnWidth - size) / 2,
+        controlsTop: 0,
+        controlsLeft: groupLeft + columnWidth,
+        controlsWidth: groupWidth - columnWidth,
+        controlsAlignment: Alignment.center,
+      );
+    }
+
+    if (w < Responsive.mediumMinWidth) {
+      if (h >= _shortPortraitHeight) {
+        return _TimerLayout(
+          dense: false,
+          large: false,
+          hourglassSize: _phoneHourglass,
+          hourglassHeight: 230,
+          hourglassTop: 48,
+          hourglassLeft: (w - _phoneHourglass) / 2,
+          controlsTop: 300,
+          controlsLeft: 0,
+          controlsWidth: w,
+          controlsAlignment: Alignment.center,
+        );
+      }
+      final size = (h * 0.36).clamp(120.0, _phoneHourglass);
+      return _TimerLayout(
+        dense: true,
+        large: false,
+        hourglassSize: size,
+        hourglassHeight: size * 1.05,
+        hourglassTop: 16,
+        hourglassLeft: (w - size) / 2,
+        controlsTop: 16 + size * 1.05 + 8,
+        controlsLeft: 0,
+        controlsWidth: w,
+        controlsAlignment: Alignment.center,
+      );
+    }
+
+    final size = (math.min(w, h) * 0.36).clamp(_phoneHourglass, _maxHourglass);
+    final hourglassHeight = size * 1.05;
+    const gap = 20.0;
+    final top = math.max(32.0, (h - hourglassHeight - gap - _estimatedControlsHeight) / 2);
+    final controlsWidth = math.min(w, _maxCenteredControlsWidth);
+    return _TimerLayout(
+      dense: false,
+      large: large,
+      hourglassSize: size,
+      hourglassHeight: hourglassHeight,
+      hourglassTop: top,
+      hourglassLeft: (w - size) / 2,
+      controlsTop: top + hourglassHeight + gap,
+      controlsLeft: (w - controlsWidth) / 2,
+      controlsWidth: controlsWidth,
+      controlsAlignment: Alignment.topCenter,
+    );
+  }
+
+  /// Dikey alan kıt: kontrollerin aralıkları sıkışır.
+  final bool dense;
+
+  /// Tablet: süre ve düğme biraz büyür, kategori çipleri satırlara sarılır.
+  final bool large;
+
+  final double hourglassSize;
+  final double hourglassHeight;
+  final double hourglassTop;
+  final double hourglassLeft;
+  final double controlsTop;
+  final double controlsLeft;
+  final double controlsWidth;
+  final Alignment controlsAlignment;
 }
 
-class _CountdownDialogState extends State<_CountdownDialog> {
+/// Seans tamamlanınca gösterilen tebrik diyaloğu.
+class SessionCompletedDialog extends StatelessWidget {
+  final int minutes;
+
+  const SessionCompletedDialog({super.key, required this.minutes});
+
+  @override
+  Widget build(BuildContext context) {
+    final isTurkish = LanguageService.instance.isTurkish;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return AlertDialog(
+      // Yatay telefonda dikeyde sığmazsa kayar; tablette makul genişlikte kalır.
+      scrollable: true,
+      constraints: kTimerDialogConstraints,
+      backgroundColor: isDark ? AppColors.darkSurfaceContainerHigh : AppColors.surfaceContainerHigh,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      title: Column(
+        children: [
+          const Icon(Icons.stars_rounded, color: Colors.amber, size: 48),
+          const SizedBox(height: 16),
+          Text(
+            isTurkish ? 'Tebrikler! 🎉' : 'Congratulations! 🎉',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+              color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+      content: Text(
+        isTurkish
+            ? '$minutes dakikalık odaklanma seansını\nbaşarıyla tamamladın! ⏳'
+            : 'You successfully completed a $minutes-minute\nfocus session! ⏳',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 14,
+          color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+          height: 1.5,
+        ),
+      ),
+      actionsAlignment: MainAxisAlignment.center,
+      actions: [
+        SizedBox(
+          width: double.infinity,
+          height: 48,
+          child: ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryContainer,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+              elevation: 0,
+            ),
+            child: Text(
+              isTurkish ? 'Harika!' : 'Awesome!',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Separate StatefulWidget for the 3-2-1 countdown to properly
+/// manage its own Timer lifecycle without spawning duplicates.
+class TimerCountdownDialog extends StatefulWidget {
+  final VoidCallback onComplete;
+
+  const TimerCountdownDialog({super.key, required this.onComplete});
+
+  @override
+  State<TimerCountdownDialog> createState() => _TimerCountdownDialogState();
+}
+
+class _TimerCountdownDialogState extends State<TimerCountdownDialog> {
   int _count = 3;
   Timer? _timer;
 
@@ -889,32 +1043,34 @@ class _CountdownDialogState extends State<_CountdownDialog> {
     return Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
+      // Yatay telefonda ya da büyük yazı ölçeğinde sığmazsa orantılı küçülür.
       child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
-              child: Text(
-                '$_count',
-                key: ValueKey(_count),
-                style: const TextStyle(
-                  fontSize: 110,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  shadows: [
-                    Shadow(color: AppColors.primaryContainer, blurRadius: 30),
-                  ],
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
+                child: Text(
+                  '$_count',
+                  key: ValueKey(_count),
+                  style: const TextStyle(
+                    fontSize: 110,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    shadows: [Shadow(color: AppColors.primaryContainer, blurRadius: 30)],
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              LanguageService.instance.isTurkish ? 'Hazırlan! Odaklanıyorsun...' : 'Get Ready! Focusing...',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white70),
-            ),
-          ],
+              const SizedBox(height: 16),
+              Text(
+                LanguageService.instance.isTurkish ? 'Hazırlan! Odaklanıyorsun...' : 'Get Ready! Focusing...',
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white70),
+              ),
+            ],
+          ),
         ),
       ),
     );

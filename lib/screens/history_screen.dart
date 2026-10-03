@@ -7,16 +7,21 @@ import '../l10n/app_localizations.dart';
 import '../models/category_model.dart';
 import '../services/language_service.dart';
 import '../theme.dart';
+import '../utils/responsive.dart';
 import '../utils/stats_calculator.dart';
 import '../utils/study_day.dart';
 import '../widgets/stats/category_style.dart';
 import '../widgets/stats/daily_goal_sheet.dart';
 import '../widgets/stats/progress_ring.dart';
 import '../widgets/stats/stats_empty_card.dart';
+import '../widgets/stats/stats_layout.dart';
 import '../widgets/stats/stats_text.dart';
 
 /// Raporlar > Haftalık Çalışma: içinde bulunulan Pazartesi-Pazar haftası.
 /// Veriler ReportsScreen'den gelir (tek yükleme, ortak 'bugün').
+///
+/// Düzen: tek sütunlu liste, geniş ekranda okuma genişliğinde ortalanır;
+/// yeterince genişse verimlilik ve hedef kartları yan yana durur.
 class HistoryScreen extends StatefulWidget {
   final List<StatSession> sessions;
 
@@ -64,43 +69,55 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
     return RefreshIndicator(
       onRefresh: widget.onRefresh,
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 1. Haftalık trend (sütun grafik)
-            _buildWeeklyTrendChart(days, selectedIndex),
-            const SizedBox(height: 24),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final layout = StatsLayout.of(context, constraints.maxWidth, maxContentWidth: ContentWidth.reading);
+          // 2. Haftalık verimlilik  2.5 Haftalık hedef (günlük hedef × 7)
+          final efficiency = _buildEfficiencyCard(weekMinutes);
+          final weeklyGoal = _buildWeeklyGoalSetting();
 
-            // 2. Haftalık verimlilik
-            _buildEfficiencyCard(weekMinutes),
-            const SizedBox(height: 16),
+          return StatsScrollView(
+            layout: layout,
+            maxWidth: ContentWidth.reading,
+            children: [
+              // 1. Haftalık trend (sütun grafik)
+              _buildWeeklyTrendChart(days, selectedIndex, layout),
+              const SizedBox(height: 24),
 
-            // 2.5 Haftalık hedef (günlük hedef × 7)
-            _buildWeeklyGoalSetting(),
-            const SizedBox(height: 16),
+              if (layout.isWide)
+                StatsGrid(columns: 2, children: [efficiency, weeklyGoal])
+              else ...[
+                efficiency,
+                const SizedBox(height: 16),
+                weeklyGoal,
+              ],
+              const SizedBox(height: 16),
 
-            // 3. Toplam süre ve en verimli gün
-            _buildStatsBento(weekMinutes, busiestDay(days)),
-            const SizedBox(height: 24),
+              // 3. Toplam süre ve en verimli gün
+              _buildStatsBento(weekMinutes, busiestDay(days)),
+              const SizedBox(height: 24),
 
-            // 4. Ders bazında haftalık analiz
-            _buildWeeklyAnalysis(subjects),
-            const SizedBox(height: 100),
-          ],
-        ),
+              // 4. Ders bazında haftalık analiz
+              _buildWeeklyAnalysis(subjects),
+              SizedBox(height: layout.bottomSpacing(100)),
+            ],
+          );
+        },
       ),
     );
   }
 
   // --- 1. HAFTALIK TREND ---
-  Widget _buildWeeklyTrendChart(List<DayStat> days, int selectedIndex) {
+  Widget _buildWeeklyTrendChart(List<DayStat> days, int selectedIndex, StatsLayout layout) {
     final lang = LanguageService.instance;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final locale = StatsText.dateLocale;
     final accent = isDark ? AppColors.darkPrimary : AppColors.primary;
+    // Grafik yüksekliği ekrana göre: dikey telefonda 160 (sütun en çok 120),
+    // yatay telefonda kısa, tablette yüksek.
+    final chartHeight = layout.chartHeight(160);
+    final maxBarHeight = chartHeight * 0.75;
+    final barWidth = layout.isWide ? 40.0 : 32.0;
 
     final maxMins = max(60, days.map((d) => d.minutes).reduce(max)); // en az 1 saatlik ölçek
     final selected = days[selectedIndex];
@@ -174,9 +191,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 32),
+          SizedBox(height: layout.isShortHeight ? 20 : 32),
           SizedBox(
-            height: 160,
+            height: chartHeight,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: List.generate(days.length, (index) {
@@ -199,23 +216,35 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          // Dar ekranlarda sütun, payına düşen genişliğe sığar.
-                          Container(
-                            width: 32,
-                            height: 120 * heightFactor + 4, // en az 4 px
-                            margin: const EdgeInsets.symmetric(horizontal: 2),
-                            decoration: BoxDecoration(
-                              color: isSelected ? accent : accent.withValues(alpha: 0.2),
-                              borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-                              boxShadow: isSelected
-                                  ? [
-                                      BoxShadow(
-                                        color: accent.withValues(alpha: 0.3),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 4),
-                                      ),
-                                    ]
-                                  : null,
+                          // Sütun, gün etiketinden kalan yüksekliğe sığar
+                          // (büyük yazı boyutunda taşmaz). Dar ekranlarda
+                          // payına düşen genişliğe sığar.
+                          Expanded(
+                            child: LayoutBuilder(
+                              builder: (context, box) {
+                                final barArea = min(maxBarHeight, max(0.0, box.maxHeight - 4));
+                                return Align(
+                                  alignment: Alignment.bottomCenter,
+                                  child: Container(
+                                    width: barWidth,
+                                    height: barArea * heightFactor + 4, // en az 4 px
+                                    margin: const EdgeInsets.symmetric(horizontal: 2),
+                                    decoration: BoxDecoration(
+                                      color: isSelected ? accent : accent.withValues(alpha: 0.2),
+                                      borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+                                      boxShadow: isSelected
+                                          ? [
+                                              BoxShadow(
+                                                color: accent.withValues(alpha: 0.3),
+                                                blurRadius: 8,
+                                                offset: const Offset(0, 4),
+                                              ),
+                                            ]
+                                          : null,
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -277,6 +306,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         children: [
           Expanded(
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
@@ -476,12 +506,20 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          Text(
-                            StatsText.duration(best.minutes),
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF0055D4),
+                          // Dar kartta ya da büyük yazı boyutunda küçülür.
+                          ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 88),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                StatsText.duration(best.minutes),
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF0055D4),
+                                ),
+                              ),
                             ),
                           ),
                         ],
@@ -685,6 +723,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(

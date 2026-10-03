@@ -1,8 +1,11 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../models/avatar_model.dart';
 import '../../theme.dart';
+import '../../utils/responsive.dart';
 import '../avatar_widget.dart';
 import 'countdown_text.dart';
 import 'ranking_models.dart';
@@ -170,6 +173,7 @@ class RankingEmptyView extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.leaderboard_outlined, size: 48, color: _muted(isDark)),
           const SizedBox(height: 12),
@@ -202,6 +206,7 @@ class LeaguePlacementView extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           const Icon(Icons.hourglass_empty_rounded, size: 48, color: AppColors.primaryContainer),
           const SizedBox(height: 12),
@@ -222,6 +227,129 @@ class LeaguePlacementView extends StatelessWidget {
   }
 }
 
+/// Bir sıralama sekmesinin gövdesi: kullanıcının durum kartı, podyum ve 4.
+/// sıradan itibaren liste.
+///
+/// Dar alanda (telefon, tablet dikey) bugünkü tek sütun düzeni okunabilir
+/// genişlikte ortalanır. Yeterince geniş alanda (tablet yatay, yatay telefon)
+/// durum kartı ve podyum solda, liste sağda iki sütuna bölünür; böylece
+/// liste kaydırmadan görünür.
+class RankingStandings extends StatelessWidget {
+  final List<RankingEntry> entries;
+
+  /// Lig sekmesinde odanın özeti (terfi/düşme bölgeleri); diğer sekmelerde null.
+  final LeagueSnapshot? league;
+
+  /// Dikey alanı kıt ekranlar (yatay telefon): küçük podyum.
+  final bool compact;
+
+  const RankingStandings({super.key, required this.entries, this.league, this.compact = false});
+
+  /// İki sütuna geçilen en dar genişlik.
+  static const double splitMinWidth = 800;
+
+  /// Küçük podyumla (yatay telefon) iki sütuna geçilen en dar genişlik.
+  static const double compactSplitMinWidth = 600;
+
+  static const double _gap = 20;
+
+  @override
+  Widget build(BuildContext context) {
+    final league = this.league;
+    // Lig-yok satırı (tek kişi, 0 puan): sahte "#1" podyumu gösterilmez.
+    if (league != null && league.awaitingPlacement) return const ContentWidth(child: LeaguePlacementView());
+    if (entries.isEmpty) return const ContentWidth(child: RankingEmptyView());
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final myIndex = entries.indexWhere((e) => e.isMe);
+
+    // Terfi/düşme bölgesi podyum dahil her sıra için aynı kuralla gösterilir.
+    LeagueZone zoneOf(RankingEntry entry, int rank) => league?.zoneOf(rank, entry.points) ?? LeagueZone.none;
+
+    Color? zoneColor(RankingEntry entry, int rank) => switch (zoneOf(entry, rank)) {
+          LeagueZone.promotion => Colors.green.withValues(alpha: 0.15),
+          LeagueZone.demotion => Colors.red.withValues(alpha: 0.15),
+          _ => null,
+        };
+
+    final myRank = myIndex == -1
+        ? null
+        : MyRankCard(
+            rank: myIndex + 1,
+            points: entries[myIndex].points,
+            zone: league == null ? null : zoneOf(entries[myIndex], myIndex + 1),
+          );
+    final podium = RankingPodium(
+      top: entries.take(3).toList(),
+      zoneOf: league == null ? null : zoneOf,
+      compact: compact,
+    );
+    final list = entries.length <= 3
+        ? null
+        : Container(
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(
+              color: isDark ? AppColors.darkSurfaceContainerLowest : AppColors.surfaceContainerLowest,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2)),
+              ],
+            ),
+            child: Column(
+              children: [
+                for (var i = 3; i < entries.length; i++) ...[
+                  if (i > 3)
+                    Divider(
+                      height: 1,
+                      color: isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow,
+                    ),
+                  RankingRow(entry: entries[i], rank: i + 1, zoneColor: zoneColor(entries[i], i + 1)),
+                ],
+              ],
+            ),
+          );
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        if (list == null || width < (compact ? compactSplitMinWidth : splitMinWidth)) {
+          return ContentWidth(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (myRank != null) ...[myRank, const SizedBox(height: 12)],
+                podium,
+                const SizedBox(height: 20),
+                ?list,
+              ],
+            ),
+          );
+        }
+        // Sol sütun podyumun tam (ya da küçük) boyuna yetecek kadar geniş
+        // tutulur; kalan alan listeye kalır.
+        final leftWidth = math.max(compact ? 280.0 : 360.0, (width - _gap) * 0.42);
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: leftWidth,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (myRank != null) ...[myRank, const SizedBox(height: 12)],
+                  podium,
+                ],
+              ),
+            ),
+            const SizedBox(width: _gap),
+            Expanded(child: list),
+          ],
+        );
+      },
+    );
+  }
+}
+
 /// İlk üç: ortada 1. (en büyük), solda 2., sağda 3.
 class RankingPodium extends StatelessWidget {
   final List<RankingEntry> top;
@@ -231,32 +359,59 @@ class RankingPodium extends StatelessWidget {
   /// gösterilir.
   final LeagueZone Function(RankingEntry entry, int rank)? zoneOf;
 
-  const RankingPodium({super.key, required this.top, this.zoneOf});
+  /// Dikey alanı kıt ekranlar (yatay telefon) için küçültülmüş podyum.
+  /// Tam boy koltuklar sığmayacak kadar dar alanda da kendiliğinden
+  /// küçülür.
+  final bool compact;
 
-  Widget _seat(int index) => _PodiumSeat(entry: top[index], rank: index + 1, zone: zoneOf?.call(top[index], index + 1));
+  const RankingPodium({super.key, required this.top, this.zoneOf, this.compact = false});
+
+  static const double _compactScale = 0.75;
+  static const double _horizontalPadding = 12;
+
+  // Tam boy üç koltuğun (altın halka dahil en geniş koltuk 104 px) yan yana
+  // sığdığı en dar podyum.
+  static const double _fullSizeMinWidth = 3 * 104 + 2 * _horizontalPadding;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurfaceContainerLowest : AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 4)),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          if (top.length >= 2) _seat(1) else const SizedBox(width: 80),
-          if (top.isNotEmpty) _seat(0),
-          if (top.length >= 3) _seat(2) else const SizedBox(width: 80),
-        ],
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final small = compact || constraints.maxWidth < _fullSizeMinWidth;
+        final scale = small ? _compactScale : 1.0;
+        // Koltuklar Flexible: metin ölçeği büyüse ya da alan daralsa da satır
+        // taşmaz; sığdığında yerleşim eskisiyle aynıdır (spaceEvenly).
+        Widget seat(int index) => Flexible(
+              child: _PodiumSeat(
+                entry: top[index],
+                rank: index + 1,
+                zone: zoneOf?.call(top[index], index + 1),
+                scale: scale,
+              ),
+            );
+        final placeholder = SizedBox(width: 80 * scale);
+        return Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(vertical: small ? 12 : 20, horizontal: _horizontalPadding),
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.darkSurfaceContainerLowest : AppColors.surfaceContainerLowest,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 4)),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              if (top.length >= 2) seat(1) else placeholder,
+              if (top.isNotEmpty) seat(0),
+              if (top.length >= 3) seat(2) else placeholder,
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -283,18 +438,22 @@ class _PodiumSeat extends StatelessWidget {
   final int rank;
   final LeagueZone? zone;
 
-  const _PodiumSeat({required this.entry, required this.rank, this.zone});
+  /// Avatar, madalya ve isim genişliği çarpanı (küçük podyumda < 1).
+  final double scale;
+
+  const _PodiumSeat({required this.entry, required this.rank, this.zone, this.scale = 1});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final style = _PodiumStyle.forRank(rank);
+    final small = scale < 1;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Padding(
-          padding: const EdgeInsets.only(bottom: 6),
-          child: Icon(Icons.workspace_premium, color: style.medal, size: style.medalSize),
+          padding: EdgeInsets.only(bottom: small ? 4 : 6),
+          child: Icon(Icons.workspace_premium, color: style.medal, size: style.medalSize * scale),
         ),
         Stack(
           clipBehavior: Clip.none,
@@ -302,39 +461,44 @@ class _PodiumSeat extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(rank == 1 ? 4 : 3),
               decoration: BoxDecoration(shape: BoxShape.circle, gradient: LinearGradient(colors: style.ring)),
-              child: AvatarWidget(avatar: AvatarCharacter.byId(entry.avatarId), size: style.avatarSize),
+              child: AvatarWidget(avatar: AvatarCharacter.byId(entry.avatarId), size: style.avatarSize * scale),
             ),
             Positioned(
               bottom: -6,
               left: 0,
               right: 0,
+              // Rozet avatar genişliğini aşacaksa (küçük podyum, büyük metin
+              // ölçeği) bütünüyle küçülür.
               child: Center(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: style.medal,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2))],
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(style.badgeIcon, size: 12, color: style.badgeText),
-                      const SizedBox(width: 2),
-                      Text(
-                        '#$rank',
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: style.badgeText),
-                      ),
-                    ],
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: style.medal,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2))],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(style.badgeIcon, size: 12, color: style.badgeText),
+                        const SizedBox(width: 2),
+                        Text(
+                          '#$rank',
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: style.badgeText),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: small ? 10 : 12),
         SizedBox(
-          width: 90,
+          width: small ? 80 : 90,
           child: Text(
             entry.name ?? l10n.userDefault,
             textAlign: TextAlign.center,
@@ -407,57 +571,67 @@ class RankingRow extends StatelessWidget {
     final background = zoneColor ??
         (entry.isMe ? AppColors.primaryContainer.withValues(alpha: 0.12) : Colors.transparent);
     final name = entry.name ?? l10n.userDefault;
-    return Container(
-      decoration: BoxDecoration(
-        color: background,
-        border: entry.isMe ? const Border(left: BorderSide(color: AppColors.primary, width: 4)) : null,
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        children: [
-          Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              color: isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow,
-              shape: BoxShape.circle,
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              '$rank',
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: _muted(isDark)),
-            ),
+    // Satırın iç genişliği (yatay dolgu ve kendi satırındaki sol çizgi hariç);
+    // puan rozeti bunun en fazla ~üçte birini alır, isme yer kalır.
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final rowWidth = constraints.maxWidth - 32 - (entry.isMe ? 4 : 0);
+        return Container(
+          decoration: BoxDecoration(
+            color: background,
+            border: entry.isMe ? const Border(left: BorderSide(color: AppColors.primary, width: 4)) : null,
           ),
-          const SizedBox(width: 12),
-          AvatarWidget(avatar: AvatarCharacter.byId(entry.avatarId), size: 40),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  entry.isMe ? '$name ${l10n.youBadge}' : name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: entry.isMe ? AppColors.primary : null,
-                  ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              // En az 28 px daire; büyük metin ölçeğinde sıra numarası kesilmez.
+              Container(
+                constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                decoration: BoxDecoration(
+                  color: isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow,
+                  shape: BoxShape.circle,
                 ),
-                if (entry.minutes != null) ...[
-                  const SizedBox(height: 2),
-                  Text(
-                    l10n.minutesStudy(entry.minutes!),
-                    style: TextStyle(fontSize: 12, color: _muted(isDark)),
-                  ),
-                ],
-              ],
-            ),
+                alignment: Alignment.center,
+                child: Text(
+                  '$rank',
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: _muted(isDark)),
+                ),
+              ),
+              const SizedBox(width: 12),
+              AvatarWidget(avatar: AvatarCharacter.byId(entry.avatarId), size: 40),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      entry.isMe ? '$name ${l10n.youBadge}' : name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: entry.isMe ? AppColors.primary : null,
+                      ),
+                    ),
+                    if (entry.minutes != null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        l10n.minutesStudy(entry.minutes!),
+                        style: TextStyle(fontSize: 12, color: _muted(isDark)),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: math.max(0.0, rowWidth * 0.35)),
+                child: _PointsBadge(points: entry.points),
+              ),
+            ],
           ),
-          _PointsBadge(points: entry.points),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -476,12 +650,18 @@ class _PointsBadge extends StatelessWidget {
         color: AppColors.primaryFixed,
         borderRadius: BorderRadius.circular(small ? 10 : 12),
       ),
-      child: Text(
-        AppLocalizations.of(context)!.rankingPoints(points),
-        style: TextStyle(
-          fontSize: small ? 11 : 13,
-          fontWeight: FontWeight.bold,
-          color: AppColors.onPrimaryFixed,
+      // Sınırlı alanda (podyum koltuğu, liste satırı) büyük metin ölçeğinde
+      // rozet tek satırda küçülür; sığdığında boyutu değişmez.
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          AppLocalizations.of(context)!.rankingPoints(points),
+          maxLines: 1,
+          style: TextStyle(
+            fontSize: small ? 11 : 13,
+            fontWeight: FontWeight.bold,
+            color: AppColors.onPrimaryFixed,
+          ),
         ),
       ),
     );

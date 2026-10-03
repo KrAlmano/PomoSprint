@@ -6,6 +6,7 @@ import '../l10n/app_localizations.dart';
 import '../models/user_model.dart';
 import '../services/supabase_service.dart';
 import '../theme.dart';
+import '../utils/responsive.dart';
 import '../widgets/league_info_sheet.dart';
 import '../widgets/social/league_tiers.dart';
 import '../widgets/social/load_error_view.dart';
@@ -185,10 +186,15 @@ class _RankingScreenState extends State<RankingScreen> {
     ]..sort(RankingEntry.compare);
   }
 
+  // Düzen: sekme çubuğu, geri sayım ve durum mesajları okunabilir genişlikte
+  // ortalanır; podyum ve liste geniş ekranda (tablet yatay) iki sütuna
+  // bölünür (bkz. RankingStandings). Yatay telefonda dikey alan kıt olduğu
+  // için podyum küçülür ve her şey tek kaydırmada kalır.
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final data = _data[_tab]!;
+    final compact = Responsive.of(context).isShortHeight;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -198,28 +204,42 @@ class _RankingScreenState extends State<RankingScreen> {
           color: AppColors.primary,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildTabBar(l10n),
-                const SizedBox(height: 16),
-                ..._buildBanner(l10n),
-                if (!data.loaded)
-                  data.error != null
-                      ? LoadErrorView(message: l10n.rankingLoadError, onRetry: () => _load(_tab))
-                      : const Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(40.0),
-                            child: CircularProgressIndicator(color: AppColors.primary),
-                          ),
-                        )
-                else ...[
-                  if (data.error != null) StaleDataNotice(onRetry: () => _load(_tab)),
-                  ..._buildList(_visibleEntries()),
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: compact ? 12 : 20),
+            child: ContentWidth(
+              maxWidth: ContentWidth.dashboard,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ContentWidth(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildTabBar(l10n),
+                        SizedBox(height: compact ? 12 : 16),
+                        ..._buildBanner(l10n),
+                        if (!data.loaded)
+                          data.error != null
+                              ? LoadErrorView(message: l10n.rankingLoadError, onRetry: () => _load(_tab))
+                              : const Center(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(40.0),
+                                    child: CircularProgressIndicator(color: AppColors.primary),
+                                  ),
+                                )
+                        else if (data.error != null)
+                          StaleDataNotice(onRetry: () => _load(_tab)),
+                      ],
+                    ),
+                  ),
+                  if (data.loaded)
+                    RankingStandings(
+                      entries: _visibleEntries(),
+                      league: _tab == _RankingTab.league ? _league : null,
+                      compact: compact,
+                    ),
+                  const SizedBox(height: 24),
                 ],
-                const SizedBox(height: 24),
-              ],
+              ),
             ),
           ),
         ),
@@ -255,14 +275,21 @@ class _RankingScreenState extends State<RankingScreen> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   alignment: Alignment.center,
-                  child: Text(
-                    entry.value,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: _tab == entry.key
-                          ? Colors.white
-                          : (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  // Dar sekmede ya da büyük metin ölçeğinde etiket tek satırda
+                  // küçülür; çubuk sabit yükseklikte kalır, taşmaz.
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      entry.value,
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: _tab == entry.key
+                            ? Colors.white
+                            : (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
+                      ),
                     ),
                   ),
                 ),
@@ -294,60 +321,5 @@ class _RankingScreenState extends State<RankingScreen> {
         return const [];
     }
     return [banner, const SizedBox(height: 12)];
-  }
-
-  List<Widget> _buildList(List<RankingEntry> entries) {
-    final league = _tab == _RankingTab.league ? _league : null;
-    // Lig-yok satırı (tek kişi, 0 puan): sahte "#1" podyumu gösterilmez.
-    if (league != null && league.awaitingPlacement) return const [LeaguePlacementView()];
-    if (entries.isEmpty) return const [RankingEmptyView()];
-
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final myIndex = entries.indexWhere((e) => e.isMe);
-
-    // Terfi/düşme bölgesi podyum dahil her sıra için aynı kuralla gösterilir.
-    LeagueZone zoneOf(RankingEntry entry, int rank) => league?.zoneOf(rank, entry.points) ?? LeagueZone.none;
-
-    Color? zoneColor(RankingEntry entry, int rank) => switch (zoneOf(entry, rank)) {
-          LeagueZone.promotion => Colors.green.withValues(alpha: 0.15),
-          LeagueZone.demotion => Colors.red.withValues(alpha: 0.15),
-          _ => null,
-        };
-
-    return [
-      if (myIndex != -1) ...[
-        MyRankCard(
-          rank: myIndex + 1,
-          points: entries[myIndex].points,
-          zone: league == null ? null : zoneOf(entries[myIndex], myIndex + 1),
-        ),
-        const SizedBox(height: 12),
-      ],
-      RankingPodium(top: entries.take(3).toList(), zoneOf: league == null ? null : zoneOf),
-      const SizedBox(height: 20),
-      if (entries.length > 3)
-        Container(
-          clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(
-            color: isDark ? AppColors.darkSurfaceContainerLowest : AppColors.surfaceContainerLowest,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2)),
-            ],
-          ),
-          child: Column(
-            children: [
-              for (var i = 3; i < entries.length; i++) ...[
-                if (i > 3)
-                  Divider(
-                    height: 1,
-                    color: isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow,
-                  ),
-                RankingRow(entry: entries[i], rank: i + 1, zoneColor: zoneColor(entries[i], i + 1)),
-              ],
-            ],
-          ),
-        ),
-    ];
   }
 }

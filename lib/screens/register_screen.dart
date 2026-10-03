@@ -6,6 +6,7 @@ import '../models/user_model.dart';
 import '../services/supabase_service.dart';
 import '../services/language_service.dart';
 import '../utils/auth_error_text.dart';
+import '../utils/responsive.dart';
 import '../theme.dart';
 import '../widgets/auth/auth_error_banner.dart';
 import '../widgets/auth/legal_links.dart';
@@ -156,8 +157,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 480),
+            // Tablette ortalanmış form genişliği; kaydırma tüm genişlikte çalışır.
+            child: ContentWidth(
+              maxWidth: ContentWidth.form,
               child: _isVerificationSent
                   ? _buildVerificationSentView()
                   : AutofillGroup(
@@ -309,11 +311,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   : Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Text(
-                                          l10n.registerBtn,
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
+                                        Flexible(
+                                          child: Text(
+                                            l10n.registerBtn,
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ),
                                         const SizedBox(width: 8),
@@ -325,9 +329,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                           const SizedBox(height: 24),
 
-                          // Login Link
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                          // Login Link (dar ekranda ya da büyük yazıda alt satıra geçer)
+                          Wrap(
+                            alignment: WrapAlignment.center,
+                            crossAxisAlignment: WrapCrossAlignment.center,
                             children: [
                               Text(
                                 l10n.alreadyHaveAccount,
@@ -409,55 +414,58 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ],
           ),
           const SizedBox(height: 14),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              crossAxisSpacing: 8,
-              mainAxisSpacing: 8,
-              childAspectRatio: 1.1,
-            ),
-            itemCount: avatars.length,
-            itemBuilder: (context, index) {
-              final avatar = avatars[index];
-              final isSelected = avatar.id == selectedAvatar.id;
-              return GestureDetector(
-                onTap: () => setState(() => _selectedAvatarId = avatar.id),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? avatar.backgroundColor
-                        : (isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: isSelected ? AppColors.primary : Colors.transparent,
-                      width: 2,
+          // Telefonda 3 sütun (bugünkü); tablette form genişliğinde 4 sütun.
+          LayoutBuilder(
+            builder: (context, constraints) => GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: constraints.maxWidth >= 420 ? 4 : 3,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+                childAspectRatio: 1.1,
+              ),
+              itemCount: avatars.length,
+              itemBuilder: (context, index) {
+                final avatar = avatars[index];
+                final isSelected = avatar.id == selectedAvatar.id;
+                return GestureDetector(
+                  onTap: () => setState(() => _selectedAvatarId = avatar.id),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? avatar.backgroundColor
+                          : (isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isSelected ? AppColors.primary : Colors.transparent,
+                        width: 2,
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        AvatarWidget(avatar: avatar, size: 38),
+                        const SizedBox(height: 2),
+                        Text(
+                          avatar.getName(isTurkish),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          softWrap: true,
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                            color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                            height: 1.1,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      AvatarWidget(avatar: avatar, size: 38),
-                      const SizedBox(height: 2),
-                      Text(
-                        avatar.getName(isTurkish),
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        softWrap: true,
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
-                          height: 1.1,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ],
       ),

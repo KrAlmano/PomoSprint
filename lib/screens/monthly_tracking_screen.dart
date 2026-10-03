@@ -5,12 +5,18 @@ import '../l10n/app_localizations.dart';
 import '../models/category_model.dart';
 import '../services/language_service.dart';
 import '../theme.dart';
+import '../utils/responsive.dart';
 import '../utils/stats_calculator.dart';
 import '../widgets/stats/category_style.dart';
+import '../widgets/stats/stats_layout.dart';
 import '../widgets/stats/stats_text.dart';
 
 /// Raporlar > Aylık Takip. Veriler ReportsScreen'den gelir; tüm gün ve hafta
 /// hesapları stats_calculator ile (04:00 kuralı, takvim aritmetiği) yapılır.
+///
+/// Düzen: dikey telefonda tek sütun. Yeterli genişlikte (tablet, yatay
+/// telefon) ısı haritası ile konu karşılaştırması eşit yükseklikte yan yana,
+/// haftalık özet kartları 2-3 sütunlu ızgaradır.
 class MonthlyTrackingScreen extends StatelessWidget {
   final List<StatSession> sessions;
 
@@ -52,27 +58,55 @@ class MonthlyTrackingScreen extends StatelessWidget {
     final weeks = weeksOfMonth(monthStart, today);
     final monthToDate = monthToDateComparison(sessions, today);
     final growth = percentChangeOf(monthToDate.current, monthToDate.previous);
+    final days = dailyTotals(sessions, monthStart, monthEnd);
+    final series = weeklyCategorySeries(sessions, weeks);
 
     return RefreshIndicator(
       onRefresh: onRefresh,
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeatmap(context, isDark, dailyTotals(sessions, monthStart, monthEnd)),
-            const SizedBox(height: 24),
-            _buildTopicComparison(context, isDark, weeks, weeklyCategorySeries(sessions, weeks)),
-            const SizedBox(height: 24),
-            _buildWeeklySummary(context, isDark, weeks),
-            if (growth != null && growth > 0) ...[
-              const SizedBox(height: 16),
-              _buildMotivation(context, isDark, growth),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final layout = StatsLayout.of(context, constraints.maxWidth);
+          final chartHeight = layout.chartHeight(160);
+          // Yan yana düzen: tablette ve yatay telefonda ısı haritası tüm
+          // genişliğe yayılıp ekranı kaplamaz.
+          final split = layout.contentWidth >= 480;
+
+          return StatsScrollView(
+            layout: layout,
+            maxWidth: ContentWidth.dashboard,
+            children: [
+              if (split)
+                IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        flex: layout.isExpanded ? 2 : 1,
+                        child: _buildHeatmap(context, isDark, days, fill: true),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        flex: layout.isExpanded ? 3 : 1,
+                        child: _buildTopicComparison(context, isDark, weeks, series, chartHeight: chartHeight, fill: true),
+                      ),
+                    ],
+                  ),
+                )
+              else ...[
+                _buildHeatmap(context, isDark, days, maxGridWidth: layout.isShortHeight ? 360 : null),
+                const SizedBox(height: 24),
+                _buildTopicComparison(context, isDark, weeks, series, chartHeight: chartHeight),
+              ],
+              const SizedBox(height: 24),
+              _buildWeeklySummary(context, isDark, weeks, columns: layout.columns(compact: 1, medium: 2, expanded: 3)),
+              if (growth != null && growth > 0) ...[
+                const SizedBox(height: 16),
+                _buildMotivation(context, isDark, growth),
+              ],
+              SizedBox(height: layout.bottomSpacing(100)),
             ],
-            const SizedBox(height: 100),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -85,7 +119,9 @@ class MonthlyTrackingScreen extends StatelessWidget {
       ).color;
 
   // ─── ISI HARİTASI ───
-  Widget _buildHeatmap(BuildContext context, bool isDark, List<DayStat> days) {
+  // [fill]: yan yana düzende kart, satırın kalan yüksekliğini doldurur.
+  // [maxGridWidth]: kısa ekranda hücrelerin aşırı büyümesini önler.
+  Widget _buildHeatmap(BuildContext context, bool isDark, List<DayStat> days, {bool fill = false, double? maxGridWidth}) {
     final lang = LanguageService.instance;
     final locale = StatsText.dateLocale;
     final monthStart = monthStartOf(today);
@@ -103,6 +139,110 @@ class MonthlyTrackingScreen extends StatelessWidget {
       if (intensity <= 0.75) return base.withValues(alpha: 0.7);
       return base;
     }
+
+    // 7 sütunlu takvim: hafta günü başlıkları, ayın ilk gününe kadar boş
+    // hücreler, sonra günler. Satırlar Row ile kurulur (GridView değil);
+    // böylece kart yan yana düzende eşit yükseklik ölçümüne katılabilir.
+    final cells = <Widget>[
+      ...List.generate(7, (i) => ExcludeSemantics(
+            child: Center(
+              child: Text(
+                weekdayFormat.format(addDays(firstMonday, i)),
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant).withValues(alpha: 0.6),
+                ),
+              ),
+            ),
+          )),
+      ...List.generate(monthStart.weekday - 1, (_) => const SizedBox.shrink()),
+      ...days.map((day) => Semantics(
+            label: '${cellFormat.format(day.day)}: '
+                '${day.minutes > 0 ? StatsText.duration(day.minutes) : lang.translate('no_study_this_day')}',
+            child: Container(
+              decoration: BoxDecoration(
+                color: cellColor(day.minutes),
+                borderRadius: BorderRadius.circular(4),
+                border: isSameDay(day.day, today) ? Border.all(color: base, width: 1.5) : null,
+              ),
+            ),
+          )),
+    ];
+    const gap = 6.0;
+    Widget grid = Column(
+      children: [
+        for (var start = 0; start < cells.length; start += 7) ...[
+          if (start > 0) const SizedBox(height: gap),
+          Row(
+            children: [
+              for (var i = 0; i < 7; i++) ...[
+                if (i > 0) const SizedBox(width: gap),
+                Expanded(
+                  child: AspectRatio(
+                    aspectRatio: 1,
+                    child: start + i < cells.length ? cells[start + i] : const SizedBox.shrink(),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ],
+      ],
+    );
+    if (maxGridWidth != null) {
+      grid = Center(
+        child: ConstrainedBox(constraints: BoxConstraints(maxWidth: maxGridWidth), child: grid),
+      );
+    }
+
+    final card = Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          grid,
+          const SizedBox(height: 12),
+          // Dar sütunda ya da büyük yazı boyutunda lejant küçülür.
+          ExcludeSemantics(
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerRight,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      lang.translate('heatmap_less'),
+                      style: TextStyle(fontSize: 11, color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
+                    ),
+                    const SizedBox(width: 6),
+                    ...[0.2, 0.4, 0.7, 1.0].map((alpha) => Container(
+                          width: 12,
+                          height: 12,
+                          margin: const EdgeInsets.symmetric(horizontal: 1),
+                          decoration: BoxDecoration(
+                            color: base.withValues(alpha: alpha),
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                        )),
+                    const SizedBox(width: 6),
+                    Text(
+                      lang.translate('heatmap_more'),
+                      style: TextStyle(fontSize: 11, color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,91 +277,22 @@ class MonthlyTrackingScreen extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Column(
-            children: [
-              GridView.count(
-                crossAxisCount: 7,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisSpacing: 6,
-                mainAxisSpacing: 6,
-                children: [
-                  ...List.generate(7, (i) => ExcludeSemantics(
-                        child: Center(
-                          child: Text(
-                            weekdayFormat.format(addDays(firstMonday, i)),
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant).withValues(alpha: 0.6),
-                            ),
-                          ),
-                        ),
-                      )),
-                  ...List.generate(monthStart.weekday - 1, (_) => const SizedBox.shrink()),
-                  ...days.map((day) => Semantics(
-                        label: '${cellFormat.format(day.day)}: '
-                            '${day.minutes > 0 ? StatsText.duration(day.minutes) : lang.translate('no_study_this_day')}',
-                        child: AspectRatio(
-                          aspectRatio: 1,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: cellColor(day.minutes),
-                              borderRadius: BorderRadius.circular(4),
-                              border: isSameDay(day.day, today) ? Border.all(color: base, width: 1.5) : null,
-                            ),
-                          ),
-                        ),
-                      )),
-                ],
-              ),
-              const SizedBox(height: 12),
-              ExcludeSemantics(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      lang.translate('heatmap_less'),
-                      style: TextStyle(fontSize: 11, color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
-                    ),
-                    const SizedBox(width: 6),
-                    ...[0.2, 0.4, 0.7, 1.0].map((alpha) => Container(
-                          width: 12,
-                          height: 12,
-                          margin: const EdgeInsets.symmetric(horizontal: 1),
-                          decoration: BoxDecoration(
-                            color: base.withValues(alpha: alpha),
-                            borderRadius: BorderRadius.circular(3),
-                          ),
-                        )),
-                    const SizedBox(width: 6),
-                    Text(
-                      lang.translate('heatmap_more'),
-                      style: TextStyle(fontSize: 11, color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
+        if (fill) Expanded(child: card) else card,
       ],
     );
   }
 
   // ─── KONU KARŞILAŞTIRMASI (ÇİZGİ GRAFİK) ───
+  // [fill]: yan yana düzende kart ve grafik, satırın kalan yüksekliğini
+  // doldurur; grafik en az [chartHeight] yüksekliğindedir.
   Widget _buildTopicComparison(
     BuildContext context,
     bool isDark,
     List<MonthWeek> weeks,
-    List<CategorySeries> series,
-  ) {
+    List<CategorySeries> series, {
+    required double chartHeight,
+    bool fill = false,
+  }) {
     final l10n = AppLocalizations.of(context)!;
     final names = [
       for (final s in series) s.isOther ? l10n.statsOtherCategory : StatsText.categoryName(context, s.name),
@@ -237,6 +308,85 @@ class MonthlyTrackingScreen extends StatelessWidget {
         ].join(', ')}',
     ].join('; ');
 
+    final chart = CustomPaint(
+      painter: _MultiLineChartPainter(
+        series: [for (final s in series) s.weeklyMinutes],
+        colors: colors,
+        gridColor: (isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant).withValues(alpha: 0.3),
+      ),
+    );
+
+    final card = Semantics(
+      label: summary,
+      excludeSemantics: true,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Wrap(
+              spacing: 16,
+              runSpacing: 8,
+              children: [
+                for (var i = 0; i < series.length; i++)
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(color: colors[i], shape: BoxShape.circle),
+                      ),
+                      const SizedBox(width: 6),
+                      Flexible(
+                        child: Text(
+                          names[i],
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            if (fill)
+              Expanded(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: chartHeight),
+                  child: SizedBox(width: double.infinity, child: chart),
+                ),
+              )
+            else
+              SizedBox(height: chartHeight, width: double.infinity, child: chart),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: weekLabels
+                  .map((l) => Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            l,
+                            style: TextStyle(fontSize: 11, color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
+                          ),
+                        ),
+                      ))
+                  .toList(),
+            ),
+          ],
+        ),
+      ),
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -249,87 +399,111 @@ class MonthlyTrackingScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        Semantics(
-          label: summary,
-          excludeSemantics: true,
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Wrap(
-                  spacing: 16,
-                  runSpacing: 8,
-                  children: [
-                    for (var i = 0; i < series.length; i++)
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 10,
-                            height: 10,
-                            decoration: BoxDecoration(color: colors[i], shape: BoxShape.circle),
-                          ),
-                          const SizedBox(width: 6),
-                          Flexible(
-                            child: Text(
-                              names[i],
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                SizedBox(
-                  height: 160,
-                  width: double.infinity,
-                  child: CustomPaint(
-                    painter: _MultiLineChartPainter(
-                      series: [for (final s in series) s.weeklyMinutes],
-                      colors: colors,
-                      gridColor: (isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant).withValues(alpha: 0.3),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: weekLabels
-                      .map((l) => Flexible(
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                l,
-                                style: TextStyle(fontSize: 11, color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
-                              ),
-                            ),
-                          ))
-                      .toList(),
-                ),
-              ],
-            ),
-          ),
-        ),
+        if (fill) Expanded(child: card) else card,
       ],
     );
   }
 
   // ─── HAFTALIK ÖZET KARTLARI ───
-  Widget _buildWeeklySummary(BuildContext context, bool isDark, List<MonthWeek> weeks) {
+  // Dikey telefonda alt alta; geniş ekranda [columns] sütunlu ızgara.
+  Widget _buildWeeklySummary(BuildContext context, bool isDark, List<MonthWeek> weeks, {int columns = 1}) {
     final l10n = AppLocalizations.of(context)!;
     final lang = LanguageService.instance;
     final dateFmt = DateFormat('d MMM', StatsText.dateLocale);
+
+    final cards = weeks.reversed.map((week) {
+      // Eşit uzunlukta pencereler: bu haftanın ay içindeki ve bugüne
+      // kadarki günleri ile önceki haftanın aynı günleri.
+      final comparison = compareWithPreviousWeek(sessions, week, today);
+      final pct = comparison.percentChange;
+      final isUp = (pct ?? 0) >= 0;
+      final trendColor = isUp ? (isDark ? AppColors.darkPrimary : AppColors.primary) : Colors.red;
+      final pctText = pct == null ? '' : StatsText.percent(context, pct.abs());
+
+      return InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () => _showWeekDetailModal(context, week, comparison.to, isDark),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.darkSurfaceContainerHigh.withValues(alpha: 0.5) : AppColors.surfaceContainerHighest.withValues(alpha: 0.4),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${dateFmt.format(week.rangeStart)} - ${dateFmt.format(week.rangeEnd)}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      l10n.statsWeekStudyTotal(StatsText.duration(comparison.minutes)),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                        color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              if (pct != null)
+                Semantics(
+                  label: isUp ? l10n.statsWeekChangeUp(pctText) : l10n.statsWeekChangeDown(pctText),
+                  excludeSemantics: true,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: (isUp ? AppColors.primary : Colors.red).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          isUp ? Icons.trending_up_rounded : Icons.trending_down_rounded,
+                          size: 18,
+                          color: trendColor,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          pctText,
+                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: trendColor),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              else
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: (isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant).withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    lang.translate('new_week_label'),
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      );
+    }).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -343,101 +517,12 @@ class MonthlyTrackingScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        ...weeks.reversed.map((week) {
-          // Eşit uzunlukta pencereler: bu haftanın ay içindeki ve bugüne
-          // kadarki günleri ile önceki haftanın aynı günleri.
-          final comparison = compareWithPreviousWeek(sessions, week, today);
-          final pct = comparison.percentChange;
-          final isUp = (pct ?? 0) >= 0;
-          final trendColor = isUp ? (isDark ? AppColors.darkPrimary : AppColors.primary) : Colors.red;
-          final pctText = pct == null ? '' : StatsText.percent(context, pct.abs());
-
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(16),
-              onTap: () => _showWeekDetailModal(context, week, comparison.to, isDark),
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: isDark ? AppColors.darkSurfaceContainerHigh.withValues(alpha: 0.5) : AppColors.surfaceContainerHighest.withValues(alpha: 0.4),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '${dateFmt.format(week.rangeStart)} - ${dateFmt.format(week.rangeEnd)}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            l10n.statsWeekStudyTotal(StatsText.duration(comparison.minutes)),
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                              color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    if (pct != null)
-                      Semantics(
-                        label: isUp ? l10n.statsWeekChangeUp(pctText) : l10n.statsWeekChangeDown(pctText),
-                        excludeSemantics: true,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                          decoration: BoxDecoration(
-                            color: (isUp ? AppColors.primary : Colors.red).withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                isUp ? Icons.trending_up_rounded : Icons.trending_down_rounded,
-                                size: 18,
-                                color: trendColor,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                pctText,
-                                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: trendColor),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                    else
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: (isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant).withValues(alpha: 0.3),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          lang.translate('new_week_label'),
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        }),
+        if (columns <= 1)
+          ...cards.map((card) => Padding(padding: const EdgeInsets.only(bottom: 10), child: card))
+        else ...[
+          StatsGrid(columns: columns, spacing: 12, runSpacing: 10, children: cards),
+          const SizedBox(height: 10),
+        ],
       ],
     );
   }
@@ -448,14 +533,18 @@ class MonthlyTrackingScreen extends StatelessWidget {
     final rangeFmt = DateFormat('d MMM', StatsText.dateLocale);
     // Gelecek günler listelenmez: hafta bugüne kadar gösterilir.
     final days = dailyTotals(sessions, week.rangeStart, lastDay);
+    // Yatay telefonda ekranın %60'ı çok kısa kalır; sayfa neredeyse tam açılır.
+    final short = Responsive.of(context).isShortHeight;
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      // Tablette tam genişliğe yayılmaz.
+      constraints: const BoxConstraints(maxWidth: kStatsSheetMaxWidth),
       backgroundColor: Colors.transparent,
       builder: (ctx) {
         return DraggableScrollableSheet(
-          initialChildSize: 0.6,
+          initialChildSize: short ? 0.9 : 0.6,
           minChildSize: 0.3,
           maxChildSize: 0.9,
           expand: false,
@@ -637,43 +726,47 @@ class MonthlyTrackingScreen extends StatelessWidget {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 90,
-              height: 90,
-              decoration: BoxDecoration(
-                color: AppColors.primaryContainer.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
+        // Geniş ekranda metin okunabilir genişlikte ortalanır.
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: ContentWidth.form),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 90,
+                height: 90,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryContainer.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.calendar_month_outlined,
+                  size: 48,
+                  color: isDark ? AppColors.darkPrimary : AppColors.primaryContainer,
+                ),
               ),
-              child: Icon(
-                Icons.calendar_month_outlined,
-                size: 48,
-                color: isDark ? AppColors.darkPrimary : AppColors.primaryContainer,
+              const SizedBox(height: 20),
+              Text(
+                l10n.statsMonthEmptyTitle,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              l10n.statsMonthEmptyTitle,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+              const SizedBox(height: 10),
+              Text(
+                l10n.statsMonthEmptyDesc,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                  height: 1.5,
+                ),
               ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              l10n.statsMonthEmptyDesc,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
-                height: 1.5,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

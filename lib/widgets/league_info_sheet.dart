@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../l10n/app_localizations.dart';
 import '../theme.dart';
 import '../services/supabase_service.dart';
+import '../utils/responsive.dart';
 import 'social/league_tiers.dart';
 import 'social/ranking_models.dart';
 
@@ -16,11 +17,14 @@ import 'social/ranking_models.dart';
 //   -> get_points_config RPC'si.
 // Dönem uzunluğu (14 gün) metinde sabitlenmez; bitiş tarihi sunucudan
 // gösterilir.
+// Tablette ve yatay telefonda sheet tam genişliğe yayılmaz; içerik zaten
+// kaydırılabilir bir liste olduğu için kısa ekranda da taşmaz.
 Future<void> showLeagueInfoSheet(BuildContext context, {LeagueSnapshot? league}) {
   return showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
+    constraints: const BoxConstraints(maxWidth: 640),
     builder: (_) => LeagueInfoSheet(league: league),
   );
 }
@@ -78,9 +82,12 @@ class _LeagueInfoSheetState extends State<LeagueInfoSheet> {
     final onSurface = isDark ? AppColors.darkOnSurface : AppColors.onSurface;
     final onSurfaceVariant = isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant;
     final dailyLimit = _config('daily_league_session_limit', 16);
+    // Yatay telefonda ekranın %85'i birkaç satıra denk gelir; sheet en
+    // yüksek boyunda açılır (içerik yine kaydırılır).
+    final shortHeight = Responsive.of(context).isShortHeight;
 
     return DraggableScrollableSheet(
-      initialChildSize: 0.85,
+      initialChildSize: shortHeight ? 0.95 : 0.85,
       minChildSize: 0.5,
       maxChildSize: 0.95,
       expand: false,

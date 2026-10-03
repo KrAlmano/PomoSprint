@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../models/avatar_model.dart';
@@ -6,6 +8,7 @@ import '../widgets/avatar_widget.dart';
 import '../widgets/social/load_error_view.dart';
 import '../services/supabase_service.dart';
 import '../theme.dart';
+import '../utils/responsive.dart';
 
 class SocialScreen extends StatefulWidget {
   const SocialScreen({super.key});
@@ -116,47 +119,57 @@ class _SocialScreenState extends State<SocialScreen> with WidgetsBindingObserver
     return Scaffold(
       backgroundColor: background,
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 4),
-              child: Row(
-                children: [
-                  Text(
-                    l10n.socialYourFriends,
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+        // Liste tam genişlikte kaydırılır (kenarlardan da kaydırma ve
+        // yenileme çalışır); içerik geniş ekranda okunabilir genişlikte
+        // ortalanır.
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final side = math.max(20.0, (constraints.maxWidth - ContentWidth.reading) / 2);
+            return Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.fromLTRB(side, 20, side, 4),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          l10n.socialYourFriends,
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: _fetchData,
+                    color: AppColors.primary,
+                    child: CustomScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                      slivers: _buildSlivers(l10n, isDark, side),
                     ),
                   ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: RefreshIndicator(
-                onRefresh: _fetchData,
-                color: AppColors.primary,
-                child: CustomScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-                  slivers: _buildSlivers(l10n, isDark),
                 ),
-              ),
-            ),
-          ],
+              ],
+            );
+          },
         ),
       ),
     );
   }
 
-  List<Widget> _buildSlivers(AppLocalizations l10n, bool isDark) {
+  List<Widget> _buildSlivers(AppLocalizations l10n, bool isDark, double side) {
     if (!_loaded) {
       return [
         SliverFillRemaining(
           hasScrollBody: false,
           child: Center(
             child: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.symmetric(horizontal: side, vertical: 20),
               child: LoadErrorView(message: l10n.socialLoadError, onRetry: _fetchData),
             ),
           ),
@@ -165,7 +178,7 @@ class _SocialScreenState extends State<SocialScreen> with WidgetsBindingObserver
     }
 
     final staleNotice = SliverPadding(
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+      padding: EdgeInsets.fromLTRB(side, 8, side, 0),
       sliver: SliverToBoxAdapter(child: StaleDataNotice(onRetry: _fetchData)),
     );
 
@@ -179,7 +192,7 @@ class _SocialScreenState extends State<SocialScreen> with WidgetsBindingObserver
     return [
       if (_error != null) staleNotice,
       SliverPadding(
-        padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
+        padding: EdgeInsets.fromLTRB(side, 24, side, 8),
         sliver: SliverToBoxAdapter(
           child: Row(
             children: [
@@ -189,12 +202,14 @@ class _SocialScreenState extends State<SocialScreen> with WidgetsBindingObserver
                 decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle),
               ),
               const SizedBox(width: 8),
-              Text(
-                l10n.socialFocusingNow,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+              Expanded(
+                child: Text(
+                  l10n.socialFocusingNow,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                  ),
                 ),
               ),
             ],
@@ -202,7 +217,7 @@ class _SocialScreenState extends State<SocialScreen> with WidgetsBindingObserver
         ),
       ),
       SliverPadding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: EdgeInsets.symmetric(horizontal: side),
         sliver: SliverList.builder(
           itemCount: _activeUsers.length,
           itemBuilder: (context, index) => Padding(
