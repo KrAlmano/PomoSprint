@@ -1002,7 +1002,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get errAcceptTerms =>
-      'Devam etmek için kullanım koşullarını kabul edin.';
+      'Devam etmek için Kullanım Şartları\'nı kabul etmelisin.';
 
   @override
   String get errEmailExists =>
@@ -1407,4 +1407,202 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get rankingZoneDemotionMe =>
       'Düşme bölgesindesin: dönem böyle biterse bir alt lige inersin.';
+
+  @override
+  String get authSocialNoticePrefix => 'Devam ederek ';
+
+  @override
+  String get authSocialNoticeTermsLink => 'Kullanım Şartları\'nı';
+
+  @override
+  String get authSocialNoticeMiddle => ' kabul etmiş ve ';
+
+  @override
+  String get authSocialNoticeKvkkLink => 'KVKK Aydınlatma Metni\'ni';
+
+  @override
+  String get authSocialNoticeSuffix => ' okumuş olursun.';
+
+  @override
+  String legalOpenFailed(String url) {
+    return 'Sayfa açılamadı. Tarayıcında şu adresi açabilirsin: $url';
+  }
+
+  @override
+  String get registerNameLabel => 'Görünen ad';
+
+  @override
+  String get registerNameHelper =>
+      'Sıralamada ve arkadaş listelerinde bu ad görünür.';
+
+  @override
+  String get registerErrNameRequired => 'Görünen adını gir.';
+
+  @override
+  String get registerErrNameTooLong => 'Ad en fazla 50 karakter olabilir.';
+
+  @override
+  String get nameNotAllowed => 'Bu ad uygun değil. Lütfen başka bir ad seç.';
+
+  @override
+  String get registerErrEmailRequired => 'E-posta adresini gir.';
+
+  @override
+  String get registerErrPasswordRequired => 'Bir şifre belirle.';
+
+  @override
+  String get registerPasswordHelper => 'En az 6 karakter.';
+
+  @override
+  String get registerShowPassword => 'Şifreyi göster';
+
+  @override
+  String get registerHidePassword => 'Şifreyi gizle';
+
+  @override
+  String get registerConsentsTitle => 'Onaylar';
+
+  @override
+  String get registerConsentRequiredTag => 'Zorunlu';
+
+  @override
+  String get registerConsentOptionalTag => 'İsteğe bağlı';
+
+  @override
+  String get registerConsentTermsPrefix => '';
+
+  @override
+  String get registerConsentTermsLink => 'Kullanım Şartları\'nı';
+
+  @override
+  String get registerConsentTermsSuffix => ' okudum ve kabul ediyorum.';
+
+  @override
+  String get registerConsentPrivacyPrefix => '';
+
+  @override
+  String get registerConsentKvkkLink => 'KVKK Aydınlatma Metni\'ni';
+
+  @override
+  String get registerConsentPrivacyConnector => ' ve ';
+
+  @override
+  String get registerConsentPrivacyLink => 'Gizlilik Politikası\'nı';
+
+  @override
+  String get registerConsentPrivacySuffix => ' okudum.';
+
+  @override
+  String get registerConsentMarketing =>
+      'Yeni özellikler ve güncellemeler hakkında bana e-posta gönderilmesini kabul ediyorum (ticari elektronik ileti onayı).';
+
+  @override
+  String get registerConsentMarketingHint =>
+      'İstediğin zaman e-postalardaki bağlantıyla abonelikten çıkabilirsin.';
+
+  @override
+  String get errAcknowledgePrivacy =>
+      'Devam etmek için KVKK Aydınlatma Metni\'ni ve Gizlilik Politikası\'nı okuduğunu onaylamalısın.';
+
+  @override
+  String get profileLegalSectionTitle => 'Gizlilik ve yasal';
+
+  @override
+  String get kvkkNoticeLink => 'KVKK Aydınlatma Metni';
+
+  @override
+  String get accountDeletionInfoLink => 'Hesap silme hakkında';
+
+  @override
+  String get accountDeletionInfoSub =>
+      'Hangi verilerin silindiği ve web üzerinden silme talebi';
+
+  @override
+  String get deleteAccountSub =>
+      'Hesabını ve tüm verilerini kalıcı olarak siler.';
+
+  @override
+  String get hiddenUsersTitle => 'Gizlenen kullanıcıları göster';
+
+  @override
+  String hiddenUsersCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count kullanıcı gizli · dokununca liste sıfırlanır',
+      zero: 'Gizlenen kullanıcı yok',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get hiddenUsersCleared => 'Gizlenen kullanıcılar yeniden görünecek.';
+
+  @override
+  String get userActionsTooltip => 'Kullanıcı seçenekleri';
+
+  @override
+  String get reportUserAction => 'Kullanıcıyı bildir';
+
+  @override
+  String get reportUserActionSub =>
+      'Uygunsuz bir adı ya da davranışı destek ekibine e-postayla bildir.';
+
+  @override
+  String get hideUserAction => 'Bu kullanıcıyı gizle';
+
+  @override
+  String get hideUserActionSub =>
+      'Sıralamada adı gizlenir, canlı akışta görünmez. Profil\'den geri alabilirsin.';
+
+  @override
+  String userHiddenMsg(String name) {
+    return '$name gizlendi.';
+  }
+
+  @override
+  String get undoAction => 'Geri al';
+
+  @override
+  String get hiddenUserLabel => 'Gizlenen kullanıcı';
+
+  @override
+  String reportEmailSubject(String name) {
+    return 'PomoSprint kullanıcı bildirimi: $name';
+  }
+
+  @override
+  String reportEmailBody(String name, String userId, String place) {
+    return 'Bildirilen görünen ad: $name\nKullanıcı kimliği: $userId\nGörüldüğü yer: $place\n\nNeyi bildiriyorsun? Lütfen kısaca açıkla:\n';
+  }
+
+  @override
+  String get reportUserIdUnknown =>
+      'bilinmiyor (sıralamada kimlik gösterilmez)';
+
+  @override
+  String get reportPlaceLeague => 'Sıralama · Lig';
+
+  @override
+  String get reportPlaceMonthly => 'Sıralama · Aylık';
+
+  @override
+  String get reportPlaceFriendsRanking => 'Sıralama · Arkadaşlar';
+
+  @override
+  String get reportPlaceLiveFeed => 'Sosyal · Şu an odaklananlar';
+
+  @override
+  String get reportPlaceFriendsList => 'Arkadaş listesi';
+
+  @override
+  String get reportPlaceFriendRequest => 'Arkadaşlık isteği';
+
+  @override
+  String reportMailFailed(String email) {
+    return 'E-posta uygulaması açılamadı. Bildirimini $email adresine gönderebilirsin.';
+  }
+
+  @override
+  String get reportCopyAddress => 'Adresi kopyala';
 }

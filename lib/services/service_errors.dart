@@ -99,6 +99,7 @@ enum ServiceErrorCode {
   invalidInput,
   nameTooShort,
   nameTooLong,
+  nameNotAllowed,
   premiumRequired,
   insufficientCoins,
   avatarLocked,

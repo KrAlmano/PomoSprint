@@ -16,6 +16,8 @@ String socialErrorText(AppLocalizations l10n, Object error) {
       return l10n.profileNameTooShort;
     case ServiceErrorCode.nameTooLong:
       return l10n.profileNameTooLong;
+    case ServiceErrorCode.nameNotAllowed:
+      return l10n.nameNotAllowed;
     case ServiceErrorCode.insufficientCoins:
       return l10n.socialErrInsufficientCoins;
     case ServiceErrorCode.premiumRequired:

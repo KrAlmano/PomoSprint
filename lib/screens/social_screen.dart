@@ -6,12 +6,24 @@ import '../l10n/app_localizations.dart';
 import '../models/avatar_model.dart';
 import '../widgets/avatar_widget.dart';
 import '../widgets/social/load_error_view.dart';
+import '../widgets/social/user_safety.dart';
+import '../services/hidden_users.dart';
 import '../services/supabase_service.dart';
 import '../theme.dart';
 import '../utils/responsive.dart';
 
 class SocialScreen extends StatefulWidget {
   const SocialScreen({super.key});
+
+  /// Canlı akıştan kullanıcının gizlediği kişiler çıkarılır.
+  @visibleForTesting
+  static List<Map<String, dynamic>> withoutHidden(List<Map<String, dynamic>> rows, HiddenUserList hidden) {
+    if (hidden.isEmpty) return rows;
+    return [
+      for (final r in rows)
+        if (!hidden.isHidden(id: r['id']?.toString(), name: r['name']?.toString())) r,
+    ];
+  }
 
   @override
   State<SocialScreen> createState() => _SocialScreenState();
@@ -33,6 +45,11 @@ class _SocialScreenState extends State<SocialScreen> with WidgetsBindingObserver
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    HiddenUsersStore.instance.hidden.addListener(_onHiddenUsersChanged);
+  }
+
+  void _onHiddenUsersChanged() {
+    if (mounted) setState(() {});
   }
 
   @override
@@ -55,6 +72,7 @@ class _SocialScreenState extends State<SocialScreen> with WidgetsBindingObserver
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    HiddenUsersStore.instance.hidden.removeListener(_onHiddenUsersChanged);
     _pollingTimer?.cancel();
     super.dispose();
   }
@@ -77,6 +95,8 @@ class _SocialScreenState extends State<SocialScreen> with WidgetsBindingObserver
 
   Future<void> _fetchData() async {
     final requestId = ++_requestId;
+    // Gizlenen kullanıcılar oturumdaki hesaba bağlı.
+    unawaited(HiddenUsersStore.instance.load(SupabaseService.instance.currentUser.value?.id));
     try {
       final live = await SupabaseService.instance.getLiveFriends();
       if (!mounted || requestId != _requestId) return;
@@ -101,6 +121,18 @@ class _SocialScreenState extends State<SocialScreen> with WidgetsBindingObserver
       for (final r in rows)
         if (r['id'] == null || seen.add(r['id'].toString())) r,
     ];
+  }
+
+  void _openUserActions(Map<String, dynamic> user, AppLocalizations l10n) {
+    unawaited(showUserSafetySheet(
+      context,
+      target: UserSafetyTarget(
+        name: user['name']?.toString() ?? l10n.userDefault,
+        userId: user['id']?.toString(),
+        avatarId: user['avatar_id']?.toString(),
+      ),
+      place: UserReportPlace.liveFeed,
+    ));
   }
 
   @override
@@ -182,7 +214,8 @@ class _SocialScreenState extends State<SocialScreen> with WidgetsBindingObserver
       sliver: SliverToBoxAdapter(child: StaleDataNotice(onRetry: _fetchData)),
     );
 
-    if (_activeUsers.isEmpty) {
+    final users = SocialScreen.withoutHidden(_activeUsers, HiddenUsersStore.instance.hidden.value);
+    if (users.isEmpty) {
       return [
         if (_error != null) staleNotice,
         SliverFillRemaining(hasScrollBody: false, child: _buildEmptyState(l10n, isDark)),
@@ -219,10 +252,10 @@ class _SocialScreenState extends State<SocialScreen> with WidgetsBindingObserver
       SliverPadding(
         padding: EdgeInsets.symmetric(horizontal: side),
         sliver: SliverList.builder(
-          itemCount: _activeUsers.length,
+          itemCount: users.length,
           itemBuilder: (context, index) => Padding(
             padding: const EdgeInsets.only(bottom: 10),
-            child: _buildActiveUserItem(_activeUsers[index], l10n, isDark),
+            child: _buildActiveUserItem(users[index], l10n, isDark),
           ),
         ),
       ),
@@ -234,8 +267,8 @@ class _SocialScreenState extends State<SocialScreen> with WidgetsBindingObserver
     final name = user['name']?.toString() ?? l10n.userDefault;
     final category = (user['category_name'] ?? user['active_session_category_name'])?.toString().trim() ?? '';
 
-    return Container(
-      padding: const EdgeInsets.all(12),
+    final card = Container(
+      padding: const EdgeInsets.fromLTRB(12, 12, 4, 12),
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkSurfaceContainerLowest : AppColors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(14),
@@ -274,9 +307,11 @@ class _SocialScreenState extends State<SocialScreen> with WidgetsBindingObserver
             color: isDark ? AppColors.darkPrimary : AppColors.primary,
             size: 20,
           ),
+          UserActionsButton(onPressed: () => _openUserActions(user, l10n)),
         ],
       ),
     );
+    return GestureDetector(onLongPress: () => _openUserActions(user, l10n), child: card);
   }
 
   Widget _buildEmptyState(AppLocalizations l10n, bool isDark) {

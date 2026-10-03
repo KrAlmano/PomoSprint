@@ -219,7 +219,20 @@ class TimerPersistence {
     });
   }
 
+  // Hesabı silinmiş sahipler. Hesap silinince Shell kapanırken sayaç ekranı
+  // dispose'da süren seansı yeniden yazıyordu; bu süreç boyunca bu
+  // sahiplere yazma yapılmaz (yeni hesabın kimliği farklıdır).
+  final Set<String> _retiredOwners = {};
+
+  /// Hesabı silinen kullanıcının süren seans kaydını siler ve bu süreçte
+  /// o sahibe yeniden yazılmasını engeller.
+  Future<void> retireOwner(String ownerKey) {
+    _retiredOwners.add(ownerKey);
+    return clear(ownerKey);
+  }
+
   Future<void> save(String ownerKey, ActiveTimerSession session) {
+    if (_retiredOwners.contains(ownerKey)) return Future.value();
     return _lock.synchronized(() async {
       try {
         final prefs = await SharedPreferences.getInstance();

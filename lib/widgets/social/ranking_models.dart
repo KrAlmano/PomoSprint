@@ -12,23 +12,38 @@ class RankingEntry {
   /// (arkadaşlar sekmesi) ile belirlenir; isimle eşleştirme yapılmaz.
   final bool isMe;
 
+  /// Genel kullanıcı kimliği. Yalnızca arkadaşlar sekmesi (get_my_friends)
+  /// döndürür; lig ve aylık sıralamada yoktur.
+  final String? userId;
+
+  /// Kullanıcının gizlediği biri: sıra ve puan korunur (lig bölgeleri
+  /// bozulmasın), ad ve avatar gösterilmez.
+  final bool hidden;
+
   const RankingEntry({
     this.name,
     this.avatarId,
     required this.points,
     this.minutes,
     this.isMe = false,
+    this.userId,
+    this.hidden = false,
   });
 
   factory RankingEntry.fromRow(Map<String, dynamic> row, {required String pointsKey}) {
+    final id = row['id']?.toString();
     return RankingEntry(
       name: row['name']?.toString(),
       avatarId: row['avatar_id']?.toString(),
       points: _asInt(row[pointsKey]),
       minutes: row['total_minutes'] == null ? null : _asInt(row['total_minutes']),
       isMe: row['is_me'] == true,
+      userId: (id == null || id.isEmpty) ? null : id,
     );
   }
+
+  /// Gizlenmiş hali: ad, kimlik ve avatar çıkarılır; sıra ve puan aynı kalır.
+  RankingEntry asHidden() => RankingEntry(points: points, minutes: minutes, isMe: isMe, hidden: true);
 
   /// Puana, sonra dakikaya göre azalan sıralama.
   static int compare(RankingEntry a, RankingEntry b) {

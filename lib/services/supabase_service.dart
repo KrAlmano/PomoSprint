@@ -13,12 +13,16 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/avatar_model.dart';
 import '../models/category_model.dart';
+import '../models/registration_consent.dart';
 import '../models/study_session.dart';
 import '../models/user_model.dart';
+import '../utils/name_filter.dart';
 import '../utils/study_day.dart';
+import 'hidden_users.dart';
 import 'server_clock.dart';
 import 'service_errors.dart';
 import 'session_queue.dart';
+import 'timer_persistence.dart';
 
 export 'service_errors.dart';
 export 'session_queue.dart'
@@ -255,29 +259,48 @@ class SupabaseService {
     }
   }
 
+  /// signUp `data` (auth.users.raw_user_meta_data). handle_new_user yalnızca
+  /// name / full_name / avatar_id okur; handle_newsletter_subscription
+  /// 'newsletter' = true ise e-posta onaylanınca aboneliği açar. Onay kaydı
+  /// (terms_version, privacy_version, terms_accepted_at, marketing_consent)
+  /// [RegistrationConsent.toMetadata]'dan gelir; zorunlu onaylar yoksa
+  /// [StateError] fırlatılır.
+  @visibleForTesting
+  static Map<String, dynamic> signUpMetadata({
+    required String email,
+    required String avatarId,
+    required RegistrationConsent consent,
+    String? name,
+  }) {
+    final cleanEmail = email.trim().toLowerCase();
+    final displayName = (name != null && name.trim().isNotEmpty) ? name.trim() : cleanEmail.split('@').first;
+    return {
+      'name': displayName,
+      // Yalnızca varsayılan (ücretsiz) avatarlar kayıtta seçilebilir;
+      // sunucu (handle_new_user) diğerlerini avatar_16_basic'e çeker.
+      'avatar_id': AvatarCharacter.isFreeAvatarId(avatarId) ? avatarId : kDefaultAvatarId,
+      ...consent.toMetadata(),
+    };
+  }
+
   Future<AuthResponse?> registerUser({
     required String email,
     required String password,
     required String avatarId,
+    required RegistrationConsent consent,
     String? name,
-    bool wantsNewsletter = false,
   }) async {
+    // Zorunlu onaylar olmadan istek hiç gönderilmez (UI da engeller).
+    final data = signUpMetadata(email: email, avatarId: avatarId, consent: consent, name: name);
     _requireCloudForAuth();
     final cleanEmail = email.trim().toLowerCase();
-    final displayName = (name != null && name.trim().isNotEmpty) ? name.trim() : cleanEmail.split('@').first;
 
     try {
       final response = await _client.auth.signUp(
         email: cleanEmail,
         password: password,
         emailRedirectTo: 'https://pomosprint.app/confirmed.html',
-        data: {
-          'name': displayName,
-          // Yalnızca varsayılan (ücretsiz) avatarlar kayıtta seçilebilir;
-          // sunucu (handle_new_user) diğerlerini avatar_16_basic'e çeker.
-          'avatar_id': AvatarCharacter.isFreeAvatarId(avatarId) ? avatarId : kDefaultAvatarId,
-          'newsletter': wantsNewsletter,
-        },
+        data: data,
       );
       // GoTrue, kayıtlı e-posta için hata yerine boş identities döndürür.
       final identities = response.user?.identities;
@@ -428,6 +451,8 @@ class SupabaseService {
     if (!isEmailDefault && !isFullNameDefault) return null;
     final desired = _initialProfileNameFrom(provider: provider, metadata: metadata, email: email, nameHint: givenName);
     if (desired == current || desired == emailLocal || desired.length < _nameMinLength) return null;
+    // Sağlayıcıdaki ad başkalarına görünecek; küfür içeriyorsa yazılmaz.
+    if (NameFilter.isOffensive(desired)) return null;
     return desired;
   }
 
@@ -492,23 +517,49 @@ class SupabaseService {
     );
   }
 
-  /// Hesabı sunucudan siler; ardından bu kullanıcıya ait tüm yerel veriyi
-  /// (bekleyen seanslar dahil) temizler ve oturumu kapatır.
+  /// Hesabı sunucudan siler (delete_own_account: auth.users satırı; profil,
+  /// seanslar, kategoriler, arkadaşlıklar, lig üyeliği, akış, avatarlar ve
+  /// abonelik kaydı yabancı anahtarla birlikte silinir). Ardından bu
+  /// kullanıcıya ait tüm yerel veriyi temizler ve oturumu kapatır: bekleyen
+  /// ve reddedilen seanslar, süren sayaç kaydı, gizlenen kullanıcılar, lig
+  /// bilgisi ve hedef taşıma bayrakları, kullanıcı/kategori önbelleği.
   Future<void> deleteUserAccount() async {
     final authUser = _requireAuthUser();
+    final uid = authUser.id;
     final email = authUser.email ?? currentUser.value?.email;
     await _guard(() => _client.rpc('delete_own_account'));
-    await _queue.clearUser(authUser.id, email: email);
-    try {
+    await clearDeletedAccountLocalData(uid, email: email);
+    await signOutFully();
+  }
+
+  /// Silinen hesabın cihazdaki verisi. Kuyruk dahil hiçbir adım diğerini
+  /// engellemez; hata yalnızca günlüğe yazılır.
+  @visibleForTesting
+  Future<void> clearDeletedAccountLocalData(String uid, {String? email}) async {
+    final mail = email?.trim().toLowerCase();
+    Future<void> step(String what, Future<void> Function() body) async {
+      try {
+        await body();
+      } catch (e) {
+        debugPrint('[AUTH] Silinen hesabın yerel verisi temizlenemedi ($what): $e');
+      }
+    }
+
+    await step('kuyruk', () => _queue.clearUser(uid, email: email));
+    // Sayaç ekranı kapanırken seansı yeniden yazmasın diye sahip emekliye ayrılır.
+    await step('sayaç', () => TimerPersistence.instance.retireOwner(uid));
+    if (mail != null && mail.isNotEmpty) await step('sayaç (e-posta)', () => TimerPersistence.instance.clear(mail));
+    await step('gizlenenler', () => HiddenUsersStore.instance.forget(uid));
+    await step('tercihler', () async {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.remove(_dailyGoalMigratedKey(authUser.id));
+      await prefs.remove(_dailyGoalMigratedKey(uid));
+      await prefs.remove('league_info_shown_$uid');
       if (email != null && email.isNotEmpty) {
         await prefs.remove('league_info_shown_$email');
+        await prefs.remove('saved_categories_$email');
       }
-    } catch (e) {
-      debugPrint('[AUTH] Silinen hesabın yerel verisi temizlenemedi: $e');
-    }
-    await signOutFully();
+      if (mail != null && mail.isNotEmpty && mail != email) await prefs.remove('saved_categories_$mail');
+    });
   }
 
   /// Herhangi bir auth hatasını koda çevirir; UI metni ARB'den üretir.
@@ -685,11 +736,13 @@ class SupabaseService {
     }
   }
 
-  /// Profil adını günceller (2..30 karakter). Başarıda [currentUser] güncellenir.
+  /// Profil adını günceller (2..30 karakter, küfür/hakaret içermez; bkz.
+  /// [NameFilter]). Başarıda [currentUser] güncellenir.
   Future<void> updateUserName(String newName) async {
     final cleanName = newName.trim();
     if (cleanName.length < _nameMinLength) throw const ServiceException(ServiceErrorCode.nameTooShort);
     if (cleanName.length > _nameMaxLength) throw const ServiceException(ServiceErrorCode.nameTooLong);
+    if (NameFilter.isOffensive(cleanName)) throw const ServiceException(ServiceErrorCode.nameNotAllowed);
     final uid = _requireUserId();
     final epoch = _userEpoch;
     final rows = await _guard(

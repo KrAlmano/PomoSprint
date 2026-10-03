@@ -1024,7 +1024,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errShortPassword => 'Password must be at least 6 characters.';
 
   @override
-  String get errAcceptTerms => 'Please accept the terms to continue.';
+  String get errAcceptTerms =>
+      'Please accept the Terms of Service to continue.';
 
   @override
   String get errEmailExists =>
@@ -1429,4 +1430,203 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get rankingZoneDemotionMe =>
       'You\'re in the demotion zone: if the period ends like this, you move down a league.';
+
+  @override
+  String get authSocialNoticePrefix => 'By continuing, you accept our ';
+
+  @override
+  String get authSocialNoticeTermsLink => 'Terms of Service';
+
+  @override
+  String get authSocialNoticeMiddle => ' and confirm that you have read the ';
+
+  @override
+  String get authSocialNoticeKvkkLink => 'Privacy Notice (KVKK)';
+
+  @override
+  String get authSocialNoticeSuffix => '.';
+
+  @override
+  String legalOpenFailed(String url) {
+    return 'Couldn\'t open the page. You can visit it in your browser: $url';
+  }
+
+  @override
+  String get registerNameLabel => 'Display name';
+
+  @override
+  String get registerNameHelper =>
+      'Shown to others in rankings and friend lists.';
+
+  @override
+  String get registerErrNameRequired => 'Enter a display name.';
+
+  @override
+  String get registerErrNameTooLong => 'Name can be at most 50 characters.';
+
+  @override
+  String get nameNotAllowed =>
+      'This name isn\'t allowed. Please choose a different one.';
+
+  @override
+  String get registerErrEmailRequired => 'Enter your email address.';
+
+  @override
+  String get registerErrPasswordRequired => 'Choose a password.';
+
+  @override
+  String get registerPasswordHelper => 'At least 6 characters.';
+
+  @override
+  String get registerShowPassword => 'Show password';
+
+  @override
+  String get registerHidePassword => 'Hide password';
+
+  @override
+  String get registerConsentsTitle => 'Agreements';
+
+  @override
+  String get registerConsentRequiredTag => 'Required';
+
+  @override
+  String get registerConsentOptionalTag => 'Optional';
+
+  @override
+  String get registerConsentTermsPrefix => 'I have read and accept the ';
+
+  @override
+  String get registerConsentTermsLink => 'Terms of Service';
+
+  @override
+  String get registerConsentTermsSuffix => '.';
+
+  @override
+  String get registerConsentPrivacyPrefix => 'I have read the ';
+
+  @override
+  String get registerConsentKvkkLink => 'Privacy Notice (KVKK)';
+
+  @override
+  String get registerConsentPrivacyConnector => ' and the ';
+
+  @override
+  String get registerConsentPrivacyLink => 'Privacy Policy';
+
+  @override
+  String get registerConsentPrivacySuffix => '.';
+
+  @override
+  String get registerConsentMarketing =>
+      'Send me emails about new features and updates (consent to commercial electronic messages).';
+
+  @override
+  String get registerConsentMarketingHint =>
+      'You can unsubscribe at any time using the link in the emails.';
+
+  @override
+  String get errAcknowledgePrivacy =>
+      'Please confirm that you have read the Privacy Notice (KVKK) and the Privacy Policy.';
+
+  @override
+  String get profileLegalSectionTitle => 'Privacy & legal';
+
+  @override
+  String get kvkkNoticeLink => 'Privacy Notice (KVKK)';
+
+  @override
+  String get accountDeletionInfoLink => 'About account deletion';
+
+  @override
+  String get accountDeletionInfoSub =>
+      'What gets deleted and how to request deletion on the web';
+
+  @override
+  String get deleteAccountSub =>
+      'Permanently deletes your account and all of your data.';
+
+  @override
+  String get hiddenUsersTitle => 'Show hidden users';
+
+  @override
+  String hiddenUsersCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count users hidden · tap to reset the list',
+      one: '1 user hidden · tap to reset the list',
+      zero: 'No hidden users',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get hiddenUsersCleared => 'Hidden users will be visible again.';
+
+  @override
+  String get userActionsTooltip => 'User options';
+
+  @override
+  String get reportUserAction => 'Report user';
+
+  @override
+  String get reportUserActionSub =>
+      'Email our support team about an inappropriate name or behavior.';
+
+  @override
+  String get hideUserAction => 'Hide this user';
+
+  @override
+  String get hideUserActionSub =>
+      'Their name is hidden in rankings and they won\'t appear in the live feed. You can undo this in Profile.';
+
+  @override
+  String userHiddenMsg(String name) {
+    return '$name is now hidden.';
+  }
+
+  @override
+  String get undoAction => 'Undo';
+
+  @override
+  String get hiddenUserLabel => 'Hidden user';
+
+  @override
+  String reportEmailSubject(String name) {
+    return 'PomoSprint user report: $name';
+  }
+
+  @override
+  String reportEmailBody(String name, String userId, String place) {
+    return 'Reported display name: $name\nUser ID: $userId\nSeen in: $place\n\nWhat are you reporting? Please describe briefly:\n';
+  }
+
+  @override
+  String get reportUserIdUnknown => 'unknown (rankings don\'t show user IDs)';
+
+  @override
+  String get reportPlaceLeague => 'Rankings · League';
+
+  @override
+  String get reportPlaceMonthly => 'Rankings · Monthly';
+
+  @override
+  String get reportPlaceFriendsRanking => 'Rankings · Friends';
+
+  @override
+  String get reportPlaceLiveFeed => 'Social · Focusing now';
+
+  @override
+  String get reportPlaceFriendsList => 'Friends list';
+
+  @override
+  String get reportPlaceFriendRequest => 'Friend request';
+
+  @override
+  String reportMailFailed(String email) {
+    return 'Couldn\'t open an email app. You can send your report to $email.';
+  }
+
+  @override
+  String get reportCopyAddress => 'Copy address';
 }
