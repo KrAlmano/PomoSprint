@@ -13,8 +13,25 @@ class AvatarWidget extends StatelessWidget {
     this.isUnlocked = true,
   });
 
+  static const ColorFilter _lockedFilter = ColorFilter.mode(Colors.grey, BlendMode.saturation);
+
   @override
   Widget build(BuildContext context) {
+    // Görsel gösterildiği boyutta çözülür; listelerde tam boy PNG çözmek
+    // gereksiz bellek tüketiyordu.
+    final cacheWidth = (size * MediaQuery.devicePixelRatioOf(context)).round();
+    final Widget image = Image.asset(
+      avatar.imagePath,
+      fit: BoxFit.cover,
+      cacheWidth: cacheWidth,
+      errorBuilder: (context, error, stackTrace) => Center(
+        child: Text(
+          avatar.emoji,
+          style: TextStyle(fontSize: size * 0.5),
+        ),
+      ),
+    );
+
     return Container(
       width: size,
       height: size,
@@ -34,21 +51,7 @@ class AvatarWidget extends StatelessWidget {
         ],
       ),
       child: ClipOval(
-        child: ColorFiltered(
-          colorFilter: isUnlocked
-              ? const ColorFilter.mode(Colors.transparent, BlendMode.dst)
-              : const ColorFilter.mode(Colors.grey, BlendMode.saturation),
-          child: Image.asset(
-            avatar.imagePath,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) => Center(
-              child: Text(
-                avatar.emoji,
-                style: TextStyle(fontSize: size * 0.5),
-              ),
-            ),
-          ),
-        ),
+        child: isUnlocked ? image : ColorFiltered(colorFilter: _lockedFilter, child: image),
       ),
     );
   }

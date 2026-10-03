@@ -1,122 +1,321 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../models/avatar_model.dart';
+import '../models/user_model.dart';
 import '../widgets/avatar_widget.dart';
-import '../services/language_service.dart';
+import '../widgets/social/social_error_text.dart';
 import '../services/supabase_service.dart';
 import '../theme.dart';
 
+/// Avatar koleksiyonu: sahip olunan avatar kuşanılır, sahip olunmayan
+/// satın alınır (bakiyenin yetmesi sahiplik sayılmaz). Satın alma ve kuşanma
+/// sunucu onayından sonra uygulanır; sonuç servisteki currentUser üzerinden
+/// profile ve ana ekrana yansır.
 class CharacterCollectionScreen extends StatefulWidget {
-  final String selectedAvatarId;
-  final int userCoins;
-  final bool isPremium;
-  final List<String> unlockedAvatars;
-  final ValueChanged<String> onAvatarSelected;
-  final ValueChanged<int>? onCoinsChanged;
+  final UserModel user;
 
-  const CharacterCollectionScreen({
-    super.key,
-    required this.selectedAvatarId,
-    required this.userCoins,
-    required this.isPremium,
-    required this.unlockedAvatars,
-    required this.onAvatarSelected,
-    this.onCoinsChanged,
-  });
+  const CharacterCollectionScreen({super.key, required this.user});
 
   @override
-  State<CharacterCollectionScreen> createState() =>
-      _CharacterCollectionScreenState();
+  State<CharacterCollectionScreen> createState() => _CharacterCollectionScreenState();
 }
 
 class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
-  late String _currentSelection;
-  late int _userCoins;
+  late final String _equippedId = widget.user.avatarId;
+  late String _selection = widget.user.avatarId;
+  late int _coins = widget.user.coins;
+  // Üst bileşenin listesi değiştirilemez; satın alınanlar yerel kopyaya eklenir.
+  late final List<String> _unlocked = List.of(widget.user.unlockedAvatars);
+  late List<AvatarCharacter> _shopAvatars;
+  late final List<AvatarCharacter> _leagueAwards =
+      AvatarCharacter.allAvatars().where((a) => a.isLeagueAward).toList();
+  bool _isSaving = false;
+  String? _purchasingId;
 
   @override
   void initState() {
     super.initState();
-    _currentSelection = widget.selectedAvatarId;
-    _userCoins = widget.userCoins;
+    _sortShop();
+    SupabaseService.instance.currentUser.addListener(_onUserChanged);
   }
 
-  List<AvatarCharacter> get _avatars {
-    final all = AvatarCharacter.allAvatars().where((a) => !a.isLeagueAward).toList();
-    final unlocked = <AvatarCharacter>[];
-    final locked = <AvatarCharacter>[];
-    for (final avatar in all) {
-      if (avatar.isUnlocked(_userCoins, widget.isPremium, widget.unlockedAvatars)) {
-        unlocked.add(avatar);
-      } else {
-        locked.add(avatar);
+  @override
+  void dispose() {
+    SupabaseService.instance.currentUser.removeListener(_onUserChanged);
+    super.dispose();
+  }
+
+  // Ekran açıkken biten bir seans bakiyeyi değiştirebilir.
+  void _onUserChanged() {
+    final user = SupabaseService.instance.currentUser.value;
+    if (user == null || !mounted) return;
+    setState(() {
+      _coins = user.coins;
+      for (final id in user.unlockedAvatars) {
+        if (!_unlocked.contains(id)) _unlocked.add(id);
       }
-    }
-    return [...unlocked, ...locked];
+      _sortShop();
+    });
   }
 
-  List<AvatarCharacter> get _leagueAwardAvatars {
-    return AvatarCharacter.allAvatars().where((a) => a.isLeagueAward).toList();
+  // Sahip olunanlar önce; liste yalnızca sahiplik değişince yeniden kurulur.
+  void _sortShop() {
+    final shop = AvatarCharacter.allAvatars().where((a) => !a.isLeagueAward).toList();
+    _shopAvatars = [
+      ...shop.where((a) => a.isOwned(_unlocked)),
+      ...shop.where((a) => !a.isOwned(_unlocked)),
+    ];
+  }
+
+  bool get _isTurkish => AppLocalizations.of(context)!.localeName == 'tr';
+
+  void _showSnack(String message, {Color? color}) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(message),
+      backgroundColor: color,
+      behavior: SnackBarBehavior.floating,
+    ));
+  }
+
+  void _onAvatarTap(AvatarCharacter avatar) {
+    if (_purchasingId != null || _isSaving) return;
+    if (avatar.isOwned(_unlocked)) {
+      setState(() => _selection = avatar.id);
+    } else if (avatar.isLeagueAward) {
+      final l10n = AppLocalizations.of(context)!;
+      unawaited(_showInfoDialog(avatar, l10n.leagueAwardLockedTitle, l10n.leagueAwardLockedBody));
+    } else if (avatar.isPremiumOnly && !widget.user.isPremium) {
+      final l10n = AppLocalizations.of(context)!;
+      unawaited(_showInfoDialog(avatar, l10n.avatarPremiumTitle, l10n.avatarPremiumBody));
+    } else {
+      unawaited(_confirmPurchase(avatar));
+    }
+  }
+
+  Future<void> _confirmPurchase(AvatarCharacter avatar) async {
+    final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final name = avatar.getName(_isTurkish);
+    final premiumUnlock = avatar.canUnlockWithPremium(widget.user.isPremium);
+    final affordable = premiumUnlock || avatar.canAfford(_coins);
+    final textColor = isDark ? Colors.white70 : Colors.black87;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+        title: Text(
+          premiumUnlock ? l10n.avatarPremiumTitle : l10n.avatarPurchaseTitle,
+          style: TextStyle(color: isDark ? Colors.white : Colors.black),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _dialogAvatar(avatar),
+            const SizedBox(height: 16),
+            Text(
+              premiumUnlock
+                  ? l10n.avatarPremiumUnlockBody(name)
+                  : l10n.avatarPurchaseBody(name, avatar.requiredCoins),
+              textAlign: TextAlign.center,
+              style: TextStyle(color: textColor),
+            ),
+            if (!premiumUnlock) ...[
+              const SizedBox(height: 10),
+              Text(
+                l10n.avatarBalance(_coins),
+                textAlign: TextAlign.center,
+                style: TextStyle(color: textColor, fontWeight: FontWeight.w600),
+              ),
+              if (!affordable) ...[
+                const SizedBox(height: 6),
+                Text(
+                  l10n.avatarNotEnoughCoins(avatar.requiredCoins - _coins),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
+                ),
+              ],
+            ],
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: affordable ? () => Navigator.pop(ctx, true) : null,
+            child: Text(premiumUnlock ? l10n.avatarUnlockBtn : l10n.avatarPurchaseTitle),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && mounted) await _purchase(avatar);
+  }
+
+  Future<void> _purchase(AvatarCharacter avatar) async {
+    if (_purchasingId != null) return;
+    final l10n = AppLocalizations.of(context)!;
+    final name = avatar.getName(_isTurkish);
+    setState(() => _purchasingId = avatar.id);
+    try {
+      final newCoins = await SupabaseService.instance.purchaseAvatar(avatar.id);
+      if (!mounted) return;
+      setState(() {
+        _coins = newCoins;
+        if (!_unlocked.contains(avatar.id)) _unlocked.add(avatar.id);
+        _selection = avatar.id;
+        _sortShop();
+      });
+      _showSnack(l10n.avatarPurchased(name), color: Colors.green);
+    } catch (e) {
+      debugPrint('[AVATAR] Satın alma başarısız: $e');
+      if (mounted) _showSnack(socialErrorText(l10n, e), color: Colors.red);
+    } finally {
+      if (mounted) setState(() => _purchasingId = null);
+    }
+  }
+
+  // Kuşanma yalnızca sunucu onaylarsa uygulanır; hata olursa ekran açık
+  // kalır ve önceki avatar kuşanılı kalır.
+  Future<void> _confirmSelection() async {
+    if (_isSaving || _purchasingId != null) return;
+    if (_selection == _equippedId) {
+      Navigator.pop(context);
+      return;
+    }
+    final l10n = AppLocalizations.of(context)!;
+    setState(() => _isSaving = true);
+    try {
+      await SupabaseService.instance.setEquippedAvatar(_selection);
+      if (mounted) Navigator.pop(context, _selection);
+    } catch (e) {
+      debugPrint('[AVATAR] Kuşanma başarısız: $e');
+      if (!mounted) return;
+      setState(() => _isSaving = false);
+      _showSnack(socialErrorText(l10n, e), color: Colors.red);
+    }
+  }
+
+  Future<void> _showInfoDialog(AvatarCharacter avatar, String title, String body) {
+    final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+        title: Text(title, style: TextStyle(color: isDark ? Colors.white : Colors.black)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _dialogAvatar(avatar),
+            const SizedBox(height: 16),
+            Text(
+              body,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
+            ),
+          ],
+        ),
+        actions: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(l10n.leagueAwardLockedOk, style: const TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _dialogAvatar(AvatarCharacter avatar) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(color: avatar.backgroundColor, shape: BoxShape.circle),
+      child: AvatarWidget(avatar: avatar, size: 88),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final onSurface = isDark ? AppColors.darkOnSurface : AppColors.onSurface;
+    final muted = isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant;
+    const gridDelegate = SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: 3,
+      crossAxisSpacing: 12,
+      mainAxisSpacing: 12,
+      childAspectRatio: 0.82,
+    );
+
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
       appBar: AppBar(
         backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: isDark ? AppColors.darkOnSurface : AppColors.onSurface),
+          icon: Icon(Icons.arrow_back, color: onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           l10n.selectCharacter,
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
-          ),
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: onSurface),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: Tooltip(
+              message: l10n.avatarBalance(_coins),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryFixed,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  '🪙 $_coins',
+                  semanticsLabel: l10n.avatarBalance(_coins),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.onPrimaryFixed,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       body: Column(
         children: [
-          // Description text
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             child: Text(
               l10n.selectCharacterSub,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
-                height: 1.5,
-              ),
+              style: TextStyle(fontSize: 16, color: muted, height: 1.5),
             ),
           ),
-
-          // Avatar Grid + Lig Kazanımları
           Expanded(
             child: CustomScrollView(
               physics: const BouncingScrollPhysics(),
               slivers: [
                 SliverPadding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
-                  sliver: SliverGrid(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      childAspectRatio: 0.82,
-                    ),
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) => _buildAvatarCard(_avatars[index]),
-                      childCount: _avatars.length,
-                    ),
+                  sliver: SliverGrid.builder(
+                    gridDelegate: gridDelegate,
+                    itemCount: _shopAvatars.length,
+                    itemBuilder: (context, index) => _buildAvatarCard(_shopAvatars[index]),
                   ),
                 ),
-                if (_leagueAwardAvatars.isNotEmpty) ...[
+                if (_leagueAwards.isNotEmpty) ...[
                   SliverPadding(
                     padding: const EdgeInsets.fromLTRB(24, 28, 24, 4),
                     sliver: SliverToBoxAdapter(
@@ -131,20 +330,10 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
                               children: [
                                 Text(
                                   l10n.leagueAwardsTitle,
-                                  style: TextStyle(
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.bold,
-                                    color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
-                                  ),
+                                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: onSurface),
                                 ),
                                 const SizedBox(height: 2),
-                                Text(
-                                  l10n.leagueAwardsSub,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
-                                  ),
-                                ),
+                                Text(l10n.leagueAwardsSub, style: TextStyle(fontSize: 12, color: muted)),
                               ],
                             ),
                           ),
@@ -154,25 +343,16 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
                   ),
                   SliverPadding(
                     padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
-                    sliver: SliverGrid(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
-                        childAspectRatio: 0.82,
-                      ),
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) => _buildAvatarCard(_leagueAwardAvatars[index]),
-                        childCount: _leagueAwardAvatars.length,
-                      ),
+                    sliver: SliverGrid.builder(
+                      gridDelegate: gridDelegate,
+                      itemCount: _leagueAwards.length,
+                      itemBuilder: (context, index) => _buildAvatarCard(_leagueAwards[index]),
                     ),
                   ),
                 ],
               ],
             ),
           ),
-
-          // Bottom confirm button
           Container(
             padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
             decoration: BoxDecoration(
@@ -188,37 +368,30 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
-
-                onPressed: () async {
-                  if (_currentSelection != widget.selectedAvatarId) {
-                    await SupabaseService.instance.setEquippedAvatar(_currentSelection);
-                  }
-                  widget.onAvatarSelected(_currentSelection);
-                  if (context.mounted) Navigator.pop(context);
-                },
-
+                onPressed: _isSaving || _purchasingId != null ? null : _confirmSelection,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: AppColors.onPrimary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(28),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
                   elevation: 0,
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      l10n.confirmSelection,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                child: _isSaving
+                    ? const SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(strokeWidth: 2.5, color: AppColors.onPrimary),
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            l10n.confirmSelection,
+                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(width: 8),
+                          const Icon(Icons.arrow_forward, size: 18),
+                        ],
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    const Icon(Icons.arrow_forward, size: 18),
-                  ],
-                ),
               ),
             ),
           ),
@@ -228,126 +401,13 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
   }
 
   Widget _buildAvatarCard(AvatarCharacter avatar) {
-    final isSelected = _currentSelection == avatar.id;
-    final isUnlocked = avatar.isUnlocked(_userCoins, widget.isPremium, widget.unlockedAvatars);
+    final isSelected = _selection == avatar.id;
+    final isOwned = avatar.isOwned(_unlocked);
+    final isPurchasing = _purchasingId == avatar.id;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return GestureDetector(
-
-      onTap: () {
-        if (isUnlocked) {
-          setState(() => _currentSelection = avatar.id);
-        } else if (avatar.isLeagueAward) {
-          final l10n = AppLocalizations.of(context)!;
-          showDialog(
-            context: context,
-            builder: (ctx) => AlertDialog(
-              backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-              title: Text(
-                l10n.leagueAwardLockedTitle,
-                style: TextStyle(color: isDark ? Colors.white : Colors.black),
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: avatar.backgroundColor,
-                      shape: BoxShape.circle,
-                    ),
-                    child: AvatarWidget(avatar: avatar, size: 88),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    l10n.leagueAwardLockedBody,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
-                  ),
-                ],
-              ),
-              actions: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-                  onPressed: () => Navigator.pop(ctx),
-                  child: Text(l10n.leagueAwardLockedOk, style: const TextStyle(color: Colors.white)),
-                ),
-              ],
-            ),
-          );
-        } else {
-          showDialog(
-            context: context,
-            builder: (ctx) => AlertDialog(
-              backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-              title: Text(
-                LanguageService.instance.isTurkish ? 'Satın Al' : 'Purchase',
-                style: TextStyle(color: isDark ? Colors.white : Colors.black),
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: avatar.backgroundColor,
-                      shape: BoxShape.circle,
-                    ),
-                    child: AvatarWidget(avatar: avatar, size: 88),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    LanguageService.instance.isTurkish
-                        ? '${avatar.getName(true)} avatarını ${avatar.requiredCoins} kum tanesine satın almak ister misin?'
-                        : 'Do you want to purchase ${avatar.getName(false)} for ${avatar.requiredCoins} coins?',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  child: Text(LanguageService.instance.isTurkish ? 'İptal' : 'Cancel'),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-                  onPressed: () async {
-                    Navigator.pop(ctx);
-                    if (_userCoins < avatar.requiredCoins) {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text(LanguageService.instance.isTurkish ? 'Yetersiz bakiye!' : 'Not enough coins!'),
-                      ));
-                      return;
-                    }
-
-                    final newCoins = await SupabaseService.instance.purchaseAvatar(avatar.id);
-                    if (newCoins != null) {
-                      if (!mounted) return;
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text(LanguageService.instance.isTurkish ? 'Satın alındı!' : 'Purchased!'),
-                      ));
-                      setState(() {
-                        widget.unlockedAvatars.add(avatar.id);
-                        _currentSelection = avatar.id;
-                        _userCoins = newCoins;
-                      });
-                      widget.onCoinsChanged?.call(newCoins);
-                    } else {
-                      if (!mounted) return;
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text(LanguageService.instance.isTurkish ? 'Hata oluştu' : 'Error occurred'),
-                      ));
-                    }
-                  },
-                  child: Text(LanguageService.instance.isTurkish ? 'Satın Al' : 'Purchase', style: const TextStyle(color: Colors.white)),
-                ),
-              ],
-            ),
-          );
-        }
-      },
-
+      onTap: () => _onAvatarTap(avatar),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
@@ -359,40 +419,25 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
             color: isSelected ? AppColors.primary : Colors.transparent,
             width: 2,
           ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.15),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+          boxShadow: [
+            BoxShadow(
+              color: isSelected ? AppColors.primary.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.04),
+              blurRadius: isSelected ? 12 : 4,
+              offset: Offset(0, isSelected ? 4 : 2),
+            ),
+          ],
         ),
         child: Stack(
           children: [
-            // Main content
             Padding(
               padding: const EdgeInsets.all(8),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Avatar Image
-                  AvatarWidget(
-                    avatar: avatar,
-                    size: 54,
-                    isUnlocked: isUnlocked,
-                  ),
+                  AvatarWidget(avatar: avatar, size: 54, isUnlocked: isOwned),
                   const SizedBox(height: 6),
-                  // Name (Full, no truncation, max 2 lines)
                   Text(
-                    avatar.getName(LanguageService.instance.isTurkish),
+                    avatar.getName(_isTurkish),
                     textAlign: TextAlign.center,
                     maxLines: 2,
                     softWrap: true,
@@ -406,8 +451,6 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
                 ],
               ),
             ),
-
-            // Selection checkmark
             if (isSelected)
               Positioned(
                 top: -1,
@@ -418,58 +461,56 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
                   decoration: BoxDecoration(
                     color: AppColors.primary,
                     shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.3),
-                        blurRadius: 4,
-                      ),
-                    ],
+                    boxShadow: [BoxShadow(color: AppColors.primary.withValues(alpha: 0.3), blurRadius: 4)],
                   ),
-                  child: const Icon(
-                    Icons.check,
-                    size: 14,
-                    color: Colors.white,
-                  ),
+                  child: const Icon(Icons.check, size: 14, color: Colors.white),
                 ),
               ),
-
-            // Lock overlay if not unlocked
-            if (!isUnlocked)
-              Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.4),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          avatar.isLeagueAward ? Icons.emoji_events_rounded : Icons.lock_rounded,
-                          color: Colors.white,
-                          size: 24,
-                        ),
-                        if (!avatar.isLeagueAward) ...[
-                          const SizedBox(height: 4),
-                          Text(
-                            avatar.isPremiumOnly && !widget.isPremium
-                                ? avatar.unlockLabel(widget.isPremium)
-                                : '🪙 ${avatar.unlockLabel(widget.isPremium)}',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+            if (!isOwned) Positioned.fill(child: _buildLockOverlay(avatar, isPurchasing)),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildLockOverlay(AvatarCharacter avatar, bool isPurchasing) {
+    final IconData icon;
+    String? label;
+    if (avatar.isLeagueAward) {
+      icon = Icons.emoji_events_rounded;
+    } else if (avatar.isPremiumOnly) {
+      icon = Icons.workspace_premium_rounded;
+      label = 'Premium';
+    } else {
+      // Bakiye yetiyorsa "satın alınabilir" ikonu; yine de sahiplik değildir.
+      icon = avatar.canAfford(_coins) ? Icons.shopping_bag_outlined : Icons.lock_rounded;
+      label = '🪙 ${avatar.requiredCoins}';
+    }
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.4),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Center(
+        child: isPurchasing
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
+              )
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(icon, color: Colors.white, size: 24),
+                  if (label != null) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      label,
+                      style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ],
+              ),
       ),
     );
   }

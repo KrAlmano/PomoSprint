@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../models/avatar_model.dart';
 import '../widgets/avatar_widget.dart';
+import '../widgets/social/load_error_view.dart';
 import '../services/supabase_service.dart';
-import '../services/language_service.dart';
 import '../theme.dart';
 
 class SocialScreen extends StatefulWidget {
@@ -13,142 +14,210 @@ class SocialScreen extends StatefulWidget {
   State<SocialScreen> createState() => _SocialScreenState();
 }
 
-class _SocialScreenState extends State<SocialScreen> {
-  List<Map<String, dynamic>> _activeUsers = [];
+class _SocialScreenState extends State<SocialScreen> with WidgetsBindingObserver {
+  static const Duration _pollInterval = Duration(seconds: 30);
+
+  List<Map<String, dynamic>> _activeUsers = const [];
   Timer? _pollingTimer;
-  bool _isLoading = true;
+  bool _loaded = false;
+  Object? _error;
+  DateTime? _loadedAt;
+  int _requestId = 0;
+  bool _isVisible = false;
+  bool _isResumed = true;
 
   @override
   void initState() {
     super.initState();
-    _fetchData();
-    _pollingTimer = Timer.periodic(const Duration(seconds: 30), (_) => _fetchData());
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Shell görünmeyen sekmeyi TickerMode(enabled: false) ile sarar.
+    final visible = TickerMode.valuesOf(context).enabled;
+    if (visible != _isVisible) {
+      _isVisible = visible;
+      _updatePolling();
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _isResumed = state == AppLifecycleState.resumed;
+    _updatePolling();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _pollingTimer?.cancel();
     super.dispose();
   }
 
+  // Canlı liste yalnızca sekme görünür ve uygulama ön plandayken yoklanır;
+  // geri dönüldüğünde veri bayatsa hemen yenilenir.
+  void _updatePolling() {
+    if (!_isVisible || !_isResumed) {
+      _pollingTimer?.cancel();
+      _pollingTimer = null;
+      return;
+    }
+    if (_pollingTimer != null) return;
+    final loadedAt = _loadedAt;
+    if (loadedAt == null || DateTime.now().difference(loadedAt) > _pollInterval) {
+      unawaited(_fetchData());
+    }
+    _pollingTimer = Timer.periodic(_pollInterval, (_) => _fetchData());
+  }
+
   Future<void> _fetchData() async {
-    final live = await SupabaseService.instance.getLiveFriends();
-    if (mounted) {
+    final requestId = ++_requestId;
+    try {
+      final live = await SupabaseService.instance.getLiveFriends();
+      if (!mounted || requestId != _requestId) return;
       setState(() {
-        _activeUsers = live;
-        _isLoading = false;
+        _activeUsers = _dedupeById(live);
+        _loaded = true;
+        _error = null;
+        _loadedAt = DateTime.now();
       });
+    } catch (e) {
+      debugPrint('[SOCIAL] Canlı liste alınamadı: $e');
+      if (!mounted || requestId != _requestId) return;
+      // Yenileme başarısız: mevcut liste korunur.
+      setState(() => _error = e);
     }
   }
 
-  AvatarCharacter _getAvatar(String? avatarId) {
-    final avatars = AvatarCharacter.allAvatars();
-    return avatars.firstWhere(
-      (a) => a.id == avatarId,
-      orElse: () => avatars.first,
-    );
+  // Eski get_live_friends iki yönlü arkadaşlıkta aynı kişiyi iki kez döndürebiliyordu.
+  static List<Map<String, dynamic>> _dedupeById(List<Map<String, dynamic>> rows) {
+    final seen = <String>{};
+    return [
+      for (final r in rows)
+        if (r['id'] == null || seen.add(r['id'].toString())) r,
+    ];
   }
 
   @override
   Widget build(BuildContext context) {
-    final lang = LanguageService.instance;
+    final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final background = isDark ? AppColors.darkSurface : AppColors.surface;
 
-    return ListenableBuilder(
-      listenable: lang,
-      builder: (context, _) {
-        final isTurkish = lang.isTurkish;
+    if (!_loaded && _error == null) {
+      return Scaffold(
+        backgroundColor: background,
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
 
-        if (_isLoading) {
-          return Scaffold(
-            backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
-            body: const Center(child: CircularProgressIndicator()),
-          );
-        }
-
-        return Scaffold(
-          backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
-          body: SafeArea(
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 4),
-                  child: Row(
-                    children: [
-                      Text(
-                        isTurkish ? 'Arkadaşların' : 'Your Friends',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
-                        ),
-                      ),
-                    ],
+    return Scaffold(
+      backgroundColor: background,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 4),
+              child: Row(
+                children: [
+                  Text(
+                    l10n.socialYourFriends,
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: _activeUsers.isEmpty
-                      ? _buildEmptyState(isDark, isTurkish)
-                      : CustomScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    slivers: [
-                      SliverPadding(
-                        padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
-                        sliver: SliverToBoxAdapter(
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 10,
-                                height: 10,
-                                decoration: const BoxDecoration(
-                                  color: Colors.green,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                isTurkish ? 'Şu An Çalışanlar' : 'Focusing Right Now',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      SliverPadding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        sliver: SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                            (context, index) => Padding(
-                              padding: const EdgeInsets.only(bottom: 10),
-                              child: _buildActiveUserItem(
-                                _activeUsers[index],
-                                isDark,
-                                isTurkish,
-                              ),
-                            ),
-                            childCount: _activeUsers.length,
-                          ),
-                        ),
-                      ),
-                      const SliverPadding(padding: EdgeInsets.only(bottom: 40)),
-                    ],
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        );
-      },
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: _fetchData,
+                color: AppColors.primary,
+                child: CustomScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                  slivers: _buildSlivers(l10n, isDark),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  Widget _buildActiveUserItem(Map<String, dynamic> user, bool isDark, bool isTurkish) {
-    final avatar = _getAvatar(user['avatar_id']?.toString());
-    final name = user['name']?.toString() ?? (isTurkish ? 'Kullanıcı' : 'User');
+  List<Widget> _buildSlivers(AppLocalizations l10n, bool isDark) {
+    if (!_loaded) {
+      return [
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: LoadErrorView(message: l10n.socialLoadError, onRetry: _fetchData),
+            ),
+          ),
+        ),
+      ];
+    }
+
+    final staleNotice = SliverPadding(
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+      sliver: SliverToBoxAdapter(child: StaleDataNotice(onRetry: _fetchData)),
+    );
+
+    if (_activeUsers.isEmpty) {
+      return [
+        if (_error != null) staleNotice,
+        SliverFillRemaining(hasScrollBody: false, child: _buildEmptyState(l10n, isDark)),
+      ];
+    }
+
+    return [
+      if (_error != null) staleNotice,
+      SliverPadding(
+        padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
+        sliver: SliverToBoxAdapter(
+          child: Row(
+            children: [
+              Container(
+                width: 10,
+                height: 10,
+                decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                l10n.socialFocusingNow,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      SliverPadding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        sliver: SliverList.builder(
+          itemCount: _activeUsers.length,
+          itemBuilder: (context, index) => Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: _buildActiveUserItem(_activeUsers[index], l10n, isDark),
+          ),
+        ),
+      ),
+      const SliverPadding(padding: EdgeInsets.only(bottom: 40)),
+    ];
+  }
+
+  Widget _buildActiveUserItem(Map<String, dynamic> user, AppLocalizations l10n, bool isDark) {
+    final name = user['name']?.toString() ?? l10n.userDefault;
+    final category = (user['category_name'] ?? user['active_session_category_name'])?.toString().trim() ?? '';
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -158,7 +227,7 @@ class _SocialScreenState extends State<SocialScreen> {
       ),
       child: Row(
         children: [
-          AvatarWidget(avatar: avatar, size: 44),
+          AvatarWidget(avatar: AvatarCharacter.byId(user['avatar_id']?.toString()), size: 44),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -174,7 +243,9 @@ class _SocialScreenState extends State<SocialScreen> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  isTurkish ? 'Odaklanıyor' : 'Focusing',
+                  category.isEmpty ? l10n.socialFocusing : l10n.socialFocusingOn(category),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 12,
                     color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
@@ -193,7 +264,7 @@ class _SocialScreenState extends State<SocialScreen> {
     );
   }
 
-  Widget _buildEmptyState(bool isDark, bool isTurkish) {
+  Widget _buildEmptyState(AppLocalizations l10n, bool isDark) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -215,9 +286,7 @@ class _SocialScreenState extends State<SocialScreen> {
             ),
             const SizedBox(height: 20),
             Text(
-              isTurkish
-                  ? 'Şu an çalışan arkadaşın yok. Biri odaklanmaya başladığında burada görünecek.'
-                  : 'No friends studying right now. They\'ll show up here once someone starts focusing.',
+              l10n.socialNoLiveFriends,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,

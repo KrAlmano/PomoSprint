@@ -1,52 +1,31 @@
+import 'dart:async';
+
 import 'categories_management_screen.dart';
 
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../l10n/app_localizations.dart';
 import '../models/avatar_model.dart';
+import '../models/user_model.dart';
 import '../widgets/avatar_widget.dart';
-import '../models/category_model.dart';
+import '../widgets/social/social_error_text.dart';
 import '../theme.dart';
 import '../services/supabase_service.dart';
 import '../services/language_service.dart';
+import '../services/notification_service.dart';
 import 'character_collection_screen.dart';
+
+/// Profil ve ayarlar. Kullanıcı bilgisi tek kaynaktan
+/// (SupabaseService.currentUser) okunur; isim, avatar ve satın alma
+/// değişiklikleri servis tarafından oraya yazılır ve shell'e de yansır.
 class ProfileScreen extends StatefulWidget {
-  final String userName;
-  final String userEmail;
-  final String currentAvatarId;
-  final int totalStudyMinutes;
-  final int userPoints;
-  final int userCoins;
-  final bool isPremium;
-  final List<String> unlockedAvatars;
-  final bool isDarkMode;
-  final ValueChanged<String> onAvatarChanged;
-  final ValueChanged<int>? onCoinsChanged;
-  final ValueChanged<String>? onNameChanged;
   final ValueChanged<bool> onDarkModeChanged;
   final VoidCallback onLogout;
-  final List<CourseCategory> categories;
-  final Function(CourseCategory) onAddCategory;
-  final Function(String) onDeleteCategory;
 
   const ProfileScreen({
     super.key,
-    required this.userName,
-    required this.userEmail,
-    required this.currentAvatarId,
-    required this.totalStudyMinutes,
-    required this.userPoints,
-    required this.userCoins,
-    required this.isPremium,
-    required this.unlockedAvatars,
-    required this.isDarkMode,
-    required this.onAvatarChanged,
-    this.onCoinsChanged,
-    this.onNameChanged,
     required this.onDarkModeChanged,
     required this.onLogout,
-    required this.categories,
-    required this.onAddCategory,
-    required this.onDeleteCategory,
   });
 
   @override
@@ -54,91 +33,185 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  late String _avatarId;
+  static const int _nameMinLength = 2;
+  static const int _nameMaxLength = 30;
+
+  final SupabaseService _service = SupabaseService.instance;
+  UserModel? _user;
   bool _notificationsEnabled = true;
-  late bool _darkModeEnabled;
+  bool _isUpdatingNotifications = false;
   bool _socialVisibilityEnabled = true;
-  late TextEditingController _nameController;
-  late TextEditingController _emailController;
+  late final TextEditingController _nameController;
+  late final TextEditingController _emailController;
   bool _isSavingName = false;
   bool _isNameEditing = false;
+  String? _nameError;
+  bool _isDeleting = false;
 
   @override
   void initState() {
     super.initState();
-    _avatarId = widget.currentAvatarId;
-    _darkModeEnabled = widget.isDarkMode;
-    _nameController = TextEditingController(text: widget.userName);
-    _emailController = TextEditingController(text: widget.userEmail);
-    _loadSocialVisibility();
-  }
-
-  Future<void> _loadSocialVisibility() async {
-    final value = await SupabaseService.instance.getSocialVisibility();
-    if (mounted) setState(() => _socialVisibilityEnabled = value);
+    _user = _service.currentUser.value;
+    _nameController = TextEditingController(text: _user?.name ?? '');
+    _emailController = TextEditingController(text: _user?.email ?? '');
+    _service.currentUser.addListener(_onUserChanged);
+    unawaited(_loadSocialVisibility());
+    unawaited(_loadNotificationPreference());
   }
 
   @override
   void dispose() {
+    _service.currentUser.removeListener(_onUserChanged);
     _nameController.dispose();
     _emailController.dispose();
     super.dispose();
   }
 
-  AvatarCharacter get _currentAvatar {
-    final avatars = AvatarCharacter.allAvatars();
-    return avatars.firstWhere(
-      (a) => a.id == _avatarId,
-      orElse: () => avatars.first,
-    );
+  // Çıkış/hesap silme sırasında kullanıcı null olur; ekran kapanana kadar
+  // son bilinen kullanıcı gösterilir.
+  void _onUserChanged() {
+    final user = _service.currentUser.value;
+    if (user == null || !mounted) return;
+    setState(() {
+      _user = user;
+      if (!_isNameEditing) _nameController.text = user.name;
+      _emailController.text = user.email;
+    });
+  }
+
+  Future<void> _loadSocialVisibility() async {
+    final value = await _service.getSocialVisibility();
+    if (mounted) setState(() => _socialVisibilityEnabled = value);
+  }
+
+  Future<void> _loadNotificationPreference() async {
+    final value = await NotificationService.instance.isEnabled();
+    if (mounted) setState(() => _notificationsEnabled = value);
+  }
+
+  AvatarCharacter get _currentAvatar => AvatarCharacter.byId(_user?.avatarId);
+
+  String? _validateName(AppLocalizations l10n, String name) {
+    if (name.length < _nameMinLength) return l10n.profileNameTooShort;
+    if (name.length > _nameMaxLength) return l10n.profileNameTooLong;
+    return null;
+  }
+
+  void _toggleNameEditing() {
+    setState(() {
+      _isNameEditing = !_isNameEditing;
+      _nameError = null;
+      // Vazgeçilince yazılan metin atılır.
+      if (!_isNameEditing) _nameController.text = _user?.name ?? '';
+    });
   }
 
   Future<void> _saveName() async {
+    if (_isSavingName) return;
+    final l10n = AppLocalizations.of(context)!;
     final newName = _nameController.text.trim();
-    if (newName.isEmpty) return;
+    final validationError = _validateName(l10n, newName);
+    if (validationError != null) {
+      setState(() => _nameError = validationError);
+      return;
+    }
+    if (newName == _user?.name) {
+      _toggleNameEditing();
+      return;
+    }
 
-    setState(() => _isSavingName = true);
+    setState(() {
+      _isSavingName = true;
+      _nameError = null;
+    });
     final messenger = ScaffoldMessenger.of(context);
-    final lang = LanguageService.instance;
-
     try {
-      await SupabaseService.instance.updateUserName(widget.userEmail, newName);
-      if (widget.onNameChanged != null) {
-        widget.onNameChanged!(newName);
-      }
+      await _service.updateUserName(newName);
+      if (!mounted) return;
       setState(() {
         _isNameEditing = false;
+        _nameController.text = _service.currentUser.value?.name ?? newName;
       });
-      if (mounted) {
-        messenger.showSnackBar(
-          SnackBar(
-            content: Text('✅ ${lang.translate('name_updated_success')}'),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('✅ ${l10n.nameUpdatedSuccess}'),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } catch (e) {
+      debugPrint('[PROFILE] İsim kaydedilemedi: $e');
+      if (mounted) setState(() => _nameError = socialErrorText(l10n, e));
+    } finally {
+      if (mounted) setState(() => _isSavingName = false);
+    }
+  }
+
+  Future<void> _setNotificationsEnabled(bool value) async {
+    if (_isUpdatingNotifications) return;
+    final l10n = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+    final notifications = NotificationService.instance;
+    setState(() {
+      _notificationsEnabled = value;
+      _isUpdatingNotifications = true;
+    });
+    var permissionDenied = false;
+    var failed = false;
+    try {
+      await notifications.setEnabled(value);
+      // Sistem izni verilmediyse tercih kapalı kalır; kullanıcı ayarlara yönlendirilir.
+      if (value && !await notifications.ensurePermission()) {
+        await notifications.setEnabled(false);
+        permissionDenied = true;
       }
     } catch (e) {
-      if (mounted) {
-        messenger.showSnackBar(
-          SnackBar(
-            content: Text('⚠️ $e'),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isSavingName = false);
-      }
+      debugPrint('[PROFILE] Bildirim tercihi kaydedilemedi: $e');
+      failed = true;
+    }
+    final actual = await notifications.isEnabled();
+    if (!mounted) return;
+    setState(() {
+      _notificationsEnabled = actual;
+      _isUpdatingNotifications = false;
+    });
+    if (permissionDenied || failed) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(permissionDenied ? l10n.profileNotificationsDenied : l10n.profileSettingSaveError),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  Future<void> _setSocialVisibility(bool value) async {
+    final l10n = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _socialVisibilityEnabled = value);
+    try {
+      await _service.setSocialVisibility(value);
+    } catch (e) {
+      debugPrint('[PROFILE] Sosyal görünürlük kaydedilemedi: $e');
+      if (!mounted) return;
+      setState(() => _socialVisibilityEnabled = !value);
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(socialErrorText(l10n, e)),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final lang = LanguageService.instance;
+    final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final muted = isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant;
+    final user = _user;
 
     return ListenableBuilder(
       listenable: lang,
@@ -175,421 +248,87 @@ class _ProfileScreenState extends State<ProfileScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             child: Column(
               children: [
-                // Avatar & Name Card Header
-                Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? AppColors.darkSurfaceContainerLowest
-                            : AppColors.surfaceContainerLowest,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.03),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          // Avatar with Edit Badge
-                          GestureDetector(
-                            onTap: _openCharacterCollection,
-                            child: Stack(
-                              children: [
-                                AvatarWidget(
-                                  avatar: _currentAvatar,
-                                  size: 96,
-                                ),
-                                Positioned(
-                                  bottom: 0,
-                                  right: 0,
-                                  child: Container(
-                                    width: 32,
-                                    height: 32,
-                                    decoration: const BoxDecoration(
-                                      color: AppColors.primary,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(
-                                      Icons.edit,
-                                      size: 18,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            _nameController.text.isNotEmpty
-                                ? _nameController.text
-                                : 'Kullanıcı',
-                            style: const TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            _currentAvatar.getName(lang.isTurkish),
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // Points / Streak Badge (Hanging top-right)
-                    Positioned(
-                      top: 12,
-                      right: 12,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryContainer,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.local_fire_department,
-                              size: 16,
-                              color: AppColors.onPrimaryContainer,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '${widget.userPoints} ${lang.translate('points_unit')}',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.onPrimaryContainer,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
+                _buildHeader(lang, l10n, isDark, muted),
                 const SizedBox(height: 20),
 
-                // Categories Management
+                // Kategori yönetimi: değişiklikler servisteki categoriesRevision
+                // ile ana ekrana yansır; dönüşte ayrıca bir şey yapılmaz.
                 _buildSectionCard(
                   title: lang.translate('categories_section_title'),
                   child: Material(
                     color: Colors.transparent,
                     child: ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(
-                      lang.translate('manage_categories_tile_title'),
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        lang.translate('manage_categories_tile_title'),
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                        ),
                       ),
-                    ),
-                    subtitle: Text(
-                      lang.translate('manage_categories_tile_sub'),
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                      subtitle: Text(
+                        lang.translate('manage_categories_tile_sub'),
+                        style: TextStyle(fontSize: 13, color: muted),
                       ),
-                    ),
-                    trailing: Icon(
-                      Icons.chevron_right,
-                      color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
-                    ),
-                    onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                        builder: (_) => CategoriesManagementScreen(isPremium: widget.isPremium),
-                      )).then((_) {
-                        // No refresh needed here
-                      });
-                    },
+                      trailing: Icon(Icons.chevron_right, color: muted),
+                      onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                        builder: (_) => CategoriesManagementScreen(isPremium: user?.isPremium ?? false),
+                      )),
                     ),
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Profile Information Form Card (Editable Name with Pencil Icon)
-                _buildSectionCard(
-                  title: lang.translate('edit_profile').toUpperCase(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Name Label + Pencil Icon Header Row
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            lang.translate('name_surname'),
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              setState(() {
-                                _isNameEditing = !_isNameEditing;
-                              });
-                            },
-                            icon: Icon(
-                              _isNameEditing ? Icons.close : Icons.mode_edit_outline_rounded,
-                              size: 18,
-                              color: AppColors.primary,
-                            ),
-                            tooltip: lang.translate('edit_profile'),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      TextField(
-                        controller: _nameController,
-                        readOnly: !_isNameEditing,
-                        decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.person_outline, size: 20),
-                          suffixIcon: _isNameEditing
-                              ? IconButton(
-                                  icon: _isSavingName
-                                      ? const SizedBox(
-                                          width: 16,
-                                          height: 16,
-                                          child: CircularProgressIndicator(strokeWidth: 2),
-                                        )
-                                      : const Icon(Icons.check_circle, color: Colors.green),
-                                  onPressed: _saveName,
-                                )
-                              : null,
-                          filled: true,
-                          fillColor: isDark
-                              ? AppColors.darkSurfaceContainerLow
-                              : AppColors.surfaceContainerLow,
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 12),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: _isNameEditing
-                                ? const BorderSide(color: AppColors.primary, width: 1.5)
-                                : BorderSide.none,
-                          ),
-                        ),
-                      ),
-
-                      if (_isNameEditing) ...[
-                        const SizedBox(height: 8),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: ElevatedButton.icon(
-                            onPressed: _isSavingName ? null : _saveName,
-                            icon: const Icon(Icons.save, size: 16),
-                            label: Text(lang.translate('save')),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primary,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-
-                      const SizedBox(height: 14),
-
-                      // Email Field (Read-only with Lock Icon)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            lang.translate('email'),
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
-                            ),
-                          ),
-                          Icon(Icons.lock_outline, size: 16, color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      TextField(
-                        controller: _emailController,
-                        readOnly: true,
-                        decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.mail_outline, size: 20),
-                          filled: true,
-                          fillColor: isDark
-                              ? AppColors.darkSurfaceContainerLow.withValues(alpha: 0.6)
-                              : AppColors.surfaceContainerLow.withValues(alpha: 0.6),
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 12),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        lang.translate('email_readonly_hint'),
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
+                _buildProfileForm(lang, l10n, isDark, muted),
                 const SizedBox(height: 20),
 
                 // Language Selection Card with Flags 🇹🇷 / 🇬🇧
                 _buildSectionCard(
                   title: lang.translate('app_language').toUpperCase(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
                     children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildLanguageTile(
-                              flag: '🇹🇷',
-                              label: 'Türkçe',
-                              isSelected: lang.isTurkish,
-                              onTap: () => lang.setLanguage(AppLanguage.tr),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _buildLanguageTile(
-                              flag: '🇬🇧',
-                              label: 'English',
-                              isSelected: !lang.isTurkish,
-                              onTap: () => lang.setLanguage(AppLanguage.en),
-                            ),
-                          ),
-                        ],
+                      Expanded(
+                        child: _buildLanguageTile(
+                          flag: '🇹🇷',
+                          label: 'Türkçe',
+                          isSelected: lang.isTurkish,
+                          onTap: () => lang.setLanguage(AppLanguage.tr),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildLanguageTile(
+                          flag: '🇬🇧',
+                          label: 'English',
+                          isSelected: !lang.isTurkish,
+                          onTap: () => lang.setLanguage(AppLanguage.en),
+                        ),
                       ),
                     ],
                   ),
                 ),
 
                 const SizedBox(height: 20),
-
-                // Preferences Card (with Dark Mode toggle!)
-                _buildSectionCard(
-                  title: lang.translate('preferences').toUpperCase(),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: Column(
-                      children: [
-                        SwitchListTile(
-                          value: _notificationsEnabled,
-                          onChanged: (val) =>
-                              setState(() => _notificationsEnabled = val),
-                          title: Text(
-                            lang.translate('notifications'),
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          secondary: Icon(Icons.notifications_outlined,
-                              color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
-                          activeThumbColor: AppColors.primary,
-                          contentPadding: EdgeInsets.zero,
-                        ),
-                        const Divider(height: 16),
-                        SwitchListTile(
-                          value: _darkModeEnabled,
-                          onChanged: (val) {
-                            setState(() => _darkModeEnabled = val);
-                            widget.onDarkModeChanged(val);
-                          },
-                          title: Text(
-                            lang.translate('dark_mode'),
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          secondary: Icon(Icons.dark_mode_outlined,
-                              color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
-                          activeThumbColor: AppColors.primary,
-                          contentPadding: EdgeInsets.zero,
-                        ),
-                        const Divider(height: 16),
-                        SwitchListTile(
-                          value: _socialVisibilityEnabled,
-                          onChanged: (val) {
-                            setState(() => _socialVisibilityEnabled = val);
-                            SupabaseService.instance.setSocialVisibility(val);
-                          },
-                          title: Text(
-                            lang.translate('social_visibility'),
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          subtitle: Text(
-                            lang.translate('social_visibility_sub'),
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
-                            ),
-                          ),
-                          secondary: Icon(Icons.groups_outlined,
-                              color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
-                          activeThumbColor: AppColors.primary,
-                          contentPadding: EdgeInsets.zero,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
+                _buildPreferences(lang, isDark, muted),
                 const SizedBox(height: 20),
 
-                // Legal Links (Privacy Policy / Terms of Service)
+                // Yasal metinler: İngilizce arayüzde /en/ sürümleri açılır.
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     TextButton(
-                      onPressed: () => _openLegalUrl('privacy.html'),
+                      onPressed: () => _openLegalUrl('privacy'),
                       child: Text(
                         lang.translate('privacy_policy'),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
-                          decoration: TextDecoration.underline,
-                        ),
+                        style: TextStyle(fontSize: 12, color: muted, decoration: TextDecoration.underline),
                       ),
                     ),
-                    Text('·', style: TextStyle(color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant)),
+                    Text('·', style: TextStyle(color: muted)),
                     TextButton(
-                      onPressed: () => _openLegalUrl('terms.html'),
+                      onPressed: () => _openLegalUrl('terms'),
                       child: Text(
                         lang.translate('terms_of_service'),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
-                          decoration: TextDecoration.underline,
-                        ),
+                        style: TextStyle(fontSize: 12, color: muted, decoration: TextDecoration.underline),
                       ),
                     ),
                   ],
@@ -597,14 +336,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                 const SizedBox(height: 4),
 
-                // Sign Out Button
                 SizedBox(
                   width: double.infinity,
                   child: TextButton.icon(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      widget.onLogout();
-                    },
+                    onPressed: _isDeleting
+                        ? null
+                        : () {
+                            Navigator.pop(context);
+                            widget.onLogout();
+                          },
                     icon: const Icon(Icons.logout, color: AppColors.primary),
                     label: Text(
                       lang.translate('logout'),
@@ -616,23 +356,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                   ),
                 ),
 
                 const SizedBox(height: 12),
 
-                // Delete Account Button (Red Warning)
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
-                    onPressed: _confirmDeleteAccount,
+                    onPressed: _isDeleting ? null : _confirmDeleteAccount,
                     icon: const Icon(Icons.delete_forever_rounded, color: Colors.red),
                     label: Text(
-                      lang.translate('delete_account'),
+                      l10n.deleteAccount,
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -642,9 +379,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       side: const BorderSide(color: Colors.red, width: 1.5),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                   ),
                 ),
@@ -655,6 +390,239 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildHeader(LanguageService lang, AppLocalizations l10n, bool isDark, Color muted) {
+    final user = _user;
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.darkSurfaceContainerLowest : AppColors.surfaceContainerLowest,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4)),
+            ],
+          ),
+          child: Column(
+            children: [
+              GestureDetector(
+                onTap: user == null ? null : () => _openCharacterCollection(user),
+                child: Stack(
+                  children: [
+                    AvatarWidget(avatar: _currentAvatar, size: 96),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: Container(
+                        width: 32,
+                        height: 32,
+                        decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
+                        child: const Icon(Icons.edit, size: 18, color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                (user?.name.isNotEmpty ?? false) ? user!.name : l10n.userDefault,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                _currentAvatar.getName(lang.isTurkish),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: muted),
+              ),
+            ],
+          ),
+        ),
+        Positioned(
+          top: 12,
+          right: 12,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppColors.primaryContainer,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.local_fire_department, size: 16, color: AppColors.onPrimaryContainer),
+                const SizedBox(width: 4),
+                Text(
+                  l10n.rankingPoints(user?.lifetimePoints ?? 0),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.onPrimaryContainer,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProfileForm(LanguageService lang, AppLocalizations l10n, bool isDark, Color muted) {
+    final fieldFill = isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow;
+    return _buildSectionCard(
+      title: lang.translate('edit_profile').toUpperCase(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                lang.translate('name_surname'),
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: muted),
+              ),
+              IconButton(
+                onPressed: _isSavingName ? null : _toggleNameEditing,
+                icon: Icon(
+                  _isNameEditing ? Icons.close : Icons.mode_edit_outline_rounded,
+                  size: 18,
+                  color: AppColors.primary,
+                ),
+                tooltip: _isNameEditing ? l10n.cancel : lang.translate('edit_profile'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          TextField(
+            controller: _nameController,
+            readOnly: !_isNameEditing,
+            textCapitalization: TextCapitalization.words,
+            onChanged: (_) {
+              if (_nameError != null) setState(() => _nameError = null);
+            },
+            onSubmitted: (_) => _saveName(),
+            decoration: InputDecoration(
+              prefixIcon: const Icon(Icons.person_outline, size: 20),
+              errorText: _nameError,
+              suffixIcon: _isNameEditing
+                  ? IconButton(
+                      icon: _isSavingName
+                          ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                          : const Icon(Icons.check_circle, color: Colors.green),
+                      tooltip: l10n.save,
+                      onPressed: _isSavingName ? null : _saveName,
+                    )
+                  : null,
+              filled: true,
+              fillColor: fieldFill,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: _isNameEditing
+                    ? const BorderSide(color: AppColors.primary, width: 1.5)
+                    : BorderSide.none,
+              ),
+            ),
+          ),
+          if (_isNameEditing) ...[
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerRight,
+              child: ElevatedButton.icon(
+                onPressed: _isSavingName ? null : _saveName,
+                icon: const Icon(Icons.save, size: 16),
+                label: Text(l10n.save),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+              ),
+            ),
+          ],
+          const SizedBox(height: 14),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                lang.translate('email'),
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: muted),
+              ),
+              Icon(Icons.lock_outline, size: 16, color: muted),
+            ],
+          ),
+          const SizedBox(height: 6),
+          TextField(
+            controller: _emailController,
+            readOnly: true,
+            decoration: InputDecoration(
+              prefixIcon: const Icon(Icons.mail_outline, size: 20),
+              filled: true,
+              fillColor: fieldFill.withValues(alpha: 0.6),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            lang.translate('email_readonly_hint'),
+            style: TextStyle(fontSize: 11, color: muted),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPreferences(LanguageService lang, bool isDark, Color muted) {
+    const titleStyle = TextStyle(fontSize: 15, fontWeight: FontWeight.w500);
+    return _buildSectionCard(
+      title: lang.translate('preferences').toUpperCase(),
+      child: Material(
+        color: Colors.transparent,
+        child: Column(
+          children: [
+            SwitchListTile(
+              value: _notificationsEnabled,
+              onChanged: _isUpdatingNotifications ? null : _setNotificationsEnabled,
+              title: Text(lang.translate('notifications'), style: titleStyle),
+              secondary: Icon(Icons.notifications_outlined, color: muted),
+              activeThumbColor: AppColors.primary,
+              contentPadding: EdgeInsets.zero,
+            ),
+            const Divider(height: 16),
+            // Anahtar her zaman o an uygulanan temayı gösterir.
+            SwitchListTile(
+              value: isDark,
+              onChanged: widget.onDarkModeChanged,
+              title: Text(lang.translate('dark_mode'), style: titleStyle),
+              secondary: Icon(Icons.dark_mode_outlined, color: muted),
+              activeThumbColor: AppColors.primary,
+              contentPadding: EdgeInsets.zero,
+            ),
+            const Divider(height: 16),
+            SwitchListTile(
+              value: _socialVisibilityEnabled,
+              onChanged: _setSocialVisibility,
+              title: Text(lang.translate('social_visibility'), style: titleStyle),
+              subtitle: Text(
+                lang.translate('social_visibility_sub'),
+                style: TextStyle(fontSize: 12, color: muted),
+              ),
+              secondary: Icon(Icons.groups_outlined, color: muted),
+              activeThumbColor: AppColors.primary,
+              contentPadding: EdgeInsets.zero,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -708,52 +676,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  void _openCharacterCollection() {
-    Navigator.push(
+  void _openCharacterCollection(UserModel user) {
+    unawaited(Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => CharacterCollectionScreen(
-          selectedAvatarId: _avatarId,
-          userCoins: widget.userCoins,
-          isPremium: widget.isPremium,
-          unlockedAvatars: widget.unlockedAvatars,
-          onAvatarSelected: (newId) {
-            setState(() => _avatarId = newId);
-            widget.onAvatarChanged(newId);
-          },
-          onCoinsChanged: widget.onCoinsChanged,
-        ),
-      ),
-    );
+      MaterialPageRoute(builder: (context) => CharacterCollectionScreen(user: user)),
+    ));
   }
 
-  Future<void> _openLegalUrl(String path) async {
-    final uri = Uri.parse('https://pomosprint.app/$path');
+  Future<void> _openLegalUrl(String page) async {
+    final isTurkish = AppLocalizations.of(context)!.localeName == 'tr';
+    final uri = Uri.parse('https://pomosprint.app/${isTurkish ? '' : 'en/'}$page');
     await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
-  void _confirmDeleteAccount() {
-    final lang = LanguageService.instance;
+  Future<void> _confirmDeleteAccount() async {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    showDialog(
+    final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
             const Icon(Icons.warning_amber_rounded, color: Colors.red, size: 28),
             const SizedBox(width: 8),
-            Text(lang.translate('delete_account'), style: const TextStyle(fontWeight: FontWeight.bold)),
+            Expanded(child: Text(l10n.deleteAccount, style: const TextStyle(fontWeight: FontWeight.bold))),
           ],
         ),
-        content: const Text(
-          'Hesabınızı ve tüm verilerinizi kalıcı olarak silmek istediğinizden emin misiniz?\n\nBu işlem veritabanından profilinizi ve çalışma geçmişinizi tamamen siler ve geri alınamaz.',
-          style: TextStyle(fontSize: 14, height: 1.4),
+        content: Text(
+          l10n.profileDeleteConfirm,
+          style: const TextStyle(fontSize: 14, height: 1.4),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(lang.translate('cancel'), style: TextStyle(color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant)),
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(
+              l10n.cancel,
+              style: TextStyle(color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -761,33 +721,64 @@ class _ProfileScreenState extends State<ProfileScreen> {
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            onPressed: () async {
-              final nav = Navigator.of(context);
-              final messenger = ScaffoldMessenger.of(context);
-              nav.pop(); // Close dialog
-              try {
-                await SupabaseService.instance.deleteUserAccount(widget.userEmail);
-                if (mounted) {
-                  nav.pop(); // Close profile screen
-                  widget.onLogout(); // Return to login
-                }
-              } catch (e) {
-                if (mounted) {
-                  messenger.showSnackBar(
-                    SnackBar(
-                      content: Text('${lang.translate('delete_account_error')}: $e'),
-                      backgroundColor: Colors.red,
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                }
-              }
-            },
-            child: Text(lang.translate('delete_account'), style: const TextStyle(fontWeight: FontWeight.bold)),
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(l10n.deleteAccount, style: const TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),
     );
+    if (confirmed == true && mounted) await _deleteAccount();
+  }
+
+  // Silme sürerken kapatılamayan bir ilerleme diyaloğu gösterilir; bu sırada
+  // çıkış gibi diğer eylemler yapılamaz. Yerel verinin temizliği ve oturum
+  // kapatma servis tarafından yapılır.
+  Future<void> _deleteAccount() async {
+    if (_isDeleting) return;
+    final l10n = AppLocalizations.of(context)!;
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _isDeleting = true);
+    unawaited(showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => PopScope(
+        canPop: false,
+        child: AlertDialog(
+          content: Row(
+            children: [
+              const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2.5, color: AppColors.primary),
+              ),
+              const SizedBox(width: 16),
+              Expanded(child: Text(l10n.profileDeleting)),
+            ],
+          ),
+        ),
+      ),
+    ));
+
+    try {
+      await _service.deleteUserAccount();
+      if (!mounted) return;
+      navigator.pop(); // ilerleme diyaloğu
+      navigator.pop(); // profil ekranı
+      widget.onLogout();
+    } catch (e) {
+      debugPrint('[PROFILE] Hesap silinemedi: $e');
+      if (!mounted) return;
+      navigator.pop(); // ilerleme diyaloğu
+      setState(() => _isDeleting = false);
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(l10n.profileDeleteError),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 
   Widget _buildSectionCard({required String title, required Widget child}) {
@@ -795,16 +786,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.darkSurfaceContainerLowest
-            : AppColors.surfaceContainerLowest,
+        color: isDark ? AppColors.darkSurfaceContainerLowest : AppColors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 6, offset: const Offset(0, 2)),
         ],
       ),
       child: Column(
@@ -814,9 +799,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
-              color: isDark
-                  ? AppColors.darkSurfaceContainerLow
-                  : AppColors.surfaceContainerLow,
+              color: isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow,
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),

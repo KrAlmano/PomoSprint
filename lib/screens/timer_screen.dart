@@ -1,32 +1,42 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+import '../l10n/app_localizations.dart';
 import '../theme.dart';
 import '../utils/text_util.dart';
 import '../models/category_model.dart';
 import '../widgets/hourglass_widget.dart';
 import '../services/language_service.dart';
 import '../services/notification_service.dart';
+import '../services/timer_persistence.dart';
 
 class TimerScreen extends StatefulWidget {
   final List<CourseCategory> categories;
+
+  /// Süren seansın cihazda saklandığı anahtar (kullanıcı kimliği).
+  final String sessionOwnerKey;
+
+  /// Kimlik bilinmeden önce kullanılmış anahtar (e-posta); oradaki kayıt taşınır.
+  final String? legacySessionOwnerKey;
   final VoidCallback onOpenSettings;
-  final Function(String categoryId, int minutes, bool wasPaused, int isVerified, DateTime startedAt, String clientUuid)? onSessionCompleted;
-  final void Function(bool isRunning, String categoryName, int loggedMinutes)? onTimerStateChanged;
-  final int userPoints;
-  final int streakDays;
+
+  /// Süre dolunca çağrılır; seans gönderilip sonuç bildirilince tamamlanır.
+  /// Ardından cihazdaki seans kaydı silinir.
+  final Future<void> Function(ActiveTimerSession session) onSessionCompleted;
+
+  /// Sayaç başlayınca/devam edince (kalan dakikayla) ve durunca çağrılır.
+  final void Function(bool isRunning, String categoryName, int minutesLeft)? onTimerStateChanged;
   final String? userSegment;
 
   const TimerScreen({
     super.key,
     required this.categories,
+    required this.sessionOwnerKey,
+    this.legacySessionOwnerKey,
     required this.onOpenSettings,
-    this.onSessionCompleted,
+    required this.onSessionCompleted,
     this.onTimerStateChanged,
     this.userSegment,
-    this.userPoints = 0,
-    this.streakDays = 0,
   });
 
   @override
@@ -34,179 +44,265 @@ class TimerScreen extends StatefulWidget {
 }
 
 class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
-  // Sadece debug build'lerde (flutter run, --release DEĞİL) test için süre
-  // kısaltılır; gerçek kullanıcılara giden release build'de her zaman
-  // gerçek 25/50 dakika çalışır. Bkz. _durationSeconds.
-  static int _durationSeconds(int minutes) {
-    if (kDebugMode) {
-      return minutes == 25 ? 5 : 10;
-    }
-    return minutes * 60;
-  }
+  static const int _maxPauses = 1;
 
-  int totalSeconds = _durationSeconds(25);
-  int remaining = _durationSeconds(25);
+  int totalSeconds = timerDurationSeconds(25);
+  int remaining = timerDurationSeconds(25);
   int loggedMinutes = 25;
   bool isRunning = false;
   bool _isStarting = false; // BAŞLAT butonuna çift tıklama koruması
   Timer? _timer;
-  String selectedCategoryId = '1';
+  String selectedCategoryId = '';
+  String selectedCategoryName = '';
 
-  // 1-Pause Rule Credit (Per session)
-  int pauseCredits = 1;
-  int pauseUsedCount = 0;
-
-  // Sayaç çalışırken seansın biteceği an. Kalan süre her tick'te bundan
-  // hesaplanır; böylece Timer.periodic kayması veya uygulamanın arka
-  // planda askıya alınması süreyi bozmaz.
-  DateTime? _endsAt;
-
-  // Session tracking for server-side scoring
-  DateTime? _sessionStartedAt;
-  String? _sessionClientUuid;
+  // Süren ya da duraklatılmış seans (null: seans yok). Başlat, duraklat ve
+  // devamda cihaza yazılır; uygulama öldürülse bile açılışta geri yüklenir.
+  // Kalan süre her tick'te bitiş anından hesaplanır.
+  ActiveTimerSession? _session;
   int _foregroundSeconds = 0;
+
+  bool get _hasSession => _session != null;
+  int get _pauseCreditsLeft => _maxPauses - (_session?.pauseUsedCount ?? 0);
+  TimerPersistence get _store => TimerPersistence.instance;
+
+  static bool get _isInForeground {
+    final state = WidgetsBinding.instance.lifecycleState;
+    return state == null || state == AppLifecycleState.resumed;
+  }
+
+  static int _minutesLeft(int seconds) => (seconds / 60).ceil();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _validateSelectedCategory();
+    unawaited(_restoreSession());
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
+    // Seans cihazda saklı olduğu için ekran kapanınca (ör. çıkış) iptal
+    // edilmez; aynı hesapla açılınca kaldığı yerden sürer.
+    _persistSession();
     super.dispose();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // Arka plandayken periyodik timer durur; öne gelince kalan süreyi
-    // bitiş anından yeniden hesapla (süre dolduysa seans tamamlanır).
-    if (state == AppLifecycleState.resumed && isRunning) {
-      _tick(countForeground: false);
+    if (state == AppLifecycleState.resumed) {
+      // Arka planda periyodik timer durmuş olabilir; kalan süreyi bitiş
+      // anından yeniden hesapla (süre dolduysa seans tamamlanır).
+      if (isRunning) _tick(countForeground: false);
+    } else if (state == AppLifecycleState.paused) {
+      _persistSession();
     }
-  }
-
-  int _secondsUntilEnd() {
-    final ms = _endsAt!.difference(DateTime.now()).inMilliseconds;
-    return ms <= 0 ? 0 : (ms / 1000).ceil();
-  }
-
-  void _tick({bool countForeground = true}) {
-    if (!isRunning || _endsAt == null || !mounted) return;
-    final left = _secondsUntilEnd();
-    if (left > 0) {
-      setState(() {
-        remaining = left;
-        if (countForeground) _foregroundSeconds++; // Track active time
-      });
-    } else {
-      _completeSession();
-    }
-  }
-
-  /// Süre dolduğunda seansı kapatır ve sonucu üst bileşene bildirir.
-  void _completeSession() {
-    _timer?.cancel();
-    NotificationService.instance.cancelAllNotifications();
-
-    final catId = selectedCategoryId;
-    final categoryName = _selectedCategoryName;
-    final minsLogged = loggedMinutes;
-    final wasPaused = pauseUsedCount > 0;
-    final isVerified = _foregroundSeconds; // Pass total foreground time
-    final startedAt = _sessionStartedAt ?? DateTime.now().subtract(Duration(minutes: minsLogged));
-    final clientUuid = _sessionClientUuid ?? const Uuid().v4();
-
-    setState(() {
-      isRunning = false;
-      remaining = totalSeconds;
-      pauseCredits = 1; // Reset pause credit on finish
-      pauseUsedCount = 0;
-      _resetSessionTracking();
-    });
-
-    widget.onTimerStateChanged?.call(false, categoryName, minsLogged);
-    widget.onSessionCompleted?.call(catId, minsLogged, wasPaused, isVerified, startedAt, clientUuid);
-    _showSessionCompletedDialog();
-  }
-
-  void _resetSessionTracking() {
-    _endsAt = null;
-    _sessionStartedAt = null;
-    _sessionClientUuid = null;
-    _foregroundSeconds = 0;
   }
 
   @override
   void didUpdateWidget(TimerScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.sessionOwnerKey != widget.sessionOwnerKey && _hasSession) {
+      unawaited(_store.clear(oldWidget.sessionOwnerKey));
+      _persistSession();
+    }
     _validateSelectedCategory();
   }
 
-  void _validateSelectedCategory() {
-    final activeCategories = widget.categories.where((c) => !c.isArchived).toList();
-    if (activeCategories.isNotEmpty && !activeCategories.any((c) => c.id == selectedCategoryId)) {
+  void _persistSession() {
+    final session = _session;
+    if (session == null) return;
+    unawaited(_store.save(widget.sessionOwnerKey, session.withForegroundSeconds(_foregroundSeconds)));
+  }
+
+  Future<void> _restoreSession() async {
+    final saved = await _store.load(widget.sessionOwnerKey, legacyOwnerKey: widget.legacySessionOwnerKey);
+    if (saved == null || !mounted || _hasSession || _isStarting) return;
+
+    final now = DateTime.now();
+    _foregroundSeconds = saved.foregroundSeconds;
+    setState(() {
+      loggedMinutes = saved.durationMinutes;
+      totalSeconds = saved.totalSeconds;
+      selectedCategoryId = saved.categoryId;
+      selectedCategoryName = saved.categoryName;
+    });
+
+    if (saved.isRunning) {
+      if (saved.isFinishedAt(now)) {
+        // Uygulama kapalıyken süre doldu: seans hemen tamamlanıp gönderilir.
+        unawaited(_completeSession(saved));
+      } else {
+        _runSession(saved, now);
+      }
+    } else if (saved.isAbandonedAt(now)) {
+      // Sunucu 24 saatten eski seansı kabul etmez; kayıt silinir.
+      unawaited(_store.clear(widget.sessionOwnerKey, onlyClientUuid: saved.clientUuid));
+      _foregroundSeconds = 0;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.pausedSessionExpired),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } else {
       setState(() {
-        selectedCategoryId = activeCategories.first.id;
+        _session = saved;
+        remaining = saved.remainingSecondsAt(now);
       });
     }
   }
 
-  String get _selectedCategoryName {
-    final match = widget.categories.where((c) => c.id == selectedCategoryId);
-    return match.isNotEmpty ? match.first.name : '';
+  void _tick({bool countForeground = true}) {
+    final session = _session;
+    if (!isRunning || session == null || !mounted) return;
+    final left = session.remainingSecondsAt(DateTime.now());
+    if (left > 0) {
+      // Android'de süreç arka planda da tick atabilir; yalnızca ön plan sayılır.
+      if (countForeground && _isInForeground) _foregroundSeconds++;
+      setState(() => remaining = left);
+    } else {
+      unawaited(_completeSession(session));
+    }
+  }
+
+  /// Süre dolduğunda seansı kapatır, sonucu üst bileşene bildirir ve
+  /// gönderim bitince cihazdaki kaydı siler.
+  Future<void> _completeSession(ActiveTimerSession session) async {
+    _timer?.cancel();
+    final completed = session.withForegroundSeconds(_foregroundSeconds);
+    if (_isInForeground) {
+      // Gösterilmiş bildirime dokunulmaz; yalnızca bekleyen iptal edilir.
+      unawaited(NotificationService.instance.cancelSessionEndNotification());
+    } else {
+      // Android'de süreç arka planda yaşıyorsa seans burada biter; alarmın
+      // gecikmesini beklemeden bildirim hemen gösterilir.
+      unawaited(NotificationService.instance.showSessionEndNow(categoryName: completed.categoryName));
+    }
+
+    _resetToIdle();
+    widget.onTimerStateChanged?.call(false, completed.categoryName, 0);
+    _showSessionCompletedDialog(completed.durationMinutes);
+
+    final owner = widget.sessionOwnerKey;
+    final onCompleted = widget.onSessionCompleted;
+    try {
+      await onCompleted(completed);
+      await _store.clear(owner, onlyClientUuid: completed.clientUuid);
+    } catch (e) {
+      // Kayıt silinmez: sonraki açılışta süresi dolmuş seans olarak yeniden gönderilir.
+      debugPrint('[TIMER] Seans gönderimi tamamlanamadı: $e');
+    }
+  }
+
+  void _resetToIdle() {
+    _foregroundSeconds = 0;
+    setState(() {
+      isRunning = false;
+      _isStarting = false;
+      _session = null;
+      remaining = totalSeconds;
+      _validateSelectedCategory();
+    });
+  }
+
+  CourseCategory? _resolveCategory(String id, String name) {
+    final active = widget.categories.where((c) => !c.isArchived);
+    return active.where((c) => c.id == id).firstOrNull ??
+        (name.isEmpty ? null : active.where((c) => c.name == name).firstOrNull);
+  }
+
+  // Seans sürerken ya da duraklatılmışken seçim KİLİTLİDİR: kategori listesi
+  // yenilense bile seans başladığı kategoriyle kaydedilir. Seans yokken
+  // seçili kategori listede yoksa (ör. yer tutucudan sunucu kategorisine
+  // geçiş) önce aynı isimli kategoriye, yoksa ilk aktif kategoriye geçilir.
+  void _validateSelectedCategory() {
+    if (_hasSession) return;
+    final active = widget.categories.where((c) => !c.isArchived);
+    if (active.isEmpty) return;
+    final match = _resolveCategory(selectedCategoryId, selectedCategoryName) ?? active.first;
+    selectedCategoryId = match.id;
+    selectedCategoryName = match.name;
   }
 
   void _toggleTimer() {
     if (isRunning) {
-      // Trying to PAUSE
-      if (pauseCredits > 0) {
-        // 1st Pause allowed!
-        _timer?.cancel();
-        NotificationService.instance.cancelAllNotifications();
-        setState(() {
-          if (_endsAt != null) remaining = _secondsUntilEnd();
-          _endsAt = null;
-          isRunning = false;
-          pauseCredits--;
-          pauseUsedCount++;
-        });
-        widget.onTimerStateChanged?.call(false, _selectedCategoryName, loggedMinutes);
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.info_outline, color: Colors.white, size: 20),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(LanguageService.instance.translate('pause_used_snackbar')),
-                ),
-              ],
-            ),
-            backgroundColor: AppColors.primaryContainer,
-            duration: const Duration(seconds: 3),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          ),
-        );
+      if (_pauseCreditsLeft > 0) {
+        _pause();
       } else {
-        // 2nd Pause Attempt -> Blocked! Show Confirmation Dialog
         _showPauseLimitDialog();
       }
     } else {
-      // START / RESUME TIMER with 3-2-1 Countdown Animation
       if (_isStarting) return; // çift tıklama koruması
       _isStarting = true;
-      _show321CountdownAndStart();
+      unawaited(_show321CountdownAndStart());
     }
   }
 
-  void _show321CountdownAndStart() {
-    showDialog(
+  void _pause() {
+    final session = _session;
+    if (session == null) return;
+    _timer?.cancel();
+    unawaited(NotificationService.instance.cancelSessionEndNotification());
+    final now = DateTime.now();
+    final paused = session.pauseAt(now);
+    setState(() {
+      _session = paused;
+      isRunning = false;
+      remaining = paused.remainingSecondsAt(now);
+    });
+    _persistSession();
+    widget.onTimerStateChanged?.call(false, paused.categoryName, _minutesLeft(remaining));
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.info_outline, color: Colors.white, size: 20),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(LanguageService.instance.translate('pause_used_snackbar')),
+            ),
+          ],
+        ),
+        backgroundColor: AppColors.primaryContainer,
+        duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
+  /// Seansı kaydetmeden bırakır (Sıfırla & Durdur).
+  void _discardSession() {
+    _timer?.cancel();
+    unawaited(NotificationService.instance.cancelSessionEndNotification());
+    final categoryName = _session?.categoryName ?? selectedCategoryName;
+    _resetToIdle();
+    unawaited(_store.clear(widget.sessionOwnerKey));
+    widget.onTimerStateChanged?.call(false, categoryName, 0);
+  }
+
+  void _selectDuration(int minutes) {
+    // Duraklatılmış bir seans varsa süre değişince sıfırlanır.
+    if (_hasSession) unawaited(_store.clear(widget.sessionOwnerKey));
+    _foregroundSeconds = 0;
+    setState(() {
+      loggedMinutes = minutes;
+      totalSeconds = timerDurationSeconds(minutes);
+      remaining = totalSeconds;
+      _session = null;
+      _validateSelectedCategory();
+    });
+  }
+
+  Future<void> _show321CountdownAndStart() async {
+    // Bildirim izni ilk BAŞLAT'ta, bağlamıyla birlikte istenir (bir kez sorulur).
+    await NotificationService.instance.ensurePermission();
+    if (!mounted) return;
+    await showDialog<void>(
       context: context,
       barrierDismissible: false,
       barrierColor: Colors.black.withValues(alpha: 0.85),
@@ -216,32 +312,50 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
             if (ctx.mounted && Navigator.of(ctx).canPop()) {
               Navigator.of(ctx).pop();
             }
-            _startTimerPeriodic();
+            _startOrResume();
           },
         );
       },
     );
+    // Geri tuşuyla kapatılan geri sayım BAŞLAT'ı kilitli bırakmaz.
+    if (mounted && !isRunning) setState(() => _isStarting = false);
   }
 
-  void _startTimerPeriodic() {
-    _timer?.cancel();
+  void _startOrResume() {
+    if (!mounted) return;
+    final now = DateTime.now();
+    final current = _session;
+    if (current != null) {
+      _runSession(current.resumeAt(now), now);
+      return;
+    }
+    final category = _resolveCategory(selectedCategoryId, selectedCategoryName);
+    _runSession(
+      ActiveTimerSession.start(
+        clientUuid: const Uuid().v4(),
+        categoryId: category?.id ?? selectedCategoryId,
+        categoryName: category?.name ?? selectedCategoryName,
+        durationMinutes: loggedMinutes,
+        totalSeconds: totalSeconds,
+        now: now,
+      ),
+      now,
+    );
+  }
 
+  void _runSession(ActiveTimerSession session, DateTime now) {
+    _timer?.cancel();
+    final left = session.remainingSecondsAt(now);
     setState(() {
+      _session = session;
       isRunning = true;
       _isStarting = false;
-      _endsAt = DateTime.now().add(Duration(seconds: remaining));
-      // Başlangıç zamanı ve seans kimliği yalnızca YENİ bir seansta
-      // atanır. Duraklatıp devam edince korunmalı: aksi halde sunucuya
-      // giden başlangıç zamanı devam etme anı olur ve seans, gerçekte
-      // geçen süreden kısa görünür.
-      _sessionStartedAt ??= DateTime.now();
-      _sessionClientUuid ??= const Uuid().v4();
+      remaining = left;
     });
-
+    _persistSession();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) => _tick());
-
-    NotificationService.instance.scheduleTimerCompletionNotification(remaining, _selectedCategoryName);
-    widget.onTimerStateChanged?.call(true, _selectedCategoryName, loggedMinutes);
+    unawaited(NotificationService.instance.scheduleSessionEnd(after: Duration(seconds: left), categoryName: session.categoryName));
+    widget.onTimerStateChanged?.call(true, session.categoryName, _minutesLeft(left));
   }
 
   void _showPauseLimitDialog() {
@@ -279,17 +393,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
-              // Option A: Reset Progress completely
-              _timer?.cancel();
-              NotificationService.instance.cancelAllNotifications();
-              setState(() {
-                isRunning = false;
-                remaining = totalSeconds;
-                pauseCredits = 1;
-                pauseUsedCount = 0;
-                _resetSessionTracking();
-              });
-              widget.onTimerStateChanged?.call(false, _selectedCategoryName, loggedMinutes);
+              _discardSession();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(LanguageService.instance.translate('session_reset')),
@@ -307,10 +411,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
             ),
           ),
           ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              // Option B: Continue session running
-            },
+            onPressed: () => Navigator.pop(ctx),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryContainer,
               foregroundColor: Colors.white,
@@ -328,8 +429,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     );
   }
 
-  void _showSessionCompletedDialog() {
-    final displayMinutes = loggedMinutes;
+  void _showSessionCompletedDialog(int displayMinutes) {
     final isTurkish = LanguageService.instance.isTurkish;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -390,17 +490,18 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     );
   }
 
-  // dispose removed since it is handled above in the chunks
-
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
       listenable: LanguageService.instance,
       builder: (context, _) {
-        final progress = 1 - (remaining / totalSeconds);
+        final l10n = AppLocalizations.of(context)!;
         final minutes = (remaining ~/ 60).toString().padLeft(2, '0');
         final seconds = (remaining % 60).toString().padLeft(2, '0');
         final isDark = Theme.of(context).brightness == Brightness.dark;
+        final activeCategories = widget.categories.where((c) => !c.isArchived).toList();
+        final displayCategory = _resolveCategory(selectedCategoryId, selectedCategoryName);
+        final hasPauseCredit = _pauseCreditsLeft > 0;
 
         return Scaffold(
           body: SafeArea(
@@ -410,16 +511,10 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
 
                 final hourglassWidget = HourglassWidget(
                   size: 220,
-                  progress: progress,
                   isRunning: isRunning,
                   totalSeconds: totalSeconds,
                   remainingSeconds: remaining,
-                  sandColor: widget.categories.where((c) => !c.isArchived).isNotEmpty 
-                      ? widget.categories.firstWhere(
-                          (c) => c.id == selectedCategoryId, 
-                          orElse: () => widget.categories.where((c) => !c.isArchived).first,
-                        ).color 
-                      : null,
+                  sandColor: displayCategory?.color ?? activeCategories.firstOrNull?.color,
                 );
 
                 final controlsWidget = Column(
@@ -452,7 +547,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                       ),
                       const SizedBox(height: 12),
                     ],
-                    
+
                     // Active Category Pills
                     if (!isLandscape) ...[
                       SingleChildScrollView(
@@ -460,18 +555,22 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                         physics: const BouncingScrollPhysics(),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: widget.categories.where((cat) => !cat.isArchived).map((cat) {
-                            final isSelected = cat.id == selectedCategoryId;
+                          children: activeCategories.map((cat) {
+                            final isSelected = cat.id == displayCategory?.id;
                             return Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 4),
                               child: FilterChip(
                                 label: Text(LanguageService.instance.translateCatName(cat.name)),
                                 selected: isSelected,
-                                onSelected: (isRunning || (remaining < totalSeconds && remaining > 0))
+                                // Seans sürerken/duraklatılmışken kategori kilitli.
+                                onSelected: _hasSession
                                     ? null
                                     : (val) {
                                         if (val) {
-                                          setState(() => selectedCategoryId = cat.id);
+                                          setState(() {
+                                            selectedCategoryId = cat.id;
+                                            selectedCategoryName = cat.name;
+                                          });
                                         }
                                       },
                                 avatar: CircleAvatar(
@@ -522,23 +621,10 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [25, 50].map((mins) {
                           final isSel = loggedMinutes == mins;
-                          final durationSeconds = _durationSeconds(mins);
                           return Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 6),
                             child: GestureDetector(
-                              onTap: isRunning
-                                  ? null
-                                  : () {
-                                      setState(() {
-                                        loggedMinutes = mins;
-                                        totalSeconds = durationSeconds;
-                                        remaining = durationSeconds;
-                                        pauseCredits = 1;
-                                        pauseUsedCount = 0;
-                                        // Duraklatılmış bir seans varsa süre değişince sıfırlanır.
-                                        _resetSessionTracking();
-                                      });
-                                    },
+                              onTap: isRunning ? null : () => _selectDuration(mins),
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 200),
                                 padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
@@ -575,12 +661,12 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                       decoration: BoxDecoration(
-                        color: pauseCredits > 0
+                        color: hasPauseCredit
                             ? (isDark ? AppColors.darkSurfaceContainerHigh : AppColors.surfaceContainerHigh)
                             : AppColors.primaryContainer.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: pauseCredits > 0
+                          color: hasPauseCredit
                               ? (isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant)
                               : AppColors.primary,
                         ),
@@ -589,21 +675,19 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            pauseCredits > 0 ? Icons.pause_circle_outline : Icons.block_outlined,
+                            hasPauseCredit ? Icons.pause_circle_outline : Icons.block_outlined,
                             size: 13,
-                            color: pauseCredits > 0
+                            color: hasPauseCredit
                                 ? (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant)
                                 : AppColors.primary,
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            pauseCredits > 0
-                                ? (LanguageService.instance.isTurkish ? '1/1 Duraklatma Hakkı' : '1/1 Pause Credit')
-                                : (LanguageService.instance.isTurkish ? '0/1 Duraklatma Hakkı (Hakkın Bitti)' : '0/1 Pause Credit (Limit Reached)'),
+                            hasPauseCredit ? l10n.pauseCreditAvailable : l10n.pauseCreditUsed,
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: pauseCredits > 0
+                              color: hasPauseCredit
                                   ? (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant)
                                   : AppColors.primary,
                             ),
@@ -643,10 +727,10 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                     const SizedBox(height: 24),
                   ],
                 );
-                
+
                 final double hourglassTop = isLandscape ? (constraints.maxHeight - 230) / 2 : 48.0;
                 final double hourglassLeft = isLandscape ? (constraints.maxWidth * 0.25 - 110) : (constraints.maxWidth - 220) / 2;
-                
+
                 final double controlsTop = isLandscape ? 16.0 : 300.0;
                 final double controlsLeft = isLandscape ? constraints.maxWidth * 0.5 : 0.0;
                 final double controlsWidth = isLandscape ? constraints.maxWidth * 0.5 : constraints.maxWidth;
@@ -684,12 +768,12 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                     ),
                   ],
                 );
-              }
-            )
+              },
+            ),
           ),
         );
-  },
-);
+      },
+    );
   }
 }
 

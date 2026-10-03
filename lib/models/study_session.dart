@@ -1,3 +1,5 @@
+import '../utils/study_day.dart';
+
 class StudySession {
   final String id;
   final String userId;
@@ -6,7 +8,14 @@ class StudySession {
   final String? colorHex;
   final int minutes;         // Maps to 'duration_minutes' in DB
   final int pomodoros;       // Computed locally from minutes
-  final DateTime createdAt;  // Maps to 'completed_at' in DB
+
+  /// Seansın gerçek başlangıcı (yerel saat). Çok eski kayıtlarda boş olabilir.
+  final DateTime? startedAt;
+
+  /// Sunucunun completed_at değeri (yerel saat). Canlı sunucu bunu
+  /// started_at + süre olarak yazar; eski kayıtlarda senkronun anı
+  /// olabileceği için gösterimde [createdAt] / [studyDay] kullanılır.
+  final DateTime completedAt;
 
   StudySession({
     required this.id,
@@ -16,30 +25,33 @@ class StudySession {
     this.colorHex,
     required this.minutes,
     required this.pomodoros,
-    required this.createdAt,
+    this.startedAt,
+    required this.completedAt,
   });
 
+  /// Gösterim zamanı: seansın gerçek bitişi (started_at + süre). started_at
+  /// yoksa completed_at'e düşülür.
+  DateTime get createdAt => startedAt?.add(Duration(minutes: minutes)) ?? completedAt;
+
+  /// Seansın sunucu kuralına göre ait olduğu çalışma günü (04:00 sınırı,
+  /// başlangıç anına göre).
+  DateTime get studyDay => studyDayOf(startedAt ?? completedAt);
+
   factory StudySession.fromJson(Map<String, dynamic> json) {
-    final int duration = json['duration_minutes'] as int? ?? 0;
+    final int duration = (json['duration_minutes'] as num?)?.toInt() ?? 0;
+    final categories = json['categories'];
+    final joinedName = categories is Map ? categories['name'] as String? : null;
+    final startedRaw = json['started_at'] as String?;
     return StudySession(
       id: json['id'] as String,
       userId: json['user_id'] as String,
-      categoryName: (json['categories'] != null && json['categories']['name'] != null) ? json['categories']['name'] : (json['category'] ?? 'Diğer'),
+      categoryName: joinedName ?? json['category'] as String? ?? 'Diğer',
       categoryId: json['category_id'] as String?,
-      colorHex: (json['categories'] != null) ? json['categories']['color_hex'] : null,
+      colorHex: categories is Map ? categories['color_hex'] as String? : null,
       minutes: duration,
       pomodoros: duration > 0 ? (duration ~/ 25) : 0,
-      createdAt: DateTime.parse(json['completed_at'] as String).toLocal(),
+      startedAt: startedRaw == null ? null : DateTime.parse(startedRaw).toLocal(),
+      completedAt: DateTime.parse(json['completed_at'] as String).toLocal(),
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'user_id': userId,
-      'category': categoryName,
-      'duration_minutes': minutes,
-      'completed_at': createdAt.toUtc().toIso8601String(),
-    };
   }
 }

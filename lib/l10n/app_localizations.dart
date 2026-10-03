@@ -98,6 +98,1038 @@ abstract class AppLocalizations {
     Locale('tr'),
   ];
 
+  /// No description provided for @authEmailHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'ornek@posta.com'**
+  String get authEmailHint;
+
+  /// No description provided for @authAppleSignInBtn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Apple ile Giriş Yap'**
+  String get authAppleSignInBtn;
+
+  /// No description provided for @authSocialConsentPrefix.
+  ///
+  /// In tr, this message translates to:
+  /// **'Devam ederek '**
+  String get authSocialConsentPrefix;
+
+  /// No description provided for @authSocialConsentSuffix.
+  ///
+  /// In tr, this message translates to:
+  /// **' kabul etmiş olursun.'**
+  String get authSocialConsentSuffix;
+
+  /// No description provided for @authResendAvailableIn.
+  ///
+  /// In tr, this message translates to:
+  /// **'{seconds} sn sonra tekrar gönderebilirsin'**
+  String authResendAvailableIn(int seconds);
+
+  /// No description provided for @onboardingSelectCategoryError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Devam etmek için en az bir kategori seç.'**
+  String get onboardingSelectCategoryError;
+
+  /// No description provided for @onboardingUnder13Error.
+  ///
+  /// In tr, this message translates to:
+  /// **'PomoSprint\'i kullanmak için en az 13 yaşında olmalısın.'**
+  String get onboardingUnder13Error;
+
+  /// No description provided for @onboardingSessionExpired.
+  ///
+  /// In tr, this message translates to:
+  /// **'Oturumun sona erdi. Lütfen tekrar giriş yap.'**
+  String get onboardingSessionExpired;
+
+  /// No description provided for @onboardingSaveError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bilgilerin kaydedilemedi. Lütfen tekrar dene.'**
+  String get onboardingSaveError;
+
+  /// No description provided for @onboardingCategoryStepBodyLimit.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şimdi çalışacağın dersleri/alanları seç; istediğin zaman değiştirebilirsin. En fazla {limit} tane seçebilirsin.'**
+  String onboardingCategoryStepBodyLimit(int limit);
+
+  /// No description provided for @categoryNameExistsMsg.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu isimde bir kategori zaten var.'**
+  String get categoryNameExistsMsg;
+
+  /// No description provided for @categoriesLoadError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategoriler yüklenemedi. İnternet bağlantını kontrol edip tekrar dene.'**
+  String get categoriesLoadError;
+
+  /// No description provided for @categorySaveError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Değişiklik kaydedilemedi. Lütfen tekrar dene.'**
+  String get categorySaveError;
+
+  /// No description provided for @categoriesRetryBtn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tekrar Dene'**
+  String get categoriesRetryBtn;
+
+  /// No description provided for @rankingTabLeague.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lig'**
+  String get rankingTabLeague;
+
+  /// No description provided for @rankingTabMonthly.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aylık'**
+  String get rankingTabMonthly;
+
+  /// No description provided for @rankingTabFriends.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arkadaşlar'**
+  String get rankingTabFriends;
+
+  /// No description provided for @rankingMonthlyResetIn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aylık sıralamanın sıfırlanmasına kalan süre'**
+  String get rankingMonthlyResetIn;
+
+  /// No description provided for @rankingLoadError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıralama yüklenemedi. Bağlantını kontrol edip tekrar dene.'**
+  String get rankingLoadError;
+
+  /// No description provided for @rankingMyStatus.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıran: #{rank} · {points} puan'**
+  String rankingMyStatus(int rank, int points);
+
+  /// No description provided for @rankingPoints.
+  ///
+  /// In tr, this message translates to:
+  /// **'{points} puan'**
+  String rankingPoints(int points);
+
+  /// No description provided for @rankingCountdownDays.
+  ///
+  /// In tr, this message translates to:
+  /// **'{days} gün {hours} saat {minutes} dk'**
+  String rankingCountdownDays(int days, int hours, int minutes);
+
+  /// No description provided for @rankingCountdownHours.
+  ///
+  /// In tr, this message translates to:
+  /// **'{hours} saat {minutes} dk {seconds} sn'**
+  String rankingCountdownHours(int hours, int minutes, int seconds);
+
+  /// No description provided for @rankingCountdownResetting.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıfırlanıyor...'**
+  String get rankingCountdownResetting;
+
+  /// No description provided for @socialRetry.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tekrar Dene'**
+  String get socialRetry;
+
+  /// No description provided for @socialRefreshFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Güncellenemedi, son yüklenen veriler gösteriliyor.'**
+  String get socialRefreshFailed;
+
+  /// No description provided for @socialErrNetwork.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bağlantı kurulamadı. İnternetini kontrol edip tekrar dene.'**
+  String get socialErrNetwork;
+
+  /// No description provided for @socialErrSession.
+  ///
+  /// In tr, this message translates to:
+  /// **'Oturumun sona ermiş. Lütfen yeniden giriş yap.'**
+  String get socialErrSession;
+
+  /// No description provided for @socialErrGeneric.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir hata oluştu. Lütfen tekrar dene.'**
+  String get socialErrGeneric;
+
+  /// No description provided for @socialErrInsufficientCoins.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeterli kum tanen yok.'**
+  String get socialErrInsufficientCoins;
+
+  /// No description provided for @socialErrAvatarLocked.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu avatarın henüz sahibi değilsin.'**
+  String get socialErrAvatarLocked;
+
+  /// No description provided for @socialYourFriends.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arkadaşların'**
+  String get socialYourFriends;
+
+  /// No description provided for @socialFocusingNow.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şu An Çalışanlar'**
+  String get socialFocusingNow;
+
+  /// No description provided for @socialFocusing.
+  ///
+  /// In tr, this message translates to:
+  /// **'Odaklanıyor'**
+  String get socialFocusing;
+
+  /// No description provided for @socialFocusingOn.
+  ///
+  /// In tr, this message translates to:
+  /// **'{category} çalışıyor'**
+  String socialFocusingOn(String category);
+
+  /// No description provided for @socialNoLiveFriends.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şu an çalışan arkadaşın yok. Biri odaklanmaya başladığında burada görünecek.'**
+  String get socialNoLiveFriends;
+
+  /// No description provided for @socialLoadError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arkadaşlarının durumu yüklenemedi. Bağlantını kontrol edip tekrar dene.'**
+  String get socialLoadError;
+
+  /// No description provided for @leagueTierBronze.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bronz Kum Saati'**
+  String get leagueTierBronze;
+
+  /// No description provided for @leagueTierSilver.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gümüş Kum Saati'**
+  String get leagueTierSilver;
+
+  /// No description provided for @leagueTierGold.
+  ///
+  /// In tr, this message translates to:
+  /// **'Altın Kum Saati'**
+  String get leagueTierGold;
+
+  /// No description provided for @leagueTierSapphire.
+  ///
+  /// In tr, this message translates to:
+  /// **'Safir Kum Saati'**
+  String get leagueTierSapphire;
+
+  /// No description provided for @leagueTierDiamond.
+  ///
+  /// In tr, this message translates to:
+  /// **'Elmas Kum Saati'**
+  String get leagueTierDiamond;
+
+  /// No description provided for @leagueTierLeagueName.
+  ///
+  /// In tr, this message translates to:
+  /// **'{tier} Ligi'**
+  String leagueTierLeagueName(String tier);
+
+  /// No description provided for @leagueInfoTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lig Sistemi Nasıl Çalışır?'**
+  String get leagueInfoTitle;
+
+  /// No description provided for @leagueInfoWhatTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lig Nedir?'**
+  String get leagueInfoWhatTitle;
+
+  /// No description provided for @leagueInfoWhatBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Her lig döneminde seninle benzer seviyedeki en fazla 30 kişiyle aynı gruba düşersin. Dönem boyunca kim daha çok odaklanırsa üst sıraya çıkar.'**
+  String get leagueInfoWhatBody;
+
+  /// No description provided for @leagueInfoTiersTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lig Kademeleri'**
+  String get leagueInfoTiersTitle;
+
+  /// No description provided for @leagueInfoYouAreHere.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şu an buradasın'**
+  String get leagueInfoYouAreHere;
+
+  /// No description provided for @leagueInfoPointsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Puan Nasıl Kazanılır?'**
+  String get leagueInfoPointsTitle;
+
+  /// No description provided for @leagueInfoPoints25.
+  ///
+  /// In tr, this message translates to:
+  /// **'25 dakikalık odak: {points} puan'**
+  String leagueInfoPoints25(String points);
+
+  /// No description provided for @leagueInfoPoints50.
+  ///
+  /// In tr, this message translates to:
+  /// **'50 dakikalık odak: {points} puan'**
+  String leagueInfoPoints50(String points);
+
+  /// No description provided for @leagueInfoStreakBonus.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seri bonusu:'**
+  String get leagueInfoStreakBonus;
+
+  /// No description provided for @leagueInfoStreakRange.
+  ///
+  /// In tr, this message translates to:
+  /// **'{from}-{to} gün: %{pct}'**
+  String leagueInfoStreakRange(String from, String to, String pct);
+
+  /// No description provided for @leagueInfoStreakRangeOpen.
+  ///
+  /// In tr, this message translates to:
+  /// **'{from}+ gün: %{pct}'**
+  String leagueInfoStreakRangeOpen(String from, String pct);
+
+  /// No description provided for @leagueInfoStreakKeep.
+  ///
+  /// In tr, this message translates to:
+  /// **'Her gün en az 1 pomodoro tamamlayarak serini canlı tut.'**
+  String get leagueInfoStreakKeep;
+
+  /// No description provided for @leagueInfoPausePenalty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seansı duraklatırsan puan %{pct} azalır.'**
+  String leagueInfoPausePenalty(String pct);
+
+  /// No description provided for @leagueInfoCoins.
+  ///
+  /// In tr, this message translates to:
+  /// **'🪙 Kum tanesi: Tamamladığın her pomodorodan {coins} kum tanesi kazanırsın. Karakter koleksiyonundan yeni kum saatleri açmak için kullanılır.'**
+  String leagueInfoCoins(String coins);
+
+  /// No description provided for @leagueInfoPromotionTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yükselme ve Düşme'**
+  String get leagueInfoPromotionTitle;
+
+  /// No description provided for @leagueInfoPeriodEnds.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu lig dönemi {date} tarihinde sona erer. Dönem sonunda sıralamana göre yükselir, kalır ya da düşersin.'**
+  String leagueInfoPeriodEnds(String date);
+
+  /// No description provided for @leagueInfoPeriodGeneric.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lig dönemi sona erdiğinde sıralamana göre yükselir, kalır ya da düşersin.'**
+  String get leagueInfoPeriodGeneric;
+
+  /// No description provided for @leagueInfoTopTier.
+  ///
+  /// In tr, this message translates to:
+  /// **'En üst ligdesin, yükselecek yer yok.'**
+  String get leagueInfoTopTier;
+
+  /// No description provided for @leagueInfoPromote.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu dönem puan toplayan ilk {count} kişi bir üst lige yükselir.'**
+  String leagueInfoPromote(int count);
+
+  /// No description provided for @leagueInfoDemote.
+  ///
+  /// In tr, this message translates to:
+  /// **'Son {count} kişi bir alt lige düşer.'**
+  String leagueInfoDemote(int count);
+
+  /// No description provided for @leagueInfoNoDemotionBronze.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bronz ligde düşme yoktur.'**
+  String get leagueInfoNoDemotionBronze;
+
+  /// No description provided for @leagueInfoNoDemotionThisPeriod.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu dönem bu ligde düşme yok.'**
+  String get leagueInfoNoDemotionThisPeriod;
+
+  /// No description provided for @leagueAwaitingPlacementTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz bir lig odasında değilsin'**
+  String get leagueAwaitingPlacementTitle;
+
+  /// No description provided for @leagueAwaitingPlacementBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu dönem ilk pomodoronu tamamladığında seninle benzer seviyedeki en fazla 30 kişilik bir odaya yerleşirsin. Sıralaman ve yükselme durumun burada görünür.'**
+  String get leagueAwaitingPlacementBody;
+
+  /// No description provided for @leagueInfoDailyLimitTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük Sınır'**
+  String get leagueInfoDailyLimitTitle;
+
+  /// No description provided for @leagueInfoDailyLimitBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günde en fazla {limit} pomodoro lig puanına sayılır. Üstü kişisel istatistiklerine ve serine eklenmeye devam eder ama lig sıralamasını etkilemez.'**
+  String leagueInfoDailyLimitBody(String limit);
+
+  /// No description provided for @leagueInfoFaqTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Puanım Neden Artmadı?'**
+  String get leagueInfoFaqTitle;
+
+  /// No description provided for @leagueInfoFaqLimit.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük {limit} pomodoro sınırına ulaşmış olabilirsin.'**
+  String leagueInfoFaqLimit(String limit);
+
+  /// No description provided for @leagueInfoFaqCancelled.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seansı çok erken iptal etmiş olabilirsin.'**
+  String get leagueInfoFaqCancelled;
+
+  /// No description provided for @leagueInfoFaqReset.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lig dönemi yeni sıfırlanmış olabilir.'**
+  String get leagueInfoFaqReset;
+
+  /// No description provided for @leagueInfoFaqPending.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çevrimdışıyken tamamladığın seanslar bağlantı gelince gönderilir; puanın o zaman eklenir.'**
+  String get leagueInfoFaqPending;
+
+  /// No description provided for @friendsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arkadaşlar'**
+  String get friendsTitle;
+
+  /// No description provided for @friendsMyCode.
+  ///
+  /// In tr, this message translates to:
+  /// **'Senin Arkadaşlık Kodun'**
+  String get friendsMyCode;
+
+  /// No description provided for @friendsCopyCode.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kodu kopyala'**
+  String get friendsCopyCode;
+
+  /// No description provided for @friendsCodeCopied.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kod kopyalandı!'**
+  String get friendsCodeCopied;
+
+  /// No description provided for @friendsAddByCode.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kod ile Arkadaş Ekle'**
+  String get friendsAddByCode;
+
+  /// No description provided for @friendsCodeHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Örn: A1B2C3'**
+  String get friendsCodeHint;
+
+  /// No description provided for @friendsAdded.
+  ///
+  /// In tr, this message translates to:
+  /// **'✅ {name} arkadaş listene eklendi!'**
+  String friendsAdded(String name);
+
+  /// No description provided for @friendsRequestSent.
+  ///
+  /// In tr, this message translates to:
+  /// **'📨 {name} kullanıcısına arkadaşlık isteği gönderildi. Onay bekleniyor.'**
+  String friendsRequestSent(String name);
+
+  /// No description provided for @friendsErrNotFound.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu koda sahip bir kullanıcı bulunamadı.'**
+  String get friendsErrNotFound;
+
+  /// No description provided for @friendsErrSelf.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kendi kodunu ekleyemezsin.'**
+  String get friendsErrSelf;
+
+  /// No description provided for @friendsErrAlreadyFriends.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu kullanıcıyla zaten arkadaşsınız.'**
+  String get friendsErrAlreadyFriends;
+
+  /// No description provided for @friendsErrAlreadyPending.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu kullanıcıyla bekleyen bir arkadaşlık isteğin zaten var.'**
+  String get friendsErrAlreadyPending;
+
+  /// No description provided for @friendsErrAddFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arkadaş eklenemedi. Kodu kontrol edip tekrar dene.'**
+  String get friendsErrAddFailed;
+
+  /// No description provided for @friendsIncoming.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gelen İstekler ({count})'**
+  String friendsIncoming(int count);
+
+  /// No description provided for @friendsAccept.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kabul et'**
+  String get friendsAccept;
+
+  /// No description provided for @friendsReject.
+  ///
+  /// In tr, this message translates to:
+  /// **'Reddet'**
+  String get friendsReject;
+
+  /// No description provided for @friendsAccepted.
+  ///
+  /// In tr, this message translates to:
+  /// **'✅ Arkadaşlık isteği kabul edildi!'**
+  String get friendsAccepted;
+
+  /// No description provided for @friendsRespondFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'İstek yanıtlanamadı. Lütfen tekrar dene.'**
+  String get friendsRespondFailed;
+
+  /// No description provided for @friendsRequestGone.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu istek artık geçerli değil.'**
+  String get friendsRequestGone;
+
+  /// No description provided for @friendsYourFriends.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arkadaşların ({count})'**
+  String friendsYourFriends(int count);
+
+  /// No description provided for @friendsEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz arkadaşın yok. Kodunu paylaş veya yukarıdan bir kod gir!'**
+  String get friendsEmpty;
+
+  /// No description provided for @friendsLoadError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arkadaş listen yüklenemedi. Bağlantını kontrol edip tekrar dene.'**
+  String get friendsLoadError;
+
+  /// No description provided for @profileNameTooShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'İsim en az 2 karakter olmalı.'**
+  String get profileNameTooShort;
+
+  /// No description provided for @profileNameTooLong.
+  ///
+  /// In tr, this message translates to:
+  /// **'İsim en fazla 30 karakter olabilir.'**
+  String get profileNameTooLong;
+
+  /// No description provided for @profileDeleteConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesabını ve tüm verilerini kalıcı olarak silmek istediğinden emin misin?\n\nBu işlem profilini ve çalışma geçmişini tamamen siler ve geri alınamaz.'**
+  String get profileDeleteConfirm;
+
+  /// No description provided for @profileDeleting.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesabın siliniyor...'**
+  String get profileDeleting;
+
+  /// No description provided for @profileDeleteError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesabın silinemedi. Bağlantını kontrol edip tekrar dene.'**
+  String get profileDeleteError;
+
+  /// No description provided for @profileNotificationsDenied.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bildirim izni verilmedi. Bildirimleri telefonunun Ayarlar bölümünden PomoSprint için açabilirsin.'**
+  String get profileNotificationsDenied;
+
+  /// No description provided for @profileSettingSaveError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ayar kaydedilemedi. Lütfen tekrar dene.'**
+  String get profileSettingSaveError;
+
+  /// No description provided for @avatarBalance.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bakiyen: {coins} kum tanesi'**
+  String avatarBalance(int coins);
+
+  /// No description provided for @avatarPurchaseTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Satın Al'**
+  String get avatarPurchaseTitle;
+
+  /// No description provided for @avatarPurchaseBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} avatarını {price} kum tanesine satın almak ister misin?'**
+  String avatarPurchaseBody(String name, int price);
+
+  /// No description provided for @avatarNotEnoughCoins.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yetersiz bakiye: {missing} kum tanesi daha gerekiyor.'**
+  String avatarNotEnoughCoins(int missing);
+
+  /// No description provided for @avatarPurchased.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} artık senin!'**
+  String avatarPurchased(String name);
+
+  /// No description provided for @avatarPremiumTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Premium Avatar'**
+  String get avatarPremiumTitle;
+
+  /// No description provided for @avatarPremiumBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu avatar Premium üyelere özel.'**
+  String get avatarPremiumBody;
+
+  /// No description provided for @avatarPremiumUnlockBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Premium üyeliğinle {name} avatarını ücretsiz açabilirsin.'**
+  String avatarPremiumUnlockBody(String name);
+
+  /// No description provided for @avatarUnlockBtn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aç'**
+  String get avatarUnlockBtn;
+
+  /// No description provided for @coinsCaption.
+  ///
+  /// In tr, this message translates to:
+  /// **'🪙 KUM'**
+  String get coinsCaption;
+
+  /// No description provided for @pendingSessionsBanner.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} senkronize edilmemiş seansın var. Tekrar denemek için dokun.'**
+  String pendingSessionsBanner(int count);
+
+  /// No description provided for @sessionPointsBreakdown.
+  ///
+  /// In tr, this message translates to:
+  /// **'🔥 {base} puan + {bonus} seri bonusu (%{pct}) = {total} puan!'**
+  String sessionPointsBreakdown(int base, int bonus, int pct, int total);
+
+  /// No description provided for @sessionDailyLimitReached.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugünlük lig puanı sınırına ulaştın (16 pomodoro). Çalışman kaydedilmeye devam ediyor.'**
+  String get sessionDailyLimitReached;
+
+  /// No description provided for @sessionQueuedOffline.
+  ///
+  /// In tr, this message translates to:
+  /// **'⚠️ Seans şu an buluta kaydedilemedi, bağlantı gelince otomatik gönderilecek.'**
+  String get sessionQueuedOffline;
+
+  /// No description provided for @sessionQueuedClockSkew.
+  ///
+  /// In tr, this message translates to:
+  /// **'⚠️ Seans bekletiliyor: cihazının saati sunucudan farklı görünüyor. Saat ayarını kontrol et; seans otomatik olarak yeniden denenecek.'**
+  String get sessionQueuedClockSkew;
+
+  /// No description provided for @sessionQueuedOverlap.
+  ///
+  /// In tr, this message translates to:
+  /// **'⚠️ Seans önceki bir kayıtla çakışıyor; bekletiliyor ve daha sonra yeniden denenecek.'**
+  String get sessionQueuedOverlap;
+
+  /// No description provided for @sessionRejectedTooOld.
+  ///
+  /// In tr, this message translates to:
+  /// **'⚠️ Bu seans 24 saatten eski olduğu için kaydedilemedi.'**
+  String get sessionRejectedTooOld;
+
+  /// No description provided for @sessionRejectedClock.
+  ///
+  /// In tr, this message translates to:
+  /// **'⚠️ Bu seans kaydedilemedi: cihazının saati ileri görünüyor. Saat ayarını kontrol et.'**
+  String get sessionRejectedClock;
+
+  /// No description provided for @sessionRejectedOverlap.
+  ///
+  /// In tr, this message translates to:
+  /// **'⚠️ Bu seans kaydedilemedi: aynı zaman aralığında kayıtlı başka bir seans var.'**
+  String get sessionRejectedOverlap;
+
+  /// No description provided for @sessionRejectedGeneric.
+  ///
+  /// In tr, this message translates to:
+  /// **'⚠️ Bu seans kaydedilemedi: sunucu doğrulamasından geçmedi.'**
+  String get sessionRejectedGeneric;
+
+  /// No description provided for @rejectedSessionsNotice.
+  ///
+  /// In tr, this message translates to:
+  /// **'⚠️ Bekleyen {count} seans sunucu tarafından reddedildi ve kaydedilemedi.'**
+  String rejectedSessionsNotice(int count);
+
+  /// No description provided for @pausedSessionExpired.
+  ///
+  /// In tr, this message translates to:
+  /// **'Duraklatılmış seansın 24 saati aştığı için kaydedilemedi ve sıfırlandı.'**
+  String get pausedSessionExpired;
+
+  /// No description provided for @leaveWhileRunningTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seansın sürüyor'**
+  String get leaveWhileRunningTitle;
+
+  /// No description provided for @leaveWhileRunningBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uygulamadan çıksan da sayaç çalışmaya devam eder; geri döndüğünde seansın kaldığı yerden sürer.'**
+  String get leaveWhileRunningBody;
+
+  /// No description provided for @leaveWhileRunningStay.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kal'**
+  String get leaveWhileRunningStay;
+
+  /// No description provided for @leaveWhileRunningLeave.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arka plana al'**
+  String get leaveWhileRunningLeave;
+
+  /// No description provided for @notifSessionDoneTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Pomodoro tamamlandı! 🎉'**
+  String get notifSessionDoneTitle;
+
+  /// No description provided for @notifSessionDoneBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'{category} seansın bitti. Puanlarını görmek için uygulamaya dön.'**
+  String notifSessionDoneBody(String category);
+
+  /// No description provided for @notifChannelName.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seans bildirimleri'**
+  String get notifChannelName;
+
+  /// No description provided for @notifChannelDescription.
+  ///
+  /// In tr, this message translates to:
+  /// **'Pomodoro seansın bittiğinde haber verir.'**
+  String get notifChannelDescription;
+
+  /// No description provided for @statsLoadErrorTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'İstatistikler yüklenemedi'**
+  String get statsLoadErrorTitle;
+
+  /// No description provided for @statsLoadErrorOffline.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sunucuya bağlanılamadı. İnternet bağlantını kontrol edip tekrar dene.'**
+  String get statsLoadErrorOffline;
+
+  /// No description provided for @statsLoadErrorSignedOut.
+  ///
+  /// In tr, this message translates to:
+  /// **'İstatistiklerini görmek için tekrar giriş yapman gerekiyor.'**
+  String get statsLoadErrorSignedOut;
+
+  /// No description provided for @statsLoadErrorGeneric.
+  ///
+  /// In tr, this message translates to:
+  /// **'Veriler alınırken bir sorun oluştu. Lütfen tekrar dene.'**
+  String get statsLoadErrorGeneric;
+
+  /// No description provided for @statsRetry.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tekrar Dene'**
+  String get statsRetry;
+
+  /// No description provided for @statsStaleNotice.
+  ///
+  /// In tr, this message translates to:
+  /// **'Güncel veriler alınamadı; son yüklenen veriler gösteriliyor.'**
+  String get statsStaleNotice;
+
+  /// No description provided for @statsPendingSessions.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} seans senkron bekliyor'**
+  String statsPendingSessions(int count);
+
+  /// No description provided for @statsNoStudyTodayTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün henüz çalışmadın'**
+  String get statsNoStudyTodayTitle;
+
+  /// No description provided for @statsNoStudyTodayDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir Pomodoro başlat; bugünün ders dağılımı burada görünecek.'**
+  String get statsNoStudyTodayDesc;
+
+  /// No description provided for @statsNoStudyThisWeekTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu hafta henüz çalışmadın'**
+  String get statsNoStudyThisWeekTitle;
+
+  /// No description provided for @statsNoStudyThisWeekDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir Pomodoro başlat; haftalık analizin burada oluşacak.'**
+  String get statsNoStudyThisWeekDesc;
+
+  /// No description provided for @statsGoalSheetSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günde ne kadar odaklanmak istiyorsun?'**
+  String get statsGoalSheetSubtitle;
+
+  /// No description provided for @statsGoalPomodoroApprox.
+  ///
+  /// In tr, this message translates to:
+  /// **'≈ {count} Pomodoro'**
+  String statsGoalPomodoroApprox(int count);
+
+  /// No description provided for @statsGoalSaveFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedef kaydedilemedi. Bağlantını kontrol edip tekrar dene.'**
+  String get statsGoalSaveFailed;
+
+  /// No description provided for @statsTodayPomodoros.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugün {count} Pomodoro tamamlandı'**
+  String statsTodayPomodoros(int count);
+
+  /// No description provided for @statsWeeklyGoalTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Haftalık Hedef'**
+  String get statsWeeklyGoalTitle;
+
+  /// No description provided for @statsWeeklyGoalSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'{weekly} · günlük hedefin × 7'**
+  String statsWeeklyGoalSubtitle(String weekly);
+
+  /// No description provided for @statsWeekLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hafta {index}'**
+  String statsWeekLabel(int index);
+
+  /// No description provided for @statsWeekStudyTotal.
+  ///
+  /// In tr, this message translates to:
+  /// **'{duration} Çalışma'**
+  String statsWeekStudyTotal(String duration);
+
+  /// No description provided for @statsWeekChangeUp.
+  ///
+  /// In tr, this message translates to:
+  /// **'Önceki haftanın aynı günlerine göre {percent} artış'**
+  String statsWeekChangeUp(String percent);
+
+  /// No description provided for @statsWeekChangeDown.
+  ///
+  /// In tr, this message translates to:
+  /// **'Önceki haftanın aynı günlerine göre {percent} düşüş'**
+  String statsWeekChangeDown(String percent);
+
+  /// No description provided for @statsMonthMotivation.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçen ayın aynı dönemine göre odağını {percent} artırdın, harika gidiyorsun!'**
+  String statsMonthMotivation(String percent);
+
+  /// No description provided for @statsMonthEmptyTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu ay henüz çalışma kaydın yok'**
+  String get statsMonthEmptyTitle;
+
+  /// No description provided for @statsMonthEmptyDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu ay ilk Pomodoro\'nu tamamladığında aylık takip burada görünecek.'**
+  String get statsMonthEmptyDesc;
+
+  /// No description provided for @statsOtherCategory.
+  ///
+  /// In tr, this message translates to:
+  /// **'Diğer'**
+  String get statsOtherCategory;
+
+  /// No description provided for @statsShowAsDuration.
+  ///
+  /// In tr, this message translates to:
+  /// **'Süre olarak göster'**
+  String get statsShowAsDuration;
+
+  /// No description provided for @statsShowAsPercent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yüzde olarak göster'**
+  String get statsShowAsPercent;
+
+  /// No description provided for @authErrWeakPassword.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifren çok zayıf. En az 1 küçük harf (a-z), 1 büyük harf (A-Z) ve 1 rakam (0-9) içermeli.'**
+  String get authErrWeakPassword;
+
+  /// No description provided for @authErrEmailExistsResent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu e-posta adresi zaten kayıtlı! Doğrulama bağlantısı e-postana tekrar gönderildi.'**
+  String get authErrEmailExistsResent;
+
+  /// No description provided for @authErrInvalidCredentials.
+  ///
+  /// In tr, this message translates to:
+  /// **'E-posta adresi veya şifre hatalı ya da hesabın henüz onaylanmamış olabilir. Şifreni kontrol et; sorun sürerse aşağıdan onay e-postasını tekrar gönderebilirsin.'**
+  String get authErrInvalidCredentials;
+
+  /// No description provided for @authErrEmailNotConfirmed.
+  ///
+  /// In tr, this message translates to:
+  /// **'E-posta adresin henüz doğrulanmamış. Lütfen gelen kutundaki onay bağlantısına tıkla.'**
+  String get authErrEmailNotConfirmed;
+
+  /// No description provided for @authErrRateLimited.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çok fazla deneme yapıldı. Lütfen birkaç dakika bekleyip tekrar dene.'**
+  String get authErrRateLimited;
+
+  /// No description provided for @authErrNetwork.
+  ///
+  /// In tr, this message translates to:
+  /// **'İnternet veya sunucu bağlantısı kurulamadı. Lütfen ağ bağlantını kontrol et.'**
+  String get authErrNetwork;
+
+  /// No description provided for @authErrInvalidEmail.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lütfen geçerli bir e-posta adresi gir.'**
+  String get authErrInvalidEmail;
+
+  /// No description provided for @authErrCloudUnavailable.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sunucuya bağlanılamadı. Lütfen internet bağlantını kontrol et.'**
+  String get authErrCloudUnavailable;
+
+  /// No description provided for @authErrProfileLoad.
+  ///
+  /// In tr, this message translates to:
+  /// **'Profilin yüklenemedi. Lütfen bağlantını kontrol edip tekrar giriş yap.'**
+  String get authErrProfileLoad;
+
+  /// No description provided for @authErrGoogleFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Google ile giriş yapılamadı. Lütfen tekrar dene.'**
+  String get authErrGoogleFailed;
+
+  /// No description provided for @authErrAppleFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Apple ile giriş yapılamadı. Lütfen tekrar dene.'**
+  String get authErrAppleFailed;
+
+  /// No description provided for @authErrUnknown.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir hata oluştu. Lütfen tekrar dene.'**
+  String get authErrUnknown;
+
   /// No description provided for @navTimer.
   ///
   /// In tr, this message translates to:

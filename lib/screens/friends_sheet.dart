@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../l10n/app_localizations.dart';
 import '../models/avatar_model.dart';
 import '../widgets/avatar_widget.dart';
+import '../widgets/social/load_error_view.dart';
+import '../widgets/social/social_error_text.dart';
 import '../services/supabase_service.dart';
-import '../services/language_service.dart';
 import '../theme.dart';
 
 /// Arkadaş ekleme ve arkadaş listesi pop-up ekranı.
@@ -16,11 +20,15 @@ class FriendsSheet extends StatefulWidget {
 }
 
 class _FriendsSheetState extends State<FriendsSheet> {
+  static const int _codeLength = 6;
+
   final _codeController = TextEditingController();
   String? _myCode;
-  List<Map<String, dynamic>> _friends = [];
-  List<Map<String, dynamic>> _pendingRequests = [];
+  List<Map<String, dynamic>> _friends = const [];
+  List<Map<String, dynamic>> _pendingRequests = const [];
   bool _isLoading = true;
+  bool _hasLoaded = false;
+  bool _loadFailed = false;
   bool _isAdding = false;
   String? _respondingId;
   String? _errorMessage;
@@ -28,7 +36,7 @@ class _FriendsSheetState extends State<FriendsSheet> {
   @override
   void initState() {
     super.initState();
-    _loadData();
+    unawaited(_loadData());
   }
 
   @override
@@ -39,103 +47,143 @@ class _FriendsSheetState extends State<FriendsSheet> {
 
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
-    final code = await SupabaseService.instance.getMyFriendCode();
-    final friends = await SupabaseService.instance.fetchFriends();
-    final pending = await SupabaseService.instance.fetchPendingFriendRequests();
-    if (mounted) {
-      setState(() {
-        _myCode = code;
-        _friends = friends;
-        _pendingRequests = pending;
-        _isLoading = false;
-      });
+    final service = SupabaseService.instance;
+    final codeFuture = service.getMyFriendCode();
+    List<Map<String, dynamic>>? friends;
+    List<Map<String, dynamic>>? pending;
+    try {
+      final results = await Future.wait([service.fetchFriends(), service.fetchPendingFriendRequests()]);
+      friends = results[0];
+      pending = results[1];
+    } catch (e) {
+      debugPrint('[SOCIAL] Arkadaş listesi alınamadı: $e');
     }
+    final code = await codeFuture;
+    if (!mounted) return;
+    setState(() {
+      _myCode = code ?? _myCode;
+      if (friends != null && pending != null) {
+        _friends = [...friends]
+          ..sort((a, b) => _asInt(b['lifetime_points']).compareTo(_asInt(a['lifetime_points'])));
+        _pendingRequests = pending;
+        _hasLoaded = true;
+      }
+      _loadFailed = friends == null;
+      _isLoading = false;
+    });
   }
 
+  static int _asInt(Object? value) => value is num ? value.toInt() : 0;
+
+  static String _normalizeCode(String raw) => raw.replaceAll(RegExp(r'\s'), '').toUpperCase();
+
   Future<void> _handleAddFriend() async {
-    final code = _codeController.text.trim();
+    final l10n = AppLocalizations.of(context)!;
+    final code = _normalizeCode(_codeController.text);
     if (code.isEmpty || _isAdding) return;
-    final isTurkish = LanguageService.instance.isTurkish;
+    if (_myCode != null && code == _normalizeCode(_myCode!)) {
+      setState(() => _errorMessage = l10n.friendsErrSelf);
+      return;
+    }
 
     setState(() {
       _isAdding = true;
       _errorMessage = null;
     });
 
-    final result = await SupabaseService.instance.addFriendByCode(code);
+    Map<String, dynamic>? result;
+    String? error;
+    try {
+      result = await SupabaseService.instance.addFriendByCode(code);
+    } catch (e) {
+      error = socialErrorText(l10n, e);
+    }
 
     if (!mounted) return;
     setState(() => _isAdding = false);
 
-    if (result['success'] == true) {
+    if (result != null && result['success'] == true) {
       _codeController.clear();
+      final name = result['friend']?['name']?.toString() ?? l10n.userDefault;
+      final autoAccepted = result['auto_accepted'] == true || result['code'] == 'accepted';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(autoAccepted ? l10n.friendsAdded(name) : l10n.friendsRequestSent(name)),
+          backgroundColor: autoAccepted ? Colors.green : AppColors.primary,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
       await _loadData();
-      if (mounted) {
-        final name = result['friend']?['name']?.toString() ?? (isTurkish ? 'Kullanıcı' : 'User');
-        final autoAccepted = result['auto_accepted'] == true;
-        final message = autoAccepted
-            ? (isTurkish ? '✅ $name arkadaş listene eklendi!' : '✅ $name was added to your friends list!')
-            : (isTurkish
-                ? '📨 $name kullanıcısına arkadaşlık isteği gönderildi. Onay bekleniyor.'
-                : '📨 Friend request sent to $name. Waiting for approval.');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(message),
-            backgroundColor: autoAccepted ? Colors.green : AppColors.primary,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
     } else {
-      setState(() => _errorMessage = result['message']?.toString() ?? 'Bir hata oluştu.');
+      setState(() => _errorMessage = error ?? _addFailureText(l10n, result));
     }
+  }
+
+  // Sunucunun makine-okunur 'code' alanı yerelleştirilir. Kod henüz yoksa
+  // (eski sunucu sürümü) yalnızca Türkçe arayüzde sunucunun Türkçe mesajı
+  // gösterilir; aksi halde genel metin.
+  String _addFailureText(AppLocalizations l10n, Map<String, dynamic>? result) {
+    switch (result?['code']) {
+      case 'not_found':
+        return l10n.friendsErrNotFound;
+      case 'self_add':
+        return l10n.friendsErrSelf;
+      case 'already_friends':
+        return l10n.friendsErrAlreadyFriends;
+      case 'already_pending':
+        return l10n.friendsErrAlreadyPending;
+    }
+    final message = result?['message']?.toString().trim() ?? '';
+    if (l10n.localeName == 'tr' && message.isNotEmpty) return message;
+    return l10n.friendsErrAddFailed;
   }
 
   Future<void> _handleRespond(String fromUserId, bool accept) async {
     if (_respondingId != null) return;
-    final isTurkish = LanguageService.instance.isTurkish;
+    final l10n = AppLocalizations.of(context)!;
     setState(() => _respondingId = fromUserId);
 
-    final result = await SupabaseService.instance.respondToFriendRequest(fromUserId, accept);
+    Map<String, dynamic>? result;
+    String? error;
+    try {
+      result = await SupabaseService.instance.respondToFriendRequest(fromUserId, accept);
+    } catch (e) {
+      error = socialErrorText(l10n, e);
+    }
 
     if (!mounted) return;
     setState(() => _respondingId = null);
 
-    if (result['success'] == true) {
-      await _loadData();
-      if (mounted && accept) {
-        ScaffoldMessenger.of(context).showSnackBar(
+    final messenger = ScaffoldMessenger.of(context);
+    if (result != null && result['success'] == true) {
+      if (accept) {
+        messenger.showSnackBar(
           SnackBar(
-            content: Text(isTurkish ? '✅ Arkadaşlık isteği kabul edildi!' : '✅ Friend request accepted!'),
+            content: Text(l10n.friendsAccepted),
             backgroundColor: Colors.green,
             behavior: SnackBarBehavior.floating,
           ),
         );
       }
-    } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      await _loadData();
+    } else {
+      final gone = result?['code'] == 'not_found';
+      messenger.showSnackBar(
         SnackBar(
-          content: Text(result['message']?.toString() ?? (isTurkish ? 'Bir hata oluştu.' : 'An error occurred.')),
+          content: Text(error ?? (gone ? l10n.friendsRequestGone : l10n.friendsRespondFailed)),
           backgroundColor: Colors.red,
           behavior: SnackBarBehavior.floating,
         ),
       );
+      if (gone) await _loadData();
     }
-  }
-
-  AvatarCharacter _getAvatar(String? avatarId) {
-    final avatars = AvatarCharacter.allAvatars();
-    return avatars.firstWhere(
-      (a) => a.id == avatarId,
-      orElse: () => avatars.first,
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final lang = LanguageService.instance;
+    final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isTurkish = lang.isTurkish;
+    final muted = isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant;
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
@@ -160,251 +208,287 @@ class _FriendsSheetState extends State<FriendsSheet> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  isTurkish ? 'Arkadaşlar' : 'Friends',
+                  l10n.friendsTitle,
                   style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 IconButton(
                   icon: const Icon(Icons.close),
+                  tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
             ),
           ),
           Expanded(
-            child: _isLoading
+            child: _isLoading && !_hasLoaded
                 ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
                 : ListView(
                     padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
                     children: [
-                      // Kendi kodun
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryContainer.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: AppColors.primaryContainer.withValues(alpha: 0.3)),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              isTurkish ? 'Senin Arkadaşlık Kodun' : 'Your Friend Code',
-                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
-                            ),
-                            const SizedBox(height: 6),
-                            Row(
-                              children: [
-                                Text(
-                                  _myCode ?? '------',
-                                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: 2, color: AppColors.primary),
-                                ),
-                                const Spacer(),
-                                IconButton(
-                                  icon: const Icon(Icons.copy_rounded, size: 20, color: AppColors.primary),
-                                  onPressed: _myCode == null
-                                      ? null
-                                      : () {
-                                          Clipboard.setData(ClipboardData(text: _myCode!));
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: Text(isTurkish ? 'Kod kopyalandı!' : 'Code copied!'),
-                                              behavior: SnackBarBehavior.floating,
-                                            ),
-                                          );
-                                        },
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-
+                      _buildMyCodeCard(l10n, muted),
                       const SizedBox(height: 20),
-
-                      // Kod ile arkadaş ekle
-                      Text(
-                        isTurkish ? 'Kod ile Arkadaş Ekle' : 'Add Friend by Code',
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: _codeController,
-                              textCapitalization: TextCapitalization.characters,
-                              maxLength: 6,
-                              decoration: InputDecoration(
-                                hintText: isTurkish ? 'Örn: A1B2C3' : 'E.g: A1B2C3',
-                                counterText: '',
-                                filled: true,
-                                fillColor: isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide.none,
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          ElevatedButton(
-                            onPressed: _isAdding ? null : _handleAddFriend,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primary,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            ),
-                            child: _isAdding
-                                ? const SizedBox(
-                                    width: 18,
-                                    height: 18,
-                                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                                  )
-                                : Text(isTurkish ? 'Ekle' : 'Add'),
-                          ),
+                      ..._buildAddByCode(l10n, isDark),
+                      if (!_hasLoaded) ...[
+                        const SizedBox(height: 24),
+                        LoadErrorView(message: l10n.friendsLoadError, onRetry: _loadData),
+                      ] else ...[
+                        if (_loadFailed) ...[
+                          const SizedBox(height: 12),
+                          StaleDataNotice(onRetry: _loadData),
                         ],
-                      ),
-                      if (_errorMessage != null) ...[
-                        const SizedBox(height: 8),
-                        Text(_errorMessage!, style: const TextStyle(color: Colors.red, fontSize: 13)),
-                      ],
-
-                      if (_pendingRequests.isNotEmpty) ...[
+                        ..._buildPendingRequests(l10n),
                         const SizedBox(height: 24),
                         Text(
-                          isTurkish ? 'Gelen İstekler (${_pendingRequests.length})' : 'Incoming Requests (${_pendingRequests.length})',
+                          l10n.friendsYourFriends(_friends.length),
                           style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 8),
-                        ..._pendingRequests.map((r) {
-                          final avatar = _getAvatar(r['avatar_id']?.toString());
-                          final requesterId = r['id']?.toString() ?? '';
-                          final isResponding = _respondingId == requesterId;
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 10),
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryContainer.withValues(alpha: 0.10),
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(color: AppColors.primaryContainer.withValues(alpha: 0.3)),
-                            ),
-                            child: Row(
-                              children: [
-                                AvatarWidget(avatar: avatar, size: 40),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Text(
-                                    r['name']?.toString() ?? (isTurkish ? 'Kullanıcı' : 'User'),
-                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                                  ),
-                                ),
-                                if (isResponding)
-                                  const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
-                                  )
-                                else ...[
-                                  IconButton(
-                                    icon: const Icon(Icons.check_circle, color: Colors.green, size: 26),
-                                    tooltip: isTurkish ? 'Kabul et' : 'Accept',
-                                    onPressed: () => _handleRespond(requesterId, true),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.cancel, color: Colors.redAccent, size: 26),
-                                    tooltip: isTurkish ? 'Reddet' : 'Reject',
-                                    onPressed: () => _handleRespond(requesterId, false),
-                                  ),
-                                ],
-                              ],
-                            ),
-                          );
-                        }),
+                        if (_friends.isEmpty)
+                          _buildEmptyFriends(l10n, isDark, muted)
+                        else
+                          for (final f in _friends) _buildFriendTile(f, l10n, isDark, muted),
                       ],
-
-                      const SizedBox(height: 24),
-
-                      Text(
-                        isTurkish ? 'Arkadaşların (${_friends.length})' : 'Your Friends (${_friends.length})',
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 8),
-
-                      if (_friends.isEmpty)
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(24),
-                          decoration: BoxDecoration(
-                            color: isDark ? AppColors.darkSurfaceContainerLowest : AppColors.surfaceContainerLowest,
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Column(
-                            children: [
-                              Icon(Icons.people_outline, size: 40, color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
-                              const SizedBox(height: 8),
-                              Text(
-                                isTurkish
-                                    ? 'Henüz arkadaşın yok. Kodunu paylaş veya yukarıdan bir kod gir!'
-                                    : 'No friends yet. Share your code or enter one above!',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 13, color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
-                              ),
-                            ],
-                          ),
-                        )
-                      else
-                        ...(_friends..sort((a, b) => (b['lifetime_points'] as int? ?? 0).compareTo(a['lifetime_points'] as int? ?? 0)))
-                            .map((f) {
-                          final avatar = _getAvatar(f['avatar_id']?.toString());
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 10),
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: isDark ? AppColors.darkSurfaceContainerLowest : AppColors.surfaceContainerLowest,
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                            child: Row(
-                              children: [
-                                AvatarWidget(avatar: avatar, size: 44),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        f['name']?.toString() ?? 'Kullanıcı',
-                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                                      ),
-                                      Text(
-                                        '${f['total_minutes'] ?? 0} dk',
-                                        style: TextStyle(fontSize: 12, color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primaryFixed,
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    '${f['lifetime_points'] ?? 0}',
-                                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.onPrimaryFixed),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }),
                     ],
                   ),
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildMyCodeCard(AppLocalizations l10n, Color muted) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.primaryContainer.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.primaryContainer.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.friendsMyCode,
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: muted),
+          ),
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              Text(
+                _myCode ?? '------',
+                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: 2, color: AppColors.primary),
+              ),
+              const Spacer(),
+              IconButton(
+                icon: const Icon(Icons.copy_rounded, size: 20, color: AppColors.primary),
+                tooltip: l10n.friendsCopyCode,
+                onPressed: _myCode == null
+                    ? null
+                    : () {
+                        unawaited(Clipboard.setData(ClipboardData(text: _myCode!)));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(l10n.friendsCodeCopied),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _buildAddByCode(AppLocalizations l10n, bool isDark) {
+    return [
+      Text(
+        l10n.friendsAddByCode,
+        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+      ),
+      const SizedBox(height: 8),
+      Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _codeController,
+              textCapitalization: TextCapitalization.characters,
+              autocorrect: false,
+              enableSuggestions: false,
+              // Yapıştırılan koddaki boşluklar önce silinir, sonra kısaltılır;
+              // küçük harf büyüğe çevrilir (kodlar büyük harf üretilir).
+              inputFormatters: [
+                FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                _UpperCaseTextFormatter(),
+                LengthLimitingTextInputFormatter(_codeLength),
+              ],
+              onSubmitted: (_) => _handleAddFriend(),
+              decoration: InputDecoration(
+                hintText: l10n.friendsCodeHint,
+                filled: true,
+                fillColor: isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          ElevatedButton(
+            onPressed: _isAdding ? null : _handleAddFriend,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: _isAdding
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                  )
+                : Text(l10n.addBtn),
+          ),
+        ],
+      ),
+      if (_errorMessage != null) ...[
+        const SizedBox(height: 8),
+        Text(_errorMessage!, style: const TextStyle(color: Colors.red, fontSize: 13)),
+      ],
+    ];
+  }
+
+  List<Widget> _buildPendingRequests(AppLocalizations l10n) {
+    if (_pendingRequests.isEmpty) return const [];
+    return [
+      const SizedBox(height: 24),
+      Text(
+        l10n.friendsIncoming(_pendingRequests.length),
+        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+      ),
+      const SizedBox(height: 8),
+      for (final r in _pendingRequests) _buildRequestTile(r, l10n),
+    ];
+  }
+
+  Widget _buildRequestTile(Map<String, dynamic> r, AppLocalizations l10n) {
+    final requesterId = r['id']?.toString() ?? '';
+    final isResponding = _respondingId == requesterId;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.primaryContainer.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.primaryContainer.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        children: [
+          AvatarWidget(avatar: AvatarCharacter.byId(r['avatar_id']?.toString()), size: 40),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              r['name']?.toString() ?? l10n.userDefault,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            ),
+          ),
+          if (isResponding)
+            const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+            )
+          else ...[
+            IconButton(
+              icon: const Icon(Icons.check_circle, color: Colors.green, size: 26),
+              tooltip: l10n.friendsAccept,
+              onPressed: requesterId.isEmpty ? null : () => _handleRespond(requesterId, true),
+            ),
+            IconButton(
+              icon: const Icon(Icons.cancel, color: Colors.redAccent, size: 26),
+              tooltip: l10n.friendsReject,
+              onPressed: requesterId.isEmpty ? null : () => _handleRespond(requesterId, false),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyFriends(AppLocalizations l10n, bool isDark, Color muted) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurfaceContainerLowest : AppColors.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          Icon(Icons.people_outline, size: 40, color: muted),
+          const SizedBox(height: 8),
+          Text(
+            l10n.friendsEmpty,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 13, color: muted),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFriendTile(Map<String, dynamic> f, AppLocalizations l10n, bool isDark, Color muted) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurfaceContainerLowest : AppColors.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        children: [
+          AvatarWidget(avatar: AvatarCharacter.byId(f['avatar_id']?.toString()), size: 44),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  f['name']?.toString() ?? l10n.userDefault,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                ),
+                Text(
+                  l10n.minutesStudy(_asInt(f['total_minutes'])),
+                  style: TextStyle(fontSize: 12, color: muted),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppColors.primaryFixed,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              '${_asInt(f['lifetime_points'])}',
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.onPrimaryFixed),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    return newValue.copyWith(text: newValue.text.toUpperCase());
   }
 }

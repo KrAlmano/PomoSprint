@@ -1,9 +1,23 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- flutter_local_notifications: seans bitiş bildirimi (zonedSchedule).
+         Android 13+ çalışma zamanı izni Dart tarafında istenir. Exact alarm
+         kullanılmıyor (inexactAllowWhileIdle), o yüzden SCHEDULE_EXACT_ALARM /
+         USE_EXACT_ALARM bilinçli olarak yok. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <!-- allowBackup=false + dataExtractionRules: Supabase oturum token'ları ve
+         kullanıcıya özel önbellek (SharedPreferences) bulut yedeğine ve
+         cihazdan cihaza aktarıma girmez. -->
     <application
         android:label="PomoSprint"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:enableOnBackInvokedCallback="true">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -25,15 +39,20 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-
-            <!-- Deep Link Intent Filter for io.supabase.pomosprint -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="io.supabase.pomosprint" android:host="login-callback" />
-            </intent-filter>
         </activity>
+        <!-- flutter_local_notifications alıcıları (eklenti v16'dan beri bunları
+             uygulama manifest'ine bırakıyor). ScheduledNotificationReceiver
+             olmadan zamanlanmış bildirim hiç gösterilmez. -->
+        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
+        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
+            </intent-filter>
+        </receiver>
+        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver" />
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

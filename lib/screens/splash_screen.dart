@@ -1,20 +1,20 @@
-import 'dart:convert';
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../app/category_cache.dart';
 import '../theme.dart';
 import '../models/user_model.dart';
 import '../models/category_model.dart';
 import '../services/supabase_service.dart';
-import '../models/avatar_model.dart';
 
+/// Açılış ekranı: önce cihazdaki veriyi, sonra (sınırlı sürede) buluttaki
+/// oturumu yükler. Kullanıcı SupabaseService.currentUser'a konur;
+/// [onNavigate] yalnızca ilk kategori listesini alır.
 class SplashScreen extends StatefulWidget {
-  final ValueChanged<UserModel?> onInitialized;
-  final Widget Function(UserModel? user, List<CourseCategory> categories) onNavigate;
+  final Widget Function(List<CourseCategory> categories) onNavigate;
 
   const SplashScreen({
     super.key,
-    required this.onInitialized,
     required this.onNavigate,
   });
 
@@ -23,6 +23,8 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+  static const Duration _networkTimeout = Duration(seconds: 5);
+
   late AnimationController _animController;
   late Animation<double> _scaleAnim;
   late Animation<double> _fadeAnim;
@@ -51,133 +53,57 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
   Future<void> _initializeAppAndNavigate() async {
     final startTime = DateTime.now();
+    final service = SupabaseService.instance;
 
-
-    UserModel? initialUser;
-    List<CourseCategory> loadedCategories = CourseCategory.initialCategories();
-
-    final prefs = await SharedPreferences.getInstance();
-
-    // 1. ÖNCE cihazdaki oturumu/kategorileri yükle (tamamen yerel, ağ
-    // GEREKTİRMEZ). Böylece internet yokken/uçak modunda bile kullanıcı
-    // ana ekrana ulaşabilir — bu adım asla askıda kalamaz.
-    final savedUserStr = prefs.getString('saved_user');
-    if (savedUserStr != null && savedUserStr.isNotEmpty) {
-      try {
-        initialUser = UserModel.fromMap(jsonDecode(savedUserStr));
-      } catch (e) {
-        debugPrint('[AUTH] saved_user parse hatası: $e');
-      }
-    }
-
-    final localCatKey = initialUser != null ? 'saved_categories_${initialUser.email}' : 'saved_categories';
-    final savedCategoriesStr = prefs.getString(localCatKey);
-    if (savedCategoriesStr != null && savedCategoriesStr.isNotEmpty) {
-      try {
-        final List<dynamic> decoded = jsonDecode(savedCategoriesStr);
-        loadedCategories = decoded
-            .map((item) => CourseCategory.fromJson(item as Map<String, dynamic>))
-            .toList();
-      } catch (e) {
-        debugPrint('[SPLASH] saved_categories parse hatası: $e');
-      }
-    }
+    // 1. ÖNCE cihazdaki oturumu/kategorileri/avatar kataloğunu yükle (tamamen
+    // yerel, ağ GEREKTİRMEZ). Böylece internet yokken/uçak modunda bile
+    // kullanıcı ana ekrana ulaşabilir — bu adım asla askıda kalamaz.
+    final user = await service.restoreCachedUser();
+    await service.loadCachedAvatarCatalog();
+    var categories = await CategoryCache.read(user?.email) ?? CourseCategory.initialCategories();
 
     // 2. Supabase'i başlat ve (varsa) bulut verisiyle tazele — ama bu SINIRLI
-    // bir süre (5 sn) beklenir; internet yoksa/timeout olursa yukarıdaki
-    // yerel veriyle devam edilir, açılış ASLA bloklanmaz.
+    // bir süre beklenir; internet yoksa/timeout olursa yukarıdaki yerel
+    // veriyle devam edilir, açılış ASLA bloklanmaz.
     try {
-      await SupabaseService.instance.initialize().timeout(const Duration(seconds: 5));
+      await service.initialize().timeout(_networkTimeout);
 
-      // Sunucudan avatarları çek
-      try {
-        final avatars = await SupabaseService.instance.getAvatars();
-        if (avatars.isNotEmpty) {
-          AvatarCharacter.setCachedAvatars(avatars);
-        }
-      } catch (e) {
-        debugPrint('[SPLASH] getAvatars hatası: $e');
-      }
-
-      if (SupabaseService.instance.isCloudActive) {
+      if (service.isCloudActive) {
         final session = Supabase.instance.client.auth.currentSession;
         if (session == null) {
           debugPrint('[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek');
           // KRİTİK: currentSession null ise (oturum hiç yok ya da geçersiz
           // hale geldi), yereldeki eski 'saved_user' önbelleğine ASLA
           // güvenilmez — aksi halde tamamen kimliksiz bir cihaz, eski
-          // önbellek sayesinde onboarding/ana ekrana düşebilir. Bu satır
-          // olmadan initialUser burada dokunulmadan kalıyor ve aşağıda
-          // olduğu gibi kullanılıyordu.
-          initialUser = null;
+          // önbellek sayesinde onboarding/ana ekrana düşebilir.
+          await service.setCurrentUser(null);
         } else {
           final expiresAt = session.expiresAt;
           final expiryStr = expiresAt != null
               ? DateTime.fromMillisecondsSinceEpoch(expiresAt * 1000).toIso8601String()
               : 'bilinmiyor';
-          debugPrint('[AUTH] Splash: currentSession VAR (email=${session.user.email}, expiresAt=$expiryStr)');
-        }
-        if (session != null) {
+          debugPrint('[AUTH] Splash: currentSession VAR (expiresAt=$expiryStr)');
+
           // Önbellekteki kullanıcı bu oturumdan FARKLI bir hesaba aitse
-          // (cihazda daha önce başka bir test hesabı kullanılmış olabilir)
-          // ona güvenmeyelim. Aşağıdaki taze profil çekimi başarısız
-          // olursa (ağ/timeout), yanlış hesabın verisiyle (özellikle
-          // onboarding_completed_at ile) devam etmek yerine null kalsın —
-          // bu durumda en kötü ihtimalle Login ekranı gösterilir, asla
-          // başka bir hesabın onboarding durumu yanlışlıkla kullanılmaz.
-          if (initialUser != null &&
-              initialUser.email.toLowerCase() != (session.user.email ?? '').toLowerCase()) {
-            initialUser = null;
+          // (cihazda daha önce başka bir hesap kullanılmış olabilir) ona ve
+          // kategorilerine güvenilmez; taze profil alınamazsa null kalır.
+          if (user != null && !_belongsTo(user, session.user)) {
+            categories = CourseCategory.initialCategories();
+            await service.setCurrentUser(null);
           }
-          try {
-            final profile = await Supabase.instance.client
-                .from('profiles')
-                .select(SupabaseService.ownProfileColumns)
-                .eq('id', session.user.id)
-                .maybeSingle()
-                .timeout(const Duration(seconds: 5));
 
-            if (profile != null) {
-              int streak = profile['current_streak'] ?? 0;
-              final String? lastStudyStr = profile['last_study_date'];
-              if (lastStudyStr != null) {
-                final lastStudy = DateTime.parse(lastStudyStr);
-                final today = DateTime.now();
-                final todayDate = DateTime(today.year, today.month, today.day);
-                if (todayDate.difference(lastStudy).inDays > 1) {
-                  streak = 0;
-                }
-              }
-
-              // UserModel.fromMap kullanarak TÜM alanları oku (onboarding_completed_at dahil)
-              initialUser = UserModel.fromMap({
-                ...profile,
-                'email': session.user.email ?? '',
-                'current_streak': streak,
-              });
-              // Save fresh profile to prefs
-              await prefs.setString('saved_user', jsonEncode(initialUser.toMap()));
-            }
-          } catch (e) {
-            debugPrint('[AUTH] Splash: profil çekme hatası (currentSession vardı ama profil alınamadı): $e');
-          }
-        }
-
-        // Kategorileri buluttan tazele (yine timeout korumalı)
-        if (initialUser != null) {
-          try {
-            final cloudCats = await SupabaseService.instance
-                .fetchUserCategories()
-                .timeout(const Duration(seconds: 5));
-            if (cloudCats.isNotEmpty) {
-              loadedCategories = cloudCats;
-            } else if (loadedCategories.isNotEmpty) {
-              // Bulut boş ama yerelde kategori var: buluta senkronize et (arka planda, beklemeden)
-              SupabaseService.instance.upsertCategories(loadedCategories);
-            }
-          } catch (e) {
-            debugPrint('[SPLASH] fetchUserCategories hatası: $e');
-          }
+          // Profil (sahip olunan avatarlar ve seri dahil, tek yerden; servis
+          // kullanıcısını günceller) ve kategoriler paralel çekilir; her biri
+          // sınırlı süre beklenir. Profil alınamazsa önbellekle devam edilir.
+          final profile = _orNull(service.fetchCurrentUserModel(), 'profil');
+          final cloudCategories = _orNull(service.fetchUserCategories(), 'kategoriler');
+          // Bulut boşsa liste boş geçilir; eksik kategorileri sunucuda
+          // oluşturmak tek yerden, ana kabukta yapılır.
+          categories = await cloudCategories ?? categories;
+          await profile;
+          // Avatar kataloğu arka planda tazelenir; açılışı bekletmez
+          // (gömülü/önbellekteki katalog zaten kullanılabilir).
+          unawaited(service.refreshAvatarCatalog());
         }
       }
     } catch (e) {
@@ -192,18 +118,30 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     }
 
     if (mounted) {
+      final initialCategories = categories;
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
           transitionDuration: const Duration(milliseconds: 600),
           pageBuilder: (context, animation, secondaryAnimation) {
             return FadeTransition(
               opacity: animation,
-              child: widget.onNavigate(initialUser, loadedCategories),
+              child: widget.onNavigate(initialCategories),
             );
           },
         ),
       );
     }
+  }
+
+  static bool _belongsTo(UserModel cached, User authUser) => cached.id != null
+      ? cached.id == authUser.id
+      : cached.email.toLowerCase() == (authUser.email ?? '').toLowerCase();
+
+  static Future<T?> _orNull<T>(Future<T> future, String label) {
+    return future.timeout(_networkTimeout).then<T?>((value) => value, onError: (Object e) {
+      debugPrint('[SPLASH] $label alınamadı: $e');
+      return null;
+    });
   }
 
   @override

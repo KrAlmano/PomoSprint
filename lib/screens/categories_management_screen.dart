@@ -3,10 +3,15 @@ import '../l10n/app_localizations.dart';
 import '../models/category_model.dart';
 import '../services/language_service.dart';
 import '../services/supabase_service.dart';
+import '../widgets/auth/category_name_dialog.dart';
 
+/// Kategorilerim: ekleme, düzenleme, arşivleme ve sıralama. Tüm değişiklikler
+/// SupabaseService üzerinden yapılır; servis başarıdan sonra
+/// categoriesRevision'ı artırır, bu ekran da (Timer gibi) onu dinleyerek
+/// listeyi yeniler.
 class CategoriesManagementScreen extends StatefulWidget {
   final bool isPremium;
-  
+
   const CategoriesManagementScreen({super.key, this.isPremium = false});
 
   @override
@@ -14,223 +19,241 @@ class CategoriesManagementScreen extends StatefulWidget {
 }
 
 class _CategoriesManagementScreenState extends State<CategoriesManagementScreen> {
+  final _service = SupabaseService.instance;
   List<CourseCategory> _activeCategories = [];
   List<CourseCategory> _archivedCategories = [];
   bool _isLoading = true;
+  bool _hasLoaded = false;
+  bool _loadFailed = false;
+  bool _isBusy = false;
+  int _loadGeneration = 0;
 
-  final List<String> _availableColors = [
-    '#EF4444', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316'
-  ];
+  int get _limit => categoryLimitFor(isPremium: widget.isPremium);
 
   @override
   void initState() {
     super.initState();
-    _loadCategories();
+    _service.categoriesRevision.addListener(_onCategoriesChanged);
+    _loadCategories(showSpinner: false); // _isLoading zaten true
   }
 
-  Future<void> _loadCategories() async {
-    setState(() => _isLoading = true);
+  @override
+  void dispose() {
+    _service.categoriesRevision.removeListener(_onCategoriesChanged);
+    super.dispose();
+  }
+
+  void _onCategoriesChanged() => _loadCategories(showSpinner: false);
+
+  Future<void> _loadCategories({bool showSpinner = true}) async {
+    // Üst üste gelen yüklemelerde yalnızca en sonuncunun sonucu uygulanır.
+    final generation = ++_loadGeneration;
+    if (showSpinner) {
+      setState(() {
+        _isLoading = true;
+        _loadFailed = false;
+      });
+    }
     try {
-      final allCats = await SupabaseService.instance.fetchUserCategories(includeArchived: true);
+      final allCats = await _service.fetchUserCategories(includeArchived: true);
+      if (!mounted || generation != _loadGeneration) return;
       setState(() {
         _activeCategories = allCats.where((c) => !c.isArchived).toList();
         _archivedCategories = allCats.where((c) => c.isArchived).toList();
+        _isLoading = false;
+        _hasLoaded = true;
+        _loadFailed = false;
       });
     } catch (e) {
       debugPrint('Error loading categories: $e');
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (!mounted || generation != _loadGeneration) return;
+      setState(() {
+        _isLoading = false;
+        _loadFailed = true;
+      });
+      if (_hasLoaded) _showSnack(AppLocalizations.of(context)!.categoriesLoadError);
     }
   }
 
-  void _showCategoryDialog({CourseCategory? cat}) {
+  void _showSnack(String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  String _errorText(AppLocalizations l10n, Object error) {
+    return switch (serviceErrorCodeOf(error)) {
+      ServiceErrorCode.categoryLimitReached => l10n.categoryLimitReachedMsg(_limit),
+      ServiceErrorCode.categoryNameExists => l10n.categoryNameExistsMsg,
+      _ => l10n.categorySaveError,
+    };
+  }
+
+  /// Bir kategori değişikliğini çalıştırır. Başarıda liste, servisin
+  /// categoriesRevision bildirimiyle yenilenir; hatada mesaj gösterilir ve
+  /// (iyimser değişiklikleri geri almak için) liste sunucudan tekrar okunur.
+  Future<void> _mutate(Future<void> Function() action) async {
+    if (_isBusy) return;
+    setState(() => _isBusy = true);
+    try {
+      await action();
+    } catch (e) {
+      debugPrint('Kategori işlemi başarısız: $e');
+      if (!mounted) return;
+      _showSnack(_errorText(AppLocalizations.of(context)!, e));
+      await _loadCategories(showSpinner: false);
+    } finally {
+      if (mounted) setState(() => _isBusy = false);
+    }
+  }
+
+  Future<void> _showCategoryDialog({CourseCategory? cat}) async {
     final l10n = AppLocalizations.of(context)!;
-    final limit = widget.isPremium ? 15 : 8;
-    if (cat == null && _activeCategories.length >= limit) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.categoryLimitReachedMsg(limit))));
+    if (cat == null && _activeCategories.length >= _limit) {
+      _showSnack(l10n.categoryLimitReachedMsg(_limit));
       return;
     }
 
-    final nameCtrl = TextEditingController(text: cat?.name);
-    String selectedColor = cat?.colorHex ?? _availableColors[0];
-    // if cat?.colorHex is not in the list, just add it for this dialog instance
-    if (!selectedColor.startsWith('#')) selectedColor = '#$selectedColor';
-    selectedColor = selectedColor.toUpperCase();
-
-    showDialog(
-      context: context,
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (ctx, setDialogState) {
-            return AlertDialog(
-              title: Text(cat == null ? l10n.newCategoryDialogTitle : l10n.editCategoryDialogTitle),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: nameCtrl,
-                    decoration: InputDecoration(hintText: l10n.categoryNameHint),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(l10n.chooseColor, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 10),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: _availableColors.map((hex) {
-                      final cValue = int.tryParse(hex.substring(1), radix: 16) ?? 0xFF0000;
-                      final isSelected = hex == selectedColor;
-                      return GestureDetector(
-                        onTap: () => setDialogState(() => selectedColor = hex),
-                        child: Container(
-                          width: 30, height: 30,
-                          decoration: BoxDecoration(
-                            color: Color(cValue).withValues(alpha: 1.0),
-                            shape: BoxShape.circle,
-                            border: Border.all(color: isSelected ? Colors.black : Colors.transparent, width: 2),
-                          ),
-                          child: isSelected ? const Icon(Icons.check, size: 16, color: Colors.white) : null,
-                        ),
-                      );
-                    }).toList(),
-                  )
-                ],
-              ),
-              actions: [
-                TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.cancel)),
-                ElevatedButton(
-                  onPressed: () async {
-                    if (nameCtrl.text.trim().isNotEmpty) {
-                      Navigator.pop(ctx);
-                      setState(() => _isLoading = true);
-                      try {
-                        if (cat == null) {
-                          await SupabaseService.instance.createCategory(nameCtrl.text.trim(), selectedColor, 'book');
-                        } else {
-                          await SupabaseService.instance.updateCategory(cat.id, nameCtrl.text.trim(), selectedColor, cat.iconName);
-                        }
-                        await _loadCategories();
-                      } catch (e) {
-                        setState(() => _isLoading = false);
-                        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
-                      }
-                    }
-                  },
-                  child: Text(cat == null ? l10n.addBtn : l10n.save),
-                )
-              ],
-            );
-          }
-        );
-      }
+    final result = await CategoryNameDialog.show(
+      context,
+      title: cat == null ? l10n.newCategoryDialogTitle : l10n.editCategoryDialogTitle,
+      confirmLabel: cat == null ? l10n.addBtn : l10n.save,
+      hintText: l10n.categoryNameHint,
+      initialName: cat == null ? null : LanguageService.instance.translateCatName(cat.name),
+      initialColorHex: cat?.colorHex,
+      // Sunucu kuralıyla aynı: ad yalnızca aktif kategoriler arasında benzersiz.
+      takenNames: _activeCategories.where((c) => c.id != cat?.id).map((c) => c.name),
     );
+    if (result == null || !mounted) return;
+
+    await _mutate(() async {
+      if (cat == null) {
+        await _service.createCategory(result.name, result.colorHex, 'book');
+      } else {
+        // Ad değişmediyse (yalnızca çeviri gösterildiyse) sunucudaki ad korunur.
+        final unchanged = categoryNameKey(result.name) == categoryNameKey(cat.name);
+        await _service.updateCategory(cat.id, unchanged ? cat.name : result.name, result.colorHex, cat.iconName);
+      }
+    });
   }
 
-  void _archiveCategory(CourseCategory cat) async {
-    setState(() => _isLoading = true);
-    try {
-      await SupabaseService.instance.archiveCategory(cat.id);
-      await _loadCategories();
-    } catch (e) {
-      setState(() => _isLoading = false);
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
-    }
-  }
-
-  void _unarchiveCategory(CourseCategory cat) async {
-    setState(() => _isLoading = true);
-    try {
-      await SupabaseService.instance.unarchiveCategory(cat.id);
-      await _loadCategories();
-    } catch (e) {
-      setState(() => _isLoading = false);
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
-    }
+  Future<void> _reorder(int oldIndex, int newIndex) async {
+    setState(() {
+      final item = _activeCategories.removeAt(oldIndex);
+      _activeCategories.insert(newIndex, item);
+    });
+    final orderedIds = _activeCategories.map((e) => e.id).toList();
+    await _mutate(() => _service.updateCategoryOrders(orderedIds));
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final lang = LanguageService.instance;
-    final limit = widget.isPremium ? 15 : 8;
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.categoriesManagementTitle)),
+      appBar: AppBar(
+        title: Text(l10n.categoriesManagementTitle),
+        bottom: _isBusy
+            ? const PreferredSize(preferredSize: Size.fromHeight(2), child: LinearProgressIndicator(minHeight: 2))
+            : null,
+      ),
       body: _isLoading
-        ? const Center(child: CircularProgressIndicator())
-        : ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.blue.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(l10n.activeCategoryCountLabel, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                    Text('${_activeCategories.length} / $limit', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue)),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              ReorderableListView(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                onReorderItem: (oldIndex, newIndex) async {
-                  final item = _activeCategories.removeAt(oldIndex);
-                  _activeCategories.insert(newIndex, item);
-                  setState(() {});
-                  await SupabaseService.instance.updateCategoryOrders(_activeCategories.map((e) => e.id).toList());
-                },
-                children: _activeCategories.map((c) {
-                  final hex = c.colorHex.startsWith('#') ? c.colorHex.substring(1) : c.colorHex;
-                  final colorVal = int.tryParse(hex, radix: 16) ?? 0xFF0000;
-                  return ListTile(
-                    key: ValueKey(c.id),
-                    title: Text(lang.translateCatName(c.name)),
-                    leading: CircleAvatar(
-                      backgroundColor: Color(colorVal).withValues(alpha: 1.0),
-                      radius: 12,
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(icon: const Icon(Icons.edit), onPressed: () => _showCategoryDialog(cat: c)),
-                        IconButton(
-                          icon: const Icon(Icons.archive),
-                          onPressed: () => _archiveCategory(c),
-                          tooltip: l10n.archiveCategoryTooltip,
+          ? const Center(child: CircularProgressIndicator())
+          : (!_hasLoaded && _loadFailed)
+              ? _buildLoadError(l10n)
+              : AbsorbPointer(
+                  absorbing: _isBusy,
+                  child: ListView(
+                    padding: const EdgeInsets.all(16),
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
                         ),
-                        const Icon(Icons.drag_handle, color: Colors.grey),
-                      ],
-                    ),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 10),
-              ElevatedButton.icon(
-                onPressed: () => _showCategoryDialog(),
-                icon: const Icon(Icons.add),
-                label: Text(l10n.addCategoryTitle)
-              ),
-              const Divider(height: 40),
-              Text(l10n.archivedCategoriesHeader, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 10),
-              Text(l10n.archivedCategoriesDesc, style: const TextStyle(color: Colors.grey)),
-              const SizedBox(height: 10),
-              ..._archivedCategories.map((c) => ListTile(
-                title: Text(lang.translateCatName(c.name)),
-                trailing: IconButton(
-                  icon: const Icon(Icons.unarchive),
-                  onPressed: () => _unarchiveCategory(c),
-                  tooltip: l10n.unarchiveTooltip,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(l10n.activeCategoryCountLabel,
+                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                            Text('${_activeCategories.length} / $_limit',
+                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue)),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      ReorderableListView(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        onReorderItem: _reorder,
+                        children: _activeCategories.map((c) {
+                          return ListTile(
+                            key: ValueKey(c.id),
+                            title: Text(lang.translateCatName(c.name)),
+                            leading: CircleAvatar(backgroundColor: c.color, radius: 12),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(icon: const Icon(Icons.edit), onPressed: () => _showCategoryDialog(cat: c)),
+                                IconButton(
+                                  icon: const Icon(Icons.archive),
+                                  onPressed: () => _mutate(() => _service.archiveCategory(c.id)),
+                                  tooltip: l10n.archiveCategoryTooltip,
+                                ),
+                                const Icon(Icons.drag_handle, color: Colors.grey),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 10),
+                      ElevatedButton.icon(
+                        onPressed: () => _showCategoryDialog(),
+                        icon: const Icon(Icons.add),
+                        label: Text(l10n.addCategoryTitle),
+                      ),
+                      const Divider(height: 40),
+                      Text(l10n.archivedCategoriesHeader,
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 10),
+                      Text(l10n.archivedCategoriesDesc, style: const TextStyle(color: Colors.grey)),
+                      const SizedBox(height: 10),
+                      ..._archivedCategories.map((c) => ListTile(
+                            title: Text(lang.translateCatName(c.name)),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.unarchive),
+                              // Limit sunucudaki trigger ile zorunlu; aşılırsa hata mesajı gösterilir.
+                              onPressed: () => _mutate(() => _service.unarchiveCategory(c.id)),
+                              tooltip: l10n.unarchiveTooltip,
+                            ),
+                          )),
+                    ],
+                  ),
                 ),
-              )),
-            ],
-          ),
+    );
+  }
+
+  Widget _buildLoadError(AppLocalizations l10n) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.cloud_off_outlined, size: 48, color: Colors.grey),
+            const SizedBox(height: 16),
+            Text(l10n.categoriesLoadError, textAlign: TextAlign.center),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: _loadCategories,
+              icon: const Icon(Icons.refresh),
+              label: Text(l10n.categoriesRetryBtn),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

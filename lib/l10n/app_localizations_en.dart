@@ -9,6 +9,684 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get authEmailHint => 'name@example.com';
+
+  @override
+  String get authAppleSignInBtn => 'Sign in with Apple';
+
+  @override
+  String get authSocialConsentPrefix => 'By continuing, you agree to our ';
+
+  @override
+  String get authSocialConsentSuffix => '.';
+
+  @override
+  String authResendAvailableIn(int seconds) {
+    return 'You can resend in ${seconds}s';
+  }
+
+  @override
+  String get onboardingSelectCategoryError =>
+      'Pick at least one category to continue.';
+
+  @override
+  String get onboardingUnder13Error =>
+      'You must be at least 13 years old to use PomoSprint.';
+
+  @override
+  String get onboardingSessionExpired =>
+      'Your session has expired. Please sign in again.';
+
+  @override
+  String get onboardingSaveError =>
+      'Couldn\'t save your answers. Please try again.';
+
+  @override
+  String onboardingCategoryStepBodyLimit(int limit) {
+    return 'Now pick the subjects/areas you\'ll study; you can change them anytime. You can pick up to $limit.';
+  }
+
+  @override
+  String get categoryNameExistsMsg =>
+      'A category with this name already exists.';
+
+  @override
+  String get categoriesLoadError =>
+      'Couldn\'t load your categories. Check your connection and try again.';
+
+  @override
+  String get categorySaveError =>
+      'Couldn\'t save the change. Please try again.';
+
+  @override
+  String get categoriesRetryBtn => 'Retry';
+
+  @override
+  String get rankingTabLeague => 'League';
+
+  @override
+  String get rankingTabMonthly => 'Monthly';
+
+  @override
+  String get rankingTabFriends => 'Friends';
+
+  @override
+  String get rankingMonthlyResetIn => 'Monthly leaderboard resets in';
+
+  @override
+  String get rankingLoadError =>
+      'Couldn\'t load the leaderboard. Check your connection and try again.';
+
+  @override
+  String rankingMyStatus(int rank, int points) {
+    return 'Your rank: #$rank · $points pts';
+  }
+
+  @override
+  String rankingPoints(int points) {
+    return '$points pts';
+  }
+
+  @override
+  String rankingCountdownDays(int days, int hours, int minutes) {
+    return '${days}d ${hours}h ${minutes}m';
+  }
+
+  @override
+  String rankingCountdownHours(int hours, int minutes, int seconds) {
+    return '${hours}h ${minutes}m ${seconds}s';
+  }
+
+  @override
+  String get rankingCountdownResetting => 'Resetting...';
+
+  @override
+  String get socialRetry => 'Try Again';
+
+  @override
+  String get socialRefreshFailed =>
+      'Couldn\'t refresh. Showing the last loaded data.';
+
+  @override
+  String get socialErrNetwork =>
+      'Couldn\'t connect. Check your internet and try again.';
+
+  @override
+  String get socialErrSession =>
+      'Your session has expired. Please sign in again.';
+
+  @override
+  String get socialErrGeneric => 'Something went wrong. Please try again.';
+
+  @override
+  String get socialErrInsufficientCoins =>
+      'You don\'t have enough sand grains.';
+
+  @override
+  String get socialErrAvatarLocked => 'You don\'t own this avatar yet.';
+
+  @override
+  String get socialYourFriends => 'Your Friends';
+
+  @override
+  String get socialFocusingNow => 'Focusing Right Now';
+
+  @override
+  String get socialFocusing => 'Focusing';
+
+  @override
+  String socialFocusingOn(String category) {
+    return 'Focusing on $category';
+  }
+
+  @override
+  String get socialNoLiveFriends =>
+      'No friends studying right now. They\'ll show up here once someone starts focusing.';
+
+  @override
+  String get socialLoadError =>
+      'Couldn\'t load your friends\' status. Check your connection and try again.';
+
+  @override
+  String get leagueTierBronze => 'Bronze Hourglass';
+
+  @override
+  String get leagueTierSilver => 'Silver Hourglass';
+
+  @override
+  String get leagueTierGold => 'Gold Hourglass';
+
+  @override
+  String get leagueTierSapphire => 'Sapphire Hourglass';
+
+  @override
+  String get leagueTierDiamond => 'Diamond Hourglass';
+
+  @override
+  String leagueTierLeagueName(String tier) {
+    return '$tier League';
+  }
+
+  @override
+  String get leagueInfoTitle => 'How the League System Works';
+
+  @override
+  String get leagueInfoWhatTitle => 'What is a League?';
+
+  @override
+  String get leagueInfoWhatBody =>
+      'Each league period you\'re grouped with up to 30 people at a similar level. Whoever focuses the most during the period climbs to the top.';
+
+  @override
+  String get leagueInfoTiersTitle => 'League Tiers';
+
+  @override
+  String get leagueInfoYouAreHere => 'You are here';
+
+  @override
+  String get leagueInfoPointsTitle => 'How Do You Earn Points?';
+
+  @override
+  String leagueInfoPoints25(String points) {
+    return '25-minute focus: $points pts';
+  }
+
+  @override
+  String leagueInfoPoints50(String points) {
+    return '50-minute focus: $points pts';
+  }
+
+  @override
+  String get leagueInfoStreakBonus => 'Streak bonus:';
+
+  @override
+  String leagueInfoStreakRange(String from, String to, String pct) {
+    return '$from-$to days: $pct%';
+  }
+
+  @override
+  String leagueInfoStreakRangeOpen(String from, String pct) {
+    return '$from+ days: $pct%';
+  }
+
+  @override
+  String get leagueInfoStreakKeep =>
+      'Keep your streak alive by completing at least 1 pomodoro every day.';
+
+  @override
+  String leagueInfoPausePenalty(String pct) {
+    return 'Pausing a session reduces its points by $pct%.';
+  }
+
+  @override
+  String leagueInfoCoins(String coins) {
+    return '🪙 Sand grains: You earn $coins sand grains from every completed pomodoro. Spend them to unlock new hourglass characters in your collection.';
+  }
+
+  @override
+  String get leagueInfoPromotionTitle => 'Promotion & Demotion';
+
+  @override
+  String leagueInfoPeriodEnds(String date) {
+    return 'This league period ends on $date. When it ends, you move up, stay or move down based on your rank.';
+  }
+
+  @override
+  String get leagueInfoPeriodGeneric =>
+      'When the league period ends, you move up, stay or move down based on your rank.';
+
+  @override
+  String get leagueInfoTopTier =>
+      'You\'re in the top league, there\'s nowhere higher to go.';
+
+  @override
+  String leagueInfoPromote(int count) {
+    return 'This period the top $count who earned points move up a league.';
+  }
+
+  @override
+  String leagueInfoDemote(int count) {
+    return 'The bottom $count move down a league.';
+  }
+
+  @override
+  String get leagueInfoNoDemotionBronze =>
+      'There\'s no demotion from the Bronze league.';
+
+  @override
+  String get leagueInfoNoDemotionThisPeriod =>
+      'No one moves down from this league this period.';
+
+  @override
+  String get leagueAwaitingPlacementTitle => 'You\'re not in a league room yet';
+
+  @override
+  String get leagueAwaitingPlacementBody =>
+      'Complete your first pomodoro this period to join a room of up to 30 people at a similar level. Your rank and promotion status will show up here.';
+
+  @override
+  String get leagueInfoDailyLimitTitle => 'Daily Limit';
+
+  @override
+  String leagueInfoDailyLimitBody(String limit) {
+    return 'Up to $limit pomodoros per day count toward league points. Anything beyond that keeps adding to your personal stats and streak, but won\'t affect the league ranking.';
+  }
+
+  @override
+  String get leagueInfoFaqTitle => 'Why Didn\'t My Points Go Up?';
+
+  @override
+  String leagueInfoFaqLimit(String limit) {
+    return 'You may have hit the daily $limit-pomodoro limit.';
+  }
+
+  @override
+  String get leagueInfoFaqCancelled =>
+      'The session may have been cancelled too early.';
+
+  @override
+  String get leagueInfoFaqReset => 'The league period may have just reset.';
+
+  @override
+  String get leagueInfoFaqPending =>
+      'Sessions completed offline are sent once you\'re back online; your points are added then.';
+
+  @override
+  String get friendsTitle => 'Friends';
+
+  @override
+  String get friendsMyCode => 'Your Friend Code';
+
+  @override
+  String get friendsCopyCode => 'Copy code';
+
+  @override
+  String get friendsCodeCopied => 'Code copied!';
+
+  @override
+  String get friendsAddByCode => 'Add Friend by Code';
+
+  @override
+  String get friendsCodeHint => 'E.g. A1B2C3';
+
+  @override
+  String friendsAdded(String name) {
+    return '✅ $name was added to your friends list!';
+  }
+
+  @override
+  String friendsRequestSent(String name) {
+    return '📨 Friend request sent to $name. Waiting for approval.';
+  }
+
+  @override
+  String get friendsErrNotFound => 'No user found with this code.';
+
+  @override
+  String get friendsErrSelf => 'You can\'t add your own code.';
+
+  @override
+  String get friendsErrAlreadyFriends =>
+      'You\'re already friends with this user.';
+
+  @override
+  String get friendsErrAlreadyPending =>
+      'There\'s already a pending friend request with this user.';
+
+  @override
+  String get friendsErrAddFailed =>
+      'Couldn\'t add friend. Check the code and try again.';
+
+  @override
+  String friendsIncoming(int count) {
+    return 'Incoming Requests ($count)';
+  }
+
+  @override
+  String get friendsAccept => 'Accept';
+
+  @override
+  String get friendsReject => 'Reject';
+
+  @override
+  String get friendsAccepted => '✅ Friend request accepted!';
+
+  @override
+  String get friendsRespondFailed =>
+      'Couldn\'t respond to the request. Please try again.';
+
+  @override
+  String get friendsRequestGone => 'This request is no longer valid.';
+
+  @override
+  String friendsYourFriends(int count) {
+    return 'Your Friends ($count)';
+  }
+
+  @override
+  String get friendsEmpty =>
+      'No friends yet. Share your code or enter one above!';
+
+  @override
+  String get friendsLoadError =>
+      'Couldn\'t load your friends list. Check your connection and try again.';
+
+  @override
+  String get profileNameTooShort => 'Name must be at least 2 characters.';
+
+  @override
+  String get profileNameTooLong => 'Name can be at most 30 characters.';
+
+  @override
+  String get profileDeleteConfirm =>
+      'Are you sure you want to permanently delete your account and all your data?\n\nThis removes your profile and study history and can\'t be undone.';
+
+  @override
+  String get profileDeleting => 'Deleting your account...';
+
+  @override
+  String get profileDeleteError =>
+      'Couldn\'t delete your account. Check your connection and try again.';
+
+  @override
+  String get profileNotificationsDenied =>
+      'Notification permission wasn\'t granted. You can enable notifications for PomoSprint in your phone\'s Settings.';
+
+  @override
+  String get profileSettingSaveError =>
+      'Couldn\'t save the setting. Please try again.';
+
+  @override
+  String avatarBalance(int coins) {
+    return 'Your balance: $coins sand grains';
+  }
+
+  @override
+  String get avatarPurchaseTitle => 'Buy';
+
+  @override
+  String avatarPurchaseBody(String name, int price) {
+    return 'Buy $name for $price sand grains?';
+  }
+
+  @override
+  String avatarNotEnoughCoins(int missing) {
+    return 'Not enough sand grains: you need $missing more.';
+  }
+
+  @override
+  String avatarPurchased(String name) {
+    return '$name is yours!';
+  }
+
+  @override
+  String get avatarPremiumTitle => 'Premium Avatar';
+
+  @override
+  String get avatarPremiumBody =>
+      'This avatar is available to Premium members.';
+
+  @override
+  String avatarPremiumUnlockBody(String name) {
+    return 'With Premium you can unlock $name for free.';
+  }
+
+  @override
+  String get avatarUnlockBtn => 'Unlock';
+
+  @override
+  String get coinsCaption => '🪙 SAND';
+
+  @override
+  String pendingSessionsBanner(int count) {
+    return 'You have $count unsynced session(s). Tap to retry.';
+  }
+
+  @override
+  String sessionPointsBreakdown(int base, int bonus, int pct, int total) {
+    return '🔥 $base pts + $bonus streak bonus ($pct%) = $total pts!';
+  }
+
+  @override
+  String get sessionDailyLimitReached =>
+      'You have reached today\'s league points limit (16 pomodoros). Your work continues to be saved.';
+
+  @override
+  String get sessionQueuedOffline =>
+      '⚠️ Couldn\'t save the session to the cloud right now. It will sync automatically once you\'re back online.';
+
+  @override
+  String get sessionQueuedClockSkew =>
+      '⚠️ Session on hold: your device clock seems different from the server\'s. Check your time settings; the session will be retried automatically.';
+
+  @override
+  String get sessionQueuedOverlap =>
+      '⚠️ This session overlaps an earlier record; it\'s on hold and will be retried later.';
+
+  @override
+  String get sessionRejectedTooOld =>
+      '⚠️ This session couldn\'t be saved because it\'s older than 24 hours.';
+
+  @override
+  String get sessionRejectedClock =>
+      '⚠️ This session couldn\'t be saved: your device clock seems to be ahead. Check your time settings.';
+
+  @override
+  String get sessionRejectedOverlap =>
+      '⚠️ This session couldn\'t be saved: another session is already recorded for the same time.';
+
+  @override
+  String get sessionRejectedGeneric =>
+      '⚠️ This session couldn\'t be saved: it failed server validation.';
+
+  @override
+  String rejectedSessionsNotice(int count) {
+    return '⚠️ $count pending session(s) were rejected by the server and couldn\'t be saved.';
+  }
+
+  @override
+  String get pausedSessionExpired =>
+      'Your paused session went past 24 hours, so it couldn\'t be saved and was reset.';
+
+  @override
+  String get leaveWhileRunningTitle => 'Session in progress';
+
+  @override
+  String get leaveWhileRunningBody =>
+      'The timer keeps running even if you leave. When you come back, your session continues where it left off.';
+
+  @override
+  String get leaveWhileRunningStay => 'Stay';
+
+  @override
+  String get leaveWhileRunningLeave => 'Leave';
+
+  @override
+  String get notifSessionDoneTitle => 'Pomodoro complete! 🎉';
+
+  @override
+  String notifSessionDoneBody(String category) {
+    return 'Your $category session is done. Open the app to see your points.';
+  }
+
+  @override
+  String get notifChannelName => 'Session notifications';
+
+  @override
+  String get notifChannelDescription =>
+      'Lets you know when your Pomodoro session ends.';
+
+  @override
+  String get statsLoadErrorTitle => 'Couldn\'t load your stats';
+
+  @override
+  String get statsLoadErrorOffline =>
+      'Couldn\'t reach the server. Check your internet connection and try again.';
+
+  @override
+  String get statsLoadErrorSignedOut =>
+      'Please sign in again to see your stats.';
+
+  @override
+  String get statsLoadErrorGeneric =>
+      'Something went wrong while loading your data. Please try again.';
+
+  @override
+  String get statsRetry => 'Try Again';
+
+  @override
+  String get statsStaleNotice =>
+      'Couldn\'t refresh; showing the last loaded data.';
+
+  @override
+  String statsPendingSessions(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sessions waiting to sync',
+      one: '1 session waiting to sync',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get statsNoStudyTodayTitle => 'You haven\'t studied yet today';
+
+  @override
+  String get statsNoStudyTodayDesc =>
+      'Start a Pomodoro and today\'s subject breakdown will appear here.';
+
+  @override
+  String get statsNoStudyThisWeekTitle => 'No study this week yet';
+
+  @override
+  String get statsNoStudyThisWeekDesc =>
+      'Start a Pomodoro and your weekly analysis will build up here.';
+
+  @override
+  String get statsGoalSheetSubtitle =>
+      'How long do you want to focus each day?';
+
+  @override
+  String statsGoalPomodoroApprox(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '≈ $count Pomodoros',
+      one: '≈ 1 Pomodoro',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get statsGoalSaveFailed =>
+      'Couldn\'t save your goal. Check your connection and try again.';
+
+  @override
+  String statsTodayPomodoros(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Pomodoros completed today',
+      one: '1 Pomodoro completed today',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get statsWeeklyGoalTitle => 'Weekly Goal';
+
+  @override
+  String statsWeeklyGoalSubtitle(String weekly) {
+    return '$weekly · your daily goal × 7';
+  }
+
+  @override
+  String statsWeekLabel(int index) {
+    return 'Week $index';
+  }
+
+  @override
+  String statsWeekStudyTotal(String duration) {
+    return '$duration Study';
+  }
+
+  @override
+  String statsWeekChangeUp(String percent) {
+    return '$percent more than the same days last week';
+  }
+
+  @override
+  String statsWeekChangeDown(String percent) {
+    return '$percent less than the same days last week';
+  }
+
+  @override
+  String statsMonthMotivation(String percent) {
+    return 'You\'ve increased your focus by $percent compared to the same period last month. Great job!';
+  }
+
+  @override
+  String get statsMonthEmptyTitle => 'No study recorded this month yet';
+
+  @override
+  String get statsMonthEmptyDesc =>
+      'Your monthly tracking will appear here once you complete your first Pomodoro this month.';
+
+  @override
+  String get statsOtherCategory => 'Other';
+
+  @override
+  String get statsShowAsDuration => 'Show as duration';
+
+  @override
+  String get statsShowAsPercent => 'Show as percentage';
+
+  @override
+  String get authErrWeakPassword =>
+      'Your password is too weak. It must contain at least 1 lowercase letter (a-z), 1 uppercase letter (A-Z) and 1 digit (0-9).';
+
+  @override
+  String get authErrEmailExistsResent =>
+      'This email is already registered! A verification link has been resent to your inbox.';
+
+  @override
+  String get authErrInvalidCredentials =>
+      'Invalid email or password, or your account may not be confirmed yet. Check your password; if the problem continues, you can resend the confirmation email below.';
+
+  @override
+  String get authErrEmailNotConfirmed =>
+      'Your email address has not been confirmed yet. Please click the confirmation link in your inbox.';
+
+  @override
+  String get authErrRateLimited =>
+      'Too many attempts. Please wait a few minutes and try again.';
+
+  @override
+  String get authErrNetwork =>
+      'Could not reach the internet or the server. Please check your connection.';
+
+  @override
+  String get authErrInvalidEmail => 'Please enter a valid email address.';
+
+  @override
+  String get authErrCloudUnavailable =>
+      'Could not connect to the server. Please check your internet connection.';
+
+  @override
+  String get authErrProfileLoad =>
+      'Your profile could not be loaded. Please check your connection and sign in again.';
+
+  @override
+  String get authErrGoogleFailed => 'Google sign-in failed. Please try again.';
+
+  @override
+  String get authErrAppleFailed => 'Apple sign-in failed. Please try again.';
+
+  @override
+  String get authErrUnknown => 'Something went wrong. Please try again.';
+
+  @override
   String get navTimer => 'Timer';
 
   @override

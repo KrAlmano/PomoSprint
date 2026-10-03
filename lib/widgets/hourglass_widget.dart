@@ -4,25 +4,19 @@ import 'package:lottie/lottie.dart';
 /// Donmayı Önleyen, 60 FPS Donanım İvmeli (RenderMode.HARDWARE) ve
 /// Süreyle Uyumlu Akan Lottie Kum Saati Bileşeni.
 class HourglassWidget extends StatefulWidget {
-  final double progress; // 0.0 -> 1.0
   final bool isRunning;
   final double size;
   final int totalSeconds;
   final int remainingSeconds;
   final Color? sandColor;
-  final Color? glassColor;
-  final Color? frameColor;
 
   const HourglassWidget({
     super.key,
-    required this.progress,
     required this.isRunning,
     this.size = 210,
     this.totalSeconds = 25 * 60,
     this.remainingSeconds = 25 * 60,
     this.sandColor,
-    this.glassColor,
-    this.frameColor,
   });
 
   @override

@@ -65,14 +65,25 @@ android {
 // Mağazaya yüklenecek AAB (bundleRelease) asla debug anahtarıyla
 // imzalanmamalı: Play Console reddeder, yanlışlıkla dağıtılırsa sonraki
 // güncellemeler imza uyuşmazlığına düşer. Yerel `flutter run --release`
-// için yukarıdaki debug fallback'i korunuyor.
+// için yukarıdaki debug fallback'i korunuyor; bu yüzden release APK
+// (assembleRelease) durdurulmaz, yalnızca uyarı verilir: debug imzalı APK
+// dağıtılırsa kullanıcılar Play sürümüne güncelleyemez.
 gradle.taskGraph.whenReady {
-    val buildsStoreBundle = allTasks.any { it.name.contains("bundleRelease", ignoreCase = true) }
-    if (buildsStoreBundle && !keystorePropertiesFile.exists()) {
-        throw GradleException(
-            "android/key.properties bulunamadı: release AAB debug anahtarıyla imzalanamaz. " +
-                "key.properties dosyasını oluşturup tekrar deneyin."
-        )
+    if (!keystorePropertiesFile.exists()) {
+        val buildsStoreBundle = allTasks.any { it.name.contains("bundleRelease", ignoreCase = true) }
+        if (buildsStoreBundle) {
+            throw GradleException(
+                "android/key.properties bulunamadı: release AAB debug anahtarıyla imzalanamaz. " +
+                    "key.properties dosyasını oluşturup tekrar deneyin."
+            )
+        }
+        val buildsReleaseApk = allTasks.any { it.name.contains("assembleRelease", ignoreCase = true) }
+        if (buildsReleaseApk) {
+            logger.warn(
+                "UYARI: android/key.properties bulunamadı; release APK DEBUG anahtarıyla imzalanıyor. " +
+                    "Bu APK'yı dağıtmayın: Play sürümüyle imza uyuşmazlığı olur."
+            )
+        }
     }
 }
 

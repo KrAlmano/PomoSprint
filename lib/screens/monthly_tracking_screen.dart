@@ -1,266 +1,108 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:intl/date_symbol_data_local.dart';
+
+import '../l10n/app_localizations.dart';
 import '../models/category_model.dart';
-import '../models/study_session.dart';
-import '../services/supabase_service.dart';
 import '../services/language_service.dart';
 import '../theme.dart';
+import '../utils/stats_calculator.dart';
+import '../widgets/stats/category_style.dart';
+import '../widgets/stats/stats_text.dart';
 
-/// Ay içindeki bir Pazartesi-Pazar haftası. [start]/[end] haftanın GERÇEK
-/// sınırları (ay dışına taşabilir); [rangeStart]/[rangeEnd] bu ay içinde
-/// GÖRÜNTÜLENEN kırpılmış aralık (kart etiketleri için).
-class _WeekBucket {
-  final DateTime start;
-  final DateTime end;
-  final DateTime rangeStart;
-  final DateTime rangeEnd;
-  int totalMinutes = 0;
-  final Map<String, int> categoryMinutes = {};
-  // gün (ayın günü, 1-31) -> {minutes: int, categories: Map<String,int>}
-  final Map<int, Map<String, dynamic>> dayBreakdown = {};
+/// Raporlar > Aylık Takip. Veriler ReportsScreen'den gelir; tüm gün ve hafta
+/// hesapları stats_calculator ile (04:00 kuralı, takvim aritmetiği) yapılır.
+class MonthlyTrackingScreen extends StatelessWidget {
+  final List<StatSession> sessions;
 
-  _WeekBucket({
-    required this.start,
-    required this.end,
-    required this.rangeStart,
-    required this.rangeEnd,
-  });
-}
-
-class MonthlyTrackingScreen extends StatefulWidget {
+  /// Bugünün çalışma günü (04:00 kuralı); gösterilen ay bunun ayıdır.
+  final DateTime today;
   final List<CourseCategory> categories;
+  final Future<void> Function() onRefresh;
 
-  const MonthlyTrackingScreen({super.key, required this.categories});
-
-  @override
-  State<MonthlyTrackingScreen> createState() => _MonthlyTrackingScreenState();
-}
-
-class _MonthlyTrackingScreenState extends State<MonthlyTrackingScreen> {
-  bool _isLoading = true;
-  List<StudySession> _allSessions = [];
-
-  DateTime _monthStart = DateTime(DateTime.now().year, DateTime.now().month, 1);
-  Map<int, int> _dayMinutes = {};
-  List<_WeekBucket> _weeks = [];
-  Map<String, List<int>> _categoryWeeklyMinutes = {};
-  List<String> _activeCategoryNames = [];
-  int _prevMonthTotalMinutes = 0;
-  int _thisMonthTotalMinutes = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    Future.wait([
-      initializeDateFormatting('tr_TR', null),
-      initializeDateFormatting('en_US', null),
-    ]).then((_) => _fetch());
-    SupabaseService.instance.addRankingListener(_onStatsUpdated);
-    LanguageService.instance.addListener(_onLanguageChanged);
-  }
-
-  @override
-  void dispose() {
-    SupabaseService.instance.removeRankingListener(_onStatsUpdated);
-    LanguageService.instance.removeListener(_onLanguageChanged);
-    super.dispose();
-  }
-
-  void _onStatsUpdated() => _fetch();
-
-  void _onLanguageChanged() {
-    if (mounted) setState(() {});
-  }
-
-  String get _dateLocale => LanguageService.instance.isTurkish ? 'tr_TR' : 'en_US';
-
-  Future<void> _fetch() async {
-    if (mounted) setState(() => _isLoading = true);
-    try {
-      _allSessions = await SupabaseService.instance.fetchStudySessions();
-      _processData();
-    } catch (e) {
-      debugPrint('Error fetching sessions in MonthlyTrackingScreen: $e');
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
-  Color _colorForCategory(String name) {
-    final match = widget.categories.where((c) => c.name == name);
-    if (match.isNotEmpty) return match.first.color;
-    // Eski kayıtlarda kategori silinmiş/yeniden adlandırılmış olabilir:
-    // isim bazlı sabit bir renk seç ki aynı ders her zaman aynı renkte kalsın.
-    const palette = [
-      AppColors.primary,
-      Color(0xFF0055D4),
-      Color(0xFF586062),
-      Color(0xFF8E706C),
-      Color(0xFF10B981),
-      Color(0xFFF59E0B),
-    ];
-    return palette[name.hashCode.abs() % palette.length];
-  }
-
-  DateTime _mondayOf(DateTime date) {
-    final d = DateTime(date.year, date.month, date.day);
-    return d.subtract(Duration(days: d.weekday - 1));
-  }
-
-  int _totalMinutesForWeek(DateTime monday) {
-    final sunday = monday.add(const Duration(days: 6));
-    int total = 0;
-    for (final s in _allSessions) {
-      final local = s.createdAt.toLocal();
-      final d = DateTime(local.year, local.month, local.day);
-      if (!d.isBefore(monday) && !d.isAfter(sunday)) total += s.minutes;
-    }
-    return total;
-  }
-
-  void _processData() {
-    final now = DateTime.now();
-    _monthStart = DateTime(now.year, now.month, 1);
-    final monthEnd = DateTime(now.year, now.month + 1, 0);
-    final today = DateTime(now.year, now.month, now.day);
-
-    final monthSessions = _allSessions.where((s) {
-      final local = s.createdAt.toLocal();
-      final d = DateTime(local.year, local.month, local.day);
-      return !d.isBefore(_monthStart) && !d.isAfter(monthEnd);
-    }).toList();
-
-    // Isı haritası: gün -> toplam dakika
-    final dayMinutes = <int, int>{};
-    for (final s in monthSessions) {
-      final d = s.createdAt.toLocal();
-      dayMinutes[d.day] = (dayMinutes[d.day] ?? 0) + s.minutes;
-    }
-
-    // Ay içinde başlamış olan Pazartesi-Pazar haftaları
-    final weeks = <_WeekBucket>[];
-    var cursor = _mondayOf(_monthStart);
-    while (!cursor.isAfter(monthEnd)) {
-      if (!cursor.isAfter(today)) {
-        final sunday = cursor.add(const Duration(days: 6));
-        final rangeStart = cursor.isBefore(_monthStart) ? _monthStart : cursor;
-        final rangeEnd = sunday.isAfter(monthEnd) ? monthEnd : sunday;
-        weeks.add(_WeekBucket(start: cursor, end: sunday, rangeStart: rangeStart, rangeEnd: rangeEnd));
-      }
-      cursor = cursor.add(const Duration(days: 7));
-    }
-
-    final categoryTotals = <String, int>{};
-    for (final s in monthSessions) {
-      final local = s.createdAt.toLocal();
-      final d = DateTime(local.year, local.month, local.day);
-      for (final w in weeks) {
-        if (!d.isBefore(w.start) && !d.isAfter(w.end)) {
-          w.totalMinutes += s.minutes;
-          w.categoryMinutes[s.categoryName] = (w.categoryMinutes[s.categoryName] ?? 0) + s.minutes;
-          final dayEntry = w.dayBreakdown.putIfAbsent(d.day, () => {'minutes': 0, 'categories': <String, int>{}});
-          dayEntry['minutes'] = (dayEntry['minutes'] as int) + s.minutes;
-          (dayEntry['categories'] as Map<String, int>)[s.categoryName] =
-              ((dayEntry['categories'] as Map<String, int>)[s.categoryName] ?? 0) + s.minutes;
-          break;
-        }
-      }
-      categoryTotals[s.categoryName] = (categoryTotals[s.categoryName] ?? 0) + s.minutes;
-    }
-
-    final activeCategoryNames = categoryTotals.keys.toList()
-      ..sort((a, b) => categoryTotals[b]!.compareTo(categoryTotals[a]!));
-    final categoryWeekly = <String, List<int>>{};
-    for (final name in activeCategoryNames) {
-      categoryWeekly[name] = weeks.map((w) => w.categoryMinutes[name] ?? 0).toList();
-    }
-
-    final prevMonthRef = DateTime(now.year, now.month - 1, 1);
-    final prevMonthStart = DateTime(prevMonthRef.year, prevMonthRef.month, 1);
-    final prevMonthEnd = DateTime(prevMonthRef.year, prevMonthRef.month + 1, 0);
-    int prevTotal = 0;
-    for (final s in _allSessions) {
-      final local = s.createdAt.toLocal();
-      final d = DateTime(local.year, local.month, local.day);
-      if (!d.isBefore(prevMonthStart) && !d.isAfter(prevMonthEnd)) prevTotal += s.minutes;
-    }
-
-    _dayMinutes = dayMinutes;
-    _weeks = weeks;
-    _categoryWeeklyMinutes = categoryWeekly;
-    _activeCategoryNames = activeCategoryNames.take(6).toList();
-    _prevMonthTotalMinutes = prevTotal;
-    _thisMonthTotalMinutes = monthSessions.fold<int>(0, (sum, s) => sum + s.minutes);
-  }
-
-  String _formatDuration(int minutes, bool isTurkish) {
-    final h = minutes ~/ 60;
-    final m = minutes % 60;
-    if (h > 0) {
-      return isTurkish ? '${h}sa ${m.toString().padLeft(2, '0')}dk' : '${h}h ${m.toString().padLeft(2, '0')}m';
-    }
-    return isTurkish ? '${m}dk' : '${m}m';
-  }
+  const MonthlyTrackingScreen({
+    super.key,
+    required this.sessions,
+    required this.today,
+    required this.categories,
+    required this.onRefresh,
+  });
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    if (_isLoading) {
-      return Center(child: CircularProgressIndicator(color: isDark ? AppColors.darkPrimary : AppColors.primary));
+    final monthStart = monthStartOf(today);
+    final monthEnd = monthEndOf(today);
+    final monthMinutes = sumMinutesBetween(sessions, monthStart, monthEnd);
+
+    if (monthMinutes <= 0) {
+      return RefreshIndicator(
+        onRefresh: onRefresh,
+        child: LayoutBuilder(
+          builder: (context, constraints) => SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: _buildEmptyState(context, isDark),
+            ),
+          ),
+        ),
+      );
     }
 
-    final lang = LanguageService.instance;
-    final isTurkish = lang.isTurkish;
+    final weeks = weeksOfMonth(monthStart, today);
+    final monthToDate = monthToDateComparison(sessions, today);
+    final growth = percentChangeOf(monthToDate.current, monthToDate.previous);
 
-    if (_thisMonthTotalMinutes <= 0) {
-      return _buildEmptyState(isDark, isTurkish);
-    }
-
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeatmap(isDark, isTurkish),
-          const SizedBox(height: 24),
-          _buildTopicComparison(isDark, isTurkish),
-          const SizedBox(height: 24),
-          _buildWeeklySummary(isDark, isTurkish),
-          if (_prevMonthTotalMinutes > 0) ...[
-            const SizedBox(height: 16),
-            _buildMotivation(isDark, isTurkish),
+    return RefreshIndicator(
+      onRefresh: onRefresh,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeatmap(context, isDark, dailyTotals(sessions, monthStart, monthEnd)),
+            const SizedBox(height: 24),
+            _buildTopicComparison(context, isDark, weeks, weeklyCategorySeries(sessions, weeks)),
+            const SizedBox(height: 24),
+            _buildWeeklySummary(context, isDark, weeks),
+            if (growth != null && growth > 0) ...[
+              const SizedBox(height: 16),
+              _buildMotivation(context, isDark, growth),
+            ],
+            const SizedBox(height: 100),
           ],
-          const SizedBox(height: 100),
-        ],
+        ),
       ),
     );
   }
 
+  Color _colorFor(String name, String? categoryId, String? colorHex) => categoryStyleFor(
+        name: name,
+        categoryId: categoryId,
+        colorHex: colorHex,
+        categories: categories,
+      ).color;
+
   // ─── ISI HARİTASI ───
-  Widget _buildHeatmap(bool isDark, bool isTurkish) {
-    final monthEnd = DateTime(_monthStart.year, _monthStart.month + 1, 0);
-    final daysInMonth = monthEnd.day;
-    final firstWeekday = _monthStart.weekday; // 1=Pzt .. 7=Paz
-    final monthName = DateFormat('MMMM', _dateLocale).format(_monthStart);
-    final year = _monthStart.year;
+  Widget _buildHeatmap(BuildContext context, bool isDark, List<DayStat> days) {
+    final lang = LanguageService.instance;
+    final locale = StatsText.dateLocale;
+    final monthStart = monthStartOf(today);
+    final monthName = DateFormat('MMMM', locale).format(monthStart);
+    final cellFormat = DateFormat('d MMMM', locale);
+    final weekdayFormat = DateFormat('EEEEE', locale);
+    final firstMonday = mondayOf(monthStart);
+    final base = isDark ? AppColors.darkPrimary : AppColors.primary;
 
     Color cellColor(int minutes) {
-      final base = isDark ? AppColors.darkPrimary : AppColors.primary;
-      final empty = isDark ? AppColors.darkSurfaceContainerHigh : AppColors.surfaceContainerHighest;
-      if (minutes <= 0) return empty;
-      
-      final intensity = (minutes / 25.0) / 15.0; // 1 pomodoro = 25 dk. Max 15 pomodoro.
+      if (minutes <= 0) return isDark ? AppColors.darkSurfaceContainerHigh : AppColors.surfaceContainerHighest;
+      final intensity = (minutes / kPomodoroMinutes) / 15.0; // En koyu ton: 15 pomodoro
       if (intensity <= 0.25) return base.withValues(alpha: 0.2);
       if (intensity <= 0.5) return base.withValues(alpha: 0.4);
       if (intensity <= 0.75) return base.withValues(alpha: 0.7);
       return base;
     }
-
-    final dayHeaders = isTurkish
-        ? ['P', 'S', 'Ç', 'P', 'C', 'C', 'P']
-        : ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -270,7 +112,7 @@ class _MonthlyTrackingScreenState extends State<MonthlyTrackingScreen> {
           children: [
             Expanded(
               child: Text(
-                '$monthName ${LanguageService.instance.translate('month_intensity_suffix')}',
+                '$monthName ${lang.translate('month_intensity_suffix')}',
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -283,7 +125,7 @@ class _MonthlyTrackingScreenState extends State<MonthlyTrackingScreen> {
                 Icon(Icons.calendar_today, size: 16, color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
                 const SizedBox(width: 4),
                 Text(
-                  '$year',
+                  '${monthStart.year}',
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -310,56 +152,61 @@ class _MonthlyTrackingScreenState extends State<MonthlyTrackingScreen> {
                 crossAxisSpacing: 6,
                 mainAxisSpacing: 6,
                 children: [
-                  ...dayHeaders.map((d) => Center(
-                        child: Text(
-                          d,
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant).withValues(alpha: 0.6),
+                  ...List.generate(7, (i) => ExcludeSemantics(
+                        child: Center(
+                          child: Text(
+                            weekdayFormat.format(addDays(firstMonday, i)),
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant).withValues(alpha: 0.6),
+                            ),
                           ),
                         ),
                       )),
-                  ...List.generate(firstWeekday - 1, (_) => const SizedBox.shrink()),
-                  ...List.generate(daysInMonth, (index) {
-                    final day = index + 1;
-                    final minutes = _dayMinutes[day] ?? 0;
-                    return AspectRatio(
-                      aspectRatio: 1,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: cellColor(minutes),
-                          borderRadius: BorderRadius.circular(4),
+                  ...List.generate(monthStart.weekday - 1, (_) => const SizedBox.shrink()),
+                  ...days.map((day) => Semantics(
+                        label: '${cellFormat.format(day.day)}: '
+                            '${day.minutes > 0 ? StatsText.duration(day.minutes) : lang.translate('no_study_this_day')}',
+                        child: AspectRatio(
+                          aspectRatio: 1,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: cellColor(day.minutes),
+                              borderRadius: BorderRadius.circular(4),
+                              border: isSameDay(day.day, today) ? Border.all(color: base, width: 1.5) : null,
+                            ),
+                          ),
                         ),
-                      ),
-                    );
-                  }),
+                      )),
                 ],
               ),
               const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    LanguageService.instance.translate('heatmap_less'),
-                    style: TextStyle(fontSize: 11, color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
-                  ),
-                  const SizedBox(width: 6),
-                  ...[0.2, 0.4, 0.7, 1.0].map((alpha) => Container(
-                        width: 12,
-                        height: 12,
-                        margin: const EdgeInsets.symmetric(horizontal: 1),
-                        decoration: BoxDecoration(
-                          color: (isDark ? AppColors.darkPrimary : AppColors.primary).withValues(alpha: alpha),
-                          borderRadius: BorderRadius.circular(3),
-                        ),
-                      )),
-                  const SizedBox(width: 6),
-                  Text(
-                    LanguageService.instance.translate('heatmap_more'),
-                    style: TextStyle(fontSize: 11, color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
-                  ),
-                ],
+              ExcludeSemantics(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      lang.translate('heatmap_less'),
+                      style: TextStyle(fontSize: 11, color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
+                    ),
+                    const SizedBox(width: 6),
+                    ...[0.2, 0.4, 0.7, 1.0].map((alpha) => Container(
+                          width: 12,
+                          height: 12,
+                          margin: const EdgeInsets.symmetric(horizontal: 1),
+                          decoration: BoxDecoration(
+                            color: base.withValues(alpha: alpha),
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                        )),
+                    const SizedBox(width: 6),
+                    Text(
+                      lang.translate('heatmap_more'),
+                      style: TextStyle(fontSize: 11, color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -369,9 +216,26 @@ class _MonthlyTrackingScreenState extends State<MonthlyTrackingScreen> {
   }
 
   // ─── KONU KARŞILAŞTIRMASI (ÇİZGİ GRAFİK) ───
-  Widget _buildTopicComparison(bool isDark, bool isTurkish) {
-    final colors = {for (final name in _activeCategoryNames) name: _colorForCategory(name)};
-    final weekLabels = List.generate(_weeks.length, (i) => isTurkish ? 'Hafta ${i + 1}' : 'Week ${i + 1}');
+  Widget _buildTopicComparison(
+    BuildContext context,
+    bool isDark,
+    List<MonthWeek> weeks,
+    List<CategorySeries> series,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+    final names = [
+      for (final s in series) s.isOther ? l10n.statsOtherCategory : StatsText.categoryName(context, s.name),
+    ];
+    final colors = [
+      for (final s in series) s.isOther ? kStatsNeutralColor : _colorFor(s.name, s.categoryId, s.colorHex),
+    ];
+    final weekLabels = [for (var i = 0; i < weeks.length; i++) l10n.statsWeekLabel(i + 1)];
+    final summary = [
+      for (var i = 0; i < series.length; i++)
+        '${names[i]}: ${[
+          for (var w = 0; w < weekLabels.length; w++) '${weekLabels[w]} ${StatsText.duration(series[i].weeklyMinutes[w])}',
+        ].join(', ')}',
+    ].join('; ');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -385,62 +249,76 @@ class _MonthlyTrackingScreenState extends State<MonthlyTrackingScreen> {
           ),
         ),
         const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Wrap(
-                spacing: 16,
-                runSpacing: 8,
-                children: _activeCategoryNames.map((name) {
-                  return Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 10,
-                        height: 10,
-                        decoration: BoxDecoration(color: colors[name], shape: BoxShape.circle),
+        Semantics(
+          label: summary,
+          excludeSemantics: true,
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  spacing: 16,
+                  runSpacing: 8,
+                  children: [
+                    for (var i = 0; i < series.length; i++)
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 10,
+                            height: 10,
+                            decoration: BoxDecoration(color: colors[i], shape: BoxShape.circle),
+                          ),
+                          const SizedBox(width: 6),
+                          Flexible(
+                            child: Text(
+                              names[i],
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 6),
-                      Text(
-                        LanguageService.instance.translateCatName(name),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
-                        ),
-                      ),
-                    ],
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                height: 160,
-                width: double.infinity,
-                child: CustomPaint(
-                  painter: _MultiLineChartPainter(
-                    series: _categoryWeeklyMinutes,
-                    colors: colors,
-                    gridColor: (isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant).withValues(alpha: 0.3),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  height: 160,
+                  width: double.infinity,
+                  child: CustomPaint(
+                    painter: _MultiLineChartPainter(
+                      series: [for (final s in series) s.weeklyMinutes],
+                      colors: colors,
+                      gridColor: (isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant).withValues(alpha: 0.3),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: weekLabels
-                    .map((l) => Text(
-                          l,
-                          style: TextStyle(fontSize: 11, color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
-                        ))
-                    .toList(),
-              ),
-            ],
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: weekLabels
+                      .map((l) => Flexible(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                l,
+                                style: TextStyle(fontSize: 11, color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
+                              ),
+                            ),
+                          ))
+                      .toList(),
+                ),
+              ],
+            ),
           ),
         ),
       ],
@@ -448,15 +326,16 @@ class _MonthlyTrackingScreenState extends State<MonthlyTrackingScreen> {
   }
 
   // ─── HAFTALIK ÖZET KARTLARI ───
-  Widget _buildWeeklySummary(bool isDark, bool isTurkish) {
-    final cards = _weeks.reversed.toList(); // en yeni hafta üstte
-    final dateFmt = DateFormat('d MMM', _dateLocale);
+  Widget _buildWeeklySummary(BuildContext context, bool isDark, List<MonthWeek> weeks) {
+    final l10n = AppLocalizations.of(context)!;
+    final lang = LanguageService.instance;
+    final dateFmt = DateFormat('d MMM', StatsText.dateLocale);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          LanguageService.instance.translate('weekly_summary_title'),
+          lang.translate('weekly_summary_title'),
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
@@ -464,17 +343,20 @@ class _MonthlyTrackingScreenState extends State<MonthlyTrackingScreen> {
           ),
         ),
         const SizedBox(height: 12),
-        ...cards.map((week) {
-          final prevTotal = _totalMinutesForWeek(week.start.subtract(const Duration(days: 7)));
-          final hasBaseline = prevTotal > 0;
-          final pct = hasBaseline ? ((week.totalMinutes - prevTotal) / prevTotal * 100).round() : 0;
-          final isUp = pct >= 0;
+        ...weeks.reversed.map((week) {
+          // Eşit uzunlukta pencereler: bu haftanın ay içindeki ve bugüne
+          // kadarki günleri ile önceki haftanın aynı günleri.
+          final comparison = compareWithPreviousWeek(sessions, week, today);
+          final pct = comparison.percentChange;
+          final isUp = (pct ?? 0) >= 0;
+          final trendColor = isUp ? (isDark ? AppColors.darkPrimary : AppColors.primary) : Colors.red;
+          final pctText = pct == null ? '' : StatsText.percent(context, pct.abs());
 
           return Padding(
             padding: const EdgeInsets.only(bottom: 10),
             child: InkWell(
               borderRadius: BorderRadius.circular(16),
-              onTap: () => _showWeekDetailModal(week, isDark, isTurkish),
+              onTap: () => _showWeekDetailModal(context, week, comparison.to, isDark),
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -482,56 +364,56 @@ class _MonthlyTrackingScreenState extends State<MonthlyTrackingScreen> {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${dateFmt.format(week.rangeStart)} - ${dateFmt.format(week.rangeEnd)}',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${dateFmt.format(week.rangeStart)} - ${dateFmt.format(week.rangeEnd)}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          isTurkish
-                              ? '${_formatDuration(week.totalMinutes, isTurkish)} Çalışma'
-                              : '${_formatDuration(week.totalMinutes, isTurkish)} Study',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                            color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                          const SizedBox(height: 2),
+                          Text(
+                            l10n.statsWeekStudyTotal(StatsText.duration(comparison.minutes)),
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                              color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                    if (hasBaseline)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: (isUp ? AppColors.primary : Colors.red).withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              isUp ? Icons.trending_up_rounded : Icons.trending_down_rounded,
-                              size: 18,
-                              color: isUp ? (isDark ? AppColors.darkPrimary : AppColors.primary) : Colors.red,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '%${pct.abs()}',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: isUp ? (isDark ? AppColors.darkPrimary : AppColors.primary) : Colors.red,
+                    const SizedBox(width: 8),
+                    if (pct != null)
+                      Semantics(
+                        label: isUp ? l10n.statsWeekChangeUp(pctText) : l10n.statsWeekChangeDown(pctText),
+                        excludeSemantics: true,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: (isUp ? AppColors.primary : Colors.red).withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                isUp ? Icons.trending_up_rounded : Icons.trending_down_rounded,
+                                size: 18,
+                                color: trendColor,
                               ),
-                            ),
-                          ],
+                              const SizedBox(width: 4),
+                              Text(
+                                pctText,
+                                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: trendColor),
+                              ),
+                            ],
+                          ),
                         ),
                       )
                     else
@@ -542,7 +424,7 @@ class _MonthlyTrackingScreenState extends State<MonthlyTrackingScreen> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          LanguageService.instance.translate('new_week_label'),
+                          lang.translate('new_week_label'),
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -560,9 +442,12 @@ class _MonthlyTrackingScreenState extends State<MonthlyTrackingScreen> {
     );
   }
 
-  void _showWeekDetailModal(_WeekBucket week, bool isDark, bool isTurkish) {
-    final dateFmt = DateFormat('d MMMM, EEEE', _dateLocale);
-    final rangeFmt = DateFormat('d MMM', _dateLocale);
+  void _showWeekDetailModal(BuildContext context, MonthWeek week, DateTime lastDay, bool isDark) {
+    final lang = LanguageService.instance;
+    final dateFmt = DateFormat('d MMMM, EEEE', StatsText.dateLocale);
+    final rangeFmt = DateFormat('d MMM', StatsText.dateLocale);
+    // Gelecek günler listelenmez: hafta bugüne kadar gösterilir.
+    final days = dailyTotals(sessions, week.rangeStart, lastDay);
 
     showModalBottomSheet(
       context: context,
@@ -575,10 +460,6 @@ class _MonthlyTrackingScreenState extends State<MonthlyTrackingScreen> {
           maxChildSize: 0.9,
           expand: false,
           builder: (context, scrollController) {
-            final days = <DateTime>[];
-            for (var d = week.rangeStart; !d.isAfter(week.rangeEnd); d = d.add(const Duration(days: 1))) {
-              days.add(d);
-            }
             return Container(
               decoration: BoxDecoration(
                 color: isDark ? AppColors.darkSurfaceContainerLowest : Colors.white,
@@ -600,28 +481,31 @@ class _MonthlyTrackingScreenState extends State<MonthlyTrackingScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              LanguageService.instance.translate('week_day_breakdown_title'),
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                lang.translate('week_day_breakdown_title'),
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                                ),
                               ),
-                            ),
-                            Text(
-                              '${rangeFmt.format(week.rangeStart)} - ${rangeFmt.format(week.rangeEnd)}',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                              Text(
+                                '${rangeFmt.format(week.rangeStart)} - ${rangeFmt.format(week.rangeEnd)}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                         IconButton(
                           icon: const Icon(Icons.close),
+                          tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
                           onPressed: () => Navigator.pop(ctx),
                         ),
                       ],
@@ -636,9 +520,7 @@ class _MonthlyTrackingScreenState extends State<MonthlyTrackingScreen> {
                       separatorBuilder: (_, _) => const SizedBox(height: 10),
                       itemBuilder: (context, index) {
                         final day = days[index];
-                        final entry = week.dayBreakdown[day.day];
-                        final minutes = entry == null ? 0 : entry['minutes'] as int;
-                        final categories = entry == null ? <String, int>{} : entry['categories'] as Map<String, int>;
+                        final dayCategories = totalsByCategory(sessionsBetween(sessions, day.day, day.day));
 
                         return Container(
                           padding: const EdgeInsets.all(14),
@@ -654,7 +536,7 @@ class _MonthlyTrackingScreenState extends State<MonthlyTrackingScreen> {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      dateFmt.format(day),
+                                      dateFmt.format(day.day),
                                       style: TextStyle(
                                         fontSize: 13,
                                         fontWeight: FontWeight.w600,
@@ -662,9 +544,9 @@ class _MonthlyTrackingScreenState extends State<MonthlyTrackingScreen> {
                                       ),
                                     ),
                                   ),
-                                  if (minutes > 0)
+                                  if (day.minutes > 0)
                                     Text(
-                                      _formatDuration(minutes, isTurkish),
+                                      StatsText.duration(day.minutes),
                                       style: TextStyle(
                                         fontSize: 13,
                                         fontWeight: FontWeight.bold,
@@ -673,11 +555,11 @@ class _MonthlyTrackingScreenState extends State<MonthlyTrackingScreen> {
                                     ),
                                 ],
                               ),
-                              if (categories.isEmpty)
+                              if (dayCategories.isEmpty)
                                 Padding(
                                   padding: const EdgeInsets.only(top: 6),
                                   child: Text(
-                                    LanguageService.instance.translate('no_study_this_day'),
+                                    lang.translate('no_study_this_day'),
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
@@ -690,8 +572,8 @@ class _MonthlyTrackingScreenState extends State<MonthlyTrackingScreen> {
                                   child: Wrap(
                                     spacing: 8,
                                     runSpacing: 6,
-                                    children: categories.entries.map((e) {
-                                      final color = _colorForCategory(e.key);
+                                    children: dayCategories.map((c) {
+                                      final color = _colorFor(c.name, c.categoryId, c.colorHex);
                                       return Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                         decoration: BoxDecoration(
@@ -699,7 +581,7 @@ class _MonthlyTrackingScreenState extends State<MonthlyTrackingScreen> {
                                           borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: Text(
-                                          '${LanguageService.instance.translateCatName(e.key)} • ${_formatDuration(e.value, isTurkish)}',
+                                          '${StatsText.categoryName(context, c.name)} • ${StatsText.duration(c.minutes)}',
                                           style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: color),
                                         ),
                                       );
@@ -721,11 +603,8 @@ class _MonthlyTrackingScreenState extends State<MonthlyTrackingScreen> {
     );
   }
 
-  // ─── AY SONU MOTİVASYON MESAJI ───
-  Widget _buildMotivation(bool isDark, bool isTurkish) {
-    final pct = ((_thisMonthTotalMinutes - _prevMonthTotalMinutes) / _prevMonthTotalMinutes * 100).round();
-    if (pct <= 0) return const SizedBox.shrink();
-
+  // ─── AY MOTİVASYON MESAJI ───
+  Widget _buildMotivation(BuildContext context, bool isDark, int growthPercent) {
     return Center(
       child: Column(
         children: [
@@ -740,9 +619,7 @@ class _MonthlyTrackingScreenState extends State<MonthlyTrackingScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            isTurkish
-                ? 'Bu ay odağını %$pct artırarak harika bir iş çıkardın!'
-                : 'You increased your focus by $pct% this month — great job!',
+            AppLocalizations.of(context)!.statsMonthMotivation(StatsText.percent(context, growthPercent)),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 13,
@@ -755,7 +632,8 @@ class _MonthlyTrackingScreenState extends State<MonthlyTrackingScreen> {
     );
   }
 
-  Widget _buildEmptyState(bool isDark, bool isTurkish) {
+  Widget _buildEmptyState(BuildContext context, bool isDark) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -777,7 +655,7 @@ class _MonthlyTrackingScreenState extends State<MonthlyTrackingScreen> {
             ),
             const SizedBox(height: 20),
             Text(
-              isTurkish ? 'Bu ay henüz çalışma kaydın yok' : 'No study recorded this month yet',
+              l10n.statsMonthEmptyTitle,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 20,
@@ -787,9 +665,7 @@ class _MonthlyTrackingScreenState extends State<MonthlyTrackingScreen> {
             ),
             const SizedBox(height: 10),
             Text(
-              isTurkish
-                  ? 'İlk pomodoro seansını tamamladığında aylık takip burada görünecek.'
-                  : 'Your monthly tracking will show up here once you complete your first pomodoro.',
+              l10n.statsMonthEmptyDesc,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
@@ -806,8 +682,8 @@ class _MonthlyTrackingScreenState extends State<MonthlyTrackingScreen> {
 
 // ─── ÇOK ÇİZGİLİ KARŞILAŞTIRMA GRAFİĞİ ───
 class _MultiLineChartPainter extends CustomPainter {
-  final Map<String, List<int>> series;
-  final Map<String, Color> colors;
+  final List<List<int>> series;
+  final List<Color> colors;
   final Color gridColor;
 
   _MultiLineChartPainter({required this.series, required this.colors, required this.gridColor});
@@ -823,25 +699,24 @@ class _MultiLineChartPainter extends CustomPainter {
     }
 
     if (series.isEmpty) return;
-    final weekCount = series.values.first.length;
+    final weekCount = series.first.length;
     if (weekCount == 0) return;
 
-    int maxVal = 1;
-    for (final values in series.values) {
+    var maxVal = 1;
+    for (final values in series) {
       for (final v in values) {
         if (v > maxVal) maxVal = v;
       }
     }
 
-    series.forEach((name, values) {
-      final color = colors[name] ?? AppColors.primary;
+    for (var s = 0; s < series.length; s++) {
+      final values = series[s];
+      final color = colors[s];
       final dotPaint = Paint()..color = color;
 
       if (weekCount == 1) {
-        final x = size.width / 2;
-        final y = size.height * (1 - values[0] / maxVal);
-        canvas.drawCircle(Offset(x, y), 4, dotPaint);
-        return;
+        canvas.drawCircle(Offset(size.width / 2, size.height * (1 - values[0] / maxVal)), 4, dotPaint);
+        continue;
       }
 
       final linePaint = Paint()
@@ -851,26 +726,20 @@ class _MultiLineChartPainter extends CustomPainter {
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round;
 
-      final path = Path();
-      for (int i = 0; i < values.length; i++) {
-        final x = size.width * i / (weekCount - 1);
-        final y = size.height * (1 - values[i] / maxVal);
-        if (i == 0) {
-          path.moveTo(x, y);
-        } else {
-          path.lineTo(x, y);
-        }
+      Offset point(int i) => Offset(size.width * i / (weekCount - 1), size.height * (1 - values[i] / maxVal));
+
+      final path = Path()..moveTo(point(0).dx, point(0).dy);
+      for (var i = 1; i < values.length; i++) {
+        path.lineTo(point(i).dx, point(i).dy);
       }
       canvas.drawPath(path, linePaint);
-
-      for (int i = 0; i < values.length; i++) {
-        final x = size.width * i / (weekCount - 1);
-        final y = size.height * (1 - values[i] / maxVal);
-        canvas.drawCircle(Offset(x, y), 3, dotPaint);
+      for (var i = 0; i < values.length; i++) {
+        canvas.drawCircle(point(i), 3, dotPaint);
       }
-    });
+    }
   }
 
   @override
-  bool shouldRepaint(covariant _MultiLineChartPainter oldDelegate) => true;
+  bool shouldRepaint(covariant _MultiLineChartPainter oldDelegate) =>
+      oldDelegate.series != series || oldDelegate.colors != colors || oldDelegate.gridColor != gridColor;
 }

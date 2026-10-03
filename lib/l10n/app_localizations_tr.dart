@@ -9,6 +9,660 @@ class AppLocalizationsTr extends AppLocalizations {
   AppLocalizationsTr([String locale = 'tr']) : super(locale);
 
   @override
+  String get authEmailHint => 'ornek@posta.com';
+
+  @override
+  String get authAppleSignInBtn => 'Apple ile Giriş Yap';
+
+  @override
+  String get authSocialConsentPrefix => 'Devam ederek ';
+
+  @override
+  String get authSocialConsentSuffix => ' kabul etmiş olursun.';
+
+  @override
+  String authResendAvailableIn(int seconds) {
+    return '$seconds sn sonra tekrar gönderebilirsin';
+  }
+
+  @override
+  String get onboardingSelectCategoryError =>
+      'Devam etmek için en az bir kategori seç.';
+
+  @override
+  String get onboardingUnder13Error =>
+      'PomoSprint\'i kullanmak için en az 13 yaşında olmalısın.';
+
+  @override
+  String get onboardingSessionExpired =>
+      'Oturumun sona erdi. Lütfen tekrar giriş yap.';
+
+  @override
+  String get onboardingSaveError =>
+      'Bilgilerin kaydedilemedi. Lütfen tekrar dene.';
+
+  @override
+  String onboardingCategoryStepBodyLimit(int limit) {
+    return 'Şimdi çalışacağın dersleri/alanları seç; istediğin zaman değiştirebilirsin. En fazla $limit tane seçebilirsin.';
+  }
+
+  @override
+  String get categoryNameExistsMsg => 'Bu isimde bir kategori zaten var.';
+
+  @override
+  String get categoriesLoadError =>
+      'Kategoriler yüklenemedi. İnternet bağlantını kontrol edip tekrar dene.';
+
+  @override
+  String get categorySaveError =>
+      'Değişiklik kaydedilemedi. Lütfen tekrar dene.';
+
+  @override
+  String get categoriesRetryBtn => 'Tekrar Dene';
+
+  @override
+  String get rankingTabLeague => 'Lig';
+
+  @override
+  String get rankingTabMonthly => 'Aylık';
+
+  @override
+  String get rankingTabFriends => 'Arkadaşlar';
+
+  @override
+  String get rankingMonthlyResetIn =>
+      'Aylık sıralamanın sıfırlanmasına kalan süre';
+
+  @override
+  String get rankingLoadError =>
+      'Sıralama yüklenemedi. Bağlantını kontrol edip tekrar dene.';
+
+  @override
+  String rankingMyStatus(int rank, int points) {
+    return 'Sıran: #$rank · $points puan';
+  }
+
+  @override
+  String rankingPoints(int points) {
+    return '$points puan';
+  }
+
+  @override
+  String rankingCountdownDays(int days, int hours, int minutes) {
+    return '$days gün $hours saat $minutes dk';
+  }
+
+  @override
+  String rankingCountdownHours(int hours, int minutes, int seconds) {
+    return '$hours saat $minutes dk $seconds sn';
+  }
+
+  @override
+  String get rankingCountdownResetting => 'Sıfırlanıyor...';
+
+  @override
+  String get socialRetry => 'Tekrar Dene';
+
+  @override
+  String get socialRefreshFailed =>
+      'Güncellenemedi, son yüklenen veriler gösteriliyor.';
+
+  @override
+  String get socialErrNetwork =>
+      'Bağlantı kurulamadı. İnternetini kontrol edip tekrar dene.';
+
+  @override
+  String get socialErrSession =>
+      'Oturumun sona ermiş. Lütfen yeniden giriş yap.';
+
+  @override
+  String get socialErrGeneric => 'Bir hata oluştu. Lütfen tekrar dene.';
+
+  @override
+  String get socialErrInsufficientCoins => 'Yeterli kum tanen yok.';
+
+  @override
+  String get socialErrAvatarLocked => 'Bu avatarın henüz sahibi değilsin.';
+
+  @override
+  String get socialYourFriends => 'Arkadaşların';
+
+  @override
+  String get socialFocusingNow => 'Şu An Çalışanlar';
+
+  @override
+  String get socialFocusing => 'Odaklanıyor';
+
+  @override
+  String socialFocusingOn(String category) {
+    return '$category çalışıyor';
+  }
+
+  @override
+  String get socialNoLiveFriends =>
+      'Şu an çalışan arkadaşın yok. Biri odaklanmaya başladığında burada görünecek.';
+
+  @override
+  String get socialLoadError =>
+      'Arkadaşlarının durumu yüklenemedi. Bağlantını kontrol edip tekrar dene.';
+
+  @override
+  String get leagueTierBronze => 'Bronz Kum Saati';
+
+  @override
+  String get leagueTierSilver => 'Gümüş Kum Saati';
+
+  @override
+  String get leagueTierGold => 'Altın Kum Saati';
+
+  @override
+  String get leagueTierSapphire => 'Safir Kum Saati';
+
+  @override
+  String get leagueTierDiamond => 'Elmas Kum Saati';
+
+  @override
+  String leagueTierLeagueName(String tier) {
+    return '$tier Ligi';
+  }
+
+  @override
+  String get leagueInfoTitle => 'Lig Sistemi Nasıl Çalışır?';
+
+  @override
+  String get leagueInfoWhatTitle => 'Lig Nedir?';
+
+  @override
+  String get leagueInfoWhatBody =>
+      'Her lig döneminde seninle benzer seviyedeki en fazla 30 kişiyle aynı gruba düşersin. Dönem boyunca kim daha çok odaklanırsa üst sıraya çıkar.';
+
+  @override
+  String get leagueInfoTiersTitle => 'Lig Kademeleri';
+
+  @override
+  String get leagueInfoYouAreHere => 'Şu an buradasın';
+
+  @override
+  String get leagueInfoPointsTitle => 'Puan Nasıl Kazanılır?';
+
+  @override
+  String leagueInfoPoints25(String points) {
+    return '25 dakikalık odak: $points puan';
+  }
+
+  @override
+  String leagueInfoPoints50(String points) {
+    return '50 dakikalık odak: $points puan';
+  }
+
+  @override
+  String get leagueInfoStreakBonus => 'Seri bonusu:';
+
+  @override
+  String leagueInfoStreakRange(String from, String to, String pct) {
+    return '$from-$to gün: %$pct';
+  }
+
+  @override
+  String leagueInfoStreakRangeOpen(String from, String pct) {
+    return '$from+ gün: %$pct';
+  }
+
+  @override
+  String get leagueInfoStreakKeep =>
+      'Her gün en az 1 pomodoro tamamlayarak serini canlı tut.';
+
+  @override
+  String leagueInfoPausePenalty(String pct) {
+    return 'Seansı duraklatırsan puan %$pct azalır.';
+  }
+
+  @override
+  String leagueInfoCoins(String coins) {
+    return '🪙 Kum tanesi: Tamamladığın her pomodorodan $coins kum tanesi kazanırsın. Karakter koleksiyonundan yeni kum saatleri açmak için kullanılır.';
+  }
+
+  @override
+  String get leagueInfoPromotionTitle => 'Yükselme ve Düşme';
+
+  @override
+  String leagueInfoPeriodEnds(String date) {
+    return 'Bu lig dönemi $date tarihinde sona erer. Dönem sonunda sıralamana göre yükselir, kalır ya da düşersin.';
+  }
+
+  @override
+  String get leagueInfoPeriodGeneric =>
+      'Lig dönemi sona erdiğinde sıralamana göre yükselir, kalır ya da düşersin.';
+
+  @override
+  String get leagueInfoTopTier => 'En üst ligdesin, yükselecek yer yok.';
+
+  @override
+  String leagueInfoPromote(int count) {
+    return 'Bu dönem puan toplayan ilk $count kişi bir üst lige yükselir.';
+  }
+
+  @override
+  String leagueInfoDemote(int count) {
+    return 'Son $count kişi bir alt lige düşer.';
+  }
+
+  @override
+  String get leagueInfoNoDemotionBronze => 'Bronz ligde düşme yoktur.';
+
+  @override
+  String get leagueInfoNoDemotionThisPeriod => 'Bu dönem bu ligde düşme yok.';
+
+  @override
+  String get leagueAwaitingPlacementTitle => 'Henüz bir lig odasında değilsin';
+
+  @override
+  String get leagueAwaitingPlacementBody =>
+      'Bu dönem ilk pomodoronu tamamladığında seninle benzer seviyedeki en fazla 30 kişilik bir odaya yerleşirsin. Sıralaman ve yükselme durumun burada görünür.';
+
+  @override
+  String get leagueInfoDailyLimitTitle => 'Günlük Sınır';
+
+  @override
+  String leagueInfoDailyLimitBody(String limit) {
+    return 'Günde en fazla $limit pomodoro lig puanına sayılır. Üstü kişisel istatistiklerine ve serine eklenmeye devam eder ama lig sıralamasını etkilemez.';
+  }
+
+  @override
+  String get leagueInfoFaqTitle => 'Puanım Neden Artmadı?';
+
+  @override
+  String leagueInfoFaqLimit(String limit) {
+    return 'Günlük $limit pomodoro sınırına ulaşmış olabilirsin.';
+  }
+
+  @override
+  String get leagueInfoFaqCancelled =>
+      'Seansı çok erken iptal etmiş olabilirsin.';
+
+  @override
+  String get leagueInfoFaqReset => 'Lig dönemi yeni sıfırlanmış olabilir.';
+
+  @override
+  String get leagueInfoFaqPending =>
+      'Çevrimdışıyken tamamladığın seanslar bağlantı gelince gönderilir; puanın o zaman eklenir.';
+
+  @override
+  String get friendsTitle => 'Arkadaşlar';
+
+  @override
+  String get friendsMyCode => 'Senin Arkadaşlık Kodun';
+
+  @override
+  String get friendsCopyCode => 'Kodu kopyala';
+
+  @override
+  String get friendsCodeCopied => 'Kod kopyalandı!';
+
+  @override
+  String get friendsAddByCode => 'Kod ile Arkadaş Ekle';
+
+  @override
+  String get friendsCodeHint => 'Örn: A1B2C3';
+
+  @override
+  String friendsAdded(String name) {
+    return '✅ $name arkadaş listene eklendi!';
+  }
+
+  @override
+  String friendsRequestSent(String name) {
+    return '📨 $name kullanıcısına arkadaşlık isteği gönderildi. Onay bekleniyor.';
+  }
+
+  @override
+  String get friendsErrNotFound => 'Bu koda sahip bir kullanıcı bulunamadı.';
+
+  @override
+  String get friendsErrSelf => 'Kendi kodunu ekleyemezsin.';
+
+  @override
+  String get friendsErrAlreadyFriends => 'Bu kullanıcıyla zaten arkadaşsınız.';
+
+  @override
+  String get friendsErrAlreadyPending =>
+      'Bu kullanıcıyla bekleyen bir arkadaşlık isteğin zaten var.';
+
+  @override
+  String get friendsErrAddFailed =>
+      'Arkadaş eklenemedi. Kodu kontrol edip tekrar dene.';
+
+  @override
+  String friendsIncoming(int count) {
+    return 'Gelen İstekler ($count)';
+  }
+
+  @override
+  String get friendsAccept => 'Kabul et';
+
+  @override
+  String get friendsReject => 'Reddet';
+
+  @override
+  String get friendsAccepted => '✅ Arkadaşlık isteği kabul edildi!';
+
+  @override
+  String get friendsRespondFailed => 'İstek yanıtlanamadı. Lütfen tekrar dene.';
+
+  @override
+  String get friendsRequestGone => 'Bu istek artık geçerli değil.';
+
+  @override
+  String friendsYourFriends(int count) {
+    return 'Arkadaşların ($count)';
+  }
+
+  @override
+  String get friendsEmpty =>
+      'Henüz arkadaşın yok. Kodunu paylaş veya yukarıdan bir kod gir!';
+
+  @override
+  String get friendsLoadError =>
+      'Arkadaş listen yüklenemedi. Bağlantını kontrol edip tekrar dene.';
+
+  @override
+  String get profileNameTooShort => 'İsim en az 2 karakter olmalı.';
+
+  @override
+  String get profileNameTooLong => 'İsim en fazla 30 karakter olabilir.';
+
+  @override
+  String get profileDeleteConfirm =>
+      'Hesabını ve tüm verilerini kalıcı olarak silmek istediğinden emin misin?\n\nBu işlem profilini ve çalışma geçmişini tamamen siler ve geri alınamaz.';
+
+  @override
+  String get profileDeleting => 'Hesabın siliniyor...';
+
+  @override
+  String get profileDeleteError =>
+      'Hesabın silinemedi. Bağlantını kontrol edip tekrar dene.';
+
+  @override
+  String get profileNotificationsDenied =>
+      'Bildirim izni verilmedi. Bildirimleri telefonunun Ayarlar bölümünden PomoSprint için açabilirsin.';
+
+  @override
+  String get profileSettingSaveError =>
+      'Ayar kaydedilemedi. Lütfen tekrar dene.';
+
+  @override
+  String avatarBalance(int coins) {
+    return 'Bakiyen: $coins kum tanesi';
+  }
+
+  @override
+  String get avatarPurchaseTitle => 'Satın Al';
+
+  @override
+  String avatarPurchaseBody(String name, int price) {
+    return '$name avatarını $price kum tanesine satın almak ister misin?';
+  }
+
+  @override
+  String avatarNotEnoughCoins(int missing) {
+    return 'Yetersiz bakiye: $missing kum tanesi daha gerekiyor.';
+  }
+
+  @override
+  String avatarPurchased(String name) {
+    return '$name artık senin!';
+  }
+
+  @override
+  String get avatarPremiumTitle => 'Premium Avatar';
+
+  @override
+  String get avatarPremiumBody => 'Bu avatar Premium üyelere özel.';
+
+  @override
+  String avatarPremiumUnlockBody(String name) {
+    return 'Premium üyeliğinle $name avatarını ücretsiz açabilirsin.';
+  }
+
+  @override
+  String get avatarUnlockBtn => 'Aç';
+
+  @override
+  String get coinsCaption => '🪙 KUM';
+
+  @override
+  String pendingSessionsBanner(int count) {
+    return '$count senkronize edilmemiş seansın var. Tekrar denemek için dokun.';
+  }
+
+  @override
+  String sessionPointsBreakdown(int base, int bonus, int pct, int total) {
+    return '🔥 $base puan + $bonus seri bonusu (%$pct) = $total puan!';
+  }
+
+  @override
+  String get sessionDailyLimitReached =>
+      'Bugünlük lig puanı sınırına ulaştın (16 pomodoro). Çalışman kaydedilmeye devam ediyor.';
+
+  @override
+  String get sessionQueuedOffline =>
+      '⚠️ Seans şu an buluta kaydedilemedi, bağlantı gelince otomatik gönderilecek.';
+
+  @override
+  String get sessionQueuedClockSkew =>
+      '⚠️ Seans bekletiliyor: cihazının saati sunucudan farklı görünüyor. Saat ayarını kontrol et; seans otomatik olarak yeniden denenecek.';
+
+  @override
+  String get sessionQueuedOverlap =>
+      '⚠️ Seans önceki bir kayıtla çakışıyor; bekletiliyor ve daha sonra yeniden denenecek.';
+
+  @override
+  String get sessionRejectedTooOld =>
+      '⚠️ Bu seans 24 saatten eski olduğu için kaydedilemedi.';
+
+  @override
+  String get sessionRejectedClock =>
+      '⚠️ Bu seans kaydedilemedi: cihazının saati ileri görünüyor. Saat ayarını kontrol et.';
+
+  @override
+  String get sessionRejectedOverlap =>
+      '⚠️ Bu seans kaydedilemedi: aynı zaman aralığında kayıtlı başka bir seans var.';
+
+  @override
+  String get sessionRejectedGeneric =>
+      '⚠️ Bu seans kaydedilemedi: sunucu doğrulamasından geçmedi.';
+
+  @override
+  String rejectedSessionsNotice(int count) {
+    return '⚠️ Bekleyen $count seans sunucu tarafından reddedildi ve kaydedilemedi.';
+  }
+
+  @override
+  String get pausedSessionExpired =>
+      'Duraklatılmış seansın 24 saati aştığı için kaydedilemedi ve sıfırlandı.';
+
+  @override
+  String get leaveWhileRunningTitle => 'Seansın sürüyor';
+
+  @override
+  String get leaveWhileRunningBody =>
+      'Uygulamadan çıksan da sayaç çalışmaya devam eder; geri döndüğünde seansın kaldığı yerden sürer.';
+
+  @override
+  String get leaveWhileRunningStay => 'Kal';
+
+  @override
+  String get leaveWhileRunningLeave => 'Arka plana al';
+
+  @override
+  String get notifSessionDoneTitle => 'Pomodoro tamamlandı! 🎉';
+
+  @override
+  String notifSessionDoneBody(String category) {
+    return '$category seansın bitti. Puanlarını görmek için uygulamaya dön.';
+  }
+
+  @override
+  String get notifChannelName => 'Seans bildirimleri';
+
+  @override
+  String get notifChannelDescription =>
+      'Pomodoro seansın bittiğinde haber verir.';
+
+  @override
+  String get statsLoadErrorTitle => 'İstatistikler yüklenemedi';
+
+  @override
+  String get statsLoadErrorOffline =>
+      'Sunucuya bağlanılamadı. İnternet bağlantını kontrol edip tekrar dene.';
+
+  @override
+  String get statsLoadErrorSignedOut =>
+      'İstatistiklerini görmek için tekrar giriş yapman gerekiyor.';
+
+  @override
+  String get statsLoadErrorGeneric =>
+      'Veriler alınırken bir sorun oluştu. Lütfen tekrar dene.';
+
+  @override
+  String get statsRetry => 'Tekrar Dene';
+
+  @override
+  String get statsStaleNotice =>
+      'Güncel veriler alınamadı; son yüklenen veriler gösteriliyor.';
+
+  @override
+  String statsPendingSessions(int count) {
+    return '$count seans senkron bekliyor';
+  }
+
+  @override
+  String get statsNoStudyTodayTitle => 'Bugün henüz çalışmadın';
+
+  @override
+  String get statsNoStudyTodayDesc =>
+      'Bir Pomodoro başlat; bugünün ders dağılımı burada görünecek.';
+
+  @override
+  String get statsNoStudyThisWeekTitle => 'Bu hafta henüz çalışmadın';
+
+  @override
+  String get statsNoStudyThisWeekDesc =>
+      'Bir Pomodoro başlat; haftalık analizin burada oluşacak.';
+
+  @override
+  String get statsGoalSheetSubtitle => 'Günde ne kadar odaklanmak istiyorsun?';
+
+  @override
+  String statsGoalPomodoroApprox(int count) {
+    return '≈ $count Pomodoro';
+  }
+
+  @override
+  String get statsGoalSaveFailed =>
+      'Hedef kaydedilemedi. Bağlantını kontrol edip tekrar dene.';
+
+  @override
+  String statsTodayPomodoros(int count) {
+    return 'Bugün $count Pomodoro tamamlandı';
+  }
+
+  @override
+  String get statsWeeklyGoalTitle => 'Haftalık Hedef';
+
+  @override
+  String statsWeeklyGoalSubtitle(String weekly) {
+    return '$weekly · günlük hedefin × 7';
+  }
+
+  @override
+  String statsWeekLabel(int index) {
+    return 'Hafta $index';
+  }
+
+  @override
+  String statsWeekStudyTotal(String duration) {
+    return '$duration Çalışma';
+  }
+
+  @override
+  String statsWeekChangeUp(String percent) {
+    return 'Önceki haftanın aynı günlerine göre $percent artış';
+  }
+
+  @override
+  String statsWeekChangeDown(String percent) {
+    return 'Önceki haftanın aynı günlerine göre $percent düşüş';
+  }
+
+  @override
+  String statsMonthMotivation(String percent) {
+    return 'Geçen ayın aynı dönemine göre odağını $percent artırdın, harika gidiyorsun!';
+  }
+
+  @override
+  String get statsMonthEmptyTitle => 'Bu ay henüz çalışma kaydın yok';
+
+  @override
+  String get statsMonthEmptyDesc =>
+      'Bu ay ilk Pomodoro\'nu tamamladığında aylık takip burada görünecek.';
+
+  @override
+  String get statsOtherCategory => 'Diğer';
+
+  @override
+  String get statsShowAsDuration => 'Süre olarak göster';
+
+  @override
+  String get statsShowAsPercent => 'Yüzde olarak göster';
+
+  @override
+  String get authErrWeakPassword =>
+      'Şifren çok zayıf. En az 1 küçük harf (a-z), 1 büyük harf (A-Z) ve 1 rakam (0-9) içermeli.';
+
+  @override
+  String get authErrEmailExistsResent =>
+      'Bu e-posta adresi zaten kayıtlı! Doğrulama bağlantısı e-postana tekrar gönderildi.';
+
+  @override
+  String get authErrInvalidCredentials =>
+      'E-posta adresi veya şifre hatalı ya da hesabın henüz onaylanmamış olabilir. Şifreni kontrol et; sorun sürerse aşağıdan onay e-postasını tekrar gönderebilirsin.';
+
+  @override
+  String get authErrEmailNotConfirmed =>
+      'E-posta adresin henüz doğrulanmamış. Lütfen gelen kutundaki onay bağlantısına tıkla.';
+
+  @override
+  String get authErrRateLimited =>
+      'Çok fazla deneme yapıldı. Lütfen birkaç dakika bekleyip tekrar dene.';
+
+  @override
+  String get authErrNetwork =>
+      'İnternet veya sunucu bağlantısı kurulamadı. Lütfen ağ bağlantını kontrol et.';
+
+  @override
+  String get authErrInvalidEmail => 'Lütfen geçerli bir e-posta adresi gir.';
+
+  @override
+  String get authErrCloudUnavailable =>
+      'Sunucuya bağlanılamadı. Lütfen internet bağlantını kontrol et.';
+
+  @override
+  String get authErrProfileLoad =>
+      'Profilin yüklenemedi. Lütfen bağlantını kontrol edip tekrar giriş yap.';
+
+  @override
+  String get authErrGoogleFailed =>
+      'Google ile giriş yapılamadı. Lütfen tekrar dene.';
+
+  @override
+  String get authErrAppleFailed =>
+      'Apple ile giriş yapılamadı. Lütfen tekrar dene.';
+
+  @override
+  String get authErrUnknown => 'Bir hata oluştu. Lütfen tekrar dene.';
+
+  @override
   String get navTimer => 'Süreç';
 
   @override
