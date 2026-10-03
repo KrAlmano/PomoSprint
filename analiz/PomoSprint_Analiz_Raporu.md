@@ -1,5 +1,7 @@
 # PomoSprint — Uygulama Analiz Raporu
 
+> **Not (3 Ekim 2026):** Bu rapor 28 Eylül tarihli ilk denetimdir; bazı tespitleri canlı veritabanı görülmeden yazılmıştı. Güncel rapor: [PomoSprint_Analiz_Raporu_2026-10-03.md](PomoSprint_Analiz_Raporu_2026-10-03.md).
+
 **Tarih:** 28 Eylül 2026  
 **Kapsam:** Flutter istemcisi (`lib/`, ~16.900 satır), Supabase migration'ları (`supabase/migrations/`), yardımcı scriptler (`scripts/`), landing sitesi (`landing/`)  
 **Yöntem:** Kaynak kodu okuma + `flutter analyze`. Canlı Supabase veritabanına erişilmedi (Supabase MCP bağlantısı yetkilendirilmemiş), bu yüzden veritabanı bulguları repodaki migration dosyalarına dayanıyor.

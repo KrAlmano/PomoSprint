@@ -22,6 +22,7 @@
 | Site (pomosprint.app) | `landing/`, `landing/README.md`, `wrangler.jsonc`, `_headers` | `waitlist`, `unsubscribe` | §8 |
 | DB değişikliği | `supabase/README.md` akışı, `migrations/20261003150000_live_audit_fixes.sql` | canlı tanımlar | §2.3, §2.4, §4.6 |
 | E-posta (hoş geldin, bülten, abonelikten çıkma) | `supabase/functions/`, `scripts/send_newsletter.js` | `marketing_subscribers` | §8 |
+| Yatay telefon / tablet düzeni | `lib/utils/responsive.dart` (Responsive, ContentWidth), `widgets/shell_navigation.dart`, `test/responsive_*_test.dart` | — | Yeni ekranda `Responsive.of(context)` kullan; 6 boyutta taşma testi ekle |
 | Derleme, imzalama, platform ayarı | `android/app/build.gradle.kts`, `ios/Runner/Info.plist`, `pubspec.yaml` | — | §4.7 |
 
 ## 1. Proje bir bakışta
