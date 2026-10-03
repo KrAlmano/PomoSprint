@@ -30,6 +30,18 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pomosprint.app/en/terms"/>
   </url>
   <url>
+    <loc>https://pomosprint.app/kvkk</loc>
+    <lastmod>2026-10-03</lastmod>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pomosprint.app/kvkk"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pomosprint.app/en/kvkk"/>
+  </url>
+  <url>
+    <loc>https://pomosprint.app/hesap-silme</loc>
+    <lastmod>2026-10-03</lastmod>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pomosprint.app/hesap-silme"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pomosprint.app/en/delete-account"/>
+  </url>
+  <url>
     <loc>https://pomosprint.app/en/privacy</loc>
     <lastmod>2026-10-03</lastmod>
     <xhtml:link rel="alternate" hreflang="tr" href="https://pomosprint.app/privacy"/>
@@ -40,5 +52,17 @@
     <lastmod>2026-10-03</lastmod>
     <xhtml:link rel="alternate" hreflang="tr" href="https://pomosprint.app/terms"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://pomosprint.app/en/terms"/>
+  </url>
+  <url>
+    <loc>https://pomosprint.app/en/kvkk</loc>
+    <lastmod>2026-10-03</lastmod>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pomosprint.app/kvkk"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pomosprint.app/en/kvkk"/>
+  </url>
+  <url>
+    <loc>https://pomosprint.app/en/delete-account</loc>
+    <lastmod>2026-10-03</lastmod>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pomosprint.app/hesap-silme"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pomosprint.app/en/delete-account"/>
   </url>
 </urlset>

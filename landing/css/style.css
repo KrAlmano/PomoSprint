@@ -2253,6 +2253,96 @@ html.nav-lock { overflow: hidden; }
   .prose .toc ol { columns: 1; }
 }
 
+/* ---------------- Yasal sayfalar: alt başlık, adım listesi, veri tablosu ----------------
+   KVKK Aydınlatma Metni ve Hesap Silme sayfaları kullanır. İçindekiler (.toc ol)
+   daha özgül seçiciyle kendi stilini korur. */
+
+.prose h3 {
+  font-size: 1.08rem;
+  margin: 26px 0 8px;
+}
+
+.prose ol {
+  margin: 0 0 14px 22px;
+  color: var(--ink-soft);
+}
+
+.prose ol li::marker { font-weight: 800; color: var(--coral-text); }
+
+.prose .data-table {
+  width: 100%;
+  margin: 6px 0 24px;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  font-size: 0.93rem;
+  line-height: 1.55;
+}
+
+.prose .data-table th,
+.prose .data-table td {
+  padding: 12px 14px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-soft);
+}
+
+.prose .data-table thead th {
+  background: var(--bg-deep);
+  color: var(--ink);
+  font-weight: 800;
+  font-size: 0.86rem;
+}
+
+.prose .data-table tbody th { color: var(--ink); font-weight: 800; }
+
+/* İlk sütun kısa etiket; son sütun ("m.5/2-f" gibi) tireden bölünmesin diye geniş */
+.prose .data-table thead th:first-child { width: 17%; }
+.prose .data-table thead th:last-child { width: 24%; }
+
+.prose .data-table tbody tr:last-child > * { border-bottom: 0; }
+
+/* Dar ekranda her satır bir kart olur; sütun adı hücrenin data-label'ından gelir */
+@media (max-width: 640px) {
+  .prose .data-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  .prose .data-table,
+  .prose .data-table tbody,
+  .prose .data-table tr,
+  .prose .data-table th,
+  .prose .data-table td { display: block; width: 100%; }
+
+  .prose .data-table tr { padding: 8px 0; border-bottom: 1px solid var(--line); }
+
+  .prose .data-table tbody tr:last-child { border-bottom: 0; }
+
+  .prose .data-table th,
+  .prose .data-table td { padding: 6px 16px; border-bottom: 0; }
+
+  .prose .data-table td::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 2px;
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+}
+
 /* ---------------- 404 ---------------- */
 
 .notfound {

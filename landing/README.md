@@ -25,6 +25,19 @@ python3 landing/tools/sync_partials.py --check  # fark varsa 1 ile çıkar
 - Özellikler sayfasındaki telefon videoları `js/main.js` içindeki `SHOT_VIDEOS` listesinden gelir (540x1174, sessiz döngü). Her video için ilk kareden bir poster (`videos/<ad>.webp`) olmalı: `ffmpeg -i <ad>.mp4 -frames:v 1 kare.png && cwebp -q 72 kare.png -o videos/<ad>.webp`. Listede olmayan ekranlarda yer tutucu ya da "Örnek görünüm" kartı görünür. Eski arayüzü gösteren `leaderboard.mp4` ve `reports.mp4` güncel kayıt gelene kadar listeden çıkarıldı ve `.assetsignore` ile yayınlanmıyor.
 - Ana sayfadaki canlı aylık sıralama bölümü (`#siralama`) gizli başlar; en az 3 kişi puan topladığında görünür.
 
+## Yasal sayfalar
+
+| TR | EN | Kim bağlanıyor |
+|---|---|---|
+| `/privacy` | `/en/privacy` | Uygulama (Profil ve Ayarlar), App Store ve Google Play gizlilik URL'si |
+| `/terms` | `/en/terms` | Uygulama, kayıt ekranındaki onay |
+| `/kvkk` | `/en/kvkk` | Kayıt ekranındaki aydınlatma teyidi, bekleme listesi formu |
+| `/hesap-silme` | `/en/delete-account` | Google Play Data safety "hesap silme URL'si" |
+
+- Bu adresleri değiştirme; mağaza kayıtları ve uygulama sürümleri bunlara bağlı.
+- Metin değişince "Son güncelleme" tarihini yenile ve uygulamadaki `terms_version` / `privacy_version` değerleriyle eşleştir (iki dil birlikte).
+- Uzun tablolar `.prose .data-table` ile yazılır; her `<td>` için `data-label` ver (dar ekranda kart düzeninde sütun adı olarak görünür).
+
 ## Yardımcı sayfalar
 
 Üçü de Türkçe ve İngilizcedir: dil bağlantıdaki `?lang=tr|en` parametresinden, yoksa tarayıcı dilinden seçilir (`js/auth-i18n.js`). E-posta şablonları İngilizce kullanıcılar için bağlantıya `lang=en` eklemelidir.
