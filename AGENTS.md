@@ -54,6 +54,7 @@
 | `flutter run --profile` / `--release` | Gerçek seans ve puan testi | Debug build'de sayaç 5/10 sn'dir, sunucu bu seansları reddeder |
 | `supabase/tests/run_local.sh` | SQL değişikliği; **yalnızca yerel Postgres** | ASSERT'ler geçer. `live_audit_fixes` varsayılan olarak atlanır |
 | `python3 landing/tools/sync_partials.py --check` | Site değişikliğinden sonra | Çıkış kodu 0 |
+| `cd scripts && npm test` | `landing/js`, `supabase/functions`, `scripts/send_newsletter.js` değişikliğinden sonra | Hepsi yeşil. Ağsız: Edge Function'lar sahte Supabase ile, site betikleri sahte DOM ile (`scripts/test/`); Node 22.18+ ya da 23.6+ (bayraksız TypeScript ayıklama ve `module.registerHooks`) |
 | `cd scripts && node security_regression_test.js` | **Yalnızca kullanıcı onayıyla.** Gerçek hesap açar ve siler | Bazı senaryolar canlıda olmayan `proposed/11` yüzünden bilinçli kırmızı |
 
 ### 2.3 Canlı DB'yi kontrol et (salt okuma; Supabase MCP `execute_sql` ya da SQL Editor)
@@ -125,7 +126,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 | `supabase/proposed/` | Canlıya uygulanmamış öneriler (`01`–`11`). Her dosya `\quit` ile başlar |
 | `supabase/tests/` | `run_local.sh` (yerel), `*_dryrun.sql` (canlıda, geri alınan transaction) |
 | `supabase/functions/` | `unsubscribe`, `send-welcome-email` (repodaki sürümler canlıdan yeni, §10) |
-| `scripts/` | `security_regression_test.js` (canlı), `send_newsletter.js`, `templates/`. Sırlar `scripts/.env` (şablon `.env.example`) |
+| `scripts/` | `security_regression_test.js` (canlı), `send_newsletter.js` (+ `lib/newsletter_mail.js`), `templates/`, `test/` (`npm test`, ağsız). Sırlar `scripts/.env` (şablon `.env.example`) |
 | `landing/` | Site: `_partials/`, `tools/sync_partials.py`, `js/config.js`, `_headers`, `worker.js`, `wrangler.jsonc`, `en/` |
 | `android/`, `ios/` | Platform yapılandırması (`com.pomosprint.app`). `ios/PomoSprintTimerWidget/` Canlı Etkinlik uzantısı, `ios/Shared/` iki hedefte derlenen ActivityAttributes |
 | `tool/ios/add_live_activity_target.rb` | Widget uzantı hedefini `project.pbxproj`'a ekleyen idempotent betik (xcodeproj gem) |
@@ -448,13 +449,14 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 
 ### 7.3 Sırlar
 - Kök `.env`: yalnızca public değerler (`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SENTRY_DSN`).
-- `scripts/.env`: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`. İçeriğini okuma, hiçbir yere kopyalama.
-- Edge secret: `RESEND_API_KEY` (`send-welcome-email`). Abonelikten çıkma token'ı UUID olduğu için ek secret yok.
+- `scripts/.env`: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `MAIL_SENDER_NAME`, `MAIL_SENDER_ADDRESS` (son ikisi sır değil, e-posta altbilgisindeki hizmet sağlayıcı kimliği; boşsa bülten gönderilmez). İçeriğini okuma, hiçbir yere kopyalama.
+- Edge secret: `RESEND_API_KEY`, `MAIL_SENDER_NAME`, `MAIL_SENDER_ADDRESS` (`send-welcome-email`; kimlik eksikse e-posta gönderilmez). Abonelikten çıkma token'ı UUID olduğu için ek secret yok.
 
 ## 8. Landing sitesi ve deploy
 
 **Yapı**
-- Statik site, build yok. `_partials/` tek kaynak → `python3 landing/tools/sync_partials.py`. `en/` İngilizce yasal sayfalar.
+- Statik site, build yok. `_partials/` tek kaynak → `python3 landing/tools/sync_partials.py`. `en/` İngilizce yasal sayfalar ve destek sayfası.
+- Yazı tipleri (`fonts/`, `css/fonts.css`) ve GSAP (`vendor/gsap-3.13.0/`, jsDelivr'deki dosyayla birebir, SRI aynı) kendi alan adımızdan sunulur; dış CDN yok (KVKK-19).
 - `js/config.js` Supabase URL ve anon key'in tek yeri. Site supabase-js yüklemez, düz `fetch` kullanır: `POST /rest/v1/waitlist`, `rpc/get_public_monthly_leaderboard` (p_limit 10), `functions/v1/unsubscribe`.
 - `worker.js` (`run_worker_first`): http → https ve `www` → apex 301 (yol ve sorgu korunur). Diğer her istek statik varlıklara gider.
 - `wrangler.jsonc`: `html_handling: auto-trailing-slash` (`.html` → uzantısız adrese 307), `not_found_handling: 404-page`, `pomosprint.app` ve `www` custom domain route'ları.
@@ -470,21 +472,22 @@ curl -sI https://pomosprint.app/reset-password | grep -i cache-control   # no-st
 - CSS/JS değişince `?v=` değerini `_partials/head.html`, `_partials/scripts.html` ve yardımcı sayfalarda artır (1 saat önbellek).
 
 **`_headers`**
-- CSP: inline `<script>`/`style=""` yok (JSON-LD hariç). `script-src` yalnızca `gsap@3.13.0` (jsDelivr) + Cloudflare Web Analytics. `connect-src` Supabase + Cloudflare Insights. Yeni dış kaynak → önce CSP'ye ekle.
+- CSP: inline `<script>`/`style=""` yok (JSON-LD hariç). `script-src` yalnızca `'self'` + Cloudflare Web Analytics; `style-src` ve `font-src` yalnızca `'self'`. `connect-src` Supabase + Cloudflare Insights. Yeni dış kaynak → önce CSP'ye ve gizlilik metinlerindeki sağlayıcı listesine ekle.
 - Token taşıyan sayfalar (`/reset-password`, `/confirmed`, `/unsubscribe`): `no-store`, `noindex`, `no-referrer`.
 
-**Dokunulmaz URL'ler:** `/privacy`, `/terms`, `/en/privacy`, `/en/terms`, `/reset-password`, `/confirmed`, `/unsubscribe`. Uygulama sürümleri, Auth redirect allowlist'i ve gönderilmiş e-postalar bunlara bağlı.
+**Dokunulmaz URL'ler:** `/privacy`, `/terms`, `/kvkk`, `/hesap-silme`, `/destek` ve `/en/` karşılıkları (`/en/delete-account`, `/en/support`), `/reset-password`, `/confirmed`, `/unsubscribe`. Uygulama sürümleri, mağaza kayıtları, Auth redirect allowlist'i ve gönderilmiş e-postalar bunlara bağlı.
 
 **Yardımcı sayfa sözleşmeleri**
 - `reset-password`: `#access_token=…&type=recovery` (implicit) ya da `?token_hash=…&type=recovery` (form gönderilince doğrulanır). `?code=` eski sürüm mesajı verir.
 - `confirmed`: onay dönüşü; parametresiz açılınca "onaylandı" demez; uygulamayı açma deep link'i yok.
-- `unsubscribe`: `?email=…&token=<uuid>`; sayfa açılınca bir şey silmez, butonla POST atar.
+- `unsubscribe`: `?token=<uuid>` (yeni e-postalar; e-posta adresi URL'de yok). Eski `?email=…&token=<uuid>` bağlantıları da çalışır: sayfa adresi adres çubuğundan siler, istekte yalnızca gövdeye koyar. Sayfa açılınca bir şey silmez, butonla POST atar.
+- Bekleme listesi formu: ayrı, önceden işaretsiz ticari ileti onay kutusu (`#notify-consent`); işaretlenmeden kayıt yok. Canlı `waitlist`'te onay kolonu olmadığı için gövde yalnızca `{email}`; sunucu tarafı `proposed/19`.
 
 **E-posta**
 - Email Routing: `destek@pomosprint.app` → kullanıcının Gmail'i. MX, SPF, DKIM var.
-- `send-welcome-email`: `marketing_subscribers` INSERT trigger'ı `net.http_post` ile çağırır. Resend, gönderici `noreply@mail.pomosprint.app`. Satır son 1 saatte eklenmiş ve `welcome_sent_at` boş olmalı.
+- `send-welcome-email`: `marketing_subscribers` INSERT trigger'ı `net.http_post` ile çağırır. Resend, gönderici `noreply@mail.pomosprint.app`. Satır son 1 saatte eklenmiş ve `welcome_sent_at` boş olmalı. Altbilgide hizmet sağlayıcı kimliği (`MAIL_SENDER_*` secret'ları), destek adresi, Gizlilik ve KVKK bağlantıları; abonelikten çıkma bağlantıları yalnızca `?token=`.
 - `unsubscribe`: yalnızca POST siler (GET 405), token yok/biçimsiz 400, e-posta-token uyuşmazlığı 403, bilinmeyen token 200. Aboneyi `waitlist`'ten de çıkarır. Deploy: `supabase functions deploy unsubscribe --no-verify-jwt`.
-- Bülten: `node scripts/send_newsletter.js --dry-run`, sonra gerçek gönderim. `List-Unsubscribe` + tek tık başlıkları üretir.
+- Bülten: `node scripts/send_newsletter.js --dry-run`, sonra gerçek gönderim. `List-Unsubscribe` + tek tık başlıkları üretir; bağlantılar yalnızca token taşır. Şablonda `{{unsubscribe_url}}`, `{{sender_name}}`, `{{sender_address}}` zorunlu.
 
 **İçerik tutarlılığı (uygulamayla aynı olmalı):** yalnızca 25/50 dk seans, mola sayacı yok, sanal kütüphane yok, lig 14 gün / 30 kişi / 5 kademe, puan 5/12, seri %10/%20/%30, günde en fazla 16 seans sayılır, varsayılan dil TR.
 
@@ -519,7 +522,8 @@ curl -sI https://pomosprint.app/reset-password | grep -i cache-control   # no-st
 | Öncelik | Konu | Not |
 |---|---|---|
 | P0 | Migration geçmişi canlıyla uyumsuz, baseline yok | `supabase/README.md` → Baseline (`db dump` + `migration repair`). O zamana kadar CLI push yasak |
-| P1 | Edge Function'lar deploy edilmedi | Canlıda `unsubscribe` v8 (5 Ağustos, JWT kapalı, eski kod) ve `send-welcome-email` v6 (**JWT açık**, trigger çağrıları 401 alıyor, hoş geldin e-postası gitmiyor). Repodaki sürümleri `--no-verify-jwt` ile deploy et. Adımlar: `analiz/PomoSprint_Analiz_Raporu_2026-10-03.md` §8 |
+| P1 | `send-welcome-email` repodaki sürümü deploy edilmedi | 3 Ekim `list_edge_functions`: `unsubscribe` v9 ve `send-welcome-email` v7 canlıda, ikisi de JWT kapalı; `unsubscribe` v9 token-only isteği zaten kabul ediyor (repo farkı yalnızca yorum). Repodaki `send-welcome-email` (gönderen kimliği altbilgisi, yalnızca token'lı bağlantı) için sıra: site deploy → `supabase secrets set MAIL_SENDER_NAME=… MAIL_SENDER_ADDRESS=…` → `supabase functions deploy send-welcome-email --no-verify-jwt`. Secret'lar yoksa hoş geldin e-postası gönderilmez |
+| P1 | Veri sorumlusu kimliği sitede yer tutucu (KVKK-15) | `/privacy`, `/kvkk` (iki dil) §1'de `data-fill-in` işaretli; kullanıcı gerçek bilgiyle doldurur (`grep -rn 'data-fill-in' landing/`) |
 | P1 | `mail.pomosprint.app` Resend doğrulaması ve DNS kayıtları | Yapılmadan hoş geldin ve bülten gönderilemez |
 | P1 | `cleanup_unconfirmed_duplicate_identity(p_email)` parametredeki e-postaya güveniyor | `proposed/04` |
 | P1 | Hesap silme `waitlist` ve `user_id`'siz abonelik satırını silmiyor | `proposed/12` (DRYRUN → migration, SQL Editor'de kullanıcı) |
@@ -530,6 +534,7 @@ curl -sI https://pomosprint.app/reset-password | grep -i cache-control   # no-st
 | P1 | Supabase Auth panel ayarları repoda yok | Redirect URLs (`/reset-password`, `/confirmed`, `.html`'li hâlleri; `io.supabase.pomosprint://` silinmeli), Reset Password şablonu `token_hash`, Leaked password protection, Apple provider (Client ID `com.pomosprint.app`) |
 | P2 | `proposed/11` RPC'leri canlıda yok | Arkadaş silme/iptal UI'ı ve toplu kategori sıralaması bunlara bağlı |
 | P2 | `proposed/15` (aylık sıralama = çalışma ayı) ve `proposed/16` (kategori sırası, silme/kolon yetkileri) uygulanmadı | Her ikisinin DRYRUN'u yerel taklitte doğrulandı; kullanıcı SQL Editor'de önce DRYRUN, sonra dosyayı çalıştırır |
+| P2 | `proposed/19` (bekleme listesi onay kaydı ve abonelikten çıkma token'ı) uygulanmadı | Yerel taklitte DRYRUN 12/12 `true`. A bölümü geriye uyumlu; B yalnızca site onay alanlarını gönderdikten sonra. Sonra `unsubscribe` waitlist token'ını da tanımalı ve lansman e-postası yalnızca `marketing_consent = true` satırlara gitmeli |
 | P2 | `proposed/01`–`10` kalan maddeler | Puan sabitleri tek kaynak, `purchase_avatar` kilidi (05), `activity_feed` RLS ve `get_friends_feed` (07), `profiles` kolon bazlı SELECT (06), kategori ad kuralları (09), varsayılan yetkiler (08), veri temizliği (10) |
 | P2 | Herkese açık sıralama oturum açıkken tam ad döndürüyor | Ürün kararı (`proposed/README.md`, 03 satırı) |
 | P2 | `profiles.timezone` istemciden yazılmıyor | Yetki ve doğrulama canlıda hazır; `set_my_timezone` yok. Cihaz IANA adı için ek paket (`flutter_timezone`) gerekir |

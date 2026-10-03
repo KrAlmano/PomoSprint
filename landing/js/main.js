@@ -65,7 +65,11 @@
      dokunma) olmadan gönderimin reddi ve en kısa doldurma süresi. Süre
      dolmadan gönderilirse kullanıcıya tekrar sorulmaz; kalan süre beklenip
      kendiliğinden gönderilir. Aynı adres ikinci kez gönderilse de aynı
-     teşekkür gösterilir; form bir adresin listede olup olmadığını ele vermez. */
+     teşekkür gösterilir; form bir adresin listede olup olmadığını ele vermez.
+     Ticari elektronik ileti onayı (6563 sayılı Kanun) ayrı ve önceden
+     işaretsiz bir kutuyla alınır: kutu işaretlenmeden (ya da sayfada yoksa)
+     kayıt gönderilmez. waitlist tablosunda onay kolonu olmadığı için istekte
+     yalnızca e-posta gider; onay kaydı için bkz. supabase/proposed/19. */
   var notifyForm = document.getElementById("notify-form");
   var notifyInput = document.getElementById("notify-email");
   if (notifyForm && notifyInput) {
@@ -74,6 +78,7 @@
     var notifyBtn = notifyForm.querySelector("button[type=submit]");
     var notifyBtnLabel = notifyBtn ? notifyBtn.textContent : "";
     var honeypot = document.getElementById("notify-website");
+    var consentBox = document.getElementById("notify-consent");
     var formReadyAt = Date.now();
     var MIN_FILL_MS = 2500;
     var sending = false;
@@ -85,6 +90,7 @@
     var MSG_EMPTY = "E-posta adresini yazar mısın?";
     var MSG_INVALID = "Geçerli bir e-posta adresi girer misin?";
     var MSG_FAILED = "Bir şeyler ters gitti, tekrar dener misin?";
+    var MSG_CONSENT = "Sana haber verebilmemiz için onay kutusunu işaretlemen gerekiyor.";
     var EMAIL_RE = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 
     var hideStatus = function () {
@@ -106,6 +112,18 @@
       notifyInput.setAttribute("aria-invalid", "true");
       notifyInput.setAttribute("aria-describedby", "notify-status");
       notifyInput.focus();
+    };
+    var clearConsentInvalid = function () {
+      if (!consentBox) return;
+      consentBox.removeAttribute("aria-invalid");
+      consentBox.removeAttribute("aria-describedby");
+    };
+    var showConsentError = function () {
+      showStatus(MSG_CONSENT);
+      if (!consentBox) return;
+      consentBox.setAttribute("aria-invalid", "true");
+      consentBox.setAttribute("aria-describedby", "notify-status");
+      consentBox.focus();
     };
     var setBusy = function (busy) {
       sending = busy;
@@ -131,8 +149,22 @@
         hideStatus();
       }
     });
+    if (consentBox) {
+      consentBox.addEventListener("change", function () {
+        if (consentBox.checked && consentBox.hasAttribute("aria-invalid")) {
+          clearConsentInvalid();
+          hideStatus();
+        }
+      });
+    }
 
     var sendEmail = function (email) {
+      // Bekleme süresinde kutu kaldırıldıysa yine gönderme
+      if (!consentBox || !consentBox.checked) {
+        setBusy(false);
+        showConsentError();
+        return;
+      }
       if (!api) {
         setBusy(false);
         showStatus(MSG_FAILED);
@@ -171,6 +203,12 @@
         return;
       }
       clearInvalid();
+      // Onay kutusu işaretli değilse kayıt yok
+      if (!consentBox || !consentBox.checked) {
+        showConsentError();
+        return;
+      }
+      clearConsentInvalid();
       hideStatus();
       // Tuzak alanı dolduysa ya da sayfada hiç gerçek etkileşim yoksa bot:
       // kayıt göndermeden teşekkür et

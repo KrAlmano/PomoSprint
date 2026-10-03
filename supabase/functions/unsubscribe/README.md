@@ -6,12 +6,18 @@ var; token olmadan kimse listeden çıkarılamaz. Ek secret gerekmez.
 
 ## Link biçimi
 
-- Sayfa: `https://pomosprint.app/unsubscribe?email=<e-posta>&token=<uuid>`
+E-posta adresi bağlantıya konmaz (istek günlüklerine ve tarayıcı geçmişine
+düşmesin); token tek başına yeterlidir.
+
+- Sayfa: `https://pomosprint.app/unsubscribe?token=<uuid>`
   (sayfa açılınca hiçbir şey silmez; kullanıcı butona basınca POST atar)
-- Tek tık (RFC 8058): `List-Unsubscribe: <https://<proje>.supabase.co/functions/v1/unsubscribe?email=..&token=..>`
+- Tek tık (RFC 8058): `List-Unsubscribe: <https://<proje>.supabase.co/functions/v1/unsubscribe?token=<uuid>>`
   ve `List-Unsubscribe-Post: List-Unsubscribe=One-Click`
 
 `send-welcome-email` ve `scripts/send_newsletter.js` linkleri bu biçimde üretir.
+Daha önce gönderilmiş e-postalardaki `?email=..&token=..` bağlantıları da
+çalışır: fonksiyon e-postayı token'ın sahibiyle karşılaştırır, sayfa ise
+adresi okuduktan sonra adres çubuğundan siler.
 
 ## Davranış
 
@@ -40,3 +46,6 @@ CLI yoksa: Supabase Dashboard > Edge Functions > unsubscribe > Code'a
 - Token'sız POST → 400
 - `GET` → 405
 - Rastgele UUID token ile POST → 200 (hiçbir satır silinmez)
+
+Yerel birim testi (canlıya dokunmaz; Supabase istemcisi sahte):
+`cd scripts && npm test`

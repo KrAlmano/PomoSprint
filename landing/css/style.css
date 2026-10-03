@@ -2174,6 +2174,57 @@ html.nav-lock { overflow: hidden; }
 
 .library-band a { color: var(--sand); font-weight: 700; }
 
+/* Ticari elektronik ileti onayı: e-posta alanından ayrı, önceden işaretsiz
+   kutu. Form alt alta dizilir (e-posta, onay, buton; odak sırası da bu);
+   formdaki genel input stili (yuvarlak alan) checkbox'tan kaldırılır. */
+.notify-form input[type="email"] {
+  flex-basis: 100%;
+  max-width: 30rem;
+}
+
+.notify-consent {
+  flex: 1 1 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  text-align: left;
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: rgba(245, 237, 228, 0.85);
+}
+
+.notify-form .notify-consent input[type="checkbox"] {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  min-width: 0;
+  margin: 1px 0 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  accent-color: var(--sand);
+  cursor: pointer;
+}
+
+.notify-form .notify-consent input[type="checkbox"]:focus-visible {
+  outline: 2px solid var(--sand);
+  outline-offset: 2px;
+}
+
+.notify-form .notify-consent input[type="checkbox"][aria-invalid="true"] {
+  outline: 2px solid #FFB3A7;
+  outline-offset: 2px;
+}
+
+.notify-consent label { cursor: pointer; max-width: 34rem; }
+
+/* Bant ortalandığında (≤960px) onay satırı da ortada dursun */
+@media (max-width: 960px) {
+  .notify-consent { justify-content: center; }
+}
+
 /* ---------------- Yasal sayfalar: dil bağlantısı ---------------- */
 
 .lang-switch {

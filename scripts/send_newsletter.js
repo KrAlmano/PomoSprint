@@ -13,17 +13,29 @@
 //
 // Ayarlar yalnızca scripts/.env dosyasından okunur (bkz. scripts/.env.example).
 // Kök .env uygulamaya asset olarak gömüldüğü için service role anahtarı oraya
-// ASLA konmamalı.
+// ASLA konmamalı. Gerçek gönderim için MAIL_SENDER_NAME ve MAIL_SENDER_ADDRESS
+// (hizmet sağlayıcının adı/unvanı ve adresi, e-posta altbilgisinde yazılır)
+// da gerekir; eksikse hiçbir e-posta gönderilmez.
 //
-// Şablon yer tutucuları (her geçtiği yer değiştirilir):
+// Şablon yer tutucuları (her geçtiği yer değiştirilir, değerler HTML kaçışlı):
 //   {{unsubscribe_url}}  kişiye özel abonelikten çıkma sayfası linki (ZORUNLU)
-//   {{email}}            alıcının e-posta adresi (HTML kaçışlı)
+//   {{sender_name}}      hizmet sağlayıcının adı-soyadı ya da unvanı (ZORUNLU)
+//   {{sender_address}}   hizmet sağlayıcının iletişim adresi (ZORUNLU)
+//   {{email}}            alıcının e-posta adresi
+// Abonelikten çıkma linkleri yalnızca token taşır (e-posta adresi URL'de yok).
+// Saf yardımcılar: scripts/lib/newsletter_mail.js (test: npm test).
 
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 const { createClient } = require('@supabase/supabase-js');
 const { Resend } = require('resend');
 const fs = require('fs');
+const {
+  REQUIRED_PLACEHOLDERS,
+  buildEmail: buildNewsletterEmail,
+  missingPlaceholders,
+  readSenderIdentity,
+} = require('./lib/newsletter_mail');
 
 // --- ARGÜMANLAR ---
 const args = process.argv.slice(2);
@@ -38,7 +50,6 @@ const START_INDEX = Math.max(0, parseInt(argValue('--from') || '0', 10) || 0);
 
 // --- SABİTLER ---
 const FROM_ADDRESS = 'PomoSprint <noreply@mail.pomosprint.app>';
-const UNSUBSCRIBE_PAGE = 'https://pomosprint.app/unsubscribe';
 const BATCH_SIZE = 100; // Resend batch API çağrı başına en fazla 100 e-posta kabul eder.
 const PAGE_SIZE = 1000; // PostgREST varsayılan satır sınırı.
 const BATCH_DELAY_MS = 600; // Resend varsayılan hız sınırı: saniyede 2 istek.
@@ -55,17 +66,27 @@ if (missing.length > 0) {
   process.exit(1);
 }
 
-const placeholderRe = (name) => new RegExp(`\\{\\{\\s*${name}\\s*\\}\\}`, 'g');
-
 if (!fs.existsSync(TEMPLATE_PATH)) {
   console.error(`HATA: Şablon bulunamadı: ${TEMPLATE_PATH}`);
   console.error('Örnek şablon: scripts/templates/newsletter.html (ya da --template <yol>).');
   process.exit(1);
 }
 const TEMPLATE = fs.readFileSync(TEMPLATE_PATH, 'utf8');
-if (!placeholderRe('unsubscribe_url').test(TEMPLATE)) {
-  console.error('HATA: Şablonda {{unsubscribe_url}} yer tutucusu yok. Abonelikten çıkma linki olmadan gönderim yapılmaz.');
+const missingInTemplate = missingPlaceholders(TEMPLATE);
+if (missingInTemplate.length > 0) {
+  console.error(`HATA: Şablonda zorunlu yer tutucu yok: ${missingInTemplate.map((n) => `{{${n}}}`).join(', ')}`);
+  console.error(`Zorunlu olanlar: ${REQUIRED_PLACEHOLDERS.map((n) => `{{${n}}}`).join(', ')} (abonelikten çıkma linki ve gönderen kimliği olmadan gönderim yapılmaz).`);
   process.exit(1);
+}
+
+const SENDER = readSenderIdentity(process.env);
+if (SENDER.missing.length > 0) {
+  const msg = `scripts/.env dosyasında gönderen kimliği eksik: ${SENDER.missing.join(', ')} (hizmet sağlayıcının adı-soyadı/unvanı ve adresi; bilgi uydurulmaz).`;
+  if (!DRY_RUN) {
+    console.error(`HATA: ${msg}`);
+    process.exit(1);
+  }
+  console.warn(`UYARI: ${msg} Gerçek gönderim bu hâliyle yapılmaz.`);
 }
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
@@ -74,40 +95,17 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-function escapeHtml(value) {
-  return String(value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
 // Her abonenin veritabanında tahmin edilemez bir unsubscribe_token'ı
 // (UUID) var; unsubscribe Edge Function'ı satırı bu token'la bulup siler.
-function unsubscribeQuery({ email, token }) {
-  return `email=${encodeURIComponent(email)}&token=${encodeURIComponent(token)}`;
-}
-
+// RFC 8058 tek tık: e-posta istemcisi List-Unsubscribe adresine POST atar.
 function buildEmail(subscriber) {
-  const { email } = subscriber;
-  const pageUrl = `${UNSUBSCRIBE_PAGE}?${unsubscribeQuery(subscriber)}`;
-  // RFC 8058 tek tık: e-posta istemcisi bu adrese doğrudan POST atar.
-  const oneClickUrl = `${SUPABASE_URL.replace(/\/+$/, '')}/functions/v1/unsubscribe?${unsubscribeQuery(subscriber)}`;
-  // Fonksiyonlu replace: değerdeki '$&' gibi diziler özel kalıp sayılmasın.
-  const html = TEMPLATE
-    .replace(placeholderRe('unsubscribe_url'), () => escapeHtml(pageUrl))
-    .replace(placeholderRe('email'), () => escapeHtml(email));
-  return {
-    from: FROM_ADDRESS,
-    to: [email],
+  return buildNewsletterEmail(subscriber, {
+    template: TEMPLATE,
     subject: EMAIL_SUBJECT,
-    html,
-    headers: {
-      'List-Unsubscribe': `<${oneClickUrl}>`,
-      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
-    },
-  };
+    from: FROM_ADDRESS,
+    supabaseUrl: SUPABASE_URL,
+    sender: SENDER,
+  });
 }
 
 // Tüm aboneleri sayfalayarak çeker; büyük/küçük harf farkıyla yinelenen
