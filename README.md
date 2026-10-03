@@ -40,6 +40,21 @@ Pomodoro tekniğini oyunlaştıran Flutter çalışma uygulaması: 25/50 dakikal
 
 4. Android release AAB için `android/key.properties` ve upload keystore gerekir. Yoksa `bundleRelease` bilerek hata verir; release APK ise uyarıyla debug anahtarıyla imzalanır.
 
+## Mağaza derlemesi
+
+```bash
+scripts/build_release.sh android   # AAB: build/app/outputs/bundle/release/
+scripts/build_release.sh ios       # IPA: build/ios/ipa/
+scripts/build_release.sh all
+```
+
+- Betik `flutter clean` yapar, `--obfuscate --split-debug-info` ile derler. Dart sembolleri, obfuscation haritası ve Android R8 `mapping.txt` `release_symbols/<sürüm>/<platform>/` altına yazılır (git'e girmez). Her mağaza sürümü için saklayın.
+- Sentry'ye yükleme için `scripts/.env`'e `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN` ekleyin (şablon: `scripts/.env.example`). Betik bu dosyadan yalnızca `SENTRY_*` satırlarını okur. Token repoya ve `pubspec.yaml`'a yazılmaz. Eksikse derleme yapılır, yükleme atlanır.
+- Yüklenenler: Dart sembolleri ve obfuscation haritası (`sentry_dart_plugin`), iOS dSYM'leri, Android R8 mapping (`sentry-cli upload-proguard`; eşleşme UUID'si derleme sırasında `android/app/src/main/assets/sentry-debug-meta.properties`'e yazılır, sonra silinir). Native sembol tabloları AAB'ye girer (`ndk.debugSymbolLevel`), Play Console kullanır.
+- Release adı `com.pomosprint.app@<pubspec version>`, dist derleme numarası; `sentry_flutter`'ın varsayılanıyla aynı.
+- Sentry'siz çözümleme: `flutter symbolize -i <stack.txt> -d release_symbols/<sürüm>/android/app.android-arm64.symbols`.
+- Android derlemesi ve R8 mapping eşleşmesi bu makinede doğrulanmadı (Android SDK yok). İlk Android sürümünde Sentry'de bir Java yığınının çözüldüğünü kontrol edin.
+
 ## Kontrol ve testler
 
 ```bash

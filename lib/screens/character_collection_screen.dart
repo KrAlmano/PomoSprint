@@ -349,16 +349,18 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
                 ),
               ),
             );
+            // Kısa ekranda ve alçak gövdede (320x568 telefon, büyük yazı)
+            // açıklama ızgarayla birlikte kayar; sabit kalınca ızgaraya
+            // birkaç satır kalıyor ya da sütun taşıyordu.
+            final scrollSubtitle = shortHeight || constraints.maxHeight < 600;
             return Column(
               children: [
-                // Kısa ekranda açıklama ızgarayla birlikte kayar; sabit
-                // kalınca ızgaraya birkaç satır kalıyordu.
-                if (!shortHeight) subtitle,
+                if (!scrollSubtitle) subtitle,
                 Expanded(
                   child: CustomScrollView(
                     physics: const BouncingScrollPhysics(),
                     slivers: [
-                      if (shortHeight) SliverToBoxAdapter(child: subtitle),
+                      if (scrollSubtitle) SliverToBoxAdapter(child: subtitle),
                       SliverPadding(
                         padding: EdgeInsets.symmetric(horizontal: side),
                         sliver: SliverGrid.builder(

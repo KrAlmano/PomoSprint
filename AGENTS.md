@@ -98,7 +98,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 | `lib/main.dart` | Açılış: `.env` → Sentry → `LanguageService` → `ThemeController` → `NotificationService` (beklenmez) → `runApp`. `home: SplashScreen` → `AppGate` |
 | `lib/app/app_gate.dart` | **Tek yönlendirme kapısı**: `currentUser` null → Login; `onboardingCompletedAt` null → PostAuthOnboarding; aksi halde Shell |
 | `lib/app/main_shell.dart` | `MainNavigationShell`: 4 sekme (Pomo, Raporlar, Sıralama, Sosyal) IndexedStack + TickerMode, bekleyen seans banner'ı, bağlantı dinleyicisi, `PopScope` |
-| `lib/app/` (diğer) | `theme_controller` (`theme_mode`), `session_feedback` (seans sonucu diyalogları), `category_cache` (`saved_categories_<email>`), `error_reporting` (Sentry, e-posta maskeleme) |
+| `lib/app/` (diğer) | `theme_controller` (`theme_mode`), `session_feedback` (seans sonucu diyalogları), `category_cache` (`saved_categories_uid_<uid>`; eski `saved_categories_<email>` ilk okumada taşınır), `error_reporting` (Sentry, e-posta maskeleme) |
 | `lib/screens/timer_screen.dart` | Sayaç durum makinesi (25/50 dk, tek duraklatma, 3-2-1 geri sayım) |
 | `lib/screens/splash_screen.dart` | Önce yerel önbellek, sonra `SupabaseService.initialize` (süreçte tek kez), sonra profil ve kategori tazeleme |
 | `lib/screens/login_ / register_ / post_auth_onboarding_screen.dart` | Giriş (e-posta, Google, iOS'ta Apple), kayıt, onboarding |
@@ -294,9 +294,14 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 - `ios/Runner/PrivacyInfo.xcprivacy`: izleme yok; toplanan veri türleri App Store Connect gizlilik etiketleriyle aynı tutulmalı.
 - Android: `allowBackup=false` + `data_extraction_rules.xml`; bildirim receiver'ları manifest'te. Exact alarm: `USE_EXACT_ALARM` (13+) ve `SCHEDULE_EXACT_ALARM` (`maxSdkVersion=32`); Play Console'da exact alarm beyanı gerekir.
 - Sentry: `enablePrintBreadcrumbs=false`, e-postalar maskelenir. Yine de `debugPrint`'e kişisel veri yazma.
+- Mağaza derlemesi yalnızca `scripts/build_release.sh` ile (`--obfuscate --split-debug-info`; Dart sembolleri, obfuscation haritası, R8 mapping Sentry'ye; README > Mağaza derlemesi). Sentry kimlikleri `scripts/.env`'de (`SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN`); `pubspec.yaml`'daki `sentry:` bloğuna org/proje/token yazma.
+- R8: ek `proguard-rules.pro` gerekmiyor. `sentry_flutter` kendi consumer kurallarını getiriyor (`io.sentry.**`), `flutter_local_notifications` 22.x modellerinde `@Keep` var ve GSON 2.12 kendi kurallarını taşıyor; bildirim ikonu `res/raw/keep.xml` ile korunuyor. Gerekirse `android/app/proguard-rules.pro` açın; Flutter Gradle eklentisi onu kendisi ekler, `build.gradle.kts`'e bağlamak gerekmez.
+- Uygulama adı her yerde `PomoSprint`: `kAppDisplayName` (MaterialApp.title, Android son uygulamalar), `android:label`, `CFBundleDisplayName`. `test/platform_config_test.dart` denetler.
+- İkon ve açılış ekranı üretilir, elle düzenlenmez: `dart run flutter_launcher_icons`, `dart run flutter_native_splash:create` (ayar `pubspec.yaml`). Monochrome (Android 13+ temalı ikon) `assets/icon/monochrome.png`: `foreground.png`'nin alfa kanalı, beyaz. Android 12+ splash simgesi `assets/icon/splash_android12.png` (daire maskesine sığacak kadar küçültülmüş logo). Açılış renkleri `AppColors.surface` / `darkSurface` ile aynı; tema rengi değişirse `platform_config_test` kırılır.
 
 **Tuzaklar**
-- `google_sign_in` 6.x'te; 7.x'e geçiş (Credential Manager) yapılmadı.
+- `google_sign_in` 6.x'te; 7.x'e geçiş (Credential Manager) yapılmadı. Yapılacaklar: `GoogleSignIn.instance.initialize(serverClientId, clientId)` tek sefer; `signInSilently() ?? signIn()` yerine `attemptLightweightAuthentication()` ve `authenticate()`; `idToken` `account.authentication`'dan, `accessToken` yalnızca `authorizationClient.authorizationForScopes` ile (Supabase `signInWithIdToken` için idToken yeterli); `signOut`/`disconnect` yeni API; iOS'ta nonce (idToken'da nonce varsa Supabase aynısını ister) ve `GIDClientID` yeniden doğrulanmalı; Android'de Credential Manager için gerçek cihazda test. Android derlemesi doğrulanamadığı için ertelendi.
+- iOS'ta Supabase oturumu (refresh token) ve `saved_user` önbelleği SharedPreferences'ta, yani NSUserDefaults'ta; cihaz yedeğine girer. `flutter_secure_storage` + özel `LocalStorage` ertelendi: yeni native eklenti Android'de derlenip denenemiyor; Keychain kilitliyken (ilk kilit açmadan önce arka plan açılışı) okuma hatası oturumu sessizce kapatır; Keychain kaydı uygulama silinince kalır. Göç yazılırken eski anahtar ancak yeni depoya yazma doğrulanınca silinmeli.
 - `assets/league_award_avatars/` (9,6 MB) kullanılmıyor, pubspec'te yok.
 - `.claude/settings.local.json` ve `landing/.claude/settings.local.json` gitignore'da ama git'te izleniyor olabilir (`git rm --cached` kullanıcıda).
 
@@ -446,7 +451,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 
 ### 7.3 Sırlar
 - Kök `.env`: yalnızca public değerler (`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SENTRY_DSN`).
-- `scripts/.env`: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`. İçeriğini okuma, hiçbir yere kopyalama.
+- `scripts/.env`: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`; mağaza derlemesi için `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN`. İçeriğini okuma, hiçbir yere kopyalama.
 - Edge secret: `RESEND_API_KEY` (`send-welcome-email`). Abonelikten çıkma token'ı UUID olduğu için ek secret yok.
 
 ## 8. Landing sitesi ve deploy

@@ -273,6 +273,7 @@ void main() {
         'league_info_shown_$email': true,
         'daily_goal_migrated_$uid': true,
         'saved_categories_$email': '[]',
+        'saved_categories_uid_$uid': '[]',
         // Başka hesap ve cihaz tercihleri korunur.
         'pending_sessions_uid_other': '[]',
         'hidden_users_uid_other': '[{"name":"Y"}]',

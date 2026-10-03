@@ -167,26 +167,34 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   ],
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryContainer.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.timer_rounded, size: 16, color: accent),
-                    const SizedBox(width: 4),
-                    Text(
-                      StatsText.duration(selected.minutes),
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: accent,
+              // 320 pt ekranda büyük yazıyla süre küçülür, başlığı itmez.
+              Flexible(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryContainer.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.timer_rounded, size: 16, color: accent),
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            StatsText.duration(selected.minutes),
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: accent,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -381,12 +389,17 @@ class _HistoryScreenState extends State<HistoryScreen> {
     // En verimli günün çubuğu, o günün günlük hedefe oranıdır.
     final bestFactor = best == null ? 0.0 : (best.minutes / max(1, widget.dailyGoalMinutes)).clamp(0.0, 1.0);
 
-    // Uzun metin ya da büyük yazı boyutunda kartlar birlikte uzar.
+    // Uzun metin ya da büyük yazı boyutunda kartlar birlikte uzar. 320 pt
+    // ekranda (iPhone SE, iPad Slide Over) yan yana sığmıyor; alt alta dizilir.
+    // Karar ekran genişliğinden: IntrinsicHeight içinde LayoutBuilder olmaz.
+    final stacked = MediaQuery.sizeOf(context).width < 360;
     return IntrinsicHeight(
-      child: Row(
+      child: Flex(
+        direction: stacked ? Axis.vertical : Axis.horizontal,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(
+            flex: stacked ? 0 : 1,
             child: Semantics(
               label: '${lang.translate('total_focus_label').replaceAll('\n', ' ')}: ${StatsText.duration(weekMinutes)}',
               excludeSemantics: true,
@@ -458,8 +471,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
               ),
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 16, height: 16),
           Expanded(
+            flex: stacked ? 0 : 1,
             child: MergeSemantics(
               child: Container(
                 constraints: const BoxConstraints(minHeight: 120),
@@ -662,12 +676,20 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           ),
                           const SizedBox(width: 4),
                         ],
-                        Text(
-                          StatsText.duration(sub.minutes),
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: variant,
+                        // Dar ekranda (320 pt) büyük yazıyla süre küçülür.
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 100),
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              StatsText.duration(sub.minutes),
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: variant,
+                              ),
+                            ),
                           ),
                         ),
                       ],

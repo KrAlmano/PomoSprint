@@ -234,6 +234,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
     final result = await loadShellCategories(
       _service,
       email: _user.email,
+      uid: _user.id,
       seedAttempted: _categorySeedAttempted,
     );
     _categorySeedAttempted = result.seedAttempted;
@@ -440,6 +441,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
 Future<({List<CourseCategory> categories, bool seedAttempted})> loadShellCategories(
   SupabaseService service, {
   required String email,
+  String? uid,
   required bool seedAttempted,
 }) async {
   var attempted = seedAttempted;
@@ -458,7 +460,7 @@ Future<({List<CourseCategory> categories, bool seedAttempted})> loadShellCategor
         final all = await service.fetchUserCategories(includeArchived: true);
         cloud = all.isNotEmpty
             ? active
-            : await service.ensureServerCategories(await CategoryCache.read(email) ?? const []);
+            : await service.ensureServerCategories(await CategoryCache.read(email, uid: uid) ?? const []);
       }
     } catch (e) {
       debugPrint('[SHELL] Kategoriler buluttan alınamadı, önbelleğe düşülüyor: $e');
@@ -469,10 +471,10 @@ Future<({List<CourseCategory> categories, bool seedAttempted})> loadShellCategor
   if (cloud != null) {
     // Başarılı bulut yanıtı (boş olsa da) önbelleği ezer: önbellekte aktif
     // görünen ama sunucuda arşivlenmiş kategori sayaçta seçilemez.
-    await CategoryCache.write(email, cloud);
+    await CategoryCache.write(email, cloud, uid: uid);
     categories = cloud;
   } else {
-    categories = await CategoryCache.read(email) ?? CourseCategory.initialCategories();
+    categories = await CategoryCache.read(email, uid: uid) ?? CourseCategory.initialCategories();
   }
   return (categories: categories, seedAttempted: attempted);
 }
