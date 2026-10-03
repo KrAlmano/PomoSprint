@@ -89,6 +89,50 @@ void main() {
       expect(promotionDemotionText(l10n, league), '${l10n.leagueInfoPromote(3)}\n${l10n.leagueInfoDemote(3)}');
     });
 
+    test('küçük odada terfi bölgesi podyumun içinde; 0 puanlı terfi etmez', () {
+      // 3 kişilik Bronz oda: promotion_zone_end = min(3, ceil(3/2)) = 2, düşme yok.
+      final league = LeagueSnapshot.fromRows([
+        for (final (i, points) in [(0, 20), (1, 10), (2, 5)])
+          {
+            'weekly_points': points,
+            'tier': 1,
+            'end_date': '2026-10-11T20:59:59Z',
+            'is_me': i == 2,
+            'promotion_zone_end': 2,
+            'demotion_zone_start': 999,
+            'member_count': 3,
+          },
+      ]);
+      expect(league.zoneOf(1, 20), LeagueZone.promotion);
+      expect(league.zoneOf(2, 10), LeagueZone.promotion);
+      expect(league.zoneOf(3, 5), LeagueZone.none, reason: '3. terfi etmez');
+      expect(league.zoneOf(2, 0), LeagueZone.promotionNeedsPoints);
+    });
+
+    test('12 kişilik oda: terfi 1-3 (podyum), düşme 10-12; en üst/en alt kademe istisnası', () {
+      Map<String, dynamic> row(int tier) => {
+            'weekly_points': 5,
+            'tier': tier,
+            'is_me': true,
+            'promotion_zone_end': 3,
+            'demotion_zone_start': 10,
+            'member_count': 12,
+          };
+      final mid = LeagueSnapshot.fromRows([row(2)]);
+      expect([for (var r = 1; r <= 12; r++) mid.zoneOf(r, 5)], [
+        for (var r = 1; r <= 12; r++) r <= 3 ? LeagueZone.promotion : (r >= 10 ? LeagueZone.demotion : LeagueZone.none),
+      ]);
+      expect(LeagueSnapshot.fromRows([row(kLeagueTierCount)]).zoneOf(1, 5), LeagueZone.none, reason: 'en üst lig');
+      expect(LeagueSnapshot.fromRows([row(1)]).zoneOf(12, 5), LeagueZone.none, reason: 'Bronzda düşme yok');
+    });
+
+    test('yerleşme beklenirken bölge yok', () {
+      final league = LeagueSnapshot.fromRows([
+        {'weekly_points': 0, 'tier': 1, 'is_me': true, 'promotion_zone_end': 1, 'demotion_zone_start': 999, 'member_count': 1},
+      ]);
+      expect(league.zoneOf(1, 0), LeagueZone.none);
+    });
+
     test('end_date gelmezse 14 günlük dönem varsayımı (Türkiye saati)', () {
       // Cumartesi 3 Ekim 15:00 (TR) → bu haftanın Pazartesi'si 28 Eylül + 13 gün.
       final league = LeagueSnapshot.fromRows(

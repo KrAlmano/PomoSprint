@@ -86,16 +86,30 @@ class RankingCountdownBanner extends StatelessWidget {
   }
 }
 
+/// Terfi bölgesi rengi (podyum çipi, liste satırı, kendi durum kartı).
+const Color kPromotionZoneColor = Color(0xFF2E7D32);
+
+/// Düşme bölgesi rengi.
+const Color kDemotionZoneColor = Color(0xFFC62828);
+
 /// Kullanıcının listedeki yeri. Liste ezilmez; bu ayrı bir göstergedir.
+/// Lig sekmesinde [zone] verilirse dönem sonu durumu da yazılır.
 class MyRankCard extends StatelessWidget {
   final int rank;
   final int points;
+  final LeagueZone? zone;
 
-  const MyRankCard({super.key, required this.rank, required this.points});
+  const MyRankCard({super.key, required this.rank, required this.points, this.zone});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final (String? zoneText, Color zoneColor, IconData zoneIcon) = switch (zone) {
+      LeagueZone.promotion => (l10n.rankingZonePromotionMe, kPromotionZoneColor, Icons.arrow_upward_rounded),
+      LeagueZone.promotionNeedsPoints => (l10n.rankingZoneNeedsPointsMe, Colors.orange.shade800, Icons.info_outline),
+      LeagueZone.demotion => (l10n.rankingZoneDemotionMe, kDemotionZoneColor, Icons.arrow_downward_rounded),
+      _ => (null, AppColors.primary, Icons.info_outline),
+    };
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -103,16 +117,37 @@ class MyRankCard extends StatelessWidget {
         color: AppColors.primaryContainer.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.person_pin_circle_rounded, color: AppColors.primary, size: 20),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              l10n.rankingMyStatus(rank, points),
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.primary),
-            ),
+          Row(
+            children: [
+              const Icon(Icons.person_pin_circle_rounded, color: AppColors.primary, size: 20),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  l10n.rankingMyStatus(rank, points),
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.primary),
+                ),
+              ),
+            ],
           ),
+          if (zoneText != null) ...[
+            const SizedBox(height: 6),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(zoneIcon, color: zoneColor, size: 18),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    zoneText,
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: zoneColor, height: 1.3),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -191,7 +226,14 @@ class LeaguePlacementView extends StatelessWidget {
 class RankingPodium extends StatelessWidget {
   final List<RankingEntry> top;
 
-  const RankingPodium({super.key, required this.top});
+  /// Lig sekmesinde koltuğun dönem sonu durumu (sıra 1'den başlar). Küçük
+  /// odalarda terfi bölgesi tamamen podyumda kaldığı için burada da
+  /// gösterilir.
+  final LeagueZone Function(RankingEntry entry, int rank)? zoneOf;
+
+  const RankingPodium({super.key, required this.top, this.zoneOf});
+
+  Widget _seat(int index) => _PodiumSeat(entry: top[index], rank: index + 1, zone: zoneOf?.call(top[index], index + 1));
 
   @override
   Widget build(BuildContext context) {
@@ -210,9 +252,9 @@ class RankingPodium extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          if (top.length >= 2) _PodiumSeat(entry: top[1], rank: 2) else const SizedBox(width: 80),
-          if (top.isNotEmpty) _PodiumSeat(entry: top[0], rank: 1),
-          if (top.length >= 3) _PodiumSeat(entry: top[2], rank: 3) else const SizedBox(width: 80),
+          if (top.length >= 2) _seat(1) else const SizedBox(width: 80),
+          if (top.isNotEmpty) _seat(0),
+          if (top.length >= 3) _seat(2) else const SizedBox(width: 80),
         ],
       ),
     );
@@ -239,8 +281,9 @@ class _PodiumStyle {
 class _PodiumSeat extends StatelessWidget {
   final RankingEntry entry;
   final int rank;
+  final LeagueZone? zone;
 
-  const _PodiumSeat({required this.entry, required this.rank});
+  const _PodiumSeat({required this.entry, required this.rank, this.zone});
 
   @override
   Widget build(BuildContext context) {
@@ -311,7 +354,38 @@ class _PodiumSeat extends StatelessWidget {
           ),
         const SizedBox(height: 2),
         _PointsBadge(points: entry.points, small: true),
+        if (zone == LeagueZone.promotion) ...[
+          const SizedBox(height: 4),
+          _ZoneChip(label: l10n.rankingZonePromotionChip, color: kPromotionZoneColor),
+        ] else if (zone == LeagueZone.demotion) ...[
+          const SizedBox(height: 4),
+          _ZoneChip(label: l10n.rankingZoneDemotionChip, color: kDemotionZoneColor),
+        ],
       ],
+    );
+  }
+}
+
+/// Podyum koltuğunun altındaki terfi/düşme etiketi.
+class _ZoneChip extends StatelessWidget {
+  final String label;
+  final Color color;
+
+  const _ZoneChip({required this.label, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withValues(alpha: 0.5)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: color),
+      ),
     );
   }
 }

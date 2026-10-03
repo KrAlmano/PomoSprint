@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro/models/avatar_model.dart';
 import 'package:pomodoro/models/study_session.dart';
 import 'package:pomodoro/models/user_model.dart';
+import 'package:pomodoro/utils/study_day.dart' show kDefaultStudyTimeZone;
 
 void main() {
   group('UserModel', () {
@@ -22,6 +23,7 @@ void main() {
       dailyGoalMinutes: 120,
       birthYear: 2001,
       onboardingCompletedAt: DateTime.utc(2026, 9, 1, 10, 30).toLocal(),
+      timezone: 'Europe/Istanbul',
     );
 
     test('toMap/fromMap gidiş-dönüşü tüm alanları korur (saved_user)', () {
@@ -34,6 +36,13 @@ void main() {
       expect(copy.unlockedAvatars, full.unlockedAvatars);
       expect(copy.dailyGoalMinutes, 120);
       expect(copy.onboardingCompletedAt, full.onboardingCompletedAt);
+      expect(copy.timezone, 'Europe/Istanbul');
+    });
+
+    test('profil saat dilimi okunur; yoksa sunucu varsayılanı', () {
+      expect(UserModel.fromMap({'name': 'x', 'email': 'y', 'timezone': 'Europe/Berlin'}).timezone, 'Europe/Berlin');
+      expect(UserModel.fromMap({'name': 'x', 'email': 'y'}).timezone, kDefaultStudyTimeZone);
+      expect(UserModel.fromMap({'name': 'x', 'email': 'y', 'timezone': ''}).timezone, kDefaultStudyTimeZone);
     });
 
     test('toMap seri ve son çalışma gününü yazar', () {
@@ -64,12 +73,14 @@ void main() {
       expect(full.unlockedAvatars, isNot(contains('avatar_1_gamer')));
     });
 
-    test('gösterilen seri sunucu kuralına göre normalize edilir', () {
-      // Son çalışma günü 2 Ekim.
-      expect(full.streakOn(DateTime(2026, 10, 2, 22)), 7, reason: 'aynı gün');
-      expect(full.streakOn(DateTime(2026, 10, 3, 15)), 7, reason: 'ertesi gün: seri sürüyor');
-      expect(full.streakOn(DateTime(2026, 10, 4, 3, 59)), 7, reason: '04:00 öncesi hâlâ 3 Ekim çalışma günü');
-      expect(full.streakOn(DateTime(2026, 10, 4, 4, 0)), 0, reason: '4 Ekim çalışma günü: seri kırıldı');
+    test('gösterilen seri sunucu kuralına (profil dilimi) göre normalize edilir', () {
+      // Son çalışma günü 2 Ekim; anlar UTC (İstanbul = UTC+3).
+      expect(full.streakOn(DateTime.utc(2026, 10, 2, 19)), 7, reason: 'aynı gün (22:00)');
+      expect(full.streakOn(DateTime.utc(2026, 10, 3, 12)), 7, reason: 'ertesi gün: seri sürüyor');
+      expect(full.streakOn(DateTime.utc(2026, 10, 4, 0, 59)), 7, reason: '03:59: hâlâ 3 Ekim çalışma günü');
+      expect(full.streakOn(DateTime.utc(2026, 10, 4, 1)), 0, reason: '04:00: 4 Ekim çalışma günü, seri kırıldı');
+      // Aynı an New York profilinde hâlâ 3 Ekim akşamı: seri sürüyor.
+      expect(full.copyWith(timezone: 'America/New_York').streakOn(DateTime.utc(2026, 10, 4, 1)), 7);
     });
   });
 

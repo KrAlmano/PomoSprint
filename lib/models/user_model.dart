@@ -29,6 +29,11 @@ class UserModel {
   final int? birthYear;
   final DateTime? onboardingCompletedAt;
 
+  /// Profilin saat dilimi (profiles.timezone, IANA adı). Sunucu çalışma
+  /// gününü (04:00 sınırı), seriyi ve günlük seans tavanını bu dilimde
+  /// hesaplar; istemci de aynısını kullanır (bkz. study_day.dart).
+  final String timezone;
+
   UserModel({
     this.id,
     required this.name,
@@ -46,16 +51,18 @@ class UserModel {
     this.dailyGoalMinutes,
     this.birthYear,
     this.onboardingCompletedAt,
+    this.timezone = kDefaultStudyTimeZone,
   }) : unlockedAvatars = List.unmodifiable(unlockedAvatars);
 
   /// Ekranda gösterilecek (normalize edilmiş) seri: son çalışma günü bugün
-  /// ya da dün değilse 0. Kural tek yerde: [effectiveStreak].
+  /// ya da dün (profil diliminde) değilse 0. Kural tek yerde: [effectiveStreak].
   int get streakDays => streakOn(DateTime.now());
 
   int streakOn(DateTime now) => effectiveStreak(
         storedStreak: currentStreak,
         lastStudyDate: lastStudyDate,
         now: now,
+        timeZone: timezone,
       );
 
   /// [fromMap] ile birebir simetrik. 'saved_user' önbelleği bu biçimde
@@ -78,6 +85,7 @@ class UserModel {
       'daily_goal_minutes': dailyGoalMinutes,
       'birth_year': birthYear,
       'onboarding_completed_at': onboardingCompletedAt?.toUtc().toIso8601String(),
+      'timezone': timezone,
     };
   }
 
@@ -115,6 +123,7 @@ class UserModel {
       dailyGoalMinutes: _parseInt(map['daily_goal_minutes']),
       birthYear: _parseInt(map['birth_year']),
       onboardingCompletedAt: onboardingRaw == null ? null : DateTime.tryParse(onboardingRaw)?.toLocal(),
+      timezone: _nonEmpty(map['timezone']) ?? kDefaultStudyTimeZone,
     );
   }
 
@@ -135,6 +144,7 @@ class UserModel {
     int? dailyGoalMinutes,
     int? birthYear,
     DateTime? onboardingCompletedAt,
+    String? timezone,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -153,6 +163,7 @@ class UserModel {
       dailyGoalMinutes: dailyGoalMinutes ?? this.dailyGoalMinutes,
       birthYear: birthYear ?? this.birthYear,
       onboardingCompletedAt: onboardingCompletedAt ?? this.onboardingCompletedAt,
+      timezone: timezone ?? this.timezone,
     );
   }
 }

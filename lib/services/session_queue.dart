@@ -479,6 +479,15 @@ class SessionSyncReport {
   /// Tur erken durduysa nedeni (ör. 'network').
   final String? stopReason;
 
+  /// Kuyrukta, kendiliğinden yeniden denemeye değer (ağ, zaman aşımı,
+  /// sunucu ya da oturum hatası gibi geçici bir nedenle bekleyen) seans
+  /// kaldı mı? Yalnızca çakışma ('overlap') nedeniyle bekleyenler için
+  /// false: onlar tekrar gönderilince yine çakışır.
+  bool get hasRetryableFailure =>
+      remaining > 0 &&
+      (stopReason != null ||
+          outcomes.values.any((o) => o is SessionSubmitQueued && o.reasonCode != SessionReason.overlap));
+
   SessionSyncReport _merge(SessionSyncReport later) => SessionSyncReport(
         sent: sent + later.sent,
         rejected: rejected + later.rejected,
@@ -684,104 +693,134 @@ class SessionQueue {
           }
         }
 
-        // 2) started_at sırasıyla gönder.
-        sendLoop:
-        for (final entry in entries) {
-          if (backend.signedInUserId != userId) {
-            stopReason = SessionReason.offline;
-            break;
-          }
-          final isForeground = entry.clientUuid == foregroundUuid;
-          final entryOffset = entry.clockOffsetMs != null ? Duration(milliseconds: entry.clockOffsetMs!) : null;
-
-          if (_serverAge(entry, entryOffset) > giveUpAge) {
-            await _reject(userId, entry, SessionReason.tooOld, notify: !isForeground);
-            rejected++;
-            outcomes[entry.clientUuid] = const SessionSubmitRejected(SessionReason.tooOld);
-            continue;
-          }
-
-          final categoryId = isUuidCategoryId(entry.categoryId) ? entry.categoryId! : resolved[entry.clientUuid];
-          if (categoryId == null) {
-            // Kategori eşlenemedi (çoğunlukla ağ yok). Sıra bozulmasın diye tur durur.
-            final reason = categoryFailure?.reasonCode ?? SessionReason.categoryInvalid;
-            outcomes[entry.clientUuid] = SessionSubmitQueued(reasonCode: reason, pendingCount: 0);
-            stopReason = reason;
-            break;
-          }
-
-          SessionSubmitSuccess? success;
-          SessionFailure? failure;
-          // Saat farkı bu denemede ilk kez öğrenildiyse bir kez düzeltilmiş
-          // started_at ile yeniden denenir.
-          for (var attempt = 0; attempt < 2; attempt++) {
-            final correction = ServerClock.correctionFor(entryOffset ?? clock.offset);
+        // 2) Saat farkı bilinmeden kuyruğa girmiş seanslar, fark öğrenilmeden
+        // gönderilmez. Farksız (cihaz saatiyle) giden bir seans sunucuya
+        // kaydırılmış aralıkla yazılır; fark o yanıttan öğrenilince sıradaki
+        // seans düzeltilmiş saatle gider ve öncekiyle çakışır ('overlap').
+        // Ucuz bir istek (kategoriler) yanıtının 'date' başlığıyla farkı
+        // öğretir. İstek başarısızsa tur durur; hiçbir seans gönderilmez.
+        // (İstek başarılı olup başlık yine de okunamadıysa düzeltmesiz
+        // gönderilir: başka bir yol yok.)
+        if (clock.offset == null && entries.any((e) => e.clockOffsetMs == null)) {
+          if (categoryFailure != null) {
+            stopReason = categoryFailure.reasonCode;
+          } else {
             try {
-              final response = await backend
-                  .completeSession(entry, categoryId: categoryId, startedAtForServer: entry.startedAt.add(correction))
-                  .timeout(rpcTimeout);
-              failure = classifySessionResponse(response);
-              if (failure == null) success = SessionSubmitSuccess.fromResponse(response, minutes: entry.minutes);
+              await backend.fetchCategories().timeout(rpcTimeout);
             } catch (e) {
-              failure = classifySessionError(
-                e,
-                // Kuyruğa yazılırken fark biliniyorsa o fark esas alınır.
-                offsetNow: entryOffset ?? clock.offset,
-                appliedCorrection: correction,
-              );
-              debugPrint('[QUEUE] Seans gönderilemedi (${failure.kind.name}/${failure.reasonCode}): $e');
+              stopReason = classifySessionError(e).reasonCode;
+              debugPrint('[QUEUE] Saat farkı öğrenilemedi, seanslar bekleyecek: $e');
             }
-            final retryWithNewClock = failure?.kind == SessionFailureKind.clockSkew &&
-                entryOffset == null &&
-                ServerClock.correctionFor(clock.offset) != correction;
-            if (!retryWithNewClock) break;
           }
+        }
 
-          if (success != null) {
-            await _storageLock.synchronized(() => _remove(queueKey(userId), entry.clientUuid));
-            sent++;
-            outcomes[entry.clientUuid] = success;
-            onAccepted?.call(userId, entry, success);
-            continue;
-          }
+        // Fark kaydı olmayan seansların hepsi bu turda AYNI farkla düzeltilir
+        // (yanıtlarla gelen her yeni ölçüm araya girmez).
+        var passOffset = clock.offset;
 
-          final f = failure!;
-          switch (f.kind) {
-            case SessionFailureKind.permanent:
-              await _reject(userId, entry, f.reasonCode, notify: !isForeground);
+        // 3) started_at sırasıyla gönder.
+        if (stopReason == null) {
+          sendLoop:
+          for (final entry in entries) {
+            if (backend.signedInUserId != userId) {
+              stopReason = SessionReason.offline;
+              break;
+            }
+            final isForeground = entry.clientUuid == foregroundUuid;
+            final entryOffset = entry.clockOffsetMs != null ? Duration(milliseconds: entry.clockOffsetMs!) : null;
+
+            if (_serverAge(entry, entryOffset) > giveUpAge) {
+              await _reject(userId, entry, SessionReason.tooOld, notify: !isForeground);
               rejected++;
-              outcomes[entry.clientUuid] = SessionSubmitRejected(f.reasonCode);
-            case SessionFailureKind.overlap:
-              if (_serverAge(entry, entryOffset) >= serverMaxAge) {
-                await _reject(userId, entry, SessionReason.overlap, notify: !isForeground);
+              outcomes[entry.clientUuid] = const SessionSubmitRejected(SessionReason.tooOld);
+              continue;
+            }
+
+            final categoryId = isUuidCategoryId(entry.categoryId) ? entry.categoryId! : resolved[entry.clientUuid];
+            if (categoryId == null) {
+              // Kategori eşlenemedi (çoğunlukla ağ yok). Sıra bozulmasın diye tur durur.
+              final reason = categoryFailure?.reasonCode ?? SessionReason.categoryInvalid;
+              outcomes[entry.clientUuid] = SessionSubmitQueued(reasonCode: reason, pendingCount: 0);
+              stopReason = reason;
+              break;
+            }
+
+            SessionSubmitSuccess? success;
+            SessionFailure? failure;
+            // Saat farkı bu denemede ilk kez öğrenildiyse bir kez düzeltilmiş
+            // started_at ile yeniden denenir.
+            for (var attempt = 0; attempt < 2; attempt++) {
+              final correction = ServerClock.correctionFor(entryOffset ?? passOffset);
+              try {
+                final response = await backend
+                    .completeSession(entry, categoryId: categoryId, startedAtForServer: entry.startedAt.add(correction))
+                    .timeout(rpcTimeout);
+                failure = classifySessionResponse(response);
+                if (failure == null) success = SessionSubmitSuccess.fromResponse(response, minutes: entry.minutes);
+              } catch (e) {
+                failure = classifySessionError(
+                  e,
+                  // Kuyruğa yazılırken fark biliniyorsa o fark esas alınır.
+                  offsetNow: entryOffset ?? clock.offset,
+                  appliedCorrection: correction,
+                );
+                debugPrint('[QUEUE] Seans gönderilemedi (${failure.kind.name}/${failure.reasonCode}): $e');
+              }
+              final retryWithNewClock = failure?.kind == SessionFailureKind.clockSkew &&
+                  entryOffset == null &&
+                  ServerClock.correctionFor(clock.offset) != correction;
+              if (!retryWithNewClock) break;
+              // Fark bu turda değişti (ör. cihaz saati ayarlandı): sonraki
+              // kayıtlar da yeni farkla, tutarlı gönderilir.
+              passOffset = clock.offset;
+            }
+
+            if (success != null) {
+              await _storageLock.synchronized(() => _remove(queueKey(userId), entry.clientUuid));
+              sent++;
+              outcomes[entry.clientUuid] = success;
+              onAccepted?.call(userId, entry, success);
+              continue;
+            }
+
+            final f = failure!;
+            switch (f.kind) {
+              case SessionFailureKind.permanent:
+                await _reject(userId, entry, f.reasonCode, notify: !isForeground);
                 rejected++;
-                outcomes[entry.clientUuid] = const SessionSubmitRejected(SessionReason.overlap);
-              } else {
+                outcomes[entry.clientUuid] = SessionSubmitRejected(f.reasonCode);
+              case SessionFailureKind.overlap:
+                if (_serverAge(entry, entryOffset) >= serverMaxAge) {
+                  await _reject(userId, entry, SessionReason.overlap, notify: !isForeground);
+                  rejected++;
+                  outcomes[entry.clientUuid] = const SessionSubmitRejected(SessionReason.overlap);
+                } else {
+                  await _keep(userId, entry.copyWith(lastError: f.reasonCode));
+                  outcomes[entry.clientUuid] = SessionSubmitQueued(reasonCode: f.reasonCode, pendingCount: 0);
+                }
+              case SessionFailureKind.categoryInvalid:
+                if (entry.categoryRemaps >= 1) {
+                  await _reject(userId, entry, SessionReason.categoryInvalid, notify: !isForeground);
+                  rejected++;
+                  outcomes[entry.clientUuid] = const SessionSubmitRejected(SessionReason.categoryInvalid);
+                } else {
+                  await _keep(
+                    userId,
+                    entry.copyWith(clearCategoryId: true, categoryRemaps: entry.categoryRemaps + 1, lastError: f.reasonCode),
+                  );
+                  remapRequested = true;
+                  outcomes[entry.clientUuid] = SessionSubmitQueued(reasonCode: f.reasonCode, pendingCount: 0);
+                }
+              case SessionFailureKind.offline:
                 await _keep(userId, entry.copyWith(lastError: f.reasonCode));
                 outcomes[entry.clientUuid] = SessionSubmitQueued(reasonCode: f.reasonCode, pendingCount: 0);
-              }
-            case SessionFailureKind.categoryInvalid:
-              if (entry.categoryRemaps >= 1) {
-                await _reject(userId, entry, SessionReason.categoryInvalid, notify: !isForeground);
-                rejected++;
-                outcomes[entry.clientUuid] = const SessionSubmitRejected(SessionReason.categoryInvalid);
-              } else {
-                await _keep(
-                  userId,
-                  entry.copyWith(clearCategoryId: true, categoryRemaps: entry.categoryRemaps + 1, lastError: f.reasonCode),
-                );
-                remapRequested = true;
+                stopReason = f.reasonCode;
+                break sendLoop;
+              case SessionFailureKind.transient:
+              case SessionFailureKind.clockSkew:
+                await _keep(userId, entry.copyWith(lastError: f.reasonCode));
                 outcomes[entry.clientUuid] = SessionSubmitQueued(reasonCode: f.reasonCode, pendingCount: 0);
-              }
-            case SessionFailureKind.offline:
-              await _keep(userId, entry.copyWith(lastError: f.reasonCode));
-              outcomes[entry.clientUuid] = SessionSubmitQueued(reasonCode: f.reasonCode, pendingCount: 0);
-              stopReason = f.reasonCode;
-              break sendLoop;
-            case SessionFailureKind.transient:
-            case SessionFailureKind.clockSkew:
-              await _keep(userId, entry.copyWith(lastError: f.reasonCode));
-              outcomes[entry.clientUuid] = SessionSubmitQueued(reasonCode: f.reasonCode, pendingCount: 0);
+            }
           }
         }
       }

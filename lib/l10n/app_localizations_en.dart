@@ -219,8 +219,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String leagueInfoCoins(String coins) {
-    return '🪙 Sand grains: You earn $coins sand grains from every completed pomodoro. Spend them to unlock new hourglass characters in your collection.';
+  String leagueInfoCoins(String coins, String limit) {
+    return '🪙 Sand grains: You earn $coins sand grains from every completed session (up to $limit sessions a day). Spend them to unlock new hourglass characters in your collection.';
   }
 
   @override
@@ -269,7 +269,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String leagueInfoDailyLimitBody(String limit) {
-    return 'Up to $limit pomodoros per day count toward league points. Anything beyond that keeps adding to your personal stats and streak, but won\'t affect the league ranking.';
+    return 'Up to $limit sessions a day earn points and sand (league points, monthly ranking, total points). Sessions after that only add to your study time and streak.';
   }
 
   @override
@@ -277,7 +277,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String leagueInfoFaqLimit(String limit) {
-    return 'You may have hit the daily $limit-pomodoro limit.';
+    return 'You may have hit the daily $limit-session limit.';
   }
 
   @override
@@ -448,8 +448,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get sessionDailyLimitReached =>
-      'You have reached today\'s league points limit (16 pomodoros). Your work continues to be saved.';
+  String sessionDailyLimitReached(int limit) {
+    return 'You\'ve reached today\'s points and sand limit ($limit sessions). Further sessions only add to your study time and streak.';
+  }
 
   @override
   String get sessionQueuedOffline =>
@@ -859,14 +860,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get leagueAwardsSub =>
-      'Earned by finishing 1st, 2nd, or 3rd in a league period.';
+      'Earned by finishing a league period in the top 3 with points: 1st gets the Champion Award, 2nd and 3rd get the Podium Award.';
 
   @override
   String get leagueAwardLockedTitle => 'This Avatar Is Locked';
 
   @override
   String get leagueAwardLockedBody =>
-      'To earn this avatar, you need to finish 1st, 2nd, or 3rd in this tier during a league period. It can\'t be purchased.';
+      'To earn this avatar, finish a league period in this tier in the top 3 with points. It can\'t be purchased.';
+
+  @override
+  String get leagueAwardLockedBodyChampion =>
+      'To earn this Champion Award, finish a league period in this tier in 1st place with points. It can\'t be purchased.';
+
+  @override
+  String get leagueAwardLockedBodyPodium =>
+      'To earn this Podium Award, finish a league period in this tier in 2nd or 3rd place with points (1st place gets the Champion Award). It can\'t be purchased.';
 
   @override
   String get leagueAwardLockedOk => 'Got It';
@@ -1356,4 +1365,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unarchiveTooltip => 'Unarchive';
+
+  @override
+  String get timerResetBtn => 'Reset';
+
+  @override
+  String get timerResetConfirmTitle => 'Reset this session?';
+
+  @override
+  String get timerResetConfirmBody =>
+      'This session will be discarded without being saved, and you won\'t earn points or sand. This can\'t be undone.';
+
+  @override
+  String get timerResetConfirmAction => 'Reset';
+
+  @override
+  String get timerDurationLocked =>
+      'Reset the session first to change its length.';
+
+  @override
+  String get rankingZonePromotionChip => '↑ Promotion';
+
+  @override
+  String get rankingZoneDemotionChip => '↓ Demotion';
+
+  @override
+  String get rankingZonePromotionMe =>
+      'You\'re in the promotion zone: if the period ends like this, you move up a league.';
+
+  @override
+  String get rankingZoneNeedsPointsMe =>
+      'You\'re in the promotion zone, but you can\'t move up with 0 points. Complete a session.';
+
+  @override
+  String get rankingZoneDemotionMe =>
+      'You\'re in the demotion zone: if the period ends like this, you move down a league.';
 }

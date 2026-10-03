@@ -18,9 +18,17 @@ class ServerClock {
   final DateTime Function() _now;
   Duration? _offset;
 
-  /// Bu eşiğin altındaki farklar ölçüm gürültüsü sayılır (başlık saniye
-  /// çözünürlüklü, ağ gecikmesi var); düzeltme uygulanmaz.
+  /// Sunucunun "bitmedi / gelecekte" hatası ancak düzeltilmemiş fark bu
+  /// eşikten büyükse saat sapmasıyla açıklanır (bkz. classifySessionError).
+  /// Düzeltmenin kendisi eşiksizdir: [correctionFor].
   static const Duration significantSkew = Duration(seconds: 60);
+
+  /// Yeni ölçüm eskisinden bu kadar az farklıysa eski değer korunur. Başlık
+  /// saniye çözünürlüklü ve ağ gecikmesi değişken olduğu için her yanıtta
+  /// fark ±1 sn oynar; sabit tutulan fark, art arda gelen seansların aynı
+  /// düzeltmeyle gönderilmesini sağlar (aksi halde aralarında çakışma
+  /// oluşabilir).
+  static const Duration noiseBand = Duration(seconds: 2);
 
   // Gidiş-dönüşü bundan uzun süren ölçümler güvenilmez sayılır.
   static const Duration _maxRoundTrip = Duration(seconds: 10);
@@ -29,9 +37,10 @@ class ServerClock {
   Duration? get offset => _offset;
 
   /// Bir anı cihaz saatinden sunucu saatine çevirmek için uygulanacak
-  /// düzeltme. Fark bilinmiyorsa ya da anlamlı değilse sıfır.
-  static Duration correctionFor(Duration? offset) =>
-      (offset == null || offset.abs() < significantSkew) ? Duration.zero : offset;
+  /// düzeltme. Fark biliniyorsa EŞİKSİZ uygulanır (eşik, ölçümü eşiğin iki
+  /// yanına düşen seanslara tutarsız düzeltme verip çakışma yaratıyordu);
+  /// bilinmiyorsa sıfır.
+  static Duration correctionFor(Duration? offset) => offset ?? Duration.zero;
 
   /// Sunucu saatine göre şimdiki an (fark bilinmiyorsa cihaz saati).
   DateTime serverNow() => _now().add(_offset ?? Duration.zero);
@@ -45,7 +54,10 @@ class ServerClock {
     if (roundTrip.isNegative || roundTrip > _maxRoundTrip) return;
     final localMid = sentAt.add(roundTrip ~/ 2);
     // 'date' başlığı saniyeye aşağı yuvarlanır; ortalama hatayı +500 ms dengeler.
-    _offset = serverTime.add(const Duration(milliseconds: 500)).difference(localMid);
+    final measured = serverTime.add(const Duration(milliseconds: 500)).difference(localMid);
+    final current = _offset;
+    if (current != null && (measured - current).abs() < noiseBand) return;
+    _offset = measured;
   }
 
   void recordDateHeader(String? header, {required DateTime sentAt, required DateTime receivedAt}) {

@@ -30,7 +30,8 @@ class NotificationService {
   Future<void> initialize() => _initialization ??= _initialize();
 
   Future<void> _initialize() async {
-    tz.initializeTimeZones();
+    // Veri study_day.dart tarafından zaten yüklenmiş olabilir.
+    if (!tz.timeZoneDatabase.isInitialized) tz.initializeTimeZones();
     const darwin = DarwinInitializationSettings(
       requestAlertPermission: false,
       requestBadgePermission: false,

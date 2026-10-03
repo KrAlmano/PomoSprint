@@ -305,19 +305,25 @@ class _RankingScreenState extends State<RankingScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final myIndex = entries.indexWhere((e) => e.isMe);
 
-    Color? zoneColor(RankingEntry entry, int rank) {
-      if (league == null) return null;
-      if (league.isPromotionRank(rank, entry.points)) return Colors.green.withValues(alpha: 0.15);
-      if (league.isDemotionRank(rank)) return Colors.red.withValues(alpha: 0.15);
-      return null;
-    }
+    // Terfi/düşme bölgesi podyum dahil her sıra için aynı kuralla gösterilir.
+    LeagueZone zoneOf(RankingEntry entry, int rank) => league?.zoneOf(rank, entry.points) ?? LeagueZone.none;
+
+    Color? zoneColor(RankingEntry entry, int rank) => switch (zoneOf(entry, rank)) {
+          LeagueZone.promotion => Colors.green.withValues(alpha: 0.15),
+          LeagueZone.demotion => Colors.red.withValues(alpha: 0.15),
+          _ => null,
+        };
 
     return [
       if (myIndex != -1) ...[
-        MyRankCard(rank: myIndex + 1, points: entries[myIndex].points),
+        MyRankCard(
+          rank: myIndex + 1,
+          points: entries[myIndex].points,
+          zone: league == null ? null : zoneOf(entries[myIndex], myIndex + 1),
+        ),
         const SizedBox(height: 12),
       ],
-      RankingPodium(top: entries.take(3).toList()),
+      RankingPodium(top: entries.take(3).toList(), zoneOf: league == null ? null : zoneOf),
       const SizedBox(height: 20),
       if (entries.length > 3)
         Container(

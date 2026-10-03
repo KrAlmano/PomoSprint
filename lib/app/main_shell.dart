@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
@@ -45,7 +46,21 @@ class MainNavigationShell extends StatefulWidget {
   State<MainNavigationShell> createState() => _MainNavigationShellState();
 }
 
-class _MainNavigationShellState extends State<MainNavigationShell> {
+class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsBindingObserver {
+  // Kuyrukta geçici bir nedenle (ağ, zaman aşımı, sunucu, oturum) kalan
+  // seanslar, uygulama ön plandayken artan aralıklarla yeniden denenir.
+  // Bağlantı türü değişmeden ağ düzelirse ya da ilk istek ölü sokete
+  // denk gelirse bağlantı olayı gelmez; bu zamanlayıcı olmadan seans
+  // 24 saati aşıp kaybolabiliyordu.
+  static const List<Duration> _syncRetryDelays = [
+    Duration(seconds: 30),
+    Duration(minutes: 1),
+    Duration(minutes: 2),
+    Duration(minutes: 4),
+    Duration(minutes: 8),
+    Duration(minutes: 15),
+  ];
+
   final SupabaseService _service = SupabaseService.instance;
   int _currentIndex = 0;
   late List<CourseCategory> _categories;
@@ -55,6 +70,8 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
 
   StreamSubscription<AuthState>? _authSubscription;
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
+  Timer? _syncRetryTimer;
+  int _syncRetryAttempt = 0;
 
   UserModel get _user => widget.user;
 
@@ -65,6 +82,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
   void initState() {
     super.initState();
     _categories = List.of(widget.initialCategories);
+    WidgetsBinding.instance.addObserver(this);
     // Kategori ekleme/düzenleme/arşiv/sıralama sonrası liste yeniden yüklenir.
     _service.categoriesRevision.addListener(_loadCategories);
     _listenAuthChanges();
@@ -72,14 +90,37 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     // Açılışta bulut erişilemediyse yer tutucu kategorilerle başlamış olabiliriz.
     if (_needsCategoryReload) unawaited(_loadCategories());
     unawaited(_syncPendingSessions());
+    // Günlük sınır metni (seans sonucu) için puan kuralları önceden okunur.
+    unawaited(_service.getPointsConfig());
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _service.categoriesRevision.removeListener(_loadCategories);
     _authSubscription?.cancel();
     _connectivitySubscription?.cancel();
+    _cancelSyncRetry();
     super.dispose();
+  }
+
+  static bool get _isInForeground {
+    final state = WidgetsBinding.instance.lifecycleState;
+    return state == null || state == AppLifecycleState.resumed || state == AppLifecycleState.inactive;
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        // Ön plana dönüş: askıdayken kaçan bağlantı olayı yerine bekleyenler denenir.
+        _syncRetryAttempt = 0;
+        if (_service.pendingSessionCount.value > 0) unawaited(_syncPendingSessions());
+      case AppLifecycleState.paused || AppLifecycleState.hidden || AppLifecycleState.detached:
+        _cancelSyncRetry();
+      case AppLifecycleState.inactive:
+        break;
+    }
   }
 
   void _listenAuthChanges() {
@@ -95,6 +136,8 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
         if (isNewSignIn || data.event == AuthChangeEvent.tokenRefreshed) {
           unawaited(_refreshUser());
           unawaited(_loadCategories());
+          // Süresi dolmuş oturum yüzünden ('auth') bekleyen seanslar artık gönderilebilir.
+          if (_service.pendingSessionCount.value > 0) unawaited(_syncPendingSessions());
         }
       },
       onError: (Object e) => debugPrint('[AUTH] onAuthStateChange hatası: $e'),
@@ -121,6 +164,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     _wasOffline = offline;
     if (offline) return;
     if (_needsCategoryReload) unawaited(_loadCategories());
+    if (cameOnline) _syncRetryAttempt = 0;
     unawaited(_syncPendingSessions());
     if (cameOnline) {
       unawaited(_refreshUser());
@@ -141,15 +185,41 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
 
   Future<void> _syncPendingSessions() async {
     if (!_service.isCloudActive) return;
+    _cancelSyncRetry();
+    var retry = false;
     try {
       final before = await _service.getPendingSessionCount();
-      final remaining = await _service.syncPendingSessions();
+      final result = await _service.syncPendingSessions();
+      // İlerleme olduysa (ya da kuyruk boşaldıysa) bekleme aralığı baştan başlar.
+      if (result.remaining < before || result.remaining == 0) _syncRetryAttempt = 0;
       // Gönderilen seansların puan/kum/dakika etkisi sunucudan taze okunur.
-      if (remaining < before) await _refreshUser();
+      if (result.remaining < before) await _refreshUser();
+      retry = result.retryable;
     } catch (e) {
       debugPrint('[SHELL] Bekleyen seanslar gönderilemedi: $e');
+      retry = _service.pendingSessionCount.value > 0;
     }
+    if (retry) _scheduleSyncRetry();
     await _showRejectedNotices();
+  }
+
+  /// Bekleyen seanslar için bir sonraki denemeyi kurar (30 sn → 1 dk → 2 dk
+  /// … en fazla 15 dk). Yalnızca ön plandayken; arka plana geçince iptal
+  /// edilir, ön plana dönüşte hemen denenir.
+  void _scheduleSyncRetry() {
+    if (!mounted || !_isInForeground) return;
+    _syncRetryTimer?.cancel();
+    final delay = _syncRetryDelays[math.min(_syncRetryAttempt, _syncRetryDelays.length - 1)];
+    _syncRetryAttempt++;
+    _syncRetryTimer = Timer(delay, () {
+      _syncRetryTimer = null;
+      if (mounted && _isInForeground) unawaited(_syncPendingSessions());
+    });
+  }
+
+  void _cancelSyncRetry() {
+    _syncRetryTimer?.cancel();
+    _syncRetryTimer = null;
   }
 
   Future<void> _showRejectedNotices() async {
@@ -211,6 +281,9 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     );
     if (!mounted) return;
     showSessionResult(context, result);
+    // Ağ/sunucu yüzünden kuyrukta kaldıysa kendiliğinden yeniden denenir
+    // (yalnızca çakışma nedeniyle bekleyen seans için anlamsız).
+    if (result is SessionSubmitQueued && result.reasonCode != SessionReason.overlap) _scheduleSyncRetry();
     await _showRejectedNotices();
   }
 

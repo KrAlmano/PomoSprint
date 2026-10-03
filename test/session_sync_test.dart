@@ -265,4 +265,55 @@ void main() {
       expect(categoryLimitFor(isPremium: true), kPremiumCategoryLimit);
     });
   });
+
+  group('providerFirstNameUpdate (Google/Apple ilk ad)', () {
+    String? update({
+      required String current,
+      String? email = 'q8x7zz2bnd@privaterelay.appleid.com',
+      String provider = 'apple',
+      Map<String, dynamic> metadata = const {},
+      bool onboardingCompleted = false,
+      String? givenName,
+    }) =>
+        SupabaseService.providerFirstNameUpdate(
+          currentName: current,
+          email: email,
+          provider: provider,
+          metadata: metadata,
+          onboardingCompleted: onboardingCompleted,
+          givenName: givenName,
+        );
+
+    test("Apple: trigger'ın yazdığı gizli röle adı, Apple'ın verdiği ilk adla değişir", () {
+      expect(update(current: 'q8x7zz2bnd', givenName: 'Ayşe'), 'Ayşe');
+      // Onboarding bitmiş olsa bile ad hâlâ e-posta yerel kısmıysa düzeltilir.
+      expect(update(current: 'q8x7zz2bnd', givenName: 'Ayşe', onboardingCompleted: true), 'Ayşe');
+    });
+
+    test('Apple ad vermediyse (sonraki girişler) dokunulmaz', () {
+      expect(update(current: 'q8x7zz2bnd'), isNull);
+    });
+
+    test('Google: onboarding bitmeden tam ad ilk ada iner', () {
+      const meta = {'full_name': 'Ahmet Yılmaz', 'name': 'Ahmet Yılmaz'};
+      expect(update(current: 'Ahmet Yılmaz', email: 'ahmet@gmail.com', provider: 'google', metadata: meta), 'Ahmet');
+      expect(
+        update(current: 'Ahmet Yılmaz', email: 'ahmet@gmail.com', provider: 'google', metadata: meta, onboardingCompleted: true),
+        isNull,
+        reason: 'onboarding sonrası (kullanıcı tam adı kendisi seçmiş olabilir) dokunulmaz',
+      );
+    });
+
+    test('kullanıcının kendi seçtiği ada dokunulmaz', () {
+      expect(update(current: 'Kaptan', givenName: 'Ayşe'), isNull);
+      expect(
+        update(current: 'Mehmet', email: 'm@gmail.com', provider: 'google', metadata: const {'full_name': 'Ahmet Yılmaz'}),
+        isNull,
+      );
+    });
+
+    test('tek harfli ilk ad yazılmaz (sunucu/uygulama alt sınırı)', () {
+      expect(update(current: 'q8x7zz2bnd', givenName: 'J'), isNull);
+    });
+  });
 }

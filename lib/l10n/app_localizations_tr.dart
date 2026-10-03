@@ -218,8 +218,8 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
-  String leagueInfoCoins(String coins) {
-    return '🪙 Kum tanesi: Tamamladığın her pomodorodan $coins kum tanesi kazanırsın. Karakter koleksiyonundan yeni kum saatleri açmak için kullanılır.';
+  String leagueInfoCoins(String coins, String limit) {
+    return '🪙 Kum tanesi: Tamamladığın her seanstan (günde $limit seansa kadar) $coins kum tanesi kazanırsın. Karakter koleksiyonundan yeni kum saatleri açmak için kullanılır.';
   }
 
   @override
@@ -265,7 +265,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String leagueInfoDailyLimitBody(String limit) {
-    return 'Günde en fazla $limit pomodoro lig puanına sayılır. Üstü kişisel istatistiklerine ve serine eklenmeye devam eder ama lig sıralamasını etkilemez.';
+    return 'Günde en fazla $limit seans puan ve kum kazandırır (lig puanı, aylık sıralama, toplam puan). Sonraki seanslar yalnızca çalışma süresine ve serine eklenir.';
   }
 
   @override
@@ -273,7 +273,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String leagueInfoFaqLimit(String limit) {
-    return 'Günlük $limit pomodoro sınırına ulaşmış olabilirsin.';
+    return 'Günlük $limit seans sınırına ulaşmış olabilirsin.';
   }
 
   @override
@@ -441,8 +441,9 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
-  String get sessionDailyLimitReached =>
-      'Bugünlük lig puanı sınırına ulaştın (16 pomodoro). Çalışman kaydedilmeye devam ediyor.';
+  String sessionDailyLimitReached(int limit) {
+    return 'Bugünlük puan ve kum sınırına ulaştın ($limit seans). Sonraki seanslar yalnızca çalışma süresine ve serine eklenir.';
+  }
 
   @override
   String get sessionQueuedOffline =>
@@ -835,14 +836,22 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get leagueAwardsSub =>
-      'Bir lig döneminde 1., 2. veya 3. olarak bitirerek kazanılır.';
+      'Bir lig dönemini puan toplayarak ilk 3\'te bitirince kazanılır: 1.\'ye Şampiyonluk, 2. ve 3.\'ye Podyum Ödülü.';
 
   @override
   String get leagueAwardLockedTitle => 'Bu Avatar Kilitli';
 
   @override
   String get leagueAwardLockedBody =>
-      'Bu avatarı kazanmak için bir lig döneminde bu kademede 1., 2. veya 3. sırayla bitirmen gerekiyor. Parayla satın alınamaz.';
+      'Bu avatarı kazanmak için bu kademede bir lig dönemini puan toplayarak ilk 3\'te bitirmen gerekiyor. Parayla satın alınamaz.';
+
+  @override
+  String get leagueAwardLockedBodyChampion =>
+      'Bu Şampiyonluk Ödülü\'nü kazanmak için bu kademede bir lig dönemini puan toplayarak 1. sırada bitirmen gerekiyor. Parayla satın alınamaz.';
+
+  @override
+  String get leagueAwardLockedBodyPodium =>
+      'Bu Podyum Ödülü\'nü kazanmak için bu kademede bir lig dönemini puan toplayarak 2. veya 3. sırada bitirmen gerekiyor (1. olan Şampiyonluk Ödülü\'nü alır). Parayla satın alınamaz.';
 
   @override
   String get leagueAwardLockedOk => 'Anladım';
@@ -1334,4 +1343,39 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get unarchiveTooltip => 'Arşivi Aç';
+
+  @override
+  String get timerResetBtn => 'Sıfırla';
+
+  @override
+  String get timerResetConfirmTitle => 'Seans sıfırlansın mı?';
+
+  @override
+  String get timerResetConfirmBody =>
+      'Bu seans kaydedilmeden silinecek; puan ve kum kazanmayacaksın. Bu işlem geri alınamaz.';
+
+  @override
+  String get timerResetConfirmAction => 'Sıfırla';
+
+  @override
+  String get timerDurationLocked =>
+      'Süreyi değiştirmek için önce seansı sıfırla.';
+
+  @override
+  String get rankingZonePromotionChip => '↑ Terfi';
+
+  @override
+  String get rankingZoneDemotionChip => '↓ Düşme';
+
+  @override
+  String get rankingZonePromotionMe =>
+      'Terfi bölgesindesin: dönem böyle biterse bir üst lige çıkarsın.';
+
+  @override
+  String get rankingZoneNeedsPointsMe =>
+      'Terfi bölgesindesin ama 0 puanla terfi edilmez. Bir seans tamamla.';
+
+  @override
+  String get rankingZoneDemotionMe =>
+      'Düşme bölgesindesin: dönem böyle biterse bir alt lige inersin.';
 }

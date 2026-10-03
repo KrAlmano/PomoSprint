@@ -4,8 +4,8 @@ import 'study_day.dart';
 
 // İstatistik ekranlarının (Günlük / Haftalık / Aylık) ortak, saf hesapları.
 //
-// - Seanslar sunucunun gün kuralıyla (yerel 04:00 sınırı, bkz. studyDayOf)
-//   çalışma gününe atanır.
+// - Seanslar sunucunun gün kuralıyla (profil saat diliminde 04:00 sınırı,
+//   bkz. studyDayOf) çalışma gününe atanır.
 // - Tüm gün adımları takvim aritmetiğiyle yapılır (DateTime(y, m, d + n));
 //   Duration eklenmez, böylece yaz saati geçişlerinde gün kaymaz.
 // - Gün karşılaştırmaları 'yyyymmdd' tamsayı anahtarıyla yapılır.
@@ -39,7 +39,7 @@ class StatSession {
       );
 
   factory StatSession.fromPending(PendingSession p) => StatSession(
-        day: studyDayOf(p.startedAt.toLocal()),
+        day: studyDayOf(p.startedAt),
         minutes: p.minutes,
         categoryName: p.categoryName,
         categoryId: p.categoryId,

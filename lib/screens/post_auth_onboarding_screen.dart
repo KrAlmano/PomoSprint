@@ -14,8 +14,10 @@ class PostAuthOnboardingScreen extends StatefulWidget {
   /// kullanıcı nesnesi yerine onu kullanmalıdır.
   final VoidCallback onCompleted;
 
-  /// Kullanıcı onboarding'den çıkış yaptığında ya da oturumu düştüğünde,
-  /// oturum kapatıldıktan sonra çağrılır; çağıran giriş ekranına dönmelidir.
+  /// Kullanıcı onboarding'den çıkış yaptığında, hesabını sildiğinde ya da
+  /// oturumu düştüğünde, oturum kapatıldıktan sonra çağrılır. AppGate
+  /// yönlendirmeyi zaten currentUser=null ile yaptığı için isteğe bağlıdır;
+  /// çıkış düğmesi her durumda gösterilir.
   final VoidCallback? onSignedOut;
 
   const PostAuthOnboardingScreen({
@@ -174,6 +176,42 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
     widget.onSignedOut?.call();
   }
 
+  /// Yaş sınırına takılan (ya da yanlış hesapla giren) kullanıcı onboarding'i
+  /// bitirmeden hesabını silebilir; Profil ekranına buradan ulaşılamıyor.
+  Future<void> _confirmDeleteAccount() async {
+    if (_isSaving) return;
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(l10n.deleteAccount, style: const TextStyle(fontWeight: FontWeight.bold)),
+        content: Text(l10n.profileDeleteConfirm, style: const TextStyle(fontSize: 14, height: 1.4)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(l10n.deleteAccount, style: const TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    setState(() => _isSaving = true);
+    try {
+      // Servis yerel veriyi temizleyip oturumu kapatır; AppGate girişe döner.
+      await SupabaseService.instance.deleteUserAccount();
+      if (!mounted) return;
+      widget.onSignedOut?.call();
+    } catch (e) {
+      debugPrint('PostAuth onboarding: hesap silinemedi: $e');
+      if (!mounted) return;
+      setState(() => _isSaving = false);
+      _showSnack(l10n.profileDeleteError, isError: true);
+    }
+  }
+
   void _selectSegment(String value) {
     if (_userSegment == value) return;
     setState(() {
@@ -242,15 +280,13 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
                         icon: Icon(Icons.arrow_back, color: textColor),
                         onPressed: _isSaving ? null : _prevPage,
                       )
-                    else if (widget.onSignedOut != null)
+                    else
                       // Yanlış hesapla giren kullanıcı onboarding'i bitirmeden çıkabilir.
                       IconButton(
                         icon: Icon(Icons.logout, color: textColor),
                         tooltip: l10n.logout,
                         onPressed: _isSaving ? null : () => _signOut(),
-                      )
-                    else
-                      const SizedBox(width: 48),
+                      ),
                     Expanded(
                       child: LinearProgressIndicator(
                         value: (_currentPage + 1) / _totalSteps,
@@ -383,7 +419,7 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
               }),
             ),
           ),
-          if (_isUnderMinimumAge)
+          if (_isUnderMinimumAge) ...[
             Padding(
               padding: const EdgeInsets.fromLTRB(32, 12, 32, 0),
               child: Text(
@@ -392,6 +428,26 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
                 style: TextStyle(fontSize: 13, color: Colors.red.shade700, fontWeight: FontWeight.w600),
               ),
             ),
+            // Yaş sınırına takılan kullanıcı burada kalmaz: çıkabilir ya da
+            // hesabını silebilir (geri tuşu uygulamayı kapatıyordu).
+            const SizedBox(height: 8),
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 8,
+              children: [
+                TextButton.icon(
+                  onPressed: _isSaving ? null : () => _signOut(),
+                  icon: const Icon(Icons.logout, size: 18),
+                  label: Text(l10n.logout),
+                ),
+                TextButton.icon(
+                  onPressed: _isSaving ? null : _confirmDeleteAccount,
+                  icon: Icon(Icons.delete_outline, size: 18, color: Colors.red.shade700),
+                  label: Text(l10n.deleteAccount, style: TextStyle(color: Colors.red.shade700)),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );

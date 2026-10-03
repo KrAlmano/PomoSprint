@@ -107,6 +107,24 @@ void main() {
       expect(AvatarCharacter.fallbackCatalog.any((a) => a.id == 'tomato_basic'), isFalse, reason: 'canlıda pasif');
     });
 
+    test('lig ödülü adı ve türü canlı ödül kuralından (1. → monthly, 2.-3. → weekly)', () {
+      final champion = AvatarCharacter.fromMap(const {
+        'id': 'league_gold_monthly',
+        'name_tr': 'Altın Lig Aylık Ödülü',
+        'name_en': 'Gold League Monthly Award',
+      });
+      final podium = AvatarCharacter.byId('league_bronze_weekly');
+      expect(champion.isChampionAward, isTrue);
+      expect(champion.isPodiumAward, isFalse);
+      expect(podium.isPodiumAward, isTrue);
+      // Sunucudaki "Haftalık/Aylık" adı dönemle uyuşmadığı için kullanılmaz.
+      expect(champion.getName(true), 'Altın Lig Şampiyonluk Ödülü');
+      expect(champion.getName(false), 'Gold League Champion Award');
+      expect(podium.getName(true), 'Bronz Lig Podyum Ödülü');
+      expect(podium.getName(false), 'Bronze League Podium Award');
+      expect(AvatarCharacter.byId('avatar_9_viking').getName(true), 'Viking Kum Saati');
+    });
+
     test('is_league_award kolonu yoksa lig ödülü kimlik önekinden tanınır', () {
       final award = AvatarCharacter.fromMap(const {
         'id': 'league_gold_weekly',

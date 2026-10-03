@@ -40,7 +40,11 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _errorMessage;
   bool _showResendButton = false;
 
-  bool get _showAppleSignIn => !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
+  // Debug yapılandırması, ücretsiz (Personal Team) hesapla cihaza
+  // imzalanabilsin diye Sign in with Apple entitlement'ı olmadan derlenir
+  // (ios/Runner/RunnerDebug.entitlements); orada Apple girişi 1000 hatası
+  // verir. Release/Profile tam entitlement'la derlenir.
+  bool get _showAppleSignIn => !kIsWeb && !kDebugMode && defaultTargetPlatform == TargetPlatform.iOS;
 
   @override
   void dispose() {

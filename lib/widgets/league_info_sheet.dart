@@ -172,7 +172,7 @@ class _LeagueInfoSheetState extends State<LeagueInfoSheet> {
                           const SizedBox(height: 8),
                           _pointRow(
                             Icons.savings_outlined,
-                            l10n.leagueInfoCoins(_config('coins_per_session', 20)),
+                            l10n.leagueInfoCoins(_config('coins_per_session', 20), dailyLimit),
                             onSurfaceVariant,
                           ),
                         ],

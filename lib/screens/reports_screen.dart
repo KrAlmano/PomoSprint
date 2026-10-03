@@ -123,10 +123,11 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
     if (!isSameDay(today, _today) && mounted) setState(() => _today = today);
   }
 
-  // Yeni çalışma günü (yerel 04:00) başlayınca 'bugün' ve 'bu hafta' tazelenir.
+  // Yeni çalışma günü (profil diliminde 04:00) başlayınca 'bugün' ve 'bu
+  // hafta' tazelenir.
   void _scheduleDayRollover() {
     _cancelDayTimer();
-    final nextDayStart = DateTime(_today.year, _today.month, _today.day + 1, kStudyDayStartHour);
+    final nextDayStart = studyDayStart(addDays(_today, 1));
     var wait = nextDayStart.difference(DateTime.now());
     if (wait.isNegative) wait = Duration.zero;
     _dayTimer = Timer(wait + const Duration(seconds: 1), () {
@@ -211,7 +212,7 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
       await _dateFormatting;
       // Aylık sekme önceki ayın aynı dönemini ve ayın ilk haftasının
       // kıyasını da kullandığı için önceki ayın başından itibaren çekilir.
-      final since = DateTime(today.year, today.month - 1, 1);
+      final since = studyDayStart(DateTime(today.year, today.month - 1, 1));
       final remote = await SupabaseService.instance.fetchStudySessions(since: since);
       final pending = await _readPending();
       if (!mounted) return;

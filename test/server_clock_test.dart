@@ -40,10 +40,23 @@ void main() {
       expect(ServerClock.correctionFor(clock.offset), clock.offset);
     });
 
-    test('küçük farklar gürültü sayılır', () {
-      expect(ServerClock.correctionFor(const Duration(seconds: 20)), Duration.zero);
-      expect(ServerClock.correctionFor(const Duration(seconds: -59)), Duration.zero);
-      expect(ServerClock.correctionFor(const Duration(minutes: 2)), const Duration(minutes: 2));
+    test('bilinen fark eşiksiz uygulanır (eşiğin iki yanında tutarlı)', () {
+      expect(ServerClock.correctionFor(const Duration(seconds: 20)), const Duration(seconds: 20));
+      expect(ServerClock.correctionFor(const Duration(seconds: -59)), const Duration(seconds: -59));
+      expect(ServerClock.correctionFor(const Duration(seconds: 61)), const Duration(seconds: 61));
+      expect(ServerClock.correctionFor(null), Duration.zero);
+    });
+
+    test('gürültü bandındaki yeni ölçüm farkı değiştirmez; büyük değişim günceller', () {
+      final clock = ServerClock();
+      final t = DateTime(2026, 10, 3, 12);
+      clock.recordSample(serverTime: t.toUtc(), sentAt: t, receivedAt: t);
+      final first = clock.offset;
+      clock.recordSample(
+          serverTime: t.toUtc().add(const Duration(seconds: 1)), sentAt: t, receivedAt: t);
+      expect(clock.offset, first);
+      clock.recordSample(serverTime: t.toUtc().add(const Duration(minutes: 3)), sentAt: t, receivedAt: t);
+      expect(clock.offset!.inSeconds, inInclusiveRange(180, 181));
     });
 
     test('gidiş-dönüşü çok uzun ölçüm yok sayılır', () {

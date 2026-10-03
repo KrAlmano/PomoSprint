@@ -97,6 +97,33 @@ class LeagueSnapshot {
   bool isPromotionRank(int rank, int points) => !isTopTier && points > 0 && rank <= promotionZoneEnd;
 
   bool isDemotionRank(int rank) => !isBottomTier && rank >= demotionZoneStart;
+
+  /// [rank]. sıradaki [points] puanlı üyenin dönem sonu durumu. Podyum
+  /// (1-3) dahil her sıra için aynı kural; küçük odalarda terfi bölgesi
+  /// tamamen podyumun içinde kalır.
+  LeagueZone zoneOf(int rank, int points) {
+    if (awaitingPlacement) return LeagueZone.none;
+    if (!isTopTier && rank <= promotionZoneEnd) {
+      return points > 0 ? LeagueZone.promotion : LeagueZone.promotionNeedsPoints;
+    }
+    if (isDemotionRank(rank)) return LeagueZone.demotion;
+    return LeagueZone.none;
+  }
+}
+
+/// Lig odasındaki bir sıranın dönem sonu durumu.
+enum LeagueZone {
+  /// Terfi eder (terfi bölgesinde ve puanı var).
+  promotion,
+
+  /// Terfi bölgesinde ama 0 puanlı: sunucu terfi ettirmez.
+  promotionNeedsPoints,
+
+  /// Bir alt lige düşer.
+  demotion,
+
+  /// Kalır.
+  none,
 }
 
 const int kLeagueTierCount = 5;

@@ -85,7 +85,11 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
       setState(() => _selection = avatar.id);
     } else if (avatar.isLeagueAward) {
       final l10n = AppLocalizations.of(context)!;
-      unawaited(_showInfoDialog(avatar, l10n.leagueAwardLockedTitle, l10n.leagueAwardLockedBody));
+      // Canlı ödül kuralı: 1. → *_monthly (Şampiyonluk), 2.-3. → *_weekly (Podyum).
+      final body = avatar.isChampionAward
+          ? l10n.leagueAwardLockedBodyChampion
+          : (avatar.isPodiumAward ? l10n.leagueAwardLockedBodyPodium : l10n.leagueAwardLockedBody);
+      unawaited(_showInfoDialog(avatar, l10n.leagueAwardLockedTitle, body));
     } else if (avatar.isPremiumOnly && !widget.user.isPremium) {
       final l10n = AppLocalizations.of(context)!;
       unawaited(_showInfoDialog(avatar, l10n.avatarPremiumTitle, l10n.avatarPremiumBody));

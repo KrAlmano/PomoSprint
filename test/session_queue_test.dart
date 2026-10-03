@@ -26,6 +26,10 @@ class FakeBackend implements SessionQueueBackend {
   int createDefaultsCalls = 0;
   int fetchCategoriesCalls = 0;
 
+  /// Her istekte (yanıt dönmeden önce) çağrılır; testler sunucu saatini
+  /// ('date' başlığı) buradan besler.
+  void Function()? onRequest;
+
   /// Varsayılan: kabul (5 puan). Testler davranışı değiştirir.
   Future<Object?> Function(PendingSession s, String categoryId, DateTime startedAt) handler =
       (s, c, t) async => {'total_points': 5, 'base_points': 5, 'streak': 1};
@@ -37,12 +41,14 @@ class FakeBackend implements SessionQueueBackend {
     required DateTime startedAtForServer,
   }) async {
     sent.add(SentCall(session.clientUuid, categoryId, startedAtForServer));
+    onRequest?.call();
     return handler(session, categoryId, startedAtForServer);
   }
 
   @override
   Future<List<CategoryRef>> fetchCategories() async {
     fetchCategoriesCalls++;
+    onRequest?.call();
     return categories;
   }
 
@@ -411,6 +417,95 @@ void main() {
     );
     final diff = started.toUtc().difference(backend.sent.single.startedAt);
     expect(diff.inMinutes, inInclusiveRange(9, 10));
+  });
+
+  // Canlı complete_study_session'ın zaman kuralları ve gerçek aralık
+  // çakışması ({'error': 'overlap'}) ile, cihaz saatinden [deviceAhead] kadar
+  // geride çalışan sahte sunucu. Her yanıt (kategoriler dahil) 'date'
+  // başlığıyla saat farkını öğretir. Kaydedilen aralıklar sunucu saatiyle.
+  ({List<(DateTime, DateTime)> recorded, Duration deviceAhead}) installClockedServer(
+    Duration deviceAhead, {
+    List<(DateTime, DateTime)>? existing,
+  }) {
+    final recorded = existing ?? <(DateTime, DateTime)>[];
+    DateTime serverNow() => DateTime.now().toUtc().subtract(deviceAhead);
+    backend.onRequest = () => clock.recordSample(serverTime: serverNow(), sentAt: DateTime.now(), receivedAt: DateTime.now());
+    backend.handler = (s, c, t) async {
+      final start = t.toUtc();
+      final end = start.add(Duration(minutes: s.minutes));
+      if (start.isAfter(serverNow())) {
+        throw const PostgrestException(message: 'started_at cannot be in the future', code: 'P0001');
+      }
+      if (end.isAfter(serverNow().add(const Duration(minutes: 5)))) {
+        throw const PostgrestException(message: 'session_not_finished', code: 'P0001');
+      }
+      if (recorded.any((r) => r.$1.isBefore(end) && r.$2.isAfter(start))) return {'error': 'overlap'};
+      recorded.add((start, end));
+      return {'total_points': 5, 'coins_earned': 20, 'duplicate': false};
+    };
+    return (recorded: recorded, deviceAhead: deviceAhead);
+  }
+
+  test('fark bilinmeden kuyruğa giren art arda seanslar çakışmadan kaydedilir (cihaz ileri)', () async {
+    // Cihaz saati 3 dk ileri; uygulama çevrimdışı açıldı (fark bilinmiyor).
+    const ahead = Duration(minutes: 3);
+    final server = installClockedServer(ahead);
+    final realA = DateTime.now().toUtc().subtract(const Duration(minutes: 60));
+    final realB = realA.add(const Duration(minutes: 25, seconds: 10));
+    await queue.enqueue('u1', _session('A', startedAt: realA.add(ahead)));
+    await queue.enqueue('u1', _session('B', startedAt: realB.add(ahead)));
+
+    final report = await queue.sync('u1');
+
+    expect(report.outcomes['A'], isA<SessionSubmitSuccess>());
+    expect(report.outcomes['B'], isA<SessionSubmitSuccess>());
+    expect(await queue.pendingCount('u1'), 0);
+    expect(backend.fetchCategoriesCalls, 1, reason: 'göndermeden önce fark öğrenilir');
+    // İki seans da gerçek zamanlarıyla (±1 sn) kaydedildi.
+    expect(server.recorded[0].$1.difference(realA).inSeconds.abs(), lessThanOrEqualTo(1));
+    expect(server.recorded[1].$1.difference(realB).inSeconds.abs(), lessThanOrEqualTo(1));
+  });
+
+  test('fark bilinmeden kuyruğa giren seans, önceden doğru kaydedilmiş seansla çakışmaz (cihaz geri)', () async {
+    // Cihaz saati 10 dk geri. X önceki açılışta fark bilinerek doğru kaydedildi.
+    const ahead = Duration(minutes: -10);
+    final realX = DateTime.now().toUtc().subtract(const Duration(minutes: 90));
+    final server = installClockedServer(ahead, existing: [(realX, realX.add(const Duration(minutes: 25)))]);
+    final realY = realX.add(const Duration(minutes: 25, seconds: 10));
+    final result = await queue.submit('u1', _session('Y', startedAt: realY.add(ahead)));
+
+    expect(result, isA<SessionSubmitSuccess>());
+    expect(server.recorded.last.$1.difference(realY).inSeconds.abs(), lessThanOrEqualTo(1));
+  });
+
+  test('fark öğrenilemezse (ağ yok) fark kaydı olmayan seans gönderilmez', () async {
+    final failing = _FailingCategoriesBackend();
+    final q = SessionQueue(backend: failing, clock: clock, rpcTimeout: const Duration(seconds: 2));
+    final result = await q.submit('u1', _session('a', startedAt: now.subtract(const Duration(hours: 1))));
+    expect(failing.sent, isEmpty);
+    expect(result, isA<SessionSubmitQueued>());
+    expect((result as SessionSubmitQueued).reasonCode, SessionReason.network);
+    expect(await q.pendingCount('u1'), 1);
+  });
+
+  test('fark zaten biliniyorsa ek istek atılmaz', () async {
+    clock.recordSample(serverTime: DateTime.now().toUtc(), sentAt: DateTime.now(), receivedAt: DateTime.now());
+    await queue.enqueue('u1', _session('a', startedAt: now.subtract(const Duration(hours: 1))));
+    await queue.sync('u1');
+    expect(backend.fetchCategoriesCalls, 0);
+    expect(backend.sent.single.uuid, 'a');
+  });
+
+  test('yalnızca çakışmayla bekleyen kuyruk kendiliğinden yeniden denenmez', () async {
+    backend.handler = (s, c, t) async => {'error': 'overlap'};
+    await queue.enqueue('u1', _session('a', startedAt: now.subtract(const Duration(hours: 1))));
+    final overlapOnly = await queue.sync('u1');
+    expect(overlapOnly.remaining, 1);
+    expect(overlapOnly.hasRetryableFailure, isFalse);
+
+    backend.handler = (s, c, t) async => throw Exception('SocketException: Failed host lookup');
+    final offline = await queue.sync('u1');
+    expect(offline.hasRetryableFailure, isTrue);
   });
 
   test('clearUser kuyruğu ve red kayıtlarını siler', () async {

@@ -59,7 +59,34 @@ class AvatarCharacter {
         'is_league_award': isLeagueAward,
       };
 
-  String getName(bool isTurkish) => isTurkish ? nameTr : nameEn;
+  /// Görünen ad. Lig ödüllerinde ad kimlikten türetilir: sunucu kataloğundaki
+  /// "Haftalık/Aylık Ödülü" adları 14 günlük dönemle ve ödül kuralıyla
+  /// (1. → *_monthly, 2.-3. → *_weekly) uyuşmuyordu.
+  String getName(bool isTurkish) => _leagueAwardName(isTurkish) ?? (isTurkish ? nameTr : nameEn);
+
+  /// Lig dönemini puanla 1. bitirene verilen ödül (league_{kademe}_monthly).
+  bool get isChampionAward => isLeagueAward && id.endsWith('_monthly');
+
+  /// Lig dönemini puanla 2. ya da 3. bitirene verilen ödül
+  /// (league_{kademe}_weekly).
+  bool get isPodiumAward => isLeagueAward && id.endsWith('_weekly');
+
+  static const Map<String, (String, String)> _leagueTierNames = {
+    'bronze': ('Bronz', 'Bronze'),
+    'silver': ('Gümüş', 'Silver'),
+    'gold': ('Altın', 'Gold'),
+    'sapphire': ('Safir', 'Sapphire'),
+    'diamond': ('Elmas', 'Diamond'),
+  };
+
+  String? _leagueAwardName(bool isTurkish) {
+    if (!isLeagueAward || !(isChampionAward || isPodiumAward)) return null;
+    final tierKey = id.substring(_leagueAwardIdPrefix.length, id.lastIndexOf('_'));
+    final tier = _leagueTierNames[tierKey];
+    if (tier == null) return null;
+    if (isTurkish) return '${tier.$1} Lig ${isChampionAward ? 'Şampiyonluk' : 'Podyum'} Ödülü';
+    return '${tier.$2} League ${isChampionAward ? 'Champion' : 'Podium'} Award';
+  }
 
   /// Herkese açık (varsayılan) avatar. Sunucuyla aynı kural: yalnızca
   /// is_default avatarlar kayıtta seçilebilir ve her yeni profile
@@ -136,7 +163,8 @@ class AvatarCharacter {
   /// - 200 kum tanesi: avatar_1_gamer, avatar_4_bowtie, avatar_9_viking,
   ///   avatar_10_dentist
   /// - Premium (Premium kullanıcıya bedava): avatar_11..avatar_15
-  /// - lig ödülleri (satın alınamaz): league_{kademe}_{weekly|monthly}
+  /// - lig ödülleri (satın alınamaz): league_{kademe}_{weekly|monthly};
+  ///   1. sıraya *_monthly (Şampiyonluk), 2.-3. sıraya *_weekly (Podyum)
   /// tomato_basic canlıda pasif olduğu için yok. Sunucu kataloğu
   /// alınamadığında kullanılır.
   static const List<AvatarCharacter> fallbackCatalog = [
@@ -156,16 +184,16 @@ class AvatarCharacter {
     AvatarCharacter(id: 'avatar_14_teacher', nameTr: 'Öğretmen Kum Saati', nameEn: 'Teacher Hourglass', imagePath: 'assets/avatars/avatar_14_teacher.png', isPremiumOnly: true),
     AvatarCharacter(id: 'avatar_15_athlete', nameTr: 'Sporcu Kum Saati', nameEn: 'Athlete Hourglass', imagePath: 'assets/avatars/avatar_15_athlete.png', isPremiumOnly: true),
     AvatarCharacter(id: 'avatar_16_basic', nameTr: 'Klasik Kum Saati', nameEn: 'Classic Hourglass', imagePath: 'assets/avatars/avatar_16_basic.png', isDefault: true),
-    AvatarCharacter(id: 'league_bronze_weekly', nameTr: 'Bronz Lig Haftalık Ödülü', nameEn: 'Bronze League Weekly Award', imagePath: 'assets/avatars/league_bronze_weekly.png', isLeagueAward: true),
-    AvatarCharacter(id: 'league_bronze_monthly', nameTr: 'Bronz Lig Aylık Ödülü', nameEn: 'Bronze League Monthly Award', imagePath: 'assets/avatars/league_bronze_monthly.png', isLeagueAward: true),
-    AvatarCharacter(id: 'league_silver_weekly', nameTr: 'Gümüş Lig Haftalık Ödülü', nameEn: 'Silver League Weekly Award', imagePath: 'assets/avatars/league_silver_weekly.png', isLeagueAward: true),
-    AvatarCharacter(id: 'league_silver_monthly', nameTr: 'Gümüş Lig Aylık Ödülü', nameEn: 'Silver League Monthly Award', imagePath: 'assets/avatars/league_silver_monthly.png', isLeagueAward: true),
-    AvatarCharacter(id: 'league_gold_weekly', nameTr: 'Altın Lig Haftalık Ödülü', nameEn: 'Gold League Weekly Award', imagePath: 'assets/avatars/league_gold_weekly.png', isLeagueAward: true),
-    AvatarCharacter(id: 'league_gold_monthly', nameTr: 'Altın Lig Aylık Ödülü', nameEn: 'Gold League Monthly Award', imagePath: 'assets/avatars/league_gold_monthly.png', isLeagueAward: true),
-    AvatarCharacter(id: 'league_sapphire_weekly', nameTr: 'Safir Lig Haftalık Ödülü', nameEn: 'Sapphire League Weekly Award', imagePath: 'assets/avatars/league_sapphire_weekly.png', isLeagueAward: true),
-    AvatarCharacter(id: 'league_sapphire_monthly', nameTr: 'Safir Lig Aylık Ödülü', nameEn: 'Sapphire League Monthly Award', imagePath: 'assets/avatars/league_sapphire_monthly.png', isLeagueAward: true),
-    AvatarCharacter(id: 'league_diamond_weekly', nameTr: 'Elmas Lig Haftalık Ödülü', nameEn: 'Diamond League Weekly Award', imagePath: 'assets/avatars/league_diamond_weekly.png', isLeagueAward: true),
-    AvatarCharacter(id: 'league_diamond_monthly', nameTr: 'Elmas Lig Aylık Ödülü', nameEn: 'Diamond League Monthly Award', imagePath: 'assets/avatars/league_diamond_monthly.png', isLeagueAward: true),
+    AvatarCharacter(id: 'league_bronze_weekly', nameTr: 'Bronz Lig Podyum Ödülü', nameEn: 'Bronze League Podium Award', imagePath: 'assets/avatars/league_bronze_weekly.png', isLeagueAward: true),
+    AvatarCharacter(id: 'league_bronze_monthly', nameTr: 'Bronz Lig Şampiyonluk Ödülü', nameEn: 'Bronze League Champion Award', imagePath: 'assets/avatars/league_bronze_monthly.png', isLeagueAward: true),
+    AvatarCharacter(id: 'league_silver_weekly', nameTr: 'Gümüş Lig Podyum Ödülü', nameEn: 'Silver League Podium Award', imagePath: 'assets/avatars/league_silver_weekly.png', isLeagueAward: true),
+    AvatarCharacter(id: 'league_silver_monthly', nameTr: 'Gümüş Lig Şampiyonluk Ödülü', nameEn: 'Silver League Champion Award', imagePath: 'assets/avatars/league_silver_monthly.png', isLeagueAward: true),
+    AvatarCharacter(id: 'league_gold_weekly', nameTr: 'Altın Lig Podyum Ödülü', nameEn: 'Gold League Podium Award', imagePath: 'assets/avatars/league_gold_weekly.png', isLeagueAward: true),
+    AvatarCharacter(id: 'league_gold_monthly', nameTr: 'Altın Lig Şampiyonluk Ödülü', nameEn: 'Gold League Champion Award', imagePath: 'assets/avatars/league_gold_monthly.png', isLeagueAward: true),
+    AvatarCharacter(id: 'league_sapphire_weekly', nameTr: 'Safir Lig Podyum Ödülü', nameEn: 'Sapphire League Podium Award', imagePath: 'assets/avatars/league_sapphire_weekly.png', isLeagueAward: true),
+    AvatarCharacter(id: 'league_sapphire_monthly', nameTr: 'Safir Lig Şampiyonluk Ödülü', nameEn: 'Sapphire League Champion Award', imagePath: 'assets/avatars/league_sapphire_monthly.png', isLeagueAward: true),
+    AvatarCharacter(id: 'league_diamond_weekly', nameTr: 'Elmas Lig Podyum Ödülü', nameEn: 'Diamond League Podium Award', imagePath: 'assets/avatars/league_diamond_weekly.png', isLeagueAward: true),
+    AvatarCharacter(id: 'league_diamond_monthly', nameTr: 'Elmas Lig Şampiyonluk Ödülü', nameEn: 'Diamond League Champion Award', imagePath: 'assets/avatars/league_diamond_monthly.png', isLeagueAward: true),
   ];
 
   // Fallback visual properties mapped by id

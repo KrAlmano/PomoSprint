@@ -437,8 +437,8 @@ abstract class AppLocalizations {
   /// No description provided for @leagueInfoCoins.
   ///
   /// In tr, this message translates to:
-  /// **'🪙 Kum tanesi: Tamamladığın her pomodorodan {coins} kum tanesi kazanırsın. Karakter koleksiyonundan yeni kum saatleri açmak için kullanılır.'**
-  String leagueInfoCoins(String coins);
+  /// **'🪙 Kum tanesi: Tamamladığın her seanstan (günde {limit} seansa kadar) {coins} kum tanesi kazanırsın. Karakter koleksiyonundan yeni kum saatleri açmak için kullanılır.'**
+  String leagueInfoCoins(String coins, String limit);
 
   /// No description provided for @leagueInfoPromotionTitle.
   ///
@@ -509,7 +509,7 @@ abstract class AppLocalizations {
   /// No description provided for @leagueInfoDailyLimitBody.
   ///
   /// In tr, this message translates to:
-  /// **'Günde en fazla {limit} pomodoro lig puanına sayılır. Üstü kişisel istatistiklerine ve serine eklenmeye devam eder ama lig sıralamasını etkilemez.'**
+  /// **'Günde en fazla {limit} seans puan ve kum kazandırır (lig puanı, aylık sıralama, toplam puan). Sonraki seanslar yalnızca çalışma süresine ve serine eklenir.'**
   String leagueInfoDailyLimitBody(String limit);
 
   /// No description provided for @leagueInfoFaqTitle.
@@ -521,7 +521,7 @@ abstract class AppLocalizations {
   /// No description provided for @leagueInfoFaqLimit.
   ///
   /// In tr, this message translates to:
-  /// **'Günlük {limit} pomodoro sınırına ulaşmış olabilirsin.'**
+  /// **'Günlük {limit} seans sınırına ulaşmış olabilirsin.'**
   String leagueInfoFaqLimit(String limit);
 
   /// No description provided for @leagueInfoFaqCancelled.
@@ -791,8 +791,8 @@ abstract class AppLocalizations {
   /// No description provided for @sessionDailyLimitReached.
   ///
   /// In tr, this message translates to:
-  /// **'Bugünlük lig puanı sınırına ulaştın (16 pomodoro). Çalışman kaydedilmeye devam ediyor.'**
-  String get sessionDailyLimitReached;
+  /// **'Bugünlük puan ve kum sınırına ulaştın ({limit} seans). Sonraki seanslar yalnızca çalışma süresine ve serine eklenir.'**
+  String sessionDailyLimitReached(int limit);
 
   /// No description provided for @sessionQueuedOffline.
   ///
@@ -1469,7 +1469,7 @@ abstract class AppLocalizations {
   /// No description provided for @leagueAwardsSub.
   ///
   /// In tr, this message translates to:
-  /// **'Bir lig döneminde 1., 2. veya 3. olarak bitirerek kazanılır.'**
+  /// **'Bir lig dönemini puan toplayarak ilk 3\'te bitirince kazanılır: 1.\'ye Şampiyonluk, 2. ve 3.\'ye Podyum Ödülü.'**
   String get leagueAwardsSub;
 
   /// No description provided for @leagueAwardLockedTitle.
@@ -1481,8 +1481,20 @@ abstract class AppLocalizations {
   /// No description provided for @leagueAwardLockedBody.
   ///
   /// In tr, this message translates to:
-  /// **'Bu avatarı kazanmak için bir lig döneminde bu kademede 1., 2. veya 3. sırayla bitirmen gerekiyor. Parayla satın alınamaz.'**
+  /// **'Bu avatarı kazanmak için bu kademede bir lig dönemini puan toplayarak ilk 3\'te bitirmen gerekiyor. Parayla satın alınamaz.'**
   String get leagueAwardLockedBody;
+
+  /// No description provided for @leagueAwardLockedBodyChampion.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu Şampiyonluk Ödülü\'nü kazanmak için bu kademede bir lig dönemini puan toplayarak 1. sırada bitirmen gerekiyor. Parayla satın alınamaz.'**
+  String get leagueAwardLockedBodyChampion;
+
+  /// No description provided for @leagueAwardLockedBodyPodium.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu Podyum Ödülü\'nü kazanmak için bu kademede bir lig dönemini puan toplayarak 2. veya 3. sırada bitirmen gerekiyor (1. olan Şampiyonluk Ödülü\'nü alır). Parayla satın alınamaz.'**
+  String get leagueAwardLockedBodyPodium;
 
   /// No description provided for @leagueAwardLockedOk.
   ///
@@ -2389,6 +2401,66 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Arşivi Aç'**
   String get unarchiveTooltip;
+
+  /// No description provided for @timerResetBtn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıfırla'**
+  String get timerResetBtn;
+
+  /// No description provided for @timerResetConfirmTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seans sıfırlansın mı?'**
+  String get timerResetConfirmTitle;
+
+  /// No description provided for @timerResetConfirmBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu seans kaydedilmeden silinecek; puan ve kum kazanmayacaksın. Bu işlem geri alınamaz.'**
+  String get timerResetConfirmBody;
+
+  /// No description provided for @timerResetConfirmAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıfırla'**
+  String get timerResetConfirmAction;
+
+  /// No description provided for @timerDurationLocked.
+  ///
+  /// In tr, this message translates to:
+  /// **'Süreyi değiştirmek için önce seansı sıfırla.'**
+  String get timerDurationLocked;
+
+  /// No description provided for @rankingZonePromotionChip.
+  ///
+  /// In tr, this message translates to:
+  /// **'↑ Terfi'**
+  String get rankingZonePromotionChip;
+
+  /// No description provided for @rankingZoneDemotionChip.
+  ///
+  /// In tr, this message translates to:
+  /// **'↓ Düşme'**
+  String get rankingZoneDemotionChip;
+
+  /// No description provided for @rankingZonePromotionMe.
+  ///
+  /// In tr, this message translates to:
+  /// **'Terfi bölgesindesin: dönem böyle biterse bir üst lige çıkarsın.'**
+  String get rankingZonePromotionMe;
+
+  /// No description provided for @rankingZoneNeedsPointsMe.
+  ///
+  /// In tr, this message translates to:
+  /// **'Terfi bölgesindesin ama 0 puanla terfi edilmez. Bir seans tamamla.'**
+  String get rankingZoneNeedsPointsMe;
+
+  /// No description provided for @rankingZoneDemotionMe.
+  ///
+  /// In tr, this message translates to:
+  /// **'Düşme bölgesindesin: dönem böyle biterse bir alt lige inersin.'**
+  String get rankingZoneDemotionMe;
 }
 
 class _AppLocalizationsDelegate

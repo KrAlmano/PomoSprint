@@ -44,7 +44,7 @@ void showSessionResult(BuildContext context, SessionSubmitResult result) {
         Future.delayed(const Duration(seconds: 1), () {
           if (!messenger.mounted) return;
           messenger.showSnackBar(SnackBar(
-            content: Text(l10n.sessionDailyLimitReached),
+            content: Text(l10n.sessionDailyLimitReached(SupabaseService.instance.dailySessionLimit)),
             backgroundColor: AppColors.primaryContainer,
             behavior: SnackBarBehavior.floating,
             duration: const Duration(seconds: 5),

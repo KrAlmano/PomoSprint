@@ -45,6 +45,9 @@ class SupabaseService {
       onAccepted: _onSessionAccepted,
       onQueueChanged: _onQueueChanged,
     );
+    // Çalışma günü hesapları (istatistikler, 'bugün', seri) oturumdaki
+    // kullanıcının profil saat dilimini izler; sunucu da onu kullanır.
+    currentUser.addListener(() => setStudyTimeZone(currentUser.value?.timezone));
   }
 
   static final SupabaseService instance = SupabaseService._init();
@@ -69,6 +72,12 @@ class SupabaseService {
   final ServerClock _clock = ServerClock();
   late final SessionQueue _queue;
   StreamSubscription<AuthState>? _authSubscription;
+
+  // Kullanıcıya özel durum her temizlendiğinde (çıkış, oturumun düşmesi)
+  // artar. Uçuştaki bir profil okuması ya da güncellemesi yanıtı farklı bir
+  // dönemde gelirse kullanıcıyı yayınlamaz ve 'saved_user'a yazmaz; aksi
+  // halde çıkış yapmış hesap geri geliyor ya da hesaplar karışıyordu.
+  int _userEpoch = 0;
 
   /// Sunucu ile cihaz saati arasındaki tahmini fark (sunucu - cihaz).
   Duration? get serverClockOffset => _clock.offset;
@@ -230,6 +239,7 @@ class SupabaseService {
 
   Future<void> _clearUserScopedState({String? email}) async {
     final mail = email ?? currentUser.value?.email;
+    _userEpoch++;
     _statsRefreshTimer?.cancel();
     currentUser.value = null;
     pendingSessionCount.value = 0;
@@ -323,7 +333,7 @@ class SupabaseService {
     if (response.user == null) throw const AuthFailure(AuthErrorCode.googleSignInFailed);
 
     await _cleanupDuplicateIdentity();
-    return _loadUserAfterSignIn();
+    return _applyProviderFirstName(await _loadUserAfterSignIn());
   }
 
   /// Apple ile giriş. Kullanıcı vazgeçerse null döner.
@@ -363,7 +373,62 @@ class SupabaseService {
 
     await _cleanupDuplicateIdentity();
     // Apple adı yalnızca ilk girişte verir; profil oluşturulurken kullanılır.
-    return _loadUserAfterSignIn(nameHint: credential.givenName);
+    final user = await _loadUserAfterSignIn(nameHint: credential.givenName);
+    return _applyProviderFirstName(user, givenName: credential.givenName);
+  }
+
+  /// Google/Apple girişinde profil adını sağlayıcının verdiği İLK ada çeker.
+  ///
+  /// Profil satırını signInWithIdToken anında handle_new_user trigger'ı
+  /// yazıyor: Apple id_token'ında ad olmadığı için ad e-postanın yerel kısmı
+  /// (gizli rölede anlamsız bir dizi), Google'da tam ad oluyordu ve bu ad
+  /// arkadaş listesinde, lig odasında, aylık sıralamada başkalarına
+  /// görünüyordu. Yalnızca ad hâlâ trigger'ın varsayılanıysa (e-posta yerel
+  /// kısmı; ya da onboarding bitmemişken sağlayıcının tam adı) değiştirilir;
+  /// kullanıcının kendi seçtiği ada dokunulmaz. Hata girişi bozmaz.
+  Future<UserModel> _applyProviderFirstName(UserModel user, {String? givenName}) async {
+    final authUser = _isCloudActive ? _client.auth.currentUser : null;
+    if (authUser == null || user.id != authUser.id) return user;
+    final desired = providerFirstNameUpdate(
+      currentName: user.name,
+      email: authUser.email,
+      provider: authUser.appMetadata['provider']?.toString(),
+      metadata: authUser.userMetadata ?? const <String, dynamic>{},
+      onboardingCompleted: user.onboardingCompletedAt != null,
+      givenName: givenName,
+    );
+    if (desired == null) return user;
+    try {
+      await updateUserName(desired);
+    } catch (e) {
+      debugPrint('[AUTH] Profil adı sağlayıcının ilk adına çekilemedi (yok sayılıyor): $e');
+    }
+    return currentUser.value ?? user;
+  }
+
+  /// [_applyProviderFirstName]'in kararı: profil adı hâlâ handle_new_user'ın
+  /// varsayılanıysa (e-postanın yerel kısmı; ya da onboarding bitmemişken
+  /// sağlayıcının boşluk içeren tam adı) yazılacak ilk ad, aksi halde null.
+  @visibleForTesting
+  static String? providerFirstNameUpdate({
+    required String currentName,
+    required String? email,
+    required String? provider,
+    required Map<String, dynamic> metadata,
+    required bool onboardingCompleted,
+    String? givenName,
+  }) {
+    const triggerNameMax = 50; // handle_new_user: left(..., 50)
+    String clip(String v) => v.length > triggerNameMax ? v.substring(0, triggerNameMax) : v;
+    final current = currentName.trim();
+    final emailLocal = (email ?? '').split('@').first.trim();
+    final fullName = (metadata['full_name'] ?? metadata['name'])?.toString().trim() ?? '';
+    final isEmailDefault = emailLocal.isNotEmpty && current == clip(emailLocal);
+    final isFullNameDefault = !onboardingCompleted && fullName.contains(RegExp(r'\s')) && current == clip(fullName);
+    if (!isEmailDefault && !isFullNameDefault) return null;
+    final desired = _initialProfileNameFrom(provider: provider, metadata: metadata, email: email, nameHint: givenName);
+    if (desired == current || desired == emailLocal || desired.length < _nameMinLength) return null;
+    return desired;
   }
 
   // Aynı e-postayla onaylanmamış e-posta/şifre kaydı varsa temizler.
@@ -462,11 +527,15 @@ class SupabaseService {
     _requireCloud();
     final authUser = _client.auth.currentUser;
     if (authUser == null) return null;
+    final epoch = _userEpoch;
 
     final results = await Future.wait<Object?>([
       _ensureOwnProfile(authUser, nameHint: nameHint),
       _fetchUnlockedAvatars(authUser.id),
     ]).timeout(_requestTimeout);
+    // Yanıt gelene kadar çıkış yapıldıysa ya da oturum başka hesaba
+    // geçtiyse eski kullanıcı yayınlanmaz.
+    if (!_isCurrentSession(authUser.id, epoch)) return null;
     final profile = results[0] as Map<String, dynamic>;
     final unlocked = results[1] as List<String>;
 
@@ -526,11 +595,21 @@ class SupabaseService {
 
   /// Yeni profilin adı. E-posta kaydında kullanıcının yazdığı ad; Google/Apple
   /// girişinde (herkese açık sıralamada görüneceği için) yalnızca ilk ad.
-  static String _initialProfileName(User authUser, String? nameHint) {
-    final metadata = authUser.userMetadata ?? const <String, dynamic>{};
-    final provider = authUser.appMetadata['provider']?.toString() ?? 'email';
+  static String _initialProfileName(User authUser, String? nameHint) => _initialProfileNameFrom(
+        provider: authUser.appMetadata['provider']?.toString(),
+        metadata: authUser.userMetadata ?? const <String, dynamic>{},
+        email: authUser.email,
+        nameHint: nameHint,
+      );
+
+  static String _initialProfileNameFrom({
+    required String? provider,
+    required Map<String, dynamic> metadata,
+    required String? email,
+    String? nameHint,
+  }) {
     String? candidate;
-    if (provider == 'email') {
+    if ((provider ?? 'email') == 'email') {
       candidate = metadata['name']?.toString();
     } else {
       final full = (metadata['full_name'] ?? metadata['name'])?.toString().trim();
@@ -539,7 +618,7 @@ class SupabaseService {
           : (metadata['given_name']?.toString() ?? full?.split(RegExp(r'\s+')).first);
     }
     var name = candidate?.trim() ?? '';
-    if (name.isEmpty) name = (authUser.email ?? '').split('@').first;
+    if (name.isEmpty) name = (email ?? '').split('@').first;
     if (name.isEmpty) name = 'Pomo';
     return name.length > _nameMaxLength ? name.substring(0, _nameMaxLength) : name;
   }
@@ -556,17 +635,34 @@ class SupabaseService {
   /// günceller ve önbelleğe yazar. null verilirse önbellek silinir.
   Future<void> setCurrentUser(UserModel? user) async {
     currentUser.value = user;
-    await _persistUser(user);
+    await _persistUser(user, epoch: _userEpoch);
   }
 
   void _publishUser(UserModel? user) {
     currentUser.value = user;
-    unawaited(_persistUser(user));
+    unawaited(_persistUser(user, epoch: _userEpoch));
   }
 
-  Future<void> _persistUser(UserModel? user) async {
+  /// [uid] hâlâ oturumdaki kullanıcı mı ve [epoch]'tan beri çıkış olmadı mı?
+  bool _isCurrentSession(String uid, int epoch) =>
+      epoch == _userEpoch && _isCloudActive && _client.auth.currentUser?.id == uid;
+
+  /// Bir istek yanıtından sonra kullanıcı modelini günceller; ancak istek
+  /// başladığından beri ([epoch]) çıkış olmadıysa ve [uid] hâlâ oturumdaysa.
+  /// Aksi halde (uçuştaki yanıt çıkıştan/hesap değişiminden sonra geldi)
+  /// hiçbir şey yayınlanmaz.
+  void _updateUserIfCurrent(String uid, int epoch, UserModel Function(UserModel user) change) {
+    final user = currentUser.value;
+    if (user == null || !_isCurrentSession(uid, epoch)) return;
+    if (user.id != null && user.id != uid) return;
+    _publishUser(change(user));
+  }
+
+  Future<void> _persistUser(UserModel? user, {required int epoch}) async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      // Bu arada çıkış yapıldıysa ('saved_user' silindi) eski kullanıcı geri yazılmaz.
+      if (user != null && epoch != _userEpoch) return;
       if (user == null) {
         await prefs.remove(_savedUserKey);
       } else {
@@ -595,12 +691,12 @@ class SupabaseService {
     if (cleanName.length < _nameMinLength) throw const ServiceException(ServiceErrorCode.nameTooShort);
     if (cleanName.length > _nameMaxLength) throw const ServiceException(ServiceErrorCode.nameTooLong);
     final uid = _requireUserId();
+    final epoch = _userEpoch;
     final rows = await _guard(
       () => _client.from('profiles').update({'name': cleanName}).eq('id', uid).select('name'),
     );
     if (rows.isEmpty) throw const ServiceException(ServiceErrorCode.notFound);
-    final user = currentUser.value;
-    if (user != null) _publishUser(user.copyWith(name: rows.first['name']?.toString() ?? cleanName));
+    _updateUserIfCurrent(uid, epoch, (user) => user.copyWith(name: rows.first['name']?.toString() ?? cleanName));
   }
 
   /// Günlük hedefi (dakika) profile yazar; tek kaynak profiles.daily_goal_minutes.
@@ -608,12 +704,12 @@ class SupabaseService {
   Future<void> updateDailyGoalMinutes(int minutes) async {
     if (minutes < _dailyGoalMin || minutes > _dailyGoalMax) throw const ServiceException(ServiceErrorCode.invalidInput);
     final uid = _requireUserId();
+    final epoch = _userEpoch;
     final rows = await _guard(
       () => _client.from('profiles').update({'daily_goal_minutes': minutes}).eq('id', uid).select('daily_goal_minutes'),
     );
     if (rows.isEmpty) throw const ServiceException(ServiceErrorCode.notFound);
-    final user = currentUser.value;
-    if (user != null) _publishUser(user.copyWith(dailyGoalMinutes: minutes));
+    _updateUserIfCurrent(uid, epoch, (user) => user.copyWith(dailyGoalMinutes: minutes));
   }
 
   static String _dailyGoalMigratedKey(String userId) => 'daily_goal_migrated_$userId';
@@ -649,6 +745,7 @@ class SupabaseService {
     final validBirthYear =
         (birthYear != null && birthYear >= _birthYearMin && birthYear <= _birthYearMax) ? birthYear : null;
     final authUser = _requireAuthUser();
+    final epoch = _userEpoch;
     await _guard(() => _ensureOwnProfile(authUser));
     if (categories.isNotEmpty) await setupOnboardingCategories(categories);
     final completedAt = DateTime.now();
@@ -663,15 +760,16 @@ class SupabaseService {
         .eq('id', authUser.id)
         .select('id'));
     if (rows.isEmpty) throw const ServiceException(ServiceErrorCode.notFound);
-    final user = currentUser.value;
-    if (user != null) {
-      _publishUser(user.copyWith(
+    _updateUserIfCurrent(
+      authUser.id,
+      epoch,
+      (user) => user.copyWith(
         birthYear: validBirthYear,
         userSegment: userSegment,
         dailyGoalMinutes: dailyGoalMinutes,
         onboardingCompletedAt: completedAt,
-      ));
-    }
+      ),
+    );
   }
 
   // Seans sonrası profildeki sayaçları sunucudan tazeler (deltaların doğruluğu).
@@ -686,6 +784,7 @@ class SupabaseService {
     final user = currentUser.value;
     final uid = _isCloudActive ? _client.auth.currentUser?.id : null;
     if (user == null || uid == null || (user.id != null && user.id != uid)) return;
+    final epoch = _userEpoch;
     try {
       final row = await _client
           .from('profiles')
@@ -693,10 +792,9 @@ class SupabaseService {
           .eq('id', uid)
           .maybeSingle()
           .timeout(_requestTimeout);
-      final latest = currentUser.value;
-      if (row == null || latest == null) return;
-      final fresh = UserModel.fromMap({...latest.toMap(), ...row});
-      _publishUser(fresh);
+      // A için okunan sayaçlar, bu arada oturuma giren B'nin modeline yazılmaz.
+      if (row == null) return;
+      _updateUserIfCurrent(uid, epoch, (latest) => UserModel.fromMap({...latest.toMap(), ...row}));
     } catch (e) {
       debugPrint('[DATA] Profil sayaçları tazelenemedi: $e');
     }
@@ -760,16 +858,22 @@ class SupabaseService {
     return result;
   }
 
-  /// Bekleyen seansları göndermeyi dener; kalan seans sayısını döndürür.
-  Future<int> syncPendingSessions() async {
+  /// Bekleyen seansları göndermeyi dener. Kalan seans sayısını ve kalanların
+  /// kendiliğinden yeniden denenmeye değer olup olmadığını ([retryable]: ağ,
+  /// zaman aşımı, sunucu ya da oturum hatası; yalnızca çakışma değil)
+  /// döndürür.
+  Future<({int remaining, bool retryable})> syncPendingSessions() async {
     final owner = _queueOwner();
     final uid = owner.userId;
-    if (uid == null) return 0;
+    if (uid == null) return (remaining: 0, retryable: false);
     if (owner.email != null) await _queue.adoptLegacyQueue(userId: uid, email: owner.email!);
-    if (!_isCloudActive || _client.auth.currentUser?.id != uid) return _queue.pendingCount(uid);
+    if (!_isCloudActive || _client.auth.currentUser?.id != uid) {
+      // Oturum henüz yok/başka hesap: oturum olayı (giriş, token yenileme) tetikler.
+      return (remaining: await _queue.pendingCount(uid), retryable: false);
+    }
     final report = await _queue.sync(uid);
     if (report.sent > 0) _notifyStatsChanged();
-    return report.remaining;
+    return (remaining: report.remaining, retryable: report.hasRetryableFailure);
   }
 
   /// Oturumdaki kullanıcının bekleyen seansları (started_at sırasıyla).
@@ -809,7 +913,7 @@ class SupabaseService {
     final user = currentUser.value;
     if (user == null || (user.id != null && user.id != userId)) return;
     if (!result.duplicate) {
-      final day = studyDayKey(studyDayOf(session.startedAt.toLocal()));
+      final day = studyDayKey(studyDayOf(session.startedAt, timeZone: user.timezone));
       final last = user.lastStudyDate;
       _publishUser(user.copyWith(
         id: userId,
@@ -1028,6 +1132,21 @@ class SupabaseService {
     return _rows(await _guard(() => _client.rpc('get_my_league_ranking')));
   }
 
+  // Son okunan puan kuralları; seans sonucu bildirimi gibi eşzamanlı
+  // yerlerde kullanılır.
+  Map<String, dynamic> _pointsConfigCache = const {};
+
+  // Sunucunun günlük tavanı (complete_study_session); config okunamadıysa.
+  static const int _defaultDailySessionLimit = 16;
+
+  /// Günde puan ve kum kazandıran en fazla seans sayısı
+  /// (get_points_config.daily_league_session_limit). Sonraki seanslar 0 puan
+  /// ve 0 kum alır; yalnızca dakika ve seri sayılır.
+  int get dailySessionLimit {
+    final value = _pointsConfigCache['daily_league_session_limit'];
+    return value is num && value > 0 ? value.toInt() : _defaultDailySessionLimit;
+  }
+
   // Puan hesabında kullanılan sabitleri sunucudan okur (bkz. get_points_config
   // RPC'si). Bu değerler complete_study_session RPC'sinin gövdesindeki
   // sabitlerle aynı tutulmalıdır; UI tarafında asla hardcode edilmez.
@@ -1035,7 +1154,7 @@ class SupabaseService {
     if (_isCloudActive) {
       try {
         final response = await _client.rpc('get_points_config').timeout(_requestTimeout);
-        if (response is Map) return Map<String, dynamic>.from(response);
+        if (response is Map) return _pointsConfigCache = Map<String, dynamic>.from(response);
       } catch (e) {
         debugPrint('[RANKING] getPointsConfig hatası: $e');
       }
@@ -1098,27 +1217,26 @@ class SupabaseService {
   /// açar). Yeni bakiyeyi döndürür; [currentUser] güncellenir. Hata
   /// durumunda [ServiceException] (insufficientCoins, premiumRequired, …).
   Future<int> purchaseAvatar(String avatarId) async {
-    _requireUserId();
+    final uid = _requireUserId();
+    final epoch = _userEpoch;
     final response = await _guard(() => _client.rpc('purchase_avatar', params: {'p_avatar_id': avatarId}));
     if (response is! num) throw const ServiceException(ServiceErrorCode.server);
     final newCoins = response.toInt();
-    final user = currentUser.value;
-    if (user != null) {
-      _publishUser(user.copyWith(
-        coins: newCoins,
-        unlockedAvatars: {...user.unlockedAvatars, avatarId}.toList(),
-      ));
-    }
+    _updateUserIfCurrent(
+      uid,
+      epoch,
+      (user) => user.copyWith(coins: newCoins, unlockedAvatars: {...user.unlockedAvatars, avatarId}.toList()),
+    );
     return newCoins;
   }
 
   /// Avatarı kuşanır; [currentUser] güncellenir. Sahip olunmayan avatar için
   /// sunucu reddeder ve [ServiceException] (avatarLocked) fırlatılır.
   Future<void> setEquippedAvatar(String avatarId) async {
-    _requireUserId();
+    final uid = _requireUserId();
+    final epoch = _userEpoch;
     await _guard(() => _client.rpc('set_equipped_avatar', params: {'p_avatar_id': avatarId}));
-    final user = currentUser.value;
-    if (user != null) _publishUser(user.copyWith(avatarId: avatarId));
+    _updateUserIfCurrent(uid, epoch, (user) => user.copyWith(avatarId: avatarId));
   }
 
   // ---- Kategoriler ----

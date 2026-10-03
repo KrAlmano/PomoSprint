@@ -275,8 +275,11 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     );
   }
 
-  /// Seansı kaydetmeden bırakır (Sıfırla & Durdur).
-  void _discardSession() {
+  /// Seansı kaydetmeden bırakır (Sıfırla & Durdur / Sıfırla). [expectedUuid]
+  /// verilirse yalnızca o seans hâlâ sürüyorsa bırakılır: onay diyaloğu
+  /// açıkken süre dolup seans tamamlandıysa tamamlanan kayıt silinmez.
+  void _discardSession({String? expectedUuid}) {
+    if (expectedUuid != null && _session?.clientUuid != expectedUuid) return;
     _timer?.cancel();
     unawaited(NotificationService.instance.cancelSessionEndNotification());
     final categoryName = _session?.categoryName ?? selectedCategoryName;
@@ -285,17 +288,66 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     widget.onTimerStateChanged?.call(false, categoryName, 0);
   }
 
+  // Süre yalnızca seans yokken seçilir. Seans sürerken ya da
+  // duraklatılmışken süre çipleri (kategori çipleri gibi) kilitlidir;
+  // seansı bırakmanın tek yolu onaylı "Sıfırla"dır. Eskiden duraklatılmış
+  // seans, süre çipine (seçili olana bile) tek dokunuşla onaysız siliniyordu.
   void _selectDuration(int minutes) {
-    // Duraklatılmış bir seans varsa süre değişince sıfırlanır.
-    if (_hasSession) unawaited(_store.clear(widget.sessionOwnerKey));
-    _foregroundSeconds = 0;
+    if (_hasSession) {
+      if (minutes != loggedMinutes) {
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(SnackBar(
+            content: Text(AppLocalizations.of(context)!.timerDurationLocked),
+            behavior: SnackBarBehavior.floating,
+          ));
+      }
+      return;
+    }
+    if (minutes == loggedMinutes) return;
     setState(() {
       loggedMinutes = minutes;
       totalSeconds = timerDurationSeconds(minutes);
       remaining = totalSeconds;
-      _session = null;
       _validateSelectedCategory();
     });
+  }
+
+  /// Süren ya da duraklatılmış seansı onayla bırakır.
+  Future<void> _confirmDiscardSession() async {
+    final target = _session?.clientUuid;
+    if (target == null) return;
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(l10n.timerResetConfirmTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
+        content: Text(l10n.timerResetConfirmBody, style: const TextStyle(fontSize: 14, height: 1.4)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(
+              l10n.timerResetConfirmAction,
+              style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted || _session?.clientUuid != target) return;
+    _discardSession(expectedUuid: target);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(LanguageService.instance.translate('session_reset')),
+        backgroundColor: AppColors.outline,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   Future<void> _show321CountdownAndStart() async {
@@ -360,6 +412,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
 
   void _showPauseLimitDialog() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final target = _session?.clientUuid;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -393,7 +446,8 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
-              _discardSession();
+              if (target == null || _session?.clientUuid != target) return;
+              _discardSession(expectedUuid: target);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(LanguageService.instance.translate('session_reset')),
@@ -624,7 +678,8 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                           return Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 6),
                             child: GestureDetector(
-                              onTap: isRunning ? null : () => _selectDuration(mins),
+                              // Seans varken kilitli (bkz. _selectDuration).
+                              onTap: () => _selectDuration(mins),
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 200),
                                 padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
@@ -646,7 +701,8 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                                     fontWeight: FontWeight.bold,
                                     color: isSel
                                         ? Colors.white
-                                        : (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
+                                        : (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant)
+                                            .withValues(alpha: _hasSession ? 0.45 : 1),
                                   ),
                                 ),
                               ),
@@ -724,7 +780,20 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    // Süren ya da duraklatılmış seansı onayla bırakma.
+                    if (_hasSession) ...[
+                      const SizedBox(height: 6),
+                      TextButton.icon(
+                        onPressed: _confirmDiscardSession,
+                        icon: const Icon(Icons.restart_alt_rounded, size: 18),
+                        label: Text(l10n.timerResetBtn),
+                        style: TextButton.styleFrom(
+                          foregroundColor: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                    ] else
+                      const SizedBox(height: 24),
                   ],
                 );
 
