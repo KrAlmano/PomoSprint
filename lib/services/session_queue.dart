@@ -7,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart' show AuthException, Post
 import 'package:uuid/uuid.dart';
 
 import '../utils/async_lock.dart';
+import '../utils/category_names.dart';
 import 'server_clock.dart';
 import 'service_errors.dart' show ServiceErrorCode, ServiceException, isNetworkError;
 
@@ -421,14 +422,15 @@ typedef CategoryRef = ({String id, String name, bool isArchived});
 
 /// Yer tutucu/geçersiz kategoriyle tamamlanmış seans için sunucu kategorisi
 /// seçer: önce isimle (aktifler öncelikli, sonra arşivlenmiş), eşleşme yoksa
-/// ilk aktif kategori. Hiç kategori yoksa null.
+/// ilk aktif kategori. Hiç kategori yoksa null. İsim eşlemesi dilden
+/// bağımsızdır: yer tutucu 'Fizik', İngilizce saklanmış 'Physics' ile eşleşir.
 String? resolveCategoryId(String categoryName, List<CategoryRef> categories) {
-  final wanted = categoryName.trim().toLowerCase();
+  final wanted = categoryName.trim().isEmpty ? '' : categoryMatchKey(categoryName);
   CategoryRef? archivedMatch;
   CategoryRef? firstActive;
   CategoryRef? firstAny;
   for (final c in categories) {
-    if (wanted.isNotEmpty && c.name.trim().toLowerCase() == wanted) {
+    if (wanted.isNotEmpty && categoryMatchKey(c.name) == wanted) {
       if (!c.isArchived) return c.id;
       archivedMatch ??= c;
     }

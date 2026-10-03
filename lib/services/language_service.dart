@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../utils/category_names.dart';
+
 enum AppLanguage { tr, en }
 
 class LanguageService extends ChangeNotifier {
@@ -39,76 +41,10 @@ class LanguageService extends ChangeNotifier {
     await prefs.setString(_prefKey, language.name);
   }
 
-  String translateCatName(String catName) {
-    final lower = catName.trim().toLowerCase();
-    if (lower == 'matematik' || lower == 'mathematics') {
-      return isTurkish ? 'Matematik' : 'Mathematics';
-    }
-    if (lower == 'fizik' || lower == 'physics') {
-      return isTurkish ? 'Fizik' : 'Physics';
-    }
-    if (lower == 'tarih' || lower == 'history') {
-      return isTurkish ? 'Tarih' : 'History';
-    }
-    if (lower == 'kimya' || lower == 'chemistry') {
-      return isTurkish ? 'Kimya' : 'Chemistry';
-    }
-    if (lower == 'biyoloji' || lower == 'biology') {
-      return isTurkish ? 'Biyoloji' : 'Biology';
-    }
-    if (lower == 'edebiyat' || lower == 'literature') {
-      return isTurkish ? 'Edebiyat' : 'Literature';
-    }
-    if (lower == 'ingilizce' || lower == 'english') {
-      return isTurkish ? 'İngilizce' : 'English';
-    }
-    if (lower == 'türkçe' || lower == 'turkish') {
-      return isTurkish ? 'Türkçe' : 'Turkish';
-    }
-    // Onboarding'de önerilen ek kategoriler (segment bazlı öneriler).
-    // Kaydedilen kategori adı her zaman Türkçe kalır — burada sadece
-    // görüntüleme metni değişir, translateCatName'in geri kalanıyla aynı
-    // desen. 'İ' harfi içeren karşılaştırmalarda Dart'ın toLowerCase()'i
-    // Türkçe'ye özgü olmadığı için, sabit küçük harf yazmak yerine
-    // orijinal string'i runtime'da toLowerCase() ile karşılaştırıyoruz.
-    if (lower == 'fen bilimleri' || lower == 'science') {
-      return isTurkish ? 'Fen Bilimleri' : 'Science';
-    }
-    if (lower == 'din kültürü' || lower == 'religious culture') {
-      return isTurkish ? 'Din Kültürü' : 'Religious Culture';
-    }
-    if (lower == 'coğrafya' || lower == 'geography') {
-      return isTurkish ? 'Coğrafya' : 'Geography';
-    }
-    if (lower == 'felsefe' || lower == 'philosophy') {
-      return isTurkish ? 'Felsefe' : 'Philosophy';
-    }
-    if (lower == 'ders çalışma' || lower == 'studying') {
-      return isTurkish ? 'Ders Çalışma' : 'Studying';
-    }
-    if (lower == 'ödev' || lower == 'homework') {
-      return isTurkish ? 'Ödev' : 'Homework';
-    }
-    if (lower == 'proje' || lower == 'project') {
-      return isTurkish ? 'Proje' : 'Project';
-    }
-    if (lower == 'sınav hazırlık' || lower == 'exam prep') {
-      return isTurkish ? 'Sınav Hazırlık' : 'Exam Prep';
-    }
-    if (lower == 'derin çalışma' || lower == 'deep work') {
-      return isTurkish ? 'Derin Çalışma' : 'Deep Work';
-    }
-    if (lower == 'okuma' || lower == 'reading') {
-      return isTurkish ? 'Okuma' : 'Reading';
-    }
-    if (lower == 'öğrenme' || lower == 'learning') {
-      return isTurkish ? 'Öğrenme' : 'Learning';
-    }
-    if (lower == 'T.C. İnkılap Tarihi'.toLowerCase() || lower == 'turkish revolution history') {
-      return isTurkish ? 'T.C. İnkılap Tarihi' : 'Turkish Revolution History';
-    }
-    return catName;
-  }
+  /// Hazır kategori adının arayüz dilindeki karşılığı (DB'deki ad Türkçe ya
+  /// da İngilizce olabilir; kullanıcının kendi adı olduğu gibi kalır). Tablo:
+  /// utils/category_names.dart.
+  String translateCatName(String catName) => localizedKnownCategoryName(catName, turkish: isTurkish);
 
   String translateTableName(String tableName) {
     if (tableName == 'Sessiz Masa A1' || tableName == 'Silent Table A1') {

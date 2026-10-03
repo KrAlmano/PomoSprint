@@ -14,12 +14,15 @@ class CategoryStyle {
 }
 
 /// Bir istatistik satırının rengi ve ikonu; tüm sekmelerde aynı kural:
-/// renk önce seansın sunucudaki kategori renginden (arşivlenmiş kategoriler
-/// dahil), yoksa aktif kategoriden (önce kimlik, sonra ad), en son nötr renk.
+/// renk ve ikon önce seansın sunucudaki kategorisinden (arşivlenmiş
+/// kategoriler dahil; [colorHex], [iconName]), yoksa aktif kategoriden (önce
+/// kimlik, sonra ad), en son nötr renk ve kitap ikonu. Renk ve ikon aynı
+/// kaynaktan gelir; yarı eski yarı yeni görünüm oluşmaz.
 CategoryStyle categoryStyleFor({
   required String name,
   String? categoryId,
   String? colorHex,
+  String? iconName,
   required List<CourseCategory> categories,
 }) {
   CourseCategory? match;
@@ -28,6 +31,8 @@ CategoryStyle categoryStyleFor({
   final fallback = match?.color ?? kStatsNeutralColor;
   return CategoryStyle(
     color: colorHex == null ? fallback : colorFromHex(colorHex, fallback: fallback),
-    icon: match?.icon ?? Icons.book_outlined,
+    icon: colorHex != null && iconName != null
+        ? CourseCategory.iconForName(iconName)
+        : (match?.icon ?? CourseCategory.iconForName(iconName)),
   );
 }

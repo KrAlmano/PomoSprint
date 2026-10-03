@@ -45,6 +45,14 @@ canlıda uygulanmış olmalı (`my_friend_ids`, `study_day_of`,
 | 8 | `09_categories.sql` | P3 | Kategori adı 1-40 karakter, büyük/küçük harf duyarsız benzersizlik (önce veri temizliği), RPC'lerde tek kaynaklı limit, `update_category`. | AUTH-19, BACKEND-28, AUTH-18 |
 | 9 | `08_privileges.sql` | P3 | Fonksiyonlar varsayılan olarak anon'a kapalı; extensions kullanan fonksiyonların search_path'i. | BACKEND-25 |
 | 10 | `10_data_fixes.sql` | P3 | Sahip olunmayan ücretli avatarlar, görseli olmayan avatar, abone e-postalarının normalizasyonu. Kullanıcıya görünür; ürün kararıyla. | SOCIAL-15, AUTH-21, DATA-25, SOCIAL-27, LANDING-08 |
+| 11 | `12_monthly_leaderboard_study_month.sql` (+ `_down`, `_dryrun`) | P2 | Aylık sıralamada 'bu ay' = çalışma ayı (started_at, profil dilimi, 04:00); Raporlar > Aylık ile aynı kural. CANLI gövdeden yazıldı; `11`'e bağımlı değil. Uygulanınca istemcide `nextMonthlyLeaderboardReset` 04:00'e. | MH-1, X2 |
+| 12 | `13_categories_order_and_privileges.sql` (+ `_down`, `_dryrun`) | P3 | Yeni ve arşivden çıkan kategori sona; tek seferlik sıra eşitliği çözümü; DELETE politikası/yetkisi kaldırılır, UPDATE yalnız 5 kolona. CANLI gövdeden yazıldı; `11`'e bağımlı değil. | CAT-07, CAT-10 |
+
+`12` ve `13` diğerlerinden farklı olarak doğrudan uygulanmaya hazırdır: canlı
+tanımlar (3 Ekim 2026) esas alındı, DRYRUN dosyaları geri alınan bir
+transaction'da senaryoları çalıştırır (yerel bir taklitte doğrulandı: tümü
+`true`, eski tanımla `false`). Önce `_dryrun.sql`'i SQL Editor'de çalıştırın,
+sonra ana dosyanın `\echo`/`\quit` satırlarını silip çalıştırın.
 
 `01` ile `07`'nin D bölümü birlikte düşünülmeli: `01`'deki DEĞİŞİKLİK 5,
 `07`'deki `active_session_client_uuid` kolonuna dayanır.

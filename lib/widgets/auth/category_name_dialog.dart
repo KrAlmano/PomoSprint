@@ -24,6 +24,25 @@ bool isCategoryNameTaken(String name, Iterable<String> existingNames) {
   return existingNames.any((e) => categoryNameKey(e) == key);
 }
 
+/// Yeni kategori için varsayılan renk: [usedHexes] arasında olmayan ilk
+/// palet rengi; hepsi kullanılıyorsa palet sırayla döner. Böylece iki
+/// kategori raporlarda aynı renkle görünmez.
+String firstUnusedPaletteColor(Iterable<String> usedHexes) {
+  String norm(String hex) => colorToHex(colorFromHex(hex));
+  final used = {for (final h in usedHexes) norm(h)};
+  for (final hex in kCategoryPalette) {
+    if (!used.contains(norm(hex))) return hex;
+  }
+  return kCategoryPalette[used.length % kCategoryPalette.length];
+}
+
+/// Düzenleme diyaloğundan dönen adın kaydedilecek hâli. Diyalog adı arayüz
+/// dilinde gösterir ([shownName]); kullanıcı ona dokunmadıysa sunucudaki ad
+/// ([storedName], ör. 'Matematik') korunur. Büyük/küçük harf düzeltmesi dahil
+/// her değişiklik kaydedilir.
+String categoryNameToSave({required String storedName, required String shownName, required String editedName}) =>
+    editedName.trim() == shownName.trim() ? storedName : editedName.trim();
+
 typedef CategoryDialogResult = ({String name, String colorHex});
 
 /// Kategori adı (ve isteğe bağlı renk) soran diyalog. Ad 1..40 karakter

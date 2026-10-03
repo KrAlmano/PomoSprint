@@ -278,14 +278,21 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Widget _buildEfficiencyCard(int weekMinutes) {
     final lang = LanguageService.instance;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    // Haftalık hedef = günlük hedef × 7
+    // Yüzde: haftalık hedefin (günlük hedef × 7) ne kadarı yapıldı.
     final efficiency = goalPercent(weekMinutes, widget.dailyGoalMinutes * 7);
+    // Etiket: haftanın GEÇEN günlerinin hedefine göre; Pazartesi hedefini
+    // tutturan kullanıcı 'Normal' değil 'Çok Yüksek' görür.
+    final pace = elapsedWeekGoalPercent(weekMinutes, widget.dailyGoalMinutes, mondayOf(widget.today), widget.today);
 
-    String label = lang.translate('eff_normal');
-    if (efficiency >= 80) {
+    final String label;
+    if (weekMinutes <= 0) {
+      label = AppLocalizations.of(context)!.statsWeekNotStarted;
+    } else if (pace >= 80) {
       label = lang.translate('eff_very_high');
-    } else if (efficiency >= 50) {
+    } else if (pace >= 50) {
       label = lang.translate('eff_high');
+    } else {
+      label = lang.translate('eff_normal');
     }
 
     return Container(
@@ -426,14 +433,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              if (hours > 0 || mins == 0) ...[
+                              // Sıfır '0dk' görünür (formatStudyMinutes ile aynı kural).
+                              if (hours > 0) ...[
                                 Text('$hours', style: bigNumber),
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 4, left: 2, right: 4),
                                   child: Text(hourAbbr, style: unit),
                                 ),
                               ],
-                              if (mins > 0) ...[
+                              if (mins > 0 || hours == 0) ...[
                                 Text('$mins', style: bigNumber),
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 4, left: 2),
@@ -617,8 +625,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
               name: sub.name,
               categoryId: sub.categoryId,
               colorHex: sub.colorHex,
+              iconName: sub.iconName,
               categories: widget.categories,
             );
+            final variant = isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant;
             final factor = (sub.minutes / maxSubjectMins).clamp(0.0, 1.0);
 
             return MergeSemantics(
@@ -642,12 +652,22 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           ),
                         ),
                         const SizedBox(width: 8),
+                        // Günlük sekmeyle aynı: senkron bekleyen seans varsa işaret.
+                        if (sub.pendingSessions > 0) ...[
+                          Icon(
+                            Icons.cloud_upload_outlined,
+                            size: 14,
+                            color: variant,
+                            semanticLabel: l10n.statsPendingSessions(sub.pendingSessions),
+                          ),
+                          const SizedBox(width: 4),
+                        ],
                         Text(
                           StatsText.duration(sub.minutes),
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
-                            color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                            color: variant,
                           ),
                         ),
                       ],

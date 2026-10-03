@@ -228,33 +228,15 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
   }
 
   /// Kategoriler: bulut asıl kaynak; erişilemezse cihazdaki önbellek, o da
-  /// yoksa yer tutucular. Buluta yerel veri yazılmaz (başka cihazdaki
-  /// değişiklikleri ezebilir); tek istisna hiç aktif kategorisi olmayan hesap.
+  /// yoksa yer tutucular (bkz. [loadShellCategories]).
   Future<void> _loadCategories() async {
-    final email = _user.email;
-    var categories = await _fetchCloudCategories();
-    if (categories != null && categories.isNotEmpty) {
-      await CategoryCache.write(email, categories);
-    } else {
-      categories = await CategoryCache.read(email) ?? CourseCategory.initialCategories();
-    }
-    if (mounted) setState(() => _categories = categories!);
-  }
-
-  Future<List<CourseCategory>?> _fetchCloudCategories() async {
-    if (!_service.isCloudActive) return null;
-    try {
-      final cloud = await _service.fetchUserCategories();
-      if (cloud.isNotEmpty || _categorySeedAttempted) return cloud;
-      // Onboarding'i bitmiş kullanıcının bulutta aktif kategorisi yoksa yerel
-      // liste sunucuda oluşturulur (kimlikleri sunucu üretir); yer tutucu
-      // kimliklerle kalınmaz. Tur başına bir kez denenir.
-      _categorySeedAttempted = true;
-      return await _service.ensureServerCategories(await CategoryCache.read(_user.email) ?? const []);
-    } catch (e) {
-      debugPrint('[SHELL] Kategoriler buluttan alınamadı, önbelleğe düşülüyor: $e');
-      return null;
-    }
+    final result = await loadShellCategories(
+      _service,
+      email: _user.email,
+      seedAttempted: _categorySeedAttempted,
+    );
+    _categorySeedAttempted = result.seedAttempted;
+    if (mounted) setState(() => _categories = result.categories);
   }
 
   void _onTimerStateChanged(bool isRunning, String categoryName, int minutesLeft) {
@@ -405,7 +387,9 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
                 ? null
                 : buildShellAppBar(
                     context,
-                    streakDays: _currentIndex == 0 ? user.streakDays : null,
+                    // Seri 04:00 gün dönümünde sekme değişmeden de tazelenir.
+                    streakDays: null,
+                    streakAt: _currentIndex == 0 ? user.streakOn : null,
                     points: user.lifetimePoints,
                     coins: user.coins,
                     onStatsTap: () => showLeagueInfoSheet(context),
@@ -442,4 +426,50 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
       },
     );
   }
+}
+
+/// Kabuğun gösterdiği kategoriler: bulut asıl kaynak; erişilemezse cihazdaki
+/// önbellek, o da yoksa yer tutucular. Buluta yerel veri yazılmaz (başka
+/// cihazdaki değişiklikleri ezebilir); tek istisna HİÇ kategorisi (arşiv
+/// dahil) olmayan hesap. [seedAttempted] tur başına tek tohumlama denemesini
+/// izler.
+@visibleForTesting
+Future<({List<CourseCategory> categories, bool seedAttempted})> loadShellCategories(
+  SupabaseService service, {
+  required String email,
+  required bool seedAttempted,
+}) async {
+  var attempted = seedAttempted;
+  List<CourseCategory>? cloud;
+  if (service.isCloudActive) {
+    try {
+      final active = await service.fetchUserCategories();
+      if (active.isNotEmpty || attempted) {
+        cloud = active;
+      } else {
+        attempted = true;
+        // Kategorileri arşivde duran hesapta boş aktif liste geçerlidir:
+        // arşivlenen kategori geri getirilmez, kopyası açılmaz. Yalnızca hiç
+        // kategorisi olmayan hesapta yerel liste (yoksa varsayılanlar)
+        // sunucuda oluşturulur; kimlikleri sunucu üretir. Tur başına bir kez.
+        final all = await service.fetchUserCategories(includeArchived: true);
+        cloud = all.isNotEmpty
+            ? active
+            : await service.ensureServerCategories(await CategoryCache.read(email) ?? const []);
+      }
+    } catch (e) {
+      debugPrint('[SHELL] Kategoriler buluttan alınamadı, önbelleğe düşülüyor: $e');
+      cloud = null;
+    }
+  }
+  final List<CourseCategory> categories;
+  if (cloud != null) {
+    // Başarılı bulut yanıtı (boş olsa da) önbelleği ezer: önbellekte aktif
+    // görünen ama sunucuda arşivlenmiş kategori sayaçta seçilemez.
+    await CategoryCache.write(email, cloud);
+    categories = cloud;
+  } else {
+    categories = await CategoryCache.read(email) ?? CourseCategory.initialCategories();
+  }
+  return (categories: categories, seedAttempted: attempted);
 }

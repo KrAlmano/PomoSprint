@@ -86,7 +86,9 @@ class _DailyGoalSheetState extends State<_DailyGoalSheet> {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final accent = isDark ? AppColors.darkPrimary : AppColors.primary;
-    final pomodoros = (_goal / kPomodoroMinutes).round();
+    // Hedefe ulaşmak için gereken pomodoro (yukarı yuvarlanır): 60 dk → 3;
+    // seanslar 25/50 dk olduğundan 2 pomodoro (50 dk) 1 saati doldurmaz.
+    final pomodoros = (_goal + kPomodoroMinutes - 1) ~/ kPomodoroMinutes;
     // Yatay telefonda dikey alan kıt: boşluklar sıkılaşır, içerik kaydırılır.
     final short = Responsive.of(context).isShortHeight;
 
@@ -152,7 +154,7 @@ class _DailyGoalSheetState extends State<_DailyGoalSheet> {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          l10n.statsGoalPomodoroApprox(pomodoros),
+                          l10n.statsGoalPomodorosNeeded(pomodoros),
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,

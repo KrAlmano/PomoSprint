@@ -1,5 +1,8 @@
+import '../models/category_model.dart';
 import '../models/study_session.dart';
-import '../services/session_queue.dart' show PendingSession;
+import '../services/server_clock.dart';
+import '../services/session_queue.dart' show PendingSession, SessionReason, isUuidCategoryId;
+import 'category_names.dart';
 import 'study_day.dart';
 
 // İstatistik ekranlarının (Günlük / Haftalık / Aylık) ortak, saf hesapları.
@@ -9,6 +12,8 @@ import 'study_day.dart';
 // - Tüm gün adımları takvim aritmetiğiyle yapılır (DateTime(y, m, d + n));
 //   Duration eklenmez, böylece yaz saati geçişlerinde gün kaymaz.
 // - Gün karşılaştırmaları 'yyyymmdd' tamsayı anahtarıyla yapılır.
+// - Kategori toplamları kategori KİMLİĞİYLE gruplanır (yeniden adlandırma
+//   satırı bölmez); kimliği olmayan seanslar adla gruplanır.
 
 const int kPomodoroMinutes = 25;
 
@@ -27,6 +32,8 @@ class StatSession {
     required this.categoryName,
     this.categoryId,
     this.colorHex,
+    this.iconName,
+    this.clientUuid,
     this.pending = false,
   });
 
@@ -36,15 +43,24 @@ class StatSession {
         categoryName: s.categoryName,
         categoryId: s.categoryId,
         colorHex: s.colorHex,
+        iconName: s.iconName,
+        clientUuid: s.clientUuid,
       );
 
-  factory StatSession.fromPending(PendingSession p) => StatSession(
-        day: studyDayOf(p.startedAt),
-        minutes: p.minutes,
-        categoryName: p.categoryName,
-        categoryId: p.categoryId,
-        pending: true,
-      );
+  /// Kuyruktaki seans. Günü, kuyruğun sunucuya göndereceği başlangıçla
+  /// (cihaz saati + kayıttaki saat farkı; kayıtta yoksa [clockOffset])
+  /// hesaplanır; böylece seans senkrondan sonra gün değiştirmez.
+  factory StatSession.fromPending(PendingSession p, {Duration? clockOffset}) {
+    final offset = p.clockOffsetMs != null ? Duration(milliseconds: p.clockOffsetMs!) : clockOffset;
+    return StatSession(
+      day: studyDayOf(p.startedAt.add(ServerClock.correctionFor(offset))),
+      minutes: p.minutes,
+      categoryName: p.categoryName,
+      categoryId: p.categoryId,
+      clientUuid: p.clientUuid,
+      pending: true,
+    );
+  }
 
   /// Çalışma günü (yerel gece yarısı).
   final DateTime day;
@@ -52,9 +68,98 @@ class StatSession {
   final String categoryName;
   final String? categoryId;
   final String? colorHex;
+  final String? iconName;
+  final String? clientUuid;
   final bool pending;
 
   int get pomodoros => minutes ~/ kPomodoroMinutes;
+
+  StatSession copyWith({
+    String? categoryName,
+    String? categoryId,
+    String? colorHex,
+    String? iconName,
+    bool? pending,
+  }) =>
+      StatSession(
+        day: day,
+        minutes: minutes,
+        categoryName: categoryName ?? this.categoryName,
+        categoryId: categoryId ?? this.categoryId,
+        colorHex: colorHex ?? this.colorHex,
+        iconName: iconName ?? this.iconName,
+        clientUuid: clientUuid,
+        pending: pending ?? this.pending,
+      );
+}
+
+/// Kuyruktaki seansların istatistiğe girenleri. Sunucunun 'overlap' ile
+/// yanıtladığı seans (aynı aralıkta kayıtlı başka seans var; sunucu onu
+/// hiçbir zaman kabul etmez) sayılmaz; kuyrukta kalır ve kabuktaki bekleyen
+/// seans bandında görünmeye devam eder.
+List<StatSession> pendingStatSessions(Iterable<PendingSession> queue, {Duration? clockOffset}) => [
+      for (final p in queue)
+        if (p.lastError != SessionReason.overlap) StatSession.fromPending(p, clockOffset: clockOffset),
+    ];
+
+typedef _CategoryInfo = ({String name, String? colorHex, String? iconName});
+
+/// Sunucu ve kuyruk seanslarını tek listede birleştirir:
+/// - client_uuid'si sunucu listesinde olan bekleyen seans atılır (sunucuya
+///   yazılmış ama yanıtı kaybolmuş seans iki kez sayılmaz).
+/// - Bekleyen seansın kategorisi kimliğiyle (yer tutucu kimlikte, kuyruk gibi
+///   dilden bağımsız adla) çözülür: ad, renk ve ikon önce sunucu
+///   seanslarından (güncel birleşim; arşivlenmiş kategoriler dahil), yoksa
+///   aktif [categories] listesinden alınır.
+List<StatSession> mergeStatSessions({
+  required List<StatSession> remote,
+  required List<StatSession> pending,
+  List<CourseCategory> categories = const [],
+}) {
+  final remoteUuids = {
+    for (final s in remote)
+      if (s.clientUuid != null) s.clientUuid!.toLowerCase(),
+  };
+  final known = <String, _CategoryInfo>{
+    for (final c in categories)
+      if (isUuidCategoryId(c.id)) c.id: (name: c.name, colorHex: c.colorHex, iconName: c.iconName),
+  };
+  for (final s in remote) {
+    final id = s.categoryId;
+    if (id != null && isUuidCategoryId(id)) known[id] = (name: s.categoryName, colorHex: s.colorHex, iconName: s.iconName);
+  }
+
+  String? idByName(String name) {
+    if (name.trim().isEmpty) return null;
+    final key = categoryMatchKey(name);
+    // Kuyruğun eşlemesiyle aynı öncelik: önce aktif kategoriler.
+    for (final c in categories) {
+      if (isUuidCategoryId(c.id) && !c.isArchived && categoryMatchKey(c.name) == key) return c.id;
+    }
+    for (final e in known.entries) {
+      if (categoryMatchKey(e.value.name) == key) return e.key;
+    }
+    return null;
+  }
+
+  StatSession resolve(StatSession p) {
+    final id = isUuidCategoryId(p.categoryId) ? p.categoryId : idByName(p.categoryName);
+    final info = id == null ? null : known[id];
+    if (id == null || info == null) return p;
+    return p.copyWith(categoryId: id, categoryName: info.name, colorHex: info.colorHex, iconName: info.iconName);
+  }
+
+  return [
+    ...remote,
+    for (final p in pending)
+      if (p.clientUuid == null || !remoteUuids.contains(p.clientUuid!.toLowerCase())) resolve(p),
+  ];
+}
+
+/// Seansın kategori grubu: UUID kimliği varsa kimlik, yoksa ad.
+String statGroupKey(StatSession s) {
+  final id = s.categoryId;
+  return id != null && isUuidCategoryId(id) ? 'id:${id.toLowerCase()}' : 'name:${s.categoryName}';
 }
 
 // ---- Takvim yardımcıları ----
@@ -140,32 +245,43 @@ class CategoryStat {
     required this.sessions,
     required this.pomodoros,
     required this.pendingSessions,
+    this.key = '',
     this.categoryId,
     this.colorHex,
+    this.iconName,
   });
 
+  /// Gruplama anahtarı ([statGroupKey]).
+  final String key;
   final String name;
   final String? categoryId;
   final String? colorHex;
+  final String? iconName;
   final int minutes;
   final int sessions;
   final int pomodoros;
   final int pendingSessions;
 }
 
-/// Kategori toplamları, çoktan aza (eşitlikte ada göre). Gruplama adla
-/// yapılır: sunucu birleşimi kategorinin güncel adını verir.
+/// Kategori toplamları, çoktan aza (eşitlikte ada göre). Gruplama kategori
+/// kimliğiyle yapılır; ad, renk ve ikon önce sunucu seanslarından (güncel
+/// birleşim), yoksa bekleyen seanstan alınır.
 List<CategoryStat> totalsByCategory(Iterable<StatSession> sessions) {
-  final byName = <String, List<StatSession>>{};
+  final byKey = <String, List<StatSession>>{};
   for (final s in sessions) {
-    byName.putIfAbsent(s.categoryName, () => []).add(s);
+    byKey.putIfAbsent(statGroupKey(s), () => []).add(s);
   }
-  final stats = byName.entries.map((e) {
+  T? pick<T extends Object>(List<StatSession> list, T? Function(StatSession s) field) =>
+      list.where((s) => !s.pending).map(field).whereType<T>().firstOrNull ??
+      list.map(field).whereType<T>().firstOrNull;
+  final stats = byKey.entries.map((e) {
     final list = e.value;
     return CategoryStat(
-      name: e.key,
-      categoryId: list.map((s) => s.categoryId).whereType<String>().firstOrNull,
-      colorHex: list.map((s) => s.colorHex).whereType<String>().firstOrNull,
+      key: e.key,
+      name: pick<String>(list, (s) => s.categoryName) ?? '',
+      categoryId: pick<String>(list, (s) => s.categoryId),
+      colorHex: pick<String>(list, (s) => s.colorHex),
+      iconName: pick<String>(list, (s) => s.iconName),
       minutes: sumMinutes(list),
       sessions: list.length,
       pomodoros: list.fold(0, (sum, s) => sum + s.pomodoros),
@@ -179,11 +295,49 @@ List<CategoryStat> totalsByCategory(Iterable<StatSession> sessions) {
   return stats;
 }
 
+/// Payları toplamı tam 100 olan tamsayı yüzdelere çevirir (en büyük kalan
+/// yöntemi): önce aşağı yuvarlanır, kalan puanlar ondalık kısmı en büyük
+/// paylara dağıtılır (eşitlikte öndeki). Toplam 0 ise hepsi 0.
+List<int> roundedPercents(List<int> values) {
+  final safe = [for (final v in values) v < 0 ? 0 : v];
+  final total = safe.fold<int>(0, (a, b) => a + b);
+  if (total <= 0) return List.filled(values.length, 0);
+  final percents = [for (final v in safe) v * 100 ~/ total];
+  final remainders = [for (final v in safe) v * 100 % total];
+  var left = 100 - percents.fold<int>(0, (a, b) => a + b);
+  final order = List.generate(safe.length, (i) => i)
+    ..sort((a, b) {
+      final byRemainder = remainders[b].compareTo(remainders[a]);
+      return byRemainder != 0 ? byRemainder : a.compareTo(b);
+    });
+  for (final i in order) {
+    if (left <= 0) break;
+    percents[i]++;
+    left--;
+  }
+  return percents;
+}
+
 /// Hedefin yüzde kaçı tamamlandı (0..100, aşağı yuvarlanır: hedefe
-/// ulaşılmadan %100 görünmez).
+/// ulaşılmadan %100 görünmez). Dolum halkaları için.
 int goalPercent(int minutes, int goalMinutes) {
   if (goalMinutes <= 0) return 0;
   return (minutes * 100 ~/ goalMinutes).clamp(0, 100);
+}
+
+/// Hedefin yüzde kaçı yapıldı, KIRPILMADAN (aşağı yuvarlanır): 300 / 200
+/// dk → 150.
+int goalProgressPercent(int minutes, int goalMinutes) {
+  if (goalMinutes <= 0 || minutes <= 0) return 0;
+  return minutes * 100 ~/ goalMinutes;
+}
+
+/// Haftanın bugüne kadar geçen günlerinin hedefine (günlük hedef × geçen
+/// gün) göre yüzde (0..100). Haftalık verimlilik etiketi bununla seçilir;
+/// böylece Pazartesi hedefini tutturan kullanıcı 'düşük' görünmez.
+int elapsedWeekGoalPercent(int weekMinutes, int dailyGoalMinutes, DateTime monday, DateTime today) {
+  final elapsedDays = (studyDaysBetween(monday, today) + 1).clamp(1, 7);
+  return goalPercent(weekMinutes, dailyGoalMinutes * elapsedDays);
 }
 
 /// Yüzde değişim; kıyas değeri yoksa null.
@@ -311,7 +465,7 @@ List<CategorySeries> weeklyCategorySeries(
   final totals = totalsByCategory(inMonth);
   final needsOther = totals.length > maxSeries;
   final shown = needsOther ? totals.take(maxSeries - 1).toList() : totals;
-  final shownNames = {for (final c in shown) c.name};
+  final shownKeys = {for (final c in shown) c.key};
 
   List<int> perWeek(bool Function(StatSession s) test) => [
         for (final w in weeks) sumMinutes(sessionsBetween(inMonth, w.rangeStart, w.rangeEnd).where(test)),
@@ -323,13 +477,13 @@ List<CategorySeries> weeklyCategorySeries(
         name: c.name,
         categoryId: c.categoryId,
         colorHex: c.colorHex,
-        weeklyMinutes: perWeek((s) => s.categoryName == c.name),
+        weeklyMinutes: perWeek((s) => statGroupKey(s) == c.key),
       ),
     if (needsOther)
       CategorySeries(
         name: '',
         isOther: true,
-        weeklyMinutes: perWeek((s) => !shownNames.contains(s.categoryName)),
+        weeklyMinutes: perWeek((s) => !shownKeys.contains(statGroupKey(s))),
       ),
   ];
 }

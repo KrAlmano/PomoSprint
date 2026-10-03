@@ -644,6 +644,49 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statsShowAsPercent => 'Show as percentage';
 
   @override
+  String get statsOfflinePendingOnly =>
+      'Couldn\'t reach the server; showing only the sessions waiting to sync on this device.';
+
+  @override
+  String get statsOtherCategories => 'Other categories';
+
+  @override
+  String statsMoreCategories(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '+$count more categories',
+      one: '+1 more category',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get statsGoalReached => 'You reached today\'s goal, well done!';
+
+  @override
+  String get statsTipFocusBlock =>
+      'Before you start a session, pick one specific task to finish in it.';
+
+  @override
+  String get statsWeekNotStarted => 'Not started yet';
+
+  @override
+  String get statsWeekChangeSame =>
+      'Same as the same days of the previous week';
+
+  @override
+  String statsGoalPomodorosNeeded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Pomodoros to reach it',
+      one: '1 Pomodoro to reach it',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get authErrWeakPassword =>
       'Your password is too weak. It must contain at least 1 lowercase letter (a-z), 1 uppercase letter (A-Z) and 1 digit (0-9).';
 
@@ -1365,6 +1408,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unarchiveTooltip => 'Unarchive';
+
+  @override
+  String get categoryLastActiveRequired =>
+      'You need at least one active category. Add a new category or unarchive one first.';
 
   @override
   String get timerResetBtn => 'Reset';

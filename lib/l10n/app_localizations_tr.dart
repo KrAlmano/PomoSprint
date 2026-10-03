@@ -618,6 +618,36 @@ class AppLocalizationsTr extends AppLocalizations {
   String get statsShowAsPercent => 'Yüzde olarak göster';
 
   @override
+  String get statsOfflinePendingOnly =>
+      'Sunucuya bağlanılamadı; yalnızca bu cihazda senkron bekleyen seanslar gösteriliyor.';
+
+  @override
+  String get statsOtherCategories => 'Diğer kategoriler';
+
+  @override
+  String statsMoreCategories(int count) {
+    return '+$count kategori daha';
+  }
+
+  @override
+  String get statsGoalReached => 'Bugünkü hedefine ulaştın, tebrikler!';
+
+  @override
+  String get statsTipFocusBlock =>
+      'Seansa başlamadan önce o seansta bitireceğin tek bir işi belirle.';
+
+  @override
+  String get statsWeekNotStarted => 'Henüz başlamadın';
+
+  @override
+  String get statsWeekChangeSame => 'Önceki haftanın aynı günleriyle aynı';
+
+  @override
+  String statsGoalPomodorosNeeded(int count) {
+    return 'Hedef için $count Pomodoro';
+  }
+
+  @override
   String get authErrWeakPassword =>
       'Şifren çok zayıf. En az 1 küçük harf (a-z), 1 büyük harf (A-Z) ve 1 rakam (0-9) içermeli.';
 
@@ -1343,6 +1373,10 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get unarchiveTooltip => 'Arşivi Aç';
+
+  @override
+  String get categoryLastActiveRequired =>
+      'En az bir aktif kategorin olmalı. Önce yeni bir kategori ekle ya da arşivden birini çıkar.';
 
   @override
   String get timerResetBtn => 'Sıfırla';

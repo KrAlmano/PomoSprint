@@ -294,8 +294,10 @@ class MonthlyTrackingScreen extends StatelessWidget {
     bool fill = false,
   }) {
     final l10n = AppLocalizations.of(context)!;
+    // Toplu seri 'Diğer kategoriler': kullanıcının 'Diğer' adlı kendi
+    // kategorisiyle aynı ada düşmez.
     final names = [
-      for (final s in series) s.isOther ? l10n.statsOtherCategory : StatsText.categoryName(context, s.name),
+      for (final s in series) s.isOther ? l10n.statsOtherCategories : StatsText.categoryName(context, s.name),
     ];
     final colors = [
       for (final s in series) s.isOther ? kStatsNeutralColor : _colorFor(s.name, s.categoryId, s.colorHex),
@@ -368,8 +370,10 @@ class MonthlyTrackingScreen extends StatelessWidget {
             else
               SizedBox(height: chartHeight, width: double.infinity, child: chart),
             const SizedBox(height: 8),
+            // Etiketler noktaların altında: grafik tek haftada noktayı ortaya,
+            // birden çok haftada kenardan kenara çizer.
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: weekLabels.length == 1 ? MainAxisAlignment.center : MainAxisAlignment.spaceBetween,
               children: weekLabels
                   .map((l) => Flexible(
                         child: FittedBox(
@@ -416,9 +420,17 @@ class MonthlyTrackingScreen extends StatelessWidget {
       // kadarki günleri ile önceki haftanın aynı günleri.
       final comparison = compareWithPreviousWeek(sessions, week, today);
       final pct = comparison.percentChange;
-      final isUp = (pct ?? 0) >= 0;
-      final trendColor = isUp ? (isDark ? AppColors.darkPrimary : AppColors.primary) : Colors.red;
+      // Rozet: iki pencerede de çalışma yoksa hiç; önceki boşsa 'Yeni';
+      // değişim yoksa nötr (yatay ok), aksi halde artış/düşüş.
+      final showNew = pct == null && comparison.minutes > 0;
+      final isFlat = pct == 0;
+      final isUp = (pct ?? 0) > 0;
+      final neutral = isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant;
+      final trendColor = isFlat ? neutral : (isUp ? (isDark ? AppColors.darkPrimary : AppColors.primary) : Colors.red);
       final pctText = pct == null ? '' : StatsText.percent(context, pct.abs());
+      final trendLabel = isFlat
+          ? l10n.statsWeekChangeSame
+          : (isUp ? l10n.statsWeekChangeUp(pctText) : l10n.statsWeekChangeDown(pctText));
 
       return InkWell(
         borderRadius: BorderRadius.circular(16),
@@ -458,19 +470,21 @@ class MonthlyTrackingScreen extends StatelessWidget {
               const SizedBox(width: 8),
               if (pct != null)
                 Semantics(
-                  label: isUp ? l10n.statsWeekChangeUp(pctText) : l10n.statsWeekChangeDown(pctText),
+                  label: trendLabel,
                   excludeSemantics: true,
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: (isUp ? AppColors.primary : Colors.red).withValues(alpha: 0.1),
+                      color: (isFlat ? neutral : (isUp ? AppColors.primary : Colors.red)).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          isUp ? Icons.trending_up_rounded : Icons.trending_down_rounded,
+                          isFlat
+                              ? Icons.trending_flat_rounded
+                              : (isUp ? Icons.trending_up_rounded : Icons.trending_down_rounded),
                           size: 18,
                           color: trendColor,
                         ),
@@ -483,7 +497,7 @@ class MonthlyTrackingScreen extends StatelessWidget {
                     ),
                   ),
                 )
-              else
+              else if (showNew)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
@@ -633,6 +647,16 @@ class MonthlyTrackingScreen extends StatelessWidget {
                                       ),
                                     ),
                                   ),
+                                  // Günlük sekmeyle aynı: senkron bekleyen seans varsa işaret.
+                                  if (day.pendingSessions > 0) ...[
+                                    Icon(
+                                      Icons.cloud_upload_outlined,
+                                      size: 14,
+                                      color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                                      semanticLabel: AppLocalizations.of(context)!.statsPendingSessions(day.pendingSessions),
+                                    ),
+                                    const SizedBox(width: 4),
+                                  ],
                                   if (day.minutes > 0)
                                     Text(
                                       StatsText.duration(day.minutes),

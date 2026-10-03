@@ -21,10 +21,11 @@ abstract final class StatsText {
   /// intl tarih biçimleri için yerel ayar.
   static String get dateLocale => LanguageService.instance.isTurkish ? 'tr_TR' : 'en_US';
 
-  /// Kategori adının görüntülenecek hali. Adı çözülemeyen seanslar modelde
-  /// 'Diğer' olarak gelir; bu, arayüz dilinde yazılır.
+  /// Kategori adının görüntülenecek hali. Adı olmayan (bozuk) kayıt arayüz
+  /// dilinde 'Diğer' görünür. Kullanıcının 'Diğer' adlı kendi kategorisi
+  /// olduğu gibi kalır (toplu seriyle karışmasın diye).
   static String categoryName(BuildContext context, String name) {
-    if (name.isEmpty || name == 'Diğer') return AppLocalizations.of(context)!.statsOtherCategory;
+    if (name.trim().isEmpty) return AppLocalizations.of(context)!.statsOtherCategory;
     return LanguageService.instance.translateCatName(name);
   }
 }
