@@ -48,7 +48,7 @@ canlıda uygulanmış olmalı (`my_friend_ids`, `study_day_of`,
 | 11 | `15_monthly_leaderboard_study_month.sql` (+ `_down`, `_dryrun`) | P2 | Aylık sıralamada 'bu ay' = çalışma ayı (started_at, profil dilimi, 04:00); Raporlar > Aylık ile aynı kural. CANLI gövdeden yazıldı; `11`'e bağımlı değil. Uygulanınca istemcide `nextMonthlyLeaderboardReset` 04:00'e. | MH-1, X2 |
 | 12 | `16_categories_order_and_privileges.sql` (+ `_down`, `_dryrun`) | P3 | Yeni ve arşivden çıkan kategori sona; tek seferlik sıra eşitliği çözümü; DELETE politikası/yetkisi kaldırılır, UPDATE yalnız 5 kolona. CANLI gövdeden yazıldı; `11`'e bağımlı değil. | CAT-07, CAT-10 |
 
-`12` ve `13` diğerlerinden farklı olarak doğrudan uygulanmaya hazırdır: canlı
+`15` ve `16` diğerlerinden farklı olarak doğrudan uygulanmaya hazırdır: canlı
 tanımlar (3 Ekim 2026) esas alındı, DRYRUN dosyaları geri alınan bir
 transaction'da senaryoları çalıştırır (yerel bir taklitte doğrulandı: tümü
 `true`, eski tanımla `false`). Önce `_dryrun.sql`'i SQL Editor'de çalıştırın,
@@ -59,6 +59,7 @@ sonra ana dosyanın `\echo`/`\quit` satırlarını silip çalıştırın.
 | Dosya | Öncelik | Amaç |
 |---|---|---|
 | `12_delete_own_account.sql` (+ `12_delete_own_account_down.sql`) | P1 KVKK | Hesap silinince yabancı anahtarı olmayan, e-postaya bağlı kişisel veriyi de siler (`waitlist`, `user_id`'si boş `marketing_subscribers` satırı; yalnızca doğrulanmış e-postada); `search_path`'e `pg_temp`. Diğer tablolar canlıda zaten cascade ile siliniyor (3 Ekim'de FK'ler okunarak doğrulandı). Kuru çalıştırma: `tests/proposed_12_delete_own_account_dryrun.sql` (14 senaryo; yerel stub şemada hepsi `true`). |
+| `13_sunucu_butunluk.sql` (+ `13_sunucu_butunluk_down.sql`) | P1 | **Ürün kararı gerekir (UX-01), ama karar düğmesi kapalıyken canlı davranışı değiştirmeden uygulanabilir.** UX-01: `register_session_start` + `session_starts`; `complete_study_session` eşleşen sunucu başlangıcında `started_at`'i sunucudan alır (`start_verified`), doğrulanmamış seanslara `app_config.unverified_session_daily_cap` (vars. `null` = bugünkü davranış). Lig dönemi: kapanmış döneme ait geç seans lig puanı almaz (`league_period_closed`), `league_memberships.period_started_at` trigger'larla. `handle_new_user` friend_code çakışmasında yeniden dener; Crockford arkadaş kodu, saatlik deneme sınırı, bekleyen istekte id yok (KVKK-17). `profiles.email` boşaltılır (KVKK-20, 2. aşama dosya sonunda). `app_config` + anon okunabilir `get_app_config()` (UX-08). 10 SECURITY DEFINER'a `pg_temp`. `profiles.name`/`categories.name` içerik trigger'ı, `start_study_session` doğrulaması. İstemci sözleşmesi dosya başında. Kuru çalıştırma: `tests/proposed_13_sunucu_butunluk_dryrun.sql` (50 senaryo); yerel taklit `tests/proposed_13_local_stub.sql` (canlı gövdelerle md5 eşit) üzerinde 50/50 `true`, geri alma sonrası md5'ler canlıyla aynı. |
 
 `01` ile `07`'nin D bölümü birlikte düşünülmeli: `01`'deki DEĞİŞİKLİK 5,
 `07`'deki `active_session_client_uuid` kolonuna dayanır.
