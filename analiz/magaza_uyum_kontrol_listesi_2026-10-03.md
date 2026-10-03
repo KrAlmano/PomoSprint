@@ -17,7 +17,7 @@
 | # | Madde | ID | Öncelik | Süre | Durum |
 |---|---|---|---|---|---|
 | 1 | Veri sorumlusunun kimliğini sitedeki yer tutuculara yaz | KVKK-15 | P0 | 30 dk (+ gerçek kişi / şirket kararı) | 👤 ⚖️ |
-| 2 | Siteyi deploy et (bu dal: destek sayfaları, yerel yazı tipleri, onay kutusu, token'lı çıkış sayfası) | AS-13, KVKK-19, PLAY-11 | P0 | 15 dk | 👤 |
+| 2 | Siteyi deploy et (bu dal: destek sayfaları, yerel yazı tipleri, onay kutusu, token'lı çıkış sayfası) | AS-13, KVKK-19, PLAY-11 | P0 | 15 dk | ✅ 3 Ekim akşamı yayında |
 | 3 | Supabase'de Apple sağlayıcısını aç | ACC-01 | **P0 (engelleyici)** | 30-60 dk | 👤 |
 | 4 | Auth e-postaları için özel SMTP (Resend) | ACC-03 | P0 | 1-2 saat + DNS yayılımı | 👤 |
 | 5 | Play geliştirici hesap türünü kontrol et; kişiselse kapalı testi hemen başlat | PLAY-01 | P0 (takvim) | 1 saat + **14 gün** | 👤 |
@@ -52,7 +52,7 @@ Kod tarafında açık kalan ve bu listeyle bağlantılı maddeler (başka dallar
 **Adımlar**
 1. Karar: uygulamayı gerçek kişi olarak mı, şirket olarak mı yayınlayacaksın? (Mağaza hesabı türüyle aynı olmalı; bkz. PLAY-01.)
 2. Gerçek kişi: ad-soyad ve tebligat adresi (varsa KEP adresi). Şirket: unvan, MERSİS numarası ve adres. Hangisinin yeterli olduğunu hukukçuna teyit ettir.
-3. Dört sayfada iki `<mark data-fill-in="KVKK-15">…</mark>` öğesini gerçek bilgiyle değiştir (`<mark>` etiketini de kaldır) ve yorum satırını sil.
+3. Dört sayfada iki `<span data-fill-in="KVKK-15">…</span>` öğesindeki geçici ifadeyi gerçek bilgiyle değiştir (etiketi ve önündeki `<!-- KVKK-15 … -->` yorumunu da kaldır). Canlı sitede görünür "[DOLDURULACAK]" metni kalmasın diye geçici olarak nötr bir ifade kondu.
 4. Aynı bilgiyi şuralara da yaz: `scripts/.env` → `MAIL_SENDER_NAME`, `MAIL_SENDER_ADDRESS`; Supabase Edge secret'ları (bkz. 1.13); App Store Connect ve Play Console'daki geliştirici adı/adresi.
 5. `landing/hesap-silme.html` ve `landing/en/delete-account.html` girişinde "geliştirici: PomoSprint" yazıyor; Play kaydındaki geliştirici adı farklıysa iki sayfada da düzelt (PLAY-11: ad mağazayla birebir olmalı).
 6. Metin değiştiği için gerekirse "Son güncelleme" tarihini ve uygulamadaki `kLegalDocumentsVersion`'ı birlikte güncelle (`landing/README.md` → Yasal sayfalar).
