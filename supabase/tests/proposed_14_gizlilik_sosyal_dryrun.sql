@@ -8,10 +8,15 @@
 -- fırlatılır ve tüm işlem geri alınır. Hata mesajındaki her satırın sonu
 -- 'true' olmalı; ilk satır (T00) özettir.
 --
+-- SIRA: proposed/13 UYGULANDIKTAN SONRA çalıştırın (uygulama sırası
+-- 12 → 15 → 16 → 19 → 13 → 14). 14, 13'ün gövdeleri üzerine kuruludur;
+-- T63–T67 13'ün korunan değişikliklerini (Crockford kod, yeniden deneme,
+-- ad içerik denetimi, deneme sınırı, KVKK-20) 14'ünkilerle birlikte sınar.
+--
 -- Notlar
 --  * Ön koşul denetimi başarısız olursa DRYRUN_RESULT yerine
---    'proposed/14 ön koşulu: ...' hatası görürsünüz: canlı gövde değişmiş,
---    öneriyi uyarlamak gerekir.
+--    'proposed/14 ön koşulu: ...' hatası görürsünüz: 13 uygulanmamış
+--    ('önce proposed/13 ...') ya da gövde değişmiş; öneriyi uyarlamak gerekir.
 --  * marketing_subscribers INSERT trigger'ı (invoke_send_welcome_email)
 --    pg_net kuyruğuna istek yazar; kuyruk da işlemle birlikte geri alınır,
 --    e-posta gönderilmez (adresler zaten .invalid).
@@ -19,6 +24,9 @@
 --    sırasında gerçek, 7 günden eski onaysız kayıtlar ve 12 aydan eski
 --    bekleme listesi satırları da siliniyormuş gibi görünür; işlem geri
 --    alındığı için hiçbiri kalıcı değildir.
+--  * T67 ops.neutralize_email_derived_names()'i bir kez çalıştırır: işlem
+--    sırasında adı e-posta yerel kısmıyla aynı olan gerçek profiller de
+--    nötr ad almış görünür; işlem geri alındığı için kalıcı değildir.
 --  * Gövde 14_gizlilik_sosyal.sql ile birebir aynıdır (BEGIN/COMMIT ve
 --    \echo/\quit hariç); dosyalar birlikte güncellenmeli.
 -- ============================================================================
@@ -46,17 +54,25 @@ SELECT id, 'league_promotion', current_date - 1, '{"tier":2}'::jsonb FROM dry14 
 -- Öneri 14 (supabase/proposed/14_gizlilik_sosyal.sql; BEGIN/COMMIT hariç)
 -- ---------------------------------------------------------------------------
 -- ============================================================
--- 0) Ön koşul: değiştirilecek canlı gövdeler 3 Ekim 2026'dakiyle aynı mı?
+-- 0) Ön koşul: proposed/13 uygulanmış mı, değiştirilecek gövdeler
+--    beklenen hâlde mi?
 -- ============================================================
--- md5(pg_get_functiondef) canlıdan okundu. Farklıysa (araya başka bir
--- migration girdiyse) hiçbir şey yapılmadan durulur: bu dosyayı yeni
--- gövdeye uyarlayın. Aylık sıralama canlı ya da proposed/15 uygulanmış
+-- Uygulama sırası 12 → 15 → 16 → 19 → 13 → 14. Bu dosya handle_new_user ve
+-- add_friend_by_code'u 13'ün gövdesi üzerine kurar ve 13'ün yardımcılarını
+-- (clean_display_text, display_text_is_allowed, generate_friend_code,
+-- normalize_friend_code, app_config_int, friend_code_attempts) kullanır.
+-- md5(pg_get_functiondef) değerleri: dört fonksiyon için 13 UYGULANMIŞ hâl
+-- (handle_new_user ve add_friend_by_code 13'ün gövdesi;
+-- handle_newsletter_subscription ve respond_friend_request canlı gövde +
+-- 13'ün ALTER ... SET search_path 'public','pg_temp'i), diğerleri canlı
+-- (3 Ekim 2026; 12, 16, 19 ve 13 onlara dokunmaz). Farklıysa hiçbir şey
+-- yapılmadan durulur. Aylık sıralama canlı ya da proposed/15 uygulanmış
 -- hâlde olabilir (E bölümü ikisini de tanır).
 DO $pre$
 DECLARE
     v_expected constant jsonb := '{
-        "add_friend_by_code(text)": "d59affef7f113a3072d2de604bb9506f",
-        "respond_friend_request(uuid,boolean)": "461b0959105c85cde71d50a25d1d5074",
+        "add_friend_by_code(text)": "eab30b000bbd223a3eef0af8e9900b30",
+        "respond_friend_request(uuid,boolean)": "785731c7b2c628d65a5f9e84a60be5d5",
         "get_my_friends()": "c914de18b0e6f080c7b3fe4f4fead8b2",
         "get_incoming_friend_requests()": "de9f1fd811b87172bd7f59aff204bf66",
         "get_live_friends()": "174841fa81aff71912908ebcfe0935ff",
@@ -64,8 +80,8 @@ DECLARE
         "get_league_ranking(uuid)": "81232005815cf301aa8ce29e882d5139",
         "get_my_league_ranking()": "cdcb245dd779a9eb7b651ec5a27426c5",
         "get_public_alltime_leaderboard(integer)": "60aac1f74b39ab6af9c5399cf285c607",
-        "handle_new_user()": "ae6cedf2e0e0995ec759b69e20ada604",
-        "handle_newsletter_subscription()": "d909d0550cfd1894844757e2f0318609",
+        "handle_new_user()": "92dcc142fbec96ca2fb79a7aa3d14289",
+        "handle_newsletter_subscription()": "ecf943e2d250d60989ca04bd79e90152",
         "sanitize_profile_insert()": "c1eab282e0d125d278be390a2a187ea9"
     }';
     v_monthly_ok constant text[] := ARRAY[
@@ -75,6 +91,15 @@ DECLARE
     r record;
     v_bad text[] := '{}';
 BEGIN
+    IF to_regclass('public.app_config') IS NULL
+       OR to_regclass('public.friend_code_attempts') IS NULL
+       OR to_regprocedure('public.clean_display_text(text)') IS NULL
+       OR to_regprocedure('public.display_text_is_allowed(text)') IS NULL
+       OR to_regprocedure('public.generate_friend_code(integer)') IS NULL
+       OR to_regprocedure('public.normalize_friend_code(text)') IS NULL
+       OR to_regprocedure('public.app_config_int(text)') IS NULL THEN
+        RAISE EXCEPTION 'proposed/14 ön koşulu: önce proposed/13_sunucu_butunluk.sql uygulanmalı (sıra: 12 → 15 → 16 → 19 → 13 → 14).';
+    END IF;
     FOR r IN SELECT key, value FROM jsonb_each_text(v_expected) LOOP
         IF md5(pg_get_functiondef(to_regprocedure('public.' || r.key))) IS DISTINCT FROM r.value THEN
             v_bad := v_bad || r.key;
@@ -286,8 +311,8 @@ CREATE TRIGGER log_marketing_subscription_change
     AFTER INSERT OR DELETE ON public.marketing_subscribers
     FOR EACH ROW EXECUTE FUNCTION public.log_marketing_subscription_change();
 
--- Canlı gövde + kaynak/sürüm bilgisi + search_path pg_temp. Sözleşme aynı:
--- yalnızca 'newsletter' = 'true' okunur.
+-- Canlı gövde (proposed/13 yalnızca search_path'ine pg_temp eklemişti) +
+-- kaynak/sürüm bilgisi. Sözleşme aynı: yalnızca 'newsletter' = 'true' okunur.
 CREATE OR REPLACE FUNCTION public.handle_newsletter_subscription()
  RETURNS trigger
  LANGUAGE plpgsql
@@ -566,6 +591,15 @@ SELECT u.id, ops.email_hash(u.email), k.kind, true,
 -- ============================================================
 ALTER TABLE public.profiles ALTER COLUMN show_in_social_feed SET DEFAULT false;
 
+-- proposed/13'ün gövdesi üzerine kurulur; 13'ten KORUNANLAR: friend_code
+-- çakışmasında yeniden deneme (8 deneme), Crockford kod
+-- (generate_friend_code, uzunluk app_config'ten), adın temizlenmesi
+-- (clean_display_text) ve yasaklıysa sıradaki adaya düşülmesi
+-- (display_text_is_allowed), e-posta kopyası yazılmaması (KVKK-20),
+-- search_path'te pg_temp. 14'ün EKLEDİKLERİ: ad e-postadan türetilmez
+-- (ACC-06; aday yoksa nötr ad), Google/Apple'da yalnızca ilk kelime,
+-- görünürlük yalnızca açık seçimle (KVKK-01), kayıt onaylarının deftere
+-- yazılması (KVKK-10).
 CREATE OR REPLACE FUNCTION public.handle_new_user()
  RETURNS trigger
  LANGUAGE plpgsql
@@ -576,49 +610,75 @@ declare
   v_meta jsonb := coalesce(new.raw_user_meta_data, '{}'::jsonb);
   v_provider text := coalesce(nullif(new.raw_app_meta_data->>'provider', ''), 'email');
   v_local text := lower(split_part(btrim(coalesce(new.email, '')), '@', 1));
+  v_candidates text[];
+  v_candidate text;
+  v_clean text;
   v_name text;
+  v_code text;
+  v_code_length integer;
+  v_constraint text;
   v_terms text;
   v_privacy text;
   v_marketing boolean;
   v_occurred timestamptz;
 begin
   -- Görünen ad (ACC-06): e-postadan TÜRETİLMEZ. E-posta kaydında formdaki
-  -- ad; Google/Apple'da yalnızca ilk kelime. Ad yoksa ya da istemcinin
-  -- boş ad yedeği olan e-posta yerel kısmıyla birebir aynıysa nötr ad.
+  -- ad (name, full_name); Google/Apple'da yalnızca ilk kelime (given_name,
+  -- full_name, name). Her aday temizlenir ve 50 karaktere kısaltılır
+  -- (proposed/13); boşsa, yasaklı bir ifade içeriyorsa ya da istemcinin
+  -- boş ad yedeği olan e-posta yerel kısmıyla birebir aynıysa sıradaki
+  -- adaya geçilir. Hiçbiri uygun değilse nötr ad ('Pomo 1234').
   if v_provider = 'email' then
-    v_name := coalesce(nullif(btrim(v_meta->>'name'), ''), nullif(btrim(v_meta->>'full_name'), ''));
+    v_candidates := array[v_meta->>'name', v_meta->>'full_name'];
   else
-    v_name := nullif((regexp_split_to_array(
-                coalesce(nullif(btrim(v_meta->>'given_name'), ''),
-                         nullif(btrim(v_meta->>'full_name'), ''),
-                         nullif(btrim(v_meta->>'name'), ''), ''), '\s+'))[1], '');
+    v_candidates := array[v_meta->>'given_name', v_meta->>'full_name', v_meta->>'name'];
   end if;
-  if v_name is not null and v_local <> '' and v_name = v_local then
-    v_name := null;
-  end if;
-  v_name := left(coalesce(v_name, ops.neutral_display_name()), 50);
+  foreach v_candidate in array v_candidates loop
+    v_clean := public.clean_display_text(v_candidate);
+    if v_provider <> 'email' then
+      v_clean := (regexp_split_to_array(coalesce(v_clean, ''), '\s+'))[1];
+    end if;
+    v_clean := btrim(left(v_clean, 50));
+    if v_clean <> '' and v_clean <> v_local and public.display_text_is_allowed(v_clean) then
+      v_name := v_clean;
+      exit;
+    end if;
+  end loop;
+  v_name := coalesce(v_name, ops.neutral_display_name());
 
-  insert into public.profiles (id, name, email, avatar_id, total_minutes, lifetime_points, friend_code,
-                               show_in_social_feed)
-  values (
-    new.id,
-    v_name,
-    new.email,
-    -- Yalnızca varsayılan (ücretsiz) avatarlar kayıtta seçilebilir;
-    -- önceden 200 kumluk avatar_1_gamer bedava takılıyordu.
-    coalesce(
-      (select a.id from public.avatars a
-        where a.id = v_meta->>'avatar_id' and a.is_default and a.is_active),
-      'avatar_16_basic'),
-    0,
-    0,
-    upper(substr(replace(gen_random_uuid()::text,'-',''),1,6)),
-    -- KVKK-01: herkese açık görünürlük yalnızca açık seçimle.
-    coalesce(v_meta->>'show_in_social_feed', '') = 'true'
-  )
-  on conflict (id) do update set
-    email = excluded.email,
-    name = coalesce(excluded.name, public.profiles.name);
+  v_code_length := coalesce(public.app_config_int('friend_code_length'), 6);
+
+  for v_attempt in 1..8 loop
+    -- Kod alt işlemin dışında üretilir; çakışmada yalnızca INSERT geri alınır.
+    v_code := public.generate_friend_code(v_code_length);
+    begin
+      insert into public.profiles (id, name, avatar_id, total_minutes, lifetime_points, friend_code,
+                                   show_in_social_feed)
+      values (
+        new.id,
+        v_name,
+        -- Yalnızca varsayılan (ücretsiz) avatarlar kayıtta seçilebilir;
+        -- önceden 200 kumluk avatar_1_gamer bedava takılıyordu.
+        coalesce(
+          (select a.id from public.avatars a
+            where a.id = v_meta->>'avatar_id' and a.is_default and a.is_active),
+          'avatar_16_basic'),
+        0,
+        0,
+        v_code,
+        -- KVKK-01: herkese açık görünürlük yalnızca açık seçimle.
+        coalesce(v_meta->>'show_in_social_feed', '') = 'true'
+      )
+      on conflict (id) do update set
+        name = coalesce(excluded.name, public.profiles.name);
+      exit;
+    exception when unique_violation then
+      get stacked diagnostics v_constraint = constraint_name;
+      if v_constraint is distinct from 'profiles_friend_code_key' or v_attempt = 8 then
+        raise;
+      end if;
+    end;
+  end loop;
 
   -- KVKK-10: kayıt formundaki onaylar. Kayıt yazılamazsa kayıt BOZULMAZ.
   begin
@@ -648,12 +708,18 @@ end;
 $function$;
 
 -- İstemcinin yedek profil oluşturma yolu (normalde handle_new_user yazar):
--- e-postanın yerel kısmı ad olarak kabul edilmez.
+-- e-postanın yerel kısmı ad olarak kabul edilmez. E-posta, isteğin JWT'sinden
+-- okunur: proposed/13'ün discard_profile_email trigger'ı (adı alfabetik
+-- olarak önce, yani önce çalışır) NEW.email'i zaten boşaltır ve KVKK-20'nin
+-- 2. aşamasında kolon kalkar. Trigger SECURITY DEFINER değil; authenticated
+-- auth.users'ı okuyamaz, JWT'deki 'email' talebini okuyabilir.
 CREATE OR REPLACE FUNCTION public.sanitize_profile_insert()
  RETURNS trigger
  LANGUAGE plpgsql
  SET search_path TO 'public', 'pg_temp'
 AS $function$
+DECLARE
+    v_email text;
 BEGIN
     IF current_user IN ('authenticated', 'anon') THEN
         IF NEW.avatar_id IS NULL OR NOT EXISTS (
@@ -662,8 +728,9 @@ BEGIN
         ) THEN
             NEW.avatar_id := 'avatar_16_basic';
         END IF;
-        IF NEW.name IS NOT NULL AND NEW.email IS NOT NULL
-           AND btrim(NEW.name) = lower(split_part(btrim(NEW.email), '@', 1)) THEN
+        v_email := btrim(coalesce(auth.jwt() ->> 'email', ''));
+        IF NEW.name IS NOT NULL AND v_email <> ''
+           AND btrim(NEW.name) = lower(split_part(v_email, '@', 1)) THEN
             NEW.name := 'Pomo ' || lpad((floor(random() * 10000))::integer::text, 4, '0');
         END IF;
     END IF;
@@ -675,9 +742,10 @@ $function$;
 -- yerel kısmıyla birebir aynı olan (canlı handle_new_user'ın ya da istemci
 -- yedeğinin ürettiği) mevcut profillere nötr ad verir. Büyük harfle
 -- yazılmış ad ('Ahmet' / ahmet@...) kullanıcının seçimi sayılır, dokunulmaz.
--- Önizleme: select count(*) from public.profiles p
---           where p.name in (left(split_part(btrim(p.email), '@', 1), 50),
---                            left(lower(split_part(btrim(p.email), '@', 1)), 50));
+-- E-posta auth.users'tan okunur (proposed/13 sonrası profiles.email boş).
+-- Önizleme: select count(*) from public.profiles p join auth.users u on u.id = p.id
+--           where p.name in (left(split_part(btrim(u.email), '@', 1), 50),
+--                            left(lower(split_part(btrim(u.email), '@', 1)), 50));
 CREATE FUNCTION ops.neutralize_email_derived_names()
  RETURNS integer
  LANGUAGE plpgsql
@@ -688,8 +756,10 @@ DECLARE
 BEGIN
     UPDATE public.profiles p
        SET name = ops.neutral_display_name()
-     WHERE p.name IN (left(split_part(btrim(p.email), '@', 1), 50),
-                      left(lower(split_part(btrim(p.email), '@', 1)), 50));
+      FROM auth.users u
+     WHERE u.id = p.id
+       AND p.name IN (left(split_part(btrim(u.email), '@', 1), 50),
+                      left(lower(split_part(btrim(u.email), '@', 1)), 50));
     GET DIAGNOSTICS v_count = ROW_COUNT;
     RETURN v_count;
 END;
@@ -721,9 +791,14 @@ CREATE TABLE public.friend_request_rejections (
 ALTER TABLE public.friend_request_rejections ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON public.friend_request_rejections FROM PUBLIC, anon, authenticated;
 
--- Canlı gövde + engel, ret bekleme süresi, hız sınırı, kod normalizasyonu,
--- makine-okunur 'code' (istemci friends_sheet.dart bu kodları tanıyor;
--- tanımadığı kodda Türkçe arayüzde 'message' gösterir).
+-- proposed/13'ün gövdesi üzerine kurulur; 13'ten KORUNANLAR: saatlik deneme
+-- sınırı (friend_code_attempts, app_config), Crockford normalizasyonu
+-- (normalize_friend_code), makine-okunur 'code', kabul edilmeden yanıtta
+-- karşı tarafın id'si dönmemesi (KVKK-17). 14'ün EKLEDİKLERİ: engel (seni
+-- engelleyen 'not_found' görür, engellediğin 'blocked'), iki yönlü
+-- 'already_friends', ret sonrası 7 gün bekleme ('cooldown'), saatte 20
+-- bekleyen istek ('rate_limited'). İstemci friends_sheet.dart bu kodları
+-- tanıyor; tanımadığı kodda Türkçe arayüzde 'message' gösterir.
 CREATE OR REPLACE FUNCTION public.add_friend_by_code(p_code text)
  RETURNS jsonb
  LANGUAGE plpgsql
@@ -735,13 +810,32 @@ declare
   v_code text;
   v_target record;
   v_reverse_pending boolean;
+  v_limit integer;
+  v_attempts integer;
   v_recent integer;
 begin
   if v_uid is null then
     raise exception 'not authenticated';
   end if;
 
-  v_code := upper(regexp_replace(coalesce(p_code, ''), '\s', '', 'g'));
+  -- proposed/13: deneme sayacı RAISE ile değil normal dönüşle biter; işlemle birlikte kalıcıdır.
+  v_limit := coalesce(public.app_config_int('friend_code_attempts_per_hour'), 20);
+  insert into public.friend_code_attempts as a (user_id, window_started_at, attempts)
+  values (v_uid, now(), 1)
+  on conflict (user_id) do update set
+    window_started_at = case when a.window_started_at <= now() - interval '1 hour'
+                             then now() else a.window_started_at end,
+    attempts = case when a.window_started_at <= now() - interval '1 hour'
+                    then 1 else a.attempts + 1 end
+  returning a.attempts into v_attempts;
+
+  if v_attempts > v_limit then
+    return jsonb_build_object('success', false, 'code', 'rate_limited',
+      'message', 'Çok fazla deneme yaptın. Lütfen bir süre sonra tekrar dene.');
+  end if;
+
+  -- proposed/13: boşluk, tire, alt çizgi, nokta atılır; O→0, I/L→1.
+  v_code := public.normalize_friend_code(p_code);
 
   select id, name, avatar_id, lifetime_points, total_minutes
     into v_target
@@ -819,17 +913,20 @@ begin
   insert into public.friendships (user_id, friend_id, status) values (v_uid, v_target.id, 'pending')
     on conflict (user_id, friend_id) do update set status = 'pending';
 
+  -- proposed/13: kabul edilmeden karşı tarafın kimliği dönmez (KVKK-17).
   return jsonb_build_object(
     'success', true,
     'code', 'request_sent',
     'auto_accepted', false,
-    'friend', jsonb_build_object('id', v_target.id, 'name', v_target.name, 'avatar_id', v_target.avatar_id)
+    'friend', jsonb_build_object('name', v_target.name, 'avatar_id', v_target.avatar_id)
   );
 end;
 $function$;
 REVOKE ALL ON FUNCTION public.add_friend_by_code(text) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.add_friend_by_code(text) TO authenticated, service_role;
 
+-- Canlı gövde (proposed/13 yalnızca search_path'ine pg_temp eklemişti) +
+-- engel kontrolü, makine-okunur 'code', ret kaydı (cooldown için).
 CREATE OR REPLACE FUNCTION public.respond_friend_request(p_from_user_id uuid, p_accept boolean)
  RETURNS jsonb
  LANGUAGE plpgsql
@@ -1736,6 +1833,9 @@ DECLARE
   uD uuid := gen_random_uuid();  -- hesabını silecek, bülten aboneli
   uO1 uuid := gen_random_uuid(); uO2 uuid := gen_random_uuid();
   uO3 uuid := gen_random_uuid(); uO4 uuid := gen_random_uuid();
+  uN1 uuid := gen_random_uuid(); uN2 uuid := gen_random_uuid();   -- proposed/13 ile uyum
+  uN3 uuid := gen_random_uuid(); uN4 uuid := gen_random_uuid();
+  v_code_n3 text; v_code_old text;
   ux uuid[] := '{}';
   eA text; eB text; eC text; eG text; eP text; eU text; eF text; eD text;
   v_code_a text; v_code_b text; v_code_c text; v_code_x21 text;
@@ -1865,13 +1965,14 @@ BEGIN
   res := res || ('T14 tek kelimelik ad oturumsuz listede kısaltılır: ' || coalesce(v_bool, false)::text);
 
   -- İstemcinin yedek profil yolu (profil yokken INSERT): e-posta yerel kısmı reddedilir.
+  -- E-posta isteğin JWT'sinden okunur (proposed/13 NEW.email'i boşaltır).
   DELETE FROM public.profiles WHERE id = uF;
-  PERFORM set_config('request.jwt.claims', json_build_object('sub', uF, 'role', 'authenticated')::text, true);
+  PERFORM set_config('request.jwt.claims', json_build_object('sub', uF, 'role', 'authenticated', 'email', eF)::text, true);
   EXECUTE 'SET LOCAL ROLE authenticated';
   INSERT INTO public.profiles (id, email, name, avatar_id) VALUES (uF, eF, split_part(eF, '@', 1), 'avatar_16_basic');
   EXECUTE 'RESET ROLE';
   SELECT name, show_in_social_feed INTO v_txt, v_bool FROM public.profiles WHERE id = uF;
-  res := res || ('T15 yedek profil yolu: nötr ad, görünürlük kapalı: ' || coalesce(v_txt ~ '^Pomo [0-9]{4}$' AND NOT v_bool, false)::text);
+  res := res || ('T15 yedek profil yolu: nötr ad (e-posta JWT''den), görünürlük kapalı: ' || coalesce(v_txt ~ '^Pomo [0-9]{4}$' AND NOT v_bool, false)::text);
 
   SELECT count(*) INTO v_int FROM public.consents c
    WHERE c.user_id = uA AND c.source = 'signup' AND c.granted AND c.document_version = 'dry-v1'
@@ -2005,9 +2106,9 @@ BEGIN
   EXECUTE 'SET LOCAL ROLE authenticated';
   v_j := public.add_friend_by_code(' ' || lower(v_code_a) || ' ');
   EXECUTE 'RESET ROLE';
-  res := res || ('T28 kod normalize edilir; yanıt sözleşmesi korunur + code: ' ||
+  res := res || ('T28 kod normalize edilir; yanıt sözleşmesi + code; bekleyen istekte id yok (13, KVKK-17): ' ||
                  coalesce((v_j->>'success')::boolean AND v_j->>'code' = 'request_sent' AND v_j->>'auto_accepted' = 'false'
-                          AND (v_j->'friend'->>'id')::uuid = uA, false)::text);
+                          AND NOT (v_j->'friend' ? 'id') AND v_j->'friend'->>'name' = 'Dry Ayşe Test', false)::text);
 
   PERFORM set_config('request.jwt.claims', json_build_object('sub', uA, 'role', 'authenticated')::text, true);
   EXECUTE 'SET LOCAL ROLE authenticated';
@@ -2388,6 +2489,78 @@ BEGIN
   SELECT count(*) INTO i FROM auth.users WHERE id = uD;
   res := res || ('T62 hesap silinir; onay kayıtları (' || v_int2 || ') e-posta özetiyle hesaptan ayrılmış kalır: ' ||
                  coalesce(v_int = 1 AND i = 0 AND v_int2 = 5 AND v_bool AND v_int3 = 1, false)::text);
+
+  -- =========================================================================
+  -- proposed/13 ile birlikte: 13'ün değişiklikleri korunur, 14'ünkiler eklenir
+  -- =========================================================================
+  -- Kod üreticisi 13'ünki mi: uzunluk app_config'ten (geçici olarak 8).
+  UPDATE public.app_config SET value = '8' WHERE key = 'friend_code_length';
+  INSERT INTO auth.users (id, email, raw_user_meta_data, raw_app_meta_data, aud, role, email_confirmed_at, created_at) VALUES
+    (uN1, pfx || 'n1-' || uN1 || '@example.invalid', '{"name":"Dry Orospu","full_name":"Dry Temiz Ad"}',
+         '{"provider":"email","providers":["email"]}', 'authenticated', 'authenticated', now(), now()),
+    (uN2, pfx || 'n2-' || uN2 || '@example.invalid', '{"name":"Fuck You"}',
+         '{"provider":"email","providers":["email"]}', 'authenticated', 'authenticated', now(), now()),
+    -- U+202E (sağdan sola geçersiz kılma) clean_display_text ile silinir.
+    (uN3, pfx || 'n3-' || uN3 || '@example.invalid', jsonb_build_object('full_name', E'  Dry\u202EBora   Kaya '),
+         '{"provider":"google","providers":["google"]}', 'authenticated', 'authenticated', now(), now());
+  UPDATE public.app_config SET value = '6' WHERE key = 'friend_code_length';
+  SELECT count(*) FILTER (WHERE p.friend_code ~ '^[0-9A-HJKMNP-TV-Z]{6}$' AND p.id IN (uA, uB, uC, uG, uP)),
+         count(*) FILTER (WHERE p.friend_code ~ '^[0-9A-HJKMNP-TV-Z]{8}$' AND p.id IN (uN1, uN2, uN3)),
+         count(*) FILTER (WHERE p.email IS NULL)
+    INTO v_int, v_int2, v_int3
+    FROM public.profiles p WHERE p.id IN (uA, uB, uC, uG, uP, uN1, uN2, uN3);
+  res := res || ('T63 yeni kayıtta 13''ün kod üreticisi (Crockford, uzunluk app_config''ten), profiles.email yazılmaz: ' ||
+                 (v_int = 5 AND v_int2 = 3 AND v_int3 = 8)::text);
+
+  SELECT name INTO v_txt FROM public.profiles WHERE id = uN1;
+  SELECT name INTO v_txt2 FROM public.profiles WHERE id = uN2;
+  SELECT name INTO v_code_n3 FROM public.profiles WHERE id = uN3;
+  res := res || ('T64 ad: yasaklı aday atlanır (13), e-postaya düşülmez, nötr ad (14), temizlenir (' ||
+                 coalesce(v_txt, '-') || ' / ' || coalesce(v_txt2, '-') || ' / ' || coalesce(v_code_n3, '-') || '): ' ||
+                 coalesce(v_txt = 'Dry Temiz Ad' AND v_txt2 ~ '^Pomo [0-9]{4}$' AND v_code_n3 = 'DryBora', false)::text);
+
+  -- friend_code çakışması (13): generate_friend_code ilk çağrıda VAR OLAN kodu döndürür.
+  SELECT friend_code INTO v_code_old FROM public.profiles WHERE id = uA;
+  EXECUTE 'CREATE TEMP SEQUENCE dry14_seq';
+  EXECUTE 'ALTER FUNCTION public.generate_friend_code(integer) RENAME TO dry14_gen_real';
+  EXECUTE format($f$CREATE FUNCTION public.generate_friend_code(p_length integer DEFAULT 6) RETURNS text
+    LANGUAGE plpgsql AS $g$ BEGIN IF nextval('dry14_seq') = 1 THEN RETURN %L; END IF;
+    RETURN public.dry14_gen_real(p_length); END $g$$f$, v_code_old);
+  INSERT INTO auth.users (id, email, raw_user_meta_data, raw_app_meta_data, aud, role, email_confirmed_at, created_at)
+  VALUES (uN4, pfx || 'n4-' || uN4 || '@example.invalid', '{"name":"Dry Cakisma","terms_version":"dry-v1"}',
+          '{"provider":"email","providers":["email"]}', 'authenticated', 'authenticated', now(), now());
+  SELECT friend_code INTO v_txt FROM public.profiles WHERE id = uN4;
+  SELECT count(*) INTO v_int FROM public.consents WHERE user_id = uN4 AND kind = 'terms' AND source = 'signup';
+  res := res || ('T65 friend_code çakışmasında kayıt düşmez, yeni kodla dener (13); onay yine yazılır (14): ' ||
+                 coalesce(v_txt IS NOT NULL AND v_txt <> v_code_old AND currval('dry14_seq') >= 2 AND v_int = 1, false)::text);
+  EXECUTE 'DROP FUNCTION public.generate_friend_code(integer)';
+  EXECUTE 'ALTER FUNCTION public.dry14_gen_real(integer) RENAME TO generate_friend_code';
+
+  -- add_friend_by_code: Crockford normalizasyonu ve saatlik deneme sınırı (13)
+  SELECT friend_code INTO v_code_n3 FROM public.profiles WHERE id = uN3;
+  PERFORM set_config('request.jwt.claims', json_build_object('sub', uN1, 'role', 'authenticated')::text, true);
+  EXECUTE 'SET LOCAL ROLE authenticated';
+  v_j := public.add_friend_by_code(translate(lower(left(v_code_n3, 3)) || '-' || lower(substr(v_code_n3, 4)), '01', 'ol'));
+  EXECUTE 'RESET ROLE';
+  UPDATE public.app_config SET value = '1' WHERE key = 'friend_code_attempts_per_hour';
+  PERFORM set_config('request.jwt.claims', json_build_object('sub', uN2, 'role', 'authenticated')::text, true);
+  EXECUTE 'SET LOCAL ROLE authenticated';
+  v_txt := public.add_friend_by_code('ZZZZZZ')->>'code';
+  v_j2 := public.add_friend_by_code(v_code_n3);
+  EXECUTE 'RESET ROLE';
+  UPDATE public.app_config SET value = '20' WHERE key = 'friend_code_attempts_per_hour';
+  SELECT count(*) INTO v_int FROM public.friendships WHERE user_id = uN2;
+  res := res || ('T66 kod: küçük harf/tire/O-I-L eşlemesi (13) ve deneme sınırı (13) 14''ün kurallarıyla birlikte: ' ||
+                 coalesce(v_j->>'code' = 'request_sent' AND v_txt = 'not_found' AND v_j2->>'code' = 'rate_limited'
+                          AND v_j2->>'message' LIKE 'Çok fazla deneme%' AND v_int = 0, false)::text);
+
+  -- ops.neutralize_email_derived_names: e-posta auth.users'tan (13 sonrası profiles.email boş)
+  UPDATE public.profiles SET name = split_part(eB, '@', 1) WHERE id = uB;
+  v_int := ops.neutralize_email_derived_names();
+  SELECT name INTO v_txt FROM public.profiles WHERE id = uB;
+  SELECT name INTO v_txt2 FROM public.profiles WHERE id = uA;
+  res := res || ('T67 neutralize_email_derived_names e-postayı auth.users''tan okur (' || v_int || '): ' ||
+                 coalesce(v_int >= 1 AND v_txt ~ '^Pomo [0-9]{4}$' AND v_txt2 = 'Dry Ayşe Test', false)::text);
 
   PERFORM set_config('request.jwt.claims', '', true);
 

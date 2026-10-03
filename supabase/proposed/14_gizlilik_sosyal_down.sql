@@ -1,16 +1,24 @@
 -- ============================================================
 -- GERİ ALMA: ÖNERİ 14 (gizlilik ve sosyal güvenlik)
 -- ============================================================
--- 3 Ekim 2026 canlı gövdelerine döner (pg_get_functiondef ile okundu):
--- add_friend_by_code, respond_friend_request, get_my_friends,
--- get_incoming_friend_requests, get_live_friends, mask_public_name,
--- get_league_ranking, get_my_league_ranking, get_public_monthly_leaderboard,
--- get_public_alltime_leaderboard, handle_new_user,
--- handle_newsletter_subscription, sanitize_profile_insert; activity_feed
--- politikası ve SELECT yetkisi; show_in_social_feed varsayılanı (true).
+-- proposed/13 UYGULANMIŞ hâle döner (uygulama sırası 12 → 15 → 16 → 19 →
+-- 13 → 14; geri alma 14_down → 13_down → 19_down → 16_down → 15_down →
+-- 12_down):
+--  - handle_new_user, add_friend_by_code: 13'ün gövdeleri (13 dosyasından
+--    birebir);
+--  - respond_friend_request, handle_newsletter_subscription: canlı gövde +
+--    13'ün eklediği search_path 'public','pg_temp';
+--  - get_my_friends, get_incoming_friend_requests, get_live_friends,
+--    mask_public_name, get_league_ranking, get_my_league_ranking,
+--    get_public_alltime_leaderboard, sanitize_profile_insert: 3 Ekim 2026
+--    canlı gövdeleri (13 bunlara dokunmaz);
+--  - activity_feed politikası ve SELECT yetkisi; show_in_social_feed
+--    varsayılanı (true).
 -- Aylık sıralama, 14 uygulanırken hangi gövde varsa ona döner (canlı ya da
--- proposed/15). Yerel taklitte doğrulandı: 14 + bu dosya sonrası tüm
--- fonksiyonların md5'i canlıyla aynı.
+-- proposed/15). Yerel taklitte (tests/proposed_sira_run_local.sh)
+-- doğrulandı: 14 + bu dosya sonrası şema dökümü (fonksiyon md5'leri,
+-- yetkiler, politikalar, trigger'lar, kolonlar, cron, migration geçmişi)
+-- 14 öncesiyle birebir aynı.
 --
 -- VERİ KAYBI: user_blocks, friend_request_rejections, user_reports ve
 -- consents tabloları SİLİNİR (engeller, bildirimler, onay ispat kayıtları).
@@ -258,7 +266,9 @@ REVOKE ALL ON FUNCTION public.get_public_alltime_leaderboard(integer) FROM PUBLI
 GRANT EXECUTE ON FUNCTION public.get_public_alltime_leaderboard(integer) TO anon, authenticated, service_role;
 
 -- ------------------------------------------------------------
--- D) Arkadaş RPC'leri (canlı gövdeler) ve yeni RPC'ler
+-- D) Arkadaş RPC'leri (13 uygulanmış hâl: add_friend_by_code 13'ün gövdesi,
+--    respond_friend_request canlı gövde + pg_temp; okuma RPC'leri canlı) ve
+--    yeni RPC'ler
 -- ------------------------------------------------------------
 DROP FUNCTION public.block_user(uuid);
 DROP FUNCTION public.unblock_user(uuid);
@@ -271,59 +281,84 @@ CREATE OR REPLACE FUNCTION public.add_friend_by_code(p_code text)
  RETURNS jsonb
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path TO 'public'
+ SET search_path TO 'public', 'pg_temp'
 AS $function$
 declare
+  v_uid uuid := auth.uid();
+  v_code text;
   v_target record;
   v_reverse_pending boolean;
+  v_limit integer;
+  v_attempts integer;
 begin
-  if auth.uid() is null then
+  if v_uid is null then
     raise exception 'not authenticated';
   end if;
+
+  -- Deneme sayacı RAISE ile değil normal dönüşle biter; işlemle birlikte kalıcıdır.
+  v_limit := coalesce(public.app_config_int('friend_code_attempts_per_hour'), 20);
+  insert into public.friend_code_attempts as a (user_id, window_started_at, attempts)
+  values (v_uid, now(), 1)
+  on conflict (user_id) do update set
+    window_started_at = case when a.window_started_at <= now() - interval '1 hour'
+                             then now() else a.window_started_at end,
+    attempts = case when a.window_started_at <= now() - interval '1 hour'
+                    then 1 else a.attempts + 1 end
+  returning a.attempts into v_attempts;
+
+  if v_attempts > v_limit then
+    return jsonb_build_object('success', false, 'code', 'rate_limited',
+      'message', 'Çok fazla deneme yaptın. Lütfen bir süre sonra tekrar dene.');
+  end if;
+
+  v_code := public.normalize_friend_code(p_code);
 
   select id, name, avatar_id, lifetime_points, total_minutes
     into v_target
     from public.profiles
-   where friend_code = upper(trim(p_code));
+   where friend_code = v_code;
 
   if v_target.id is null then
-    return jsonb_build_object('success', false, 'message', 'Bu kod ile bir kullanıcı bulunamadı.');
+    return jsonb_build_object('success', false, 'code', 'not_found', 'message', 'Bu kod ile bir kullanıcı bulunamadı.');
   end if;
 
-  if v_target.id = auth.uid() then
-    return jsonb_build_object('success', false, 'message', 'Kendini arkadaş olarak ekleyemezsin.');
+  if v_target.id = v_uid then
+    return jsonb_build_object('success', false, 'code', 'self_add', 'message', 'Kendini arkadaş olarak ekleyemezsin.');
   end if;
 
-  if exists (select 1 from public.friendships where user_id = auth.uid() and friend_id = v_target.id and status = 'accepted') then
-    return jsonb_build_object('success', false, 'message', 'Bu kullanıcı zaten arkadaşın.');
+  if exists (select 1 from public.friendships where user_id = v_uid and friend_id = v_target.id and status = 'accepted') then
+    return jsonb_build_object('success', false, 'code', 'already_friends', 'message', 'Bu kullanıcı zaten arkadaşın.');
   end if;
 
-  if exists (select 1 from public.friendships where user_id = auth.uid() and friend_id = v_target.id and status = 'pending') then
-    return jsonb_build_object('success', false, 'message', 'Bu kullanıcıya zaten istek gönderdin.');
+  if exists (select 1 from public.friendships where user_id = v_uid and friend_id = v_target.id and status = 'pending') then
+    return jsonb_build_object('success', false, 'code', 'already_pending', 'message', 'Bu kullanıcıya zaten istek gönderdin.');
   end if;
 
   select exists(
-    select 1 from public.friendships where user_id = v_target.id and friend_id = auth.uid() and status = 'pending'
+    select 1 from public.friendships where user_id = v_target.id and friend_id = v_uid and status = 'pending'
   ) into v_reverse_pending;
 
   if v_reverse_pending then
-    update public.friendships set status = 'accepted' where user_id = v_target.id and friend_id = auth.uid();
-    insert into public.friendships (user_id, friend_id, status) values (auth.uid(), v_target.id, 'accepted')
+    update public.friendships set status = 'accepted' where user_id = v_target.id and friend_id = v_uid;
+    insert into public.friendships (user_id, friend_id, status) values (v_uid, v_target.id, 'accepted')
       on conflict (user_id, friend_id) do update set status = 'accepted';
     return jsonb_build_object(
       'success', true,
+      'code', 'accepted',
       'auto_accepted', true,
       'friend', jsonb_build_object('id', v_target.id, 'name', v_target.name, 'avatar_id', v_target.avatar_id, 'lifetime_points', v_target.lifetime_points, 'total_minutes', v_target.total_minutes)
     );
   end if;
 
-  insert into public.friendships (user_id, friend_id, status) values (auth.uid(), v_target.id, 'pending')
+  insert into public.friendships (user_id, friend_id, status) values (v_uid, v_target.id, 'pending')
     on conflict (user_id, friend_id) do update set status = 'pending';
 
+  -- Kabul edilmeden karşı tarafın kimliği dönmez (KVKK-17).
   return jsonb_build_object(
     'success', true,
+    'code', 'request_sent',
     'auto_accepted', false,
-    'friend', jsonb_build_object('id', v_target.id, 'name', v_target.name, 'avatar_id', v_target.avatar_id)
+    'friend', jsonb_build_object('name', v_target.name, 'avatar_id', v_target.avatar_id)
   );
 end;
 $function$;
@@ -332,7 +367,7 @@ CREATE OR REPLACE FUNCTION public.respond_friend_request(p_from_user_id uuid, p_
  RETURNS jsonb
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path TO 'public'
+ SET search_path TO 'public', 'pg_temp'
 AS $function$
 begin
   if auth.uid() is null then
@@ -433,7 +468,8 @@ END;
 $function$;
 
 -- ------------------------------------------------------------
--- C) Profil adı ve görünürlük varsayılanı (canlı gövdeler)
+-- C) Profil adı ve görünürlük varsayılanı (handle_new_user 13'ün gövdesi,
+--    sanitize_profile_insert canlı gövde)
 -- ------------------------------------------------------------
 ALTER TABLE public.profiles ALTER COLUMN show_in_social_feed SET DEFAULT true;
 
@@ -441,29 +477,59 @@ CREATE OR REPLACE FUNCTION public.handle_new_user()
  RETURNS trigger
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path TO 'public'
+ SET search_path TO 'public', 'pg_temp'
 AS $function$
+declare
+  v_name text;
+  v_candidate text;
+  v_clean text;
+  v_code text;
+  v_code_length integer;
+  v_constraint text;
 begin
-  insert into public.profiles (id, name, email, avatar_id, total_minutes, lifetime_points, friend_code)
-  values (
-    new.id,
-    left(coalesce(nullif(btrim(new.raw_user_meta_data->>'name'), ''),
-                  nullif(btrim(new.raw_user_meta_data->>'full_name'), ''),
-                  split_part(new.email, '@', 1)), 50),
-    new.email,
-    -- Yalnızca varsayılan (ücretsiz) avatarlar kayıtta seçilebilir;
-    -- önceden 200 kumluk avatar_1_gamer bedava takılıyordu.
-    coalesce(
-      (select a.id from public.avatars a
-        where a.id = new.raw_user_meta_data->>'avatar_id' and a.is_default and a.is_active),
-      'avatar_16_basic'),
-    0,
-    0,
-    upper(substr(replace(gen_random_uuid()::text,'-',''),1,6))
-  )
-  on conflict (id) do update set
-    email = excluded.email,
-    name = coalesce(excluded.name, public.profiles.name);
+  foreach v_candidate in array array[
+      new.raw_user_meta_data->>'name',
+      new.raw_user_meta_data->>'full_name',
+      split_part(new.email, '@', 1)]
+  loop
+    v_clean := btrim(left(public.clean_display_text(v_candidate), 50));
+    if v_clean <> '' and public.display_text_is_allowed(v_clean) then
+      v_name := v_clean;
+      exit;
+    end if;
+  end loop;
+  v_name := coalesce(v_name, 'Kullanıcı');
+
+  v_code_length := coalesce(public.app_config_int('friend_code_length'), 6);
+
+  for v_attempt in 1..8 loop
+    -- Kod alt işlemin dışında üretilir; çakışmada yalnızca INSERT geri alınır.
+    v_code := public.generate_friend_code(v_code_length);
+    begin
+      insert into public.profiles (id, name, avatar_id, total_minutes, lifetime_points, friend_code)
+      values (
+        new.id,
+        v_name,
+        -- Yalnızca varsayılan (ücretsiz) avatarlar kayıtta seçilebilir;
+        -- önceden 200 kumluk avatar_1_gamer bedava takılıyordu.
+        coalesce(
+          (select a.id from public.avatars a
+            where a.id = new.raw_user_meta_data->>'avatar_id' and a.is_default and a.is_active),
+          'avatar_16_basic'),
+        0,
+        0,
+        v_code
+      )
+      on conflict (id) do update set
+        name = coalesce(excluded.name, public.profiles.name);
+      return new;
+    exception when unique_violation then
+      get stacked diagnostics v_constraint = constraint_name;
+      if v_constraint is distinct from 'profiles_friend_code_key' or v_attempt = 8 then
+        raise;
+      end if;
+    end;
+  end loop;
   return new;
 end;
 $function$;
@@ -499,7 +565,7 @@ CREATE OR REPLACE FUNCTION public.handle_newsletter_subscription()
  RETURNS trigger
  LANGUAGE plpgsql
  SECURITY DEFINER
- SET search_path TO 'public'
+ SET search_path TO 'public', 'pg_temp'
 AS $function$
 BEGIN
   -- Check if email_confirmed_at changed from NULL to NOT NULL

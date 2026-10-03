@@ -1,10 +1,12 @@
 -- ============================================================================
 -- GERİ ALMA: ÖNERİ 13 (sunucu bütünlüğü)
 -- ============================================================================
--- 3 Ekim 2026 canlı tanımlarına döner. Fonksiyon gövdeleri canlıdan
--- (pg_get_functiondef) birebir alındı; yerel taklitte uygula → geri al
--- sonrası md5'ler canlıyla aynı çıktı (complete_study_session,
--- handle_new_user, add_friend_by_code, start_study_session, ...).
+-- 3 Ekim 2026 canlı tanımlarına döner (uygulama sırasında: 12/15/16/19
+-- uygulanmış, 13 öncesi hâl). Fonksiyon gövdeleri canlıdan
+-- (pg_get_functiondef) birebir alındı. Yerel taklitte
+-- (tests/proposed_sira_run_local.sh) 13 → 13_down sonrası şema dökümü
+-- 13 öncesiyle birebir aynı (fonksiyon md5'leri, yetkiler, politikalar,
+-- trigger'lar, kolonlar).
 --
 -- VERİ ETKİSİ (geri gelmeyenler):
 --  - app_config, session_starts, friend_code_attempts, blocked_name_terms
@@ -18,8 +20,15 @@
 --    O/I/L eşlemesi ve tire/boşluk temizliği gider).
 --  - Kapanmış döneme ait olduğu için lig puanı verilmeyen seanslar ve
 --    doğrulanmamış tavana takılan seanslar geri puanlanmaz.
---  - delete_own_account'un search_path'i ('public','pg_temp') BİLEREK geri
---    alınmaz: proposed/12 de aynı ayarı yapar; zararsız hijyendir.
+--  - delete_own_account: proposed/12 uygulandıysa (sıra: 12 → … → 13) gövde
+--    12'nindir ve search_path'i zaten pg_temp'lidir; dokunulmaz (12'yi
+--    12_down geri alır). 12 uygulanmadıysa 13 canlı gövdeye pg_temp eklemişti;
+--    bu dosya md5 ile bunu tanır ve 'public'e döndürür.
+--
+-- SIRA: 14 uygulandıysa ÖNCE 14_gizlilik_sosyal_down.sql (14, 13'ün
+-- fonksiyonlarına dayanır). Bu dosyanın ilk adımı bunu denetler ve 14
+-- yerindeyse hiçbir şey yapmadan durur. Tam zincir:
+-- 14_down → 13_down → 19_down → 16_down → 15_down → 12_down.
 --
 -- supabase/proposed/ CLI tarafından UYGULANMAZ (\quit). Gerekirse
 -- \echo/\quit satırları olmadan SQL Editor'de çalıştırın.
@@ -29,6 +38,14 @@
 \quit
 
 BEGIN;
+
+DO $pre$
+BEGIN
+    IF to_regnamespace('ops') IS NOT NULL OR to_regclass('public.user_blocks') IS NOT NULL THEN
+        RAISE EXCEPTION 'proposed/13_down ön koşulu: proposed/14 hâlâ uygulanmış; önce 14_gizlilik_sosyal_down.sql çalıştırın.';
+    END IF;
+END
+$pre$;
 
 -- Trigger'lar
 DROP TRIGGER IF EXISTS enforce_profile_name ON public.profiles;
@@ -396,7 +413,15 @@ GRANT EXECUTE ON FUNCTION public.add_friend_by_code(text) TO authenticated, serv
 REVOKE ALL ON FUNCTION public.handle_new_user() FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.handle_new_user() TO service_role;
 
--- search_path canlıdaki hâline (delete_own_account hariç, bkz. başlık)
+-- search_path canlıdaki hâline. delete_own_account yalnızca canlı gövdesi
+-- duruyorsa (12 uygulanmamış; md5 = canlı gövde + 13'ün pg_temp'i).
+DO $dao$
+BEGIN
+    IF md5(pg_get_functiondef('public.delete_own_account()'::regprocedure)) = 'e1a85fac1902ee3cad4430effa77144e' THEN
+        ALTER FUNCTION public.delete_own_account() SET search_path TO 'public';
+    END IF;
+END
+$dao$;
 ALTER FUNCTION public.cleanup_unconfirmed_duplicate_identity(text) SET search_path TO 'public';
 ALTER FUNCTION public.ensure_user_in_league(uuid, integer) SET search_path TO 'public';
 ALTER FUNCTION public.get_my_league_ids() SET search_path TO 'public';

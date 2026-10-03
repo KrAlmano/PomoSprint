@@ -28,6 +28,12 @@
 -- başkasının e-postasıyla açılmış, doğrulanmamış bir hesap o kişinin
 -- bekleme listesi kaydını silemez.
 --
+-- UYGULAMA SIRASI: 12 → 15 → 16 → 19 → 13 → 14 (supabase/proposed/README.md);
+-- bu dosya 1. adımdır. 13 aynı fonksiyonda yalnızca
+-- ALTER FUNCTION ... SET search_path TO 'public', 'pg_temp' yapar; bu gövde
+-- zaten pg_temp'li olduğundan 13'ün o satırı etkisizdir (12 sonra
+-- uygulansa da sonuç aynı). Geri alma ters sırada: 12_down en son.
+--
 -- supabase/proposed/ CLI tarafından UYGULANMAZ; bu dosya doğrudan
 -- çalıştırılmaz (\quit).
 --

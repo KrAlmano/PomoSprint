@@ -8,6 +8,10 @@
 -- hata (DRYRUN_RESULT) fırlatılır ve her şey geri alınır.
 -- Hata mesajındaki her satırın sonu 'true' olmalı.
 --
+-- SIRA: uygulama sırası 12 → 15 → 16 → 19 → 13 → 14; bu DRYRUN 19'dan
+-- sonra, 13'ten (ve 14'ten) ÖNCE çalıştırılır. 14 uygulanmışsa öneri gövdesinin
+-- ön koşulu 'proposed/13 ön koşulu: ...' hatasıyla durur.
+--
 -- Notlar:
 --  - Sentetik ligler oluşturulur; gerçek liglere ve cron'a dokunulmaz
 --    (process_weekly_leagues çağrılmaz, devri aynı UPDATE'lerle taklit eder).
@@ -36,6 +40,43 @@ SELECT u_legacy, repeat('U', 45), '#EF4444', 'book' FROM dry13;
 -- ---------------------------------------------------------------------------
 -- Öneri (supabase/proposed/13_sunucu_butunluk.sql, BEGIN/COMMIT hariç)
 -- ---------------------------------------------------------------------------
+-- ---------------------------------------------------------------------------
+-- 0) Ön koşul: değiştirilecek canlı gövdeler 3 Ekim 2026'dakiyle aynı mı?
+-- ---------------------------------------------------------------------------
+-- md5(pg_get_functiondef) canlıdan okundu (ADIMLAR 1'deki tablo). Farklıysa
+-- hiçbir şey yapılmadan durulur. Özellikle proposed/14 13'ten ÖNCE
+-- uygulanmışsa (handle_new_user ve add_friend_by_code'u değiştirir) 13 onun
+-- engel / onay / nötr ad değişikliklerini sessizce ezmesin diye durur.
+-- 12, 15, 16 ve 19 bu fonksiyonlara dokunmaz; önce ya da sonra olabilirler.
+DO $pre$
+DECLARE
+    v_expected constant jsonb := '{
+        "add_friend_by_code(text)": "d59affef7f113a3072d2de604bb9506f",
+        "complete_study_session(uuid,uuid,integer,boolean,integer,timestamp with time zone)": "592ede066173f30b64006f02b5141756",
+        "ensure_user_in_league(uuid,integer)": "e5674f687157135f7c5feaba2de56a7e",
+        "handle_new_user()": "ae6cedf2e0e0995ec759b69e20ada604",
+        "process_weekly_leagues()": "3d547d20a94f32e3cf531a7c3888d536",
+        "start_study_session(integer,text)": "706f87a96d7b6d7d6c776aa64ecb3772"
+    }';
+    r record;
+    v_bad text[] := '{}';
+BEGIN
+    FOR r IN SELECT key, value FROM jsonb_each_text(v_expected) LOOP
+        IF to_regprocedure('public.' || r.key) IS NULL
+           OR md5(pg_get_functiondef(to_regprocedure('public.' || r.key))) IS DISTINCT FROM r.value THEN
+            v_bad := v_bad || r.key;
+        END IF;
+    END LOOP;
+    IF to_regnamespace('ops') IS NOT NULL OR to_regclass('public.user_blocks') IS NOT NULL THEN
+        v_bad := v_bad || 'proposed/14 uygulanmış görünüyor (13, 14''ten ÖNCE uygulanmalı; önce 14_down)'::text;
+    END IF;
+    IF array_length(v_bad, 1) > 0 THEN
+        RAISE EXCEPTION 'proposed/13 ön koşulu: canlı tanım beklenenden farklı: %. Dosyayı yeni gövdeye uyarlayın.',
+            array_to_string(v_bad, ', ');
+    END IF;
+END
+$pre$;
+
 -- ---------------------------------------------------------------------------
 -- A) UX-08: app_config + get_app_config
 -- ---------------------------------------------------------------------------
@@ -1004,7 +1045,11 @@ $function$;
 
 -- ---------------------------------------------------------------------------
 -- H) HİJYEN: search_path'e pg_temp (gövdeye dokunmadan). handle_new_user ve
--- add_friend_by_code yukarıda yeniden yazıldı.
+-- add_friend_by_code yukarıda yeniden yazıldı. delete_own_account: proposed/12
+-- (sırada 13'ten önce) gövdeyi zaten pg_temp'li yazar, bu satır o zaman
+-- etkisizdir; 12 uygulanmadıysa canlı gövdeye pg_temp ekler (13_down o
+-- durumda geri alır). handle_newsletter_subscription ve
+-- respond_friend_request'i proposed/14 sonra pg_temp'li gövdeyle yeniden yazar.
 -- ---------------------------------------------------------------------------
 ALTER FUNCTION public.cleanup_unconfirmed_duplicate_identity(text) SET search_path TO 'public', 'pg_temp';
 ALTER FUNCTION public.delete_own_account() SET search_path TO 'public', 'pg_temp';

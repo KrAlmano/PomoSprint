@@ -29,9 +29,85 @@ dağıtıyor). Canlı gövdeyi bilmeden repodaki eski sürümden
 
 ## Dosyalar ve uygulama sırası
 
+### Canlıya hazır paketler: TEK SIRA 12 → 15 → 16 → 19 → 13 → 14
+
+Bu altı paket canlı tanımlardan (3 Ekim 2026, `pg_get_functiondef`) yazıldı,
+`11`'e bağımlı değildir ve **yalnızca bu sırayla** uygulanır. Her adım SQL
+Editor'de iki çalıştırmadır: (1) DRYRUN dosyası olduğu gibi yapıştırılır;
+öneriyi ve senaryoları geri alınan bir transaction'da çalıştırır ve bilinçli
+bir `DRYRUN_RESULT >> ...` hatasıyla biter; her madde `true` olmalı.
+(2) Ardından ana dosya `\echo`/`\quit` satırları silinerek çalıştırılır.
+Bir adım beklenen sonucu vermezse SONRAKİNE GEÇMEYİN.
+
+| Adım | Önce DRYRUN | Sonra dosya | Beklenen sonuç |
+|---|---|---|---|
+| 1 | `tests/proposed_12_delete_own_account_dryrun.sql` | `12_delete_own_account.sql` | DRYRUN 14/14 `true`. Sonra `md5(pg_get_functiondef('public.delete_own_account()'::regprocedure))` = `e8775df60c020a1df5f03a6cb7a49d1e` |
+| 2 | `15_monthly_leaderboard_study_month_dryrun.sql` | `15_monthly_leaderboard_study_month.sql` | DRYRUN T1–T6 `true` (6/6; BİLGİ satırı yalnızca karşılaştırma). Sonra `get_public_monthly_leaderboard(integer)` md5 = `3865c94b1bdb69161d576354ffcff6c2`. İstemcide `nextMonthlyLeaderboardReset` 04:00'e |
+| 3 | `16_categories_order_and_privileges_dryrun.sql` | `16_categories_order_and_privileges.sql` | DRYRUN 13/13 `true`. Sonra `categories`'te `Categories delete policy` yok; authenticated'da DELETE yok, UPDATE yalnız 5 kolonda; `create_category` md5 = `a18e2ad9af94c786a4e7d97f9b252d50` |
+| 4 | `tests/proposed_19_waitlist_consent_token_dryrun.sql` | `19_waitlist_consent_token.sql` (A bölümü; B site onay alanlarını gönderdikten SONRA, ayrı) | DRYRUN 12/12 `true` (A + B). Sonra `waitlist`'te `marketing_consent`, `consent_text_version`, `consented_at`, `unsubscribe_token` kolonları ve `waitlist_set_consent_time` trigger'ı |
+| 5 | `tests/proposed_13_sunucu_butunluk_dryrun.sql` | `13_sunucu_butunluk.sql` | DRYRUN 50/50 `true` (14 uygulanmışsa `proposed/13 ön koşulu: ...` ile durur). Sonra `select public.get_app_config();` çalışır ve md5'ler: `handle_new_user()` `92dcc142fbec96ca2fb79a7aa3d14289`, `add_friend_by_code(text)` `eab30b000bbd223a3eef0af8e9900b30`, `respond_friend_request(uuid,boolean)` `785731c7b2c628d65a5f9e84a60be5d5`, `handle_newsletter_subscription()` `ecf943e2d250d60989ca04bd79e90152` (14'ün ön koşulu tam bunları bekler) |
+| 6 | `tests/proposed_14_gizlilik_sosyal_dryrun.sql` | `14_gizlilik_sosyal.sql` | DRYRUN `T00 özet 67/67: true` (13 yoksa `proposed/14 ön koşulu: önce proposed/13 ...`). Sonra `select * from cron.job;` içinde `privacy_retention_daily` (`17 3 * * *`), `ops` şemasında 14 fonksiyon, `select * from ops.open_user_reports;` çalışır |
+
+Ürün/hukuk kararları ilgili adımdan ÖNCE: 13 için UX-01 düğmesi
+(`app_config.unverified_session_daily_cap`, varsayılan `null` = bugünkü
+davranış), 14 için görünürlük varsayılanı, nötr ad, saklama süreleri ve Apple
+istemci ön koşulu (aşağıda "Öneri 14").
+
+**Geri alma (ters sıra):** `14_gizlilik_sosyal_down.sql` → `13_sunucu_butunluk_down.sql`
+→ `19_waitlist_consent_token_down.sql` → `16_categories_order_and_privileges_down.sql`
+→ `15_monthly_leaderboard_study_month_down.sql` → `12_delete_own_account_down.sql`.
+Her `_down` bir önceki adımdaki şemaya birebir döner (veri kaybı notları her
+dosyanın başında). `14_down` 13 uygulanmış hâle döner; `13_down` 14 hâlâ
+yerindeyse hiçbir şey yapmadan durur.
+
+**Sıra neden böyle?**
+- `14`, `handle_new_user` ve `add_friend_by_code`'u `13`'ün gövdesi üzerine
+  kurar (13'ün friend_code yeniden denemesi, Crockford kodu, deneme sınırı,
+  ad içerik denetimi, bekleyen istekte id olmaması korunur; 14'ün nötr adı,
+  onay kaydı, engel kontrolleri eklenir) ve 13'ün yardımcılarını kullanır.
+  Bu yüzden 14'ün md5 ön koşulu 13 UYGULANMIŞ gövdeleri bekler; 13 de kendi
+  ön koşuluyla 14'ten sonra uygulanmayı reddeder (yoksa 14'ün değişikliklerini
+  sessizce ezerdi).
+- `15`, `14`'ten önce: 14 iki aylık sıralama gövdesini de tanır; 14'ten sonra
+  15 uygulanamaz (dönüş tipi farklı).
+- `12`, `13`'ten önce: 12 `delete_own_account`'u `pg_temp`'li yazar; 13'ün
+  aynı fonksiyondaki `ALTER ... SET search_path` satırı o zaman etkisizdir.
+  12 hiç uygulanmazsa 13 canlı gövdeye `pg_temp` ekler ve `13_down` md5 ile
+  tanıyıp geri alır.
+- `16` ve `19` diğerleriyle çakışmaz; küçük ve bağımsız oldukları için önce.
+- 12, 15, 16, 19 atlanabilir (kalanların sırası aynı kalır); 13 atlanırsa 14
+  uygulanamaz.
+
+**Yerel doğrulama:** `supabase/tests/proposed_sira_run_local.sh` (yerel, tek
+kullanımlık Postgres 16+; `PG*` ortam değişkenleri). Taban
+`tests/proposed_sira_local_stub.sql`: canlıdan salt okunarak kuruldu; public'teki
+33 fonksiyonun md5'i ve kolon/kısıt/index/politika/yetki/trigger parmak izleri
+canlıyla aynı. Script her adımda DRYRUN'u, sonra dosyayı uygular, sıra dışı
+kullanımı dener (13'ten önce 14; 14'ten sonra 13 ve 14) ve geri alma
+zincirinde her `_down` sonrası şema dökümünü önceki adımla karşılaştırır.
+3 Ekim 2026 sonucu: DRYRUN 14/14, 6/6, 13/13, 12/12, 50/50, 67/67 `true`;
+sıra dışı üç deneme ön koşulla durdu; altı `_down`un hepsi önceki şemaya
+birebir döndü. Ayrıca 13 DRYRUN canlı hâlde 50/50, 14 DRYRUN 15'siz (yalnız 13)
+67/67, 12'siz 13 → 14 → 14_down → 13_down tabana döndü.
+
+**Paket özetleri**
+
+| Dosya | Öncelik | Amaç |
+|---|---|---|
+| `12_delete_own_account.sql` | P1 KVKK | Hesap silinince yabancı anahtarı olmayan, e-postaya bağlı kişisel veriyi de siler (`waitlist`, `user_id`'si boş `marketing_subscribers` satırı; yalnızca doğrulanmış e-postada); `search_path`'e `pg_temp`. Diğer tablolar canlıda zaten cascade ile siliniyor (3 Ekim'de FK'ler okunarak doğrulandı). |
+| `15_monthly_leaderboard_study_month.sql` | P2 (MH-1, X2) | Aylık sıralamada 'bu ay' = çalışma ayı (started_at, profil dilimi, 04:00); Raporlar > Aylık ile aynı kural. |
+| `16_categories_order_and_privileges.sql` | P3 (CAT-07, CAT-10) | Yeni ve arşivden çıkan kategori sona; tek seferlik sıra eşitliği çözümü; DELETE politikası/yetkisi kaldırılır, UPDATE yalnız 5 kolona. |
+| `19_waitlist_consent_token.sql` | P2 (6563 / KVKK-11) | Bekleme listesine ticari ileti onay kaydı (`marketing_consent`, `consent_text_version`, sunucuda yazılan `consented_at`) ve kişiye özel `unsubscribe_token`. A geriye uyumlu; B, site onay alanlarını gönderdikten SONRA anon INSERT'i yalnızca onaylı satıra ve üç kolona daraltır. |
+| `13_sunucu_butunluk.sql` | P1 | **Ürün kararı gerekir (UX-01), ama karar düğmesi kapalıyken canlı davranışı değiştirmeden uygulanabilir.** UX-01: `register_session_start` + `session_starts`; `complete_study_session` eşleşen sunucu başlangıcında `started_at`'i sunucudan alır (`start_verified`), doğrulanmamış seanslara `app_config.unverified_session_daily_cap` (vars. `null`). Lig dönemi: kapanmış döneme ait geç seans lig puanı almaz (`league_period_closed`). `handle_new_user` friend_code çakışmasında yeniden dener; Crockford arkadaş kodu, saatlik deneme sınırı, bekleyen istekte id yok (KVKK-17). `profiles.email` boşaltılır (KVKK-20, 2. aşama dosya sonunda). `app_config` + anon okunabilir `get_app_config()` (UX-08). 10 SECURITY DEFINER'a `pg_temp`. `profiles.name`/`categories.name` içerik trigger'ı, `start_study_session` doğrulaması. İstemci sözleşmesi dosya başında. |
+| `14_gizlilik_sosyal.sql` | P1/P2 (PLAY-04, PLAY-05, ACC-06, KVKK-01, KVKK-03, KVKK-06, KVKK-10, ACC-13, KVKK-09) | Sunucu tarafı engelleme ve arkadaş yönetimi, kullanıcı bildirimi + operatör araçları, nötr görünen ad ve tek kelimelik ad maskesi, görünürlük varsayılan kapalı, anon sıralama sınırı, activity_feed durdurma, onay kayıt defteri, saklama işleri (pg_cron), bülten onayı RPC'leri. `11` §2 / `07` A-B-E / `03`'ü kapsar. Ayrıntı: aşağıda "Öneri 14". |
+
+### Eski öneriler (01–10): `11`'e bağlı, canlıya göre yeniden yazılmalı
+
 Ön koşul (hepsi için): `supabase/proposed/11_audit_fixes_unapplied.sql (canlıda YOK)`
 canlıda uygulanmış olmalı (`my_friend_ids`, `study_day_of`,
-`study_day_start`, `category_limit`, completed_at trigger'ı).
+`study_day_start`, `category_limit`, completed_at trigger'ı). Bu dosyalar
+canlı gövdelerden yazılmadı; yukarıdaki sıraya dahil DEĞİLDİR ve 14'ün
+kapsadığı bölümleri (`03`, `07` A-B-E, `11` §2) 14'ten sonra UYGULANMAZ.
 
 | Sıra | Dosya | Öncelik | Amaç | Bulgular |
 |---|---|---|---|---|
@@ -45,36 +121,32 @@ canlıda uygulanmış olmalı (`my_friend_ids`, `study_day_of`,
 | 8 | `09_categories.sql` | P3 | Kategori adı 1-40 karakter, büyük/küçük harf duyarsız benzersizlik (önce veri temizliği), RPC'lerde tek kaynaklı limit, `update_category`. | AUTH-19, BACKEND-28, AUTH-18 |
 | 9 | `08_privileges.sql` | P3 | Fonksiyonlar varsayılan olarak anon'a kapalı; extensions kullanan fonksiyonların search_path'i. | BACKEND-25 |
 | 10 | `10_data_fixes.sql` | P3 | Sahip olunmayan ücretli avatarlar, görseli olmayan avatar, abone e-postalarının normalizasyonu. Kullanıcıya görünür; ürün kararıyla. | SOCIAL-15, AUTH-21, DATA-25, SOCIAL-27, LANDING-08 |
-| 11 | `15_monthly_leaderboard_study_month.sql` (+ `_down`, `_dryrun`) | P2 | Aylık sıralamada 'bu ay' = çalışma ayı (started_at, profil dilimi, 04:00); Raporlar > Aylık ile aynı kural. CANLI gövdeden yazıldı; `11`'e bağımlı değil. Uygulanınca istemcide `nextMonthlyLeaderboardReset` 04:00'e. | MH-1, X2 |
-| 12 | `16_categories_order_and_privileges.sql` (+ `_down`, `_dryrun`) | P3 | Yeni ve arşivden çıkan kategori sona; tek seferlik sıra eşitliği çözümü; DELETE politikası/yetkisi kaldırılır, UPDATE yalnız 5 kolona. CANLI gövdeden yazıldı; `11`'e bağımlı değil. | CAT-07, CAT-10 |
-| 13 | `14_gizlilik_sosyal.sql` (+ `_down`, `tests/proposed_14_gizlilik_sosyal_dryrun.sql`) | P1/P2 | Sunucu tarafı engelleme ve arkadaş yönetimi, kullanıcı bildirimi + operatör araçları, nötr görünen ad ve tek kelimelik ad maskesi, görünürlük varsayılan kapalı, anon sıralama sınırı, activity_feed durdurma, onay kayıt defteri, saklama işleri (pg_cron), bülten onayı RPC'leri. CANLI gövdeden yazıldı; `11`'e bağımlı değil, `11` §2 / `07` A-B-E / `03`'ü kapsar. `15` istenirse ondan ÖNCE. Ayrıntı: aşağıda "Öneri 14". | PLAY-04, PLAY-05, ACC-06, KVKK-01, KVKK-03, KVKK-06, KVKK-10, ACC-13, KVKK-09 |
-
-`15` ve `16` diğerlerinden farklı olarak doğrudan uygulanmaya hazırdır: canlı
-tanımlar (3 Ekim 2026) esas alındı, DRYRUN dosyaları geri alınan bir
-transaction'da senaryoları çalıştırır (yerel bir taklitte doğrulandı: tümü
-`true`, eski tanımla `false`). Önce `_dryrun.sql`'i SQL Editor'de çalıştırın,
-sonra ana dosyanın `\echo`/`\quit` satırlarını silip çalıştırın.
-
-**Bağımsız öneri (ön koşulu yok):**
-
-| Dosya | Öncelik | Amaç |
-|---|---|---|
-| `12_delete_own_account.sql` (+ `12_delete_own_account_down.sql`) | P1 KVKK | Hesap silinince yabancı anahtarı olmayan, e-postaya bağlı kişisel veriyi de siler (`waitlist`, `user_id`'si boş `marketing_subscribers` satırı; yalnızca doğrulanmış e-postada); `search_path`'e `pg_temp`. Diğer tablolar canlıda zaten cascade ile siliniyor (3 Ekim'de FK'ler okunarak doğrulandı). Kuru çalıştırma: `tests/proposed_12_delete_own_account_dryrun.sql` (14 senaryo; yerel stub şemada hepsi `true`). |
-| `13_sunucu_butunluk.sql` (+ `13_sunucu_butunluk_down.sql`) | P1 | **Ürün kararı gerekir (UX-01), ama karar düğmesi kapalıyken canlı davranışı değiştirmeden uygulanabilir.** UX-01: `register_session_start` + `session_starts`; `complete_study_session` eşleşen sunucu başlangıcında `started_at`'i sunucudan alır (`start_verified`), doğrulanmamış seanslara `app_config.unverified_session_daily_cap` (vars. `null` = bugünkü davranış). Lig dönemi: kapanmış döneme ait geç seans lig puanı almaz (`league_period_closed`), `league_memberships.period_started_at` trigger'larla. `handle_new_user` friend_code çakışmasında yeniden dener; Crockford arkadaş kodu, saatlik deneme sınırı, bekleyen istekte id yok (KVKK-17). `profiles.email` boşaltılır (KVKK-20, 2. aşama dosya sonunda). `app_config` + anon okunabilir `get_app_config()` (UX-08). 10 SECURITY DEFINER'a `pg_temp`. `profiles.name`/`categories.name` içerik trigger'ı, `start_study_session` doğrulaması. İstemci sözleşmesi dosya başında. Kuru çalıştırma: `tests/proposed_13_sunucu_butunluk_dryrun.sql` (50 senaryo); yerel taklit `tests/proposed_13_local_stub.sql` (canlı gövdelerle md5 eşit) üzerinde 50/50 `true`, geri alma sonrası md5'ler canlıyla aynı. |
-| `19_waitlist_consent_token.sql` (+ `19_waitlist_consent_token_down.sql`) | P2 (6563 / KVKK-11) | Bekleme listesine ticari ileti onay kaydı (`marketing_consent`, `consent_text_version`, sunucuda yazılan `consented_at`) ve kişiye özel `unsubscribe_token`. İki aşama: A geriye uyumlu (site yalnızca e-posta gönderse de çalışır); B, site onay alanlarını gönderdikten SONRA anon INSERT'i yalnızca onaylı satıra ve üç kolona daraltır. Kuru çalıştırma: `tests/proposed_19_waitlist_consent_token_dryrun.sql` (12 senaryo; yerel stub şemada hepsi `true`). |
 
 `01` ile `07`'nin D bölümü birlikte düşünülmeli: `01`'deki DEĞİŞİKLİK 5,
 `07`'deki `active_session_client_uuid` kolonuna dayanır.
 
 ## Öneri 14: gizlilik ve sosyal güvenlik (sunucu)
 
-`14_gizlilik_sosyal.sql` canlı tanımlardan (3 Ekim 2026, PG 17.6) yazıldı.
-İlk adımı değiştireceği 13 canlı fonksiyonun `md5(pg_get_functiondef)`
-değerini denetler; araya başka bir değişiklik girdiyse hiçbir şey yapmadan
-durur. Yerel taklitte (`tests/proposed_14_local_stub.sql`, fonksiyon md5'leri
-canlıyla aynı) doğrulandı: DRYRUN 62/62 `true` (canlı ve `15` uygulanmış
-hâl), 10 mutasyonun hepsini yakalıyor; ileri + geri sonrası şema durumu
-(fonksiyon gövdeleri, yetkiler, politikalar, trigger'lar, cron) birebir aynı.
+`14_gizlilik_sosyal.sql` canlı tanımlardan (3 Ekim 2026, PG 17.6) yazıldı ve
+`13` UYGULANMIŞ duruma göre yeniden temellendirildi (sıra: 12 → 15 → 16 → 19
+→ 13 → 14). İlk adımı 13'ün yardımcılarının varlığını ve değiştireceği 13
+fonksiyonun `md5(pg_get_functiondef)` değerini denetler (`handle_new_user`,
+`add_friend_by_code`, `respond_friend_request`,
+`handle_newsletter_subscription` için 13 uygulanmış değerler); 13 yoksa ya
+da araya başka bir değişiklik girdiyse hiçbir şey yapmadan durur. Yerel
+taklitte (`tests/proposed_sira_run_local.sh`) doğrulandı: 13'ten sonra DRYRUN
+67/67 `true` (15'li ve 15'siz); T63–T67 13'ün korunan değişikliklerini sınar
+ve 14'ün eski (13'ten habersiz) gövdeleriyle düşer; `14_down` sonrası şema 13
+uygulanmış hâlle birebir aynı.
+
+13 ile birleşen davranış: kayıtta ad adayları temizlenir, yasaklıysa ya da
+e-posta yerel kısmıyla aynıysa sıradakine geçilir, hiçbiri uygun değilse
+nötr ad (`Pomo 1234`); arkadaş kodu 13'ün Crockford üreticisiyle ve çakışmada
+yeniden denenerek yazılır; `profiles.email` yazılmaz. (13'ün üstüne 13'ten
+habersiz 14 uygulansaydı yasaklı adla kayıt `profile_name_not_allowed` ile
+düşerdi.) İstemcinin yedek profil yolunda e-posta, 13 `NEW.email`'i
+boşalttığı için JWT'deki `email` talebinden okunur;
+`ops.neutralize_email_derived_names` e-postayı `auth.users`'tan okur.
 
 **Kapsadığı / geçersiz kıldığı öneriler:** `11` §2 (`remove_friend`,
 `cancel_friend_request`, `get_outgoing_friend_requests`, `get_my_friends`,
@@ -83,28 +155,33 @@ hâl), 10 mutasyonun hepsini yakalıyor; ileri + geri sonrası şema durumu
 `code`), `03` (aylık sıralama ve maskeleme). 14'ten sonra bunları
 UYGULAMAYIN (engel filtresini geri alırlar). `12` ile çakışmaz
 (`delete_own_account`'a dokunmaz; bekleme listesinin hesap silmede
-temizlenmesi `12`'de). `15` 14'ten önce uygulanabilir (14 iki ay kuralını
-da tanır); 14'ten sonra uygulanamaz ve gerekmez.
+temizlenmesi `12`'de). `15` 14'ten önce (14 iki ay kuralını da tanır);
+14'ten sonra uygulanamaz ve gerekmez.
 
-### SQL Editor çalıştırma sırası
+### SQL Editor çalıştırma sırası (14'e özgü adımlar)
 
-1. (İsteğe bağlı) `15`: önce `15_..._dryrun.sql`, sonra `15_...sql`. 14'ten ÖNCE.
-2. `tests/proposed_14_gizlilik_sosyal_dryrun.sql` → `DRYRUN_RESULT >> T00 özet 62/62: true ...`
-   (ön koşul tutmazsa `proposed/14 ön koşulu: ...` hatası; öneriyi uyarlayın).
-3. Ürün/hukuk kararları: görünürlük varsayılanı (KVKK-01), nötr ad, saklama
+Genel sıra yukarıdaki "Dosyalar ve uygulama sırası" tablosudur; 14, 13'ten
+SONRA 6. adımdır.
+
+1. Ürün/hukuk kararları: görünürlük varsayılanı (KVKK-01), nötr ad, saklama
    süreleri (onay kaydı 1 yıl, bekleme listesi 12 ay, onaysız kayıt 7 gün).
-4. **İstemci ön koşulu (Apple):** `providerFirstNameUpdate` `^Pomo \d{4}$`
+2. **İstemci ön koşulu (Apple):** `providerFirstNameUpdate` `^Pomo \d{4}$`
    adını da varsayılan saymalı; yoksa Apple ile ilk girişte `givenName`
    yazılmaz (Apple adı yalnızca ilk girişte verir). Bu istemci değişikliği
    canlı sunucuya bağımlı değil, 14'ten önce yayınlanabilir.
-5. `14_gizlilik_sosyal.sql` (`\echo`/`\quit` satırları silinerek).
+3. `tests/proposed_14_gizlilik_sosyal_dryrun.sql` → `DRYRUN_RESULT >> T00 özet 67/67: true ...`
+   (ön koşul tutmazsa `proposed/14 ön koşulu: ...` hatası: 13 uygulanmamış ya
+   da gövde değişmiş).
+4. `14_gizlilik_sosyal.sql` (`\echo`/`\quit` satırları silinerek).
    Migration geçmişine `20261003194000 privacy_social` yazılır.
-6. Doğrulama: AGENTS.md §2.3 sorguları, `select * from cron.job;`
+5. Doğrulama: AGENTS.md §2.3 sorguları, `select * from cron.job;`
    (`privacy_retention_daily`, `17 3 * * *`), `select * from ops.open_user_reports;`.
-7. (İsteğe bağlı, ürün kararı) mevcut e-posta türevi adlar:
+6. (İsteğe bağlı, ürün kararı) mevcut e-posta türevi adlar:
    önizleme sorgusu `ops.neutralize_email_derived_names` üstünde; uygulama
    `select ops.neutralize_email_derived_names();`.
-8. Geri alma: `14_gizlilik_sosyal_down.sql` (yeni tablolar silinir; başlığını okuyun).
+7. Geri alma: `14_gizlilik_sosyal_down.sql` (yeni tablolar silinir; başlığını
+   okuyun). 13 uygulanmış hâle döner; 13'ü de geri almak için ardından
+   `13_sunucu_butunluk_down.sql`.
 
 Supabase advisor yeni dört tabloda "RLS açık, politika yok" (INFO) gösterir:
 bilinçli, istemci bu tablolara yalnızca RPC ile erişir. `ops` şemasını
@@ -124,7 +201,7 @@ Yanıtlar jsonb; istemci `code` alanına bakar, `message` (yalnızca
 | `remove_friend` | `p_friend_id uuid` | `{success:true, code:'removed'}` (iki yön, bekleyen istekler dahil) | `not_friends` |
 | `cancel_friend_request` | `p_to_user_id uuid` | `{success:true, code:'cancelled'}` | `not_found` |
 | `get_outgoing_friend_requests` | — | tablo `id, name, avatar_id, created_at` | — |
-| `add_friend_by_code` (değişti) | `p_code text` (boşluk/küçük harf normalize) | `{success:true, code:'request_sent'\|'accepted', auto_accepted, friend:{id,name,avatar_id,…}}` | `not_found` (seni engelleyen kişi de dahil, yanıt aynı), `self_add`, `blocked` (sen engelledin), `already_friends`, `already_pending`, `cooldown` (reddedildikten sonra 7 gün), `rate_limited` (saatte 20 bekleyen istek) |
+| `add_friend_by_code` (değişti) | `p_code text` (13: boşluk/tire/alt çizgi/nokta atılır, büyük harf, O→0, I/L→1; 8 karaktere kadar) | `{success:true, code:'accepted', auto_accepted:true, friend:{id,name,avatar_id,lifetime_points,total_minutes}}` ya da `{success:true, code:'request_sent', auto_accepted:false, friend:{name,avatar_id}}` (13, KVKK-17: kabul edilmeden id yok) | `not_found` (seni engelleyen kişi de dahil, yanıt aynı), `self_add`, `blocked` (sen engelledin), `already_friends`, `already_pending`, `cooldown` (reddedildikten sonra 7 gün), `rate_limited` (13: saatte 20 deneme, ya da 14: saatte 20 bekleyen istek; `message` farklı) |
 | `respond_friend_request` (değişti) | `p_from_user_id uuid, p_accept bool` | `{success:true, code:'accepted'\|'rejected'}` | `not_found` (istek yok ya da taraflardan biri engelli) |
 | `get_my_friends`, `get_incoming_friend_requests`, `get_live_friends` | aynı | Dönüş aynı; iki yönlü engel filtresi | — |
 | `get_my_league_ranking` (değişti) | — | Mevcut kolonlar + `id uuid`, `is_blocked bool`. Engellediğin üyenin satırı kalır (sıra/bölge), `name` ve `avatar_id` NULL | — |
@@ -162,9 +239,11 @@ Hesabı askıya alma: Dashboard > Authentication > Users > Ban. Yeni bildirim
 için otomatik uyarı yok; görünüm düzenli kontrol edilmeli (gerekirse ileride
 Edge Function ile e-posta).
 
-Kapsam dışı (ayrı iş): görünen ad / ders adı için sunucu tarafı içerik
-filtresi ve `start_study_session` girdi sınırları (PLAY-05'in o kısmı),
-bekleme listesinde çift onay, `profiles`'ta askıya alma kolonu.
+Görünen ad / ders adı için sunucu tarafı içerik filtresi ve
+`start_study_session` girdi sınırları (PLAY-05'in o kısmı) `13`'te
+(`profiles.name`/`categories.name` trigger'ları); 14 bunlara dayanır.
+Kapsam dışı (ayrı iş): bekleme listesinde çift onay, `profiles`'ta askıya
+alma kolonu.
 
 ## `20261003150000_live_audit_fixes` ile ilişkisi
 
