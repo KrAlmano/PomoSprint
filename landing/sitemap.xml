@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://pomosprint.app/</loc>
+    <lastmod>2026-10-03</lastmod>
+  </url>
+  <url>
+    <loc>https://pomosprint.app/features</loc>
+    <lastmod>2026-10-03</lastmod>
+  </url>
+  <url>
+    <loc>https://pomosprint.app/pomodoro-nedir</loc>
+    <lastmod>2026-10-03</lastmod>
+  </url>
+  <url>
+    <loc>https://pomosprint.app/faq</loc>
+    <lastmod>2026-10-03</lastmod>
+  </url>
+  <url>
+    <loc>https://pomosprint.app/privacy</loc>
+    <lastmod>2026-10-03</lastmod>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pomosprint.app/privacy"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pomosprint.app/en/privacy"/>
+  </url>
+  <url>
+    <loc>https://pomosprint.app/terms</loc>
+    <lastmod>2026-10-03</lastmod>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pomosprint.app/terms"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pomosprint.app/en/terms"/>
+  </url>
+  <url>
+    <loc>https://pomosprint.app/en/privacy</loc>
+    <lastmod>2026-10-03</lastmod>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pomosprint.app/privacy"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pomosprint.app/en/privacy"/>
+  </url>
+  <url>
+    <loc>https://pomosprint.app/en/terms</loc>
+    <lastmod>2026-10-03</lastmod>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pomosprint.app/terms"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pomosprint.app/en/terms"/>
+  </url>
+</urlset>

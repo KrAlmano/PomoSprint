@@ -5,38 +5,55 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pomodoro Nedir? — PomoSprint</title>
   <meta name="description" content="Pomodoro Tekniği nedir, nasıl uygulanır, neden işe yarar? 25 dakikalık odak bloklarının bilimi ve PomoSprint'in bu süreçte sana sağladıkları.">
-  <meta name="theme-color" content="#F6F0EA">
+  <link rel="canonical" href="https://pomosprint.app/pomodoro-nedir">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="PomoSprint">
+  <meta property="og:locale" content="tr_TR">
   <meta property="og:title" content="Pomodoro Nedir? — PomoSprint">
   <meta property="og:description" content="25 dakika odak, 5 dakika mola: Pomodoro Tekniği'nin hikâyesi, bilimi ve doğru uygulanışı.">
-  <meta property="og:type" content="website">
-  <meta name="twitter:card" content="summary">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23EE6C55'/%3E%3Cpath d='M10 8h12M10 24h12M11.5 8c0 4 2.5 5.8 4.5 8-2 2.2-4.5 4-4.5 8M20.5 8c0 4-2.5 5.8-4.5 8 2 2.2 4.5 4 4.5 8' stroke='%23fff' stroke-width='2.2' stroke-linecap='round' fill='none'/%3E%3C/svg%3E">
+  <meta property="og:url" content="https://pomosprint.app/pomodoro-nedir">
+  <meta property="og:image" content="https://pomosprint.app/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="PomoSprint: kum saati logosu ve 'Odaklanmanın en keyifli hali' yazısı">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Pomodoro Nedir? — PomoSprint">
+  <meta name="twitter:description" content="25 dakika odak, 5 dakika mola: Pomodoro Tekniği'nin hikâyesi, bilimi ve doğru uygulanışı.">
+  <meta name="twitter:image" content="https://pomosprint.app/og-image.png">
+  <!-- partial:head -->
+  <meta name="theme-color" content="#F6F0EA">
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="/css/style.css?v=20261003">
+  <script src="/js/boot.js?v=20261003"></script>
+  <!-- /partial:head -->
 </head>
-<body>
+<body data-page="pomodoro">
 
+  <!-- partial:header -->
   <header class="site-header">
     <div class="container header-inner">
-      <a href="index.html" class="brand" aria-label="PomoSprint ana sayfa">
+      <a href="/" class="brand" aria-label="PomoSprint ana sayfa">
         <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#EE6C55"/><path d="M10 8h12M10 24h12M11.5 8c0 4 2.5 5.8 4.5 8-2 2.2-4.5 4-4.5 8M20.5 8c0 4-2.5 5.8-4.5 8 2 2.2 4.5 4 4.5 8" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg>
         <span class="brand-name">Pomo<em>Sprint</em></span>
       </a>
-      <nav class="site-nav" aria-label="Ana menü">
-        <a href="index.html">Ana Sayfa</a>
-        <a href="features.html">Özellikler</a>
-        <a href="pomodoro-nedir.html" class="active" aria-current="page">Pomodoro Nedir?</a>
-        <a href="faq.html">SSS</a>
-        <a href="index.html#yakinda" class="btn btn-primary btn-sm nav-cta">Haberdar Ol</a>
+      <nav class="site-nav" id="site-nav" aria-label="Ana menü">
+        <a href="/">Ana Sayfa</a>
+        <a href="/features">Özellikler</a>
+        <a href="/pomodoro-nedir" class="active" aria-current="page">Pomodoro Nedir?</a>
+        <a href="/faq">SSS</a>
+        <a href="/#yakinda" class="btn btn-primary btn-sm nav-cta">Haberdar Ol</a>
       </nav>
-      <button class="nav-toggle" aria-label="Menüyü aç/kapat" aria-expanded="false">
+      <button class="nav-toggle" type="button" aria-label="Menüyü aç/kapat" aria-expanded="false" aria-controls="site-nav">
         <span></span><span></span><span></span>
       </button>
     </div>
   </header>
+  <!-- /partial:header -->
 
   <main>
     <section class="page-hero">
@@ -183,7 +200,7 @@
               <circle class="cw-seg cw-long" cx="120" cy="120" r="96" pathLength="140" stroke-dasharray="25 115" stroke-dashoffset="-115"/>
             </g>
           </svg>
-          <div class="orbit-track" style="--T: 30s; --D: 0s;">
+          <div class="orbit-track ot-cycle">
             <span class="orbit-dot od-cycle"></span>
           </div>
           <div class="cw-center">
@@ -291,36 +308,36 @@
             <div class="feature-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5"/><path d="M9 2h6"/></svg>
             </div>
-            <h3>Ritmi senin yerine tutar</h3>
-            <p>Odak ve mola sürelerini bir kez ayarla; geçişleri, sayacı ve seri takibini
-              PomoSprint yönetsin. Sen sadece başlat tuşuna bas.</p>
+            <h3>Sayacı senin yerine tutar</h3>
+            <p>25 ya da 50 dakikalık seansını seç ve başlat; sayacı, kaydı ve seri takibini
+              PomoSprint yönetsin. Seans bitince molanı sen ver.</p>
           </article>
           <article class="feature-card">
             <div class="feature-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             </div>
             <h3>Yalnız bırakmaz</h3>
-            <p>Sanal Kütüphane'de arkadaşlarınla aynı anda odaklanırsın. Birinin seni
-              &ldquo;gördüğünü&rdquo; bilmek, pomodoroyu yarıda bırakmayı zorlaştırır.</p>
+            <p>Arkadaşlarından kimin şu an odaklandığını canlı görürsün. Birinin de seninle
+              çalıştığını bilmek, pomodoroyu yarıda bırakmayı zorlaştırır.</p>
           </article>
           <article class="feature-card">
             <div class="feature-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M6 4h12v5a6 6 0 0 1-12 0Z"/><path d="M12 15v3"/><path d="M8 21h8"/></svg>
             </div>
-            <h3>Molaları ödüle çevirir</h3>
-            <p>Tamamladığın her pomodoro lig puanına dönüşür. 14 günlük dönemlerde tatlı
-              bir rekabet, ritmi sürdürmek için küçük ama etkili bir dürtü.</p>
+            <h3>Odağı ödüle çevirir</h3>
+            <p>Tamamladığın her pomodoro puana ve kum tanesine dönüşür. Liglerdeki tatlı
+              rekabet, ritmi sürdürmek için küçük ama etkili bir dürtü.</p>
           </article>
           <article class="feature-card">
             <div class="feature-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="5"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
             </div>
             <h3>Süreci sana benzetir</h3>
-            <p>16 karakterden birini seç, istatistiklerini izle, kendi çalışma tarzını keşfet.
+            <p>Kum saati karakterini seç, raporlarını izle, kendi çalışma tarzını keşfet.
               Yöntem klasik; deneyim tamamen senin.</p>
           </article>
         </div>
-        <p class="section-more" data-reveal><a class="btn btn-primary" href="features.html">Tüm özellikleri incele</a></p>
+        <p class="section-more" data-reveal><a class="btn btn-primary" href="/features">Tüm özellikleri incele</a></p>
       </div>
     </section>
 
@@ -329,35 +346,37 @@
       <div class="container" data-reveal>
         <h2>İlk pomodoronu PomoSprint'le başlat</h2>
         <p>Uygulama çok yakında App Store ve Google Play'de. Yayınlandığı gün haber almak için e-postanı bırak.</p>
-        <p style="margin-top: 14px;"><a class="btn btn-primary" href="index.html#yakinda">Yayınlanınca haber ver</a></p>
+        <p class="cta-actions"><a class="btn btn-primary" href="/#yakinda">Yayınlanınca haber ver</a></p>
       </div>
     </section>
   </main>
 
+  <!-- partial:footer -->
   <footer class="site-footer">
     <div class="container footer-inner">
       <div class="footer-brand">
-        <a href="index.html" class="brand" aria-label="PomoSprint ana sayfa">
+        <a href="/" class="brand" aria-label="PomoSprint ana sayfa">
           <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#EE6C55"/><path d="M10 8h12M10 24h12M11.5 8c0 4 2.5 5.8 4.5 8-2 2.2-4.5 4-4.5 8M20.5 8c0 4-2.5 5.8-4.5 8 2 2.2 4.5 4 4.5 8" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg>
           <span class="brand-name">Pomo<em>Sprint</em></span>
         </a>
-        <p>Odaklan, mola ver, arkadaşlarınla birlikte hedeflerine koş.</p>
+        <p>Odaklan, serini koru, arkadaşlarınla birlikte hedeflerine koş.</p>
       </div>
       <div class="footer-col">
-        <h4>Sayfalar</h4>
+        <h2 class="footer-title">Sayfalar</h2>
         <ul>
-          <li><a href="index.html">Ana Sayfa</a></li>
-          <li><a href="features.html">Özellikler</a></li>
-          <li><a href="pomodoro-nedir.html">Pomodoro Nedir?</a></li>
-          <li><a href="faq.html">SSS</a></li>
+          <li><a href="/">Ana Sayfa</a></li>
+          <li><a href="/features">Özellikler</a></li>
+          <li><a href="/pomodoro-nedir">Pomodoro Nedir?</a></li>
+          <li><a href="/faq">SSS</a></li>
         </ul>
       </div>
       <div class="footer-col">
-        <h4>Destek</h4>
+        <h2 class="footer-title">Destek</h2>
         <ul>
           <li><a href="mailto:destek@pomosprint.app">destek@pomosprint.app</a></li>
-          <li><a href="privacy.html">Gizlilik Politikası</a></li>
-          <li><a href="terms.html">Kullanım Şartları</a></li>
+          <li><a href="/privacy">Gizlilik Politikası</a></li>
+          <li><a href="/terms">Kullanım Şartları</a></li>
+          <li><a href="/en/privacy" hreflang="en" lang="en">Privacy &amp; Terms (English)</a></li>
         </ul>
       </div>
     </div>
@@ -366,9 +385,12 @@
       <p>🍅 Bolca pomodoro ile yapıldı.</p>
     </div>
   </footer>
+  <!-- /partial:footer -->
 
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
-  <script src="js/main.js"></script>
+  <!-- partial:scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js" integrity="sha384-HOvlOYPIs/zjoIkWUGXkVmXsjr8GuZLV+Q+rcPwmJOVZVpvTSXQChiN4t9Euv9Vc" crossorigin="anonymous" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js" integrity="sha384-P8VzCVnT9NBUkMrpcIZrJbA7EBjJvh/fJS6PmP+4nLIM284DtsImIv8D0fFjIkeh" crossorigin="anonymous" defer></script>
+  <script src="/js/main.js?v=20261003" defer></script>
+  <!-- /partial:scripts -->
 </body>
 </html>

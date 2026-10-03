@@ -1,11 +1,21 @@
 {
   "name": "pomosprint-website",
   "compatibility_date": "2026-08-04",
+  // www ve http yönlendirmelerini yapan Worker (bkz. worker.js)
+  "main": "worker.js",
   "assets": {
-    "directory": "."
+    "directory": ".",
+    "binding": "ASSETS",
+    // Yönlendirme kararı statik dosya eşleşmesinden önce verilmeli
+    "run_worker_first": true,
+    // /features.html -> /features (307); iç linkler zaten uzantısız
+    "html_handling": "auto-trailing-slash",
+    // Bilinmeyen adreslerde boş gövde yerine 404.html (status 404)
+    "not_found_handling": "404-page"
   },
   // Alan adları yapılandırmada tutuluyor: her `wrangler deploy` bunları
   // aktif zone'a yeniden bağlar (zone silinip yeniden eklense bile).
+  // www -> apex ve http -> https 301 yönlendirmesini worker.js yapar.
   "routes": [
     { "pattern": "pomosprint.app", "custom_domain": true },
     { "pattern": "www.pomosprint.app", "custom_domain": true }

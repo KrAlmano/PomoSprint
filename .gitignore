@@ -63,3 +63,14 @@ node_modules/
 
 # Android derleme çıktıları
 android/build/
+
+# Kişiye özel AI/araç ayarları
+.claude/settings.local.json
+**/.claude/settings.local.json
+
+# Cloudflare Wrangler yerel durumu
+.wrangler/
+**/.wrangler/
+
+# Supabase CLI geçici dosyaları
+supabase/.temp/

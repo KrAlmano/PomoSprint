@@ -1,10 +1,15 @@
 # Worker'ın statik dosya olarak YAYINLAMAMASI gerekenler
+# (_headers burada OLMAMALI: Workers onu okuyup başlıklara uygular, kendisi yayınlanmaz)
 .assetsignore
 .gitignore
+.DS_Store
+.git
 .claude
 .vercel
 .wrangler
 node_modules
-package.json
-package-lock.json
+_partials
+tools
+*.md
 wrangler.jsonc
+worker.js

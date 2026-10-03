@@ -7,6 +7,11 @@
   --coral: #EE6C55;
   --coral-dark: #D9553F;
   --coral-deep: #C24733;
+  /* Erişilebilir tonlar (WCAG AA 4.5:1): metin ve beyaz yazılı zeminler için.
+     Parlak --coral yalnızca dekoratif dolgularda (logo, kum saati, ikon) kalır. */
+  --coral-btn: #C84A35;
+  --coral-btn-hover: #B03F2C;
+  --coral-text: #A93C29;
   --coral-tint: rgba(238, 108, 85, 0.12);
   --coral-soft: #FADFD8;
   --sand: #EFB054;
@@ -16,7 +21,7 @@
   --card: #FFFDFB;
   --ink: #33302B;
   --ink-soft: #5C554E;
-  --muted: #8A8178;
+  --muted: #6E665E;
   --line: #E5DAD1;
   --dark: #2C2724;
   --dark-2: #211D1A;
@@ -27,6 +32,9 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* hidden özniteliği, display tanımlı bileşenlerde de her zaman gizlesin */
+[hidden] { display: none !important; }
 
 html { scroll-behavior: smooth; }
 
@@ -43,10 +51,10 @@ body {
 
 img { max-width: 100%; display: block; }
 
-a { color: var(--coral); text-decoration: none; }
+a { color: var(--coral-text); text-decoration: none; }
 
 :focus-visible {
-  outline: 3px solid var(--coral);
+  outline: 3px solid var(--coral-btn);
   outline-offset: 3px;
   border-radius: 6px;
 }
@@ -84,6 +92,10 @@ h1, h2 {
   letter-spacing: 0;
 }
 
+/* İlk boyamada hero gizli başlar; GSAP giriş animasyonu kurulunca main.js
+   bu sınıfı kaldırır (boot.js 3 sn sonra her durumda kaldırır). */
+.js-anim [data-hero] { opacity: 0; }
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -114,13 +126,13 @@ h1, h2 {
 }
 
 .btn-primary {
-  background: var(--coral);
+  background: var(--coral-btn);
   color: #fff;
   box-shadow: 0 6px 18px rgba(238, 108, 85, 0.35);
 }
 
 .btn-primary:hover {
-  background: var(--coral-dark);
+  background: var(--coral-btn-hover);
   transform: translateY(-2px) scale(1.02);
   box-shadow: 0 10px 24px rgba(238, 108, 85, 0.4);
 }
@@ -232,9 +244,9 @@ h1, h2 {
   transition: color 0.2s ease;
 }
 
-.site-nav a:not(.btn):hover { color: var(--coral); }
+.site-nav a:not(.btn):hover { color: var(--coral-text); }
 
-.site-nav a.active { color: var(--coral); }
+.site-nav a.active { color: var(--coral-text); }
 
 .site-nav a.active::after {
   content: "";
@@ -319,7 +331,7 @@ h1, h2 {
   align-items: center;
   gap: 8px;
   background: var(--coral-tint);
-  color: var(--coral-deep);
+  color: var(--coral-text);
   font-weight: 800;
   font-size: 0.88rem;
   padding: 8px 16px;
@@ -334,7 +346,7 @@ h1, h2 {
 }
 
 .hero h1 .hl {
-  color: var(--coral);
+  color: var(--coral-dark);
   position: relative;
   white-space: nowrap;
 }
@@ -363,7 +375,13 @@ h1, h2 {
   margin-top: 28px;
 }
 
-.avatar-stack { display: flex; }
+.hero-proof a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+.avatar-stack { display: flex; flex-shrink: 0; }
 
 .avatar-stack img {
   width: 42px;
@@ -379,7 +397,7 @@ h1, h2 {
 .hero-proof p {
   font-size: 0.92rem;
   font-weight: 700;
-  color: var(--muted);
+  color: var(--ink-soft);
   max-width: 15rem;
   line-height: 1.4;
 }
@@ -390,6 +408,9 @@ h1, h2 {
 
 main, .site-footer { position: relative; z-index: 1; }
 
+/* Giriş animasyonlarındaki yatay kaydırmalar (x ofsetleri) sayfayı yana taşırmasın */
+main { overflow-x: clip; }
+
 .hg-backdrop {
   position: fixed;
   inset: 0;
@@ -399,7 +420,7 @@ main, .site-footer { position: relative; z-index: 1; }
   justify-content: flex-end;
   padding-right: max(4vw, calc((100vw - 1120px) / 2 - 10px));
   pointer-events: none;
-  opacity: 0.35; /* JS yoksa sabit fısıltı; JS scroll'a göre 0.95 → 0.16 sürer */
+  opacity: 0.35; /* JS yoksa sabit fısıltı; JS scroll'a göre 0.95 → 0.24 sürer */
 }
 
 .hg-backdrop .hourglass {
@@ -480,7 +501,7 @@ main, .site-footer { position: relative; z-index: 1; }
   white-space: nowrap;
 }
 
-.hg-chip-1 { top: 14%; left: -4%; transform: rotate(-5deg); color: var(--coral-deep); font-variant-numeric: tabular-nums; }
+.hg-chip-1 { top: 14%; left: -4%; transform: rotate(-5deg); color: var(--coral-text); font-variant-numeric: tabular-nums; }
 .hg-chip-2 { bottom: 12%; right: -6%; transform: rotate(4deg); color: var(--ink-soft); }
 
 /* ---------------- Sections (generic) ---------------- */
@@ -499,7 +520,7 @@ main, .site-footer { position: relative; z-index: 1; }
 .eyebrow {
   display: inline-block;
   background: var(--coral-tint);
-  color: var(--coral-deep);
+  color: var(--coral-text);
   font-size: 0.8rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -600,7 +621,7 @@ main, .site-footer { position: relative; z-index: 1; }
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: var(--coral);
+  background: var(--coral-btn);
   color: #fff;
   font-size: 0.85rem;
   font-weight: 800;
@@ -624,7 +645,7 @@ main, .site-footer { position: relative; z-index: 1; }
   border-top: 3px dashed var(--coral-soft);
 }
 
-/* ---------------- Gece kütüphanesi / erken erişim bandı ---------------- */
+/* ---------------- Erken erişim (bekleme listesi) bandı ---------------- */
 
 .library-band {
   position: relative;
@@ -863,7 +884,7 @@ main, .site-footer { position: relative; z-index: 1; }
   text-align: center;
   padding: 24px;
   border: 2px dashed #CFC3B8;
-  color: var(--muted);
+  color: var(--ink-soft);
 }
 
 .phone-screen svg { width: 36px; height: 36px; opacity: 0.55; }
@@ -899,7 +920,8 @@ main, .site-footer { position: relative; z-index: 1; }
    verir, sonra kendi etrafında 180° dönüp döngüye baştan başlar.
    Çevresinde karakter avatarları ve noktalar yörüngede döner (saf CSS). */
 
-.orbit-section { padding-top: 36px; }
+/* Dönen kare izler dar ekranda yatay taşma yaratmasın */
+.orbit-section { padding-top: 36px; overflow-x: hidden; overflow-x: clip; }
 
 .hg-orbit {
   position: relative;
@@ -925,6 +947,14 @@ main, .site-footer { position: relative; z-index: 1; }
 }
 
 .orbit-track.rev { animation-direction: reverse; }
+
+/* Yörünge süreleri ve faz kaymaları (inline style yerine; sıkı CSP için) */
+.ot-a1 { --T: 18s; --D: 0s; }
+.ot-a2 { --T: 18s; --D: -6s; }
+.ot-a3 { --T: 18s; --D: -12s; }
+.ot-d1 { --T: 28s; --D: 0s; }
+.ot-d2 { --T: 28s; --D: -14s; }
+.ot-cycle { --T: 30s; --D: 0s; }
 
 .orbit-track > * {
   position: absolute;
@@ -1058,7 +1088,7 @@ main, .site-footer { position: relative; z-index: 1; }
   padding: 8px 16px;
   font-weight: 800;
   font-size: 0.9rem;
-  color: var(--coral-deep);
+  color: var(--coral-text);
   box-shadow: var(--shadow-md);
   white-space: nowrap;
 }
@@ -1109,7 +1139,7 @@ main, .site-footer { position: relative; z-index: 1; }
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: var(--coral);
+  background: var(--coral-btn);
   color: #fff;
   display: flex;
   align-items: center;
@@ -1252,7 +1282,7 @@ main, .site-footer { position: relative; z-index: 1; }
   font-weight: 700;
   font-size: 2.6rem;
   line-height: 1.1;
-  color: var(--coral-deep);
+  color: var(--coral-text);
   font-variant-numeric: tabular-nums;
 }
 
@@ -1302,7 +1332,7 @@ main, .site-footer { position: relative; z-index: 1; }
   text-align: left;
 }
 
-.faq-q:hover { color: var(--coral-deep); }
+.faq-q:hover { color: var(--coral-text); }
 
 .faq-q svg {
   flex: none;
@@ -1317,11 +1347,17 @@ main, .site-footer { position: relative; z-index: 1; }
 .faq-a {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows 0.32s ease;
+  visibility: hidden;
+  transition: grid-template-rows 0.32s ease, visibility 0s linear 0.32s;
 }
 
-/* Açık durumda cevap satırı büyür — bu kural olmadan cevaplar hiç görünmez */
-.faq-item.open .faq-a { grid-template-rows: 1fr; }
+/* Açık durumda cevap satırı büyür — bu kural olmadan cevaplar hiç görünmez.
+   Kapalıyken visibility:hidden, içteki linklerin Tab ile odaklanmasını engeller. */
+.faq-item.open .faq-a {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition: grid-template-rows 0.32s ease, visibility 0s;
+}
 
 .faq-a-inner { overflow: hidden; min-height: 0; }
 
@@ -1329,6 +1365,17 @@ main, .site-footer { position: relative; z-index: 1; }
   padding: 0 24px 22px;
   color: var(--ink-soft);
   font-size: 0.99rem;
+}
+
+.faq-a-inner p + p { margin-top: -10px; }
+
+.faq-a-inner a,
+.prose a,
+.notify-note a,
+.lb-note a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
 }
 
 .faq-contact {
@@ -1409,7 +1456,9 @@ main, .site-footer { position: relative; z-index: 1; }
   max-width: 20rem;
 }
 
-.footer-col h4 {
+.footer-title {
+  font-family: inherit;
+  font-weight: 800;
   color: #fff;
   font-size: 0.85rem;
   text-transform: uppercase;
@@ -1447,7 +1496,8 @@ main, .site-footer { position: relative; z-index: 1; }
   .store-badges { justify-content: center; }
   .hero-proof { justify-content: center; }
   .hourglass-stage { margin-top: 12px; min-height: clamp(280px, 60vw, 380px); }
-  .hg-backdrop { justify-content: center; padding-right: 0; }
+  /* Dar ekranda kum saati hero metninin arkasına düşer: okunurluk için soluk başlar */
+  .hg-backdrop { justify-content: center; padding-right: 0; opacity: 0.16; }
 
   .feature-grid { grid-template-columns: repeat(2, 1fr); }
 
@@ -1509,6 +1559,8 @@ main, .site-footer { position: relative; z-index: 1; }
 }
 
 @media (max-width: 520px) {
+  .hero-proof { flex-direction: column; gap: 10px; }
+  .hero-proof p { max-width: 18rem; }
   .feature-grid { grid-template-columns: 1fr; }
   .store-badge { flex: 1 1 100%; justify-content: center; }
   .hero { padding: 48px 0 64px; }
@@ -1536,6 +1588,8 @@ main, .site-footer { position: relative; z-index: 1; }
 
   /* Pomodoro Nedir sayfası animasyonları */
   .tt-hand, .fb-ring, .fb-card { animation: none; }
+
+  .faq-a, .faq-item.open .faq-a { transition: none; }
 }
 
 /* ---------------- Canlı Lig Sıralaması (index.html) ---------------- */
@@ -1573,7 +1627,7 @@ main, .site-footer { position: relative; z-index: 1; }
 .lb-countdown-time {
   font-size: 0.95rem;
   font-weight: 800;
-  color: var(--coral-dark);
+  color: var(--coral-text);
   font-variant-numeric: tabular-nums;
 }
 
@@ -1649,7 +1703,7 @@ main, .site-footer { position: relative; z-index: 1; }
 .lb-podium-points {
   font-size: 0.75rem;
   font-weight: 800;
-  color: var(--coral-dark);
+  color: var(--coral-text);
   background: var(--coral-tint);
   padding: 3px 10px;
   border-radius: 999px;
@@ -1692,7 +1746,7 @@ main, .site-footer { position: relative; z-index: 1; }
 .lb-points {
   flex: none;
   font-weight: 800;
-  color: var(--coral-dark);
+  color: var(--coral-text);
   background: var(--coral-tint);
   padding: 5px 12px;
   border-radius: 999px;
@@ -1730,4 +1784,98 @@ main, .site-footer { position: relative; z-index: 1; }
   .lb-podium-name { max-width: 88px; font-size: 0.78rem; }
   .lb-podium-1 .lb-podium-name { font-size: 0.85rem; }
   .lb-podium-points { font-size: 0.68rem; padding: 2px 8px; }
+}
+
+.lb-intro {
+  color: var(--ink-soft);
+  font-size: 1.05rem;
+}
+
+.lb-countdown-note {
+  flex-basis: 100%;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.lb-note {
+  max-width: 640px;
+  margin: 14px auto 0;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lb-skeleton { animation: none; }
+}
+
+/* ---------------- Bekleme listesi: bot tuzağı ve koyu bant linkleri ---------------- */
+
+/* Gerçek ziyaretçi görmez; botlar doldurursa kayıt gönderilmez */
+.hp-field {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.library-band a { color: var(--sand); font-weight: 700; }
+
+/* ---------------- Yasal sayfalar: dil bağlantısı ---------------- */
+
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.lang-switch a { text-decoration: underline; text-underline-offset: 3px; }
+
+/* ---------------- 404 ---------------- */
+
+.notfound {
+  text-align: center;
+  padding: 72px 0 40px;
+}
+
+.notfound .nf-code {
+  font-family: "Baloo 2", "Nunito", system-ui, sans-serif;
+  font-weight: 700;
+  font-size: clamp(4rem, 14vw, 7rem);
+  line-height: 1;
+  color: var(--coral-dark);
+}
+
+.notfound h1 { font-size: clamp(1.7rem, 4vw, 2.4rem); margin: 10px 0 12px; }
+
+.notfound p { color: var(--ink-soft); max-width: 30rem; margin: 0 auto 28px; }
+
+.notfound .nf-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px 22px;
+  margin-top: 22px;
+  font-weight: 700;
+}
+
+/* Üst boşluğu kaldırılmış bölüm (önceki bölümle bitişik durur) */
+.section-flush { padding-top: 0; }
+.section-tight { padding-top: 32px; }
+.section-legal { padding-top: 24px; }
+.cta-actions { margin-top: 14px; }
+
+/* Hareket azaltıldığında yörünge karakterleri üst üste binmesin: sabit açılarla dağılır */
+@media (prefers-reduced-motion: reduce) {
+  .ot-a2 { transform: rotate(120deg); }
+  .ot-a3 { transform: rotate(240deg); }
+  .ot-a2 .orbit-avatar { transform: translate(-50%, -50%) rotate(-120deg); }
+  .ot-a3 .orbit-avatar { transform: translate(-50%, -50%) rotate(-240deg); }
+  .ot-d2 { transform: rotate(180deg); }
 }
