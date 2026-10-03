@@ -179,6 +179,20 @@
   },
   "notifChannelName": "Seans bildirimleri",
   "notifChannelDescription": "Pomodoro seansın bittiğinde haber verir.",
+  "lockTimerChannelName": "Süren seans",
+  "lockTimerChannelDescription": "Seans sürerken kalan süreyi kilit ekranında ve bildirim panelinde gösterir.",
+  "lockTimerRunningBody": "Odaklanıyorsun · bitiş {time}",
+  "@lockTimerRunningBody": {
+    "placeholders": { "time": { "type": "String" } }
+  },
+  "lockTimerPausedBody": "Duraklatıldı · {remaining} kaldı",
+  "@lockTimerPausedBody": {
+    "placeholders": { "remaining": { "type": "String" } }
+  },
+  "lockTimerStatusRunning": "Odaklanıyorsun",
+  "lockTimerStatusPaused": "Duraklatıldı",
+  "lockTimerStatusDone": "Seans tamamlandı",
+  "lockTimerDoneHint": "Seansını kaydetmek için PomoSprint'i aç.",
   "statsLoadErrorTitle": "İstatistikler yüklenemedi",
   "statsLoadErrorOffline": "Sunucuya bağlanılamadı. İnternet bağlantını kontrol edip tekrar dene.",
   "statsLoadErrorSignedOut": "İstatistiklerini görmek için tekrar giriş yapman gerekiyor.",

@@ -518,6 +518,35 @@ class AppLocalizationsEn extends AppLocalizations {
       'Lets you know when your Pomodoro session ends.';
 
   @override
+  String get lockTimerChannelName => 'Running session';
+
+  @override
+  String get lockTimerChannelDescription =>
+      'Shows the time left on your lock screen and in the notification shade while a session runs.';
+
+  @override
+  String lockTimerRunningBody(String time) {
+    return 'Focusing · ends at $time';
+  }
+
+  @override
+  String lockTimerPausedBody(String remaining) {
+    return 'Paused · $remaining left';
+  }
+
+  @override
+  String get lockTimerStatusRunning => 'Focusing';
+
+  @override
+  String get lockTimerStatusPaused => 'Paused';
+
+  @override
+  String get lockTimerStatusDone => 'Session complete';
+
+  @override
+  String get lockTimerDoneHint => 'Open PomoSprint to save your session.';
+
+  @override
   String get statsLoadErrorTitle => 'Couldn\'t load your stats';
 
   @override

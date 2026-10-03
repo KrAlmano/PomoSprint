@@ -896,6 +896,54 @@ abstract class AppLocalizations {
   /// **'Pomodoro seansın bittiğinde haber verir.'**
   String get notifChannelDescription;
 
+  /// No description provided for @lockTimerChannelName.
+  ///
+  /// In tr, this message translates to:
+  /// **'Süren seans'**
+  String get lockTimerChannelName;
+
+  /// No description provided for @lockTimerChannelDescription.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seans sürerken kalan süreyi kilit ekranında ve bildirim panelinde gösterir.'**
+  String get lockTimerChannelDescription;
+
+  /// No description provided for @lockTimerRunningBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Odaklanıyorsun · bitiş {time}'**
+  String lockTimerRunningBody(String time);
+
+  /// No description provided for @lockTimerPausedBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Duraklatıldı · {remaining} kaldı'**
+  String lockTimerPausedBody(String remaining);
+
+  /// No description provided for @lockTimerStatusRunning.
+  ///
+  /// In tr, this message translates to:
+  /// **'Odaklanıyorsun'**
+  String get lockTimerStatusRunning;
+
+  /// No description provided for @lockTimerStatusPaused.
+  ///
+  /// In tr, this message translates to:
+  /// **'Duraklatıldı'**
+  String get lockTimerStatusPaused;
+
+  /// No description provided for @lockTimerStatusDone.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seans tamamlandı'**
+  String get lockTimerStatusDone;
+
+  /// No description provided for @lockTimerDoneHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seansını kaydetmek için PomoSprint\'i aç.'**
+  String get lockTimerDoneHint;
+
   /// No description provided for @statsLoadErrorTitle.
   ///
   /// In tr, this message translates to:

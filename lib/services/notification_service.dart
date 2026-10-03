@@ -1,6 +1,7 @@
 import 'dart:ui' show Color;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show PlatformException;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -9,7 +10,8 @@ import 'package:timezone/timezone.dart' as tz;
 import '../l10n/app_localizations.dart';
 import 'language_service.dart';
 
-/// Seans bitiş bildirimi. İzin açılışta İSTENMEZ; ilk BAŞLAT'ta
+/// Seans bitiş bildirimi ve (Android) süren seansın kilit ekranında da
+/// görünen kalıcı bildirimi. İzin açılışta İSTENMEZ; ilk BAŞLAT'ta
 /// [ensurePermission] ile bağlamı olan bir anda sorulur.
 class NotificationService {
   static final NotificationService instance = NotificationService._init();
@@ -18,12 +20,19 @@ class NotificationService {
   NotificationService._init();
 
   static const int _sessionEndId = 0;
+  static const int _ongoingTimerId = 1;
   static const String _channelId = 'pomodoro_timer_channel';
+  // Ayrı kanal: varsayılan önem (sessiz/"düşük" kanal kilit ekranında
+  // gizlenebilir) ama ses ve titreşim yok.
+  static const String _ongoingChannelId = 'pomodoro_running_channel';
   static const String _enabledKey = 'notifications_enabled';
   static const String _permissionAskedKey = 'notification_permission_asked';
   static const Color _brandColor = Color(0xFFFF5C4D);
 
   Future<void>? _initialization;
+
+  /// Bildirim tercihi her değiştiğinde artar (kilit ekranı sayacı dinler).
+  final ValueNotifier<int> preferenceRevision = ValueNotifier<int>(0);
 
   /// Eklentiyi başlatır (izin istemeden). Desteklenmeyen platformda hata
   /// fırlatır; çağıran raporlar, bildirimler sessizce devre dışı kalır.
@@ -70,6 +79,7 @@ class NotificationService {
   Future<void> setEnabled(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_enabledKey, value);
+    preferenceRevision.value++;
     if (value) {
       await ensurePermission(force: true);
     } else {
@@ -104,24 +114,49 @@ class NotificationService {
   Future<void> scheduleSessionEnd({required Duration after, required String categoryName}) async {
     if (!await _ready() || !await isEnabled()) return;
     final l10n = _l10n();
+    final scheduledDate = tz.TZDateTime.now(tz.local).add(after);
+    // Android: bitiş bildirimi tam zamanında gelsin diye exact alarm
+    // (Android 13+ USE_EXACT_ALARM, 12-12L SCHEDULE_EXACT_ALARM). İzin yoksa
+    // (ör. kullanıcı Android 12'de kapattıysa) inexact'e düşülür; Doze'da
+    // birkaç dakika gecikebilir.
+    final exact = await _canScheduleExact();
+    final modes = [
+      if (exact) AndroidScheduleMode.exactAllowWhileIdle,
+      AndroidScheduleMode.inexactAllowWhileIdle,
+    ];
+    for (final mode in modes) {
+      try {
+        await _plugin.zonedSchedule(
+          id: _sessionEndId,
+          title: l10n.notifSessionDoneTitle,
+          body: l10n.notifSessionDoneBody(displayCategoryName(categoryName)),
+          scheduledDate: scheduledDate,
+          notificationDetails: _details(l10n),
+          androidScheduleMode: mode,
+        );
+        return;
+      } on PlatformException catch (e) {
+        // exact_alarms_not_permitted: izin bu arada geri alınmış olabilir.
+        debugPrint('[NOTIF] Bildirim zamanlanamadı ($mode): ${e.code}');
+      } catch (e) {
+        debugPrint('[NOTIF] Bildirim zamanlanamadı: $e');
+        return;
+      }
+    }
+  }
+
+  Future<bool> _canScheduleExact() async {
     try {
-      await _plugin.zonedSchedule(
-        id: _sessionEndId,
-        title: l10n.notifSessionDoneTitle,
-        body: l10n.notifSessionDoneBody(_displayCategory(categoryName)),
-        scheduledDate: tz.TZDateTime.now(tz.local).add(after),
-        notificationDetails: _details(l10n),
-        // exactAllowWhileIdle, Android 12+'ta SCHEDULE_EXACT_ALARM izni ister;
-        // bir pomodoro bitiş hatırlatması için saniye hassasiyeti gerekmiyor.
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      );
-    } catch (e) {
-      debugPrint('[NOTIF] Bildirim zamanlanamadı: $e');
+      final android = _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+      if (android == null) return false;
+      return await android.canScheduleExactNotifications() ?? false;
+    } catch (_) {
+      return false;
     }
   }
 
   /// Uygulama arka plandayken biten seans için bildirimi beklemeden gösterir
-  /// (inexact alarm geç tetiklenebilir).
+  /// (alarm Doze'da ya da exact izni yoksa geç tetiklenebilir).
   Future<void> showSessionEndNow({required String categoryName}) async {
     if (!await _ready() || !await isEnabled()) return;
     final l10n = _l10n();
@@ -130,12 +165,65 @@ class NotificationService {
       await _plugin.show(
         id: _sessionEndId,
         title: l10n.notifSessionDoneTitle,
-        body: l10n.notifSessionDoneBody(_displayCategory(categoryName)),
+        body: l10n.notifSessionDoneBody(displayCategoryName(categoryName)),
         notificationDetails: _details(l10n),
       );
     } catch (e) {
       debugPrint('[NOTIF] Bildirim gösterilemedi: $e');
     }
+  }
+
+  /// Android: süren seansın kalıcı (kaydırılarak kapatılamayan) bildirimi;
+  /// kilit ekranında içeriğiyle görünür. [countdownTo] verilirse o ana geri
+  /// sayan kronometre gösterilir. [timeout] dolunca bildirim kendiliğinden
+  /// kalkar (uygulama öldürülse bile). Aynı kimlikle yeniden çağrılınca
+  /// sessizce güncellenir. Android dışında hiçbir şey yapmaz.
+  Future<bool> showOngoingTimer({
+    required String title,
+    required String body,
+    required String channelName,
+    required String channelDescription,
+    required Duration timeout,
+    DateTime? countdownTo,
+  }) async {
+    if (defaultTargetPlatform != TargetPlatform.android || timeout <= Duration.zero) return false;
+    if (!await _ready() || !await isEnabled()) return false;
+    final android = _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    if (android == null) return false;
+    final countdown = countdownTo != null;
+    await android.show(
+      id: _ongoingTimerId,
+      title: title,
+      body: body,
+      notificationDetails: AndroidNotificationDetails(
+        _ongoingChannelId,
+        channelName,
+        channelDescription: channelDescription,
+        importance: Importance.defaultImportance,
+        priority: Priority.defaultPriority,
+        playSound: false,
+        enableVibration: false,
+        channelShowBadge: false,
+        onlyAlertOnce: true,
+        ongoing: true,
+        autoCancel: false,
+        visibility: NotificationVisibility.public,
+        category: AndroidNotificationCategory.alarm,
+        color: _brandColor,
+        showWhen: countdown,
+        when: countdownTo?.millisecondsSinceEpoch,
+        usesChronometer: countdown,
+        chronometerCountDown: countdown,
+        timeoutAfter: timeout.inMilliseconds,
+      ),
+    );
+    return true;
+  }
+
+  /// Süren seansın kalıcı bildirimini kaldırır (Android).
+  Future<void> cancelOngoingTimer() async {
+    if (defaultTargetPlatform != TargetPlatform.android || !await _ready()) return;
+    await _plugin.cancel(id: _ongoingTimerId);
   }
 
   /// Hâlâ bekleyen zamanlanmış bildirimi iptal eder; gösterilmiş bildirime
@@ -152,7 +240,8 @@ class NotificationService {
   // Bağlam (context) olmadan da o anki uygulama dilinde metin üretir.
   static AppLocalizations _l10n() => lookupAppLocalizations(LanguageService.instance.currentLocale);
 
-  static String _displayCategory(String name) =>
+  /// Bildirimde ve kilit ekranında gösterilen kategori adı (o anki dilde).
+  static String displayCategoryName(String name) =>
       name.trim().isEmpty ? 'Pomodoro' : LanguageService.instance.translateCatName(name);
 
   static NotificationDetails _details(AppLocalizations l10n) {

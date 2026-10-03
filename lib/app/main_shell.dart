@@ -17,6 +17,7 @@ import '../screens/reports_screen.dart';
 import '../screens/social_screen.dart';
 import '../screens/timer_screen.dart';
 import '../services/language_service.dart';
+import '../services/lock_screen_timer.dart';
 import '../services/notification_service.dart';
 import '../services/supabase_service.dart';
 import '../services/timer_persistence.dart';
@@ -289,9 +290,11 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
 
   Future<void> _logout() async {
     // Süren seans kullanıcıya bağlı olarak cihazda kalır (aynı hesapla
-    // girişte sürer); canlı listeden çıkılır ve bekleyen bildirim iptal edilir.
+    // girişte sürer); canlı listeden çıkılır, bekleyen bildirim iptal edilir
+    // ve kilit ekranı sayacı kaldırılır.
     if (_isTimerRunning) await _service.cancelStudySession();
     await NotificationService.instance.cancelSessionEndNotification();
+    await LockScreenTimer.instance.clear();
     await _service.signOutFully();
   }
 

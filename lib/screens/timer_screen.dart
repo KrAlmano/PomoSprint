@@ -10,6 +10,7 @@ import '../utils/text_util.dart';
 import '../models/category_model.dart';
 import '../widgets/hourglass_widget.dart';
 import '../services/language_service.dart';
+import '../services/lock_screen_timer.dart';
 import '../services/notification_service.dart';
 import '../services/timer_persistence.dart';
 
@@ -34,6 +35,9 @@ class TimerScreen extends StatefulWidget {
   final void Function(bool isRunning, String categoryName, int minutesLeft)? onTimerStateChanged;
   final String? userSegment;
 
+  /// Kilit ekranı sayacı (varsayılan: [LockScreenTimer.instance]; testte sahtesi).
+  final LockScreenTimer? lockScreenTimer;
+
   const TimerScreen({
     super.key,
     required this.categories,
@@ -43,6 +47,7 @@ class TimerScreen extends StatefulWidget {
     required this.onSessionCompleted,
     this.onTimerStateChanged,
     this.userSegment,
+    this.lockScreenTimer,
   });
 
   @override
@@ -70,6 +75,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
   bool get _hasSession => _session != null;
   int get _pauseCreditsLeft => _maxPauses - (_session?.pauseUsedCount ?? 0);
   TimerPersistence get _store => TimerPersistence.instance;
+  LockScreenTimer get _lockScreen => widget.lockScreenTimer ?? LockScreenTimer.instance;
 
   static bool get _isInForeground {
     final state = WidgetsBinding.instance.lifecycleState;
@@ -91,8 +97,10 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
     // Seans cihazda saklı olduğu için ekran kapanınca (ör. çıkış) iptal
-    // edilmez; aynı hesapla açılınca kaldığı yerden sürer.
+    // edilmez; aynı hesapla açılınca kaldığı yerden sürer. Kilit ekranından
+    // ise kalkar (kabuk yalnızca çıkışta ya da hesap değişince kapanır).
     _persistSession();
+    unawaited(_lockScreen.clear());
     super.dispose();
   }
 
@@ -102,6 +110,9 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
       // Arka planda periyodik timer durmuş olabilir; kalan süreyi bitiş
       // anından yeniden hesapla (süre dolduysa seans tamamlanır).
       if (isRunning) _tick(countForeground: false);
+      // Kullanıcı kilit ekranı bildirimini kapatmış ya da sistem Canlı
+      // Etkinliği bitirmiş olabilir: süren seans yeniden gösterilir.
+      if (_hasSession) _syncLockScreen(force: true);
     } else if (state == AppLifecycleState.paused) {
       _persistSession();
     }
@@ -113,8 +124,16 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     if (oldWidget.sessionOwnerKey != widget.sessionOwnerKey && _hasSession) {
       unawaited(_store.clear(oldWidget.sessionOwnerKey));
       _persistSession();
+      _syncLockScreen();
     }
     _validateSelectedCategory();
+  }
+
+  /// Kilit ekranı sayacını (Android kalıcı bildirim, iPhone Canlı Etkinlik)
+  /// mevcut seansla eşitler; seans yoksa kaldırır.
+  void _syncLockScreen({bool force = false}) {
+    final session = _session;
+    unawaited(session == null ? _lockScreen.clear() : _lockScreen.show(session, force: force));
   }
 
   void _persistSession() {
@@ -125,7 +144,13 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
 
   Future<void> _restoreSession() async {
     final saved = await _store.load(widget.sessionOwnerKey, legacyOwnerKey: widget.legacySessionOwnerKey);
-    if (saved == null || !mounted || _hasSession || _isStarting) return;
+    if (!mounted || _hasSession || _isStarting) return;
+    if (saved == null) {
+      // Bu hesabın süren seansı yok: önceki süreçten kalmış kilit ekranı
+      // sayacı varsa kaldırılır.
+      unawaited(_lockScreen.clear());
+      return;
+    }
 
     final now = DateTime.now();
     _foregroundSeconds = saved.foregroundSeconds;
@@ -146,6 +171,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     } else if (saved.isAbandonedAt(now)) {
       // Sunucu 24 saatten eski seansı kabul etmez; kayıt silinir.
       unawaited(_store.clear(widget.sessionOwnerKey, onlyClientUuid: saved.clientUuid));
+      unawaited(_lockScreen.clear());
       _foregroundSeconds = 0;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -158,6 +184,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
         _session = saved;
         remaining = saved.remainingSecondsAt(now);
       });
+      unawaited(_lockScreen.showPaused(saved));
     }
   }
 
@@ -179,6 +206,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
   Future<void> _completeSession(ActiveTimerSession session) async {
     _timer?.cancel();
     final completed = session.withForegroundSeconds(_foregroundSeconds);
+    unawaited(_lockScreen.clear());
     if (_isInForeground) {
       // Gösterilmiş bildirime dokunulmaz; yalnızca bekleyen iptal edilir.
       unawaited(NotificationService.instance.cancelSessionEndNotification());
@@ -260,6 +288,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
       remaining = paused.remainingSecondsAt(now);
     });
     _persistSession();
+    unawaited(_lockScreen.showPaused(paused));
     widget.onTimerStateChanged?.call(false, paused.categoryName, _minutesLeft(remaining));
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
@@ -288,6 +317,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     if (expectedUuid != null && _session?.clientUuid != expectedUuid) return;
     _timer?.cancel();
     unawaited(NotificationService.instance.cancelSessionEndNotification());
+    unawaited(_lockScreen.clear());
     final categoryName = _session?.categoryName ?? selectedCategoryName;
     _resetToIdle();
     unawaited(_store.clear(widget.sessionOwnerKey));
@@ -415,6 +445,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     _persistSession();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) => _tick());
     unawaited(NotificationService.instance.scheduleSessionEnd(after: Duration(seconds: left), categoryName: session.categoryName));
+    unawaited(_lockScreen.showRunning(session));
     widget.onTimerStateChanged?.call(true, session.categoryName, _minutesLeft(left));
   }
 

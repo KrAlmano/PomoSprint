@@ -5,14 +5,21 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro/l10n/app_localizations.dart';
 import 'package:pomodoro/models/category_model.dart';
 import 'package:pomodoro/screens/timer_screen.dart';
+import 'package:pomodoro/services/lock_screen_timer.dart';
 import 'package:pomodoro/services/timer_persistence.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'support/fake_lock_screen_platform.dart';
 
 // Duraklatılmış seans, süre çipine dokunarak (seçili olana bile) onaysız
 // silinmemeli; seansı bırakmanın yolu onaylı "Sıfırla"dır.
 void main() {
   const owner = 'u1';
   final category = CourseCategory.initialCategories().first;
+  // Kilit ekranı cephesi test gövdesinde (fake async bölgesinde) kurulur;
+  // kilidinin Future zinciri o bölgeye bağlıdır.
+  late FakeLockScreenPlatform lockPlatform;
+  late LockScreenTimer lockScreen;
 
   Future<void> pumpPausedTimer(WidgetTester tester) async {
     // Dikey ekran (yatayda süre çipleri gizlenir). Test yazı tipi kare
@@ -21,6 +28,12 @@ void main() {
     tester.view.devicePixelRatio = 2;
     addTearDown(tester.view.reset);
     SharedPreferences.setMockInitialValues({});
+    lockPlatform = FakeLockScreenPlatform();
+    lockScreen = LockScreenTimer(
+      platform: lockPlatform,
+      isEnabled: () async => true,
+      categoryLabel: (name) => name,
+    );
     final now = DateTime.now();
     final paused = ActiveTimerSession.start(
       clientUuid: 'paused-1',
@@ -41,6 +54,7 @@ void main() {
         sessionOwnerKey: owner,
         onOpenSettings: () {},
         onSessionCompleted: (_) async {},
+        lockScreenTimer: lockScreen,
       ),
     ));
     // Kayıt (SharedPreferences) geri yüklenir.
@@ -70,6 +84,10 @@ void main() {
     await pumpPausedTimer(tester);
     final l10n = await AppLocalizations.delegate.load(const Locale('tr'));
     expect(find.text(l10n.timerResetBtn), findsOneWidget);
+    // Geri yüklenen duraklatılmış seans kilit ekranında sabit kalan süreyle görünür.
+    await tester.pump();
+    expect(lockPlatform.calls, ['show:paused:paused-1:same']);
+    expect(lockPlatform.shown.single.remainingSeconds, 5 * 60 + 30);
 
     // 1) Süre çiplerine (seçili 25 dahil) dokunmak seansı silmez.
     await tester.tap(find.textContaining('25 '));
@@ -88,6 +106,7 @@ void main() {
     await tester.pump();
     expect(await stored(tester), 'paused-1');
     expect(find.text(l10n.timerResetBtn), findsOneWidget);
+    expect(lockPlatform.calls, ['show:paused:paused-1:same']);
 
     // 3) Onaylayınca seans silinir.
     await tester.tap(find.text(l10n.timerResetBtn));
@@ -96,9 +115,13 @@ void main() {
     await tester.pump();
     expect(find.text(l10n.timerResetBtn), findsNothing);
     expect(await stored(tester), isNull);
+    // Kilit ekranından da kalkar.
+    expect(lockPlatform.calls, ['show:paused:paused-1:same', 'clear']);
 
-    // Ekran kapanırken silinmiş seans geri yazılmaz.
+    // Ekran kapanırken silinmiş seans geri yazılmaz; kaldırılmış sayaç için
+    // platforma tekrar gidilmez.
     await unmount(tester);
     expect(await stored(tester), isNull);
+    expect(lockPlatform.calls, ['show:paused:paused-1:same', 'clear']);
   });
 }

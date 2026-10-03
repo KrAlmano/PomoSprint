@@ -150,6 +150,20 @@
   },
   "notifChannelName": "Session notifications",
   "notifChannelDescription": "Lets you know when your Pomodoro session ends.",
+  "lockTimerChannelName": "Running session",
+  "lockTimerChannelDescription": "Shows the time left on your lock screen and in the notification shade while a session runs.",
+  "lockTimerRunningBody": "Focusing · ends at {time}",
+  "@lockTimerRunningBody": {
+    "placeholders": { "time": { "type": "String" } }
+  },
+  "lockTimerPausedBody": "Paused · {remaining} left",
+  "@lockTimerPausedBody": {
+    "placeholders": { "remaining": { "type": "String" } }
+  },
+  "lockTimerStatusRunning": "Focusing",
+  "lockTimerStatusPaused": "Paused",
+  "lockTimerStatusDone": "Session complete",
+  "lockTimerDoneHint": "Open PomoSprint to save your session.",
   "statsLoadErrorTitle": "Couldn't load your stats",
   "statsLoadErrorOffline": "Couldn't reach the server. Check your internet connection and try again.",
   "statsLoadErrorSignedOut": "Please sign in again to see your stats.",

@@ -15,5 +15,7 @@ import UIKit
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+    // Kilit ekranı sayacı (Canlı Etkinlik) kanalı: lib/services/lock_screen_timer.dart
+    LiveActivityChannel.register(with: engineBridge.applicationRegistrar.messenger())
   }
 }

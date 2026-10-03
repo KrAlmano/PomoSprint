@@ -511,6 +511,35 @@ class AppLocalizationsTr extends AppLocalizations {
       'Pomodoro seansın bittiğinde haber verir.';
 
   @override
+  String get lockTimerChannelName => 'Süren seans';
+
+  @override
+  String get lockTimerChannelDescription =>
+      'Seans sürerken kalan süreyi kilit ekranında ve bildirim panelinde gösterir.';
+
+  @override
+  String lockTimerRunningBody(String time) {
+    return 'Odaklanıyorsun · bitiş $time';
+  }
+
+  @override
+  String lockTimerPausedBody(String remaining) {
+    return 'Duraklatıldı · $remaining kaldı';
+  }
+
+  @override
+  String get lockTimerStatusRunning => 'Odaklanıyorsun';
+
+  @override
+  String get lockTimerStatusPaused => 'Duraklatıldı';
+
+  @override
+  String get lockTimerStatusDone => 'Seans tamamlandı';
+
+  @override
+  String get lockTimerDoneHint => 'Seansını kaydetmek için PomoSprint\'i aç.';
+
+  @override
   String get statsLoadErrorTitle => 'İstatistikler yüklenemedi';
 
   @override

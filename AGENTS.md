@@ -10,7 +10,7 @@
 |---|---|---|---|
 | Seans kaydı, puan, kum, seri hatası | `lib/services/session_queue.dart`, `supabase_service.dart` (`submitCompletedSession`) | `complete_study_session` | §4.2, §5.2, §5.3 |
 | Sayaç, duraklatma, uygulama kapanınca seans | `timer_screen.dart`, `services/timer_persistence.dart`, `app/main_shell.dart` | `start_/cancel_study_session` | §4.1, §6.1 |
-| Bildirim gelmiyor | `services/notification_service.dart`, `AndroidManifest.xml`, `Runner.entitlements` | — | §4.1, §4.7 |
+| Bildirim gelmiyor, kilit ekranı sayacı | `services/notification_service.dart`, `services/lock_screen_timer.dart`, `AndroidManifest.xml`, `ios/Runner/LiveActivityChannel.swift`, `ios/PomoSprintTimerWidget/` | — | §4.1, §4.7 |
 | Çevrimdışı kuyruk | `session_queue.dart`, `server_clock.dart`, `test/session_queue_test.dart` | `complete_study_session` | §6.2 |
 | Raporlar, gün/hafta hesabı | `reports_screen.dart`, `utils/stats_calculator.dart`, `utils/study_day.dart` | gün kuralı RPC'de | §4.3 |
 | Sıralama / lig | `ranking_screen.dart`, `widgets/social/ranking_models.dart`, `widgets/league_info_sheet.dart` | `get_my_league_ranking`, `get_public_*_leaderboard`, `process_weekly_leagues` | §4.4, §6.4 |
@@ -111,7 +111,9 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 | `lib/services/timer_persistence.dart` | Süren seansın cihazdaki kaydı (`active_session_uid_<key>`), `timerDurationSeconds` |
 | `lib/services/server_clock.dart` | HTTP `date` başlığından sunucu-cihaz saat farkı |
 | `lib/services/service_errors.dart` | `AuthErrorCode`, `ServiceErrorCode`, `ServiceException`. Servis metin üretmez |
-| `lib/services/notification_service.dart` | Seans bitiş bildirimi, izin akışı, açma/kapama tercihi |
+| `lib/services/notification_service.dart` | Seans bitiş bildirimi (Android'de exact alarm), Android kalıcı sayaç bildirimi, izin akışı, açma/kapama tercihi |
+| `lib/services/lock_screen_timer.dart` | Kilit ekranı sayacı cephesi: Android kalıcı bildirim / iOS Canlı Etkinlik (MethodChannel `com.pomosprint.app/live_activity`), testte no-op |
+| `lib/dev/lock_screen_preview.dart` | Kilit ekranı sayacını girişsiz deneme ekranı (`flutter run -t lib/dev/lock_screen_preview.dart`); uygulamadan import edilmez |
 | `lib/services/language_service.dart` | Dil seçimi (`app_language_code`), eski `translate()` haritası, `translateCatName` |
 | `lib/utils/` | `study_day` (04:00 kuralı), `stats_calculator`, `stats_format`, `async_lock`, `auth_error_text`, `color_hex`, `text_util` |
 | `lib/models/` | `UserModel`, `CourseCategory`, `StudySession`, `AvatarCharacter` (gömülü yedek katalog dahil) |
@@ -125,7 +127,8 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 | `supabase/functions/` | `unsubscribe`, `send-welcome-email` (repodaki sürümler canlıdan yeni, §10) |
 | `scripts/` | `security_regression_test.js` (canlı), `send_newsletter.js`, `templates/`. Sırlar `scripts/.env` (şablon `.env.example`) |
 | `landing/` | Site: `_partials/`, `tools/sync_partials.py`, `js/config.js`, `_headers`, `worker.js`, `wrangler.jsonc`, `en/` |
-| `android/`, `ios/` | Platform yapılandırması (`com.pomosprint.app`) |
+| `android/`, `ios/` | Platform yapılandırması (`com.pomosprint.app`). `ios/PomoSprintTimerWidget/` Canlı Etkinlik uzantısı, `ios/Shared/` iki hedefte derlenen ActivityAttributes |
+| `tool/ios/add_live_activity_target.rb` | Widget uzantı hedefini `project.pbxproj`'a ekleyen idempotent betik (xcodeproj gem) |
 | `analiz/` | 3 Ekim denetim raporu (`PomoSprint_Analiz_Raporu_2026-10-03.md`) ve 245 maddelik bulgu listesi |
 | `specs/`, `.specify/`, `.claude/` | spec-kit, proje ajanı `qa-tester`, skill'ler |
 
@@ -141,6 +144,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 - Debug build'de süre 5/10 sn (`timerDurationSeconds`, `kDebugMode`). Bilinçli; sunucu bu seansları reddeder.
 - Duraklatma hakkı 1. Seans varken 25/50 değiştirilirse seans sıfırlanır.
 - Bildirim izni açılışta değil, ilk BAŞLAT'ta (`ensurePermission`) istenir. Profil'deki anahtar `notifications_enabled`.
+- Kilit ekranı sayacı (`LockScreenTimer`) her durum geçişinde çağrılır: başlat/devam/geri yükleme `showRunning`, duraklat `showPaused`, sıfırla/tamamla/çıkış/ekran kapanışı `clear`, ön plana dönüş `force: true`. Bildirim tercihi kapalıysa gösterilmez. Dart arka planda çalışmaz; geri sayımı sistem yürütür (Android kronometre + `timeoutAfter`, iOS `Text(timerInterval:)` + `staleDate`). Foreground service / background mode EKLEME.
 - `start_study_session` / `cancel_study_session` çağrıları Shell'in `onTimerStateChanged` callback'inde yapılır.
 
 **Tuzaklar**
@@ -148,6 +152,8 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 - Çıkışta süren seans cihazda kalır (aynı hesapla girişte sürer); Shell bildirimi iptal edip `cancel_study_session` çağırır.
 - `onAuthStateChange` son olayı yeni aboneye yeniden verir.
 - Android bildirim ikonu `@drawable/ic_stat_notification` (`res/raw/keep.xml` R8'den korur). Bu makinede Android SDK yok; Android derlemesi doğrulanmadı.
+- Android 14+ kullanıcı kalıcı bildirimi kaydırıp kapatabilir; uygulama ön plana dönünce yeniden gösterilir. Bildirim kimlikleri: 0 bitiş, 1 süren seans (`pomodoro_running_channel`).
+- iOS Canlı Etkinlik bitişte "eskir" ("Seans tamamlandı" görünümü); uygulama açılınca seans tamamlanır ve etkinlik kaldırılır. Sistem etkinliği ~8 saatte bitirir.
 
 ### 4.2 DATA: veri katmanı ve modeller
 **Dosyalar:** `supabase_service.dart`, `session_queue.dart`, `server_clock.dart`, `service_errors.dart`, `models/`
@@ -267,7 +273,9 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 - Kök `.env` APK/IPA'ya düz metin gömülür. Yalnızca `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SENTRY_DSN`.
 - Release AAB için `android/key.properties` + upload keystore (ikisi de gitignore'da). Yoksa `bundleRelease` hata verir; `assembleRelease` uyarıyla debug imzası kullanır.
 - iOS: min 15.0, UIScene yaşam döngüsü, SPM (Podfile yok), team `AQGX8BJMYJ`. Entitlements: Sign in with Apple, time-sensitive bildirim.
-- Android: `allowBackup=false` + `data_extraction_rules.xml`; bildirim receiver'ları manifest'te.
+- iOS Canlı Etkinlik: `PomoSprintTimerWidget` uzantısı (iOS 16.2, `com.pomosprint.app.TimerWidget`, App Group yok), Runner'da `NSSupportsLiveActivities`, ActivityKit zayıf bağlı. "Embed Foundation Extensions" aşaması "Thin Binary"den önce kalmalı (yoksa "Cycle inside Runner"). Hedefi elle değil `tool/ios/add_live_activity_target.rb` ile düzelt.
+- `ios/Runner/PrivacyInfo.xcprivacy`: izleme yok; toplanan veri türleri App Store Connect gizlilik etiketleriyle aynı tutulmalı.
+- Android: `allowBackup=false` + `data_extraction_rules.xml`; bildirim receiver'ları manifest'te. Exact alarm: `USE_EXACT_ALARM` (13+) ve `SCHEDULE_EXACT_ALARM` (`maxSdkVersion=32`); Play Console'da exact alarm beyanı gerekir.
 - Sentry: `enablePrintBreadcrumbs=false`, e-postalar maskelenir. Yine de `debugPrint`'e kişisel veri yazma.
 
 **Tuzaklar**

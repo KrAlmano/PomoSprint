@@ -1,10 +1,20 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET"/>
-    <!-- flutter_local_notifications: seans bitiş bildirimi (zonedSchedule).
-         Android 13+ çalışma zamanı izni Dart tarafında istenir. Exact alarm
-         kullanılmıyor (inexactAllowWhileIdle), o yüzden SCHEDULE_EXACT_ALARM /
-         USE_EXACT_ALARM bilinçli olarak yok. -->
+    <!-- flutter_local_notifications: seans bitiş bildirimi (zonedSchedule) ve
+         süren seansın kilit ekranında görünen kalıcı (ongoing) bildirimi.
+         Android 13+ bildirim izni Dart tarafında ilk BAŞLAT'ta istenir.
+         Foreground service ve arka plan çalışması YOK: geri sayımı sistem
+         kronometresi yürütür, bitişi AlarmManager tetikler. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <!-- Bitiş bildirimi tam zamanında gelsin diye exact alarm
+         (exactAllowWhileIdle; izin yoksa Dart inexact'e düşer).
+         USE_EXACT_ALARM (Android 13+): kurulumda verilir; Play politikası
+         çekirdek işlevi zamanlayıcı olan uygulamalara izin verir, Play
+         Console'da "exact alarm" beyanı gerekir.
+         SCHEDULE_EXACT_ALARM yalnızca Android 12-12L (API 31-32) için;
+         13+ cihazda USE_EXACT_ALARM yeterli. -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" android:maxSdkVersion="32"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
