@@ -9,6 +9,7 @@ import '../../utils/responsive.dart';
 import '../avatar_widget.dart';
 import 'countdown_text.dart';
 import 'ranking_models.dart';
+import 'user_safety.dart';
 
 Color _muted(bool isDark) => isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant;
 
@@ -243,7 +244,24 @@ class RankingStandings extends StatelessWidget {
   /// Dikey alanı kıt ekranlar (yatay telefon): küçük podyum.
   final bool compact;
 
-  const RankingStandings({super.key, required this.entries, this.league, this.compact = false});
+  /// Başka bir kullanıcının satırında güvenlik menüsü (bildir / gizle).
+  /// Verilirse liste satırına uzun basma ve "⋮" düğmesi, podyuma uzun basma
+  /// eklenir. Kendi satırında ve gizlenmiş satırda menü yoktur.
+  final ValueChanged<RankingEntry>? onEntryActions;
+
+  const RankingStandings({
+    super.key,
+    required this.entries,
+    this.league,
+    this.compact = false,
+    this.onEntryActions,
+  });
+
+  VoidCallback? _actionsFor(RankingEntry entry) {
+    final callback = onEntryActions;
+    if (callback == null || entry.isMe || entry.hidden) return null;
+    return () => callback(entry);
+  }
 
   /// İki sütuna geçilen en dar genişlik.
   static const double splitMinWidth = 800;
@@ -283,6 +301,7 @@ class RankingStandings extends StatelessWidget {
       top: entries.take(3).toList(),
       zoneOf: league == null ? null : zoneOf,
       compact: compact,
+      actionsFor: onEntryActions == null ? null : _actionsFor,
     );
     final list = entries.length <= 3
         ? null
@@ -303,7 +322,12 @@ class RankingStandings extends StatelessWidget {
                       height: 1,
                       color: isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow,
                     ),
-                  RankingRow(entry: entries[i], rank: i + 1, zoneColor: zoneColor(entries[i], i + 1)),
+                  RankingRow(
+                    entry: entries[i],
+                    rank: i + 1,
+                    zoneColor: zoneColor(entries[i], i + 1),
+                    onActions: _actionsFor(entries[i]),
+                  ),
                 ],
               ],
             ),
@@ -364,7 +388,10 @@ class RankingPodium extends StatelessWidget {
   /// küçülür.
   final bool compact;
 
-  const RankingPodium({super.key, required this.top, this.zoneOf, this.compact = false});
+  /// Koltuğa uzun basınca açılan güvenlik menüsü (null: menü yok).
+  final VoidCallback? Function(RankingEntry entry)? actionsFor;
+
+  const RankingPodium({super.key, required this.top, this.zoneOf, this.compact = false, this.actionsFor});
 
   static const double _compactScale = 0.75;
   static const double _horizontalPadding = 12;
@@ -388,6 +415,7 @@ class RankingPodium extends StatelessWidget {
                 rank: index + 1,
                 zone: zoneOf?.call(top[index], index + 1),
                 scale: scale,
+                onActions: actionsFor?.call(top[index]),
               ),
             );
         final placeholder = SizedBox(width: 80 * scale);
@@ -441,14 +469,18 @@ class _PodiumSeat extends StatelessWidget {
   /// Avatar, madalya ve isim genişliği çarpanı (küçük podyumda < 1).
   final double scale;
 
-  const _PodiumSeat({required this.entry, required this.rank, this.zone, this.scale = 1});
+  /// Uzun basınca güvenlik menüsü (başka kullanıcının koltuğu).
+  final VoidCallback? onActions;
+
+  const _PodiumSeat({required this.entry, required this.rank, this.zone, this.scale = 1, this.onActions});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final style = _PodiumStyle.forRank(rank);
     final small = scale < 1;
-    return Column(
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final seat = Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Padding(
@@ -461,7 +493,10 @@ class _PodiumSeat extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(rank == 1 ? 4 : 3),
               decoration: BoxDecoration(shape: BoxShape.circle, gradient: LinearGradient(colors: style.ring)),
-              child: AvatarWidget(avatar: AvatarCharacter.byId(entry.avatarId), size: style.avatarSize * scale),
+              child: AvatarWidget(
+                avatar: AvatarCharacter.byId(entry.hidden ? null : entry.avatarId),
+                size: style.avatarSize * scale,
+              ),
             ),
             Positioned(
               bottom: -6,
@@ -500,14 +535,15 @@ class _PodiumSeat extends StatelessWidget {
         SizedBox(
           width: small ? 80 : 90,
           child: Text(
-            entry.name ?? l10n.userDefault,
+            entry.hidden ? l10n.hiddenUserLabel : (entry.name ?? l10n.userDefault),
             textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: rank == 1 ? 15 : 13,
               fontWeight: rank == 1 || entry.isMe ? FontWeight.bold : FontWeight.w600,
-              color: entry.isMe ? AppColors.primary : null,
+              fontStyle: entry.hidden ? FontStyle.italic : null,
+              color: entry.isMe ? AppColors.primary : (entry.hidden ? _muted(isDark) : null),
             ),
           ),
         ),
@@ -526,6 +562,16 @@ class _PodiumSeat extends StatelessWidget {
           _ZoneChip(label: l10n.rankingZoneDemotionChip, color: kDemotionZoneColor),
         ],
       ],
+    );
+    final onActions = this.onActions;
+    if (onActions == null) return seat;
+    return Semantics(
+      onLongPressHint: l10n.userActionsTooltip,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onLongPress: onActions,
+        child: seat,
+      ),
     );
   }
 }
@@ -562,7 +608,12 @@ class RankingRow extends StatelessWidget {
   /// Lig sekmesinde terfi/düşme bölgesi rengi (yoksa null).
   final Color? zoneColor;
 
-  const RankingRow({super.key, required this.entry, required this.rank, this.zoneColor});
+  /// Başka kullanıcının satırında güvenlik menüsü (uzun basma ve "⋮").
+  final VoidCallback? onActions;
+
+  const RankingRow({super.key, required this.entry, required this.rank, this.zoneColor, this.onActions});
+
+  static const double _actionsButtonWidth = 36;
 
   @override
   Widget build(BuildContext context) {
@@ -570,18 +621,21 @@ class RankingRow extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final background = zoneColor ??
         (entry.isMe ? AppColors.primaryContainer.withValues(alpha: 0.12) : Colors.transparent);
-    final name = entry.name ?? l10n.userDefault;
-    // Satırın iç genişliği (yatay dolgu ve kendi satırındaki sol çizgi hariç);
-    // puan rozeti bunun en fazla ~üçte birini alır, isme yer kalır.
+    final name = entry.hidden ? l10n.hiddenUserLabel : (entry.name ?? l10n.userDefault);
+    final onActions = this.onActions;
+    // Satırın iç genişliği (yatay dolgu, menü düğmesi ve kendi satırındaki
+    // sol çizgi hariç); puan rozeti bunun en fazla ~üçte birini alır, isme
+    // yer kalır.
     return LayoutBuilder(
       builder: (context, constraints) {
-        final rowWidth = constraints.maxWidth - 32 - (entry.isMe ? 4 : 0);
-        return Container(
+        final rightInset = onActions == null ? 16.0 : 4.0 + _actionsButtonWidth;
+        final rowWidth = constraints.maxWidth - 16 - rightInset - (entry.isMe ? 4 : 0);
+        final row = Container(
           decoration: BoxDecoration(
             color: background,
             border: entry.isMe ? const Border(left: BorderSide(color: AppColors.primary, width: 4)) : null,
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: EdgeInsets.fromLTRB(16, 12, onActions == null ? 16 : 4, 12),
           child: Row(
             children: [
               // En az 28 px daire; büyük metin ölçeğinde sıra numarası kesilmez.
@@ -598,7 +652,7 @@ class RankingRow extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              AvatarWidget(avatar: AvatarCharacter.byId(entry.avatarId), size: 40),
+              AvatarWidget(avatar: AvatarCharacter.byId(entry.hidden ? null : entry.avatarId), size: 40),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -610,8 +664,9 @@ class RankingRow extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: entry.isMe ? AppColors.primary : null,
+                        fontWeight: entry.hidden ? FontWeight.w600 : FontWeight.bold,
+                        fontStyle: entry.hidden ? FontStyle.italic : null,
+                        color: entry.isMe ? AppColors.primary : (entry.hidden ? _muted(isDark) : null),
                       ),
                     ),
                     if (entry.minutes != null) ...[
@@ -628,9 +683,12 @@ class RankingRow extends StatelessWidget {
                 constraints: BoxConstraints(maxWidth: math.max(0.0, rowWidth * 0.35)),
                 child: _PointsBadge(points: entry.points),
               ),
+              if (onActions != null) UserActionsButton(onPressed: onActions),
             ],
           ),
         );
+        if (onActions == null) return row;
+        return GestureDetector(onLongPress: onActions, child: row);
       },
     );
   }

@@ -174,7 +174,8 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 
 **Tuzaklar**
 - PGRST202 yedekleri: `fetchFriends` / `fetchPendingFriendRequests` (RPC canlıda var, yedek ölü kod) ve `updateCategoryOrders` (`reorder_categories` canlıda **yok**, her zaman tek upsert'e düşer; limit üstü aktif kategorisi olan kullanıcıda hata verebilir).
-- Prefs anahtarları: `saved_user`, `saved_categories_<email>`, `pending_sessions_uid_<uid>` (eski `pending_sessions_<email>` ilk erişimde taşınır), `rejected_sessions_uid_<uid>`, `rejected_sessions_unseen_uid_<uid>`, `active_session_uid_<key>`, `avatar_catalog_v1`, `daily_pomo_goal` (eski, bir kez taşınır), `league_info_shown_<uid>`, `app_language_code`, `theme_mode`, `notifications_enabled`, `notification_permission_asked`.
+- Prefs anahtarları: `saved_user`, `saved_categories_<email>`, `pending_sessions_uid_<uid>` (eski `pending_sessions_<email>` ilk erişimde taşınır), `rejected_sessions_uid_<uid>`, `rejected_sessions_unseen_uid_<uid>`, `active_session_uid_<key>`, `avatar_catalog_v1`, `daily_pomo_goal` (eski, bir kez taşınır), `league_info_shown_<uid>`, `hidden_users_uid_<uid>` (gizlenen kullanıcılar), `app_language_code`, `theme_mode`, `notifications_enabled`, `notification_permission_asked`.
+- Hesap silme (`deleteUserAccount` → `clearDeletedAccountLocalData`) kullanıcıya bağlı tüm anahtarları siler ve `TimerPersistence.retireOwner(uid)` ile sayaç ekranının dispose'da seansı yeniden yazmasını engeller. Yeni kullanıcıya bağlı anahtar eklersen oraya da ekle (`test/user_safety_test.dart`).
 - Avatar: `AvatarCharacter.byId` ve `allAvatars()` asla fırlatmaz / boş dönmez. Yine de listelerde korumasız `.first` kullanma.
 - `supabase_service.dart` içinde "public leaderboard `is_me` DÖNMEZ" yorumu bayat; canlı RPC `is_me` döndürüyor.
 
@@ -205,6 +206,9 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 - Avatar sahipliği = `avatar_unlocks` kaydı ya da ücretsiz (`isOwned`). Lig ödülü avatarları satın alınamaz.
 - Profil ve Koleksiyon `currentUser`'ı dinler; kopya tutmaz.
 - Başka kullanıcının verisi yalnızca RPC ile gelir.
+- Kullanıcı içeriği (App Store 1.2): başkasının satırında uzun basma / "⋮" ile `showUserSafetySheet` (`widgets/social/user_safety.dart`). Sıralama ve canlı akışta "Bildir" + "Gizle", arkadaş listesi ve isteklerde yalnızca "Bildir"; kendi satırında menü yok. Bildirim `mailto:destek@pomosprint.app` (görünen ad, varsa genel kimlik, yer; bildirenin bilgisi URL'ye konmaz).
+- Gizleme cihazda, hesaba bağlı (`HiddenUsersStore`, `hidden_users_uid_<uid>`). Lig/Aylık RPC'leri kimlik döndürmediği için orada adla eşlenir; sıralamada satır silinmez, ad/avatar "Gizlenen kullanıcı" olur (sıra ve lig bölgeleri bozulmaz). Profil > Gizlilik ve yasal'dan sıfırlanır.
+- Görünen ad denetimi `utils/name_filter.dart` (kayıt, profil ad düzenleme, Google/Apple ilk adı). Sunucuda içerik denetimi yok (§10).
 
 **Tuzaklar**
 - Arkadaş silme ve giden isteği iptal UI'ı yok: `remove_friend`, `cancel_friend_request`, `get_outgoing_friend_requests` canlıda yok.
@@ -220,7 +224,9 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 - Onboarding `completeOnboarding()` ile biter (önce kategoriler, sonra profil). Profili `handle_new_user` trigger'ı oluşturur; istemci upsert'i yedektir ve avatar sunucuda varsayılana zorlanır.
 - Kategori limiti ücretsiz 8, premium 15 (`categoryLimitFor`). Sunucu trigger'ı eklemede ve arşivden çıkarmada uygular; istemci kontrolü UX içindir. Kategori silinmez, arşivlenir.
 - Yeni metin **yalnızca ARB'ye** (iki dosyaya da) eklenir, sonra `flutter gen-l10n`.
-- Yasal sayfalar: TR `pomosprint.app/terms|privacy`, diğer diller `/en/terms|/en/privacy` (`legal_links.dart`).
+- Yasal sayfalar (`legal_links.dart`, `LegalPage`): TR `pomosprint.app/terms|privacy|kvkk|hesap-silme`, diğer diller `/en/terms|/en/privacy|/en/kvkk|/en/delete-account`. Metin sürümü tek sabit: `kLegalDocumentsVersion`; yasal metin değişince artır.
+- Kayıt onayları: iki zorunlu (Kullanım Şartları kabulü; KVKK Aydınlatma Metni + Gizlilik Politikası okundu, rıza değil bilgilendirme teyidi), bir isteğe bağlı (ticari elektronik ileti, varsayılan kapalı). "Tümünü kabul et" yok. Zorunlular olmadan `registerUser` çağrılmaz; servis de `StateError` fırlatır. Metadata sözleşmesi §5.5.
+- Google/Apple ile devam: giriş ekranındaki `SocialSignInNotice` (Kullanım Şartları + KVKK Aydınlatma Metni bağlantılı). Bu yolda onay metadata'sı yazılmıyor (§10).
 
 **Tuzaklar**
 - Üç çeviri yolu bir arada: ARB, `LanguageService.translate('key')` haritası (Timer, Raporlar, Profil, nav etiketleri) ve `isTurkish ? … : …`. Eski anahtarları taşımak ayrı bir iş; yeni `translate` anahtarı ekleme.
@@ -344,6 +350,19 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 | `study_sessions` | Kendi satırlarında SELECT. Yazma yalnızca RPC ile |
 | `avatars`, `avatar_unlocks` | SELECT |
 | `friendships` | Yalnızca PGRST202 yedek yolunda SELECT (ölü kod) |
+
+### 5.5 Kayıt metadata'sı (`auth.signUp` `data` → `auth.users.raw_user_meta_data`)
+
+| Anahtar | Okuyan | Not |
+|---|---|---|
+| `name`, `avatar_id` | `handle_new_user` (`full_name` de okunur) | Ad 1..50 (CHECK); avatar yalnızca `is_default` |
+| `newsletter` (bool) | `handle_newsletter_subscription` (e-posta onaylanınca `= 'true'` ise `marketing_subscribers`) | Mevcut sözleşme, korunur; `marketing_consent` ile aynı değer |
+| `marketing_consent` (bool), `terms_version`, `privacy_version` (`kLegalDocumentsVersion`), `terms_accepted_at` (UTC ISO-8601) | Yalnızca kayıt (KVKK ispat) | 3 Ekim'de canlı `handle_new_user` okundu; ek anahtarlar onu etkilemiyor |
+
+Üretici: `SupabaseService.signUpMetadata` + `RegistrationConsent.toMetadata` (`test/registration_consent_test.dart`).
+
+### 5.6 `delete_own_account` (canlı, 3 Ekim)
+`auth.users` satırını siler; `profiles`, `study_sessions`, `friendships` (iki yön), `marketing_subscribers.user_id` auth.users'a, `categories`, `league_memberships`, `activity_feed`, `avatar_unlocks` profiles'a `ON DELETE CASCADE`. Açık: `waitlist` (e-posta, FK yok) ve `user_id`'si boş abonelik satırı kalır, `search_path`'te `pg_temp` yok → `proposed/12_delete_own_account.sql` (+ down, `tests/proposed_12_delete_own_account_dryrun.sql`).
 
 ## 6. Veri akışları
 
@@ -482,6 +501,10 @@ curl -sI https://pomosprint.app/reset-password | grep -i cache-control   # no-st
 | P1 | Edge Function'lar deploy edilmedi | Canlıda `unsubscribe` v8 (5 Ağustos, JWT kapalı, eski kod) ve `send-welcome-email` v6 (**JWT açık**, trigger çağrıları 401 alıyor, hoş geldin e-postası gitmiyor). Repodaki sürümleri `--no-verify-jwt` ile deploy et. Adımlar: `analiz/PomoSprint_Analiz_Raporu_2026-10-03.md` §8 |
 | P1 | `mail.pomosprint.app` Resend doğrulaması ve DNS kayıtları | Yapılmadan hoş geldin ve bülten gönderilemez |
 | P1 | `cleanup_unconfirmed_duplicate_identity(p_email)` parametredeki e-postaya güveniyor | `proposed/04` |
+| P1 | Hesap silme `waitlist` ve `user_id`'siz abonelik satırını silmiyor | `proposed/12` (DRYRUN → migration, SQL Editor'de kullanıcı) |
+| P2 | Görünen ad için sunucu tarafı içerik denetimi yok | İstemci `NameFilter` doğrudan `profiles.name` UPDATE'iyle aşılabilir. Gerekirse `profiles` BEFORE INSERT/UPDATE trigger'ında küçük bir liste |
+| P2 | Google/Apple ile ilk girişte onay sürümü kaydedilmiyor | Bildirim metni gösteriliyor; istenirse ilk girişte `auth.updateUser(data: {terms_version, privacy_version, terms_accepted_at})` |
+| P2 | Kullanıcı engelleme sunucuda değil | Gizleme cihazda; arkadaşlıktan çıkarma RPC'si (`remove_friend`) canlıda yok |
 | P1 | Supabase Auth panel ayarları repoda yok | Redirect URLs (`/reset-password`, `/confirmed`, `.html`'li hâlleri; `io.supabase.pomosprint://` silinmeli), Reset Password şablonu `token_hash`, Leaked password protection, Apple provider (Client ID `com.pomosprint.app`) |
 | P2 | `proposed/11` RPC'leri canlıda yok | Arkadaş silme/iptal UI'ı ve toplu kategori sıralaması bunlara bağlı |
 | P2 | `proposed/01`–`10` kalan maddeler | Puan sabitleri tek kaynak, `purchase_avatar` kilidi (05), `activity_feed` RLS ve `get_friends_feed` (07), `profiles` kolon bazlı SELECT (06), kategori ad kuralları (09), varsayılan yetkiler (08), veri temizliği (10) |

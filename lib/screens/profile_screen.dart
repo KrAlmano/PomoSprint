@@ -3,14 +3,16 @@ import 'dart:async';
 import 'categories_management_screen.dart';
 
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../l10n/app_localizations.dart';
 import '../models/avatar_model.dart';
 import '../models/user_model.dart';
+import '../widgets/auth/legal_links.dart';
 import '../widgets/avatar_widget.dart';
 import '../widgets/social/social_error_text.dart';
 import '../theme.dart';
+import '../utils/name_filter.dart';
 import '../utils/responsive.dart';
+import '../services/hidden_users.dart';
 import '../services/supabase_service.dart';
 import '../services/language_service.dart';
 import '../services/notification_service.dart';
@@ -56,6 +58,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _nameController = TextEditingController(text: _user?.name ?? '');
     _emailController = TextEditingController(text: _user?.email ?? '');
     _service.currentUser.addListener(_onUserChanged);
+    HiddenUsersStore.instance.hidden.addListener(_onHiddenUsersChanged);
+    unawaited(HiddenUsersStore.instance.load(_user?.id));
     unawaited(_loadSocialVisibility());
     unawaited(_loadNotificationPreference());
   }
@@ -63,10 +67,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void dispose() {
     _service.currentUser.removeListener(_onUserChanged);
+    HiddenUsersStore.instance.hidden.removeListener(_onHiddenUsersChanged);
     _nameController.dispose();
     _emailController.dispose();
     super.dispose();
   }
+
+  HiddenUserList get _hiddenUsers => HiddenUsersStore.instance.hidden.value;
+
+  void _onHiddenUsersChanged() {
+    if (mounted) setState(() {});
+  }
+
+  // Bölüm başlıkları büyük harfle yazılır; Türkçede i → İ (Dart'ın
+  // toUpperCase'i "TERCIHLER" üretiyordu).
+  String _sectionTitle(String text) =>
+      (LanguageService.instance.isTurkish ? text.replaceAll('i', 'İ') : text).toUpperCase();
 
   // Çıkış/hesap silme sırasında kullanıcı null olur; ekran kapanana kadar
   // son bilinen kullanıcı gösterilir.
@@ -95,6 +111,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? _validateName(AppLocalizations l10n, String name) {
     if (name.length < _nameMinLength) return l10n.profileNameTooShort;
     if (name.length > _nameMaxLength) return l10n.profileNameTooLong;
+    if (NameFilter.isOffensive(name)) return l10n.nameNotAllowed;
     return null;
   }
 
@@ -291,7 +308,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                     // Language Selection Card with Flags 🇹🇷 / 🇬🇧
                     _buildSectionCard(
-                      title: lang.translate('app_language').toUpperCase(),
+                      title: _sectionTitle(lang.translate('app_language')),
                       child: Row(
                         children: [
                           Expanded(
@@ -319,31 +336,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     _buildPreferences(lang, isDark, muted),
                     const SizedBox(height: 20),
 
-                    // Yasal metinler: İngilizce arayüzde /en/ sürümleri açılır.
-                    // Büyük metin ölçeğinde bağlantılar alt satıra geçer.
-                    Wrap(
-                      alignment: WrapAlignment.center,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        TextButton(
-                          onPressed: () => _openLegalUrl('privacy'),
-                          child: Text(
-                            lang.translate('privacy_policy'),
-                            style: TextStyle(fontSize: 12, color: muted, decoration: TextDecoration.underline),
-                          ),
-                        ),
-                        Text('·', style: TextStyle(color: muted)),
-                        TextButton(
-                          onPressed: () => _openLegalUrl('terms'),
-                          child: Text(
-                            lang.translate('terms_of_service'),
-                            style: TextStyle(fontSize: 12, color: muted, decoration: TextDecoration.underline),
-                          ),
-                        ),
-                      ],
-                    ),
+                    // Gizlilik ve yasal: gizlenen kullanıcılar, yasal metinler
+                    // (İngilizce arayüzde /en/ sürümleri) ve hesap silme.
+                    _buildPrivacyAndLegal(l10n, isDark, muted),
 
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 12),
 
                     SizedBox(
                       width: double.infinity,
@@ -365,29 +362,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: _isDeleting ? null : _confirmDeleteAccount,
-                        icon: const Icon(Icons.delete_forever_rounded, color: Colors.red),
-                        label: Text(
-                          l10n.deleteAccount,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.red,
-                          ),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          side: const BorderSide(color: Colors.red, width: 1.5),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
                       ),
@@ -486,7 +460,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildProfileForm(LanguageService lang, AppLocalizations l10n, bool isDark, Color muted) {
     final fieldFill = isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow;
     return _buildSectionCard(
-      title: lang.translate('edit_profile').toUpperCase(),
+      title: _sectionTitle(lang.translate('edit_profile')),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -599,7 +573,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildPreferences(LanguageService lang, bool isDark, Color muted) {
     const titleStyle = TextStyle(fontSize: 15, fontWeight: FontWeight.w500);
     return _buildSectionCard(
-      title: lang.translate('preferences').toUpperCase(),
+      title: _sectionTitle(lang.translate('preferences')),
       child: Material(
         color: Colors.transparent,
         child: Column(
@@ -702,10 +676,77 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ));
   }
 
-  Future<void> _openLegalUrl(String page) async {
-    final isTurkish = AppLocalizations.of(context)!.localeName == 'tr';
-    final uri = Uri.parse('https://pomosprint.app/${isTurkish ? '' : 'en/'}$page');
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  Widget _buildPrivacyAndLegal(AppLocalizations l10n, bool isDark, Color muted) {
+    const titleStyle = TextStyle(fontSize: 15, fontWeight: FontWeight.w500);
+    final subtitleStyle = TextStyle(fontSize: 12, color: muted);
+    final hiddenCount = _hiddenUsers.length;
+
+    Widget legalLink(IconData icon, String title, LegalPage page, {String? subtitle}) => ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: Icon(icon, color: muted),
+          title: Text(title, style: titleStyle),
+          subtitle: subtitle == null ? null : Text(subtitle, style: subtitleStyle),
+          trailing: Icon(Icons.open_in_new_rounded, size: 18, color: muted),
+          onTap: () => openLegalPage(context, page),
+        );
+
+    return _buildSectionCard(
+      title: _sectionTitle(l10n.profileLegalSectionTitle),
+      child: Material(
+        color: Colors.transparent,
+        child: Column(
+          children: [
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              enabled: hiddenCount > 0,
+              leading: Icon(Icons.visibility_outlined, color: muted),
+              title: Text(l10n.hiddenUsersTitle, style: titleStyle),
+              subtitle: Text(l10n.hiddenUsersCount(hiddenCount), style: subtitleStyle),
+              onTap: _showHiddenUsers,
+            ),
+            const Divider(height: 16),
+            legalLink(Icons.description_outlined, l10n.termsOfServiceLink, LegalPage.terms),
+            legalLink(Icons.privacy_tip_outlined, l10n.privacyPolicyLink, LegalPage.privacy),
+            legalLink(Icons.gavel_rounded, l10n.kvkkNoticeLink, LegalPage.kvkk),
+            legalLink(
+              Icons.help_outline_rounded,
+              l10n.accountDeletionInfoLink,
+              LegalPage.accountDeletion,
+              subtitle: l10n.accountDeletionInfoSub,
+            ),
+            const Divider(height: 16),
+            // Uygulama içi hesap silme (App Store 5.1.1(v), Google Play).
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              enabled: !_isDeleting,
+              leading: const Icon(Icons.delete_forever_rounded, color: Colors.red),
+              title: Text(
+                l10n.deleteAccount,
+                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.red),
+              ),
+              subtitle: Text(l10n.deleteAccountSub, style: subtitleStyle),
+              onTap: _confirmDeleteAccount,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // "Gizlenen kullanıcıları göster": hesabın gizleme listesi sıfırlanır.
+  Future<void> _showHiddenUsers() async {
+    final uid = _user?.id;
+    if (uid == null || uid.isEmpty) return;
+    final l10n = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await HiddenUsersStore.instance.clear(uid);
+    } catch (e) {
+      debugPrint('[PROFILE] Gizlenen kullanıcılar sıfırlanamadı: $e');
+      messenger.showSnackBar(SnackBar(content: Text(l10n.profileSettingSaveError), behavior: SnackBarBehavior.floating));
+      return;
+    }
+    messenger.showSnackBar(SnackBar(content: Text(l10n.hiddenUsersCleared), behavior: SnackBarBehavior.floating));
   }
 
   Future<void> _confirmDeleteAccount() async {

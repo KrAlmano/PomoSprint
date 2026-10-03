@@ -465,11 +465,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   const SizedBox(height: 12),
 
-                  // Google/Apple ilk girişte hesap oluşturur; şartlar burada bildirilir.
-                  LegalConsentText(
-                    prefix: l10n.authSocialConsentPrefix,
-                    suffix: l10n.authSocialConsentSuffix,
-                    textAlign: TextAlign.center,
+                  // Google/Apple ilk girişte hesap oluşturur; Kullanım Şartları
+                  // ve KVKK Aydınlatma Metni burada bildirilir (bağlantılı).
+                  SocialSignInNotice(
                     style: TextStyle(fontSize: 12, height: 1.4, color: labelColor),
                   ),
 

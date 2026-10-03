@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../l10n/app_localizations.dart';
 import '../models/user_model.dart';
+import '../services/hidden_users.dart';
 import '../services/supabase_service.dart';
 import '../theme.dart';
 import '../utils/responsive.dart';
@@ -12,6 +13,7 @@ import '../widgets/social/league_tiers.dart';
 import '../widgets/social/load_error_view.dart';
 import '../widgets/social/ranking_models.dart';
 import '../widgets/social/ranking_widgets.dart';
+import '../widgets/social/user_safety.dart';
 
 // Sekmeler: Lig (14 günlük dönemlik oda), Aylık (herkese açık, ayın 1'inde
 // sıfırlanır), Arkadaşlar. Ayrı bir "Tüm Zamanlar" sekmesi yok: hiç sıfırlanmayan bir
@@ -58,6 +60,20 @@ class _RankingScreenState extends State<RankingScreen> {
   void initState() {
     super.initState();
     SupabaseService.instance.addStatsChangedListener(_onStatsChanged);
+    HiddenUsersStore.instance.hidden.addListener(_onHiddenUsersChanged);
+    unawaited(HiddenUsersStore.instance.load(widget.currentUser?.id));
+  }
+
+  @override
+  void didUpdateWidget(RankingScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.currentUser?.id != widget.currentUser?.id) {
+      unawaited(HiddenUsersStore.instance.load(widget.currentUser?.id));
+    }
+  }
+
+  void _onHiddenUsersChanged() {
+    if (mounted) setState(() {});
   }
 
   @override
@@ -77,6 +93,7 @@ class _RankingScreenState extends State<RankingScreen> {
   @override
   void dispose() {
     SupabaseService.instance.removeStatsChangedListener(_onStatsChanged);
+    HiddenUsersStore.instance.hidden.removeListener(_onHiddenUsersChanged);
     super.dispose();
   }
 
@@ -170,8 +187,14 @@ class _RankingScreenState extends State<RankingScreen> {
   // (get_my_friends kendini içermez). Lig ve aylık sekmelerde liste olduğu
   // gibi gösterilir; kendi satırı yalnızca sunucunun is_me alanıyla bilinir
   // (isimle eşleme yapılmaz). Aylık listede yalnızca ilk 50'deyse görünür.
+  // Kullanıcının gizlediği kişilerin satırı listeden çıkarılmaz (sıra ve lig
+  // bölgeleri bozulmasın); adı ve avatarı gösterilmez.
   List<RankingEntry> _visibleEntries() {
-    final entries = _data[_tab]!.entries;
+    final hidden = HiddenUsersStore.instance.hidden.value;
+    final entries = [
+      for (final e in _data[_tab]!.entries)
+        (!e.isMe && hidden.isHidden(id: e.userId, name: e.name)) ? e.asHidden() : e,
+    ];
     final me = widget.currentUser;
     if (_tab != _RankingTab.friends || me == null) return entries;
     return [
@@ -184,6 +207,20 @@ class _RankingScreenState extends State<RankingScreen> {
         isMe: true,
       ),
     ]..sort(RankingEntry.compare);
+  }
+
+  // Başka kullanıcının satırı: bildir / gizle.
+  void _openEntryActions(RankingEntry entry) {
+    final l10n = AppLocalizations.of(context)!;
+    unawaited(showUserSafetySheet(
+      context,
+      target: UserSafetyTarget(name: entry.name ?? l10n.userDefault, userId: entry.userId, avatarId: entry.avatarId),
+      place: switch (_tab) {
+        _RankingTab.league => UserReportPlace.league,
+        _RankingTab.monthly => UserReportPlace.monthly,
+        _RankingTab.friends => UserReportPlace.friendsRanking,
+      },
+    ));
   }
 
   // Düzen: sekme çubuğu, geri sayım ve durum mesajları okunabilir genişlikte
@@ -236,6 +273,7 @@ class _RankingScreenState extends State<RankingScreen> {
                       entries: _visibleEntries(),
                       league: _tab == _RankingTab.league ? _league : null,
                       compact: compact,
+                      onEntryActions: _openEntryActions,
                     ),
                   const SizedBox(height: 24),
                 ],

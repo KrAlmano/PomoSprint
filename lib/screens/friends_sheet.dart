@@ -7,6 +7,7 @@ import '../models/avatar_model.dart';
 import '../widgets/avatar_widget.dart';
 import '../widgets/social/load_error_view.dart';
 import '../widgets/social/social_error_text.dart';
+import '../widgets/social/user_safety.dart';
 import '../services/supabase_service.dart';
 import '../theme.dart';
 import '../utils/responsive.dart';
@@ -444,9 +445,31 @@ class _FriendsSheetState extends State<FriendsSheet> {
     ];
   }
 
+  // Arkadaş listesinde ve isteklerde yalnızca bildirme var (gizleme
+  // sıralama ve canlı akış içindir).
+  void _openReport(Map<String, dynamic> user, AppLocalizations l10n, UserReportPlace place) {
+    unawaited(showUserSafetySheet(
+      context,
+      target: UserSafetyTarget(
+        name: user['name']?.toString() ?? l10n.userDefault,
+        userId: user['id']?.toString(),
+        avatarId: user['avatar_id']?.toString(),
+      ),
+      place: place,
+      allowHide: false,
+    ));
+  }
+
   Widget _buildRequestTile(Map<String, dynamic> r, AppLocalizations l10n) {
     final requesterId = r['id']?.toString() ?? '';
     final isResponding = _respondingId == requesterId;
+    return GestureDetector(
+      onLongPress: () => _openReport(r, l10n, UserReportPlace.friendRequest),
+      child: _buildRequestCard(r, l10n, requesterId, isResponding),
+    );
+  }
+
+  Widget _buildRequestCard(Map<String, dynamic> r, AppLocalizations l10n, String requesterId, bool isResponding) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
@@ -511,9 +534,16 @@ class _FriendsSheetState extends State<FriendsSheet> {
   }
 
   Widget _buildFriendTile(Map<String, dynamic> f, AppLocalizations l10n, bool isDark, Color muted) {
+    return GestureDetector(
+      onLongPress: () => _openReport(f, l10n, UserReportPlace.friendsList),
+      child: _buildFriendCard(f, l10n, isDark, muted),
+    );
+  }
+
+  Widget _buildFriendCard(Map<String, dynamic> f, AppLocalizations l10n, bool isDark, Color muted) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.fromLTRB(12, 12, 4, 12),
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkSurfaceContainerLowest : AppColors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(14),
@@ -548,6 +578,7 @@ class _FriendsSheetState extends State<FriendsSheet> {
               style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.onPrimaryFixed),
             ),
           ),
+          UserActionsButton(onPressed: () => _openReport(f, l10n, UserReportPlace.friendsList)),
         ],
       ),
     );

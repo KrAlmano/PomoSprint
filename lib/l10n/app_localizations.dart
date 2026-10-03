@@ -1721,7 +1721,7 @@ abstract class AppLocalizations {
   /// No description provided for @errAcceptTerms.
   ///
   /// In tr, this message translates to:
-  /// **'Devam etmek için kullanım koşullarını kabul edin.'**
+  /// **'Devam etmek için Kullanım Şartları\'nı kabul etmelisin.'**
   String get errAcceptTerms;
 
   /// No description provided for @errEmailExists.
@@ -2461,6 +2461,348 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Düşme bölgesindesin: dönem böyle biterse bir alt lige inersin.'**
   String get rankingZoneDemotionMe;
+
+  /// No description provided for @authSocialNoticePrefix.
+  ///
+  /// In tr, this message translates to:
+  /// **'Devam ederek '**
+  String get authSocialNoticePrefix;
+
+  /// No description provided for @authSocialNoticeTermsLink.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kullanım Şartları\'nı'**
+  String get authSocialNoticeTermsLink;
+
+  /// No description provided for @authSocialNoticeMiddle.
+  ///
+  /// In tr, this message translates to:
+  /// **' kabul etmiş ve '**
+  String get authSocialNoticeMiddle;
+
+  /// No description provided for @authSocialNoticeKvkkLink.
+  ///
+  /// In tr, this message translates to:
+  /// **'KVKK Aydınlatma Metni\'ni'**
+  String get authSocialNoticeKvkkLink;
+
+  /// No description provided for @authSocialNoticeSuffix.
+  ///
+  /// In tr, this message translates to:
+  /// **' okumuş olursun.'**
+  String get authSocialNoticeSuffix;
+
+  /// No description provided for @legalOpenFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sayfa açılamadı. Tarayıcında şu adresi açabilirsin: {url}'**
+  String legalOpenFailed(String url);
+
+  /// No description provided for @registerNameLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Görünen ad'**
+  String get registerNameLabel;
+
+  /// No description provided for @registerNameHelper.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıralamada ve arkadaş listelerinde bu ad görünür.'**
+  String get registerNameHelper;
+
+  /// No description provided for @registerErrNameRequired.
+  ///
+  /// In tr, this message translates to:
+  /// **'Görünen adını gir.'**
+  String get registerErrNameRequired;
+
+  /// No description provided for @registerErrNameTooLong.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ad en fazla 50 karakter olabilir.'**
+  String get registerErrNameTooLong;
+
+  /// No description provided for @nameNotAllowed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu ad uygun değil. Lütfen başka bir ad seç.'**
+  String get nameNotAllowed;
+
+  /// No description provided for @registerErrEmailRequired.
+  ///
+  /// In tr, this message translates to:
+  /// **'E-posta adresini gir.'**
+  String get registerErrEmailRequired;
+
+  /// No description provided for @registerErrPasswordRequired.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir şifre belirle.'**
+  String get registerErrPasswordRequired;
+
+  /// No description provided for @registerPasswordHelper.
+  ///
+  /// In tr, this message translates to:
+  /// **'En az 6 karakter.'**
+  String get registerPasswordHelper;
+
+  /// No description provided for @registerShowPassword.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifreyi göster'**
+  String get registerShowPassword;
+
+  /// No description provided for @registerHidePassword.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifreyi gizle'**
+  String get registerHidePassword;
+
+  /// No description provided for @registerConsentsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Onaylar'**
+  String get registerConsentsTitle;
+
+  /// No description provided for @registerConsentRequiredTag.
+  ///
+  /// In tr, this message translates to:
+  /// **'Zorunlu'**
+  String get registerConsentRequiredTag;
+
+  /// No description provided for @registerConsentOptionalTag.
+  ///
+  /// In tr, this message translates to:
+  /// **'İsteğe bağlı'**
+  String get registerConsentOptionalTag;
+
+  /// No description provided for @registerConsentTermsPrefix.
+  ///
+  /// In tr, this message translates to:
+  /// **''**
+  String get registerConsentTermsPrefix;
+
+  /// No description provided for @registerConsentTermsLink.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kullanım Şartları\'nı'**
+  String get registerConsentTermsLink;
+
+  /// No description provided for @registerConsentTermsSuffix.
+  ///
+  /// In tr, this message translates to:
+  /// **' okudum ve kabul ediyorum.'**
+  String get registerConsentTermsSuffix;
+
+  /// No description provided for @registerConsentPrivacyPrefix.
+  ///
+  /// In tr, this message translates to:
+  /// **''**
+  String get registerConsentPrivacyPrefix;
+
+  /// No description provided for @registerConsentKvkkLink.
+  ///
+  /// In tr, this message translates to:
+  /// **'KVKK Aydınlatma Metni\'ni'**
+  String get registerConsentKvkkLink;
+
+  /// No description provided for @registerConsentPrivacyConnector.
+  ///
+  /// In tr, this message translates to:
+  /// **' ve '**
+  String get registerConsentPrivacyConnector;
+
+  /// No description provided for @registerConsentPrivacyLink.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gizlilik Politikası\'nı'**
+  String get registerConsentPrivacyLink;
+
+  /// No description provided for @registerConsentPrivacySuffix.
+  ///
+  /// In tr, this message translates to:
+  /// **' okudum.'**
+  String get registerConsentPrivacySuffix;
+
+  /// No description provided for @registerConsentMarketing.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni özellikler ve güncellemeler hakkında bana e-posta gönderilmesini kabul ediyorum (ticari elektronik ileti onayı).'**
+  String get registerConsentMarketing;
+
+  /// No description provided for @registerConsentMarketingHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'İstediğin zaman e-postalardaki bağlantıyla abonelikten çıkabilirsin.'**
+  String get registerConsentMarketingHint;
+
+  /// No description provided for @errAcknowledgePrivacy.
+  ///
+  /// In tr, this message translates to:
+  /// **'Devam etmek için KVKK Aydınlatma Metni\'ni ve Gizlilik Politikası\'nı okuduğunu onaylamalısın.'**
+  String get errAcknowledgePrivacy;
+
+  /// No description provided for @profileLegalSectionTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gizlilik ve yasal'**
+  String get profileLegalSectionTitle;
+
+  /// No description provided for @kvkkNoticeLink.
+  ///
+  /// In tr, this message translates to:
+  /// **'KVKK Aydınlatma Metni'**
+  String get kvkkNoticeLink;
+
+  /// No description provided for @accountDeletionInfoLink.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesap silme hakkında'**
+  String get accountDeletionInfoLink;
+
+  /// No description provided for @accountDeletionInfoSub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hangi verilerin silindiği ve web üzerinden silme talebi'**
+  String get accountDeletionInfoSub;
+
+  /// No description provided for @deleteAccountSub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesabını ve tüm verilerini kalıcı olarak siler.'**
+  String get deleteAccountSub;
+
+  /// No description provided for @hiddenUsersTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gizlenen kullanıcıları göster'**
+  String get hiddenUsersTitle;
+
+  /// No description provided for @hiddenUsersCount.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count, plural, =0{Gizlenen kullanıcı yok} other{{count} kullanıcı gizli · dokununca liste sıfırlanır}}'**
+  String hiddenUsersCount(int count);
+
+  /// No description provided for @hiddenUsersCleared.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gizlenen kullanıcılar yeniden görünecek.'**
+  String get hiddenUsersCleared;
+
+  /// No description provided for @userActionsTooltip.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kullanıcı seçenekleri'**
+  String get userActionsTooltip;
+
+  /// No description provided for @reportUserAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kullanıcıyı bildir'**
+  String get reportUserAction;
+
+  /// No description provided for @reportUserActionSub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uygunsuz bir adı ya da davranışı destek ekibine e-postayla bildir.'**
+  String get reportUserActionSub;
+
+  /// No description provided for @hideUserAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu kullanıcıyı gizle'**
+  String get hideUserAction;
+
+  /// No description provided for @hideUserActionSub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıralamada adı gizlenir, canlı akışta görünmez. Profil\'den geri alabilirsin.'**
+  String get hideUserActionSub;
+
+  /// No description provided for @userHiddenMsg.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} gizlendi.'**
+  String userHiddenMsg(String name);
+
+  /// No description provided for @undoAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geri al'**
+  String get undoAction;
+
+  /// No description provided for @hiddenUserLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gizlenen kullanıcı'**
+  String get hiddenUserLabel;
+
+  /// No description provided for @reportEmailSubject.
+  ///
+  /// In tr, this message translates to:
+  /// **'PomoSprint kullanıcı bildirimi: {name}'**
+  String reportEmailSubject(String name);
+
+  /// No description provided for @reportEmailBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bildirilen görünen ad: {name}\nKullanıcı kimliği: {userId}\nGörüldüğü yer: {place}\n\nNeyi bildiriyorsun? Lütfen kısaca açıkla:\n'**
+  String reportEmailBody(String name, String userId, String place);
+
+  /// No description provided for @reportUserIdUnknown.
+  ///
+  /// In tr, this message translates to:
+  /// **'bilinmiyor (sıralamada kimlik gösterilmez)'**
+  String get reportUserIdUnknown;
+
+  /// No description provided for @reportPlaceLeague.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıralama · Lig'**
+  String get reportPlaceLeague;
+
+  /// No description provided for @reportPlaceMonthly.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıralama · Aylık'**
+  String get reportPlaceMonthly;
+
+  /// No description provided for @reportPlaceFriendsRanking.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıralama · Arkadaşlar'**
+  String get reportPlaceFriendsRanking;
+
+  /// No description provided for @reportPlaceLiveFeed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sosyal · Şu an odaklananlar'**
+  String get reportPlaceLiveFeed;
+
+  /// No description provided for @reportPlaceFriendsList.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arkadaş listesi'**
+  String get reportPlaceFriendsList;
+
+  /// No description provided for @reportPlaceFriendRequest.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arkadaşlık isteği'**
+  String get reportPlaceFriendRequest;
+
+  /// No description provided for @reportMailFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'E-posta uygulaması açılamadı. Bildirimini {email} adresine gönderebilirsin.'**
+  String reportMailFailed(String email);
+
+  /// No description provided for @reportCopyAddress.
+  ///
+  /// In tr, this message translates to:
+  /// **'Adresi kopyala'**
+  String get reportCopyAddress;
 }
 
 class _AppLocalizationsDelegate
