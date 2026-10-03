@@ -1,0 +1,27 @@
+{
+  // VS Code > Çalıştır ve Hata Ayıkla (Ctrl/Cmd+Shift+D) listesinde görünür.
+  // Cihaz, sağ alttaki durum çubuğundaki cihaz seçicisinden seçilir.
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "PomoSprint",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart"
+    },
+    {
+      // profile modu simülatörde çalışmaz; yalnızca kabloyla bağlı gerçek cihazda.
+      "name": "PomoSprint (profile, gerçek cihaz)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "flutterMode": "profile"
+    },
+    {
+      "name": "Kilit ekranı önizleme (girişsiz)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/dev/lock_screen_preview.dart"
+    }
+  ]
+}
