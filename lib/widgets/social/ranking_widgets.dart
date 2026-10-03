@@ -126,12 +126,17 @@ class MyRankCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.person_pin_circle_rounded, color: AppColors.primary, size: 20),
+              // Koyu temada darkPrimary (okunur kontrast).
+              Icon(Icons.person_pin_circle_rounded, color: Theme.of(context).colorScheme.primary, size: 20),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   l10n.rankingMyStatus(rank, points),
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.primary),
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
               ),
             ],
@@ -543,14 +548,14 @@ class _PodiumSeat extends StatelessWidget {
               fontSize: rank == 1 ? 15 : 13,
               fontWeight: rank == 1 || entry.isMe ? FontWeight.bold : FontWeight.w600,
               fontStyle: entry.hidden ? FontStyle.italic : null,
-              color: entry.isMe ? AppColors.primary : (entry.hidden ? _muted(isDark) : null),
+              color: entry.isMe ? Theme.of(context).colorScheme.primary : (entry.hidden ? _muted(isDark) : null),
             ),
           ),
         ),
         if (entry.isMe)
           Text(
             l10n.youBadge,
-            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primary),
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.primary),
           ),
         const SizedBox(height: 2),
         _PointsBadge(points: entry.points, small: true),
@@ -666,7 +671,9 @@ class RankingRow extends StatelessWidget {
                         fontSize: 15,
                         fontWeight: entry.hidden ? FontWeight.w600 : FontWeight.bold,
                         fontStyle: entry.hidden ? FontStyle.italic : null,
-                        color: entry.isMe ? AppColors.primary : (entry.hidden ? _muted(isDark) : null),
+                        color: entry.isMe
+                            ? Theme.of(context).colorScheme.primary
+                            : (entry.hidden ? _muted(isDark) : null),
                       ),
                     ),
                     if (entry.minutes != null) ...[

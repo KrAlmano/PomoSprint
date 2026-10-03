@@ -1028,7 +1028,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get signUpLink => 'Kayıt Ol';
 
   @override
-  String get googleLogin => 'Google ile Giriş';
+  String get googleLogin => 'Google ile Giriş Yap';
 
   @override
   String get appleOnAndroidLink => 'Apple ile mi kaydoldun?';
@@ -1455,21 +1455,18 @@ class AppLocalizationsTr extends AppLocalizations {
   String get onboardingCategoryHint => 'Kategori adı';
 
   @override
-  String get onboardingMaxCategoriesMsg => 'En fazla 8 kategori seçebilirsin.';
-
-  @override
   String get onboardingWelcomeTitle => 'Hoş geldin! 👋';
 
   @override
   String get onboardingWelcomeBody =>
-      'Ben senin odaklanma arkadaşınım. Sana eşlik etmeden önce doğum yılını öğrenebilir miyim?';
+      'Ben senin odaklanma arkadaşınım. Başlamadan önce doğum yılını seçer misin? Bunu yalnızca yaş sınırını kontrol etmek için soruyoruz.';
 
   @override
   String get onboardingSegmentTitle => 'Peki, hangi yolculuktasın?';
 
   @override
   String get onboardingSegmentBody =>
-      'Beraber neye çalışacağız? Sana en uygun kategorileri seçeyim.';
+      'Beraber neye çalışacağız? Sana uygun kategorileri önereyim. Uymuyorsa \"Diğer\"i seç.';
 
   @override
   String get onboardingSegmentLgs => '🎓  LGS';
@@ -1485,10 +1482,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get onboardingCategoryStepTitle => 'Harika seçim! 🎉';
-
-  @override
-  String get onboardingCategoryStepBody =>
-      'Şimdi çalışacağın dersleri/alanları seç — istediğin zaman değiştirebilirsin. Ücretsiz planda en fazla 8 tane olur.';
 
   @override
   String get onboardingCreateOwnCategory => '+ Kendi kategorimi oluştur';
@@ -1844,4 +1837,140 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get reportCopyAddress => 'Adresi kopyala';
+
+  @override
+  String get onboardingBirthYearRequired =>
+      'Devam etmek için doğum yılını seç.';
+
+  @override
+  String get onboardingBirthYearPlaceholder => 'Doğum yılını seç';
+
+  @override
+  String get profileNotificationsLabelSub =>
+      'Seans bitiş bildirimi ve kilit ekranı sayacı';
+
+  @override
+  String get profileNotificationsBlockedSub =>
+      'Bildirim izni kapalı. Seans bitiş bildirimi ve kilit ekranı sayacı için telefonunun ayarlarından izin ver.';
+
+  @override
+  String get profileOpenSettings => 'Ayarları aç';
+
+  @override
+  String get profileSocialVisibilityTitle =>
+      'Sıralamalarda ve canlı listede görün';
+
+  @override
+  String get profileSocialVisibilitySub =>
+      'Açıkken adın ve avatarın aylık sıralamada, pomosprint.app\'teki herkese açık listede (kısaltılmış adla) ve çalışırken arkadaşlarının canlı listesinde görünür. Lig grubun ve arkadaşların seni her durumda görür.';
+
+  @override
+  String get gameRulesTitle => 'Nasıl çalışır?';
+
+  @override
+  String get gameRulesProfileSub => 'Duraklatma, günlük sınır, puan ve kum';
+
+  @override
+  String gameRulesSessions(String pct) {
+    return 'Seanslar 25 ya da 50 dakika sürer. Her seansta tek duraklatma hakkın var; duraklatırsan puanın %$pct azalır. İkinci kez durdurursan seans sıfırlanır.';
+  }
+
+  @override
+  String gameRulesPoints(
+    String points25,
+    String points50,
+    String coins,
+    String limit,
+  ) {
+    return 'Tamamladığın her seans puan (25 dk: $points25, 50 dk: $points50) ve $coins kum tanesi kazandırır. Günde en fazla $limit seans sayılır; sonrakiler yalnızca çalışma süresine ve serine eklenir.';
+  }
+
+  @override
+  String get gameRulesLeague =>
+      'Puanınla ligde yükselirsin, her gün çalışarak seri bonusu kazanırsın. Kum taneleriyle koleksiyondan yeni kum saatleri açarsın.';
+
+  @override
+  String get profileHelpSectionTitle => 'Yardım';
+
+  @override
+  String get profileSupportTitle => 'Destek ve geri bildirim';
+
+  @override
+  String get profileSupportSub =>
+      'Bir sorunu ya da önerini e-postayla bize yaz';
+
+  @override
+  String profileAppVersion(String version) {
+    return 'Sürüm $version';
+  }
+
+  @override
+  String get supportEmailSubject => 'PomoSprint destek ve geri bildirim';
+
+  @override
+  String supportEmailBody(String version, String device) {
+    return 'Mesajın:\n\n\n---\nUygulama sürümü: $version\nCihaz: $device';
+  }
+
+  @override
+  String supportMailFailed(String email) {
+    return 'E-posta uygulaması açılamadı. Bize $email adresinden yazabilirsin.';
+  }
+
+  @override
+  String get selectCategory => 'KATEGORİ SEÇ';
+
+  @override
+  String get sessionCompletedTitle => 'Tebrikler! 🎉';
+
+  @override
+  String sessionCompletedBody(int minutes) {
+    return '$minutes dakikalık odaklanma seansını\nbaşarıyla tamamladın! ⏳';
+  }
+
+  @override
+  String get sessionCompletedOk => 'Harika!';
+
+  @override
+  String get timerGetReady => 'Hazırlan! Odaklanıyorsun...';
+
+  @override
+  String get languagePickerLabel => 'Uygulama dili';
+
+  @override
+  String get onboardingSegmentOther => '✨  Diğer / belirtmek istemiyorum';
+
+  @override
+  String get onboardingVisibilityTitle => 'Sıralamalarda görünmek ister misin?';
+
+  @override
+  String get onboardingVisibilityBody =>
+      'Açarsan adın ve avatarın aylık sıralamada, pomosprint.app\'teki herkese açık listede (adın kısaltılarak) ve çalışırken arkadaşlarının canlı listesinde görünür. Kapalıyken bu yerlerde görünmezsin. Lig grubundakiler ve arkadaşların seni her durumda görür. Bu tercihi istediğin zaman Profil\'den değiştirebilirsin.';
+
+  @override
+  String get onboardingVisibilityYes => 'Evet, sıralamalarda görüneyim';
+
+  @override
+  String get onboardingVisibilityNo => 'Hayır, görünmeyeyim';
+
+  @override
+  String get onboardingRulesBody =>
+      'Başlamadan önce bilmen gereken birkaç kural:';
+
+  @override
+  String timerDurationOption(int minutes) {
+    return '$minutes dakikalık seans';
+  }
+
+  @override
+  String get timerEditCategories => 'Kategorileri düzenle';
+
+  @override
+  String timerRemainingSemantics(int minutes, int seconds) {
+    return '$minutes dakika $seconds saniye kaldı';
+  }
+
+  @override
+  String get timerNotificationsDenied =>
+      'Bildirim izni yok: seans bitince haber veremeyiz ve kilit ekranında sayaç görünmez.';
 }

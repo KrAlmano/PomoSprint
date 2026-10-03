@@ -537,7 +537,7 @@ void main() {
       await _pump(tester, screen);
       await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
       await tester.pumpAndSettle();
-      expect(find.text('3/4'), findsOneWidget);
+      expect(find.text('3/6'), findsOneWidget);
 
       // Ekranın son hâli taslağa yazılır.
       final prefs = await SharedPreferences.getInstance();

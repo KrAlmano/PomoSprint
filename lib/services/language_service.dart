@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:ui' show PlatformDispatcher;
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -5,7 +8,12 @@ import '../utils/category_names.dart';
 
 enum AppLanguage { tr, en }
 
-class LanguageService extends ChangeNotifier {
+/// Uygulama dili. Kullanıcı uygulamada bir dil seçmediyse cihazın dili
+/// izlenir (Türkçe ise tr, değilse en); böylece iOS ve Android 13+'ün
+/// uygulama başına dil ayarı da çalışır. Uygulamada seçilen dil, o andaki
+/// cihaz diliyle birlikte saklanır; cihaz dili (ya da uygulama başına dil
+/// ayarı) sonradan değişirse en son yapılan değişiklik geçerli olur.
+class LanguageService extends ChangeNotifier with WidgetsBindingObserver {
   static final LanguageService instance = LanguageService._internal();
   LanguageService._internal();
 
@@ -16,20 +24,60 @@ class LanguageService extends ChangeNotifier {
   bool get isTurkish => _currentLanguage == AppLanguage.tr;
 
   static const String _prefKey = 'app_language_code';
+  static const String _deviceAtChoiceKey = 'app_language_device_code';
+
+  /// Cihazın (uygulama başına dil ayarı dahil) tercih ettiği dil.
+  @visibleForTesting
+  static Locale Function() deviceLocale = () => PlatformDispatcher.instance.locale;
+
+  bool _observing = false;
+
+  /// Cihaz dilinden uygulama dili: Türkçe ise tr, diğer her dilde en.
+  static AppLanguage languageForLocale(Locale? locale) =>
+      locale?.languageCode.toLowerCase() == 'tr' ? AppLanguage.tr : AppLanguage.en;
+
+  static AppLanguage _parse(String code) => code == 'en' ? AppLanguage.en : AppLanguage.tr;
 
   Future<void> init() async {
-    final prefs = await SharedPreferences.getInstance();
-    final savedCode = prefs.getString(_prefKey);
-    if (savedCode != null) {
-      if (savedCode == 'en') {
-        _currentLanguage = AppLanguage.en;
-      } else {
-        _currentLanguage = AppLanguage.tr;
-      }
-    } else {
-      _currentLanguage = AppLanguage.tr;
+    await _resolve(languageForLocale(deviceLocale()));
+    if (!_observing) {
+      _observing = true;
+      WidgetsBinding.instance.addObserver(this);
     }
     notifyListeners();
+  }
+
+  // Kayıtlı seçime ve cihaz diline göre geçerli dili belirler.
+  Future<void> _resolve(AppLanguage device) async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getString(_prefKey);
+    final deviceAtChoice = prefs.getString(_deviceAtChoiceKey);
+    if (saved != null && deviceAtChoice == null) {
+      // Önceki sürümde Profil'den seçilmiş: seçim korunur; cihaz dili
+      // bundan sonraki değişiklikleri fark etmek için kaydedilir.
+      _currentLanguage = _parse(saved);
+      await prefs.setString(_deviceAtChoiceKey, device.name);
+    } else if (saved != null && deviceAtChoice == device.name) {
+      _currentLanguage = _parse(saved);
+    } else {
+      // Seçim yok ya da seçimden sonra cihaz dili değişti: cihaz izlenir.
+      if (saved != null) {
+        await prefs.remove(_prefKey);
+        await prefs.remove(_deviceAtChoiceKey);
+      }
+      _currentLanguage = device;
+    }
+  }
+
+  // Uygulama açıkken cihaz dili ya da (Android 13+) uygulama başına dil
+  // ayarı değişti.
+  @override
+  void didChangeLocales(List<Locale>? locales) {
+    final device = languageForLocale((locales == null || locales.isEmpty) ? null : locales.first);
+    final before = _currentLanguage;
+    unawaited(_resolve(device).then((_) {
+      if (_currentLanguage != before) notifyListeners();
+    }));
   }
 
   Future<void> setLanguage(AppLanguage language) async {
@@ -38,7 +86,15 @@ class LanguageService extends ChangeNotifier {
     notifyListeners();
 
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_prefKey, language.name);
+    final device = languageForLocale(deviceLocale());
+    if (language == device) {
+      // Cihazın diliyle aynı: ayrı seçim saklanmaz, cihaz izlenmeye devam eder.
+      await prefs.remove(_prefKey);
+      await prefs.remove(_deviceAtChoiceKey);
+    } else {
+      await prefs.setString(_prefKey, language.name);
+      await prefs.setString(_deviceAtChoiceKey, device.name);
+    }
   }
 
   /// Hazır kategori adının arayüz dilindeki karşılığı (DB'deki ad Türkçe ya
@@ -193,13 +249,9 @@ class LanguageService extends ChangeNotifier {
       'logout': {AppLanguage.tr: 'Çıkış Yap', AppLanguage.en: 'Log Out'},
       'save': {AppLanguage.tr: 'Kaydet', AppLanguage.en: 'Save'},
       'cancel': {AppLanguage.tr: 'İptal', AppLanguage.en: 'Cancel'},
-      'notifications': {AppLanguage.tr: 'Bildirimler', AppLanguage.en: 'Notifications'},
+      // Anahtar seans bitiş bildirimini ve kilit ekranı sayacını birlikte yönetir.
+      'notifications': {AppLanguage.tr: 'Bildirimler ve kilit ekranı sayacı', AppLanguage.en: 'Notifications & lock screen timer'},
       'dark_mode': {AppLanguage.tr: 'Karanlık Mod', AppLanguage.en: 'Dark Mode'},
-      'social_visibility': {AppLanguage.tr: 'Sosyal Listede Görün', AppLanguage.en: 'Show in Social List'},
-      'social_visibility_sub': {
-        AppLanguage.tr: 'Odaklanırken diğer kullanıcılar seni canlı listede görebilsin',
-        AppLanguage.en: 'Let other users see you in the live list while you focus',
-      },
       'preferences': {AppLanguage.tr: 'Tercihler', AppLanguage.en: 'Preferences'},
       'name_updated_success': {AppLanguage.tr: 'Profil adınız başarıyla güncellendi!', AppLanguage.en: 'Profile name updated successfully!'},
 

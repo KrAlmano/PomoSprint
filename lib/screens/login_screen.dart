@@ -12,6 +12,8 @@ import '../utils/responsive.dart';
 import '../theme.dart';
 import '../widgets/auth/account_texts.dart';
 import '../widgets/auth/auth_error_banner.dart';
+import '../widgets/auth/google_logo.dart';
+import '../widgets/auth/language_switcher.dart';
 import '../widgets/auth/legal_links.dart';
 import 'register_screen.dart';
 
@@ -305,6 +307,9 @@ class _LoginScreenState extends State<LoginScreen> {
     final labelColor = isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant;
     final fieldFill = isDark ? AppColors.darkSurfaceContainerHigh : AppColors.surfaceContainerHighest;
     final labelStyle = TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: labelColor);
+    // Koyu temada açık kırmızı (darkPrimary): küçük bağlantı metinleri koyu
+    // zeminde okunur kalır (AppColors.primary orada 3:1'in altındaydı).
+    final linkColor = Theme.of(context).colorScheme.primary;
     final fieldBorder = OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
       borderSide: BorderSide.none,
@@ -327,6 +332,10 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // Dil seçimi girişten önce de yapılabilir (varsayılan: cihaz dili).
+                  const Align(alignment: AlignmentDirectional.centerEnd, child: LanguageSwitcher()),
+                  SizedBox(height: screen.isShortHeight ? 4 : 8),
+
                   // Logo & Header
                   Container(
                     width: 72,
@@ -465,10 +474,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             )
                           : Text(
                               l10n.forgotPassword,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
+                                color: linkColor,
                               ),
                             ),
                     ),
@@ -539,24 +548,26 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 12),
                   ],
 
-                  // Google Login Button
+                  // Google ile Giriş: resmi çok renkli "G" ve Google'ın düğme
+                  // renkleri (açık temada "neutral" #F2F2F2, koyu temada
+                  // #131314 zemin + #8E918F kenar).
                   SizedBox(
                     width: double.infinity,
                     height: 52,
                     child: OutlinedButton.icon(
                       onPressed: _isLoading ? null : _handleGoogleSignIn,
-                      icon: const Icon(Icons.g_mobiledata, size: 28, color: Colors.blue),
+                      icon: const GoogleLogo(size: 20),
                       label: Text(
                         l10n.googleLogin,
                         style: TextStyle(
                           fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                          fontWeight: FontWeight.w600,
+                          color: isDark ? const Color(0xFFE3E3E3) : const Color(0xFF1F1F1F),
                         ),
                       ),
                       style: OutlinedButton.styleFrom(
-                        backgroundColor: isDark ? AppColors.darkSurfaceContainer : AppColors.surfaceContainer,
-                        side: BorderSide.none,
+                        backgroundColor: isDark ? const Color(0xFF131314) : const Color(0xFFF2F2F2),
+                        side: isDark ? const BorderSide(color: Color(0xFF8E918F)) : BorderSide.none,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(26),
                         ),
@@ -593,14 +604,21 @@ class _LoginScreenState extends State<LoginScreen> {
                         l10n.noAccountText,
                         style: TextStyle(fontSize: 14, color: labelColor),
                       ),
-                      GestureDetector(
-                        onTap: _isLoading ? null : _openRegister,
+                      // Ekran okuyucuda düğme olarak duyurulur, en az 48 dp
+                      // dokunma alanı vardır.
+                      TextButton(
+                        onPressed: _isLoading ? null : _openRegister,
+                        style: TextButton.styleFrom(
+                          foregroundColor: linkColor,
+                          minimumSize: const Size(48, 48),
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                        ),
                         child: Text(
                           l10n.signUpLink,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
+                            color: linkColor,
                           ),
                         ),
                       ),

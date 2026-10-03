@@ -419,9 +419,33 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     );
   }
 
+  // İzin yokken uyarı her BAŞLAT'ta değil, uygulama açılışı başına bir kez.
+  static bool _notificationNoticeShown = false;
+
+  /// Bildirim tercihi açık ama sistem izni yoksa seans sessiz geçmesin:
+  /// kısa bir uyarı ve sistem ayarlarını açan eylem gösterilir.
+  Future<void> _maybeShowNotificationNotice() async {
+    if (_notificationNoticeShown) return;
+    final notifications = NotificationService.instance;
+    final preference = await notifications.isEnabled();
+    final permission = await notifications.hasSystemPermission();
+    if (!mounted || !NotificationService.isBlockedBySystem(preference: preference, permission: permission)) return;
+    _notificationNoticeShown = true;
+    final l10n = AppLocalizations.of(context)!;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(l10n.timerNotificationsDenied),
+      behavior: SnackBarBehavior.floating,
+      duration: const Duration(seconds: 6),
+      action: SnackBarAction(
+        label: l10n.profileOpenSettings,
+        onPressed: () => unawaited(notifications.openSystemSettings()),
+      ),
+    ));
+  }
+
   Future<void> _show321CountdownAndStart() async {
     // Bildirim izni ilk BAŞLAT'ta, bağlamıyla birlikte istenir (bir kez sorulur).
-    await NotificationService.instance.ensurePermission();
+    final notificationsAllowed = await NotificationService.instance.ensurePermission();
     if (!mounted) return;
     await showDialog<void>(
       context: context,
@@ -440,6 +464,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     );
     // Geri tuşuyla kapatılan geri sayım BAŞLAT'ı kilitli bırakmaz.
     if (mounted && !isRunning) setState(() => _isStarting = false);
+    if (mounted && isRunning && !notificationsAllowed) unawaited(_maybeShowNotificationNotice());
   }
 
   void _startOrResume() {
@@ -577,6 +602,10 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
         final activeCategories = widget.categories.where((c) => !c.isArchived).toList();
         final displayCategory = _displayCategory();
         final hasPauseCredit = _pauseCreditsLeft > 0;
+        // Hareketi Azalt açıkken yerleşim değişimleri canlandırılmaz.
+        final layoutAnimation = (MediaQuery.maybeDisableAnimationsOf(context) ?? false)
+            ? Duration.zero
+            : const Duration(milliseconds: 600);
 
         return Scaffold(
           body: SafeArea(
@@ -642,7 +671,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                 // kaydırılan çip satırının başında (genişlik sınırsız).
                 Widget categoryHeader({required bool inline}) {
                   final label = Text(
-                    TextUtil.getCategorySelectionLabel(widget.userSegment),
+                    TextUtil.getCategorySelectionLabel(l10n, widget.userSegment),
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
@@ -655,10 +684,18 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                     mainAxisSize: inline ? MainAxisSize.min : MainAxisSize.max,
                     children: [
                       if (inline) label else Flexible(child: label),
-                      const SizedBox(width: 6),
-                      GestureDetector(
-                        onTap: widget.onOpenSettings,
-                        child: const Icon(Icons.edit_outlined, size: 13, color: AppColors.primaryContainer),
+                      const SizedBox(width: 2),
+                      // Kategori düzenleme kısayolu: etiketli, 48 dp dokunma alanı.
+                      IconButton(
+                        onPressed: widget.onOpenSettings,
+                        tooltip: l10n.timerEditCategories,
+                        iconSize: 16,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(
+                          minWidth: kMinInteractiveDimension,
+                          minHeight: kMinInteractiveDimension,
+                        ),
+                        icon: const Icon(Icons.edit_outlined, color: AppColors.primaryContainer),
                       ),
                     ],
                   );
@@ -668,8 +705,9 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     // Subject Chips Section. Dikey alanı kıt ekranda başlık
-                    // ayrı satır yerine çiplerin başında durur.
-                    if (!dense) ...[categoryHeader(inline: false), const SizedBox(height: 12)],
+                    // ayrı satır yerine çiplerin başında durur. Kalem düğmesinin
+                    // dokunma alanı başlıkla çipler arasındaki boşluğu karşılar.
+                    if (!dense) categoryHeader(inline: false),
 
                     // Active Category Pills: telefonda yatay kaydırılır,
                     // tablette ortalanmış satırlara sarılır.
@@ -689,24 +727,31 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                       ),
                     SizedBox(height: dense ? 8 : 16),
 
-                    // Time Display (dar sütunda ya da büyük yazı ölçeğinde
-                    // satır kırmadan küçülür)
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        '$minutes:$seconds',
-                        maxLines: 1,
-                        style: TextStyle(
-                          fontSize: large ? 60 : (dense ? 42 : 52),
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: -1.5,
-                          color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                    // Time Display (yalnızca sütuna sığmazsa satır kırmadan
+                    // küçülür). Ekran okuyucu "X dakika Y saniye kaldı" okur.
+                    Semantics(
+                      label: l10n.timerRemainingSemantics(remaining ~/ 60, remaining % 60),
+                      excludeSemantics: true,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          '$minutes:$seconds',
+                          maxLines: 1,
+                          style: TextStyle(
+                            fontSize: large ? 60 : (dense ? 42 : 52),
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: -1.5,
+                            color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                          ),
                         ),
                       ),
                     ),
-                    SizedBox(height: dense ? 4 : 10),
+                    // Süre çiplerinin 48 dp dokunma alanı bu boşluğun bir kısmını alır.
+                    SizedBox(height: dense ? 0 : 6),
 
-                    // Süre Seçimi: 25 dk / 50 dk
+                    // Süre Seçimi: 25 dk / 50 dk. Her çip en az 48 dp yüksek
+                    // bir dokunma alanında ortalanır ve ekran okuyucuda seçili
+                    // durumuyla düğme olarak duyurulur.
                     Wrap(
                       alignment: WrapAlignment.center,
                       runSpacing: 8,
@@ -714,32 +759,44 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                         final isSel = loggedMinutes == mins;
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 6),
-                          child: GestureDetector(
-                            // Seans varken kilitli (bkz. _selectDuration).
+                          child: Semantics(
+                            button: true,
+                            selected: isSel,
+                            label: l10n.timerDurationOption(mins),
                             onTap: () => _selectDuration(mins),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              padding: EdgeInsets.symmetric(horizontal: dense ? 16 : 18, vertical: dense ? 6 : 10),
-                              decoration: BoxDecoration(
-                                color: isSel
-                                    ? AppColors.primaryContainer
-                                    : (isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow),
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color: isSel
-                                      ? AppColors.primaryContainer
-                                      : (isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant),
-                                ),
-                              ),
-                              child: Text(
-                                '$mins ${LanguageService.instance.translate('minutes_unit_short')}',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: isSel
-                                      ? Colors.white
-                                      : (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant)
-                                            .withValues(alpha: _hasSession ? 0.45 : 1),
+                            excludeSemantics: true,
+                            child: GestureDetector(
+                              // Seans varken kilitli (bkz. _selectDuration).
+                              onTap: () => _selectDuration(mins),
+                              behavior: HitTestBehavior.opaque,
+                              child: Container(
+                                constraints: const BoxConstraints(minHeight: kMinInteractiveDimension),
+                                alignment: Alignment.center,
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  padding: EdgeInsets.symmetric(horizontal: dense ? 16 : 18, vertical: dense ? 6 : 10),
+                                  decoration: BoxDecoration(
+                                    color: isSel
+                                        ? AppColors.primaryContainer
+                                        : (isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow),
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: isSel
+                                          ? AppColors.primaryContainer
+                                          : (isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    '$mins ${LanguageService.instance.translate('minutes_unit_short')}',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: isSel
+                                          ? Colors.white
+                                          : (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant)
+                                                .withValues(alpha: _hasSession ? 0.45 : 1),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
@@ -747,7 +804,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                         );
                       }).toList(),
                     ),
-                    SizedBox(height: dense ? 10 : 20),
+                    SizedBox(height: dense ? 4 : 16),
 
                     // Duraklatma Hakkı (Pause Limit)
                     Container(
@@ -838,7 +895,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                   clipBehavior: Clip.none,
                   children: [
                     AnimatedPositioned(
-                      duration: const Duration(milliseconds: 600),
+                      duration: layoutAnimation,
                       curve: Curves.easeInOutCubic,
                       top: layout.hourglassTop,
                       left: layout.hourglassLeft,
@@ -847,7 +904,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                       child: hourglassWidget,
                     ),
                     AnimatedPositioned(
-                      duration: const Duration(milliseconds: 600),
+                      duration: layoutAnimation,
                       curve: Curves.easeInOutCubic,
                       top: layout.controlsTop,
                       bottom: 0.0,
@@ -949,7 +1006,7 @@ class _TimerLayout {
           controlsAlignment: Alignment.center,
         );
       }
-      final size = (h * 0.36).clamp(120.0, _phoneHourglass);
+      final size = (h * 0.34).clamp(120.0, _phoneHourglass);
       return _TimerLayout(
         dense: true,
         large: false,
@@ -1069,7 +1126,6 @@ class _SessionCompletedDialogState extends State<SessionCompletedDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final isTurkish = LanguageService.instance.isTurkish;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final muted = isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant;
     final accent = isDark ? AppColors.darkPrimary : AppColors.primary;
@@ -1178,7 +1234,7 @@ class _SessionCompletedDialogState extends State<SessionCompletedDialog> {
               : const Icon(Icons.stars_rounded, color: Colors.amber, size: 48),
           const SizedBox(height: 16),
           Text(
-            rejected ? l10n.sessionNotSavedTitle : (isTurkish ? 'Tebrikler! 🎉' : 'Congratulations! 🎉'),
+            rejected ? l10n.sessionNotSavedTitle : l10n.sessionCompletedTitle,
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 22,
@@ -1193,9 +1249,7 @@ class _SessionCompletedDialogState extends State<SessionCompletedDialog> {
         children: [
           if (!rejected)
             Text(
-              isTurkish
-                  ? '${widget.minutes} dakikalık odaklanma seansını\nbaşarıyla tamamladın! ⏳'
-                  : 'You successfully completed a ${widget.minutes}-minute\nfocus session! ⏳',
+              l10n.sessionCompletedBody(widget.minutes),
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 14, color: muted, height: 1.5),
             ),
@@ -1225,7 +1279,7 @@ class _SessionCompletedDialogState extends State<SessionCompletedDialog> {
               elevation: 0,
             ),
             child: Text(
-              rejected ? l10n.sessionResultOk : (isTurkish ? 'Harika!' : 'Awesome!'),
+              rejected ? l10n.sessionResultOk : l10n.sessionCompletedOk,
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ),
@@ -1286,7 +1340,10 @@ class _TimerCountdownDialogState extends State<TimerCountdownDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
+                // Hareketi Azalt açıkken rakamlar büyüyerek değil doğrudan değişir.
+                duration: (MediaQuery.maybeDisableAnimationsOf(context) ?? false)
+                    ? Duration.zero
+                    : const Duration(milliseconds: 300),
                 transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
                 child: Text(
                   '$_count',
@@ -1301,7 +1358,7 @@ class _TimerCountdownDialogState extends State<TimerCountdownDialog> {
               ),
               const SizedBox(height: 16),
               Text(
-                LanguageService.instance.isTurkish ? 'Hazırlan! Odaklanıyorsun...' : 'Get Ready! Focusing...',
+                AppLocalizations.of(context)!.timerGetReady,
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white70),
               ),
             ],

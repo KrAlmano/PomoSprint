@@ -72,8 +72,11 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
   }
 
   // Sahip olunanlar önce; liste yalnızca sahiplik değişince yeniden kurulur.
+  // Edinme yolu olmayan (sahip olunmayan) Premium avatarlar listelenmez.
   void _sortShop() {
-    final shop = AvatarCharacter.allAvatars().where((a) => !a.isLeagueAward).toList();
+    final shop = AvatarCharacter.allAvatars()
+        .where((a) => a.isListedInShop(unlockedAvatars: _unlocked, isPremium: widget.user.isPremium))
+        .toList();
     _shopAvatars = [
       ...shop.where((a) => a.isOwned(_unlocked)),
       ...shop.where((a) => !a.isOwned(_unlocked)),

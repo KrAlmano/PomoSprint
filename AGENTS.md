@@ -32,7 +32,7 @@
 - **Backend:** Supabase projesi `Pomodoro App`, ref `eoosnyakvxmifmexpgxa`, bölge `eu-north-1`. Postgres + RLS + SECURITY DEFINER RPC, Auth (e-posta, Google, Apple), pg_cron, Edge Functions.
 - **Temel ilke:** Puan, kum (coins), seri ve lig **sunucuda** hesaplanır. İstemci seans meta verisini gönderir, RPC sonucunu gösterir.
 - **Site:** `pomosprint.app`. `landing/` derleme adımı olmadan Cloudflare Workers static assets ile yayınlanır.
-- **Varsayılanlar:** dil `tr`, tema sistem teması, varsayılan avatar `avatar_16_basic`.
+- **Varsayılanlar:** dil cihazdan (Türkçe ise `tr`, değilse `en`), tema sistem teması, varsayılan avatar `avatar_16_basic`.
 
 ## 2. Bir göreve başlamadan önce
 
@@ -144,7 +144,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 - Seans her durum değişiminde diske yazılır. Açılışta: süre dolduysa hemen tamamlanıp gönderilir; 24 saatten eski duraklatılmış seans silinir.
 - Debug build'de süre 5/10 sn (`timerDurationSeconds`, `kDebugMode`). Bilinçli; sunucu bu seansları reddeder.
 - Duraklatma hakkı 1. Seans varken 25/50 değiştirilirse seans sıfırlanır.
-- Bildirim izni açılışta değil, ilk BAŞLAT'ta (`ensurePermission`) istenir. Profil'deki anahtar `notifications_enabled`.
+- Bildirim izni açılışta değil, ilk BAŞLAT'ta (`ensurePermission`) istenir. Profil'deki anahtar `notifications_enabled` (bitiş bildirimi + kilit ekranı sayacı); "tercih açık VE sistem izni var"ı gösterir (`hasSystemPermission`, `resumed`'da yeniden okunur). İzin yoksa Profil'de ve ilk BAŞLAT'ta "Ayarları aç" (`openSystemSettings`: eklentinin `openAppNotificationSettings`'i, iOS'ta yedek `app-settings:`).
 - Kilit ekranı sayacı (`LockScreenTimer`) her durum geçişinde çağrılır: başlat/devam/geri yükleme `showRunning`, duraklat `showPaused`, sıfırla/tamamla/çıkış/ekran kapanışı `clear`, ön plana dönüş `force: true`. Bildirim tercihi kapalıysa gösterilmez. Dart arka planda çalışmaz; geri sayımı sistem yürütür (Android kronometre + `timeoutAfter`, iOS `Text(timerInterval:)` + `staleDate`). Foreground service / background mode EKLEME.
 - `start_study_session` / `cancel_study_session` çağrıları Shell'in `onTimerStateChanged` callback'inde yapılır.
 
@@ -182,7 +182,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 **Tuzaklar**
 - PGRST202 yedekleri: `fetchFriends` / `fetchPendingFriendRequests` (RPC canlıda var, yedek ölü kod).
 - `updateCategoryOrders` aktif kategoriler için **paralel** `update(sort_order)` yapar; `reorder_categories` çağrılmaz (canlıda yok), upsert de yok. Kısmi başarısızlıkta sıra karışabilir: Kategorilerim hata olunca iyimser sırayı geri alır ve listeyi sessizce yeniden okur. `sort_order` canlıda çakışabilir (`create_category` aktif sayısını yazıyor); istemci `sort_order, created_at, id` ile sıralar. Kalıcı düzeltme `proposed/16`.
-- Prefs anahtarları: `saved_user`, `saved_categories_<email>`, `pending_sessions_uid_<uid>` (eski `pending_sessions_<email>` ilk erişimde taşınır), `rejected_sessions_uid_<uid>`, `rejected_sessions_unseen_uid_<uid>`, `active_session_uid_<key>`, `avatar_catalog_v1`, `daily_pomo_goal` (eski, bir kez taşınır), `league_info_shown_<uid>`, `hidden_users_uid_<uid>` (gizlenen kullanıcılar), `onboarding_draft_uid_<uid>` (yarım onboarding), `apple_sign_in_identity` (bu cihazda Apple ile girilen oturumun Apple kimliği; her çıkışta silinir), `app_language_code`, `theme_mode`, `notifications_enabled`, `notification_permission_asked`.
+- Prefs anahtarları: `saved_user`, `saved_categories_<email>`, `pending_sessions_uid_<uid>` (eski `pending_sessions_<email>` ilk erişimde taşınır), `rejected_sessions_uid_<uid>`, `rejected_sessions_unseen_uid_<uid>`, `active_session_uid_<key>`, `avatar_catalog_v1`, `daily_pomo_goal` (eski, bir kez taşınır), `league_info_shown_<uid>`, `hidden_users_uid_<uid>` (gizlenen kullanıcılar), `onboarding_draft_uid_<uid>` (yarım onboarding), `apple_sign_in_identity` (bu cihazda Apple ile girilen oturumun Apple kimliği; her çıkışta silinir), `app_language_code` + `app_language_device_code` (seçim anındaki cihaz dili), `theme_mode`, `notifications_enabled`, `notification_permission_asked`.
 - Hesap silme (`deleteUserAccount` → `clearDeletedAccountLocalData`) kullanıcıya bağlı tüm anahtarları siler ve `TimerPersistence.retireOwner(uid)` ile sayaç ekranının dispose'da seansı yeniden yazmasını engeller. Yeni kullanıcıya bağlı anahtar eklersen oraya da ekle (`test/user_safety_test.dart`).
 - Avatar: `AvatarCharacter.byId` ve `allAvatars()` asla fırlatmaz / boş dönmez. Yine de listelerde korumasız `.first` kullanma.
 - `supabase_service.dart` içinde "public leaderboard `is_me` DÖNMEZ" yorumu bayat; canlı RPC `is_me` döndürüyor.
@@ -221,7 +221,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 - "Ben" satırı yalnızca `is_me` ile bulunur. İsimle eşleme yapma. Arkadaşlar sekmesinde kendi satırı yerel profilden eklenir.
 - Lig verisi `get_my_league_ranking()` ile okunur; terfi/düşme bölgeleri satırla birlikte sunucudan gelir (`LeagueSnapshot`).
 - Lig: 14 gün, 5 kademe (1 Bronz … 5 Elmas), en fazla 30 üye. Puan sabitleri `get_points_config`'ten okunur; `league_info_sheet`'teki sayılar yalnızca yedek.
-- Avatar sahipliği = `avatar_unlocks` kaydı ya da ücretsiz (`isOwned`). Lig ödülü avatarları satın alınamaz.
+- Avatar sahipliği = `avatar_unlocks` kaydı ya da ücretsiz (`isOwned`). Lig ödülü avatarları satın alınamaz. Premium'a özel avatarlar (edinme yolu / IAP yok, App Store 2.3.1) yalnızca sahibine ya da Premium kullanıcıya listelenir (`isListedInShop`).
 - Profil ve Koleksiyon `currentUser`'ı dinler; kopya tutmaz.
 - Başka kullanıcının verisi yalnızca RPC ile gelir.
 - Kullanıcı içeriği (App Store 1.2): başkasının satırında uzun basma / "⋮" ile `showUserSafetySheet` (`widgets/social/user_safety.dart`). Sıralama ve canlı akışta "Bildir" + "Gizle", arkadaş listesi ve isteklerde yalnızca "Bildir"; kendi satırında menü yok. Bildirim `mailto:destek@pomosprint.app` (görünen ad, varsa genel kimlik, yer; bildirenin bilgisi URL'ye konmaz).
@@ -240,6 +240,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 **Kurallar**
 - Yönlendirme yalnızca `AppGate`'te. Ekranlar kendi aralarında Login/Onboarding/Shell'e geçiş yapmaz; `currentUser`'ı günceller.
 - Onboarding `completeOnboarding()` ile biter (önce kategoriler, sonra profil). Profili `handle_new_user` trigger'ı oluşturur; istemci upsert'i yedektir ve avatar sunucuda varsayılana zorlanır.
+- Onboarding 6 adım: yaş (tekerlek önceden ayarlı değil, "Devam"da değerlendirilir; 13 altı yanıttan sonra yıl kilitlenir, çıkış / hesap silme kalır), segment (isteğe bağlı; "Diğer" → `user_segment` null), kategoriler, sıralamalarda görünürlük (varsayılansız açık seçim → `show_in_social_feed`), oyun kuralları (`GameRulesList`, `get_points_config`), hedef.
 - Kategori limiti ücretsiz 8, premium 15 (`categoryLimitFor`). Sunucu trigger'ı eklemede ve arşivden çıkarmada uygular; istemci kontrolü UX içindir. Kategori silinmez, arşivlenir.
 - Yeni metin **yalnızca ARB'ye** (iki dosyaya da) eklenir, sonra `flutter gen-l10n`.
 - Yasal sayfalar (`legal_links.dart`, `LegalPage`): TR `pomosprint.app/terms|privacy|kvkk|hesap-silme`, diğer diller `/en/terms|/en/privacy|/en/kvkk|/en/delete-account`. Metin sürümü tek sabit: `kLegalDocumentsVersion`; yasal metin değişince artır.
@@ -257,7 +258,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 - Google iOS: Supabase'de "skip nonce" bilinçli açık. iOS client id üç yerde aynı olmalı: `GIDClientID`, `CFBundleURLSchemes` (ters çevrilmiş), `supabase_service.dart`.
 - Apple girişi iOS login ekranında var; Apple Developer capability ve Supabase Apple provider ayarı kullanıcıda.
 - `AppGate`, onboarding ekranına `onSignedOut` vermiyor; onboarding'de Çıkış butonu gizli.
-- Dil cihazdan okunmaz, varsayılan `tr`.
+- Dil: kayıtlı seçim yoksa cihaz dili (`PlatformDispatcher.locale`; iOS ve Android 13+ uygulama başına dil dahil, `locales_config.xml`). Giriş ekranında TR/EN seçici var. Seçim, o anki cihaz diliyle saklanır; cihaz dili sonradan değişirse cihaz izlenir (`test/language_service_test.dart`).
 - `onboarding_screen.dart` ve `categories_screen.dart` silindi; geri getirme.
 
 ### 4.6 BACKEND: Supabase
@@ -420,7 +421,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 1. **Splash:** `restoreCachedUser` + kategori önbelleği + avatar kataloğu (ağsız) → `SupabaseService.initialize` (zaman aşımlı) → oturum varsa `fetchCurrentUserModel` + kategoriler → `AppGate`.
 2. **Login:** e-posta `signInWithPassword`; Google/Apple native idToken → `signInWithIdToken` → `cleanup_unconfirmed_duplicate_identity`.
 3. **Profil:** `handle_new_user` trigger'ı (varsayılan avatar, `friend_code`).
-4. **Onboarding:** `completeOnboarding` → `setup_onboarding_categories` → `profiles.update(birth_year, user_segment, daily_goal_minutes, onboarding_completed_at)` → `currentUser` güncellenir → AppGate Shell'e geçer.
+4. **Onboarding:** `completeOnboarding` → `setup_onboarding_categories` → `profiles.update(birth_year, user_segment, daily_goal_minutes, show_in_social_feed, onboarding_completed_at)` → `currentUser` güncellenir → AppGate Shell'e geçer.
 5. **Çıkış / oturum düşmesi:** `signOutFully` ya da `signedOut` olayı → `currentUser = null` → AppGate Login gösterir.
 
 ### 6.4 Lig döngüsü
@@ -555,7 +556,7 @@ curl -sI https://pomosprint.app/reset-password | grep -i cache-control   # no-st
 | P2 | Herkese açık sıralama oturum açıkken tam ad döndürüyor | Ürün kararı (`proposed/README.md`, 03 satırı) |
 | P2 | `profiles.timezone` istemciden yazılmıyor | Yetki ve doğrulama canlıda hazır; `set_my_timezone` yok. Cihaz IANA adı için ek paket (`flutter_timezone`) gerekir |
 | P2 | Bayat referanslar | `proposed/README.md` ve `scripts/security_regression_test.js` hâlâ `migrations/20261003120000_audit_fixes.sql` diyor; `run_local.sh` `audit_fixes_test.sql`'i çalıştırıyor; `supabase_service.dart`'ta "`is_me` DÖNMEZ" yorumları |
-| P2 | Üç çeviri yolu (ARB, `translate()`, `isTurkish`) | Ekran ekran ARB'ye taşıma; cihaz dilinden ilk dil seçimi |
+| P2 | Üç çeviri yolu (ARB, `translate()`, `isTurkish`) | Ekran ekran ARB'ye taşıma |
 | P2 | DMARC kaydı yok | `_dmarc` TXT, `p=none` ile başla |
 | P3 | Android derlemesi bu makinede doğrulanmadı | Gerçek cihaz test listesi: analiz raporu §10 |
 | P3 | Ertelenen teknik işler | `google_sign_in` 7.x; `SupabaseService`'in bölünmesi (Auth → Category → Social); onboarding'de Çıkış butonu (`AppGate` `onSignedOut` vermiyor) |

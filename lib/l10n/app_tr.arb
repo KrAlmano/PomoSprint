@@ -5,13 +5,25 @@
   "authSocialConsentPrefix": "Devam ederek ",
   "authSocialConsentSuffix": " kabul etmiş olursun.",
   "authResendAvailableIn": "{seconds} sn sonra tekrar gönderebilirsin",
-  "@authResendAvailableIn": { "placeholders": { "seconds": { "type": "int" } } },
+  "@authResendAvailableIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
   "onboardingSelectCategoryError": "Devam etmek için en az bir kategori seç.",
   "onboardingUnder13Error": "PomoSprint'i kullanmak için en az 13 yaşında olmalısın.",
   "onboardingSessionExpired": "Oturumun sona erdi. Lütfen tekrar giriş yap.",
   "onboardingSaveError": "Bilgilerin kaydedilemedi. Lütfen tekrar dene.",
   "onboardingCategoryStepBodyLimit": "Şimdi çalışacağın dersleri/alanları seç; istediğin zaman değiştirebilirsin. En fazla {limit} tane seçebilirsin.",
-  "@onboardingCategoryStepBodyLimit": { "placeholders": { "limit": { "type": "int" } } },
+  "@onboardingCategoryStepBodyLimit": {
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
   "categoryNameExistsMsg": "Bu isimde bir kategori zaten var.",
   "categoriesLoadError": "Kategoriler yüklenemedi. İnternet bağlantını kontrol edip tekrar dene.",
   "categorySaveError": "Değişiklik kaydedilemedi. Lütfen tekrar dene.",
@@ -22,13 +34,52 @@
   "rankingMonthlyResetIn": "Aylık sıralamanın sıfırlanmasına kalan süre",
   "rankingLoadError": "Sıralama yüklenemedi. Bağlantını kontrol edip tekrar dene.",
   "rankingMyStatus": "Sıran: #{rank} · {points} puan",
-  "@rankingMyStatus": {"placeholders": {"rank": {"type": "int"}, "points": {"type": "int"}}},
+  "@rankingMyStatus": {
+    "placeholders": {
+      "rank": {
+        "type": "int"
+      },
+      "points": {
+        "type": "int"
+      }
+    }
+  },
   "rankingPoints": "{points} puan",
-  "@rankingPoints": {"placeholders": {"points": {"type": "int"}}},
+  "@rankingPoints": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
   "rankingCountdownDays": "{days} gün {hours} saat {minutes} dk",
-  "@rankingCountdownDays": {"placeholders": {"days": {"type": "int"}, "hours": {"type": "int"}, "minutes": {"type": "int"}}},
+  "@rankingCountdownDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
   "rankingCountdownHours": "{hours} saat {minutes} dk {seconds} sn",
-  "@rankingCountdownHours": {"placeholders": {"hours": {"type": "int"}, "minutes": {"type": "int"}, "seconds": {"type": "int"}}},
+  "@rankingCountdownHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
   "rankingCountdownResetting": "Sıfırlanıyor...",
   "socialRetry": "Tekrar Dene",
   "socialRefreshFailed": "Güncellenemedi, son yüklenen veriler gösteriliyor.",
@@ -41,7 +92,13 @@
   "socialFocusingNow": "Şu An Çalışanlar",
   "socialFocusing": "Odaklanıyor",
   "socialFocusingOn": "{category} çalışıyor",
-  "@socialFocusingOn": {"placeholders": {"category": {"type": "String"}}},
+  "@socialFocusingOn": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
   "socialNoLiveFriends": "Şu an çalışan arkadaşın yok. Biri odaklanmaya başladığında burada görünecek.",
   "socialLoadError": "Arkadaşlarının durumu yüklenemedi. Bağlantını kontrol edip tekrar dene.",
   "leagueTierBronze": "Bronz Kum Saati",
@@ -50,7 +107,13 @@
   "leagueTierSapphire": "Safir Kum Saati",
   "leagueTierDiamond": "Elmas Kum Saati",
   "leagueTierLeagueName": "{tier} Ligi",
-  "@leagueTierLeagueName": {"placeholders": {"tier": {"type": "String"}}},
+  "@leagueTierLeagueName": {
+    "placeholders": {
+      "tier": {
+        "type": "String"
+      }
+    }
+  },
   "leagueInfoTitle": "Lig Sistemi Nasıl Çalışır?",
   "leagueInfoWhatTitle": "Lig Nedir?",
   "leagueInfoWhatBody": "Her lig döneminde seninle benzer seviyedeki en fazla 30 kişiyle aynı gruba düşersin. Dönem boyunca kim daha çok odaklanırsa üst sıraya çıkar.",
@@ -58,38 +121,116 @@
   "leagueInfoYouAreHere": "Şu an buradasın",
   "leagueInfoPointsTitle": "Puan Nasıl Kazanılır?",
   "leagueInfoPoints25": "25 dakikalık odak: {points} puan",
-  "@leagueInfoPoints25": {"placeholders": {"points": {"type": "String"}}},
+  "@leagueInfoPoints25": {
+    "placeholders": {
+      "points": {
+        "type": "String"
+      }
+    }
+  },
   "leagueInfoPoints50": "50 dakikalık odak: {points} puan",
-  "@leagueInfoPoints50": {"placeholders": {"points": {"type": "String"}}},
+  "@leagueInfoPoints50": {
+    "placeholders": {
+      "points": {
+        "type": "String"
+      }
+    }
+  },
   "leagueInfoStreakBonus": "Seri bonusu:",
   "leagueInfoStreakRange": "{from}-{to} gün: %{pct}",
-  "@leagueInfoStreakRange": {"placeholders": {"from": {"type": "String"}, "to": {"type": "String"}, "pct": {"type": "String"}}},
+  "@leagueInfoStreakRange": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
   "leagueInfoStreakRangeOpen": "{from}+ gün: %{pct}",
-  "@leagueInfoStreakRangeOpen": {"placeholders": {"from": {"type": "String"}, "pct": {"type": "String"}}},
+  "@leagueInfoStreakRangeOpen": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
   "leagueInfoStreakKeep": "Her gün en az 1 pomodoro tamamlayarak serini canlı tut.",
   "leagueInfoPausePenalty": "Seansı duraklatırsan puan %{pct} azalır.",
-  "@leagueInfoPausePenalty": {"placeholders": {"pct": {"type": "String"}}},
+  "@leagueInfoPausePenalty": {
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
   "leagueInfoCoins": "🪙 Kum tanesi: Tamamladığın her seanstan (günde {limit} seansa kadar) {coins} kum tanesi kazanırsın. Karakter koleksiyonundan yeni kum saatleri açmak için kullanılır.",
-  "@leagueInfoCoins": {"placeholders": {"coins": {"type": "String"}, "limit": {"type": "String"}}},
+  "@leagueInfoCoins": {
+    "placeholders": {
+      "coins": {
+        "type": "String"
+      },
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
   "leagueInfoPromotionTitle": "Yükselme ve Düşme",
   "leagueInfoPeriodEnds": "Bu lig dönemi {date} tarihinde sona erer. Dönem sonunda sıralamana göre yükselir, kalır ya da düşersin.",
-  "@leagueInfoPeriodEnds": {"placeholders": {"date": {"type": "String"}}},
+  "@leagueInfoPeriodEnds": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "leagueInfoPeriodGeneric": "Lig dönemi sona erdiğinde sıralamana göre yükselir, kalır ya da düşersin.",
   "leagueInfoTopTier": "En üst ligdesin, yükselecek yer yok.",
   "leagueInfoPromote": "Bu dönem puan toplayan ilk {count} kişi bir üst lige yükselir.",
-  "@leagueInfoPromote": {"placeholders": {"count": {"type": "int"}}},
+  "@leagueInfoPromote": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "leagueInfoDemote": "Son {count} kişi bir alt lige düşer.",
-  "@leagueInfoDemote": {"placeholders": {"count": {"type": "int"}}},
+  "@leagueInfoDemote": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "leagueInfoNoDemotionBronze": "Bronz ligde düşme yoktur.",
   "leagueInfoNoDemotionThisPeriod": "Bu dönem bu ligde düşme yok.",
   "leagueAwaitingPlacementTitle": "Henüz bir lig odasında değilsin",
   "leagueAwaitingPlacementBody": "Bu dönem ilk pomodoronu tamamladığında seninle benzer seviyedeki en fazla 30 kişilik bir odaya yerleşirsin. Sıralaman ve yükselme durumun burada görünür.",
   "leagueInfoDailyLimitTitle": "Günlük Sınır",
   "leagueInfoDailyLimitBody": "Günde en fazla {limit} seans puan ve kum kazandırır (lig puanı, aylık sıralama, toplam puan). Sonraki seanslar yalnızca çalışma süresine ve serine eklenir.",
-  "@leagueInfoDailyLimitBody": {"placeholders": {"limit": {"type": "String"}}},
+  "@leagueInfoDailyLimitBody": {
+    "placeholders": {
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
   "leagueInfoFaqTitle": "Puanım Neden Artmadı?",
   "leagueInfoFaqLimit": "Günlük {limit} seans sınırına ulaşmış olabilirsin.",
-  "@leagueInfoFaqLimit": {"placeholders": {"limit": {"type": "String"}}},
+  "@leagueInfoFaqLimit": {
+    "placeholders": {
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
   "leagueInfoFaqCancelled": "Seansı çok erken iptal etmiş olabilirsin.",
   "leagueInfoFaqReset": "Lig dönemi yeni sıfırlanmış olabilir.",
   "leagueInfoFaqPending": "Çevrimdışıyken tamamladığın seanslar bağlantı gelince gönderilir; puanın o zaman eklenir.",
@@ -100,23 +241,47 @@
   "friendsAddByCode": "Kod ile Arkadaş Ekle",
   "friendsCodeHint": "Örn: A1B2C3",
   "friendsAdded": "✅ {name} arkadaş listene eklendi!",
-  "@friendsAdded": {"placeholders": {"name": {"type": "String"}}},
+  "@friendsAdded": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "friendsRequestSent": "📨 {name} kullanıcısına arkadaşlık isteği gönderildi. Onay bekleniyor.",
-  "@friendsRequestSent": {"placeholders": {"name": {"type": "String"}}},
+  "@friendsRequestSent": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "friendsErrNotFound": "Bu koda sahip bir kullanıcı bulunamadı.",
   "friendsErrSelf": "Kendi kodunu ekleyemezsin.",
   "friendsErrAlreadyFriends": "Bu kullanıcıyla zaten arkadaşsınız.",
   "friendsErrAlreadyPending": "Bu kullanıcıyla bekleyen bir arkadaşlık isteğin zaten var.",
   "friendsErrAddFailed": "Arkadaş eklenemedi. Kodu kontrol edip tekrar dene.",
   "friendsIncoming": "Gelen İstekler ({count})",
-  "@friendsIncoming": {"placeholders": {"count": {"type": "int"}}},
+  "@friendsIncoming": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "friendsAccept": "Kabul et",
   "friendsReject": "Reddet",
   "friendsAccepted": "✅ Arkadaşlık isteği kabul edildi!",
   "friendsRespondFailed": "İstek yanıtlanamadı. Lütfen tekrar dene.",
   "friendsRequestGone": "Bu istek artık geçerli değil.",
   "friendsYourFriends": "Arkadaşların ({count})",
-  "@friendsYourFriends": {"placeholders": {"count": {"type": "int"}}},
+  "@friendsYourFriends": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "friendsEmpty": "Henüz arkadaşın yok. Kodunu paylaş veya yukarıdan bir kod gir!",
   "friendsLoadError": "Arkadaş listen yüklenemedi. Bağlantını kontrol edip tekrar dene.",
   "profileNameTooShort": "İsim en az 2 karakter olmalı.",
@@ -125,7 +290,13 @@
   "profileDeleting": "Hesabın siliniyor...",
   "profileDeleteError": "Hesabın silinemedi. Bağlantını kontrol edip tekrar dene.",
   "profileDeleteConfirmPending": "{count, plural, =1{Bu cihazda henüz gönderilmemiş 1 seansın da silinir.} other{Bu cihazda henüz gönderilmemiş {count} seansın da silinir.}}",
-  "@profileDeleteConfirmPending": {"placeholders": {"count": {"type": "int"}}},
+  "@profileDeleteConfirmPending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "profileDeleteConfirmApple": "Apple ile giriş yaptığın için silmeden önce Apple seni bir kez daha doğrulayacak; böylece PomoSprint'in Apple ile Giriş bağlantısı da kaldırılır.",
   "profileDeleteConfirmCopyHint": "Verilerinin bir kopyasını istiyorsan önce \"Gizlilik ve yasal\" bölümündeki \"Verilerimin kopyasını iste\"yi kullan.",
   "accountDeletedNotice": "Hesabın ve tüm verilerin silindi.",
@@ -136,42 +307,111 @@
   "profileNotificationsDenied": "Bildirim izni verilmedi. Bildirimleri telefonunun Ayarlar bölümünden PomoSprint için açabilirsin.",
   "profileSettingSaveError": "Ayar kaydedilemedi. Lütfen tekrar dene.",
   "avatarBalance": "Bakiyen: {coins} kum tanesi",
-  "@avatarBalance": {"placeholders": {"coins": {"type": "int"}}},
+  "@avatarBalance": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
   "avatarPurchaseTitle": "Satın Al",
   "avatarPurchaseBody": "{name} avatarını {price} kum tanesine satın almak ister misin?",
-  "@avatarPurchaseBody": {"placeholders": {"name": {"type": "String"}, "price": {"type": "int"}}},
+  "@avatarPurchaseBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "price": {
+        "type": "int"
+      }
+    }
+  },
   "avatarNotEnoughCoins": "Yetersiz bakiye: {missing} kum tanesi daha gerekiyor.",
-  "@avatarNotEnoughCoins": {"placeholders": {"missing": {"type": "int"}}},
+  "@avatarNotEnoughCoins": {
+    "placeholders": {
+      "missing": {
+        "type": "int"
+      }
+    }
+  },
   "avatarPurchased": "{name} artık senin!",
-  "@avatarPurchased": {"placeholders": {"name": {"type": "String"}}},
+  "@avatarPurchased": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "avatarPremiumTitle": "Premium Avatar",
   "avatarPremiumBody": "Bu avatar Premium üyelere özel.",
   "avatarPremiumUnlockBody": "Premium üyeliğinle {name} avatarını ücretsiz açabilirsin.",
-  "@avatarPremiumUnlockBody": {"placeholders": {"name": {"type": "String"}}},
+  "@avatarPremiumUnlockBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "avatarUnlockBtn": "Aç",
   "coinsCaption": "🪙 KUM",
   "pendingSessionsBanner": "{count} senkronize edilmemiş seansın var. Tekrar denemek için dokun.",
   "@pendingSessionsBanner": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "sessionPointsBreakdown": "🔥 {base} puan + {bonus} seri bonusu (%{pct}) = {total} puan!",
   "@sessionPointsBreakdown": {
     "placeholders": {
-      "base": { "type": "int" },
-      "bonus": { "type": "int" },
-      "pct": { "type": "int" },
-      "total": { "type": "int" }
+      "base": {
+        "type": "int"
+      },
+      "bonus": {
+        "type": "int"
+      },
+      "pct": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
   "sessionDailyLimitReached": "Bugünlük puan ve kum sınırına ulaştın ({limit} seans). Sonraki seanslar yalnızca çalışma süresine ve serine eklenir.",
-  "@sessionDailyLimitReached": {"placeholders": {"limit": {"type": "int"}}},
+  "@sessionDailyLimitReached": {
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
   "sessionResultSaving": "Seans kaydediliyor…",
   "sessionResultPoints": "+{points} puan",
-  "@sessionResultPoints": {"placeholders": {"points": {"type": "int"}}},
+  "@sessionResultPoints": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
   "sessionResultCoins": "+{coins} kum",
-  "@sessionResultCoins": {"placeholders": {"coins": {"type": "int"}}},
+  "@sessionResultCoins": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
   "sessionResultStreak": "{days} günlük seri",
-  "@sessionResultStreak": {"placeholders": {"days": {"type": "int"}}},
+  "@sessionResultStreak": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
   "sessionResultDuplicate": "Bu seans zaten kaydedilmişti; puanların daha önce eklendi.",
   "sessionResultOk": "Tamam",
   "sessionNotSavedTitle": "Seans kaydedilemedi",
@@ -184,13 +424,23 @@
   "sessionRejectedGeneric": "Bu seans kaydedilemedi: sunucu doğrulamasından geçmedi.",
   "rejectedSessionsNotice": "⚠️ Bekleyen {count} seans sunucu tarafından reddedildi ve kaydedilemedi.",
   "@rejectedSessionsNotice": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "rejectedSessionsTitle": "Kaydedilemeyen seanslar",
   "rejectedSessionsInfo": "Sunucunun kabul etmediği seanslar burada listelenir; puana, kuma ve seriye eklenmezler. Bu cihazda son 50 kayıt tutulur.",
   "rejectedSessionsEmpty": "Kaydedilemeyen seans yok.",
   "rejectedSessionsLink": "Kaydedilemeyen seanslar ({count})",
-  "@rejectedSessionsLink": {"placeholders": {"count": {"type": "int"}}},
+  "@rejectedSessionsLink": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "rejectedSessionsView": "Göster",
   "pausedSessionExpired": "Duraklatılmış seansın 24 saati aştığı için kaydedilemedi ve sıfırlandı.",
   "leaveWhileRunningTitle": "Seansın sürüyor",
@@ -200,7 +450,11 @@
   "notifSessionDoneTitle": "Pomodoro tamamlandı! 🎉",
   "notifSessionDoneBody": "{category} seansın bitti. Puan ve kum kazanman için 24 saat içinde uygulamayı aç.",
   "@notifSessionDoneBody": {
-    "placeholders": { "category": { "type": "String" } }
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
   },
   "notifChannelName": "Seans bildirimleri",
   "notifChannelDescription": "Pomodoro seansın bittiğinde haber verir.",
@@ -208,11 +462,19 @@
   "lockTimerChannelDescription": "Seans sürerken kalan süreyi kilit ekranında ve bildirim panelinde gösterir.",
   "lockTimerRunningBody": "Odaklanıyorsun · bitiş {time}",
   "@lockTimerRunningBody": {
-    "placeholders": { "time": { "type": "String" } }
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
   },
   "lockTimerPausedBody": "Duraklatıldı · {remaining} kaldı",
   "@lockTimerPausedBody": {
-    "placeholders": { "remaining": { "type": "String" } }
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
   },
   "lockTimerStatusRunning": "Odaklanıyorsun",
   "lockTimerStatusPaused": "Duraklatıldı",
@@ -226,7 +488,11 @@
   "statsStaleNotice": "Güncel veriler alınamadı; son yüklenen veriler gösteriliyor.",
   "statsPendingSessions": "{count} seans senkron bekliyor",
   "@statsPendingSessions": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "statsNoStudyTodayTitle": "Bugün henüz çalışmadın",
   "statsNoStudyTodayDesc": "Bir Pomodoro başlat; bugünün ders dağılımı burada görünecek.",
@@ -235,37 +501,69 @@
   "statsGoalSheetSubtitle": "Günde ne kadar odaklanmak istiyorsun?",
   "statsGoalPomodoroApprox": "≈ {count} Pomodoro",
   "@statsGoalPomodoroApprox": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "statsGoalSaveFailed": "Hedef kaydedilemedi. Bağlantını kontrol edip tekrar dene.",
   "statsTodayPomodoros": "Bugün {count} Pomodoro tamamlandı",
   "@statsTodayPomodoros": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "statsWeeklyGoalTitle": "Haftalık Hedef",
   "statsWeeklyGoalSubtitle": "{weekly} · günlük hedefin × 7",
   "@statsWeeklyGoalSubtitle": {
-    "placeholders": { "weekly": { "type": "String" } }
+    "placeholders": {
+      "weekly": {
+        "type": "String"
+      }
+    }
   },
   "statsWeekLabel": "Hafta {index}",
   "@statsWeekLabel": {
-    "placeholders": { "index": { "type": "int" } }
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
   },
   "statsWeekStudyTotal": "{duration} Çalışma",
   "@statsWeekStudyTotal": {
-    "placeholders": { "duration": { "type": "String" } }
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
   },
   "statsWeekChangeUp": "Önceki haftanın aynı günlerine göre {percent} artış",
   "@statsWeekChangeUp": {
-    "placeholders": { "percent": { "type": "String" } }
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
   },
   "statsWeekChangeDown": "Önceki haftanın aynı günlerine göre {percent} düşüş",
   "@statsWeekChangeDown": {
-    "placeholders": { "percent": { "type": "String" } }
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
   },
   "statsMonthMotivation": "Geçen ayın aynı dönemine göre odağını {percent} artırdın, harika gidiyorsun!",
   "@statsMonthMotivation": {
-    "placeholders": { "percent": { "type": "String" } }
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
   },
   "statsMonthEmptyTitle": "Bu ay henüz çalışma kaydın yok",
   "statsMonthEmptyDesc": "Bu ay ilk Pomodoro'nu tamamladığında aylık takip burada görünecek.",
@@ -276,7 +574,11 @@
   "statsOtherCategories": "Diğer kategoriler",
   "statsMoreCategories": "+{count} kategori daha",
   "@statsMoreCategories": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "statsGoalReached": "Bugünkü hedefine ulaştın, tebrikler!",
   "statsTipFocusBlock": "Seansa başlamadan önce o seansta bitireceğin tek bir işi belirle.",
@@ -284,7 +586,11 @@
   "statsWeekChangeSame": "Önceki haftanın aynı günleriyle aynı",
   "statsGoalPomodorosNeeded": "Hedef için {count} Pomodoro",
   "@statsGoalPomodorosNeeded": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "authErrWeakPassword": "Şifren çok zayıf. En az 1 küçük harf (a-z), 1 büyük harf (A-Z) ve 1 rakam (0-9) içermeli.",
   "authErrEmailExistsResent": "Bu e-posta adresi zaten kayıtlı! Doğrulama bağlantısı e-postana tekrar gönderildi.",
@@ -306,13 +612,11 @@
   "navHistory": "Geçmiş",
   "navRanking": "Sıralama",
   "navCategories": "Kategoriler",
-
   "titleTimer": "PomoSprint",
   "titleReports": "Ders Raporları & Geçmiş",
   "titleRanking": "Liderlik Tablosu",
   "titleSocial": "Sanal Kütüphane & Masalar",
   "titleCategories": "Ders Kategorileri",
-
   "selectSubject": "DERS SEÇ",
   "addSubject": "Ders Ekle",
   "btnStart": "BAŞLAT",
@@ -328,7 +632,6 @@
   "pauseCreditAvailable": "1/1 Duraklatma Hakkı",
   "pauseCreditUsed": "0/1 Duraklatma Hakkı (Hakkın Bitti)",
   "focusTimeMinutes": "{minutes} DK FOCUS TIME",
-
   "catMath": "Matematik",
   "catPhysics": "Fizik",
   "catHistory": "Tarih",
@@ -336,7 +639,6 @@
   "catBiology": "Biyoloji",
   "catLiterature": "Edebiyat",
   "catEnglish": "İngilizce",
-
   "avatarGamer": "Gamer Çırak",
   "avatarGamerDesc": "Başlangıç karakterin. 1 seans tamamla.",
   "avatarGlasses": "Gözlüklü Bilgin",
@@ -366,7 +668,6 @@
   "leagueAwardLockedBodyPodium": "Bu Podyum Ödülü'nü kazanmak için bu kademede bir lig dönemini puan toplayarak 2. veya 3. sırada bitirmen gerekiyor (1. olan Şampiyonluk Ödülü'nü alır). Parayla satın alınamaz.",
   "leagueAwardLockedOk": "Anladım",
   "lockedCharacter": "Kilitli Karakter",
-
   "welcomeBackTitle": "Tekrar hoş geldin. Odaklanmaya hazır mısın?",
   "emailOrUsername": "Kullanıcı Adı veya E-posta",
   "password": "Şifre",
@@ -374,13 +675,19 @@
   "forgotPassword": "Şifremi Unuttum",
   "noAccountText": "Hesabın yok mu? ",
   "signUpLink": "Kayıt Ol",
-  "googleLogin": "Google ile Giriş",
+  "googleLogin": "Google ile Giriş Yap",
   "appleOnAndroidLink": "Apple ile mi kaydoldun?",
   "appleOnAndroidTitle": "Apple ile açılan hesaba Android'den giriş",
   "appleOnAndroidBody": "Android'de Apple ile giriş yok; hesabına e-posta ve şifreyle girebilirsin:\n\n1. Hesabının e-posta adresini bul. Apple'da \"E-postamı Gizle\"yi seçtiysen bu bir gizli röle adresidir (…@privaterelay.appleid.com); iPhone'da Ayarlar > Apple Hesabı (adın) > Apple ile Giriş > PomoSprint altında görünür.\n2. Bu ekranda o adresi yazıp \"Şifremi Unuttum\"a dokun ve gelen bağlantıyla bir şifre belirle.\n3. Sonra aynı adres ve yeni şifrenle giriş yap.\n\nE-posta gelmezse destek@pomosprint.app adresine yaz.",
   "resendVerificationLink": "Doğrulama E-postasını Tekrar Gönder 📬",
   "loginVerificationPendingInfo": "Onay bağlantısını {email} adresine gönderdik. Bağlantıya dokunduktan sonra şifrenle buradan giriş yap.",
-  "@loginVerificationPendingInfo": {"placeholders": {"email": {"type": "String"}}},
+  "@loginVerificationPendingInfo": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
   "loginResendPrompt": "E-posta gelmedi mi? Yeniden gönder",
   "errEnterEmailForResend": "Onay e-postasını yeniden göndermek için önce e-posta adresini yaz.",
   "errFillFields": "Lütfen tüm alanları doldurun.",
@@ -388,7 +695,6 @@
   "verificationResentMsg": "📬 Doğrulama bağlantısı tekrar gönderildi. Lütfen e-postanızı kontrol edin.",
   "passwordResetMsg": "E-posta adresine bir şifre sıfırlama bağlantısı gönderdik. Gelen kutunu (ve spam klasörünü) kontrol et.",
   "errEnterEmailForReset": "Şifreni sıfırlamak için önce e-posta adresini gir.",
-
   "createAccountTitle": "Yeni Hesap Oluştur",
   "createAccountSub": "PomoSprint'e katıl ve odaklanmaya başla.",
   "orDivider": "VEYA",
@@ -412,7 +718,6 @@
   "errShortPassword": "Şifre en az 6 karakter olmalıdır.",
   "errAcceptTerms": "Devam etmek için Kullanım Şartları'nı kabul etmelisin.",
   "errEmailExists": "Bu e-posta adresi zaten kayıtlı. \"Giriş Yap\" ekranından giriş yap. Bu adresle Google ya da Apple ile kaydolduysan o butonu kullan ya da \"Şifremi Unuttum\" ile bir şifre belirle.",
-
   "reportsTabSubject": "Ders Raporları",
   "reportsTabHistory": "Çalışma Geçmişi",
   "totalFocusTime": "Toplam Çalışma",
@@ -424,14 +729,12 @@
   "hoursUnit": "s",
   "completedSessions": "Tamamlanan Seanslar",
   "sessionsCount": "{count} Seans",
-
   "weekly": "Haftalık",
   "allTime": "Tüm Zamanlar",
   "noUsersInRanking": "Henüz sıralamada kayıtlı kullanıcı bulunmuyor.",
   "minutesStudy": "{minutes} dk çalışma",
   "userDefault": "Kullanıcı",
   "youBadge": "(Sen)",
-
   "virtualLibrary": "Sanal Kütüphane & Masalar",
   "studentsStudying": "{count} Öğrenci Masalarda Çalışıyor",
   "emptyTables": "Masalar Boş - İlk Oturan Sen Ol!",
@@ -440,14 +743,12 @@
   "tableFull": "Masa Dolu",
   "silentRoom": "Sadece Sessiz",
   "chatPlaceholder": "Mesajınızı yazın...",
-
   "addCategoryTitle": "Yeni Kategori Ekle",
   "addCategorySub": "Çalışmalarını düzenlemek için yeni bir ders veya konu oluştur.",
   "categoryNameHint": "Kategori Adı (Örn: Tarih)",
   "chooseColor": "Renk Seçimi",
   "addedToast": "{name} eklendi!",
   "deleteBtn": "Sil",
-
   "profileTitle": "Profil ve Ayarlar",
   "editProfile": "PROFİL BİLGİLERİ",
   "nameSurname": "İsim Soyisim",
@@ -464,7 +765,13 @@
   "logoutConfirmTitle": "Çıkış yapılsın mı?",
   "logoutConfirmBody": "Bu cihazdaki oturumun kapanacak. İstediğin zaman aynı hesapla yeniden giriş yapabilirsin.",
   "logoutPendingWarning": "{count, plural, =1{1 seansın henüz sunucuya gönderilmedi.} other{{count} seansın henüz sunucuya gönderilmedi.}} Seans başladıktan sonraki 24 saat içinde aynı hesapla bu cihazdan giriş yapmazsan puanı, kum taneleri ve seriye katkısı kaybolur.",
-  "@logoutPendingWarning": {"placeholders": {"count": {"type": "int"}}},
+  "@logoutPendingWarning": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "logoutRunningWarning": "Süren bir seansın var. Seans bu cihazda saklanır ve aynı hesapla yeniden girince kaldığı yerden sürer; ama çıkış yaptıktan sonra bitiş bildirimi gelmez.",
   "logoutSendAndExit": "Gönder ve çık",
   "logoutAnyway": "Yine de çık",
@@ -475,7 +782,6 @@
   "darkMode": "Karanlık Mod",
   "preferences": "TERCİHLER",
   "nameUpdatedSuccess": "Profil adınız başarıyla güncellendi!",
-
   "pointsCaption": "PUAN",
   "pauseUsedSnackbar": "1/1 Duraklatma hakkını kullandın! Tekrar durduramazsın.",
   "pauseLimitTitle": "Duraklatma Hakkın Bitti!",
@@ -483,7 +789,6 @@
   "resetAndStop": "Sıfırla & Durdur",
   "continueBtn": "Devam Et",
   "sessionReset": "Seans ilerlemen sıfırlandı.",
-
   "dailyGoalLabel": "Günlük Hedef",
   "setDailyGoalTitle": "Günlük Hedef Belirle",
   "setDailyGoalSub": "Bugün kaç Pomodoro tamamlamak istiyorsun?",
@@ -505,25 +810,21 @@
   "tip2": "Her 25 dakikalık odaklanma seansından sonra 5 dakika mola ver.",
   "tip3": "Günde 4 pomodoro tamamlamak düzenli çalışma alışkanlığı oluşturur.",
   "tip4": "Zorlu konuları sabah saatlerinde çalışmak verimliliği artırır.",
-
   "addBtn": "Ekle",
-
   "onboardingSelectOptionError": "Lütfen bir seçenek seçin.",
   "onboardingTimeoutError": "Bağlantı zaman aşımına uğradı. Lütfen internetini kontrol edip tekrar dene.",
   "onboardingGenericError": "Bir şeyler ters gitti, lütfen tekrar dene: {error}",
   "onboardingAddCategoryTitle": "Kategori Ekle",
   "onboardingCategoryHint": "Kategori adı",
-  "onboardingMaxCategoriesMsg": "En fazla 8 kategori seçebilirsin.",
   "onboardingWelcomeTitle": "Hoş geldin! 👋",
-  "onboardingWelcomeBody": "Ben senin odaklanma arkadaşınım. Sana eşlik etmeden önce doğum yılını öğrenebilir miyim?",
+  "onboardingWelcomeBody": "Ben senin odaklanma arkadaşınım. Başlamadan önce doğum yılını seçer misin? Bunu yalnızca yaş sınırını kontrol etmek için soruyoruz.",
   "onboardingSegmentTitle": "Peki, hangi yolculuktasın?",
-  "onboardingSegmentBody": "Beraber neye çalışacağız? Sana en uygun kategorileri seçeyim.",
+  "onboardingSegmentBody": "Beraber neye çalışacağız? Sana uygun kategorileri önereyim. Uymuyorsa \"Diğer\"i seç.",
   "onboardingSegmentLgs": "🎓  LGS",
   "onboardingSegmentYks": "📚  YKS",
   "onboardingSegmentUniversity": "🏛️  Üniversite",
   "onboardingSegmentWork": "💼  İş & Kişisel Gelişim",
   "onboardingCategoryStepTitle": "Harika seçim! 🎉",
-  "onboardingCategoryStepBody": "Şimdi çalışacağın dersleri/alanları seç — istediğin zaman değiştirebilirsin. Ücretsiz planda en fazla 8 tane olur.",
   "onboardingCreateOwnCategory": "+ Kendi kategorimi oluştur",
   "onboardingGoalStepTitle": "Son bir adım kaldı! 🚀",
   "onboardingGoalStepBody": "Günde ne kadar birlikte odaklanmak istersin?",
@@ -532,11 +833,14 @@
   "onboardingGoal3h": "3 Saat",
   "onboardingGoal4hPlus": "4 Saat+",
   "onboardingFinishBtn": "Bitir",
-
   "categoriesManagementTitle": "Kategorilerim",
   "categoryLimitReachedMsg": "Limitinize ulaştınız. En fazla {limit} kategori ekleyebilirsiniz.",
   "@categoryLimitReachedMsg": {
-    "placeholders": { "limit": { "type": "int" } }
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      }
+    }
   },
   "newCategoryDialogTitle": "Yeni Kategori",
   "editCategoryDialogTitle": "Kategori Düzenle",
@@ -556,15 +860,19 @@
   "rankingZonePromotionMe": "Terfi bölgesindesin: dönem böyle biterse bir üst lige çıkarsın.",
   "rankingZoneNeedsPointsMe": "Terfi bölgesindesin ama 0 puanla terfi edilmez. Bir seans tamamla.",
   "rankingZoneDemotionMe": "Düşme bölgesindesin: dönem böyle biterse bir alt lige inersin.",
-
   "authSocialNoticePrefix": "Devam ederek ",
   "authSocialNoticeTermsLink": "Kullanım Şartları'nı",
   "authSocialNoticeMiddle": " kabul etmiş ve ",
   "authSocialNoticeKvkkLink": "KVKK Aydınlatma Metni'ni",
   "authSocialNoticeSuffix": " okumuş olursun.",
   "legalOpenFailed": "Sayfa açılamadı. Tarayıcında şu adresi açabilirsin: {url}",
-  "@legalOpenFailed": {"placeholders": {"url": {"type": "String"}}},
-
+  "@legalOpenFailed": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      }
+    }
+  },
   "registerNameLabel": "Görünen ad",
   "registerNameHelper": "Sıralamada ve arkadaş listelerinde bu ad görünür.",
   "registerErrNameRequired": "Görünen adını gir.",
@@ -602,7 +910,6 @@
   "registerConsentMarketing": "Yeni özellikler ve güncellemeler hakkında bana e-posta gönderilmesini kabul ediyorum (ticari elektronik ileti onayı).",
   "registerConsentMarketingHint": "İstediğin zaman e-postalardaki bağlantıyla abonelikten çıkabilirsin.",
   "errAcknowledgePrivacy": "Devam etmek için KVKK Aydınlatma Metni'ni ve Gizlilik Politikası'nı okuduğunu onaylamalısın.",
-
   "profileLegalSectionTitle": "Gizlilik ve yasal",
   "kvkkNoticeLink": "KVKK Aydınlatma Metni",
   "accountDeletionInfoLink": "Hesap silme hakkında",
@@ -612,26 +919,61 @@
   "dataCopyEmailSubject": "PomoSprint kişisel veri kopyası talebi (KVKK m.11)",
   "dataCopyEmailBody": "Merhaba,\n\nKVKK m.11 kapsamında PomoSprint hesabıma ait kişisel verilerin bir kopyasını talep ediyorum. Bu e-postayı hesabımda kayıtlı e-posta adresinden gönderiyorum.\n\nTercih ettiğim biçim (ör. JSON, PDF):\n",
   "dataCopyMailFailed": "E-posta uygulaması açılamadı. Talebini hesabındaki e-posta adresinden {email} adresine gönderebilirsin.",
-  "@dataCopyMailFailed": {"placeholders": {"email": {"type": "String"}}},
+  "@dataCopyMailFailed": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
   "deleteAccountSub": "Hesabını ve tüm verilerini kalıcı olarak siler.",
   "hiddenUsersTitle": "Gizlenen kullanıcıları göster",
   "hiddenUsersCount": "{count, plural, =0{Gizlenen kullanıcı yok} other{{count} kullanıcı gizli · dokununca liste sıfırlanır}}",
-  "@hiddenUsersCount": {"placeholders": {"count": {"type": "int"}}},
+  "@hiddenUsersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "hiddenUsersCleared": "Gizlenen kullanıcılar yeniden görünecek.",
-
   "userActionsTooltip": "Kullanıcı seçenekleri",
   "reportUserAction": "Kullanıcıyı bildir",
   "reportUserActionSub": "Uygunsuz bir adı ya da davranışı destek ekibine e-postayla bildir.",
   "hideUserAction": "Bu kullanıcıyı gizle",
   "hideUserActionSub": "Sıralamada adı gizlenir, canlı akışta görünmez. Profil'den geri alabilirsin.",
   "userHiddenMsg": "{name} gizlendi.",
-  "@userHiddenMsg": {"placeholders": {"name": {"type": "String"}}},
+  "@userHiddenMsg": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "undoAction": "Geri al",
   "hiddenUserLabel": "Gizlenen kullanıcı",
   "reportEmailSubject": "PomoSprint kullanıcı bildirimi: {name}",
-  "@reportEmailSubject": {"placeholders": {"name": {"type": "String"}}},
+  "@reportEmailSubject": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "reportEmailBody": "Bildirilen görünen ad: {name}\nKullanıcı kimliği: {userId}\nGörüldüğü yer: {place}\n\nNeyi bildiriyorsun? Lütfen kısaca açıkla:\n",
-  "@reportEmailBody": {"placeholders": {"name": {"type": "String"}, "userId": {"type": "String"}, "place": {"type": "String"}}},
+  "@reportEmailBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "userId": {
+        "type": "String"
+      },
+      "place": {
+        "type": "String"
+      }
+    }
+  },
   "reportUserIdUnknown": "bilinmiyor (sıralamada kimlik gösterilmez)",
   "reportPlaceLeague": "Sıralama · Lig",
   "reportPlaceMonthly": "Sıralama · Aylık",
@@ -640,6 +982,118 @@
   "reportPlaceFriendsList": "Arkadaş listesi",
   "reportPlaceFriendRequest": "Arkadaşlık isteği",
   "reportMailFailed": "E-posta uygulaması açılamadı. Bildirimini {email} adresine gönderebilirsin.",
-  "@reportMailFailed": {"placeholders": {"email": {"type": "String"}}},
-  "reportCopyAddress": "Adresi kopyala"
+  "@reportMailFailed": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCopyAddress": "Adresi kopyala",
+  "onboardingBirthYearRequired": "Devam etmek için doğum yılını seç.",
+  "onboardingBirthYearPlaceholder": "Doğum yılını seç",
+  "profileNotificationsLabelSub": "Seans bitiş bildirimi ve kilit ekranı sayacı",
+  "profileNotificationsBlockedSub": "Bildirim izni kapalı. Seans bitiş bildirimi ve kilit ekranı sayacı için telefonunun ayarlarından izin ver.",
+  "profileOpenSettings": "Ayarları aç",
+  "profileSocialVisibilityTitle": "Sıralamalarda ve canlı listede görün",
+  "profileSocialVisibilitySub": "Açıkken adın ve avatarın aylık sıralamada, pomosprint.app'teki herkese açık listede (kısaltılmış adla) ve çalışırken arkadaşlarının canlı listesinde görünür. Lig grubun ve arkadaşların seni her durumda görür.",
+  "gameRulesTitle": "Nasıl çalışır?",
+  "gameRulesProfileSub": "Duraklatma, günlük sınır, puan ve kum",
+  "gameRulesSessions": "Seanslar 25 ya da 50 dakika sürer. Her seansta tek duraklatma hakkın var; duraklatırsan puanın %{pct} azalır. İkinci kez durdurursan seans sıfırlanır.",
+  "@gameRulesSessions": {
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "gameRulesPoints": "Tamamladığın her seans puan (25 dk: {points25}, 50 dk: {points50}) ve {coins} kum tanesi kazandırır. Günde en fazla {limit} seans sayılır; sonrakiler yalnızca çalışma süresine ve serine eklenir.",
+  "@gameRulesPoints": {
+    "placeholders": {
+      "points25": {
+        "type": "String"
+      },
+      "points50": {
+        "type": "String"
+      },
+      "coins": {
+        "type": "String"
+      },
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "gameRulesLeague": "Puanınla ligde yükselirsin, her gün çalışarak seri bonusu kazanırsın. Kum taneleriyle koleksiyondan yeni kum saatleri açarsın.",
+  "profileHelpSectionTitle": "Yardım",
+  "profileSupportTitle": "Destek ve geri bildirim",
+  "profileSupportSub": "Bir sorunu ya da önerini e-postayla bize yaz",
+  "profileAppVersion": "Sürüm {version}",
+  "@profileAppVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "supportEmailSubject": "PomoSprint destek ve geri bildirim",
+  "supportEmailBody": "Mesajın:\n\n\n---\nUygulama sürümü: {version}\nCihaz: {device}",
+  "@supportEmailBody": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "device": {
+        "type": "String"
+      }
+    }
+  },
+  "supportMailFailed": "E-posta uygulaması açılamadı. Bize {email} adresinden yazabilirsin.",
+  "@supportMailFailed": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "selectCategory": "KATEGORİ SEÇ",
+  "sessionCompletedTitle": "Tebrikler! 🎉",
+  "sessionCompletedBody": "{minutes} dakikalık odaklanma seansını\nbaşarıyla tamamladın! ⏳",
+  "@sessionCompletedBody": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "sessionCompletedOk": "Harika!",
+  "timerGetReady": "Hazırlan! Odaklanıyorsun...",
+  "languagePickerLabel": "Uygulama dili",
+  "onboardingSegmentOther": "✨  Diğer / belirtmek istemiyorum",
+  "onboardingVisibilityTitle": "Sıralamalarda görünmek ister misin?",
+  "onboardingVisibilityBody": "Açarsan adın ve avatarın aylık sıralamada, pomosprint.app'teki herkese açık listede (adın kısaltılarak) ve çalışırken arkadaşlarının canlı listesinde görünür. Kapalıyken bu yerlerde görünmezsin. Lig grubundakiler ve arkadaşların seni her durumda görür. Bu tercihi istediğin zaman Profil'den değiştirebilirsin.",
+  "onboardingVisibilityYes": "Evet, sıralamalarda görüneyim",
+  "onboardingVisibilityNo": "Hayır, görünmeyeyim",
+  "onboardingRulesBody": "Başlamadan önce bilmen gereken birkaç kural:",
+  "timerDurationOption": "{minutes} dakikalık seans",
+  "@timerDurationOption": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "timerEditCategories": "Kategorileri düzenle",
+  "timerRemainingSemantics": "{minutes} dakika {seconds} saniye kaldı",
+  "@timerRemainingSemantics": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "timerNotificationsDenied": "Bildirim izni yok: seans bitince haber veremeyiz ve kilit ekranında sayaç görünmez."
 }

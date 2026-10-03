@@ -1775,7 +1775,7 @@ abstract class AppLocalizations {
   /// No description provided for @googleLogin.
   ///
   /// In tr, this message translates to:
-  /// **'Google ile Giriş'**
+  /// **'Google ile Giriş Yap'**
   String get googleLogin;
 
   /// No description provided for @appleOnAndroidLink.
@@ -2534,12 +2534,6 @@ abstract class AppLocalizations {
   /// **'Kategori adı'**
   String get onboardingCategoryHint;
 
-  /// No description provided for @onboardingMaxCategoriesMsg.
-  ///
-  /// In tr, this message translates to:
-  /// **'En fazla 8 kategori seçebilirsin.'**
-  String get onboardingMaxCategoriesMsg;
-
   /// No description provided for @onboardingWelcomeTitle.
   ///
   /// In tr, this message translates to:
@@ -2549,7 +2543,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingWelcomeBody.
   ///
   /// In tr, this message translates to:
-  /// **'Ben senin odaklanma arkadaşınım. Sana eşlik etmeden önce doğum yılını öğrenebilir miyim?'**
+  /// **'Ben senin odaklanma arkadaşınım. Başlamadan önce doğum yılını seçer misin? Bunu yalnızca yaş sınırını kontrol etmek için soruyoruz.'**
   String get onboardingWelcomeBody;
 
   /// No description provided for @onboardingSegmentTitle.
@@ -2561,7 +2555,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingSegmentBody.
   ///
   /// In tr, this message translates to:
-  /// **'Beraber neye çalışacağız? Sana en uygun kategorileri seçeyim.'**
+  /// **'Beraber neye çalışacağız? Sana uygun kategorileri önereyim. Uymuyorsa \"Diğer\"i seç.'**
   String get onboardingSegmentBody;
 
   /// No description provided for @onboardingSegmentLgs.
@@ -2593,12 +2587,6 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Harika seçim! 🎉'**
   String get onboardingCategoryStepTitle;
-
-  /// No description provided for @onboardingCategoryStepBody.
-  ///
-  /// In tr, this message translates to:
-  /// **'Şimdi çalışacağın dersleri/alanları seç — istediğin zaman değiştirebilirsin. Ücretsiz planda en fazla 8 tane olur.'**
-  String get onboardingCategoryStepBody;
 
   /// No description provided for @onboardingCreateOwnCategory.
   ///
@@ -3217,6 +3205,221 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Adresi kopyala'**
   String get reportCopyAddress;
+
+  /// No description provided for @onboardingBirthYearRequired.
+  ///
+  /// In tr, this message translates to:
+  /// **'Devam etmek için doğum yılını seç.'**
+  String get onboardingBirthYearRequired;
+
+  /// No description provided for @onboardingBirthYearPlaceholder.
+  ///
+  /// In tr, this message translates to:
+  /// **'Doğum yılını seç'**
+  String get onboardingBirthYearPlaceholder;
+
+  /// No description provided for @profileNotificationsLabelSub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seans bitiş bildirimi ve kilit ekranı sayacı'**
+  String get profileNotificationsLabelSub;
+
+  /// No description provided for @profileNotificationsBlockedSub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bildirim izni kapalı. Seans bitiş bildirimi ve kilit ekranı sayacı için telefonunun ayarlarından izin ver.'**
+  String get profileNotificationsBlockedSub;
+
+  /// No description provided for @profileOpenSettings.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ayarları aç'**
+  String get profileOpenSettings;
+
+  /// No description provided for @profileSocialVisibilityTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıralamalarda ve canlı listede görün'**
+  String get profileSocialVisibilityTitle;
+
+  /// No description provided for @profileSocialVisibilitySub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Açıkken adın ve avatarın aylık sıralamada, pomosprint.app\'teki herkese açık listede (kısaltılmış adla) ve çalışırken arkadaşlarının canlı listesinde görünür. Lig grubun ve arkadaşların seni her durumda görür.'**
+  String get profileSocialVisibilitySub;
+
+  /// No description provided for @gameRulesTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Nasıl çalışır?'**
+  String get gameRulesTitle;
+
+  /// No description provided for @gameRulesProfileSub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Duraklatma, günlük sınır, puan ve kum'**
+  String get gameRulesProfileSub;
+
+  /// No description provided for @gameRulesSessions.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seanslar 25 ya da 50 dakika sürer. Her seansta tek duraklatma hakkın var; duraklatırsan puanın %{pct} azalır. İkinci kez durdurursan seans sıfırlanır.'**
+  String gameRulesSessions(String pct);
+
+  /// No description provided for @gameRulesPoints.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tamamladığın her seans puan (25 dk: {points25}, 50 dk: {points50}) ve {coins} kum tanesi kazandırır. Günde en fazla {limit} seans sayılır; sonrakiler yalnızca çalışma süresine ve serine eklenir.'**
+  String gameRulesPoints(
+    String points25,
+    String points50,
+    String coins,
+    String limit,
+  );
+
+  /// No description provided for @gameRulesLeague.
+  ///
+  /// In tr, this message translates to:
+  /// **'Puanınla ligde yükselirsin, her gün çalışarak seri bonusu kazanırsın. Kum taneleriyle koleksiyondan yeni kum saatleri açarsın.'**
+  String get gameRulesLeague;
+
+  /// No description provided for @profileHelpSectionTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yardım'**
+  String get profileHelpSectionTitle;
+
+  /// No description provided for @profileSupportTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Destek ve geri bildirim'**
+  String get profileSupportTitle;
+
+  /// No description provided for @profileSupportSub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir sorunu ya da önerini e-postayla bize yaz'**
+  String get profileSupportSub;
+
+  /// No description provided for @profileAppVersion.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sürüm {version}'**
+  String profileAppVersion(String version);
+
+  /// No description provided for @supportEmailSubject.
+  ///
+  /// In tr, this message translates to:
+  /// **'PomoSprint destek ve geri bildirim'**
+  String get supportEmailSubject;
+
+  /// No description provided for @supportEmailBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mesajın:\n\n\n---\nUygulama sürümü: {version}\nCihaz: {device}'**
+  String supportEmailBody(String version, String device);
+
+  /// No description provided for @supportMailFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'E-posta uygulaması açılamadı. Bize {email} adresinden yazabilirsin.'**
+  String supportMailFailed(String email);
+
+  /// No description provided for @selectCategory.
+  ///
+  /// In tr, this message translates to:
+  /// **'KATEGORİ SEÇ'**
+  String get selectCategory;
+
+  /// No description provided for @sessionCompletedTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tebrikler! 🎉'**
+  String get sessionCompletedTitle;
+
+  /// No description provided for @sessionCompletedBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'{minutes} dakikalık odaklanma seansını\nbaşarıyla tamamladın! ⏳'**
+  String sessionCompletedBody(int minutes);
+
+  /// No description provided for @sessionCompletedOk.
+  ///
+  /// In tr, this message translates to:
+  /// **'Harika!'**
+  String get sessionCompletedOk;
+
+  /// No description provided for @timerGetReady.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hazırlan! Odaklanıyorsun...'**
+  String get timerGetReady;
+
+  /// No description provided for @languagePickerLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uygulama dili'**
+  String get languagePickerLabel;
+
+  /// No description provided for @onboardingSegmentOther.
+  ///
+  /// In tr, this message translates to:
+  /// **'✨  Diğer / belirtmek istemiyorum'**
+  String get onboardingSegmentOther;
+
+  /// No description provided for @onboardingVisibilityTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıralamalarda görünmek ister misin?'**
+  String get onboardingVisibilityTitle;
+
+  /// No description provided for @onboardingVisibilityBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Açarsan adın ve avatarın aylık sıralamada, pomosprint.app\'teki herkese açık listede (adın kısaltılarak) ve çalışırken arkadaşlarının canlı listesinde görünür. Kapalıyken bu yerlerde görünmezsin. Lig grubundakiler ve arkadaşların seni her durumda görür. Bu tercihi istediğin zaman Profil\'den değiştirebilirsin.'**
+  String get onboardingVisibilityBody;
+
+  /// No description provided for @onboardingVisibilityYes.
+  ///
+  /// In tr, this message translates to:
+  /// **'Evet, sıralamalarda görüneyim'**
+  String get onboardingVisibilityYes;
+
+  /// No description provided for @onboardingVisibilityNo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hayır, görünmeyeyim'**
+  String get onboardingVisibilityNo;
+
+  /// No description provided for @onboardingRulesBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başlamadan önce bilmen gereken birkaç kural:'**
+  String get onboardingRulesBody;
+
+  /// No description provided for @timerDurationOption.
+  ///
+  /// In tr, this message translates to:
+  /// **'{minutes} dakikalık seans'**
+  String timerDurationOption(int minutes);
+
+  /// No description provided for @timerEditCategories.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategorileri düzenle'**
+  String get timerEditCategories;
+
+  /// No description provided for @timerRemainingSemantics.
+  ///
+  /// In tr, this message translates to:
+  /// **'{minutes} dakika {seconds} saniye kaldı'**
+  String timerRemainingSemantics(int minutes, int seconds);
+
+  /// No description provided for @timerNotificationsDenied.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bildirim izni yok: seans bitince haber veremeyiz ve kilit ekranında sayaç görünmez.'**
+  String get timerNotificationsDenied;
 }
 
 class _AppLocalizationsDelegate

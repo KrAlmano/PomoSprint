@@ -3,7 +3,7 @@ import 'dart:async';
 import 'categories_management_screen.dart';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show Clipboard, ClipboardData;
+import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../l10n/app_localizations.dart';
 import '../models/avatar_model.dart';
@@ -12,8 +12,10 @@ import '../widgets/auth/account_texts.dart';
 import '../widgets/auth/change_password_dialog.dart';
 import '../widgets/auth/legal_links.dart';
 import '../widgets/avatar_widget.dart';
+import '../widgets/game_rules.dart';
 import '../widgets/social/social_error_text.dart';
 import '../theme.dart';
+import '../utils/app_info.dart';
 import '../utils/name_filter.dart';
 import '../utils/responsive.dart';
 import '../utils/user_report.dart';
@@ -47,14 +49,18 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends State<ProfileScreen> with WidgetsBindingObserver {
   static const int _nameMinLength = 2;
   static const int _nameMaxLength = 30;
 
   final SupabaseService _service = SupabaseService.instance;
   UserModel? _user;
+  // Anahtar "tercih açık VE sistem izni var" durumunu gösterir.
   bool _notificationsEnabled = true;
+  // Tercih açık ama sistem izni yok (ör. ilk BAŞLAT'ta reddedildi).
+  bool _notificationsBlocked = false;
   bool _isUpdatingNotifications = false;
+  String? _appVersion;
   bool _socialVisibilityEnabled = true;
   late final TextEditingController _nameController;
   late final TextEditingController _emailController;
@@ -75,10 +81,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
     unawaited(HiddenUsersStore.instance.load(_user?.id));
     unawaited(_loadSocialVisibility());
     unawaited(_loadNotificationPreference());
+    unawaited(_loadAppVersion());
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  // Kullanıcı sistem ayarlarından dönünce bildirim izni yeniden okunur.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && !_isUpdatingNotifications) {
+      unawaited(_loadNotificationPreference());
+    }
+  }
+
+  Future<void> _loadAppVersion() async {
+    final version = await loadAppVersion();
+    if (mounted && version != null) setState(() => _appVersion = version);
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _service.currentUser.removeListener(_onUserChanged);
     HiddenUsersStore.instance.hidden.removeListener(_onHiddenUsersChanged);
     _nameController.dispose();
@@ -114,9 +136,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (mounted) setState(() => _socialVisibilityEnabled = value);
   }
 
+  // Yalnızca kayıtlı tercihe değil sistem iznine de bakılır: izin
+  // reddedildiyse anahtar kapalı görünür ve ayarları açan yol gösterilir.
   Future<void> _loadNotificationPreference() async {
-    final value = await NotificationService.instance.isEnabled();
-    if (mounted) setState(() => _notificationsEnabled = value);
+    final notifications = NotificationService.instance;
+    final preference = await notifications.isEnabled();
+    final permission = await notifications.hasSystemPermission();
+    if (!mounted) return;
+    setState(() {
+      _notificationsEnabled = NotificationService.effectiveEnabled(preference: preference, permission: permission);
+      _notificationsBlocked = NotificationService.isBlockedBySystem(preference: preference, permission: permission);
+    });
+  }
+
+  Future<void> _openNotificationSettings() async {
+    final l10n = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+    final opened = await NotificationService.instance.openSystemSettings();
+    if (!opened && mounted) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.profileNotificationsDenied), behavior: SnackBarBehavior.floating),
+      );
+    }
   }
 
   AvatarCharacter get _currentAvatar => AvatarCharacter.byId(_user?.avatarId);
@@ -200,10 +241,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       debugPrint('[PROFILE] Bildirim tercihi kaydedilemedi: $e');
       failed = true;
     }
-    final actual = await notifications.isEnabled();
+    final preference = await notifications.isEnabled();
+    final permission = await notifications.hasSystemPermission();
     if (!mounted) return;
     setState(() {
-      _notificationsEnabled = actual;
+      _notificationsEnabled = NotificationService.effectiveEnabled(preference: preference, permission: permission);
+      _notificationsBlocked = NotificationService.isBlockedBySystem(preference: preference, permission: permission);
       _isUpdatingNotifications = false;
     });
     if (permissionDenied || failed) {
@@ -211,6 +254,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         SnackBar(
           content: Text(permissionDenied ? l10n.profileNotificationsDenied : l10n.profileSettingSaveError),
           behavior: SnackBarBehavior.floating,
+          // İzin bir kez reddedilince sistem penceresi bir daha çıkmaz;
+          // izin yalnızca sistem ayarlarından verilebilir.
+          action: permissionDenied
+              ? SnackBarAction(label: l10n.profileOpenSettings, onPressed: () => unawaited(_openNotificationSettings()))
+              : null,
         ),
       );
     }
@@ -255,6 +303,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             elevation: 0,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
+              // Ekran okuyucuda "Geri" diye okunur.
+              tooltip: MaterialLocalizations.of(context).backButtonTooltip,
               onPressed: () => Navigator.pop(context),
             ),
             title: Text(
@@ -352,6 +402,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     // Gizlilik ve yasal: gizlenen kullanıcılar, yasal metinler
                     // (İngilizce arayüzde /en/ sürümleri) ve hesap silme.
                     _buildPrivacyAndLegal(l10n, isDark, muted),
+                    const SizedBox(height: 20),
+
+                    // Yardım: oyun kuralları, destek e-postası ve sürüm.
+                    _buildHelp(l10n, muted),
 
                     const SizedBox(height: 12),
 
@@ -360,18 +414,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: TextButton.icon(
                         onPressed: (_isDeleting || _isLoggingOut) ? null : _confirmLogout,
                         icon: _isLoggingOut
-                            ? const SizedBox(
+                            ? SizedBox(
                                 width: 18,
                                 height: 18,
-                                child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+                                child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).colorScheme.primary),
                               )
-                            : const Icon(Icons.logout, color: AppColors.primary),
+                            // Koyu temada darkPrimary (okunur kontrast).
+                            : Icon(Icons.logout, color: Theme.of(context).colorScheme.primary),
                         label: Text(
                           lang.translate('logout'),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                         ),
                         style: TextButton.styleFrom(
@@ -409,22 +464,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           child: Column(
             children: [
-              GestureDetector(
+              // Ekran okuyucuda "Avatarı Değiştir" düğmesi.
+              Semantics(
+                button: true,
+                enabled: user != null,
+                label: lang.translate('change_avatar'),
+                excludeSemantics: true,
                 onTap: user == null ? null : () => _openCharacterCollection(user),
-                child: Stack(
-                  children: [
-                    AvatarWidget(avatar: _currentAvatar, size: 96),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        width: 32,
-                        height: 32,
-                        decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
-                        child: const Icon(Icons.edit, size: 18, color: Colors.white),
+                child: GestureDetector(
+                  onTap: user == null ? null : () => _openCharacterCollection(user),
+                  child: Stack(
+                    children: [
+                      AvatarWidget(avatar: _currentAvatar, size: 96),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          width: 32,
+                          height: 32,
+                          decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
+                          child: const Icon(Icons.edit, size: 18, color: Colors.white),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -492,7 +555,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 icon: Icon(
                   _isNameEditing ? Icons.close : Icons.mode_edit_outline_rounded,
                   size: 18,
-                  color: AppColors.primary,
+                  // Koyu temada darkPrimary (okunur kontrast).
+                  color: Theme.of(context).colorScheme.primary,
                 ),
                 tooltip: _isNameEditing ? l10n.cancel : lang.translate('edit_profile'),
               ),
@@ -601,20 +665,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildPreferences(LanguageService lang, bool isDark, Color muted) {
     const titleStyle = TextStyle(fontSize: 15, fontWeight: FontWeight.w500);
+    final l10n = AppLocalizations.of(context)!;
     return _buildSectionCard(
       title: _sectionTitle(lang.translate('preferences')),
       child: Material(
         color: Colors.transparent,
         child: Column(
           children: [
+            // Anahtar seans bitiş bildirimini ve kilit ekranı sayacını yönetir.
+            // Sistem izni yoksa kapalı görünür ve ayarları açan düğme çıkar.
             SwitchListTile(
               value: _notificationsEnabled,
               onChanged: _isUpdatingNotifications ? null : _setNotificationsEnabled,
               title: Text(lang.translate('notifications'), style: titleStyle),
-              secondary: Icon(Icons.notifications_outlined, color: muted),
+              subtitle: Text(
+                _notificationsBlocked ? l10n.profileNotificationsBlockedSub : l10n.profileNotificationsLabelSub,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: _notificationsBlocked ? Theme.of(context).colorScheme.error : muted,
+                ),
+              ),
+              secondary: Icon(
+                _notificationsBlocked ? Icons.notifications_off_outlined : Icons.notifications_outlined,
+                color: muted,
+              ),
               activeThumbColor: AppColors.primary,
               contentPadding: EdgeInsets.zero,
             ),
+            if (_notificationsBlocked)
+              Align(
+                alignment: AlignmentDirectional.centerEnd,
+                child: TextButton.icon(
+                  onPressed: _openNotificationSettings,
+                  icon: const Icon(Icons.settings_outlined, size: 18),
+                  label: Text(l10n.profileOpenSettings),
+                  style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.primary),
+                ),
+              ),
             const Divider(height: 16),
             // Anahtar her zaman o an uygulanan temayı gösterir.
             SwitchListTile(
@@ -626,12 +713,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               contentPadding: EdgeInsets.zero,
             ),
             const Divider(height: 16),
+            // show_in_social_feed: aylık sıralama, sitedeki herkese açık liste
+            // ve arkadaşların canlı listesi (lig grubu ve arkadaş listesi değil).
             SwitchListTile(
               value: _socialVisibilityEnabled,
               onChanged: _setSocialVisibility,
-              title: Text(lang.translate('social_visibility'), style: titleStyle),
+              title: Text(l10n.profileSocialVisibilityTitle, style: titleStyle),
               subtitle: Text(
-                lang.translate('social_visibility_sub'),
+                l10n.profileSocialVisibilitySub,
                 style: TextStyle(fontSize: 12, color: muted),
               ),
               secondary: Icon(Icons.groups_outlined, color: muted),
@@ -651,34 +740,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required VoidCallback onTap,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primaryContainer
-              : (isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
             color: isSelected
-                ? AppColors.primary
-                : (isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant).withValues(alpha: 0.4),
-            width: isSelected ? 2.0 : 1.0,
+                ? AppColors.primaryContainer
+                : (isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: isSelected
+                  ? AppColors.primary
+                  : (isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant).withValues(alpha: 0.4),
+              width: isSelected ? 2.0 : 1.0,
+            ),
           ),
-        ),
-        // Büyük metin ölçeğinde ya da dar karoda içerik tek satırda küçülür.
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
+          // Büyük metin ölçeğinde içerik küçültülmez; sığmazsa alt satıra geçer.
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8,
+            runSpacing: 4,
             children: [
-              Text(flag, style: const TextStyle(fontSize: 22)),
-              const SizedBox(width: 8),
+              ExcludeSemantics(child: Text(flag, style: const TextStyle(fontSize: 22))),
               Text(
                 label,
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
@@ -687,10 +780,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       : (isDark ? AppColors.darkOnSurface : AppColors.onSurface),
                 ),
               ),
-              if (isSelected) ...[
-                const SizedBox(width: 6),
-                const Icon(Icons.check_circle, size: 18, color: AppColors.primary),
-              ],
+              if (isSelected) const Icon(Icons.check_circle, size: 18, color: AppColors.primary),
             ],
           ),
         ),
@@ -770,6 +860,70 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
+  }
+
+  // Yardım: oyun kuralları, destek e-postası (sürüm ve cihaz bilgisiyle) ve
+  // görünür sürüm numarası.
+  Widget _buildHelp(AppLocalizations l10n, Color muted) {
+    const titleStyle = TextStyle(fontSize: 15, fontWeight: FontWeight.w500);
+    final subtitleStyle = TextStyle(fontSize: 12, color: muted);
+    final version = _appVersion;
+    return _buildSectionCard(
+      title: _sectionTitle(l10n.profileHelpSectionTitle),
+      child: Material(
+        color: Colors.transparent,
+        child: Column(
+          children: [
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(Icons.lightbulb_outline_rounded, color: muted),
+              title: Text(l10n.gameRulesTitle, style: titleStyle),
+              subtitle: Text(l10n.gameRulesProfileSub, style: subtitleStyle),
+              trailing: Icon(Icons.chevron_right, color: muted),
+              onTap: () => showGameRulesSheet(context),
+            ),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(Icons.mail_outline_rounded, color: muted),
+              title: Text(l10n.profileSupportTitle, style: titleStyle),
+              subtitle: Text(l10n.profileSupportSub, style: subtitleStyle),
+              trailing: Icon(Icons.open_in_new_rounded, size: 18, color: muted),
+              onTap: _contactSupport,
+            ),
+            if (version != null) ...[
+              const Divider(height: 16),
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: SelectableText(l10n.profileAppVersion(version), style: subtitleStyle),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _contactSupport() async {
+    final l10n = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+    final uri = supportEmailUri(l10n, version: _appVersion, device: deviceDescription());
+    var opened = false;
+    try {
+      opened = await launchUrl(uri);
+    } catch (e) {
+      debugPrint('[PROFILE] E-posta uygulaması açılamadı: $e');
+    }
+    if (opened) return;
+    // E-posta uygulaması yoksa adres gösterilir ve kopyalanabilir.
+    messenger.showSnackBar(SnackBar(
+      content: Text(l10n.supportMailFailed(kSupportEmail)),
+      behavior: SnackBarBehavior.floating,
+      duration: const Duration(seconds: 6),
+      action: SnackBarAction(
+        label: l10n.reportCopyAddress,
+        onPressed: () => unawaited(Clipboard.setData(const ClipboardData(text: kSupportEmail))),
+      ),
+    ));
   }
 
   // "Gizlenen kullanıcıları göster": hesabın gizleme listesi sıfırlanır.

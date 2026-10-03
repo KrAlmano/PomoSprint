@@ -342,15 +342,21 @@ class _FriendsSheetState extends State<FriendsSheet> {
                   alignment: Alignment.centerLeft,
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
+                    // Koyu temada darkPrimary (okunur kontrast).
                     child: Text(
                       _myCode ?? '------',
-                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: 2, color: AppColors.primary),
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 2,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
                     ),
                   ),
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.copy_rounded, size: 20, color: AppColors.primary),
+                icon: Icon(Icons.copy_rounded, size: 20, color: Theme.of(context).colorScheme.primary),
                 tooltip: l10n.friendsCopyCode,
                 onPressed: _myCode == null
                     ? null

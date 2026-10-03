@@ -120,9 +120,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
     if (mounted) {
       final initialCategories = categories;
+      final reduceMotion = MediaQuery.maybeDisableAnimationsOf(context) ?? false;
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
-          transitionDuration: const Duration(milliseconds: 600),
+          transitionDuration: reduceMotion ? Duration.zero : const Duration(milliseconds: 600),
           pageBuilder: (context, animation, secondaryAnimation) {
             return FadeTransition(
               opacity: animation,
@@ -151,8 +152,11 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     super.dispose();
   }
 
+  // Hareketi Azalt açıkken logo büyüyüp belirmez, doğrudan görünür.
   @override
-  Widget build(BuildContext context) => SplashView(fade: _fadeAnim, scale: _scaleAnim);
+  Widget build(BuildContext context) => (MediaQuery.maybeDisableAnimationsOf(context) ?? false)
+      ? const SplashView()
+      : SplashView(fade: _fadeAnim, scale: _scaleAnim);
 }
 
 /// Açılış ekranının görünümü (logo, başlık, yükleniyor göstergesi). Her

@@ -52,16 +52,35 @@ class _HourglassWidgetState extends State<HourglassWidget>
     ));
   }
 
+  /// Sistemde "Hareketi Azalt" (iOS) / "Animasyonları kaldır" (Android)
+  /// açıksa kum akmaz ve kum saati sallanmaz; durağan kare gösterilir.
+  bool get _reduceMotion => MediaQuery.maybeDisableAnimationsOf(context) ?? false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Ayar uygulama açıkken açıldıysa süren animasyon durdurulur; kapatıldıysa
+    // (animasyon yüklendikten sonra) sayaç çalışıyorsa kum yeniden akar.
+    if (_reduceMotion && _lottieController.isAnimating) {
+      _lottieController.stop();
+    } else if (!_reduceMotion &&
+        widget.isRunning &&
+        !_lottieController.isAnimating &&
+        _lottieController.duration != null) {
+      _lottieController.repeat();
+    }
+  }
+
   @override
   void didUpdateWidget(covariant HourglassWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (oldWidget.sandColor != widget.sandColor) {
+    if (oldWidget.sandColor != widget.sandColor && !_reduceMotion) {
       // Trigger shake animation when color (category) changes
       _shakeController.forward(from: 0.0);
     }
 
-    if (widget.isRunning) {
+    if (widget.isRunning && !_reduceMotion) {
       if (!_lottieController.isAnimating) {
         _lottieController.repeat(); // Sayaç çalışırken sürekli 60 FPS canlı kum akış animasyonu
       }
@@ -106,7 +125,7 @@ class _HourglassWidgetState extends State<HourglassWidget>
           onLoaded: (composition) {
             // Lottie kum saati animasyon hızı 1.0x orijinal hızında
             _lottieController.duration = composition.duration * 1.0;
-            if (widget.isRunning) {
+            if (widget.isRunning && !_reduceMotion) {
               _lottieController.repeat();
             } else if (widget.remainingSeconds >= widget.totalSeconds) {
               _lottieController.value = 0.0;

@@ -48,7 +48,9 @@ class ShellStatPill extends StatelessWidget {
                   Text(
                     label,
                     style: TextStyle(
-                      fontSize: 9,
+                      // Rozet büyük yazı ölçeğinde sığmazsa orantılı küçülür;
+                      // başlık bu yüzden 9 yerine 10 pt'den başlar.
+                      fontSize: 10,
                       fontWeight: FontWeight.bold,
                       color: foreground,
                       letterSpacing: 0.5,

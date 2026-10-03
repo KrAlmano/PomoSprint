@@ -12,6 +12,12 @@ import '../services/supabase_service.dart';
 import '../utils/responsive.dart';
 import '../widgets/auth/account_texts.dart';
 import '../widgets/auth/category_name_dialog.dart';
+import '../widgets/game_rules.dart';
+
+/// Yıl tekerleğinde [index] satırının doğum yılı. 0. satır "Doğum yılını
+/// seç" yer tutucusudur (null); sonrakiler [currentYear]'dan geriye doğru.
+@visibleForTesting
+int? birthYearForPickerIndex(int currentYear, int index) => index <= 0 ? null : currentYear - (index - 1);
 
 class PostAuthOnboardingScreen extends StatefulWidget {
   /// Onboarding sunucuya kaydedildikten sonra çağrılır. Güncel kullanıcı
@@ -37,10 +43,19 @@ class PostAuthOnboardingScreen extends StatefulWidget {
 }
 
 class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
-  static const int _totalSteps = 4; // Yaş, Segment, Kategoriler, Hedef
+  // Adımlar: yaş, segment, kategoriler, sıralamalarda görünürlük, kurallar, hedef.
+  static const int _ageStep = 0;
+  static const int _segmentStep = 1;
+  static const int _categoryStep = 2;
+  static const int _visibilityStep = 3;
+  static const int _rulesStep = 4;
+  static const int _goalStep = 5; // son adım: "Bitir"
+  static const int _totalSteps = _goalStep + 1;
   static const int _minimumAge = 13; // Kullanım Şartları ve Gizlilik Politikası
   static const int _birthYearCount = 87;
-  static const int _defaultAge = 17;
+
+  /// "Diğer / belirtmek istemiyorum": sunucuya segment yazılmaz (null).
+  static const String _otherSegment = 'other';
 
   // Hazır öneriler Türkçe anahtarlarla tutulur; ekranda ve kayıtta
   // kullanıcının diline çevrilir (LanguageService.translateCatName).
@@ -50,24 +65,36 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
     'university': ['Ders Çalışma', 'Ödev', 'Proje', 'Sınav Hazırlık'],
     'work': ['Derin Çalışma', 'Okuma', 'Öğrenme', 'Proje'],
   };
+  // Segment seçilmediğinde ya da "Diğer" seçildiğinde genel öneriler.
+  static const List<String> _generalRecommendations = ['Ders Çalışma', 'Okuma', 'Öğrenme', 'Proje'];
 
   final PageController _pageController = PageController();
   final int _currentYear = DateTime.now().year;
-  late int _birthYear = _currentYear - _defaultAge;
-  late final FixedExtentScrollController _yearController =
-      FixedExtentScrollController(initialItem: _currentYear - _birthYear);
+  // Yaş sorusu nötrdür: tekerlek bir yaşa önceden ayarlı değildir (ilk satır
+  // "Doğum yılını seç"); yıl seçilmeden ilerlenemez.
+  int? _birthYear;
+  final FixedExtentScrollController _yearController = FixedExtentScrollController();
 
   int _currentPage = 0;
   String? _userSegment;
   // Seçim sırası korunur; sunucudaki sıralama bu sırayla oluşur.
   final Set<String> _selectedCategoryNames = {};
   final List<String> _customCategoryNames = [];
+  // Sıralamalarda görünürlük açıkça sorulur; varsayılan seçim yoktur.
+  bool? _showInRankings;
   int _dailyGoalMinutes = 60;
   bool _isSaving = false;
+  // Yaş "Devam"da değerlendirilir (tekerlek çevrilirken uyarı çıkmaz, eşik
+  // yaş belli olmaz). 13 yaş altı yanıt verilince yıl bu ekranda bir daha
+  // değiştirilemez; kullanıcı çıkış yapabilir ya da hesabını silebilir.
+  bool _ageRejected = false;
 
-  bool get _isUnderMinimumAge => _currentYear - _birthYear < _minimumAge;
+  bool get _isUnderMinimumAge {
+    final year = _birthYear;
+    return year != null && _currentYear - year < _minimumAge;
+  }
 
-  List<String> get _recommendedCategoryNames => _recommendedBySegment[_userSegment] ?? const [];
+  List<String> get _recommendedCategoryNames => _recommendedBySegment[_userSegment] ?? _generalRecommendations;
 
   int get _categoryLimit =>
       categoryLimitFor(isPremium: SupabaseService.instance.currentUser.value?.isPremium ?? false);
@@ -132,7 +159,7 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
     final goal = _goalOptions.contains(draft.dailyGoalMinutes) ? draft.dailyGoalMinutes! : _dailyGoalMinutes;
     // Adım, doğrulamanın izin verdiği yerden ileride olamaz.
     var step = draft.step.clamp(0, _totalSteps - 1);
-    if (_currentYear - birthYear < _minimumAge) step = 0;
+    if (birthYear == null || _currentYear - birthYear < _minimumAge) step = 0;
     if (segment == null && step > 1) step = 1;
     if (selected.isEmpty && step > 2) step = 2;
 
@@ -147,7 +174,11 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
         ..addAll(selected);
       _dailyGoalMinutes = goal;
     });
-    if (_yearController.hasClients) _yearController.jumpToItem(_currentYear - _birthYear);
+    final restoredYear = _birthYear;
+    // Seçicinin 0. öğesi "seçilmedi"; yıl y, (bu yıl - y + 1). öğede.
+    if (_yearController.hasClients && restoredYear != null) {
+      _yearController.jumpToItem(_currentYear - restoredYear + 1);
+    }
     if (step > 0 && _pageController.hasClients) _pageController.jumpToPage(step);
   }
 
@@ -182,10 +213,15 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
   void _nextPage() {
     if (_isSaving) return;
     final l10n = AppLocalizations.of(context)!;
+    if (_currentPage == _ageStep && _isUnderMinimumAge && !_ageRejected) {
+      setState(() => _ageRejected = true);
+    }
+    // Segment isteğe bağlıdır: seçilmezse genel öneriler gösterilir.
     final error = switch (_currentPage) {
-      0 when _isUnderMinimumAge => l10n.onboardingUnder13Error,
-      1 when _userSegment == null => l10n.onboardingSelectOptionError,
-      2 when _selectedCategoryNames.isEmpty => l10n.onboardingSelectCategoryError,
+      _ageStep when _birthYear == null => l10n.onboardingBirthYearRequired,
+      _ageStep when _isUnderMinimumAge => l10n.onboardingUnder13Error,
+      _categoryStep when _selectedCategoryNames.isEmpty => l10n.onboardingSelectCategoryError,
+      _visibilityStep when _showInRankings == null => l10n.onboardingSelectOptionError,
       _ => null,
     };
     if (error != null) {
@@ -193,15 +229,22 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
       return;
     }
     if (_currentPage < _totalSteps - 1) {
-      _pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.ease);
+      _goToPage(_currentPage + 1);
     } else {
       _finishOnboarding();
     }
   }
 
   void _prevPage() {
-    if (_currentPage > 0 && !_isSaving) {
-      _pageController.previousPage(duration: const Duration(milliseconds: 300), curve: Curves.ease);
+    if (_currentPage > 0 && !_isSaving) _goToPage(_currentPage - 1);
+  }
+
+  // Hareketi Azalt açıkken adımlar canlandırılmadan değişir.
+  void _goToPage(int page) {
+    if (MediaQuery.maybeDisableAnimationsOf(context) ?? false) {
+      _pageController.jumpToPage(page);
+    } else {
+      _pageController.animateToPage(page, duration: const Duration(milliseconds: 300), curve: Curves.ease);
     }
   }
 
@@ -232,9 +275,11 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
       // gösterilir ve kategori kurulumu tekrar güvenle çalışır.
       await service.completeOnboarding(
         birthYear: _birthYear,
-        userSegment: _userSegment,
+        // "Diğer" sunucuda saklanmaz (CHECK yalnızca dört segmenti kabul eder).
+        userSegment: _userSegment == _otherSegment ? null : _userSegment,
         dailyGoalMinutes: _dailyGoalMinutes,
         categories: _categoryPayload(),
+        showInSocialFeed: _showInRankings,
       );
       await _closeDraft();
     } catch (e) {
@@ -396,6 +441,8 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
                       if (_currentPage > 0)
                         IconButton(
                           icon: Icon(Icons.arrow_back, color: textColor),
+                          // Ekran okuyucuda "Geri" diye okunur.
+                          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
                           onPressed: _isSaving ? null : _prevPage,
                         )
                       else
@@ -417,7 +464,8 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
                         child: Text(
                           '${_currentPage + 1}/$_totalSteps',
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 12, color: textColor.withValues(alpha: 0.5)),
+                          // Küçük metin: en az 4,5:1 kontrast için %70 opaklık.
+                          style: TextStyle(fontSize: 12, color: textColor.withValues(alpha: 0.7)),
                         ),
                       ),
                     ],
@@ -430,16 +478,21 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
                     physics: const NeverScrollableScrollPhysics(),
                     onPageChanged: (i) => setState(() => _currentPage = i),
                     children: [
-                      _buildAgeStep(isDark, textColor, sideBySide),
-                      _buildSegmentStep(isDark, textColor, sideBySide),
-                      _buildCategoryStep(isDark, textColor, sideBySide),
-                      _buildGoalStep(isDark, textColor, sideBySide),
+                      for (var step = 0; step < _totalSteps; step++)
+                        switch (step) {
+                          _ageStep => _buildAgeStep(isDark, textColor, sideBySide),
+                          _segmentStep => _buildSegmentStep(isDark, textColor, sideBySide),
+                          _categoryStep => _buildCategoryStep(isDark, textColor, sideBySide),
+                          _visibilityStep => _buildVisibilityStep(isDark, textColor, sideBySide),
+                          _rulesStep => _buildRulesStep(textColor, sideBySide),
+                          _ => _buildGoalStep(isDark, textColor, sideBySide),
+                        },
                     ],
                   ),
                 ),
 
                 Padding(
-                  padding: EdgeInsets.fromLTRB(20, sideBySide ? 4 : 0, 20, sideBySide ? 8 : 30),
+                  padding: EdgeInsets.fromLTRB(20, sideBySide ? 4 : 0, 20, sideBySide ? 8 : (r.height < 700 ? 12 : 30)),
                   child: ContentWidth(
                     maxWidth: ContentWidth.form,
                     child: ElevatedButton(
@@ -537,33 +590,52 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
         );
     final body = Text(
       l10n.onboardingWelcomeBody,
-      style: TextStyle(fontSize: 14, color: textColor.withValues(alpha: 0.6)),
+      style: TextStyle(fontSize: 14, color: textColor.withValues(alpha: 0.7)),
       textAlign: TextAlign.center,
     );
+    // İlk satır seçim değildir ("Doğum yılını seç"); yıllar ondan sonra
+    // bugünden geriye doğru sıralanır. Tekerlek hiçbir yaşa önceden ayarlı
+    // değildir; metin sorunun amacını söyler ama eşik yaşı söylemez (nötr
+    // yaş sorusu).
     Widget picker(double height) => SizedBox(
           height: height,
-          child: CupertinoPicker(
-            itemExtent: 52,
-            scrollController: _yearController,
-            onSelectedItemChanged: (i) {
-              setState(() => _birthYear = _currentYear - i);
-            },
-            children: List.generate(_birthYearCount, (i) {
-              return Center(
-                child: Text(
-                  (_currentYear - i).toString(),
-                  style: TextStyle(
-                    fontSize: 22,
-                    color: textColor,
-                    fontWeight: FontWeight.w500,
+          // 13 yaş altı yanıttan sonra kilitli (bkz. _ageRejected).
+          child: IgnorePointer(
+            ignoring: _ageRejected,
+            child: Opacity(
+              opacity: _ageRejected ? 0.4 : 1,
+              child: CupertinoPicker(
+                itemExtent: 52,
+                scrollController: _yearController,
+                onSelectedItemChanged: (i) {
+                  setState(() => _birthYear = birthYearForPickerIndex(_currentYear, i));
+                },
+                children: [
+                  Center(
+                    child: Text(
+                      l10n.onboardingBirthYearPlaceholder,
+                      style: TextStyle(
+                          fontSize: 18, color: textColor.withValues(alpha: 0.55), fontWeight: FontWeight.w500),
+                    ),
                   ),
-                ),
-              );
-            }),
+                  for (var i = 0; i < _birthYearCount; i++)
+                    Center(
+                      child: Text(
+                        (_currentYear - i).toString(),
+                        style: TextStyle(
+                          fontSize: 22,
+                          color: textColor,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
           ),
         );
     final underAge = [
-      if (_isUnderMinimumAge) ...[
+      if (_ageRejected) ...[
         Padding(
           padding: EdgeInsets.fromLTRB(sideBySide ? 8 : 32, 12, sideBySide ? 8 : 32, 0),
           child: Text(
@@ -611,22 +683,27 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
       );
     }
 
+    // Kısa dikey ekranda (ör. 320x568, iPad Slide Over) yıl seçici
+    // kaydırmadan görünsün diye maskot, boşluklar ve seçici küçülür.
+    final compact = MediaQuery.sizeOf(context).height < 700;
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(vertical: 20),
+      padding: EdgeInsets.symmetric(vertical: compact ? 8 : 20),
       child: _formWidth(
         Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildMascotAvatar(),
-            const SizedBox(height: 20),
-            title(28),
+            if (!compact) ...[
+              _buildMascotAvatar(),
+              const SizedBox(height: 20),
+            ],
+            title(compact ? 24 : 28),
             const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32),
               child: body,
             ),
-            const SizedBox(height: 32),
-            picker(220),
+            SizedBox(height: compact ? 12 : 32),
+            picker(compact ? 150 : 220),
             ...underAge,
           ],
         ),
@@ -641,13 +718,16 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
         style: TextStyle(fontSize: sideBySide ? 22 : 26, fontWeight: FontWeight.bold, color: textColor));
     final body = Text(l10n.onboardingSegmentBody,
         textAlign: TextAlign.center,
-        style: TextStyle(fontSize: 14, color: textColor.withValues(alpha: 0.6)));
+        style: TextStyle(fontSize: 14, color: textColor.withValues(alpha: 0.7)));
     final options = [
       _optionButton(l10n.onboardingSegmentLgs, _userSegment == 'lgs', () => _selectSegment('lgs'), isDark, textColor),
       _optionButton(l10n.onboardingSegmentYks, _userSegment == 'yks', () => _selectSegment('yks'), isDark, textColor),
       _optionButton(l10n.onboardingSegmentUniversity, _userSegment == 'university',
           () => _selectSegment('university'), isDark, textColor),
       _optionButton(l10n.onboardingSegmentWork, _userSegment == 'work', () => _selectSegment('work'), isDark, textColor),
+      // Segment isteğe bağlı: "Diğer" ile (ya da seçmeden) genel öneriler gelir.
+      _optionButton(l10n.onboardingSegmentOther, _userSegment == _otherSegment, () => _selectSegment(_otherSegment),
+          isDark, textColor),
     ];
 
     if (sideBySide) {
@@ -677,29 +757,36 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
   }
 
   Widget _optionButton(String label, bool isSelected, VoidCallback onTap, bool isDark, Color textColor) {
+    // Koyu temada darkPrimary: seçili metin koyu zeminde okunur kalır.
+    final accent = Theme.of(context).colorScheme.primary;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: isSelected ? AppColors.primary : (isDark ? Colors.white24 : Colors.black12),
-              width: isSelected ? 2 : 1,
+      // Ekran okuyucu seçeneği düğme olarak ve seçili durumuyla duyurur.
+      child: Semantics(
+        button: true,
+        selected: isSelected,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(14),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: isSelected ? accent : (isDark ? Colors.white24 : Colors.black12),
+                width: isSelected ? 2 : 1,
+              ),
+              borderRadius: BorderRadius.circular(14),
+              color: isSelected ? accent.withValues(alpha: 0.1) : Colors.transparent,
             ),
-            borderRadius: BorderRadius.circular(14),
-            color: isSelected ? AppColors.primary.withValues(alpha: 0.1) : Colors.transparent,
-          ),
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              color: isSelected ? AppColors.primary : textColor,
+            child: Text(
+              label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                color: isSelected ? accent : textColor,
+              ),
             ),
           ),
         ),
@@ -711,19 +798,26 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
     final l10n = AppLocalizations.of(context)!;
     final lang = LanguageService.instance;
     final limit = _categoryLimit;
-    Widget chip(String name) => ChoiceChip(
-          label: Text(lang.translateCatName(name)),
-          selected: _selectedCategoryNames.contains(name),
-          selectedColor: AppColors.primary.withValues(alpha: 0.2),
-          onSelected: (val) => _toggleCategory(name, val),
-        );
+    Widget chip(String name) {
+      final selected = _selectedCategoryNames.contains(name);
+      return ChoiceChip(
+        label: Text(lang.translateCatName(name)),
+        selected: selected,
+        selectedColor: isDark ? AppColors.darkPrimaryContainer : AppColors.primary.withValues(alpha: 0.2),
+        // Koyu temada temanın seçili çip metni (siyah) koyu kırmızı zeminde
+        // okunmuyordu (1,2:1); açık ton kullanılır.
+        labelStyle: selected && isDark ? const TextStyle(color: AppColors.darkOnPrimaryContainer) : null,
+        checkmarkColor: isDark ? AppColors.darkOnPrimaryContainer : null,
+        onSelected: (val) => _toggleCategory(name, val),
+      );
+    }
     final title = Text(l10n.onboardingCategoryStepTitle,
         textAlign: TextAlign.center,
         style: TextStyle(fontSize: sideBySide ? 22 : 26, fontWeight: FontWeight.bold, color: textColor));
     final body = Text(
       l10n.onboardingCategoryStepBodyLimit(limit),
       textAlign: TextAlign.center,
-      style: TextStyle(fontSize: 13, color: textColor.withValues(alpha: 0.6)),
+      style: TextStyle(fontSize: 13, color: textColor.withValues(alpha: 0.7)),
     );
     final counter = Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -733,7 +827,8 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
       ),
       child: Text(
         '${_selectedCategoryNames.length} / $limit',
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.primary),
+        // Koyu temada darkPrimary (okunur kontrast).
+        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Theme.of(context).colorScheme.primary),
       ),
     );
     // Çipler satırlara sarılır; geniş ekranda satır başına daha çok çip düşer.
@@ -788,6 +883,75 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
     );
   }
 
+  /// Seçenekli adımların ortak düzeni (segment adımındakiyle aynı).
+  Widget _optionsStep({
+    required String titleText,
+    required String bodyText,
+    required List<Widget> options,
+    required Color textColor,
+    required bool sideBySide,
+  }) {
+    final title = Text(titleText,
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: sideBySide ? 22 : 24, fontWeight: FontWeight.bold, color: textColor));
+    final body = Text(bodyText,
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 14, height: 1.4, color: textColor.withValues(alpha: 0.7)));
+    if (sideBySide) {
+      return _sideBySideStep(
+        header: [_buildMascotAvatar(size: 56), const SizedBox(height: 10), title, const SizedBox(height: 6), body],
+        content: (_) => options,
+      );
+    }
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+      child: _formWidth(
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildMascotAvatar(size: 76),
+            const SizedBox(height: 16),
+            title,
+            const SizedBox(height: 8),
+            body,
+            const SizedBox(height: 24),
+            ...options,
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Sıralamalarda görünürlük (show_in_social_feed) açıkça sorulur; iki
+  /// seçenekten biri seçilmeden ilerlenemez, varsayılan seçim yoktur.
+  Widget _buildVisibilityStep(bool isDark, Color textColor, bool sideBySide) {
+    final l10n = AppLocalizations.of(context)!;
+    return _optionsStep(
+      titleText: l10n.onboardingVisibilityTitle,
+      bodyText: l10n.onboardingVisibilityBody,
+      textColor: textColor,
+      sideBySide: sideBySide,
+      options: [
+        _optionButton(l10n.onboardingVisibilityYes, _showInRankings == true,
+            () => setState(() => _showInRankings = true), isDark, textColor),
+        _optionButton(l10n.onboardingVisibilityNo, _showInRankings == false,
+            () => setState(() => _showInRankings = false), isDark, textColor),
+      ],
+    );
+  }
+
+  /// İlk kullanımda oyun kuralları: tek duraklatma, günlük sınır, puan ve kum.
+  Widget _buildRulesStep(Color textColor, bool sideBySide) {
+    final l10n = AppLocalizations.of(context)!;
+    return _optionsStep(
+      titleText: l10n.gameRulesTitle,
+      bodyText: l10n.onboardingRulesBody,
+      textColor: textColor,
+      sideBySide: sideBySide,
+      options: const [GameRulesList()],
+    );
+  }
+
   Widget _buildGoalStep(bool isDark, Color textColor, bool sideBySide) {
     final l10n = AppLocalizations.of(context)!;
     final title = Text(
@@ -797,7 +961,7 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
     );
     final body = Text(
       l10n.onboardingGoalStepBody,
-      style: TextStyle(fontSize: 14, color: textColor.withValues(alpha: 0.6)),
+      style: TextStyle(fontSize: 14, color: textColor.withValues(alpha: 0.7)),
       textAlign: TextAlign.center,
     );
     final options = [
