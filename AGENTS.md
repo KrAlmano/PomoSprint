@@ -228,7 +228,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 - Görünen ad denetimi `utils/name_filter.dart` (kayıt, profil ad düzenleme, Google/Apple ilk adı). Sunucuda içerik denetimi yok (§10).
 
 **Tuzaklar**
-- Arkadaş silme ve giden isteği iptal UI'ı yok: `remove_friend`, `cancel_friend_request`, `get_outgoing_friend_requests` canlıda yok.
+- Arkadaş silme ve giden isteği iptal UI'ı yok: `remove_friend`, `cancel_friend_request`, `get_outgoing_friend_requests` canlıda yok (öneri: `proposed/14`; uygulanmadan istemciden çağırma).
 - `add_friend_by_code` / `respond_friend_request` yanıtında makine-okunur `code` yok (`proposed/07` E bölümü); İngilizce arayüzde metin eşlemesi zayıf.
 - Sosyal ekran 30 sn'de bir poll yapar; görünmezken durur.
 - Avatar görseli: uygulamada `assets/avatars/<asset_key>`, sitede `landing/avatars/<id>.webp`.
@@ -267,6 +267,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 | `proposed/11_audit_fixes_unapplied.sql` (eski `20261003120000_audit_fixes`) | **Uygulanmadı**, `migrations/`'tan taşındı. Başındaki durum notu hangi parçanın gereksiz olduğunu söyler |
 | `proposed/01`–`10` | Uygulanmadı. Sıra ve kapsam `proposed/README.md`'de |
 | `proposed/13_sunucu_butunluk.sql` (+ `_down`, `tests/proposed_13_*`) | **Uygulanmadı.** UX-01 sunucu başlangıç kaydı (`register_session_start`), lig dönemi sınırı, friend_code yeniden deneme + deneme sınırı, `profiles.email` boşaltma, `app_config`/`get_app_config`, içerik trigger'ları, `pg_temp`. İstemci sözleşmesi dosya başında; istemci bu RPC'leri canlıya uygulanmadan çağırmaz |
+| `proposed/14_gizlilik_sosyal` (+ `_down`, `tests/proposed_14_gizlilik_sosyal_dryrun.sql`) | **Uygulanmadı.** Engelleme, bildirim, onay kaydı, saklama işleri, bülten RPC'leri. Canlı gövdeden; md5 ön koşulu var. İstemci sözleşmesi ve sıra `proposed/README.md` "Öneri 14" |
 
 **Canlıda olmayan RPC'ler:** `reorder_categories`, `remove_friend`, `cancel_friend_request`, `get_outgoing_friend_requests`, `set_my_timezone`, `get_my_category_limit` (ayrıca `get_my_streak`, `study_day_of`, `my_friend_ids`, `synced_at` kolonu). Gerekirse `proposed/11`'den canlı gövdelere göre ayrı migration yaz.
 
@@ -525,7 +526,7 @@ curl -sI https://pomosprint.app/reset-password | grep -i cache-control   # no-st
 | P1 | Seans başlangıcı istemci saatine güveniyor (UX-01); geç gelen seans yeni lig dönemine yazılıyor | `proposed/13` (DRYRUN → dosya, SQL Editor'de kullanıcı). Ürün kararı: `app_config.unverified_session_daily_cap` (vars. `null`) |
 | P2 | Görünen ad için sunucu tarafı içerik denetimi yok | İstemci `NameFilter` doğrudan `profiles.name` UPDATE'iyle aşılabilir. `proposed/13`: `profiles.name`/`categories.name` BEFORE trigger'ı + küçük liste (`blocked_name_terms`) |
 | P2 | Google/Apple ile ilk girişte onay sürümü kaydedilmiyor | Bildirim metni gösteriliyor; istenirse ilk girişte `auth.updateUser(data: {terms_version, privacy_version, terms_accepted_at})` |
-| P2 | Kullanıcı engelleme sunucuda değil | Gizleme cihazda; arkadaşlıktan çıkarma RPC'si (`remove_friend`) canlıda yok |
+| P2 | Kullanıcı engelleme sunucuda değil | Gizleme cihazda; arkadaşlıktan çıkarma RPC'si (`remove_friend`) canlıda yok. Sunucu önerisi `proposed/14` (engel, bildirim kaydı, onay defteri, saklama işleri); Apple için istemci ön koşulu var |
 | P1 | Supabase Auth panel ayarları repoda yok | Redirect URLs (`/reset-password`, `/confirmed`, `.html`'li hâlleri; `io.supabase.pomosprint://` silinmeli), Reset Password şablonu `token_hash`, Leaked password protection, Apple provider (Client ID `com.pomosprint.app`) |
 | P2 | `proposed/11` RPC'leri canlıda yok | Arkadaş silme/iptal UI'ı ve toplu kategori sıralaması bunlara bağlı |
 | P2 | `proposed/15` (aylık sıralama = çalışma ayı) ve `proposed/16` (kategori sırası, silme/kolon yetkileri) uygulanmadı | Her ikisinin DRYRUN'u yerel taklitte doğrulandı; kullanıcı SQL Editor'de önce DRYRUN, sonra dosyayı çalıştırır |

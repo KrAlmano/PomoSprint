@@ -2,7 +2,7 @@
 
 Her bulgu ayrı bir ajan tarafından kodda çürütülmeye çalışıldı; aşağıdakiler doğrulananlar ve doğrulayıcıların ek bulgularıdır (V ile biten id). Durum sütunu düzeltme ajanlarının raporuna dayanır. "Kısmen" olanların bir kısmı aynı gün başka paket ya da canlı DB migration'ı ile tamamlandı; güncel durum için ana rapora bakın.
 
-**Toplam:** 245 bulgu — 🔴 7 kritik, 🟠 28 yüksek, 🟡 112 orta, ⚪ 98 düşük. Durum: ✅ 193 düzeltildi, 🟨 30 kısmen, ⏸ 4 yapılmadı, ❔ 18 ayrı kayıt yok (çoğu başka bir bulguyla birlikte kapandı).
+**Toplam:** 245 bulgu — 🔴 7 kritik, 🟠 28 yüksek, 🟡 112 orta, ⚪ 98 düşük. Durum: ✅ 192 düzeltildi, 🟨 31 kısmen, ⏸ 4 yapılmadı, ❔ 18 ayrı kayıt yok (çoğu başka bir bulguyla birlikte kapandı).
 
 ## TIMER — Sayaç, kabuk, bildirimler (32)
 
@@ -122,7 +122,7 @@ Her bulgu ayrı bir ajan tarafından kodda çürütülmeye çalışıldı; aşa�
 | SOCIAL-17 | 🟡 | Profildeki 'Bildirimler' anahtarı hiçbir şeye bağlı değil | `lib/screens/profile_screen.dart:58` | ✅ Düzeltildi |
 | SOCIAL-18 | 🟡 | Profilden kategori yönetimine gidip dönünce ana ekran kategorileri tazelenmiyor; ProfileScreen'de ölü parametreler var | `lib/screens/profile_screen.dart:315-321` | ✅ Düzeltildi |
 | SOCIAL-19 | 🟡 | Arkadaşlık yönü tutarsız: arkadaş listesi tek yönlü, canlı liste iki yönlü OR-join yapıyor | `lib/services/supabase_service.dart:1142-1147` | ✅ Düzeltildi |
-| SOCIAL-20 | 🟡 | Arkadaş yönetimi eksik: silme/engelleme/giden isteği iptal yok, kod normalize edilmiyor, ham hata metni gösteriliyor | `lib/screens/friends_sheet.dart:55-92` | ✅ Düzeltildi |
+| SOCIAL-20 | 🟡 | Arkadaş yönetimi eksik: silme/engelleme/giden isteği iptal yok, kod normalize edilmiyor, ham hata metni gösteriliyor | `lib/screens/friends_sheet.dart:55-92` | 🟨 Kısmen |
 | SOCIAL-22 | 🟡 | Hesap silme: yükleniyor durumu yok, cihazdaki kullanıcı verileri silinmiyor, onay metni sadece Türkçe | `lib/screens/profile_screen.dart:735-791` | ✅ Düzeltildi |
 | SOCIAL-V02 | 🟡 | Splash'teki getAvatars çağrısının zaman aşımı yok: zayıf ağda açılış dakikalarca takılabilir | `lib/screens/splash_screen.dart:86-100` | ✅ Düzeltildi |
 | SOCIAL-V03 | 🟡 | Küçük liglerde (3 veya daha az üye) herkes terfi ediyor, 10'dan az üyede düşme yok: az kullanıcıyla lig sistemi anlamsızlaşıyor | `supabase/migrations/20260809022700_fixes_rls_zones_up.sql:43-64` | 🟨 Kısmen |
