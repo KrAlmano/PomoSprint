@@ -235,7 +235,10 @@
     });
   };
 
-  // Kurtarma oturumunu yalnızca bu tarayıcıda kapat (diğer cihazlar etkilenmez)
+  // Kurtarma oturumunu bu tarayıcıda kapat (scope=local: bu çağrı yalnızca bu
+  // oturumu kapatır). Not: şifre değişikliğinin kendisi (PUT /user) GoTrue'da
+  // hesabın DİĞER oturumlarını da kapatır; uygulama bunu giriş ekranında
+  // "oturumun sona erdi" diye açıklar.
   var endSession = function (token) {
     api.request("/auth/v1/logout?scope=local", { token: token }).then(null, function () {});
   };

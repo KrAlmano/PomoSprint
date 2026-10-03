@@ -19,12 +19,18 @@ import '../models/user_model.dart';
 import '../utils/name_filter.dart';
 import '../utils/study_day.dart';
 import 'hidden_users.dart';
+import 'lock_screen_timer.dart';
+import 'notification_service.dart';
+import 'onboarding_draft.dart';
+import 'platform_env.dart' if (dart.library.io) 'platform_env_io.dart';
 import 'server_clock.dart';
 import 'service_errors.dart';
 import 'session_queue.dart';
+import 'sign_out_notice.dart';
 import 'timer_persistence.dart';
 
 export 'service_errors.dart';
+export 'sign_out_notice.dart';
 export 'session_queue.dart'
     show
         PendingSession,
@@ -83,6 +89,36 @@ class SupabaseService {
   // halde çıkış yapmış hesap geri geliyor ya da hesaplar karışıyordu.
   int _userEpoch = 0;
 
+  /// Oturumun neden kapandığı (hesap silindi, oturum uzaktan düştü, Apple
+  /// izni kaldırıldı). Giriş ekranı [takeSignOutNotice] ile bir kez okur.
+  /// Kullanıcının kendi çıkışında ayarlanmaz.
+  final ValueNotifier<SignOutNotice?> signOutNotice = ValueNotifier<SignOutNotice?>(null);
+
+  /// Bekleyen açıklamayı döndürür ve temizler.
+  SignOutNotice? takeSignOutNotice() {
+    final notice = signOutNotice.value;
+    if (notice != null) signOutNotice.value = null;
+    return notice;
+  }
+
+  // Uygulamanın kendi başlattığı çıkış/silme sürerken > 0. Bu sırada gelen
+  // signedOut olayları (ör. silinen hesabın token yenilemesi) "oturum
+  // uzaktan düştü" sayılmaz.
+  int _localSignOutDepth = 0;
+
+  /// Oturum kapanınca (çıkış, silme, uzaktan düşme) cihazda kalan seans
+  /// göstergelerini kapatır: zamanlanmış bitiş bildirimi (Android exact
+  /// alarm dahil), Android kalıcı bildirimi, iOS Canlı Etkinlik. Testte
+  /// değiştirilebilir.
+  @visibleForTesting
+  static Future<void> Function() sessionEndedCleanup = _defaultSessionEndedCleanup;
+
+  static Future<void> _defaultSessionEndedCleanup() async {
+    if (isFlutterTestEnvironment) return;
+    await NotificationService.instance.cancelSessionEndNotification();
+    await LockScreenTimer.instance.clear();
+  }
+
   /// Sunucu ile cihaz saati arasındaki tahmini fark (sunucu - cihaz).
   Duration? get serverClockOffset => _clock.offset;
 
@@ -109,6 +145,12 @@ class SupabaseService {
   static const String _avatarCatalogKey = 'avatar_catalog_v1';
   static const String _legacyDailyGoalKey = 'daily_pomo_goal';
   static const Duration _requestTimeout = Duration(seconds: 15);
+  // Giriş, kayıt, sıfırlama ve sosyal giriş istekleri (captive portal'da
+  // buton sonsuza dek dönmesin).
+  static const Duration _authTimeout = Duration(seconds: 25);
+  // Hesap silme: Apple token iptali + silme tek istekte.
+  static const Duration _deleteAccountTimeout = Duration(seconds: 30);
+  static const String _appleIdentityKey = 'apple_sign_in_identity';
   // İstemci kuralları sunucudaki CHECK'lerin (name 1..50, daily_goal_minutes
   // 5..1440, birth_year 1900..2100) içinde kalır.
   static const int _nameMinLength = 2;
@@ -136,6 +178,22 @@ class SupabaseService {
 
   void _requireCloudForAuth() {
     if (!_isCloudActive) throw const AuthFailure(AuthErrorCode.cloudUnavailable);
+  }
+
+  /// Auth isteğini zaman aşımıyla çalıştırır. Zaman aşımı
+  /// [AuthFailure]([onTimeout]) olur (varsayılan: bağlantı hatası); diğer
+  /// hatalar olduğu gibi geçer.
+  @visibleForTesting
+  static Future<T> runAuthRequest<T>(
+    Future<T> Function() body, {
+    Duration timeout = _authTimeout,
+    AuthErrorCode onTimeout = AuthErrorCode.network,
+  }) async {
+    try {
+      return await body().timeout(timeout);
+    } on TimeoutException catch (e) {
+      throw AuthFailure(onTimeout, e);
+    }
   }
 
   /// İsteği zaman aşımıyla çalıştırır, hatayı [ServiceException]'a çevirir.
@@ -196,11 +254,7 @@ class SupabaseService {
       );
       _isCloudActive = true;
       _authSubscription ??= _client.auth.onAuthStateChange.listen(
-        (data) {
-          // Kullanıcı eylemi ya da başarısız token yenilemesi: kullanıcıya
-          // özel durumu temizle (bekleyen seans kuyruğu korunur).
-          if (data.event == AuthChangeEvent.signedOut) unawaited(_clearUserScopedState());
-        },
+        handleAuthStateChange,
         onError: (Object e) => debugPrint('[AUTH] onAuthStateChange hatası: $e'),
       );
       debugPrint('[INIT] Supabase bağlandı.');
@@ -221,27 +275,70 @@ class SupabaseService {
     clientId: _googleIosClientId,
   );
 
-  /// Supabase oturumunu ve Google'ın native oturumunu kapatır, kullanıcıya
+  /// Supabase oturumunu ve Google'ın native oturumunu kapatır, cihazdaki
+  /// seans göstergelerini ([sessionEndedCleanup]) kaldırır, kullanıcıya
   /// özel önbellekleri ve singleton durumlarını temizler. Bekleyen seans
   /// kuyruğu kullanıcı kimliğine bağlı olarak diskte kalır; başka bir
-  /// hesaba gönderilmez.
-  Future<void> signOutFully() async {
+  /// hesaba gönderilmez. [notice] verilirse giriş ekranı onu açıklar.
+  Future<void> signOutFully({SignOutNotice? notice}) async {
     final email = currentUser.value?.email;
     final uid = currentUser.value?.id;
+    _localSignOutDepth++;
     try {
-      await _googleSignIn.signOut();
+      if (notice != null) signOutNotice.value = notice;
+      await _endDeviceSession();
+      if (_isCloudActive) {
+        try {
+          await _client.auth.signOut();
+        } catch (e) {
+          debugPrint('[AUTH] Supabase signOut hatası: $e');
+        }
+      }
+      await _clearUserScopedState(email: email, uid: uid);
+    } finally {
+      _localSignOutDepth--;
+    }
+  }
+
+  /// Supabase auth olayları. Tek "oturum kapandı" kancası: kullanıcı
+  /// çıkışı ve silme [signOutFully]'den, uzaktan düşme (token yenilenemedi:
+  /// şifre değişti, hesap başka cihazda kapatıldı/silindi) buradan geçer;
+  /// uzaktan düşmede Google oturumu ve seans göstergeleri de kapatılır ve
+  /// giriş ekranı nedenini açıklar.
+  @visibleForTesting
+  void handleAuthStateChange(AuthState data) {
+    if (data.event != AuthChangeEvent.signedOut) return;
+    final remote = data.signOutReason == SignOutReason.sessionExpired &&
+        _localSignOutDepth == 0 &&
+        currentUser.value != null;
+    if (!remote) {
+      // Kullanıcı eylemi: kullanıcıya özel durumu temizle (kuyruk korunur).
+      unawaited(_clearUserScopedState());
+      return;
+    }
+    signOutNotice.value = SignOutNotice.sessionExpired;
+    unawaited(() async {
+      await _endDeviceSession();
+      await _clearUserScopedState();
+    }());
+  }
+
+  /// Cihazdaki seans göstergelerini ve Google native oturumunu kapatır;
+  /// hiçbir adım hata fırlatmaz ya da çıkışı süresiz bekletmez.
+  Future<void> _endDeviceSession() async {
+    try {
+      await sessionEndedCleanup();
+    } catch (e) {
+      debugPrint('[AUTH] Seans göstergeleri kapatılamadı: $e');
+    }
+    // Testte Google eklentisi yok; kanal çağrı zinciri test zone'unda asılı kalır.
+    if (isFlutterTestEnvironment) return;
+    try {
+      await _googleSignIn.signOut().timeout(_requestTimeout);
     } catch (e) {
       // Apple/e-posta kullanıcısında Google oturumu yoktur; beklenen durum.
       debugPrint('[AUTH] GoogleSignIn signOut: $e');
     }
-    if (_isCloudActive) {
-      try {
-        await _client.auth.signOut();
-      } catch (e) {
-        debugPrint('[AUTH] Supabase signOut hatası: $e');
-      }
-    }
-    await _clearUserScopedState(email: email, uid: uid);
   }
 
   Future<void> _clearUserScopedState({String? email, String? uid}) async {
@@ -257,6 +354,8 @@ class SupabaseService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_savedUserKey);
       await prefs.remove('saved_categories');
+      // Apple ile girişin cihazdaki kaydı yalnızca o oturum için geçerli.
+      await prefs.remove(_appleIdentityKey);
       if (mail != null && mail.isNotEmpty) await prefs.remove('saved_categories_$mail');
       if (id != null && id.isNotEmpty) await prefs.remove('saved_categories_uid_$id');
     } catch (e) {
@@ -301,11 +400,15 @@ class SupabaseService {
     final cleanEmail = email.trim().toLowerCase();
 
     try {
-      final response = await _client.auth.signUp(
-        email: cleanEmail,
-        password: password,
-        emailRedirectTo: 'https://pomosprint.app/confirmed.html',
-        data: data,
+      // Zaman aşımında kayıt sunucuda tamamlanmış olabilir; ayrı metin gösterilir.
+      final response = await runAuthRequest(
+        () => _client.auth.signUp(
+          email: cleanEmail,
+          password: password,
+          emailRedirectTo: 'https://pomosprint.app/confirmed.html',
+          data: data,
+        ),
+        onTimeout: AuthErrorCode.signUpTimedOut,
       );
       // GoTrue, kayıtlı e-posta için hata yerine boş identities döndürür.
       final identities = response.user?.identities;
@@ -323,10 +426,10 @@ class SupabaseService {
 
   Future<UserModel?> loginUser(String email, String password) async {
     _requireCloudForAuth();
-    final response = await _client.auth.signInWithPassword(
-      email: email.trim().toLowerCase(),
-      password: password,
-    );
+    final response = await runAuthRequest(() => _client.auth.signInWithPassword(
+          email: email.trim().toLowerCase(),
+          password: password,
+        ));
     if (response.user == null) return null;
     return _loadUserAfterSignIn();
   }
@@ -343,7 +446,7 @@ class SupabaseService {
       // gösterilmez. Yalnızca null dönerse interaktif signIn'e düşülür.
       googleUser = await _googleSignIn.signInSilently() ?? await _googleSignIn.signIn();
       if (googleUser == null) return null;
-      final googleAuth = await googleUser.authentication;
+      final googleAuth = await runAuthRequest(() => googleUser!.authentication);
       idToken = googleAuth.idToken;
       accessToken = googleAuth.accessToken;
     } on PlatformException catch (e) {
@@ -353,11 +456,11 @@ class SupabaseService {
     }
     if (idToken == null) throw const AuthFailure(AuthErrorCode.googleSignInFailed);
 
-    final response = await _client.auth.signInWithIdToken(
-      provider: OAuthProvider.google,
-      idToken: idToken,
-      accessToken: accessToken,
-    );
+    final response = await runAuthRequest(() => _client.auth.signInWithIdToken(
+          provider: OAuthProvider.google,
+          idToken: idToken!,
+          accessToken: accessToken,
+        ));
     if (response.user == null) throw const AuthFailure(AuthErrorCode.googleSignInFailed);
 
     await _cleanupDuplicateIdentity();
@@ -392,12 +495,15 @@ class SupabaseService {
     final idToken = credential.identityToken;
     if (idToken == null) throw const AuthFailure(AuthErrorCode.appleSignInFailed);
 
-    final response = await _client.auth.signInWithIdToken(
-      provider: OAuthProvider.apple,
-      idToken: idToken,
-      nonce: rawNonce,
-    );
+    final response = await runAuthRequest(() => _client.auth.signInWithIdToken(
+          provider: OAuthProvider.apple,
+          idToken: idToken,
+          nonce: rawNonce,
+        ));
     if (response.user == null) throw const AuthFailure(AuthErrorCode.appleSignInFailed);
+    // Bu cihazda Apple ile girildi: açılışta/ön plana dönüşte izin durumu
+    // bu kimlikle denetlenir (verifyAppleCredential).
+    await _rememberAppleIdentity(response.user!.id, credential.userIdentifier);
 
     await _cleanupDuplicateIdentity();
     // Apple adı yalnızca ilk girişte verir; profil oluşturulurken kullanılır.
@@ -505,36 +611,232 @@ class SupabaseService {
 
   Future<void> resendConfirmationEmail(String email) async {
     _requireCloudForAuth();
-    await _client.auth.resend(
-      type: OtpType.signup,
-      email: email.trim().toLowerCase(),
-      emailRedirectTo: 'https://pomosprint.app/confirmed.html',
-    );
+    await runAuthRequest(() => _client.auth.resend(
+          type: OtpType.signup,
+          email: email.trim().toLowerCase(),
+          emailRedirectTo: 'https://pomosprint.app/confirmed.html',
+        ));
   }
 
   // Supabase, hesap keşfini önlemek için e-posta kayıtlı olsun ya da olmasın
   // aynı şekilde davranır; başarılı dönüş e-postanın var olduğunu göstermez.
   Future<void> resetPassword(String email) async {
     _requireCloudForAuth();
-    await _client.auth.resetPasswordForEmail(
-      email.trim().toLowerCase(),
-      redirectTo: 'https://pomosprint.app/reset-password.html',
-    );
+    await runAuthRequest(() => _client.auth.resetPasswordForEmail(
+          email.trim().toLowerCase(),
+          redirectTo: 'https://pomosprint.app/reset-password.html',
+        ));
   }
 
-  /// Hesabı sunucudan siler (delete_own_account: auth.users satırı; profil,
+  // ---- Şifre ve sağlayıcılar ----
+
+  /// [user]'ın bağlı giriş sağlayıcılarından biri [provider] mı
+  /// (app_metadata.provider/providers ya da identities)?
+  @visibleForTesting
+  static bool userHasProvider(User user, String provider) {
+    final meta = user.appMetadata;
+    final providers = meta['providers'];
+    if (providers is List && providers.map((e) => e.toString()).contains(provider)) return true;
+    if (meta['provider']?.toString() == provider) return true;
+    return user.identities?.any((i) => i.provider == provider) ?? false;
+  }
+
+  User? get _authUserOrNull => _isCloudActive ? _client.auth.currentUser : null;
+
+  /// Hesabın e-posta/şifre girişi var mı? (Google/Apple ile açılmış hesapta
+  /// şifre yoktur; "Şifremi unuttum" ile şifre belirlenebilir.)
+  bool get canChangePassword {
+    final user = _authUserOrNull;
+    return user != null && (user.email ?? '').isNotEmpty && userHasProvider(user, 'email');
+  }
+
+  /// Uygulama içi şifre değiştirme: önce mevcut şifreyle yeniden doğrulanır
+  /// (yanlışsa [AuthErrorCode.invalidCredentials]), sonra yeni şifre
+  /// yazılır. GoTrue şifre değişince hesabın diğer oturumlarını kapatır.
+  Future<void> changePassword({required String currentPassword, required String newPassword}) async {
+    _requireCloudForAuth();
+    final email = _client.auth.currentUser?.email;
+    if (email == null || email.isEmpty) throw const AuthFailure(AuthErrorCode.unknown);
+    if (newPassword == currentPassword) throw const AuthFailure(AuthErrorCode.samePassword);
+    await runAuthRequest(() => _client.auth.signInWithPassword(email: email, password: currentPassword));
+    await runAuthRequest(() => _client.auth.updateUser(UserAttributes(password: newPassword)));
+  }
+
+  // ---- Sign in with Apple ----
+
+  // Debug yapılandırması Sign in with Apple entitlement'ı olmadan derlenir
+  // (bkz. LoginScreen); Apple yalnızca iOS release/profile'da kullanılabilir.
+  static bool get _appleSignInSupported => !kIsWeb && !kDebugMode && defaultTargetPlatform == TargetPlatform.iOS;
+
+  /// Oturumdaki hesapta Apple kimliği var mı?
+  bool get hasAppleIdentity {
+    final user = _authUserOrNull;
+    return user != null && userHasProvider(user, 'apple');
+  }
+
+  /// Hesap silmeden önce Apple'dan taze yetkilendirme kodu istenebilir mi
+  /// (Apple kimliği var ve cihaz iOS)?
+  bool get canReauthorizeWithApple => _appleSignInSupported && hasAppleIdentity;
+
+  /// Hesap silme için Apple'dan taze bir authorizationCode ister (Face ID /
+  /// parola). Kullanıcı vazgeçerse ya da alınamazsa null; silme yine yapılır,
+  /// kullanıcıya Ayarlar talimatı gösterilir.
+  Future<String?> requestAppleAuthorizationCode() async {
+    if (!_appleSignInSupported) return null;
+    try {
+      final credential = await SignInWithApple.getAppleIDCredential(scopes: const []);
+      final code = credential.authorizationCode.trim();
+      return code.isEmpty ? null : code;
+    } catch (e) {
+      debugPrint('[AUTH] Apple yeniden doğrulaması alınamadı: $e');
+      return null;
+    }
+  }
+
+  Future<void> _rememberAppleIdentity(String uid, String? appleUserId) async {
+    if (appleUserId == null || appleUserId.isEmpty) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_appleIdentityKey, jsonEncode({'uid': uid, 'apple_user': appleUserId}));
+    } catch (e) {
+      debugPrint('[AUTH] Apple kimliği kaydedilemedi: $e');
+    }
+  }
+
+  /// Bu cihazda Apple ile girilmiş oturumun Apple kullanıcı kimliği (yoksa null).
+  @visibleForTesting
+  static Future<String?> rememberedAppleUserId(String uid) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_appleIdentityKey);
+      if (raw == null) return null;
+      final map = jsonDecode(raw);
+      if (map is! Map || map['uid'] != uid) return null;
+      final appleUser = map['apple_user']?.toString();
+      return (appleUser == null || appleUser.isEmpty) ? null : appleUser;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Apple izin durumu bu oturumu kapatmayı gerektiriyor mu?
+  @visibleForTesting
+  static bool appleCredentialRequiresSignOut(CredentialState state) =>
+      state == CredentialState.revoked || state == CredentialState.notFound;
+
+  /// Bu cihazda Apple ile girilmiş oturum için Apple izin durumunu denetler
+  /// (açılışta ve ön plana dönüşte). Kullanıcı Ayarlar'dan "Kullanmayı
+  /// Durdur" dediyse (revoked) ya da kimlik bulunamazsa (notFound) tam çıkış
+  /// yapılır ve giriş ekranı nedenini açıklar. Hata durumunda dokunulmaz.
+  Future<void> verifyAppleCredential() async {
+    if (!_appleSignInSupported) return;
+    final uid = _authUserOrNull?.id;
+    if (uid == null) return;
+    final appleUserId = await rememberedAppleUserId(uid);
+    if (appleUserId == null) return;
+    final CredentialState state;
+    try {
+      state = await SignInWithApple.getCredentialState(appleUserId);
+    } catch (e) {
+      debugPrint('[AUTH] Apple izin durumu okunamadı: $e');
+      return;
+    }
+    if (!appleCredentialRequiresSignOut(state) || _authUserOrNull?.id != uid) return;
+    await signOutFully(notice: SignOutNotice.appleCredentialRevoked);
+  }
+
+  // ---- Hesap silme ----
+
+  /// Hesabı sunucudan siler, sonra bu kullanıcıya ait tüm yerel veriyi
+  /// temizler ve oturumu kapatır (giriş ekranı "hesabın silindi" der).
+  ///
+  /// Önce `delete-account` Edge Function'ı denenir: [appleAuthorizationCode]
+  /// varsa Apple token'ını iptal eder, e-postaya bağlı bekleme listesi ve
+  /// abonelik kayıtlarını siler, kullanıcıyı siler (auth.users; profil,
   /// seanslar, kategoriler, arkadaşlıklar, lig üyeliği, akış, avatarlar ve
-  /// abonelik kaydı yabancı anahtarla birlikte silinir). Ardından bu
-  /// kullanıcıya ait tüm yerel veriyi temizler ve oturumu kapatır: bekleyen
-  /// ve reddedilen seanslar, süren sayaç kaydı, gizlenen kullanıcılar, lig
-  /// bilgisi ve hedef taşıma bayrakları, kullanıcı/kategori önbelleği.
-  Future<void> deleteUserAccount() async {
+  /// abonelik yabancı anahtarla birlikte). Fonksiyon canlıda yoksa (404) ya
+  /// da çalışamadıysa (5xx) `delete_own_account` RPC'sine düşülür. Yanıt kaybolursa (zaman aşımı,
+  /// bağlantı) hesabın gerçekten silinip silinmediğine bakılır.
+  ///
+  /// Yerel veri: bekleyen ve reddedilen seanslar, süren sayaç kaydı,
+  /// gizlenen kullanıcılar, onboarding taslağı, lig bilgisi ve hedef taşıma
+  /// bayrakları, kullanıcı/kategori önbelleği. Google ile bağlı hesapta
+  /// Google erişimi de kaldırılır (disconnect).
+  Future<AppleRevocation> deleteUserAccount({String? appleAuthorizationCode}) async {
     final authUser = _requireAuthUser();
     final uid = authUser.id;
     final email = authUser.email ?? currentUser.value?.email;
-    await _guard(() => _client.rpc('delete_own_account'));
-    await clearDeletedAccountLocalData(uid, email: email);
-    await signOutFully();
+    final hasApple = userHasProvider(authUser, 'apple');
+    final hasGoogle = userHasProvider(authUser, 'google');
+    _localSignOutDepth++;
+    try {
+      var apple = hasApple ? AppleRevocation.notRevoked : AppleRevocation.notApplicable;
+      try {
+        try {
+          final response = await _client.functions
+              .invoke('delete-account', body: {
+                if (appleAuthorizationCode != null && appleAuthorizationCode.isNotEmpty)
+                  'apple_authorization_code': appleAuthorizationCode,
+              })
+              .timeout(_deleteAccountTimeout);
+          apple = appleRevocationFromResponse(response.data, hasAppleIdentity: hasApple);
+        } on FunctionException catch (e) {
+          if (!shouldFallBackToDeleteRpc(e)) rethrow;
+          // Edge Function deploy edilmemiş ya da çalışamadı: canlıdaki RPC.
+          // 5xx gövdesi Apple iptalinin yapılıp yapılmadığını söyleyebilir.
+          debugPrint('[AUTH] delete-account kullanılamadı (${e.status}); delete_own_account RPC.');
+          apple = appleRevocationFromResponse(e.details, hasAppleIdentity: hasApple);
+          await _client.rpc('delete_own_account').timeout(_requestTimeout);
+        }
+      } catch (e, st) {
+        if (!await _accountNoLongerExists()) Error.throwWithStackTrace(ServiceException.wrap(e), st);
+        debugPrint('[AUTH] Silme yanıtı alınamadı ama hesap artık yok; temizliğe devam ediliyor.');
+      }
+      await clearDeletedAccountLocalData(uid, email: email);
+      if (hasGoogle) await _disconnectGoogle(email);
+      await signOutFully(notice: SignOutNotice.accountDeleted(apple: apple));
+      return apple;
+    } finally {
+      _localSignOutDepth--;
+    }
+  }
+
+  /// `delete-account` çağrısı RPC yedeğine mi düşmeli? Fonksiyon canlıda
+  /// yok (gateway 404; fonksiyon kendisi 404 döndürmez) ya da çalışamadı
+  /// (5xx: açılış hatası, kaynak sınırı, silme hatası). 401/4xx (oturum,
+  /// istek) yedeğe düşmez.
+  @visibleForTesting
+  static bool shouldFallBackToDeleteRpc(FunctionException e) => e.status == 404 || e.status >= 500;
+
+  /// Silme yanıtı kaybolduğunda hesabın sunucuda artık olmadığını doğrular.
+  Future<bool> _accountNoLongerExists() async {
+    try {
+      await _client.auth.getUser().timeout(_requestTimeout);
+      return false;
+    } on AuthException catch (e) {
+      return authErrorMeansUserGone(e);
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// GoTrue `GET /user` hatası kullanıcının silindiğini mi gösteriyor?
+  /// (Süresi dolmuş JWT'nin 401'i silinme sayılmaz.)
+  @visibleForTesting
+  static bool authErrorMeansUserGone(AuthException e) => e.code == 'user_not_found' || e.statusCode == '404';
+
+  /// Silinen hesabın Google erişimini kaldırır (yalnızca cihazdaki Google
+  /// hesabı silinen hesabın e-postasıysa). Hata yutulur.
+  Future<void> _disconnectGoogle(String? email) async {
+    final mail = email?.trim().toLowerCase();
+    if (mail == null || mail.isEmpty || isFlutterTestEnvironment) return;
+    try {
+      final account = _googleSignIn.currentUser ?? await _googleSignIn.signInSilently().timeout(_requestTimeout);
+      if (account == null || account.email.trim().toLowerCase() != mail) return;
+      await _googleSignIn.disconnect().timeout(_requestTimeout);
+    } catch (e) {
+      debugPrint('[AUTH] Google erişimi kaldırılamadı (yok sayılıyor): $e');
+    }
   }
 
   /// Silinen hesabın cihazdaki verisi. Kuyruk dahil hiçbir adım diğerini
@@ -555,6 +857,7 @@ class SupabaseService {
     await step('sayaç', () => TimerPersistence.instance.retireOwner(uid));
     if (mail != null && mail.isNotEmpty) await step('sayaç (e-posta)', () => TimerPersistence.instance.clear(mail));
     await step('gizlenenler', () => HiddenUsersStore.instance.forget(uid));
+    await step('onboarding taslağı', () => OnboardingDraftStore.clear(uid));
     await step('tercihler', () async {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_dailyGoalMigratedKey(uid));

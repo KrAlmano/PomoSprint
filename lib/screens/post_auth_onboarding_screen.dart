@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -6,8 +7,10 @@ import '../l10n/app_localizations.dart';
 import '../models/category_model.dart';
 import '../theme.dart';
 import '../services/language_service.dart';
+import '../services/onboarding_draft.dart';
 import '../services/supabase_service.dart';
 import '../utils/responsive.dart';
+import '../widgets/auth/account_texts.dart';
 import '../widgets/auth/category_name_dialog.dart';
 
 class PostAuthOnboardingScreen extends StatefulWidget {
@@ -68,6 +71,96 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
 
   int get _categoryLimit =>
       categoryLimitFor(isPremium: SupabaseService.instance.currentUser.value?.isPremium ?? false);
+
+  static const Set<int> _goalOptions = {60, 120, 180, 240};
+
+  // Taslak (adım ve seçimler) cihazda tutulur: Android süreci arka planda
+  // öldürürse onboarding baştan başlamaz. Okuma bitene kadar yazılmaz
+  // (varsayılanlar eski taslağı ezmesin); bitince ve hesap silinince silinir.
+  bool _draftLoaded = false;
+  bool _changedBeforeDraftLoad = false;
+  bool _draftClosed = false;
+
+  String? get _draftOwner => SupabaseService.instance.currentUser.value?.id;
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_restoreDraft());
+  }
+
+  // Her durum değişikliği taslağa yazılır.
+  @override
+  void setState(VoidCallback fn) {
+    super.setState(fn);
+    if (!_draftLoaded) {
+      _changedBeforeDraftLoad = true;
+      return;
+    }
+    _saveDraft();
+  }
+
+  void _saveDraft() {
+    final uid = _draftOwner;
+    if (_draftClosed || uid == null || uid.isEmpty) return;
+    unawaited(OnboardingDraftStore.save(
+      uid,
+      OnboardingDraft(
+        step: _currentPage,
+        birthYear: _birthYear,
+        segment: _userSegment,
+        selectedCategories: _selectedCategoryNames.toList(),
+        customCategories: List.of(_customCategoryNames),
+        dailyGoalMinutes: _dailyGoalMinutes,
+      ),
+    ));
+  }
+
+  Future<void> _restoreDraft() async {
+    final uid = _draftOwner;
+    final draft = (uid == null || uid.isEmpty) ? null : await OnboardingDraftStore.load(uid);
+    if (!mounted) return;
+    _draftLoaded = true;
+    if (draft == null || _changedBeforeDraftLoad) return;
+
+    final segment = _recommendedBySegment.containsKey(draft.segment) ? draft.segment : null;
+    final year = draft.birthYear;
+    final birthYear = (year != null && year <= _currentYear && year > _currentYear - _birthYearCount) ? year : _birthYear;
+    final custom = draft.customCategories.toSet().take(_categoryLimit).toList();
+    final allowed = {...?_recommendedBySegment[segment], ...custom};
+    final selected = draft.selectedCategories.where(allowed.contains).toSet().take(_categoryLimit).toList();
+    final goal = _goalOptions.contains(draft.dailyGoalMinutes) ? draft.dailyGoalMinutes! : _dailyGoalMinutes;
+    // Adım, doğrulamanın izin verdiği yerden ileride olamaz.
+    var step = draft.step.clamp(0, _totalSteps - 1);
+    if (_currentYear - birthYear < _minimumAge) step = 0;
+    if (segment == null && step > 1) step = 1;
+    if (selected.isEmpty && step > 2) step = 2;
+
+    setState(() {
+      _birthYear = birthYear;
+      _userSegment = segment;
+      _customCategoryNames
+        ..clear()
+        ..addAll(custom);
+      _selectedCategoryNames
+        ..clear()
+        ..addAll(selected);
+      _dailyGoalMinutes = goal;
+    });
+    if (_yearController.hasClients) _yearController.jumpToItem(_currentYear - _birthYear);
+    if (step > 0 && _pageController.hasClients) _pageController.jumpToPage(step);
+  }
+
+  Future<void> _closeDraft() async {
+    _draftClosed = true;
+    final uid = _draftOwner;
+    if (uid == null || uid.isEmpty) return;
+    try {
+      await OnboardingDraftStore.clear(uid);
+    } catch (e) {
+      debugPrint('PostAuth onboarding: taslak silinemedi: $e');
+    }
+  }
 
   @override
   void dispose() {
@@ -143,6 +236,7 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
         dailyGoalMinutes: _dailyGoalMinutes,
         categories: _categoryPayload(),
       );
+      await _closeDraft();
     } catch (e) {
       debugPrint('PostAuth onboarding error: $e');
       if (!mounted) return;
@@ -184,6 +278,13 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
   Future<void> _confirmDeleteAccount() async {
     if (_isSaving) return;
     final l10n = AppLocalizations.of(context)!;
+    final service = SupabaseService.instance;
+    final confirmText = deleteAccountConfirmText(
+      l10n,
+      pendingCount: service.pendingSessionCount.value,
+      appleReauthorization: service.canReauthorizeWithApple,
+      dataCopyHint: false,
+    );
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -191,7 +292,7 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
         constraints: const BoxConstraints(minWidth: 280, maxWidth: 440),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(l10n.deleteAccount, style: const TextStyle(fontWeight: FontWeight.bold)),
-        content: Text(l10n.profileDeleteConfirm, style: const TextStyle(fontSize: 14, height: 1.4)),
+        content: Text(confirmText, style: const TextStyle(fontSize: 14, height: 1.4)),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
           ElevatedButton(
@@ -205,12 +306,17 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
     if (confirmed != true || !mounted) return;
     setState(() => _isSaving = true);
     try {
-      // Servis yerel veriyi temizleyip oturumu kapatır; AppGate girişe döner.
-      await SupabaseService.instance.deleteUserAccount();
+      // Apple kimliği varsa (iOS) token iptali için taze kod; vazgeçilirse
+      // silme yine yapılır. Servis yerel veriyi (taslak dahil) temizleyip
+      // oturumu kapatır; AppGate girişe döner ve "hesabın silindi" der.
+      final appleCode = service.canReauthorizeWithApple ? await service.requestAppleAuthorizationCode() : null;
+      _draftClosed = true;
+      await service.deleteUserAccount(appleAuthorizationCode: appleCode);
       if (!mounted) return;
       widget.onSignedOut?.call();
     } catch (e) {
       debugPrint('PostAuth onboarding: hesap silinemedi: $e');
+      _draftClosed = false;
       if (!mounted) return;
       setState(() => _isSaving = false);
       _showSnack(l10n.profileDeleteError, isError: true);

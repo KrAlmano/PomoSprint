@@ -689,7 +689,7 @@ abstract class AppLocalizations {
   /// No description provided for @profileDeleteConfirm.
   ///
   /// In tr, this message translates to:
-  /// **'Hesabını ve tüm verilerini kalıcı olarak silmek istediğinden emin misin?\n\nBu işlem profilini ve çalışma geçmişini tamamen siler ve geri alınamaz.'**
+  /// **'Hesabını ve tüm verilerini kalıcı olarak silmek istediğinden emin misin?\n\nŞunların hepsi silinir ve geri alınamaz: çalışma geçmişin ve seansların, puanların ve serin, kum tanelerin ve avatarların, kategorilerin, arkadaşların ve lig kaydın.'**
   String get profileDeleteConfirm;
 
   /// No description provided for @profileDeleting.
@@ -703,6 +703,54 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Hesabın silinemedi. Bağlantını kontrol edip tekrar dene.'**
   String get profileDeleteError;
+
+  /// No description provided for @profileDeleteConfirmPending.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count, plural, =1{Bu cihazda henüz gönderilmemiş 1 seansın da silinir.} other{Bu cihazda henüz gönderilmemiş {count} seansın da silinir.}}'**
+  String profileDeleteConfirmPending(int count);
+
+  /// No description provided for @profileDeleteConfirmApple.
+  ///
+  /// In tr, this message translates to:
+  /// **'Apple ile giriş yaptığın için silmeden önce Apple seni bir kez daha doğrulayacak; böylece PomoSprint\'in Apple ile Giriş bağlantısı da kaldırılır.'**
+  String get profileDeleteConfirmApple;
+
+  /// No description provided for @profileDeleteConfirmCopyHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Verilerinin bir kopyasını istiyorsan önce \"Gizlilik ve yasal\" bölümündeki \"Verilerimin kopyasını iste\"yi kullan.'**
+  String get profileDeleteConfirmCopyHint;
+
+  /// No description provided for @accountDeletedNotice.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hesabın ve tüm verilerin silindi.'**
+  String get accountDeletedNotice;
+
+  /// No description provided for @accountDeletedAppleNotice.
+  ///
+  /// In tr, this message translates to:
+  /// **'Apple ile Giriş bağlantısını da kaldırmak için iPhone\'da Ayarlar > Apple Hesabı (adın) > Apple ile Giriş > PomoSprint > Kullanmayı Durdur adımlarını izle.'**
+  String get accountDeletedAppleNotice;
+
+  /// No description provided for @sessionExpiredNotice.
+  ///
+  /// In tr, this message translates to:
+  /// **'Oturumun sona erdi. Şifren değişmiş ya da hesabın başka bir cihazdan kapatılmış olabilir; lütfen yeniden giriş yap.'**
+  String get sessionExpiredNotice;
+
+  /// No description provided for @appleCredentialRevokedNotice.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu cihazda Apple ile Giriş izni kaldırıldığı için oturumun kapatıldı. Devam etmek için yeniden Apple ile giriş yap.'**
+  String get appleCredentialRevokedNotice;
+
+  /// No description provided for @noticeDismissTooltip.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kapat'**
+  String get noticeDismissTooltip;
 
   /// No description provided for @profileNotificationsDenied.
   ///
@@ -1298,6 +1346,12 @@ abstract class AppLocalizations {
   /// **'Bir hata oluştu. Lütfen tekrar dene.'**
   String get authErrUnknown;
 
+  /// No description provided for @authErrSignUpTimeout.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kayıt isteği yanıt vermedi. Kaydın yine de tamamlanmış olabilir: e-postanı kontrol et ya da giriş yapmayı dene.'**
+  String get authErrSignUpTimeout;
+
   /// No description provided for @navTimer.
   ///
   /// In tr, this message translates to:
@@ -1724,11 +1778,47 @@ abstract class AppLocalizations {
   /// **'Google ile Giriş'**
   String get googleLogin;
 
+  /// No description provided for @appleOnAndroidLink.
+  ///
+  /// In tr, this message translates to:
+  /// **'Apple ile mi kaydoldun?'**
+  String get appleOnAndroidLink;
+
+  /// No description provided for @appleOnAndroidTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Apple ile açılan hesaba Android\'den giriş'**
+  String get appleOnAndroidTitle;
+
+  /// No description provided for @appleOnAndroidBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Android\'de Apple ile giriş yok; hesabına e-posta ve şifreyle girebilirsin:\n\n1. Hesabının e-posta adresini bul. Apple\'da \"E-postamı Gizle\"yi seçtiysen bu bir gizli röle adresidir (…@privaterelay.appleid.com); iPhone\'da Ayarlar > Apple Hesabı (adın) > Apple ile Giriş > PomoSprint altında görünür.\n2. Bu ekranda o adresi yazıp \"Şifremi Unuttum\"a dokun ve gelen bağlantıyla bir şifre belirle.\n3. Sonra aynı adres ve yeni şifrenle giriş yap.\n\nE-posta gelmezse destek@pomosprint.app adresine yaz.'**
+  String get appleOnAndroidBody;
+
   /// No description provided for @resendVerificationLink.
   ///
   /// In tr, this message translates to:
   /// **'Doğrulama E-postasını Tekrar Gönder 📬'**
   String get resendVerificationLink;
+
+  /// No description provided for @loginVerificationPendingInfo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Onay bağlantısını {email} adresine gönderdik. Bağlantıya dokunduktan sonra şifrenle buradan giriş yap.'**
+  String loginVerificationPendingInfo(String email);
+
+  /// No description provided for @loginResendPrompt.
+  ///
+  /// In tr, this message translates to:
+  /// **'E-posta gelmedi mi? Yeniden gönder'**
+  String get loginResendPrompt;
+
+  /// No description provided for @errEnterEmailForResend.
+  ///
+  /// In tr, this message translates to:
+  /// **'Onay e-postasını yeniden göndermek için önce e-posta adresini yaz.'**
+  String get errEnterEmailForResend;
 
   /// No description provided for @errFillFields.
   ///
@@ -1895,7 +1985,7 @@ abstract class AppLocalizations {
   /// No description provided for @errEmailExists.
   ///
   /// In tr, this message translates to:
-  /// **'Bu e-posta adresi zaten kayıtlı! Lütfen \"Giriş Yap\" ekranından giriş yapın.'**
+  /// **'Bu e-posta adresi zaten kayıtlı. \"Giriş Yap\" ekranından giriş yap. Bu adresle Google ya da Apple ile kaydolduysan o butonu kullan ya da \"Şifremi Unuttum\" ile bir şifre belirle.'**
   String get errEmailExists;
 
   /// No description provided for @reportsTabSubject.
@@ -2161,6 +2251,48 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Çıkış Yap'**
   String get logout;
+
+  /// No description provided for @logoutConfirmTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çıkış yapılsın mı?'**
+  String get logoutConfirmTitle;
+
+  /// No description provided for @logoutConfirmBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu cihazdaki oturumun kapanacak. İstediğin zaman aynı hesapla yeniden giriş yapabilirsin.'**
+  String get logoutConfirmBody;
+
+  /// No description provided for @logoutPendingWarning.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count, plural, =1{1 seansın henüz sunucuya gönderilmedi.} other{{count} seansın henüz sunucuya gönderilmedi.}} Seans başladıktan sonraki 24 saat içinde aynı hesapla bu cihazdan giriş yapmazsan puanı, kum taneleri ve seriye katkısı kaybolur.'**
+  String logoutPendingWarning(int count);
+
+  /// No description provided for @logoutRunningWarning.
+  ///
+  /// In tr, this message translates to:
+  /// **'Süren bir seansın var. Seans bu cihazda saklanır ve aynı hesapla yeniden girince kaldığı yerden sürer; ama çıkış yaptıktan sonra bitiş bildirimi gelmez.'**
+  String get logoutRunningWarning;
+
+  /// No description provided for @logoutSendAndExit.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gönder ve çık'**
+  String get logoutSendAndExit;
+
+  /// No description provided for @logoutAnyway.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yine de çık'**
+  String get logoutAnyway;
+
+  /// No description provided for @logoutSendFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seanslar şu an gönderilemedi. Bağlantını kontrol edip tekrar dene.'**
+  String get logoutSendFailed;
 
   /// No description provided for @save.
   ///
@@ -2717,8 +2849,86 @@ abstract class AppLocalizations {
   /// No description provided for @registerPasswordHelper.
   ///
   /// In tr, this message translates to:
-  /// **'En az 6 karakter.'**
+  /// **'En az 6 karakter; büyük harf, küçük harf ve rakam içermeli.'**
   String get registerPasswordHelper;
+
+  /// No description provided for @passwordRuleLength.
+  ///
+  /// In tr, this message translates to:
+  /// **'En az 6 karakter'**
+  String get passwordRuleLength;
+
+  /// No description provided for @passwordRuleCase.
+  ///
+  /// In tr, this message translates to:
+  /// **'Büyük ve küçük harf (A-Z, a-z)'**
+  String get passwordRuleCase;
+
+  /// No description provided for @passwordRuleDigit.
+  ///
+  /// In tr, this message translates to:
+  /// **'En az bir rakam (0-9)'**
+  String get passwordRuleDigit;
+
+  /// No description provided for @changePasswordTile.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifreyi değiştir'**
+  String get changePasswordTile;
+
+  /// No description provided for @changePasswordTileSub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mevcut şifrenle doğrulayıp yeni bir şifre belirle.'**
+  String get changePasswordTileSub;
+
+  /// No description provided for @changePasswordCurrent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mevcut şifre'**
+  String get changePasswordCurrent;
+
+  /// No description provided for @changePasswordNew.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni şifre'**
+  String get changePasswordNew;
+
+  /// No description provided for @changePasswordRepeat.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni şifre (tekrar)'**
+  String get changePasswordRepeat;
+
+  /// No description provided for @changePasswordMismatch.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni şifreler aynı değil.'**
+  String get changePasswordMismatch;
+
+  /// No description provided for @changePasswordSame.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni şifre mevcut şifrenle aynı olamaz.'**
+  String get changePasswordSame;
+
+  /// No description provided for @changePasswordWrongCurrent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mevcut şifre hatalı.'**
+  String get changePasswordWrongCurrent;
+
+  /// No description provided for @changePasswordSave.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifreyi güncelle'**
+  String get changePasswordSave;
+
+  /// No description provided for @changePasswordSuccess.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifren güncellendi. Diğer cihazlardaki oturumların kapanmış olabilir.'**
+  String get changePasswordSuccess;
 
   /// No description provided for @registerShowPassword.
   ///
@@ -2839,6 +3049,36 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Hangi verilerin silindiği ve web üzerinden silme talebi'**
   String get accountDeletionInfoSub;
+
+  /// No description provided for @dataCopyRequestTile.
+  ///
+  /// In tr, this message translates to:
+  /// **'Verilerimin kopyasını iste'**
+  String get dataCopyRequestTile;
+
+  /// No description provided for @dataCopyRequestSub.
+  ///
+  /// In tr, this message translates to:
+  /// **'KVKK m.11 kapsamında. E-posta uygulaman açılır; hesabındaki e-posta adresinden gönder.'**
+  String get dataCopyRequestSub;
+
+  /// No description provided for @dataCopyEmailSubject.
+  ///
+  /// In tr, this message translates to:
+  /// **'PomoSprint kişisel veri kopyası talebi (KVKK m.11)'**
+  String get dataCopyEmailSubject;
+
+  /// No description provided for @dataCopyEmailBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Merhaba,\n\nKVKK m.11 kapsamında PomoSprint hesabıma ait kişisel verilerin bir kopyasını talep ediyorum. Bu e-postayı hesabımda kayıtlı e-posta adresinden gönderiyorum.\n\nTercih ettiğim biçim (ör. JSON, PDF):\n'**
+  String get dataCopyEmailBody;
+
+  /// No description provided for @dataCopyMailFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'E-posta uygulaması açılamadı. Talebini hesabındaki e-posta adresinden {email} adresine gönderebilirsin.'**
+  String dataCopyMailFailed(String email);
 
   /// No description provided for @deleteAccountSub.
   ///

@@ -125,7 +125,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 | `supabase/rollbacks/` | Down betikleri; CLI uygulamaz |
 | `supabase/proposed/` | Canlıya uygulanmamış öneriler (`01`–`11`). Her dosya `\quit` ile başlar |
 | `supabase/tests/` | `run_local.sh` (yerel), `*_dryrun.sql` (canlıda, geri alınan transaction) |
-| `supabase/functions/` | `unsubscribe`, `send-welcome-email` (repodaki sürümler canlıdan yeni, §10) |
+| `supabase/functions/` | `unsubscribe`, `send-welcome-email` (repodaki sürümler canlıdan yeni, §10), `delete-account` (canlıda yok; istemci 404/5xx'te `delete_own_account`'a düşer, §5.6) |
 | `scripts/` | `security_regression_test.js` (canlı), `send_newsletter.js` (+ `lib/newsletter_mail.js`), `templates/`, `test/` (`npm test`, ağsız). Sırlar `scripts/.env` (şablon `.env.example`) |
 | `landing/` | Site: `_partials/`, `tools/sync_partials.py`, `js/config.js`, `_headers`, `worker.js`, `wrangler.jsonc`, `en/` |
 | `android/`, `ios/` | Platform yapılandırması (`com.pomosprint.app`). `ios/PomoSprintTimerWidget/` Canlı Etkinlik uzantısı, `ios/Shared/` iki hedefte derlenen ActivityAttributes |
@@ -182,7 +182,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 **Tuzaklar**
 - PGRST202 yedekleri: `fetchFriends` / `fetchPendingFriendRequests` (RPC canlıda var, yedek ölü kod).
 - `updateCategoryOrders` aktif kategoriler için **paralel** `update(sort_order)` yapar; `reorder_categories` çağrılmaz (canlıda yok), upsert de yok. Kısmi başarısızlıkta sıra karışabilir: Kategorilerim hata olunca iyimser sırayı geri alır ve listeyi sessizce yeniden okur. `sort_order` canlıda çakışabilir (`create_category` aktif sayısını yazıyor); istemci `sort_order, created_at, id` ile sıralar. Kalıcı düzeltme `proposed/16`.
-- Prefs anahtarları: `saved_user`, `saved_categories_<email>`, `pending_sessions_uid_<uid>` (eski `pending_sessions_<email>` ilk erişimde taşınır), `rejected_sessions_uid_<uid>`, `rejected_sessions_unseen_uid_<uid>`, `active_session_uid_<key>`, `avatar_catalog_v1`, `daily_pomo_goal` (eski, bir kez taşınır), `league_info_shown_<uid>`, `hidden_users_uid_<uid>` (gizlenen kullanıcılar), `app_language_code`, `theme_mode`, `notifications_enabled`, `notification_permission_asked`.
+- Prefs anahtarları: `saved_user`, `saved_categories_<email>`, `pending_sessions_uid_<uid>` (eski `pending_sessions_<email>` ilk erişimde taşınır), `rejected_sessions_uid_<uid>`, `rejected_sessions_unseen_uid_<uid>`, `active_session_uid_<key>`, `avatar_catalog_v1`, `daily_pomo_goal` (eski, bir kez taşınır), `league_info_shown_<uid>`, `hidden_users_uid_<uid>` (gizlenen kullanıcılar), `onboarding_draft_uid_<uid>` (yarım onboarding), `apple_sign_in_identity` (bu cihazda Apple ile girilen oturumun Apple kimliği; her çıkışta silinir), `app_language_code`, `theme_mode`, `notifications_enabled`, `notification_permission_asked`.
 - Hesap silme (`deleteUserAccount` → `clearDeletedAccountLocalData`) kullanıcıya bağlı tüm anahtarları siler ve `TimerPersistence.retireOwner(uid)` ile sayaç ekranının dispose'da seansı yeniden yazmasını engeller. Yeni kullanıcıya bağlı anahtar eklersen oraya da ekle (`test/user_safety_test.dart`).
 - Avatar: `AvatarCharacter.byId` ve `allAvatars()` asla fırlatmaz / boş dönmez. Yine de listelerde korumasız `.first` kullanma.
 - `supabase_service.dart` içinde "public leaderboard `is_me` DÖNMEZ" yorumu bayat; canlı RPC `is_me` döndürüyor.
@@ -249,6 +249,11 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 **Tuzaklar**
 - Üç çeviri yolu bir arada: ARB, `LanguageService.translate('key')` haritası (Timer, Raporlar, Profil, nav etiketleri) ve `isTurkish ? … : …`. Eski anahtarları taşımak ayrı bir iş; yeni `translate` anahtarı ekleme.
 - Auth akışı **implicit** (`authFlowType: implicit`, `detectSessionInUri: false`). Sıfırlama/onay linkleri web sayfasında işlenir. Özel URL şeması (`io.supabase.pomosprint`) kaldırıldı.
+- Auth istekleri (giriş, kayıt, sıfırlama, yeniden gönderme, sosyal giriş, şifre değiştirme) `runAuthRequest` ile 25 sn zaman aşımlı; kayıtta zaman aşımı ayrı metin (`signUpTimedOut`: "kayıt tamamlanmış olabilir").
+- Oturum kapanışı tek kancadan: `signOutFully({notice})` (çıkış, silme, Apple izni) ve `handleAuthStateChange` (`signOutReason == sessionExpired`: şifre değişti / başka cihazdan kapatıldı). Kanca Google oturumunu, bitiş bildirimini ve kilit ekranı sayacını kapatır; `signOutNotice` giriş ekranında bir kez açıklanır (kullanıcının kendi çıkışında açıklama yok).
+- Şifre kuralı (`widgets/auth/password_rules.dart`): en az 6 karakter + küçük/büyük harf + rakam; Supabase panel ayarı, `authErrWeakPassword` ve `landing/js/reset-password.js` ile aynı tutulmalı. Kayıt ve Profil > Şifreyi değiştir (yalnızca `email` sağlayıcısı; mevcut şifreyle yeniden doğrulama + `updateUser`) canlı kural listesi gösterir.
+- Kayıt ekranı `RegisterResult` döndürür (`RegisterSignedIn` / `RegisterAwaitingConfirmation`); onay bekleniyorsa giriş ekranı e-postayı doldurur ve "yeniden gönder"i doğrudan gösterir.
+- Apple: iOS'ta Apple ile girilen oturum için açılışta ve ön plana dönüşte `getCredentialState` (revoked/notFound → tam çıkış). Android'de Apple girişi yok; giriş ekranındaki "Apple ile mi kaydoldun?" yardımı "Şifremi Unuttum" ile şifre belirlemeyi anlatır.
 - Google iOS: Supabase'de "skip nonce" bilinçli açık. iOS client id üç yerde aynı olmalı: `GIDClientID`, `CFBundleURLSchemes` (ters çevrilmiş), `supabase_service.dart`.
 - Apple girişi iOS login ekranında var; Apple Developer capability ve Supabase Apple provider ayarı kullanıcıda.
 - `AppGate`, onboarding ekranına `onSignedOut` vermiyor; onboarding'de Çıkış butonu gizli.
@@ -388,7 +393,10 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 
 Üretici: `SupabaseService.signUpMetadata` + `RegistrationConsent.toMetadata` (`test/registration_consent_test.dart`).
 
-### 5.6 `delete_own_account` (canlı, 3 Ekim)
+### 5.6 Hesap silme: `delete-account` Edge Function (canlıda yok) → `delete_own_account` (canlı, 3 Ekim)
+İstemci (`deleteUserAccount`) önce `functions.invoke('delete-account', {apple_authorization_code?})` çağırır: Apple token iptali (`APPLE_*` secret'ları), doğrulanmış e-postaya bağlı `waitlist` / `user_id`'siz abonelik satırları, `admin.deleteUser`. Yanıt `{deleted, apple: {status: revoked|skipped|not_applicable}}`; fonksiyon 404 döndürmez; istemci 404'ü ("deploy edilmemiş") ve 5xx'i (çalışamadı; gövdedeki `apple` durumu korunur) görünce aşağıdaki RPC'ye düşer, 401/4xx'te düşmez (`shouldFallBackToDeleteRpc`). Yanıt kaybolursa `GET /user` `user_not_found`/404 ise silinmiş sayılır. Ayrıntı: `supabase/functions/delete-account/README.md`.
+
+`delete_own_account`:
 `auth.users` satırını siler; `profiles`, `study_sessions`, `friendships` (iki yön), `marketing_subscribers.user_id` auth.users'a, `categories`, `league_memberships`, `activity_feed`, `avatar_unlocks` profiles'a `ON DELETE CASCADE`. Açık: `waitlist` (e-posta, FK yok) ve `user_id`'si boş abonelik satırı kalır, `search_path`'te `pg_temp` yok → `proposed/12_delete_own_account.sql` (+ down, `tests/proposed_12_delete_own_account_dryrun.sql`).
 
 ## 6. Veri akışları
@@ -455,7 +463,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 ### 7.3 Sırlar
 - Kök `.env`: yalnızca public değerler (`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SENTRY_DSN`).
 - `scripts/.env`: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `MAIL_SENDER_NAME`, `MAIL_SENDER_ADDRESS` (son ikisi sır değil, e-posta altbilgisindeki hizmet sağlayıcı kimliği; boşsa bülten gönderilmez); mağaza derlemesi için `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN`. İçeriğini okuma, hiçbir yere kopyalama.
-- Edge secret: `RESEND_API_KEY`, `MAIL_SENDER_NAME`, `MAIL_SENDER_ADDRESS` (`send-welcome-email`; kimlik eksikse e-posta gönderilmez). Abonelikten çıkma token'ı UUID olduğu için ek secret yok.
+- Edge secret: `RESEND_API_KEY`, `MAIL_SENDER_NAME`, `MAIL_SENDER_ADDRESS` (`send-welcome-email`; kimlik eksikse e-posta gönderilmez). Abonelikten çıkma token'ı UUID olduğu için ek secret yok. `delete-account` için `APPLE_TEAM_ID`, `APPLE_KEY_ID`, `APPLE_CLIENT_ID`, `APPLE_PRIVATE_KEY` (.p8 PEM); yoksa Apple iptali atlanır.
 
 ## 8. Landing sitesi ve deploy
 
@@ -534,6 +542,9 @@ curl -sI https://pomosprint.app/reset-password | grep -i cache-control   # no-st
 | P1 | Hesap silme `waitlist` ve `user_id`'siz abonelik satırını silmiyor | `proposed/12` (DRYRUN → migration, SQL Editor'de kullanıcı) |
 | P1 | Seans başlangıcı istemci saatine güveniyor (UX-01); geç gelen seans yeni lig dönemine yazılıyor | `proposed/13` (DRYRUN → dosya, SQL Editor'de kullanıcı). Ürün kararı: `app_config.unverified_session_daily_cap` (vars. `null`) |
 | P2 | Görünen ad için sunucu tarafı içerik denetimi yok | İstemci `NameFilter` doğrudan `profiles.name` UPDATE'iyle aşılabilir. `proposed/13`: `profiles.name`/`categories.name` BEFORE trigger'ı + küçük liste (`blocked_name_terms`) |
+| P1 | `delete-account` Edge Function deploy edilmedi | Deploy (`verify_jwt` açık) + `APPLE_*` secret'ları; o zamana kadar silme `delete_own_account` ile yapılır ve Apple token'ı iptal edilmez (kullanıcıya Ayarlar talimatı gösterilir). Apple Developer'da `pomosprint.app` / `mail.pomosprint.app` gönderici alan adları "Sign in with Apple for Email Communication"a kaydedilmeli (gizli röle adreslerine sıfırlama e-postası) |
+| P2 | E-posta değiştirme yok | Uygulama içi şifre değiştirme var; e-posta değişikliği eklenirse `handle_new_user` yalnızca INSERT'te çalıştığı için `profiles.email` ve `marketing_subscribers.email`'i güncelleyen bir trigger gerekir |
+| P2 | Başka cihazda silinen hesabın kuyruğu | Silinen uid'in `pending_/rejected_sessions_uid_<uid>` anahtarları diğer cihazda kalır (gönderilemez). "Seans sessizce silinmez" kuralı yüzünden otomatik temizlik yok |
 | P2 | Google/Apple ile ilk girişte onay sürümü kaydedilmiyor | Bildirim metni gösteriliyor; istenirse ilk girişte `auth.updateUser(data: {terms_version, privacy_version, terms_accepted_at})` |
 | P2 | Kullanıcı engelleme sunucuda değil | Gizleme cihazda; arkadaşlıktan çıkarma RPC'si (`remove_friend`) canlıda yok. Sunucu önerisi `proposed/14` (engel, bildirim kaydı, onay defteri, saklama işleri); Apple için istemci ön koşulu var |
 | P1 | Supabase Auth panel ayarları repoda yok | Redirect URLs (`/reset-password`, `/confirmed`, `.html`'li hâlleri; `io.supabase.pomosprint://` silinmeli), Reset Password şablonu `token_hash`, Leaked password protection, Apple provider (Client ID `com.pomosprint.app`) |

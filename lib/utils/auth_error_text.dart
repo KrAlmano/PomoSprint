@@ -31,6 +31,10 @@ String authErrorText(AppLocalizations l10n, AuthErrorCode code) {
       return l10n.authErrGoogleFailed;
     case AuthErrorCode.appleSignInFailed:
       return l10n.authErrAppleFailed;
+    case AuthErrorCode.signUpTimedOut:
+      return l10n.authErrSignUpTimeout;
+    case AuthErrorCode.samePassword:
+      return l10n.changePasswordSame;
     case AuthErrorCode.unknown:
       return l10n.authErrUnknown;
   }
