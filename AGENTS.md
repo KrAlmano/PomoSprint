@@ -228,7 +228,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 - Görünen ad denetimi `utils/name_filter.dart` (kayıt, profil ad düzenleme, Google/Apple ilk adı). Sunucuda içerik denetimi yok (§10).
 
 **Tuzaklar**
-- Arkadaş silme ve giden isteği iptal UI'ı yok: `remove_friend`, `cancel_friend_request`, `get_outgoing_friend_requests` canlıda yok.
+- Arkadaş silme ve giden isteği iptal UI'ı yok: `remove_friend`, `cancel_friend_request`, `get_outgoing_friend_requests` canlıda yok (öneri: `proposed/14`; uygulanmadan istemciden çağırma).
 - `add_friend_by_code` / `respond_friend_request` yanıtında makine-okunur `code` yok (`proposed/07` E bölümü); İngilizce arayüzde metin eşlemesi zayıf.
 - Sosyal ekran 30 sn'de bir poll yapar; görünmezken durur.
 - Avatar görseli: uygulamada `assets/avatars/<asset_key>`, sitede `landing/avatars/<id>.webp`.
@@ -266,6 +266,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 | `migrations/20261003150000_live_audit_fixes` | **Uygulandı** (3 Ekim, DRYRUN 28/28), geçmişe kayıtlı. Geri alma: `rollbacks/20261003150000_live_audit_fixes_down.sql` |
 | `proposed/11_audit_fixes_unapplied.sql` (eski `20261003120000_audit_fixes`) | **Uygulanmadı**, `migrations/`'tan taşındı. Başındaki durum notu hangi parçanın gereksiz olduğunu söyler |
 | `proposed/01`–`10` | Uygulanmadı. Sıra ve kapsam `proposed/README.md`'de |
+| `proposed/14_gizlilik_sosyal` (+ `_down`, `tests/proposed_14_gizlilik_sosyal_dryrun.sql`) | **Uygulanmadı.** Engelleme, bildirim, onay kaydı, saklama işleri, bülten RPC'leri. Canlı gövdeden; md5 ön koşulu var. İstemci sözleşmesi ve sıra `proposed/README.md` "Öneri 14" |
 
 **Canlıda olmayan RPC'ler:** `reorder_categories`, `remove_friend`, `cancel_friend_request`, `get_outgoing_friend_requests`, `set_my_timezone`, `get_my_category_limit` (ayrıca `get_my_streak`, `study_day_of`, `my_friend_ids`, `synced_at` kolonu). Gerekirse `proposed/11`'den canlı gövdelere göre ayrı migration yaz.
 
@@ -523,7 +524,7 @@ curl -sI https://pomosprint.app/reset-password | grep -i cache-control   # no-st
 | P1 | Hesap silme `waitlist` ve `user_id`'siz abonelik satırını silmiyor | `proposed/12` (DRYRUN → migration, SQL Editor'de kullanıcı) |
 | P2 | Görünen ad için sunucu tarafı içerik denetimi yok | İstemci `NameFilter` doğrudan `profiles.name` UPDATE'iyle aşılabilir. Gerekirse `profiles` BEFORE INSERT/UPDATE trigger'ında küçük bir liste |
 | P2 | Google/Apple ile ilk girişte onay sürümü kaydedilmiyor | Bildirim metni gösteriliyor; istenirse ilk girişte `auth.updateUser(data: {terms_version, privacy_version, terms_accepted_at})` |
-| P2 | Kullanıcı engelleme sunucuda değil | Gizleme cihazda; arkadaşlıktan çıkarma RPC'si (`remove_friend`) canlıda yok |
+| P2 | Kullanıcı engelleme sunucuda değil | Gizleme cihazda; arkadaşlıktan çıkarma RPC'si (`remove_friend`) canlıda yok. Sunucu önerisi `proposed/14` (engel, bildirim kaydı, onay defteri, saklama işleri); Apple için istemci ön koşulu var |
 | P1 | Supabase Auth panel ayarları repoda yok | Redirect URLs (`/reset-password`, `/confirmed`, `.html`'li hâlleri; `io.supabase.pomosprint://` silinmeli), Reset Password şablonu `token_hash`, Leaked password protection, Apple provider (Client ID `com.pomosprint.app`) |
 | P2 | `proposed/11` RPC'leri canlıda yok | Arkadaş silme/iptal UI'ı ve toplu kategori sıralaması bunlara bağlı |
 | P2 | `proposed/15` (aylık sıralama = çalışma ayı) ve `proposed/16` (kategori sırası, silme/kolon yetkileri) uygulanmadı | Her ikisinin DRYRUN'u yerel taklitte doğrulandı; kullanıcı SQL Editor'de önce DRYRUN, sonra dosyayı çalıştırır |

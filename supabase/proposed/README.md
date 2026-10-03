@@ -47,6 +47,7 @@ canlıda uygulanmış olmalı (`my_friend_ids`, `study_day_of`,
 | 10 | `10_data_fixes.sql` | P3 | Sahip olunmayan ücretli avatarlar, görseli olmayan avatar, abone e-postalarının normalizasyonu. Kullanıcıya görünür; ürün kararıyla. | SOCIAL-15, AUTH-21, DATA-25, SOCIAL-27, LANDING-08 |
 | 11 | `15_monthly_leaderboard_study_month.sql` (+ `_down`, `_dryrun`) | P2 | Aylık sıralamada 'bu ay' = çalışma ayı (started_at, profil dilimi, 04:00); Raporlar > Aylık ile aynı kural. CANLI gövdeden yazıldı; `11`'e bağımlı değil. Uygulanınca istemcide `nextMonthlyLeaderboardReset` 04:00'e. | MH-1, X2 |
 | 12 | `16_categories_order_and_privileges.sql` (+ `_down`, `_dryrun`) | P3 | Yeni ve arşivden çıkan kategori sona; tek seferlik sıra eşitliği çözümü; DELETE politikası/yetkisi kaldırılır, UPDATE yalnız 5 kolona. CANLI gövdeden yazıldı; `11`'e bağımlı değil. | CAT-07, CAT-10 |
+| 13 | `14_gizlilik_sosyal.sql` (+ `_down`, `tests/proposed_14_gizlilik_sosyal_dryrun.sql`) | P1/P2 | Sunucu tarafı engelleme ve arkadaş yönetimi, kullanıcı bildirimi + operatör araçları, nötr görünen ad ve tek kelimelik ad maskesi, görünürlük varsayılan kapalı, anon sıralama sınırı, activity_feed durdurma, onay kayıt defteri, saklama işleri (pg_cron), bülten onayı RPC'leri. CANLI gövdeden yazıldı; `11`'e bağımlı değil, `11` §2 / `07` A-B-E / `03`'ü kapsar. `15` istenirse ondan ÖNCE. Ayrıntı: aşağıda "Öneri 14". | PLAY-04, PLAY-05, ACC-06, KVKK-01, KVKK-03, KVKK-06, KVKK-10, ACC-13, KVKK-09 |
 
 `12` ve `13` diğerlerinden farklı olarak doğrudan uygulanmaya hazırdır: canlı
 tanımlar (3 Ekim 2026) esas alındı, DRYRUN dosyaları geri alınan bir
@@ -62,6 +63,106 @@ sonra ana dosyanın `\echo`/`\quit` satırlarını silip çalıştırın.
 
 `01` ile `07`'nin D bölümü birlikte düşünülmeli: `01`'deki DEĞİŞİKLİK 5,
 `07`'deki `active_session_client_uuid` kolonuna dayanır.
+
+## Öneri 14: gizlilik ve sosyal güvenlik (sunucu)
+
+`14_gizlilik_sosyal.sql` canlı tanımlardan (3 Ekim 2026, PG 17.6) yazıldı.
+İlk adımı değiştireceği 13 canlı fonksiyonun `md5(pg_get_functiondef)`
+değerini denetler; araya başka bir değişiklik girdiyse hiçbir şey yapmadan
+durur. Yerel taklitte (`tests/proposed_14_local_stub.sql`, fonksiyon md5'leri
+canlıyla aynı) doğrulandı: DRYRUN 62/62 `true` (canlı ve `15` uygulanmış
+hâl), 10 mutasyonun hepsini yakalıyor; ileri + geri sonrası şema durumu
+(fonksiyon gövdeleri, yetkiler, politikalar, trigger'lar, cron) birebir aynı.
+
+**Kapsadığı / geçersiz kıldığı öneriler:** `11` §2 (`remove_friend`,
+`cancel_friend_request`, `get_outgoing_friend_requests`, `get_my_friends`,
+`get_incoming_friend_requests`; aynı yanıt sözleşmesiyle, engel filtreli),
+`07` A (activity_feed RLS), B (`get_live_friends`) ve E (makine-okunur
+`code`), `03` (aylık sıralama ve maskeleme). 14'ten sonra bunları
+UYGULAMAYIN (engel filtresini geri alırlar). `12` ile çakışmaz
+(`delete_own_account`'a dokunmaz; bekleme listesinin hesap silmede
+temizlenmesi `12`'de). `15` 14'ten önce uygulanabilir (14 iki ay kuralını
+da tanır); 14'ten sonra uygulanamaz ve gerekmez.
+
+### SQL Editor çalıştırma sırası
+
+1. (İsteğe bağlı) `15`: önce `15_..._dryrun.sql`, sonra `15_...sql`. 14'ten ÖNCE.
+2. `tests/proposed_14_gizlilik_sosyal_dryrun.sql` → `DRYRUN_RESULT >> T00 özet 62/62: true ...`
+   (ön koşul tutmazsa `proposed/14 ön koşulu: ...` hatası; öneriyi uyarlayın).
+3. Ürün/hukuk kararları: görünürlük varsayılanı (KVKK-01), nötr ad, saklama
+   süreleri (onay kaydı 1 yıl, bekleme listesi 12 ay, onaysız kayıt 7 gün).
+4. **İstemci ön koşulu (Apple):** `providerFirstNameUpdate` `^Pomo \d{4}$`
+   adını da varsayılan saymalı; yoksa Apple ile ilk girişte `givenName`
+   yazılmaz (Apple adı yalnızca ilk girişte verir). Bu istemci değişikliği
+   canlı sunucuya bağımlı değil, 14'ten önce yayınlanabilir.
+5. `14_gizlilik_sosyal.sql` (`\echo`/`\quit` satırları silinerek).
+   Migration geçmişine `20261003194000 privacy_social` yazılır.
+6. Doğrulama: AGENTS.md §2.3 sorguları, `select * from cron.job;`
+   (`privacy_retention_daily`, `17 3 * * *`), `select * from ops.open_user_reports;`.
+7. (İsteğe bağlı, ürün kararı) mevcut e-posta türevi adlar:
+   önizleme sorgusu `ops.neutralize_email_derived_names` üstünde; uygulama
+   `select ops.neutralize_email_derived_names();`.
+8. Geri alma: `14_gizlilik_sosyal_down.sql` (yeni tablolar silinir; başlığını okuyun).
+
+Supabase advisor yeni dört tabloda "RLS açık, politika yok" (INFO) gösterir:
+bilinçli, istemci bu tablolara yalnızca RPC ile erişir. `ops` şemasını
+Settings > API > Exposed schemas'a EKLEMEYİN.
+
+### İstemci sözleşmesi (14 canlıya uygulandıktan SONRA bağlanacak)
+
+Oturum yoksa tüm yeni RPC'ler `not authenticated` (P0001) fırlatır.
+Yanıtlar jsonb; istemci `code` alanına bakar, `message` (yalnızca
+`add_friend_by_code` / `respond_friend_request`, Türkçe) yedektir.
+
+| RPC | Parametreler | Başarı | Hata `code`'ları |
+|---|---|---|---|
+| `block_user` | `p_user_id uuid` | `{success:true, code:'blocked', removed_friendship:bool}`. Arkadaşlık ve aradaki istekler iki yönde silinir; engellenene bildirim gitmez | `not_found` (null/bilinmeyen id), `self`, `limit_reached` (1000 engel) |
+| `unblock_user` | `p_user_id uuid` | `{success:true, code:'unblocked'}`; arkadaşlık geri gelmez | `not_blocked` |
+| `get_my_blocks` | — | tablo `id, name, avatar_id, blocked_at` (yeniden eskiye) | — |
+| `remove_friend` | `p_friend_id uuid` | `{success:true, code:'removed'}` (iki yön, bekleyen istekler dahil) | `not_friends` |
+| `cancel_friend_request` | `p_to_user_id uuid` | `{success:true, code:'cancelled'}` | `not_found` |
+| `get_outgoing_friend_requests` | — | tablo `id, name, avatar_id, created_at` | — |
+| `add_friend_by_code` (değişti) | `p_code text` (boşluk/küçük harf normalize) | `{success:true, code:'request_sent'\|'accepted', auto_accepted, friend:{id,name,avatar_id,…}}` | `not_found` (seni engelleyen kişi de dahil, yanıt aynı), `self_add`, `blocked` (sen engelledin), `already_friends`, `already_pending`, `cooldown` (reddedildikten sonra 7 gün), `rate_limited` (saatte 20 bekleyen istek) |
+| `respond_friend_request` (değişti) | `p_from_user_id uuid, p_accept bool` | `{success:true, code:'accepted'\|'rejected'}` | `not_found` (istek yok ya da taraflardan biri engelli) |
+| `get_my_friends`, `get_incoming_friend_requests`, `get_live_friends` | aynı | Dönüş aynı; iki yönlü engel filtresi | — |
+| `get_my_league_ranking` (değişti) | — | Mevcut kolonlar + `id uuid`, `is_blocked bool`. Engellediğin üyenin satırı kalır (sıra/bölge), `name` ve `avatar_id` NULL | — |
+| `get_public_monthly_leaderboard` (değişti) | `p_limit int` | Mevcut kolonlar + `id` (oturumsuz NULL), `is_blocked`. Oturumsuz en çok 10 satır ve maskeli ad (tek kelime: `Ahm…`), oturumlu en çok 100 | — |
+| `get_public_alltime_leaderboard` (değişti) | `p_limit int` | `is_premium` çıktı; anon çağıramaz. İstemci/site kullanmıyor | — |
+| `submit_user_report` | `p_target_user_id uuid, p_place text, p_reason text, p_details text = null` | `{success:true, code:'reported', duplicate:false, report_id}`; aynı kişiye 24 saatte açık bildirim varsa `{success:true, code:'duplicate', duplicate:true, report_id}` | `invalid_place`, `invalid_reason`, `not_found`, `self`, `rate_limited` (24 saatte 10) |
+| `set_marketing_consent` | `p_enabled bool, p_text_version text = null` | `{success:true, code:'subscribed'\|'unsubscribed', subscribed}`. Açınca abonelik satırı (daha önce abone olduysa hoş geldin e-postası tekrar gitmez); kapatınca satır ve aynı adresin bekleme listesi kaydı silinir. Metadata `newsletter`/`marketing_consent` güncellenir. Google/Apple dahil | `invalid_input`, `email_not_confirmed`, `email_in_use`, `rate_limited` (24 saatte 20 değişiklik) |
+| `get_my_marketing_consent` | — | `{subscribed:bool, subscribed_at, email_confirmed:bool}` | — |
+| `accept_legal_documents` | `p_terms_version text, p_privacy_version text` | `{success:true, code:'recorded'\|'unchanged', terms_version, privacy_version}` (Google/Apple ilk girişi ya da metin sürümü değişince) | `invalid_input`, `rate_limited` |
+
+`p_place`: `league`, `monthly`, `friends_ranking`, `live_feed`, `friends_list`,
+`friend_request`, `other`. `p_reason`: `offensive_name`, `offensive_content`,
+`harassment`, `spam`, `impersonation`, `other`. `p_details` kırpılır, en çok 500
+karakter. Kayıt metadata'sına yeni isteğe bağlı anahtar: `show_in_social_feed`
+(bool; onboarding'de açık seçim için), `handle_new_user` okur.
+
+Mevcut istemciye etkisi (bağlantı yapılmadan): `RankingEntry.fromRow` `id`'yi
+zaten okuyor; lig ve aylık sıralamada gizleme/bildirim kimlikle çalışmaya
+başlar. Engellenen satırda `name` NULL olduğundan bugünkü istemci
+`userDefault` metnini gösterir. `friends_sheet` tanımadığı `code`'larda
+Türkçe arayüzde `message`'ı, İngilizcede genel metni gösterir.
+
+### Operatör (SQL Editor)
+
+```sql
+select * from ops.open_user_reports;                       -- açık bildirimler, en eski önce
+select ops.reset_display_name('<hedef uuid>');             -- uygunsuz adı 'Pomo 1234' yap
+select ops.resolve_user_report('<bildirim uuid>', 'actioned', 'ad sıfırlandı');
+select ops.resolve_user_report('<bildirim uuid>', 'dismissed', 'ihlal yok');
+select * from public.consents where email_hash = ops.email_hash('<e-posta>') order by seq;  -- onay ispatı
+select ops.run_privacy_retention();                        -- saklama işini elle çalıştır
+select ops.purge_expired_waitlist(interval '30 days');     -- lansman e-postasından sonra
+```
+Hesabı askıya alma: Dashboard > Authentication > Users > Ban. Yeni bildirim
+için otomatik uyarı yok; görünüm düzenli kontrol edilmeli (gerekirse ileride
+Edge Function ile e-posta).
+
+Kapsam dışı (ayrı iş): görünen ad / ders adı için sunucu tarafı içerik
+filtresi ve `start_study_session` girdi sınırları (PLAY-05'in o kısmı),
+bekleme listesinde çift onay, `profiles`'ta askıya alma kolonu.
 
 ## `20261003150000_live_audit_fixes` ile ilişkisi
 
