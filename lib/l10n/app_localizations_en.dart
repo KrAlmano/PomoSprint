@@ -379,7 +379,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileDeleteConfirm =>
-      'Are you sure you want to permanently delete your account and all your data?\n\nThis removes your profile and study history and can\'t be undone.';
+      'Are you sure you want to permanently delete your account and all your data?\n\nAll of this is deleted and can\'t be undone: your study history and sessions, points and streak, sand grains and avatars, categories, friends and league record.';
 
   @override
   String get profileDeleting => 'Deleting your account...';
@@ -387,6 +387,46 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get profileDeleteError =>
       'Couldn\'t delete your account. Check your connection and try again.';
+
+  @override
+  String profileDeleteConfirmPending(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count sessions on this device that haven\'t been sent yet will also be deleted.',
+      one:
+          '1 session on this device that hasn\'t been sent yet will also be deleted.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get profileDeleteConfirmApple =>
+      'Because you signed in with Apple, Apple will verify you once more before deletion so that PomoSprint\'s Sign in with Apple connection is removed too.';
+
+  @override
+  String get profileDeleteConfirmCopyHint =>
+      'If you\'d like a copy of your data, use \"Request a copy of my data\" under \"Privacy & legal\" first.';
+
+  @override
+  String get accountDeletedNotice =>
+      'Your account and all your data have been deleted.';
+
+  @override
+  String get accountDeletedAppleNotice =>
+      'To also remove the Sign in with Apple connection, on your iPhone go to Settings > Apple Account (your name) > Sign in with Apple > PomoSprint > Stop Using.';
+
+  @override
+  String get sessionExpiredNotice =>
+      'Your session has ended. Your password may have changed or your account may have been signed out from another device. Please sign in again.';
+
+  @override
+  String get appleCredentialRevokedNotice =>
+      'You were signed out because Sign in with Apple was turned off for PomoSprint on this device. Sign in with Apple again to continue.';
+
+  @override
+  String get noticeDismissTooltip => 'Dismiss';
 
   @override
   String get profileNotificationsDenied =>
@@ -760,6 +800,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authErrUnknown => 'Something went wrong. Please try again.';
 
   @override
+  String get authErrSignUpTimeout =>
+      'The sign-up request timed out. Your account may still have been created: check your email or try signing in.';
+
+  @override
   String get navTimer => 'Timer';
 
   @override
@@ -980,7 +1024,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get googleLogin => 'Sign in with Google';
 
   @override
+  String get appleOnAndroidLink => 'Signed up with Apple?';
+
+  @override
+  String get appleOnAndroidTitle =>
+      'Signing in on Android to an account created with Apple';
+
+  @override
+  String get appleOnAndroidBody =>
+      'Sign in with Apple isn\'t available on Android, but you can sign in with email and password:\n\n1. Find your account\'s email address. If you chose \"Hide My Email\" with Apple, it\'s a private relay address (…@privaterelay.appleid.com); on your iPhone it\'s shown under Settings > Apple Account (your name) > Sign in with Apple > PomoSprint.\n2. Enter that address on this screen, tap \"Forgot Password?\" and set a password using the link we send.\n3. Then sign in with that address and your new password.\n\nIf the email doesn\'t arrive, write to destek@pomosprint.app.';
+
+  @override
   String get resendVerificationLink => 'Resend Verification Email 📬';
+
+  @override
+  String loginVerificationPendingInfo(String email) {
+    return 'We sent a confirmation link to $email. After tapping it, sign in here with your password.';
+  }
+
+  @override
+  String get loginResendPrompt => 'Didn\'t get the email? Resend';
+
+  @override
+  String get errEnterEmailForResend =>
+      'Enter your email address first to resend the confirmation email.';
 
   @override
   String get errFillFields => 'Please fill in all fields.';
@@ -1072,7 +1139,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errEmailExists =>
-      'This email address is already registered! Please sign in.';
+      'This email address is already registered. Please sign in. If you signed up with Google or Apple using this address, use that button, or set a password with \"Forgot Password?\".';
 
   @override
   String get reportsTabSubject => 'Subject Reports';
@@ -1216,6 +1283,38 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get logout => 'Log Out';
+
+  @override
+  String get logoutConfirmTitle => 'Log out?';
+
+  @override
+  String get logoutConfirmBody =>
+      'You\'ll be signed out on this device. You can sign back in with the same account anytime.';
+
+  @override
+  String logoutPendingWarning(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sessions haven\'t been sent to the server yet.',
+      one: '1 session hasn\'t been sent to the server yet.',
+    );
+    return '$_temp0 If you don\'t sign in with the same account on this device within 24 hours of the session\'s start, its points, sand grains and streak credit will be lost.';
+  }
+
+  @override
+  String get logoutRunningWarning =>
+      'You have a session in progress. It stays saved on this device and continues when you sign back in with the same account, but you won\'t get the end notification after logging out.';
+
+  @override
+  String get logoutSendAndExit => 'Send and log out';
+
+  @override
+  String get logoutAnyway => 'Log out anyway';
+
+  @override
+  String get logoutSendFailed =>
+      'Couldn\'t send your sessions right now. Check your connection and try again.';
 
   @override
   String get save => 'Save';
@@ -1522,7 +1621,51 @@ class AppLocalizationsEn extends AppLocalizations {
   String get registerErrPasswordRequired => 'Choose a password.';
 
   @override
-  String get registerPasswordHelper => 'At least 6 characters.';
+  String get registerPasswordHelper =>
+      'At least 6 characters, with an uppercase letter, a lowercase letter and a number.';
+
+  @override
+  String get passwordRuleLength => 'At least 6 characters';
+
+  @override
+  String get passwordRuleCase => 'Upper and lower case (A-Z, a-z)';
+
+  @override
+  String get passwordRuleDigit => 'At least one number (0-9)';
+
+  @override
+  String get changePasswordTile => 'Change password';
+
+  @override
+  String get changePasswordTileSub =>
+      'Confirm with your current password and set a new one.';
+
+  @override
+  String get changePasswordCurrent => 'Current password';
+
+  @override
+  String get changePasswordNew => 'New password';
+
+  @override
+  String get changePasswordRepeat => 'New password (again)';
+
+  @override
+  String get changePasswordMismatch => 'The new passwords don\'t match.';
+
+  @override
+  String get changePasswordSame =>
+      'Your new password must be different from your current one.';
+
+  @override
+  String get changePasswordWrongCurrent =>
+      'Your current password is incorrect.';
+
+  @override
+  String get changePasswordSave => 'Update password';
+
+  @override
+  String get changePasswordSuccess =>
+      'Your password was updated. You may have been signed out on your other devices.';
 
   @override
   String get registerShowPassword => 'Show password';
@@ -1587,6 +1730,26 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get accountDeletionInfoSub =>
       'What gets deleted and how to request deletion on the web';
+
+  @override
+  String get dataCopyRequestTile => 'Request a copy of my data';
+
+  @override
+  String get dataCopyRequestSub =>
+      'Under KVKK Art. 11 and GDPR. Your email app opens; send it from your account\'s email address.';
+
+  @override
+  String get dataCopyEmailSubject =>
+      'PomoSprint personal data copy request (KVKK Art. 11 / GDPR)';
+
+  @override
+  String get dataCopyEmailBody =>
+      'Hello,\n\nUnder KVKK Art. 11 and GDPR, I request a copy of the personal data associated with my PomoSprint account. I\'m sending this email from the email address registered to my account.\n\nPreferred format (e.g. JSON, PDF):\n';
+
+  @override
+  String dataCopyMailFailed(String email) {
+    return 'Couldn\'t open your email app. You can send your request from your account\'s email address to $email.';
+  }
 
   @override
   String get deleteAccountSub =>

@@ -15,10 +15,11 @@ import '../utils/responsive.dart';
 import '../theme.dart';
 import '../widgets/auth/auth_error_banner.dart';
 import '../widgets/auth/legal_links.dart';
+import '../widgets/auth/password_rules.dart';
 
 /// Görünen ad sınırları: sunucudaki profiles_name_length_check (1..50).
 const int kRegisterNameMaxLength = 50;
-const int kRegisterPasswordMinLength = 6;
+const int kRegisterPasswordMinLength = PasswordRules.minLength;
 
 final RegExp _emailPattern = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]{2,}$');
 
@@ -40,17 +41,31 @@ String? registerEmailError(AppLocalizations l10n, String value) {
   return null;
 }
 
+/// Sunucunun şifre kuralı (bkz. [PasswordRules]): en az 6 karakter, küçük
+/// harf, büyük harf ve rakam. Kural yazarken alanın altında canlı gösterilir.
 @visibleForTesting
-String? registerPasswordError(AppLocalizations l10n, String value) {
-  if (value.isEmpty) return l10n.registerErrPasswordRequired;
-  if (value.length < kRegisterPasswordMinLength) return l10n.errShortPassword;
-  return null;
+String? registerPasswordError(AppLocalizations l10n, String value) => passwordRuleError(l10n, value);
+
+/// Kayıt ekranının sonucu (Navigator.pop): oturum hemen açıldı ya da e-posta
+/// onayı bekleniyor (giriş ekranı adresi doldurur, yeniden göndermeyi sunar).
+sealed class RegisterResult {
+  const RegisterResult();
+}
+
+class RegisterSignedIn extends RegisterResult {
+  final UserModel user;
+  const RegisterSignedIn(this.user);
+}
+
+class RegisterAwaitingConfirmation extends RegisterResult {
+  final String email;
+  const RegisterAwaitingConfirmation(this.email);
 }
 
 /// Kayıt ekranı. Kayıt anında oturum açılırsa (e-posta onayı kapalı)
-/// kullanıcı modeliyle `Navigator.pop` edilir; çağıran (LoginScreen) girişi
-/// tamamlar. Onay e-postası gerekiyorsa bilgilendirme gösterilir ve null
-/// ile kapanır.
+/// [RegisterSignedIn] ile `Navigator.pop` edilir; çağıran (LoginScreen)
+/// girişi tamamlar. Onay e-postası gerekiyorsa bilgilendirme gösterilir ve
+/// ekran (geri tuşu dahil) [RegisterAwaitingConfirmation] ile kapanır.
 ///
 /// İki zorunlu onay (Kullanım Şartları; KVKK Aydınlatma Metni ve Gizlilik
 /// Politikası okundu) işaretlenmeden kayıt isteği gönderilmez. Ticari
@@ -206,13 +221,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
         email: authUser.email ?? email,
         avatarId: AvatarCharacter.isFreeAvatarId(_selectedAvatarId) ? _selectedAvatarId : kDefaultAvatarId,
       );
-      if (mounted) Navigator.pop<UserModel>(context, user);
+      if (mounted) Navigator.pop<RegisterResult>(context, RegisterSignedIn(user));
     } catch (e) {
       if (!mounted) return;
       setState(() {
         _isLoading = false;
         _errorMessage = authErrorText(l10n, SupabaseService.instance.parseAuthError(e));
       });
+    }
+  }
+
+  // Onay bekleniyorsa ekran her yoldan (geri, buton) adresle kapanır.
+  void _leave() {
+    if (_isVerificationSent) {
+      Navigator.pop<RegisterResult>(context, RegisterAwaitingConfirmation(_emailController.text.trim()));
+    } else {
+      Navigator.pop(context);
     }
   }
 
@@ -226,32 +250,38 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final horizontalPadding = math.max(24.0, (availableWidth - ContentWidth.form) / 2);
     final background = isDark ? AppColors.darkSurface : AppColors.surface;
 
-    return Scaffold(
-      backgroundColor: background,
-      appBar: AppBar(
+    return PopScope(
+      canPop: !_isVerificationSent,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _leave();
+      },
+      child: Scaffold(
         backgroundColor: background,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: isDark ? AppColors.darkOnSurface : AppColors.onSurface),
-          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-          onPressed: () => Navigator.pop(context),
+        appBar: AppBar(
+          backgroundColor: background,
+          surfaceTintColor: Colors.transparent,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, color: isDark ? AppColors.darkOnSurface : AppColors.onSurface),
+            tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+            onPressed: _leave,
+          ),
         ),
-      ),
-      body: SafeArea(
-        top: false,
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          padding: EdgeInsets.fromLTRB(horizontalPadding, 4, horizontalPadding, 24),
-          child: _isVerificationSent
-              ? _buildVerificationSentView()
-              : Form(
-                  key: _formKey,
-                  autovalidateMode: _submitAttempted ? AutovalidateMode.onUserInteraction : AutovalidateMode.disabled,
-                  child: AutofillGroup(child: _buildForm(screen, isDark)),
-                ),
+        body: SafeArea(
+          top: false,
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            padding: EdgeInsets.fromLTRB(horizontalPadding, 4, horizontalPadding, 24),
+            child: _isVerificationSent
+                ? _buildVerificationSentView()
+                : Form(
+                    key: _formKey,
+                    autovalidateMode: _submitAttempted ? AutovalidateMode.onUserInteraction : AutovalidateMode.disabled,
+                    child: AutofillGroup(child: _buildForm(screen, isDark)),
+                  ),
+          ),
         ),
       ),
     );
@@ -343,7 +373,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
             isDark,
             hint: '••••••••',
             icon: Icons.lock_outline,
-            helper: l10n.registerPasswordHelper,
             suffix: IconButton(
               icon: Icon(
                 _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
@@ -354,6 +383,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
               onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
             ),
           ),
+        ),
+        // Sunucu kuralı yazarken işaretlenir (sunucu reddetmeden önce).
+        ValueListenableBuilder<TextEditingValue>(
+          valueListenable: _passwordController,
+          builder: (context, value, _) => PasswordRuleChecklist(password: value.text),
         ),
         const SizedBox(height: 20),
 
@@ -653,7 +687,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               width: double.infinity,
               height: 52,
               child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: _leave,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,

@@ -18,6 +18,10 @@ enum AuthErrorCode {
   profileLoadFailed,
   googleSignInFailed,
   appleSignInFailed,
+  /// Kayıt isteği zaman aşımına uğradı; kayıt sunucuda tamamlanmış olabilir.
+  signUpTimedOut,
+  /// Yeni şifre mevcut şifreyle aynı (şifre değiştirme).
+  samePassword,
   unknown,
 }
 
@@ -40,6 +44,10 @@ AuthErrorCode authErrorCodeOf(Object error) {
 
   final lower = error.toString().toLowerCase();
   final code = error is AuthException ? (error.code ?? '').toLowerCase() : '';
+
+  if (code == 'same_password' || lower.contains('same_password') || lower.contains('should be different from the old password')) {
+    return AuthErrorCode.samePassword;
+  }
 
   if (error is AuthWeakPasswordException ||
       code == 'weak_password' ||

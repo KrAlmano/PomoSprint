@@ -127,10 +127,17 @@ void main() {
       expect(registerEmailError(l10n, ' ayse@posta.com '), isNull);
     });
 
-    test('şifre en az 6 karakter', () {
+    test('şifre sunucu kuralı: en az 6 karakter, küçük/büyük harf ve rakam', () {
       expect(registerPasswordError(l10n, ''), l10n.registerErrPasswordRequired);
-      expect(registerPasswordError(l10n, '12345'), l10n.errShortPassword);
-      expect(registerPasswordError(l10n, '123456'), isNull);
+      expect(registerPasswordError(l10n, 'Ab1'), l10n.errShortPassword);
+      // Sunucu (lower_upper_letters_digits) bunları weak_password ile reddeder.
+      expect(registerPasswordError(l10n, '123456'), l10n.authErrWeakPassword);
+      expect(registerPasswordError(l10n, 'abcdef1'), l10n.authErrWeakPassword);
+      expect(registerPasswordError(l10n, 'ABCDEF1'), l10n.authErrWeakPassword);
+      expect(registerPasswordError(l10n, 'Abcdefg'), l10n.authErrWeakPassword);
+      // Türkçe harfler sunucuda harf sayılmaz.
+      expect(registerPasswordError(l10n, 'ŞĞÜşğü1'), l10n.authErrWeakPassword);
+      expect(registerPasswordError(l10n, 'Abcde1'), isNull);
     });
   });
 
@@ -156,7 +163,7 @@ void main() {
       final fields = find.byType(TextFormField);
       await tester.enterText(fields.at(0), 'Ayşe Yılmaz');
       await tester.enterText(fields.at(1), 'ayse@example.com');
-      await tester.enterText(fields.at(2), 'gizli-sifre');
+      await tester.enterText(fields.at(2), 'Gizli-sifre1');
       await tester.pump();
     }
 

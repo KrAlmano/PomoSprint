@@ -269,6 +269,7 @@ void main() {
         'active_session_uid_$uid': '{}',
         'active_session_uid_silinen@example.com': '{}',
         'hidden_users_uid_$uid': '[{"name":"X"}]',
+        'onboarding_draft_uid_$uid': '{"step":1}',
         'league_info_shown_$uid': true,
         'league_info_shown_$email': true,
         'daily_goal_migrated_$uid': true,

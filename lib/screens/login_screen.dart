@@ -10,6 +10,7 @@ import '../models/user_model.dart';
 import '../utils/auth_error_text.dart';
 import '../utils/responsive.dart';
 import '../theme.dart';
+import '../widgets/auth/account_texts.dart';
 import '../widgets/auth/auth_error_banner.dart';
 import '../widgets/auth/legal_links.dart';
 import 'register_screen.dart';
@@ -20,9 +21,15 @@ class LoginScreen extends StatefulWidget {
   /// kalır, böylece geçiş sürerken ikinci bir giriş denemesi yapılamaz.
   final FutureOr<void> Function(UserModel user) onLoginSuccess;
 
+  /// Kayıttan e-posta onayı beklenerek dönüldüyse o adres: alan dolu gelir,
+  /// "yeniden gönder" doğrudan görünür. (Kayıt ekranından dönüşte de aynı
+  /// yol kullanılır.)
+  final String? pendingVerificationEmail;
+
   const LoginScreen({
     super.key,
     required this.onLoginSuccess,
+    this.pendingVerificationEmail,
   });
 
   @override
@@ -41,6 +48,10 @@ class _LoginScreenState extends State<LoginScreen> {
   Timer? _resendTimer;
   String? _errorMessage;
   bool _showResendButton = false;
+  // Kayıttan onay beklenerek dönüldü: bilgi kutusu ve yeniden gönder.
+  String? _pendingVerificationEmail;
+  // Oturumun neden kapandığı (hesap silindi, oturum sona erdi, Apple izni).
+  SignOutNotice? _notice;
 
   // Debug yapılandırması, ücretsiz (Personal Team) hesapla cihaza
   // imzalanabilsin diye Sign in with Apple entitlement'ı olmadan derlenir
@@ -48,8 +59,35 @@ class _LoginScreenState extends State<LoginScreen> {
   // verir. Release/Profile tam entitlement'la derlenir.
   bool get _showAppleSignIn => !kIsWeb && !kDebugMode && defaultTargetPlatform == TargetPlatform.iOS;
 
+  bool get _offerAppleOnAndroidHelp => !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+
+  @override
+  void initState() {
+    super.initState();
+    final service = SupabaseService.instance;
+    _notice = service.takeSignOutNotice();
+    service.signOutNotice.addListener(_onSignOutNotice);
+    final pending = widget.pendingVerificationEmail;
+    if (pending != null && pending.trim().isNotEmpty) _applyPendingVerification(pending);
+  }
+
+  void _onSignOutNotice() {
+    if (SupabaseService.instance.signOutNotice.value == null || !mounted) return;
+    final notice = SupabaseService.instance.takeSignOutNotice();
+    if (notice != null) setState(() => _notice = notice);
+  }
+
+  void _applyPendingVerification(String email) {
+    final clean = email.trim();
+    _emailController.text = clean;
+    _pendingVerificationEmail = clean;
+    _showResendButton = true;
+    _errorMessage = null;
+  }
+
   @override
   void dispose() {
+    SupabaseService.instance.signOutNotice.removeListener(_onSignOutNotice);
     _resendTimer?.cancel();
     _emailController.dispose();
     _passwordController.dispose();
@@ -81,6 +119,8 @@ class _LoginScreenState extends State<LoginScreen> {
       _isLoading = true;
       _errorMessage = null;
       _showResendButton = false;
+      _pendingVerificationEmail = null;
+      _notice = null;
     });
 
     try {
@@ -138,19 +178,32 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _handleAppleSignIn() => _signIn(SupabaseService.instance.signInWithApple);
 
   Future<void> _openRegister() async {
-    final user = await Navigator.push<UserModel>(
+    final result = await Navigator.push<RegisterResult>(
       context,
       MaterialPageRoute(builder: (context) => const RegisterScreen()),
     );
-    if (user == null || !mounted) return;
-    await _signIn(() async => user);
+    if (result == null || !mounted) return;
+    switch (result) {
+      case RegisterSignedIn(:final user):
+        await _signIn(() async => user);
+      case RegisterAwaitingConfirmation(:final email):
+        // Onaydan dönen kullanıcı adresini yeniden yazmaz; e-posta gelmediyse
+        // yeniden gönder doğrudan görünür.
+        setState(() {
+          _notice = null;
+          _applyPendingVerification(email);
+        });
+    }
   }
 
   Future<void> _handleResendEmail() async {
     if (_isResending || _resendSecondsLeft > 0) return;
     final l10n = AppLocalizations.of(context)!;
     final email = _emailController.text.trim();
-    if (email.isEmpty) return;
+    if (email.isEmpty) {
+      _showSnack(l10n.errEnterEmailForResend, isError: true);
+      return;
+    }
     setState(() => _isResending = true);
     try {
       await SupabaseService.instance.resendConfirmationEmail(email);
@@ -178,6 +231,49 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() => _resendSecondsLeft--);
       if (_resendSecondsLeft <= 0) timer.cancel();
     });
+  }
+
+  Future<void> _showAppleOnAndroidHelp() async {
+    final l10n = AppLocalizations.of(context)!;
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        scrollable: true,
+        constraints: const BoxConstraints(minWidth: 280, maxWidth: ContentWidth.form),
+        title: Text(l10n.appleOnAndroidTitle),
+        content: Text(l10n.appleOnAndroidBody, style: const TextStyle(fontSize: 14, height: 1.4)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(MaterialLocalizations.of(ctx).okButtonLabel),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildResendButton(AppLocalizations l10n, {required bool prompt}) {
+    return OutlinedButton.icon(
+      onPressed: (_isResending || _resendSecondsLeft > 0) ? null : _handleResendEmail,
+      icon: _isResending
+          ? const SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : const Icon(Icons.mark_email_read_outlined, size: 18),
+      label: Text(
+        _resendSecondsLeft > 0
+            ? l10n.authResendAvailableIn(_resendSecondsLeft)
+            : (prompt ? l10n.loginResendPrompt : l10n.resendVerificationLink),
+        textAlign: TextAlign.center,
+      ),
+      style: OutlinedButton.styleFrom(
+        foregroundColor: AppColors.primary,
+        side: const BorderSide(color: AppColors.primary),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
   }
 
   Future<void> _handleForgotPassword() async {
@@ -271,31 +367,36 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 32),
 
+                  // Oturumun neden kapandığı (bir kez gösterilir).
+                  if (_notice != null) ...[
+                    AuthInfoBanner(
+                      message: signOutNoticeText(l10n, _notice!),
+                      icon: _notice!.kind == SignOutNoticeKind.accountDeleted
+                          ? Icons.check_circle_outline
+                          : Icons.info_outline,
+                      dismissTooltip: l10n.noticeDismissTooltip,
+                      onDismiss: () => setState(() => _notice = null),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+
+                  // Kayıttan onay beklenerek dönüldü.
+                  if (_pendingVerificationEmail != null && _errorMessage == null) ...[
+                    AuthInfoBanner(
+                      message: l10n.loginVerificationPendingInfo(_pendingVerificationEmail!),
+                      icon: Icons.mark_email_unread_outlined,
+                    ),
+                    const SizedBox(height: 8),
+                    _buildResendButton(l10n, prompt: true),
+                    const SizedBox(height: 16),
+                  ],
+
                   // Error Banner
                   if (_errorMessage != null) ...[
                     AuthErrorBanner(message: _errorMessage!),
                     if (_showResendButton) ...[
                       const SizedBox(height: 8),
-                      OutlinedButton.icon(
-                        onPressed: (_isResending || _resendSecondsLeft > 0) ? null : _handleResendEmail,
-                        icon: _isResending
-                            ? const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2),
-                              )
-                            : const Icon(Icons.mark_email_read_outlined, size: 18),
-                        label: Text(
-                          _resendSecondsLeft > 0
-                              ? l10n.authResendAvailableIn(_resendSecondsLeft)
-                              : l10n.resendVerificationLink,
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.primary,
-                          side: const BorderSide(color: AppColors.primary),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
-                      ),
+                      _buildResendButton(l10n, prompt: false),
                     ],
                     const SizedBox(height: 16),
                   ],
@@ -470,6 +571,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   SocialSignInNotice(
                     style: TextStyle(fontSize: 12, height: 1.4, color: labelColor),
                   ),
+
+                  // Android'de Apple ile giriş yok: Apple ile açılmış hesaba
+                  // e-posta + şifre (Şifremi Unuttum) ile girme yolu.
+                  if (_offerAppleOnAndroidHelp)
+                    TextButton.icon(
+                      onPressed: _showAppleOnAndroidHelp,
+                      icon: const Icon(Icons.help_outline_rounded, size: 18),
+                      label: Text(l10n.appleOnAndroidLink, textAlign: TextAlign.center),
+                      style: TextButton.styleFrom(foregroundColor: labelColor),
+                    ),
 
                   const SizedBox(height: 32),
 

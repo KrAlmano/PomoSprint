@@ -3,19 +3,25 @@ import 'dart:async';
 import 'categories_management_screen.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show Clipboard, ClipboardData;
+import 'package:url_launcher/url_launcher.dart';
 import '../l10n/app_localizations.dart';
 import '../models/avatar_model.dart';
 import '../models/user_model.dart';
+import '../widgets/auth/account_texts.dart';
+import '../widgets/auth/change_password_dialog.dart';
 import '../widgets/auth/legal_links.dart';
 import '../widgets/avatar_widget.dart';
 import '../widgets/social/social_error_text.dart';
 import '../theme.dart';
 import '../utils/name_filter.dart';
 import '../utils/responsive.dart';
+import '../utils/user_report.dart';
 import '../services/hidden_users.dart';
 import '../services/supabase_service.dart';
 import '../services/language_service.dart';
 import '../services/notification_service.dart';
+import '../services/timer_persistence.dart';
 import 'character_collection_screen.dart';
 
 /// Profil ve ayarlar. Kullanıcı bilgisi tek kaynaktan
@@ -25,10 +31,16 @@ class ProfileScreen extends StatefulWidget {
   final ValueChanged<bool> onDarkModeChanged;
   final VoidCallback onLogout;
 
+  /// Çıkış onayındaki "süren seans" kontrolü (testte değiştirilir; varsayılan:
+  /// cihazdaki sayaç kaydı, TimerPersistence).
+  @visibleForTesting
+  final Future<bool> Function(String ownerKey)? activeTimerSessionCheck;
+
   const ProfileScreen({
     super.key,
     required this.onDarkModeChanged,
     required this.onLogout,
+    this.activeTimerSessionCheck,
   });
 
   @override
@@ -50,6 +62,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _isNameEditing = false;
   String? _nameError;
   bool _isDeleting = false;
+  bool _isLoggingOut = false;
 
   @override
   void initState() {
@@ -345,13 +358,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: TextButton.icon(
-                        onPressed: _isDeleting
-                            ? null
-                            : () {
-                                Navigator.pop(context);
-                                widget.onLogout();
-                              },
-                        icon: const Icon(Icons.logout, color: AppColors.primary),
+                        onPressed: (_isDeleting || _isLoggingOut) ? null : _confirmLogout,
+                        icon: _isLoggingOut
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+                              )
+                            : const Icon(Icons.logout, color: AppColors.primary),
                         label: Text(
                           lang.translate('logout'),
                           style: const TextStyle(
@@ -565,6 +579,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
             lang.translate('email_readonly_hint'),
             style: TextStyle(fontSize: 11, color: muted),
           ),
+          // Yalnızca e-posta/şifre hesabı (Google/Apple hesabında şifre yok).
+          if (_service.canChangePassword) ...[
+            const SizedBox(height: 8),
+            Material(
+              color: Colors.transparent,
+              child: ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Icon(Icons.password_rounded, color: muted),
+                title: Text(l10n.changePasswordTile, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
+                subtitle: Text(l10n.changePasswordTileSub, style: TextStyle(fontSize: 12, color: muted)),
+                trailing: Icon(Icons.chevron_right, color: muted),
+                onTap: () => showChangePasswordDialog(context),
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -714,6 +743,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
               LegalPage.accountDeletion,
               subtitle: l10n.accountDeletionInfoSub,
             ),
+            // KVKK m.11 bilgi talebi: destek adresine kullanıcının kendi e-posta
+            // uygulamasından gider (e-posta/kimlik URL'ye konmaz).
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(Icons.file_download_outlined, color: muted),
+              title: Text(l10n.dataCopyRequestTile, style: titleStyle),
+              subtitle: Text(l10n.dataCopyRequestSub, style: subtitleStyle),
+              trailing: Icon(Icons.mail_outline_rounded, size: 18, color: muted),
+              onTap: _requestDataCopy,
+            ),
             const Divider(height: 16),
             // Uygulama içi hesap silme (App Store 5.1.1(v), Google Play).
             ListTile(
@@ -749,9 +788,128 @@ class _ProfileScreenState extends State<ProfileScreen> {
     messenger.showSnackBar(SnackBar(content: Text(l10n.hiddenUsersCleared), behavior: SnackBarBehavior.floating));
   }
 
+  // KVKK m.11 veri kopyası talebi: destek adresine, kullanıcının kendi e-posta
+  // uygulamasından (gönderen adres hesabı tanıtır; URL'de kişisel veri yok).
+  Future<void> _requestDataCopy() async {
+    final l10n = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+    final uri = buildUserReportUri(subject: l10n.dataCopyEmailSubject, body: l10n.dataCopyEmailBody);
+    var opened = false;
+    try {
+      opened = await launchUrl(uri);
+    } catch (e) {
+      debugPrint('[PROFILE] E-posta uygulaması açılamadı: $e');
+    }
+    if (opened) return;
+    messenger.showSnackBar(SnackBar(
+      content: Text(l10n.dataCopyMailFailed(kSupportEmail)),
+      behavior: SnackBarBehavior.floating,
+      duration: const Duration(seconds: 6),
+      action: SnackBarAction(
+        label: l10n.reportCopyAddress,
+        onPressed: () => unawaited(Clipboard.setData(const ClipboardData(text: kSupportEmail))),
+      ),
+    ));
+  }
+
+  Future<int> _pendingCount() async {
+    try {
+      return await _service.getPendingSessionCount();
+    } catch (e) {
+      debugPrint('[PROFILE] Bekleyen seans sayısı okunamadı: $e');
+      return _service.pendingSessionCount.value;
+    }
+  }
+
+  /// Bekleyen seansları zaman aşımıyla göndermeyi dener; kalan sayıyı döndürür.
+  Future<int> _trySendPending() async {
+    try {
+      final result = await _service.syncPendingSessions().timeout(const Duration(seconds: 12));
+      return result.remaining;
+    } catch (e) {
+      debugPrint('[PROFILE] Bekleyen seanslar gönderilemedi: $e');
+      return _pendingCount();
+    }
+  }
+
+  // Süren ya da duraklatılmış seans (kabuk sahibi: uid, yoksa e-posta).
+  Future<bool> _hasActiveTimerSession() async {
+    final owner = _user?.id ?? _user?.email.toLowerCase();
+    if (owner == null || owner.isEmpty) return false;
+    final check = widget.activeTimerSessionCheck;
+    if (check != null) return check(owner);
+    return await TimerPersistence.instance.load(owner) != null;
+  }
+
+  /// Çıkış onayı. Önce bekleyen seanslar gönderilmeye çalışılır; hâlâ
+  /// bekleyen varsa (24 saat içinde aynı hesapla girilmezse puanı kaybolur)
+  /// ya da sayaç sürüyorsa bu söylenir.
+  Future<void> _confirmLogout() async {
+    if (_isLoggingOut || _isDeleting) return;
+    final l10n = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _isLoggingOut = true);
+    var pending = await _pendingCount();
+    if (pending > 0) pending = await _trySendPending();
+    final hasActiveSession = await _hasActiveTimerSession();
+    if (!mounted) return;
+    setState(() => _isLoggingOut = false);
+
+    final choice = await showDialog<_LogoutChoice>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        scrollable: true,
+        constraints: const BoxConstraints(minWidth: 280, maxWidth: ContentWidth.form),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(l10n.logoutConfirmTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
+        content: Text(
+          logoutConfirmText(l10n, pendingCount: pending, hasActiveSession: hasActiveSession),
+          style: const TextStyle(fontSize: 14, height: 1.4),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext), child: Text(l10n.cancel)),
+          if (pending > 0) ...[
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, _LogoutChoice.sendThenLogout),
+              child: Text(l10n.logoutSendAndExit),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, _LogoutChoice.logout),
+              child: Text(l10n.logoutAnyway, style: const TextStyle(color: Colors.red)),
+            ),
+          ] else
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, _LogoutChoice.logout),
+              child: Text(LanguageService.instance.translate('logout')),
+            ),
+        ],
+      ),
+    );
+    if (choice == null || !mounted) return;
+    if (choice == _LogoutChoice.sendThenLogout) {
+      setState(() => _isLoggingOut = true);
+      final remaining = await _trySendPending();
+      if (!mounted) return;
+      setState(() => _isLoggingOut = false);
+      if (remaining > 0) {
+        messenger.showSnackBar(SnackBar(content: Text(l10n.logoutSendFailed), behavior: SnackBarBehavior.floating));
+        return;
+      }
+    }
+    Navigator.pop(context);
+    widget.onLogout();
+  }
+
   Future<void> _confirmDeleteAccount() async {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final pending = await _pendingCount();
+    if (!mounted) return;
+    final confirmText = deleteAccountConfirmText(
+      l10n,
+      pendingCount: pending,
+      appleReauthorization: _service.canReauthorizeWithApple,
+    );
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -768,7 +926,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
         content: Text(
-          l10n.profileDeleteConfirm,
+          confirmText,
           style: const TextStyle(fontSize: 14, height: 1.4),
         ),
         actions: [
@@ -794,15 +952,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (confirmed == true && mounted) await _deleteAccount();
   }
 
-  // Silme sürerken kapatılamayan bir ilerleme diyaloğu gösterilir; bu sırada
-  // çıkış gibi diğer eylemler yapılamaz. Yerel verinin temizliği ve oturum
-  // kapatma servis tarafından yapılır.
+  // Apple kimliği olan hesapta (iOS) önce Apple'dan taze yetkilendirme kodu
+  // istenir; servis token'ı iptal eder. Kullanıcı vazgeçerse silme yine
+  // yapılır, giriş ekranı Ayarlar talimatını gösterir. Silme sürerken
+  // kapatılamayan bir ilerleme diyaloğu gösterilir; bu sırada çıkış gibi
+  // diğer eylemler yapılamaz. Yerel verinin temizliği, oturum kapatma ve
+  // "hesabın silindi" açıklaması servis tarafından yapılır.
   Future<void> _deleteAccount() async {
     if (_isDeleting) return;
     final l10n = AppLocalizations.of(context)!;
     final navigator = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
     setState(() => _isDeleting = true);
+    final appleCode = _service.canReauthorizeWithApple ? await _service.requestAppleAuthorizationCode() : null;
+    if (!mounted) return;
     unawaited(showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -825,7 +988,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ));
 
     try {
-      await _service.deleteUserAccount();
+      await _service.deleteUserAccount(appleAuthorizationCode: appleCode);
       if (!mounted) return;
       navigator.pop(); // ilerleme diyaloğu
       navigator.pop(); // profil ekranı
@@ -888,3 +1051,5 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
+
+enum _LogoutChoice { logout, sendThenLogout }

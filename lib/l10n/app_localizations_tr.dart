@@ -373,7 +373,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get profileDeleteConfirm =>
-      'Hesabını ve tüm verilerini kalıcı olarak silmek istediğinden emin misin?\n\nBu işlem profilini ve çalışma geçmişini tamamen siler ve geri alınamaz.';
+      'Hesabını ve tüm verilerini kalıcı olarak silmek istediğinden emin misin?\n\nŞunların hepsi silinir ve geri alınamaz: çalışma geçmişin ve seansların, puanların ve serin, kum tanelerin ve avatarların, kategorilerin, arkadaşların ve lig kaydın.';
 
   @override
   String get profileDeleting => 'Hesabın siliniyor...';
@@ -381,6 +381,43 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get profileDeleteError =>
       'Hesabın silinemedi. Bağlantını kontrol edip tekrar dene.';
+
+  @override
+  String profileDeleteConfirmPending(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Bu cihazda henüz gönderilmemiş $count seansın da silinir.',
+      one: 'Bu cihazda henüz gönderilmemiş 1 seansın da silinir.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get profileDeleteConfirmApple =>
+      'Apple ile giriş yaptığın için silmeden önce Apple seni bir kez daha doğrulayacak; böylece PomoSprint\'in Apple ile Giriş bağlantısı da kaldırılır.';
+
+  @override
+  String get profileDeleteConfirmCopyHint =>
+      'Verilerinin bir kopyasını istiyorsan önce \"Gizlilik ve yasal\" bölümündeki \"Verilerimin kopyasını iste\"yi kullan.';
+
+  @override
+  String get accountDeletedNotice => 'Hesabın ve tüm verilerin silindi.';
+
+  @override
+  String get accountDeletedAppleNotice =>
+      'Apple ile Giriş bağlantısını da kaldırmak için iPhone\'da Ayarlar > Apple Hesabı (adın) > Apple ile Giriş > PomoSprint > Kullanmayı Durdur adımlarını izle.';
+
+  @override
+  String get sessionExpiredNotice =>
+      'Oturumun sona erdi. Şifren değişmiş ya da hesabın başka bir cihazdan kapatılmış olabilir; lütfen yeniden giriş yap.';
+
+  @override
+  String get appleCredentialRevokedNotice =>
+      'Bu cihazda Apple ile Giriş izni kaldırıldığı için oturumun kapatıldı. Devam etmek için yeniden Apple ile giriş yap.';
+
+  @override
+  String get noticeDismissTooltip => 'Kapat';
 
   @override
   String get profileNotificationsDenied =>
@@ -723,6 +760,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get authErrUnknown => 'Bir hata oluştu. Lütfen tekrar dene.';
 
   @override
+  String get authErrSignUpTimeout =>
+      'Kayıt isteği yanıt vermedi. Kaydın yine de tamamlanmış olabilir: e-postanı kontrol et ya da giriş yapmayı dene.';
+
+  @override
   String get navTimer => 'Süreç';
 
   @override
@@ -943,7 +984,30 @@ class AppLocalizationsTr extends AppLocalizations {
   String get googleLogin => 'Google ile Giriş';
 
   @override
+  String get appleOnAndroidLink => 'Apple ile mi kaydoldun?';
+
+  @override
+  String get appleOnAndroidTitle =>
+      'Apple ile açılan hesaba Android\'den giriş';
+
+  @override
+  String get appleOnAndroidBody =>
+      'Android\'de Apple ile giriş yok; hesabına e-posta ve şifreyle girebilirsin:\n\n1. Hesabının e-posta adresini bul. Apple\'da \"E-postamı Gizle\"yi seçtiysen bu bir gizli röle adresidir (…@privaterelay.appleid.com); iPhone\'da Ayarlar > Apple Hesabı (adın) > Apple ile Giriş > PomoSprint altında görünür.\n2. Bu ekranda o adresi yazıp \"Şifremi Unuttum\"a dokun ve gelen bağlantıyla bir şifre belirle.\n3. Sonra aynı adres ve yeni şifrenle giriş yap.\n\nE-posta gelmezse destek@pomosprint.app adresine yaz.';
+
+  @override
   String get resendVerificationLink => 'Doğrulama E-postasını Tekrar Gönder 📬';
+
+  @override
+  String loginVerificationPendingInfo(String email) {
+    return 'Onay bağlantısını $email adresine gönderdik. Bağlantıya dokunduktan sonra şifrenle buradan giriş yap.';
+  }
+
+  @override
+  String get loginResendPrompt => 'E-posta gelmedi mi? Yeniden gönder';
+
+  @override
+  String get errEnterEmailForResend =>
+      'Onay e-postasını yeniden göndermek için önce e-posta adresini yaz.';
 
   @override
   String get errFillFields => 'Lütfen tüm alanları doldurun.';
@@ -1036,7 +1100,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get errEmailExists =>
-      'Bu e-posta adresi zaten kayıtlı! Lütfen \"Giriş Yap\" ekranından giriş yapın.';
+      'Bu e-posta adresi zaten kayıtlı. \"Giriş Yap\" ekranından giriş yap. Bu adresle Google ya da Apple ile kaydolduysan o butonu kullan ya da \"Şifremi Unuttum\" ile bir şifre belirle.';
 
   @override
   String get reportsTabSubject => 'Ders Raporları';
@@ -1181,6 +1245,38 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get logout => 'Çıkış Yap';
+
+  @override
+  String get logoutConfirmTitle => 'Çıkış yapılsın mı?';
+
+  @override
+  String get logoutConfirmBody =>
+      'Bu cihazdaki oturumun kapanacak. İstediğin zaman aynı hesapla yeniden giriş yapabilirsin.';
+
+  @override
+  String logoutPendingWarning(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count seansın henüz sunucuya gönderilmedi.',
+      one: '1 seansın henüz sunucuya gönderilmedi.',
+    );
+    return '$_temp0 Seans başladıktan sonraki 24 saat içinde aynı hesapla bu cihazdan giriş yapmazsan puanı, kum taneleri ve seriye katkısı kaybolur.';
+  }
+
+  @override
+  String get logoutRunningWarning =>
+      'Süren bir seansın var. Seans bu cihazda saklanır ve aynı hesapla yeniden girince kaldığı yerden sürer; ama çıkış yaptıktan sonra bitiş bildirimi gelmez.';
+
+  @override
+  String get logoutSendAndExit => 'Gönder ve çık';
+
+  @override
+  String get logoutAnyway => 'Yine de çık';
+
+  @override
+  String get logoutSendFailed =>
+      'Seanslar şu an gönderilemedi. Bağlantını kontrol edip tekrar dene.';
 
   @override
   String get save => 'Kaydet';
@@ -1485,7 +1581,49 @@ class AppLocalizationsTr extends AppLocalizations {
   String get registerErrPasswordRequired => 'Bir şifre belirle.';
 
   @override
-  String get registerPasswordHelper => 'En az 6 karakter.';
+  String get registerPasswordHelper =>
+      'En az 6 karakter; büyük harf, küçük harf ve rakam içermeli.';
+
+  @override
+  String get passwordRuleLength => 'En az 6 karakter';
+
+  @override
+  String get passwordRuleCase => 'Büyük ve küçük harf (A-Z, a-z)';
+
+  @override
+  String get passwordRuleDigit => 'En az bir rakam (0-9)';
+
+  @override
+  String get changePasswordTile => 'Şifreyi değiştir';
+
+  @override
+  String get changePasswordTileSub =>
+      'Mevcut şifrenle doğrulayıp yeni bir şifre belirle.';
+
+  @override
+  String get changePasswordCurrent => 'Mevcut şifre';
+
+  @override
+  String get changePasswordNew => 'Yeni şifre';
+
+  @override
+  String get changePasswordRepeat => 'Yeni şifre (tekrar)';
+
+  @override
+  String get changePasswordMismatch => 'Yeni şifreler aynı değil.';
+
+  @override
+  String get changePasswordSame => 'Yeni şifre mevcut şifrenle aynı olamaz.';
+
+  @override
+  String get changePasswordWrongCurrent => 'Mevcut şifre hatalı.';
+
+  @override
+  String get changePasswordSave => 'Şifreyi güncelle';
+
+  @override
+  String get changePasswordSuccess =>
+      'Şifren güncellendi. Diğer cihazlardaki oturumların kapanmış olabilir.';
 
   @override
   String get registerShowPassword => 'Şifreyi göster';
@@ -1550,6 +1688,26 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get accountDeletionInfoSub =>
       'Hangi verilerin silindiği ve web üzerinden silme talebi';
+
+  @override
+  String get dataCopyRequestTile => 'Verilerimin kopyasını iste';
+
+  @override
+  String get dataCopyRequestSub =>
+      'KVKK m.11 kapsamında. E-posta uygulaman açılır; hesabındaki e-posta adresinden gönder.';
+
+  @override
+  String get dataCopyEmailSubject =>
+      'PomoSprint kişisel veri kopyası talebi (KVKK m.11)';
+
+  @override
+  String get dataCopyEmailBody =>
+      'Merhaba,\n\nKVKK m.11 kapsamında PomoSprint hesabıma ait kişisel verilerin bir kopyasını talep ediyorum. Bu e-postayı hesabımda kayıtlı e-posta adresinden gönderiyorum.\n\nTercih ettiğim biçim (ör. JSON, PDF):\n';
+
+  @override
+  String dataCopyMailFailed(String email) {
+    return 'E-posta uygulaması açılamadı. Talebini hesabındaki e-posta adresinden $email adresine gönderebilirsin.';
+  }
 
   @override
   String get deleteAccountSub =>

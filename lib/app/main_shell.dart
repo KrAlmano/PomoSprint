@@ -93,6 +93,8 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
     unawaited(_syncPendingSessions());
     // Günlük sınır metni (seans sonucu) için puan kuralları önceden okunur.
     unawaited(_service.getPointsConfig());
+    // Apple ile girilmiş oturumda Ayarlar'dan izin kaldırıldıysa tam çıkış.
+    unawaited(_service.verifyAppleCredential());
   }
 
   @override
@@ -117,6 +119,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
         // Ön plana dönüş: askıdayken kaçan bağlantı olayı yerine bekleyenler denenir.
         _syncRetryAttempt = 0;
         if (_service.pendingSessionCount.value > 0) unawaited(_syncPendingSessions());
+        unawaited(_service.verifyAppleCredential());
       case AppLifecycleState.paused || AppLifecycleState.hidden || AppLifecycleState.detached:
         _cancelSyncRetry();
       case AppLifecycleState.inactive:
