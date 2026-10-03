@@ -1099,6 +1099,10 @@ class DailyReportView extends StatelessWidget {
     final summary = '$title, ${lang.translate('total_label')} ${StatsText.duration(totalMinutes)}: '
         '${segments.map((s) => '${s.label} ${StatsText.duration(s.minutes)} '
             '${StatsText.percent(context, s.roundedPercent)}').join(', ')}';
+    // Çok dar ekranda (320 pt telefon, iPad Slide Over) lejant halkanın yanına
+    // sığmıyor; altına iner. Karar ekran genişliğinden: geniş ekranda kart
+    // IntrinsicHeight içinde, LayoutBuilder orada kullanılamaz.
+    final legendBelow = MediaQuery.sizeOf(context).width < 360;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -1150,7 +1154,9 @@ class DailyReportView extends StatelessWidget {
           Semantics(
             label: summary,
             excludeSemantics: true,
-            child: Row(
+            child: Flex(
+              direction: legendBelow ? Axis.vertical : Axis.horizontal,
+              mainAxisSize: legendBelow ? MainAxisSize.min : MainAxisSize.max,
               children: [
                 SizedBox(
                   width: 120,
@@ -1192,8 +1198,10 @@ class DailyReportView extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 24),
+                const SizedBox(width: 24, height: 16),
                 Expanded(
+                  // Lejant alttayken esnek değil: dikey kaydırmada yükseklik sınırsız.
+                  flex: legendBelow ? 0 : 1,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: segments.map((seg) {

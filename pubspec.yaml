@@ -60,6 +60,7 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.4
   flutter_native_splash: ^2.4.8
+  sentry_dart_plugin: ^3.4.0
 
 flutter_launcher_icons:
   android: "ic_launcher"
@@ -67,17 +68,38 @@ flutter_launcher_icons:
   image_path: "assets/icon/icon_source.png"
   adaptive_icon_background: "#F0F5F8"
   adaptive_icon_foreground: "assets/icon/foreground.png"
+  # Android 13+ temalı simge: foreground.png'nin alfa kanalı, tek renk (beyaz).
+  adaptive_icon_monochrome: "assets/icon/monochrome.png"
   min_sdk_android: 21
 
+# Renkler Flutter açılış ekranıyla (SplashView) aynı: açık AppColors.surface,
+# koyu AppColors.darkSurface. Koyu temalı cihazda açık renk flaşı olmaz.
+# Değiştirince: dart run flutter_native_splash:create
 flutter_native_splash:
-  color: "#F0F5F8"
+  color: "#F8F9FB"
+  color_dark: "#130D0D"
   image: "assets/icon/foreground.png"
   android: true
   ios: true
   web: false
   android_12:
-    color: "#F0F5F8"
-    image: "assets/icon/foreground.png"
+    color: "#F8F9FB"
+    color_dark: "#130D0D"
+    # Android 12+ simgeyi çapı tuvalin 2/3'ü olan daireyle kırpar;
+    # splash_android12.png aynı logonun daireye sığacak kadar küçültülmüşü.
+    image: "assets/icon/splash_android12.png"
+    image_dark: "assets/icon/splash_android12.png"
+
+# sentry_dart_plugin: release derlemesinden sonra Dart sembollerini ve
+# obfuscation haritasını Sentry'ye yükler (scripts/build_release.sh çağırır).
+# org, project ve auth_token BURAYA YAZILMAZ: SENTRY_ORG, SENTRY_PROJECT,
+# SENTRY_AUTH_TOKEN ortam değişkenlerinden (scripts/.env) okunur. Sembol
+# klasörü, harita, release ve dist betikten --sentry-define ile verilir.
+sentry:
+  upload_debug_symbols: true
+  upload_sources: false
+  upload_source_maps: false
+  commits: false
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

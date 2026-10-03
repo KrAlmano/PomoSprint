@@ -58,6 +58,13 @@ android {
             } else {
                 signingConfigs.getByName("debug")
             }
+            // libflutter.so, libapp.so ve Sentry'nin native kütüphanesinin
+            // sembol tabloları AAB'ye (BUNDLE-METADATA) girer; Play Console
+            // native çökmeleri çözer, "debug symbols" uyarısı vermez. APK'ya
+            // eklenmez. Dart sembolleri ayrıca: scripts/build_release.sh.
+            ndk {
+                debugSymbolLevel = "SYMBOL_TABLE"
+            }
         }
     }
 }

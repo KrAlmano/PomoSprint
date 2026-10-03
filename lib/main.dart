@@ -54,6 +54,11 @@ Future<void> _guardedInit(String name, Future<void> Function() init) async {
   }
 }
 
+/// Görünen uygulama adı. Android son uygulamalar ekranı MaterialApp.title'ı
+/// gösterir; başlatıcıdaki ad (AndroidManifest android:label, iOS
+/// CFBundleDisplayName) ile aynı olmalı (test/platform_config_test.dart).
+const String kAppDisplayName = 'PomoSprint';
+
 class PomodoroApp extends StatelessWidget {
   const PomodoroApp({super.key});
 
@@ -63,7 +68,7 @@ class PomodoroApp extends StatelessWidget {
       listenable: Listenable.merge([LanguageService.instance, ThemeController.instance]),
       builder: (context, _) {
         return MaterialApp(
-          title: 'PomoSprint - Pomodoro',
+          title: kAppDisplayName,
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,

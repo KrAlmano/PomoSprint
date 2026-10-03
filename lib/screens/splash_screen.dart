@@ -61,7 +61,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     // kullanıcı ana ekrana ulaşabilir — bu adım asla askıda kalamaz.
     final user = await service.restoreCachedUser();
     await service.loadCachedAvatarCatalog();
-    var categories = await CategoryCache.read(user?.email) ?? CourseCategory.initialCategories();
+    var categories = await CategoryCache.read(user?.email, uid: user?.id) ?? CourseCategory.initialCategories();
 
     // 2. Supabase'i başlat ve (varsa) bulut verisiyle tazele — ama bu SINIRLI
     // bir süre beklenir; internet yoksa/timeout olursa yukarıdaki yerel

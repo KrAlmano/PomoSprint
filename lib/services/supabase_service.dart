@@ -227,6 +227,7 @@ class SupabaseService {
   /// hesaba gönderilmez.
   Future<void> signOutFully() async {
     final email = currentUser.value?.email;
+    final uid = currentUser.value?.id;
     try {
       await _googleSignIn.signOut();
     } catch (e) {
@@ -240,11 +241,12 @@ class SupabaseService {
         debugPrint('[AUTH] Supabase signOut hatası: $e');
       }
     }
-    await _clearUserScopedState(email: email);
+    await _clearUserScopedState(email: email, uid: uid);
   }
 
-  Future<void> _clearUserScopedState({String? email}) async {
+  Future<void> _clearUserScopedState({String? email, String? uid}) async {
     final mail = email ?? currentUser.value?.email;
+    final id = uid ?? currentUser.value?.id;
     _userEpoch++;
     _statsRefreshTimer?.cancel();
     currentUser.value = null;
@@ -256,6 +258,7 @@ class SupabaseService {
       await prefs.remove(_savedUserKey);
       await prefs.remove('saved_categories');
       if (mail != null && mail.isNotEmpty) await prefs.remove('saved_categories_$mail');
+      if (id != null && id.isNotEmpty) await prefs.remove('saved_categories_uid_$id');
     } catch (e) {
       debugPrint('[AUTH] Yerel kullanıcı önbelleği temizlenemedi: $e');
     }
@@ -556,6 +559,7 @@ class SupabaseService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_dailyGoalMigratedKey(uid));
       await prefs.remove('league_info_shown_$uid');
+      await prefs.remove('saved_categories_uid_$uid');
       if (email != null && email.isNotEmpty) {
         await prefs.remove('league_info_shown_$email');
         await prefs.remove('saved_categories_$email');
@@ -611,6 +615,7 @@ class SupabaseService {
       await _queue.adoptLegacyQueue(userId: user.id!, email: user.email);
       await getPendingSessionCount();
       await _migrateLegacyDailyGoal(user);
+      await migrateLegacyEmailKeys(user);
     } catch (e) {
       debugPrint('[DATA] Kullanıcı yükleme sonrası adımlar: $e');
     }
@@ -768,6 +773,24 @@ class SupabaseService {
   }
 
   static String _dailyGoalMigratedKey(String userId) => 'daily_goal_migrated_$userId';
+
+  // Eski sürümler bazı anahtar adlarında e-postayı kullanıyordu (iOS'ta düz
+  // plist, yedeğe girer). Kimlik bilinince uid anahtarına taşınır. Kategori
+  // önbelleği CategoryCache.read'de, bekleyen kuyruk adoptLegacyQueue'da,
+  // süren seans TimerPersistence.load'da taşınır.
+  @visibleForTesting
+  Future<void> migrateLegacyEmailKeys(UserModel user) async {
+    final uid = user.id;
+    final email = user.email.trim();
+    if (uid == null || uid.isEmpty || email.isEmpty) return;
+    final prefs = await SharedPreferences.getInstance();
+    for (final mail in {email, email.toLowerCase()}) {
+      final legacyLeagueKey = 'league_info_shown_$mail';
+      if (!prefs.containsKey(legacyLeagueKey)) continue;
+      if (prefs.getBool(legacyLeagueKey) ?? false) await prefs.setBool('league_info_shown_$uid', true);
+      await prefs.remove(legacyLeagueKey);
+    }
+  }
 
   // Raporlar eskiden hedefi cihazda ('daily_pomo_goal', pomodoro adedi)
   // tutuyordu. Kullanıcının orada seçtiği değer bir kez profile taşınır.

@@ -23,6 +23,9 @@ const _sizes = <String, Size>{
   'telefon dikey 390x844': Size(390, 844),
   'telefon yatay 844x390': Size(844, 390),
   'küçük telefon yatay 568x320': Size(568, 320),
+  'küçük telefon dikey 320x568': Size(320, 568),
+  'iPad Slide Over 320x1000': Size(320, 1000),
+  'iPad Split View 507x1024': Size(507, 1024),
   'iPad dikey 820x1180': Size(820, 1180),
   'iPad yatay 1180x820': Size(1180, 820),
   'büyük tablet 1366x1024': Size(1366, 1024),
@@ -203,11 +206,14 @@ void main() {
   }
 
   group('Dikey telefonda en büyük yazı', () {
-    for (final view in views.entries) {
-      testWidgets('${view.key} ×2 taşmaz', (tester) async {
-        await _pumpAt(tester, const Size(390, 844), view.value(), textScale: 2);
-        expect(tester.takeException(), isNull);
-      });
+    // 320 pt: iPhone SE (1. nesil) ve iPad Slide Over.
+    for (final size in const [Size(390, 844), Size(320, 568), Size(320, 1000)]) {
+      for (final view in views.entries) {
+        testWidgets('${view.key} $size ×2 taşmaz', (tester) async {
+          await _pumpAt(tester, size, view.value(), textScale: 2);
+          expect(tester.takeException(), isNull);
+        });
+      }
     }
   });
 
@@ -272,6 +278,39 @@ void main() {
       await _pumpAt(tester, const Size(1180, 820), _monthly());
       expect(tester.getTopLeft(chartTitle).dy, tester.getTopLeft(heatmapTitle).dy);
       expect(tester.getTopLeft(chartTitle).dx, greaterThan(tester.getTopRight(heatmapTitle).dx));
+    });
+
+    testWidgets('dağılım lejantı 320 pt ekranda halkanın altında, telefonda yanında', (tester) async {
+      final donut = find.byWidgetPredicate(
+        (w) => w is CustomPaint && w.painter.runtimeType.toString() == '_DonutChartPainter',
+      );
+      final card = find.ancestor(of: donut, matching: find.byWidgetPredicate((w) => w is Semantics && w.excludeSemantics));
+      Rect legendValue() => tester.getRect(find.descendant(of: card, matching: find.byType(Text)).last);
+
+      await _pumpAt(tester, const Size(320, 568), _daily());
+      expect(tester.takeException(), isNull);
+      expect(legendValue().top, greaterThanOrEqualTo(tester.getRect(donut).bottom));
+
+      await _pumpAt(tester, const Size(390, 844), _daily());
+      expect(legendValue().left, greaterThanOrEqualTo(tester.getRect(donut).right));
+    });
+
+    testWidgets('haftalık toplam ve en verimli gün kartları 320 pt ekranda alt alta, telefonda yan yana', (tester) async {
+      final total = find.text(LanguageService.instance.translate('total_focus_label'));
+      final best = find.text(LanguageService.instance.translate('most_efficient_day_label'));
+
+      await _pumpAt(tester, const Size(320, 568), _weekly());
+      await tester.ensureVisible(best);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      expect(tester.getTopLeft(best).dy, greaterThan(tester.getBottomLeft(total).dy));
+      expect(tester.getTopLeft(best).dx, tester.getTopLeft(total).dx);
+
+      await _pumpAt(tester, const Size(390, 844), _weekly());
+      await tester.ensureVisible(best);
+      await tester.pumpAndSettle();
+      expect(tester.getTopLeft(best).dy, tester.getTopLeft(total).dy);
+      expect(tester.getTopLeft(best).dx, greaterThan(tester.getTopRight(total).dx));
     });
 
     testWidgets('geniş ekranda içerik pano genişliğinde ortalanır', (tester) async {

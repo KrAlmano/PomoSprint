@@ -31,11 +31,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 const _phonePortrait = Size(390, 844);
 const _phoneLandscape = Size(844, 390);
 const _smallPhoneLandscape = Size(568, 320);
+// iPhone SE (1. nesil) / iPod touch dikey: iOS 15'te desteklenen en küçük ekran.
+const _smallPhonePortrait = Size(320, 568);
 
 const _targetSizes = <Size>[
   _phonePortrait,
   _phoneLandscape,
   _smallPhoneLandscape,
+  _smallPhonePortrait,
+  // iPad çoklu pencere: Slide Over / Split View 1/3 (320 pt) ve 1/2 (~507 pt).
+  Size(320, 1000),
+  Size(507, 1024),
   Size(820, 1180),
   Size(1180, 820),
   Size(1366, 1024),
@@ -206,7 +212,7 @@ void main() {
         for (final scale in [1.0, 1.5]) {
           await _pumpAt(tester, size, _shell(body: const SizedBox.expand()), textScale: scale);
           _expectNoLayoutError(tester, '$size x$scale');
-          final sideNav = size != _phonePortrait;
+          final sideNav = Responsive.fromSize(size).useSideNavigation;
           expect(find.byType(NavigationRail), sideNav ? findsOneWidget : findsNothing, reason: '$size');
           expect(find.byType(NavigationBar), sideNav ? findsNothing : findsOneWidget, reason: '$size');
           // Dört sekmenin etiketi de görünür (ray gerekirse kendi içinde kayar).
@@ -400,7 +406,10 @@ void main() {
               expect(hourglass.width, lessThanOrEqualTo(300), reason: label);
               expect(hourglass.top, greaterThanOrEqualTo(0), reason: label);
               expect(hourglass.bottom, lessThanOrEqualTo(size.height), reason: label);
-              if (!paused && scale == 1.0 && size != _smallPhoneLandscape) {
+              // 320x568'de kabuksuz tam ekran düzen gerçekte yok (dikeyde sayaç
+              // hep kabukta); orada ana düğmeye aşağıdaki gibi kaydırarak ulaşılır.
+              final fullScreenSmallPortrait = size == _smallPhonePortrait && !inShell;
+              if (!paused && scale == 1.0 && size != _smallPhoneLandscape && !fullScreenSmallPortrait) {
                 // Ana düğme kaydırmadan görünür.
                 expect(startButton.bottom, lessThanOrEqualTo(size.height), reason: label);
               }
@@ -665,12 +674,18 @@ void main() {
           _expectNoLayoutError(tester, '$size $step');
         }
 
+        // Küçük ekranda seçenekler kaydırılarak görünür olur.
+        Future<void> choose(Finder option) async {
+          await tester.ensureVisible(option);
+          await tester.pumpAndSettle();
+          await tester.tap(option);
+          await tester.pump();
+        }
+
         await next('adım 2');
-        await tester.tap(find.text(l10n.onboardingSegmentYks));
-        await tester.pump();
+        await choose(find.text(l10n.onboardingSegmentYks));
         await next('adım 3');
-        await tester.tap(find.text('Matematik'));
-        await tester.pump();
+        await choose(find.text('Matematik'));
         await next('adım 4');
         expect(find.text(l10n.onboardingFinishBtn), findsOneWidget, reason: '$size');
         // Seçenekler tablette form genişliğini aşmaz.
