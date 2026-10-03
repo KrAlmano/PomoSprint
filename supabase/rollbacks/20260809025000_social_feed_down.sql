@@ -1,3 +1,25 @@
+-- ============================================================
+-- UYARI: CANLIYA UYGULAMADAN ÖNCE OKUYUN
+-- ------------------------------------------------------------
+-- Bu dosya bir GERİ ALMA (rollback) betiğidir, migration DEĞİLDİR.
+-- supabase/migrations/ dışında tutulur; aksi halde `supabase db push`
+-- onu aynı sürüm numaralı ileri migration sanıp _up dosyasından ÖNCE
+-- uygular. Repodaki migration'lar canlı şemanın gerisinde olduğu için
+-- bu betik canlıdaki güncel fonksiyon gövdelerini ESKİ sürümlerle
+-- ezebilir ve geri alınamaz şekilde VERİ SİLEBİLİR.
+-- Uygulamadan önce `supabase db dump` ile yedek alın, dosyayı satır
+-- satır okuyun ve önce staging/branch üzerinde deneyin.
+--
+-- Bu dosyaya özel riskler:
+--   activity_feed tablosunu ve profiles.active_session_* kolonlarını
+--   SİLER; get_live_friends/get_friends_feed/start/cancel_study_session
+--   fonksiyonlarını siler (istemcinin canlı arkadaş listesi bozulur).
+--   complete_study_session'ı activity_feed'siz eski sürüme çevirir:
+--   canlıdaki gövde (coins_earned vb.) EZİLİR.
+--   Düzeltildi: process_weekly_leagues artık 025000'deki bozuk sürüm
+--   yerine 20260809022700'deki çalışan sürüme döner.
+-- ============================================================
+
 BEGIN;
 
 -- 1. Remove pg_cron job
@@ -19,72 +41,55 @@ DROP FUNCTION IF EXISTS public.cancel_study_session();
 DROP FUNCTION IF EXISTS public.start_study_session(integer, text);
 
 -- 3. Restore process_weekly_leagues
+-- Önceki ÇALIŞAN sürüm (20260809022700). Bu dosyanın eski hâli 025000'deki
+-- bozuk gövdeyi (integer lig id'si, var olmayan threshold/week_start
+-- kolonları) geri yüklüyordu; o gövde her çalışmada hata verir.
 CREATE OR REPLACE FUNCTION public.process_weekly_leagues()
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
 AS $function$
 DECLARE
-    v_threshold integer;
-    v_promote_count integer;
-    v_demote_count integer;
-    
-    v_current_league_id integer;
-    v_higher_league_id integer;
-    v_lower_league_id integer;
-    
-    v_league record;
-    v_member record;
-    
-    v_new_week_start timestamptz := now();
+    r_league RECORD;
+    r_member RECORD;
+    v_rank INTEGER;
+    v_new_tier INTEGER;
+    v_member_count INTEGER;
+    v_promo_end INTEGER;
+    v_demo_start INTEGER;
 BEGIN
-    FOR v_league IN SELECT id, tier FROM public.leagues
+    FOR r_league IN 
+        SELECT id, tier FROM public.leagues WHERE is_active = true 
     LOOP
-        v_current_league_id := v_league.id;
+        SELECT count(*) INTO v_member_count FROM public.league_memberships WHERE league_id = r_league.id;
         
-        v_higher_league_id := CASE v_league.tier
-            WHEN 1 THEN (SELECT id FROM public.leagues WHERE tier = 2 LIMIT 1)
-            WHEN 2 THEN (SELECT id FROM public.leagues WHERE tier = 3 LIMIT 1)
-            WHEN 3 THEN (SELECT id FROM public.leagues WHERE tier = 4 LIMIT 1)
-            WHEN 4 THEN (SELECT id FROM public.leagues WHERE tier = 5 LIMIT 1)
-            WHEN 5 THEN NULL
-        END;
+        SELECT z.promotion_zone_end, z.demotion_zone_start 
+        INTO v_promo_end, v_demo_start 
+        FROM public.get_league_zones(v_member_count) z;
 
-        v_lower_league_id := CASE v_league.tier
-            WHEN 5 THEN (SELECT id FROM public.leagues WHERE tier = 4 LIMIT 1)
-            WHEN 4 THEN (SELECT id FROM public.leagues WHERE tier = 3 LIMIT 1)
-            WHEN 3 THEN (SELECT id FROM public.leagues WHERE tier = 2 LIMIT 1)
-            WHEN 2 THEN (SELECT id FROM public.leagues WHERE tier = 1 LIMIT 1)
-            WHEN 1 THEN NULL
-        END;
-        
-        SELECT threshold, promote_count, demote_count
-        INTO v_threshold, v_promote_count, v_demote_count
-        FROM public.get_league_zones( (SELECT count(*)::integer FROM public.league_memberships WHERE league_id = v_current_league_id) );
-        
-        FOR v_member IN (
-            SELECT user_id, weekly_points, rank() OVER (ORDER BY weekly_points DESC) as rnk
-            FROM public.league_memberships
-            WHERE league_id = v_current_league_id
-        )
+        v_rank := 1;
+        FOR r_member IN 
+            SELECT user_id, weekly_points 
+            FROM public.league_memberships 
+            WHERE league_id = r_league.id 
+            -- Eşitlikte get_league_ranking ile aynı deterministik sıra (SOCIAL-08)
+            ORDER BY weekly_points DESC, joined_at ASC, user_id
         LOOP
-            IF v_member.rnk <= v_promote_count AND v_higher_league_id IS NOT NULL THEN
-                UPDATE public.league_memberships
-                SET league_id = v_higher_league_id, weekly_points = 0
-                WHERE user_id = v_member.user_id;
-            ELSIF v_member.rnk > v_threshold - v_demote_count AND v_lower_league_id IS NOT NULL THEN
-                UPDATE public.league_memberships
-                SET league_id = v_lower_league_id, weekly_points = 0
-                WHERE user_id = v_member.user_id;
-            ELSE
-                UPDATE public.league_memberships
-                SET weekly_points = 0
-                WHERE user_id = v_member.user_id;
+            v_new_tier := r_league.tier;
+            
+            IF v_rank <= v_promo_end AND r_league.tier < 5 THEN
+                v_new_tier := r_league.tier + 1;
+            ELSIF v_rank >= v_demo_start AND r_league.tier > 1 THEN
+                v_new_tier := r_league.tier - 1;
             END IF;
+            
+            UPDATE public.profiles SET league_tier = v_new_tier WHERE id = r_member.user_id;
+            v_rank := v_rank + 1;
         END LOOP;
+        
+        UPDATE public.leagues SET is_active = false WHERE id = r_league.id;
     END LOOP;
-    
-    UPDATE public.leagues SET week_start = v_new_week_start;
 END;
 $function$;
 

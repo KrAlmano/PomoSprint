@@ -1,3 +1,23 @@
+-- ============================================================
+-- UYARI: CANLIYA UYGULAMADAN ÖNCE OKUYUN
+-- ------------------------------------------------------------
+-- Bu dosya bir GERİ ALMA (rollback) betiğidir, migration DEĞİLDİR.
+-- supabase/migrations/ dışında tutulur; aksi halde `supabase db push`
+-- onu aynı sürüm numaralı ileri migration sanıp _up dosyasından ÖNCE
+-- uygular. Repodaki migration'lar canlı şemanın gerisinde olduğu için
+-- bu betik canlıdaki güncel fonksiyon gövdelerini ESKİ sürümlerle
+-- ezebilir ve geri alınamaz şekilde VERİ SİLEBİLİR.
+-- Uygulamadan önce `supabase db dump` ile yedek alın, dosyayı satır
+-- satır okuyun ve önce staging/branch üzerinde deneyin.
+--
+-- Bu dosyaya özel riskler:
+--   study_sessions.is_verified kolonunu integer'dan boolean'a çevirir
+--   (ön planda geçen saniye bilgisi kaybolur) ve complete_study_session'ı
+--   boolean imzalı eski sürüme çevirir. Güncel istemci p_is_verified'ı
+--   integer gönderdiği için TÜM seans gönderimleri başarısız olur.
+--   Canlıdaki complete_study_session gövdesi (coins_earned vb.) EZİLİR.
+-- ============================================================
+
 BEGIN;
 
 -- 1. Alter is_verified back from integer to boolean

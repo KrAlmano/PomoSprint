@@ -1,3 +1,28 @@
+-- ============================================================
+-- UYARI: CANLIYA UYGULAMADAN ÖNCE OKUYUN
+-- ------------------------------------------------------------
+-- Bu dosya bir GERİ ALMA (rollback) betiğidir, migration DEĞİLDİR.
+-- supabase/migrations/ dışında tutulur; aksi halde `supabase db push`
+-- onu aynı sürüm numaralı ileri migration sanıp _up dosyasından ÖNCE
+-- uygular. Repodaki migration'lar canlı şemanın gerisinde olduğu için
+-- bu betik canlıdaki güncel fonksiyon gövdelerini ESKİ sürümlerle
+-- ezebilir ve geri alınamaz şekilde VERİ SİLEBİLİR.
+-- Uygulamadan önce `supabase db dump` ile yedek alın, dosyayı satır
+-- satır okuyun ve önce staging/branch üzerinde deneyin.
+--
+-- Bu dosyaya özel riskler:
+--   leagues ve league_memberships tablolarında RLS'i KAPATIR: tablo
+--   yetkisi olan herkes tüm lig üyeliklerini okuyabilir.
+--   get_league_ranking'i zon kolonları olmayan eski imzayla yeniden
+--   oluşturur; get_my_league_ranking (20260928120000) bu kolonları
+--   okuduğu için uygulamanın lig ekranı hata verir.
+--   get_league_zones'u siler ve haftalık cron işini eski saate
+--   ('59 23 * * 0' UTC) alır.
+--   Düzeltildi: cron.unschedule artık iş yoksa hata vermez ve yeniden
+--   oluşturulan get_league_ranking istemcilere KAPALI kalır (e-posta
+--   sızıntısı yeniden açılmasın).
+-- ============================================================
+
 BEGIN;
 
 -- 1) REVERT RLS
@@ -9,8 +34,13 @@ DROP POLICY IF EXISTS "Memberships select policy" ON public.league_memberships;
 DROP FUNCTION IF EXISTS public.get_my_league_ids();
 
 -- 2) REVERT CRON SCHEDULE
-SELECT cron.unschedule('weekly_leagues_job');
-SELECT cron.schedule('weekly_leagues_job', '59 23 * * 0', 'SELECT public.process_weekly_leagues()');
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'weekly_leagues_job') THEN
+        PERFORM cron.unschedule('weekly_leagues_job');
+    END IF;
+    PERFORM cron.schedule('weekly_leagues_job', '59 23 * * 0', 'SELECT public.process_weekly_leagues()');
+END $$;
 
 -- 3) REVERT RPCs
 DROP FUNCTION IF EXISTS public.get_league_zones(integer);
@@ -126,6 +156,10 @@ BEGIN
     ORDER BY lm.weekly_points DESC, lm.joined_at ASC;
 END;
 $function$;
+
+-- Lig üyelerinin e-postalarını döndürdüğü için istemcilere kapalı kalmalı
+-- (bkz. 20260928120000_security_hardening_up.sql bölüm 4).
+REVOKE EXECUTE ON FUNCTION public.get_league_ranking(uuid) FROM PUBLIC, anon, authenticated;
 
 -- C. process_weekly_leagues
 CREATE OR REPLACE FUNCTION public.process_weekly_leagues()

@@ -1,57 +1,73 @@
 // Bülten abonelikten çıkma uç noktası.
 //
-// Link biçimi: /functions/v1/unsubscribe?email=<e-posta>&token=<hmac>
-// token = HMAC-SHA256(UNSUBSCRIBE_SECRET, lower(trim(email))) — hex.
-// Token scripts/send_newsletter.js tarafından üretilir. Token doğrulanmadan
-// kimse listeden çıkarılmaz; aksi halde e-posta adresini bilen herkes
-// başkasını listeden çıkarabilirdi.
+// Her abonenin marketing_subscribers.unsubscribe_token kolonunda tahmin
+// edilemez bir UUID'si var (20261003150000_live_audit_fixes). Linkler bu
+// token'ı taşır; token olmadan kimse listeden çıkarılamaz (önceden e-posta
+// adresini bilen herkes başkasını çıkarabiliyordu).
 //
-// Gerekli secret'lar: UNSUBSCRIBE_SECRET (send_newsletter.js ile aynı),
-// SUPABASE_URL ve SUPABASE_SERVICE_ROLE_KEY (Supabase tarafından sağlanır).
-// JWT doğrulaması kapalı deploy edilmeli: `supabase functions deploy unsubscribe --no-verify-jwt`
+// Kabul edilen istekler (yalnızca POST; GET silme YAPMAZ, çünkü e-posta
+// güvenlik tarayıcıları linkleri GET ile açar):
+//   POST ?email=..&token=..   RFC 8058 tek tık (List-Unsubscribe-Post)
+//   POST {email, token}       landing/unsubscribe.html'in "Abonelikten çık" butonu
+// email isteğe bağlıdır; verilirse token'ın sahibiyle eşleşmesi gerekir.
+//
+// JWT doğrulaması KAPALI deploy edilir (e-posta istemcisi Authorization
+// başlığı göndermez): `supabase functions deploy unsubscribe --no-verify-jwt`
 
 import { createClient } from "npm:@supabase/supabase-js@2";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "https://pomosprint.app",
-  "Access-Control-Allow-Methods": "GET, OPTIONS",
-  "Access-Control-Allow-Headers": "authorization, apikey, content-type",
-};
+const ALLOWED_ORIGINS = new Set([
+  "https://pomosprint.app",
+  "https://www.pomosprint.app",
+]);
 
-async function hmacHex(secret: string, message: string): Promise<string> {
-  const key = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"],
-  );
-  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(message));
-  return Array.from(new Uint8Array(sig)).map((b) => b.toString(16).padStart(2, "0")).join("");
+const UUID_TOKEN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+
+function corsHeaders(req: Request): Record<string, string> {
+  const origin = req.headers.get("Origin") ?? "";
+  return {
+    "Access-Control-Allow-Origin": ALLOWED_ORIGINS.has(origin) ? origin : "https://pomosprint.app",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "authorization, apikey, content-type",
+    "Vary": "Origin",
+  };
 }
 
-function timingSafeEqual(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  let diff = 0;
-  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  return diff === 0;
+// E-posta ve token'ı önce URL'den, yoksa POST gövdesinden okur.
+async function readParams(req: Request): Promise<{ email: string; token: string }> {
+  const url = new URL(req.url);
+  let email = url.searchParams.get("email") ?? "";
+  let token = url.searchParams.get("token") ?? "";
+
+  if (!email || !token) {
+    const type = req.headers.get("content-type") ?? "";
+    try {
+      if (type.includes("application/json")) {
+        const body = await req.json();
+        email = email || String(body?.email ?? "");
+        token = token || String(body?.token ?? "");
+      } else if (type.includes("application/x-www-form-urlencoded") || type.includes("multipart/form-data")) {
+        const form = await req.formData();
+        email = email || String(form.get("email") ?? "");
+        token = token || String(form.get("token") ?? "");
+      }
+    } catch (_) {
+      // Bozuk gövde: aşağıdaki token kontrolü 400 döndürür.
+    }
+  }
+  return { email: email.trim().toLowerCase(), token: token.trim().toLowerCase() };
 }
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
-  if (req.method !== "GET") return new Response("Method not allowed", { status: 405, headers: corsHeaders });
+  const headers = corsHeaders(req);
+  if (req.method === "OPTIONS") return new Response(null, { headers });
+  if (req.method !== "POST") {
+    return new Response("Method not allowed", { status: 405, headers });
+  }
 
-  const secret = Deno.env.get("UNSUBSCRIBE_SECRET");
-  if (!secret) return new Response("Server misconfigured", { status: 500, headers: corsHeaders });
-
-  const url = new URL(req.url);
-  const email = (url.searchParams.get("email") ?? "").trim().toLowerCase();
-  const token = (url.searchParams.get("token") ?? "").trim().toLowerCase();
-  if (!email || !token) return new Response("Bad request", { status: 400, headers: corsHeaders });
-
-  const expected = await hmacHex(secret, email);
-  if (!timingSafeEqual(expected, token)) {
-    return new Response("Forbidden", { status: 403, headers: corsHeaders });
+  const { email, token } = await readParams(req);
+  if (!UUID_TOKEN.test(token) || email.length > 254) {
+    return new Response("Bad request", { status: 400, headers });
   }
 
   const admin = createClient(
@@ -59,11 +75,28 @@ Deno.serve(async (req) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     { auth: { persistSession: false } },
   );
-  // Büyük/küçük harf duyarsız eşleşme; '_' ve '%' joker karakter olarak
-  // yorumlanıp başka adresleri silmesin diye kaçışlanır.
-  const pattern = email.replace(/[\\%_]/g, (c) => `\\${c}`);
-  const { error } = await admin.from("marketing_subscribers").delete().ilike("email", pattern);
-  if (error) return new Response("Error", { status: 500, headers: corsHeaders });
 
-  return new Response("OK", { status: 200, headers: corsHeaders });
+  const { data: row, error: readError } = await admin
+    .from("marketing_subscribers")
+    .select("id, email")
+    .eq("unsubscribe_token", token)
+    .maybeSingle();
+  if (readError) return new Response("Error", { status: 500, headers });
+
+  // Adresin listede olup olmadığı açığa çıkmasın: bulunamayan ya da zaten
+  // çıkmış token için de aynı başarılı yanıt.
+  if (!row) return new Response("OK", { status: 200, headers });
+  const rowEmail = String(row.email).trim().toLowerCase();
+  if (email && email !== rowEmail) {
+    return new Response("Forbidden", { status: 403, headers });
+  }
+
+  const { error: deleteError } = await admin.from("marketing_subscribers").delete().eq("id", row.id);
+  if (deleteError) return new Response("Error", { status: 500, headers });
+
+  // Lansman bekleme listesi de duyuru e-postası alır; oradan da çıkar.
+  const { error: waitlistError } = await admin.from("waitlist").delete().eq("email", rowEmail);
+  if (waitlistError) console.warn("waitlist silme hatası:", waitlistError.message);
+
+  return new Response("OK", { status: 200, headers });
 });

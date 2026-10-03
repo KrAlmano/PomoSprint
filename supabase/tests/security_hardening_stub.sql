@@ -1,32 +1,136 @@
--- Yerel, tek kullanımlık bir Postgres üzerinde Supabase'i taklit eden en küçük şema.
--- CANLI veritabanına UYGULAMAYIN. Kullanım: security_hardening_test.sql başlığına bakın.
-CREATE ROLE anon NOLOGIN; CREATE ROLE authenticated NOLOGIN;
-CREATE SCHEMA auth;
-CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $$ SELECT nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
-GRANT USAGE ON SCHEMA auth TO anon, authenticated;
-CREATE TABLE public.profiles (id uuid PRIMARY KEY, email text, name text, avatar_id text, is_premium boolean DEFAULT false,
-  coins int DEFAULT 0, lifetime_points int DEFAULT 0, total_minutes int DEFAULT 0, league_tier int DEFAULT 1,
-  show_in_social_feed boolean DEFAULT true, user_segment text, daily_goal_minutes int, birth_year int, onboarding_completed_at timestamptz);
-CREATE TABLE public.categories (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid NOT NULL REFERENCES public.profiles(id),
-  name text NOT NULL, color_hex text NOT NULL DEFAULT '#000000', icon_name text, sort_order int DEFAULT 0, is_archived boolean NOT NULL DEFAULT false);
-CREATE TABLE public.study_sessions (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid NOT NULL, category_id uuid,
-  duration_minutes int NOT NULL, started_at timestamptz, completed_at timestamptz DEFAULT now(), client_uuid uuid);
-GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated;
--- canlıya benzer: profili önce güncelleyip sonra seansı ekleyen RPC
-CREATE FUNCTION public.complete_study_session(p_client_uuid uuid, p_category_id uuid, p_duration_minutes int, p_started_at timestamptz)
-RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public' AS $$
+-- Yerel, tek kullanımlık bir Postgres üzerinde Supabase'in en küçük taklidi.
+-- CANLI veritabanına UYGULAMAYIN. Kullanım: supabase/tests/run_local.sh
+--
+-- Bu dosya YALNIZCA migration'ların oluşturmadığı (canlıda elle yaratılmış)
+-- şeyleri sağlar: roller, auth şeması (auth.uid/auth.jwt/auth.users),
+-- pg_cron taklidi ve baseline tablolar. Fonksiyonların tamamı (ör.
+-- complete_study_session) gerçek migration zincirinden gelir; böylece
+-- testler repodaki gerçek RPC davranışını doğrular. Canlıda olup repoda
+-- olmayan fonksiyonlar (get_points_config, add_friend_by_code,
+-- respond_friend_request ...) burada YOKTUR; onlar
+-- scripts/security_regression_test.js ile canlıda test edilir.
+
+DO $$
 BEGIN
-  UPDATE public.profiles SET coins = coins + 5, total_minutes = total_minutes + p_duration_minutes WHERE id = auth.uid();
-  INSERT INTO public.study_sessions (user_id, category_id, duration_minutes, started_at, client_uuid)
-  VALUES (auth.uid(), p_category_id, p_duration_minutes, p_started_at, p_client_uuid);
-  RETURN jsonb_build_object('ok', true);
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') THEN
+        CREATE ROLE anon NOLOGIN;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') THEN
+        CREATE ROLE authenticated NOLOGIN;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'service_role') THEN
+        CREATE ROLE service_role NOLOGIN BYPASSRLS;
+    END IF;
 END $$;
-CREATE FUNCTION public.get_league_ranking(p_user_id uuid)
-RETURNS TABLE(name text, email text, avatar_id text, weekly_points int, tier int, end_date timestamptz, is_me boolean,
-  promotion_zone_end int, demotion_zone_start int, member_count int)
-LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public' AS $$
-BEGIN RETURN QUERY SELECT p.name, p.email, p.avatar_id, 10, 1, now(), p.id = p_user_id, 3, 999, 2 FROM public.profiles p; END $$;
-CREATE FUNCTION public.ensure_user_in_league(p_user_id uuid, p_points int) RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public' AS $$ BEGIN END $$;
-CREATE FUNCTION public.start_study_session(p_duration_minutes integer, p_category_name text) RETURNS void LANGUAGE sql SECURITY DEFINER AS $$ SELECT 1 $$;
-GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO anon, authenticated;
-INSERT INTO public.profiles (id, email, name) VALUES ('11111111-1111-1111-1111-111111111111','a@x.com','A'), ('22222222-2222-2222-2222-222222222222','b@x.com','B');
+
+-- Supabase varsayılan yetkileri: public şemasındaki yeni tablo ve
+-- fonksiyonlar API rollerine açıktır; kısıtlamayı migration'lar yapar.
+GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT EXECUTE ON FUNCTIONS TO anon, authenticated, service_role;
+
+-- ------------------------------------------------------------
+-- auth
+-- ------------------------------------------------------------
+CREATE SCHEMA auth;
+CREATE TABLE auth.users (
+    id uuid PRIMARY KEY,
+    email text,
+    email_confirmed_at timestamptz
+);
+CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $$
+    SELECT COALESCE(
+        nullif(current_setting('request.jwt.claim.sub', true), ''),
+        nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'sub'
+    )::uuid
+$$;
+CREATE FUNCTION auth.jwt() RETURNS jsonb LANGUAGE sql STABLE AS $$
+    SELECT COALESCE(nullif(current_setting('request.jwt.claims', true), ''), '{}')::jsonb
+$$;
+GRANT USAGE ON SCHEMA auth TO anon, authenticated, service_role;
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA auth TO anon, authenticated, service_role;
+
+-- ------------------------------------------------------------
+-- pg_cron taklidi (20260809022700 cron.unschedule/cron.schedule çağırır)
+-- ------------------------------------------------------------
+CREATE SCHEMA cron;
+CREATE TABLE cron.job (
+    jobid bigserial PRIMARY KEY,
+    jobname text UNIQUE,
+    schedule text,
+    command text
+);
+CREATE FUNCTION cron.schedule(text, text, text) RETURNS bigint LANGUAGE sql AS $$
+    INSERT INTO cron.job (jobname, schedule, command) VALUES ($1, $2, $3)
+    ON CONFLICT (jobname) DO UPDATE SET schedule = EXCLUDED.schedule, command = EXCLUDED.command
+    RETURNING jobid
+$$;
+CREATE FUNCTION cron.unschedule(text) RETURNS boolean LANGUAGE sql AS $$
+    WITH d AS (DELETE FROM cron.job WHERE jobname = $1 RETURNING 1)
+    SELECT EXISTS (SELECT 1 FROM d)
+$$;
+
+-- ------------------------------------------------------------
+-- Baseline tablolar (hiçbir migration'da CREATE TABLE'ı yok)
+-- Kolonlar migration'ların ve istemcinin kullandıklarından türetildi.
+-- ------------------------------------------------------------
+CREATE TABLE public.profiles (
+    id uuid PRIMARY KEY,
+    email text,
+    name text,
+    avatar_id text,
+    points integer DEFAULT 0,
+    total_minutes integer NOT NULL DEFAULT 0,
+    current_streak integer NOT NULL DEFAULT 0,
+    last_study_date date,
+    league_tier integer DEFAULT 1,
+    is_premium boolean DEFAULT false,
+    show_in_social_feed boolean DEFAULT true,
+    friend_code text UNIQUE,
+    categories jsonb,
+    unlocked_avatars text[],
+    created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE public.study_sessions (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    category text,
+    duration_minutes integer NOT NULL,
+    completed_at timestamptz NOT NULL DEFAULT now()
+);
+ALTER TABLE public.study_sessions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Own sessions select" ON public.study_sessions
+    FOR SELECT USING (user_id = auth.uid());
+
+CREATE TABLE public.leagues (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    tier integer NOT NULL,
+    start_date timestamptz NOT NULL DEFAULT now(),
+    end_date timestamptz,
+    is_active boolean NOT NULL DEFAULT true
+);
+
+CREATE TABLE public.league_memberships (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    league_id uuid NOT NULL REFERENCES public.leagues(id) ON DELETE CASCADE,
+    user_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    weekly_points integer NOT NULL DEFAULT 0,
+    joined_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- Tek satır (istek gönderen -> alan) ve iki satır modellerinin ikisi de
+-- test edilir; UNIQUE (user_id, friend_id) user_id ile başlayan bir index
+-- oluşturduğundan audit_fixes yalnızca friend_id index'ini ekler.
+CREATE TABLE public.friendships (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    friend_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'accepted')),
+    created_at timestamptz NOT NULL DEFAULT now(),
+    UNIQUE (user_id, friend_id)
+);
+ALTER TABLE public.friendships ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Own friendships select" ON public.friendships
+    FOR SELECT USING (auth.uid() IN (user_id, friend_id));

@@ -1,0 +1,279 @@
+-- ============================================================
+-- ÖNERİ 01: complete_study_session yamaları          ÖNCELİK: P0 (kritik)
+-- ============================================================
+-- Bulgular: BACKEND-01, DATA-02, STATS-V01, TIMER-V02, TIMER-06 (sunucu
+-- tarafı), BACKEND-24, BACKEND-09, BACKEND-27, BACKEND-26, BACKEND-18,
+-- BACKEND-19/SOCIAL-26 (feed yazımı), BACKEND-08 (isteğe bağlı)
+--
+-- supabase/proposed/ klasörü Supabase CLI tarafından UYGULANMAZ. Bu dosya
+-- DOĞRUDAN ÇALIŞTIRILMAZ (aşağıdaki \quit psql'i durdurur; SQL editörde
+-- sözdizimi hatası verir).
+--
+-- NEDEN TAM GÖVDE DEĞİL: Canlıdaki complete_study_session repodakinden
+-- farklı (ör. coins_earned döndürüyor, coin çarpanı var). Repodaki eski
+-- gövdeden CREATE OR REPLACE yazmak canlıyı GERİLETİR.
+--
+-- ADIMLAR
+--  1. Ön koşul: supabase/migrations/20261003120000_audit_fixes.sql canlıda
+--     uygulanmış olmalı (study_day_of, study_day_start, completed_at
+--     trigger'ı, study_sessions_user_completed_at_idx).
+--  2. Canlı gövdeyi alın:
+--       select pg_get_functiondef(
+--         'public.complete_study_session(uuid,uuid,integer,boolean,integer,timestamptz)'::regprocedure);
+--  3. Çıktıyı YENİ bir migration dosyasına kopyalayın
+--     (ör. supabase/migrations/2026MMDDHHMMSS_complete_study_session_v2.sql),
+--     başına BEGIN; sonuna COMMIT; ekleyin.
+--  4. Aşağıdaki DEĞİŞİKLİK 1-5'i o gövdeye uygulayın; 6-8 ürün kararıdır.
+--     coins_earned, coin çarpanı, lig ve activity_feed mantığının geri
+--     kalanına DOKUNMAYIN.
+--  5. Staging'de: supabase/tests/run_local.sh (repo zinciri; T4 bilgi satırı
+--     artık 'kabul' göstermeli) ve staging projesine karşı
+--     scripts/security_regression_test.js.
+-- ============================================================
+
+\echo 'supabase/proposed/01: doğrudan çalıştırılmaz, dosya başındaki ADIMLAR bölümüne bakın.'
+\quit
+
+-- ------------------------------------------------------------
+-- DEĞİŞİKLİK 1 (kritik): completed_at tabanlı 'overlap' kontrolünü kaldır
+-- ------------------------------------------------------------
+-- audit_fixes'ten sonra completed_at gerçek bitiş olduğu için kontrol
+-- started_at sırasıyla gelen kuyrukta artık doğru çalışıyor; ancak daha
+-- yeni bir seanstan SONRA gelen eski seans (ör. kuyruk gönderilemeden
+-- yeni seans gönderildi) hâlâ reddediliyor. Gerçek aralık çakışmasını
+-- validate_study_session_timing zaten kontrol ediyor.
+--
+-- ESKİ (gövdeden silin):
+--     SELECT completed_at INTO v_last_completed_at
+--     FROM public.study_sessions
+--     WHERE user_id = v_uid
+--     ORDER BY completed_at DESC
+--     LIMIT 1;
+--
+--     IF v_last_completed_at IS NOT NULL AND p_started_at < v_last_completed_at THEN
+--         RETURN jsonb_build_object('error', 'overlap');
+--     END IF;
+--
+-- YENİ (yumuşak 'overlap' yanıtı korunmak isteniyorsa; gerçek aralık):
+--     IF EXISTS (
+--         SELECT 1
+--         FROM public.study_sessions s
+--         WHERE s.user_id = v_uid
+--           AND s.started_at IS NOT NULL
+--           AND s.started_at > p_started_at - interval '24 hours'
+--           AND s.started_at < p_started_at + make_interval(mins => p_duration_minutes)
+--           AND s.started_at + make_interval(mins => s.duration_minutes) > p_started_at
+--     ) THEN
+--         RETURN jsonb_build_object('error', 'overlap');
+--     END IF;
+--
+-- v_last_completed_at değişkeni artık kullanılmıyorsa DECLARE'dan silin.
+
+-- ------------------------------------------------------------
+-- DEĞİŞİKLİK 2 (kritik, 1 ile birlikte): geç gelen eski seans seriyi bozmasın
+-- ------------------------------------------------------------
+-- 1. değişiklikten sonra daha eski bir güne ait seans, yeni güne ait
+-- seanstan sonra gelebilir. Eski kod bu durumda seriyi 1'e sıfırlıyor ve
+-- last_study_date'i geriye alıyordu.
+--
+-- DECLARE'a ekleyin:
+--     v_new_last_study_date date;
+--
+-- ESKİ:
+--     IF v_last_study_date IS NULL THEN
+--         v_current_streak := 1;
+--     ELSIF v_last_study_date = v_study_day THEN
+--         NULL;
+--     ELSIF v_last_study_date = v_study_day - 1 THEN
+--         v_current_streak := v_current_streak + 1;
+--     ELSE
+--         v_current_streak := 1;
+--     END IF;
+--
+-- YENİ:
+--     IF v_last_study_date IS NULL THEN
+--         v_current_streak := 1;
+--         v_new_last_study_date := v_study_day;
+--     ELSIF v_study_day <= v_last_study_date THEN
+--         -- Aynı gün ya da geç senkronlanan ESKİ bir gün: seri ve son gün değişmez.
+--         v_new_last_study_date := v_last_study_date;
+--     ELSIF v_study_day = v_last_study_date + 1 THEN
+--         v_current_streak := v_current_streak + 1;
+--         v_new_last_study_date := v_study_day;
+--     ELSE
+--         v_current_streak := 1;
+--         v_new_last_study_date := v_study_day;
+--     END IF;
+--
+-- profiles UPDATE'inde:
+--     ESKİ: last_study_date = v_study_day
+--     YENİ: last_study_date = v_new_last_study_date
+--
+-- streak_milestone feed koşulu ('v_last_study_date IS DISTINCT FROM
+-- v_study_day') aynı kalabilir; eski gün için kilometre taşı yazılmaz
+-- çünkü seri artmaz.
+
+-- ------------------------------------------------------------
+-- DEĞİŞİKLİK 3: çalışma günü tek kural + index kullanan gün aralığı
+-- (BACKEND-09, BACKEND-27)
+-- ------------------------------------------------------------
+-- Saat dilimini doğrula (set_my_timezone zaten doğruluyor; eski satırlar
+-- için savunma). Geçersiz değer AT TIME ZONE'u 22023 ile kırar ve istemci
+-- seansı kalıcı hata sayar.
+--
+-- profiles SELECT ... INTO ... v_user_tz satırından SONRA ekleyin:
+--     IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_timezone_names WHERE name = v_user_tz) THEN
+--         v_user_tz := 'Europe/Istanbul';
+--     END IF;
+--
+-- ESKİ:
+--     v_study_day := ((p_started_at AT TIME ZONE v_user_tz) - interval '4 hours')::date;
+-- YENİ:
+--     v_study_day := public.study_day_of(p_started_at, v_user_tz);
+--
+-- Gövdedeki ÜÇ gün sorgusunda (günlük tavan sayımı, feed toplamı, en çok
+-- çalışılan kategori):
+-- ESKİ:
+--     AND ((started_at AT TIME ZONE v_user_tz) - interval '4 hours')::date = v_study_day
+-- YENİ (study_sessions_user_started_at_idx kullanılır):
+--     AND started_at >= public.study_day_start(v_study_day, v_user_tz)
+--     AND started_at <  public.study_day_start(v_study_day + 1, v_user_tz)
+
+-- ------------------------------------------------------------
+-- DEĞİŞİKLİK 4: puan sabitleri tek kaynak (BACKEND-24)
+-- ------------------------------------------------------------
+-- 5/12 taban puan, %20 ceza, seri bonusları ve 16 seans tavanı gövdede,
+-- get_points_config'te ve istemci yedeğinde ayrı ayrı yazılı. Ceza
+-- ceil() ile hesaplandığı için 50 dk'da %25 kesiliyor (12 -> 9).
+-- Aşağıdaki fonksiyonu (ek, güvenli) migration'a koyun; sonra:
+--   * complete_study_session: sabitler yerine
+--       SELECT * INTO v_rules FROM public.points_rules();   -- v_rules record
+--     ve v_rules.base_25 / v_rules.base_50 / v_rules.pause_penalty_pct ...
+--   * Ceza: ESKİ  v_base_points - ceil(v_base_points * 0.20)
+--           YENİ  v_base_points - round(v_base_points * v_rules.pause_penalty_pct / 100.0)::int
+--     (25 dk: 5 -> 4, 50 dk: 12 -> 10; regresyon testi 5 -> 4 bekler.)
+--     Ürün ceil()'i korumak isterse UI metnini 'en az %20' yapın.
+--   * get_points_config (canlı gövde): JSON'u points_rules()'tan üretin ve
+--     'league_period_days' anahtarını ekleyin (bkz. öneri 02).
+--
+-- CREATE OR REPLACE FUNCTION public.points_rules()
+-- RETURNS TABLE (
+--     base_25 integer,
+--     base_50 integer,
+--     pause_penalty_pct integer,
+--     daily_league_cap integer,
+--     streak_bonus jsonb
+-- )
+-- LANGUAGE sql
+-- IMMUTABLE
+-- SET search_path = public
+-- AS $$
+--     SELECT 5, 12, 20, 16,
+--            '[{"min_streak": 3, "pct": 10}, {"min_streak": 7, "pct": 20}, {"min_streak": 14, "pct": 30}]'::jsonb;
+-- $$;
+-- REVOKE ALL ON FUNCTION public.points_rules() FROM PUBLIC, anon;
+-- GRANT EXECUTE ON FUNCTION public.points_rules() TO authenticated;
+
+-- ------------------------------------------------------------
+-- DEĞİŞİKLİK 5: eski kuyruk seansı o an süren seansı canlı listeden
+-- silmesin (BACKEND-26)
+-- ------------------------------------------------------------
+-- Öneri 07'deki start_study_session_v2 (client_uuid saklar) uygulandıktan
+-- sonra:
+-- ESKİ (fonksiyonun başında, koşulsuz):
+--     UPDATE public.profiles
+--     SET active_session_ends_at = NULL,
+--         active_session_category_name = NULL
+--     WHERE id = v_uid;
+-- YENİ (seans INSERT'inden SONRA; yalnızca biten seans aktif seanssa ya
+-- da eski istemci uuid saklamadıysa):
+--     UPDATE public.profiles
+--     SET active_session_ends_at = NULL,
+--         active_session_category_name = NULL,
+--         active_session_client_uuid = NULL
+--     WHERE id = v_uid
+--       AND (active_session_client_uuid IS NULL OR active_session_client_uuid = p_client_uuid);
+
+-- ------------------------------------------------------------
+-- DEĞİŞİKLİK 6 (ürün kararı): çevrimdışı toplu seans tavanı (BACKEND-18)
+-- ------------------------------------------------------------
+-- Bir script 24 saat geriye ~28 seans ekleyebilir (çakışmasız oldukları
+-- sürece). Günlük 16 tavanı yalnız lig puanını kesiyor. Sert tavan:
+-- günlük sayım sorgusundan sonra
+--     IF v_daily_sessions >= 24 THEN
+--         RETURN jsonb_build_object('error', 'daily_cap');
+--     END IF;
+-- ya da kaydı tutup coin/lifetime_points vermeyin. İstemci 'daily_cap'i
+-- reddedilen seans (K5 rejected) olarak gösterir.
+
+-- ------------------------------------------------------------
+-- DEĞİŞİKLİK 7: gizlilik tercihi kapalıysa akışa yazma (BACKEND-19)
+-- ------------------------------------------------------------
+-- activity_feed INSERT bloklarını şu koşulla sarın:
+--     IF COALESCE((SELECT show_in_social_feed FROM public.profiles WHERE id = v_uid), true) THEN
+--         ... daily_summary / streak_milestone INSERT'leri ...
+--     END IF;
+-- Akış istemcide hiç okunmuyor (SOCIAL-26); özellik kaldırılacaksa bu
+-- blok tamamen silinebilir (öneri 07, get_friends_feed notu).
+
+-- ------------------------------------------------------------
+-- DEĞİŞİKLİK 8 (isteğe bağlı, istemci koordinasyonu gerekir): saat kayması
+-- (BACKEND-08 / DATA-10)
+-- ------------------------------------------------------------
+-- audit_fixes trigger'ı 3-15 dk ileri saatleri zaten kırpıyor. Tam çözüm
+-- imza değişikliği ister (K5 sözleşmesi güncellenmeden yapmayın):
+-- p_client_now timestamptz DEFAULT NULL parametresi ekleyip gövdenin
+-- başında
+--     IF p_client_now IS NOT NULL THEN
+--         p_started_at := p_started_at + (now() - p_client_now);
+--     END IF;
+-- Yeni imza eski imzanın yanına AYRI fonksiyon olarak eklenmeli (PostgREST
+-- isimli parametrelerle seçer); eski imza istemciler güncellenene kadar
+-- kalır.
+
+-- ------------------------------------------------------------
+-- EK: validate_study_session_timing iyileştirmesi (BACKEND-27, BACKEND-08)
+-- ------------------------------------------------------------
+-- Gövdesi bu repoda (20260928120000) yazıldı. İki değişiklik:
+--   a) Çakışma sorgusuna alt sınır: index aralığı daralır (24 saatten uzun
+--      seans yok).
+--   b) Makine-okunur SQLSTATE (PS001 süre dolmadı, PS002 çakışma, PS003
+--      başlangıç yok). DİKKAT: istemci şu an P0001'i kalıcı hata sayıyor;
+--      önce istemci PS00x kodlarını tanımalı (DATA paketi), sonra uygulayın.
+--      Mesaj metinleri aynı kaldığı için metin eşleştiren istemciler
+--      etkilenmez.
+--
+-- CREATE OR REPLACE FUNCTION public.validate_study_session_timing()
+-- RETURNS trigger
+-- LANGUAGE plpgsql
+-- SECURITY DEFINER
+-- SET search_path = public
+-- AS $$
+-- DECLARE
+--     v_end timestamptz;
+-- BEGIN
+--     IF NEW.started_at IS NULL THEN
+--         RAISE EXCEPTION 'session_missing_start: started_at zorunlu' USING ERRCODE = 'PS003';
+--     END IF;
+--
+--     v_end := NEW.started_at + make_interval(mins => NEW.duration_minutes);
+--
+--     IF v_end > now() + interval '3 minutes' THEN
+--         RAISE EXCEPTION 'session_not_elapsed: seans süresi henüz dolmadı' USING ERRCODE = 'PS001';
+--     END IF;
+--
+--     IF EXISTS (
+--         SELECT 1
+--         FROM public.study_sessions s
+--         WHERE s.user_id = NEW.user_id
+--           AND s.started_at IS NOT NULL
+--           AND s.started_at > NEW.started_at - interval '24 hours'
+--           AND s.started_at < v_end
+--           AND s.started_at + make_interval(mins => s.duration_minutes) > NEW.started_at
+--     ) THEN
+--         RAISE EXCEPTION 'session_overlap: bu zaman aralığında başka bir seans var' USING ERRCODE = 'PS002';
+--     END IF;
+--
+--     RETURN NEW;
+-- END;
+-- $$;

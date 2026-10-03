@@ -46,9 +46,13 @@ ALTER TABLE public.profiles
     ADD COLUMN IF NOT EXISTS timezone text NOT NULL DEFAULT 'Europe/Istanbul';
 
 -- Copy existing points to lifetime_points and coins
+-- Yalnızca henüz taşınmamış satırlar: dosya yanlışlıkla yeniden çalıştırılırsa
+-- (ör. migration geçmişi eşitlenmeden `supabase db push`) kazanılmış/harcanmış
+-- coin'ler eski points değerine sıfırlanmasın.
 UPDATE public.profiles SET 
     lifetime_points = COALESCE(points, 0), 
-    coins = COALESCE(points, 0);
+    coins = COALESCE(points, 0)
+WHERE lifetime_points = 0 AND coins = 0 AND COALESCE(points, 0) > 0;
 
 -- C) Add columns to study_sessions
 -- (duration_minutes already exists as NOT NULL, skipping it)

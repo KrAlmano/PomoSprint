@@ -1,0 +1,60 @@
+-- ============================================================
+-- ÖNERİ 05: purchase_avatar çift harcama               ÖNCELİK: P2
+-- ============================================================
+-- Bulgu: BACKEND-07. Bakiye kilitsiz okunup mutlak değerle yazılıyor
+-- (coins = v_user_coins). Paralel iki satın alma aynı bakiyeyi görür; ya da
+-- eşzamanlı bir seans tamamlamanın eklediği coin bu yazmayla ezilir.
+-- Ek: K6 için makine-okunur hata kodları (HINT).
+--
+-- supabase/proposed/ CLI tarafından UYGULANMAZ; bu dosya doğrudan
+-- çalıştırılmaz (\quit).
+--
+-- ADIMLAR
+--  1. Canlı gövdeyi alın (canlıda lig ödülü kontrolü var, repodakinden
+--     farklı):
+--       select pg_get_functiondef('public.purchase_avatar(text)'::regprocedure);
+--  2. Aşağıdaki DEĞİŞİKLİK 1-4'ü canlı gövdeye uygulayıp yeni bir migration
+--     olarak ekleyin. Lig ödülü kontrolünü ve dönüş tipini (integer: yeni
+--     bakiye) KORUYUN.
+--  3. Regresyon testine paralel satın alma senaryosu eklenebilir:
+--     Promise.all([purchase(a1), purchase(a2)]) ile bakiye negatife düşmemeli.
+-- ============================================================
+
+\echo 'supabase/proposed/05: doğrudan çalıştırılmaz, dosya başındaki ADIMLAR bölümüne bakın.'
+\quit
+
+-- DEĞİŞİKLİK 1: 'zaten sahip' kontrolünden ÖNCE profil satırını kilitleyin.
+-- Aynı kullanıcının paralel satın almaları ve seans tamamlamaları
+-- (complete_study_session de profili FOR UPDATE kilitler) sıraya girer.
+--   ESKİ: SELECT is_premium, coins INTO v_is_premium, v_user_coins
+--         FROM public.profiles WHERE id = v_uid;
+--   YENİ: SELECT is_premium, coins INTO v_is_premium, v_user_coins
+--         FROM public.profiles WHERE id = v_uid
+--         FOR UPDATE;
+--   ve bu satırı fonksiyonun başına, avatar_unlocks EXISTS kontrolünden
+--   önceye taşıyın.
+--
+-- DEĞİŞİKLİK 2: düşümü atomik yapın.
+--   ESKİ: v_user_coins := v_user_coins - v_avatar.cost_coins;
+--         UPDATE public.profiles SET coins = v_user_coins WHERE id = v_uid;
+--   YENİ: UPDATE public.profiles
+--         SET coins = coins - v_avatar.cost_coins
+--         WHERE id = v_uid AND coins >= v_avatar.cost_coins
+--         RETURNING coins INTO v_user_coins;
+--         IF NOT FOUND THEN
+--             RAISE EXCEPTION 'Yetersiz bakiye.' USING HINT = 'insufficient_coins';
+--         END IF;
+--
+-- DEĞİŞİKLİK 3: kilit kaçarsa bile çift kayıt olmasın.
+--   INSERT INTO public.avatar_unlocks (...) VALUES (...)
+--   ON CONFLICT (user_id, avatar_id) DO NOTHING;
+--
+-- DEĞİŞİKLİK 4 (K6): Türkçe RAISE metinlerini koruyup HINT ekleyin; istemci
+-- HINT'i ARB ile yerelleştirir:
+--   avatar bulunamadı / pasif   -> HINT = 'avatar_not_found'
+--   premium gerekli             -> HINT = 'premium_required'
+--   yetersiz bakiye             -> HINT = 'insufficient_coins'
+--   lig ödülü, satın alınamaz   -> HINT = 'league_award_only'
+--   oturum yok                  -> USING ERRCODE = '28000'
+--
+-- set_equipped_avatar için de: 'Bu avatar kilitli.' -> HINT = 'avatar_locked'.

@@ -67,8 +67,14 @@ $$;
 -- 3) PG_CRON SCHEDULE FIX
 -- ==========================================
 -- Use cron.unschedule and cron.schedule to avoid permission errors on cron.job table
-SELECT cron.unschedule('weekly_leagues_job');
-SELECT cron.schedule('weekly_leagues_job', '59 20 * * 0', 'SELECT public.process_weekly_leagues()');
+-- İş yoksa (yeni/staging ortam) cron.unschedule hata verir; önce kontrol edilir.
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'weekly_leagues_job') THEN
+        PERFORM cron.unschedule('weekly_leagues_job');
+    END IF;
+    PERFORM cron.schedule('weekly_leagues_job', '59 20 * * 0', 'SELECT public.process_weekly_leagues()');
+END $$;
 
 
 -- ==========================================
