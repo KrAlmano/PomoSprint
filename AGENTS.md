@@ -266,6 +266,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 | `migrations/20261003150000_live_audit_fixes` | **Uygulandı** (3 Ekim, DRYRUN 28/28), geçmişe kayıtlı. Geri alma: `rollbacks/20261003150000_live_audit_fixes_down.sql` |
 | `proposed/11_audit_fixes_unapplied.sql` (eski `20261003120000_audit_fixes`) | **Uygulanmadı**, `migrations/`'tan taşındı. Başındaki durum notu hangi parçanın gereksiz olduğunu söyler |
 | `proposed/01`–`10` | Uygulanmadı. Sıra ve kapsam `proposed/README.md`'de |
+| `proposed/13_sunucu_butunluk.sql` (+ `_down`, `tests/proposed_13_*`) | **Uygulanmadı.** UX-01 sunucu başlangıç kaydı (`register_session_start`), lig dönemi sınırı, friend_code yeniden deneme + deneme sınırı, `profiles.email` boşaltma, `app_config`/`get_app_config`, içerik trigger'ları, `pg_temp`. İstemci sözleşmesi dosya başında; istemci bu RPC'leri canlıya uygulanmadan çağırmaz |
 
 **Canlıda olmayan RPC'ler:** `reorder_categories`, `remove_friend`, `cancel_friend_request`, `get_outgoing_friend_requests`, `set_my_timezone`, `get_my_category_limit` (ayrıca `get_my_streak`, `study_day_of`, `my_friend_ids`, `synced_at` kolonu). Gerekirse `proposed/11`'den canlı gövdelere göre ayrı migration yaz.
 
@@ -521,7 +522,8 @@ curl -sI https://pomosprint.app/reset-password | grep -i cache-control   # no-st
 | P1 | `mail.pomosprint.app` Resend doğrulaması ve DNS kayıtları | Yapılmadan hoş geldin ve bülten gönderilemez |
 | P1 | `cleanup_unconfirmed_duplicate_identity(p_email)` parametredeki e-postaya güveniyor | `proposed/04` |
 | P1 | Hesap silme `waitlist` ve `user_id`'siz abonelik satırını silmiyor | `proposed/12` (DRYRUN → migration, SQL Editor'de kullanıcı) |
-| P2 | Görünen ad için sunucu tarafı içerik denetimi yok | İstemci `NameFilter` doğrudan `profiles.name` UPDATE'iyle aşılabilir. Gerekirse `profiles` BEFORE INSERT/UPDATE trigger'ında küçük bir liste |
+| P1 | Seans başlangıcı istemci saatine güveniyor (UX-01); geç gelen seans yeni lig dönemine yazılıyor | `proposed/13` (DRYRUN → dosya, SQL Editor'de kullanıcı). Ürün kararı: `app_config.unverified_session_daily_cap` (vars. `null`) |
+| P2 | Görünen ad için sunucu tarafı içerik denetimi yok | İstemci `NameFilter` doğrudan `profiles.name` UPDATE'iyle aşılabilir. `proposed/13`: `profiles.name`/`categories.name` BEFORE trigger'ı + küçük liste (`blocked_name_terms`) |
 | P2 | Google/Apple ile ilk girişte onay sürümü kaydedilmiyor | Bildirim metni gösteriliyor; istenirse ilk girişte `auth.updateUser(data: {terms_version, privacy_version, terms_accepted_at})` |
 | P2 | Kullanıcı engelleme sunucuda değil | Gizleme cihazda; arkadaşlıktan çıkarma RPC'si (`remove_friend`) canlıda yok |
 | P1 | Supabase Auth panel ayarları repoda yok | Redirect URLs (`/reset-password`, `/confirmed`, `.html`'li hâlleri; `io.supabase.pomosprint://` silinmeli), Reset Password şablonu `token_hash`, Leaked password protection, Apple provider (Client ID `com.pomosprint.app`) |

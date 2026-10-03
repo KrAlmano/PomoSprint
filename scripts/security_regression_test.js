@@ -129,7 +129,12 @@ async function main() {
       const { data: av } = prof && prof.avatar_id
         ? await admin.from('avatars').select('id, is_default').eq('id', prof.avatar_id).maybeSingle()
         : { data: null };
-      check('Profil e-postası oturumdaki kimlikten gelir', !!prof && prof.email === a.email, JSON.stringify(prof));
+      // proposed/13 (KVKK-20) uygulanınca profiles.email hep NULL; öncesinde auth e-postası.
+      check(
+        'Profil e-postası istemciden yazılamaz (auth e-postası ya da proposed/13 sonrası NULL)',
+        !!prof && (prof.email === a.email || prof.email === null),
+        JSON.stringify(prof),
+      );
       check('Yeni profilin avatarı varsayılan (is_default) bir avatar', !!av && av.is_default === true, JSON.stringify(av));
       check('equipped_avatar_id, avatar_id ile aynı', !!prof && prof.equipped_avatar_id === prof.avatar_id, JSON.stringify(prof));
     }
