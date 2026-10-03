@@ -783,6 +783,34 @@ class SupabaseService {
     await prefs.setBool(_dailyGoalMigratedKey(uid), true);
   }
 
+  /// Sunucudaki profiles_user_segment_check ile aynı küme; dışındaki değer
+  /// (ör. onboarding'deki "Diğer") null yazılır.
+  static const Set<String> validUserSegments = {'lgs', 'yks', 'university', 'work'};
+
+  /// Onboarding'in profiles satırına yazdığı alanlar. Doğum yılı CHECK
+  /// aralığı (1900..2100) dışındaysa, segment bilinen kümede değilse null
+  /// yazılır. [showInSocialFeed] verilirse kullanıcının onboarding'de açıkça
+  /// verdiği "sıralamalarda görün" yanıtı da aynı güncellemeyle yazılır
+  /// (authenticated rolün bu kolonda UPDATE yetkisi var).
+  @visibleForTesting
+  static Map<String, dynamic> onboardingProfileUpdate({
+    int? birthYear,
+    String? userSegment,
+    required int dailyGoalMinutes,
+    bool? showInSocialFeed,
+    required DateTime completedAt,
+  }) {
+    final validBirthYear =
+        (birthYear != null && birthYear >= _birthYearMin && birthYear <= _birthYearMax) ? birthYear : null;
+    return {
+      'birth_year': validBirthYear,
+      'user_segment': validUserSegments.contains(userSegment) ? userSegment : null,
+      'daily_goal_minutes': dailyGoalMinutes,
+      'show_in_social_feed': ?showInSocialFeed,
+      'onboarding_completed_at': completedAt.toUtc().toIso8601String(),
+    };
+  }
+
   /// Onboarding'i tek adımda tamamlar: profil satırını garanti eder,
   /// kategorileri oluşturur, ardından profil alanlarını yazar (kategoriler
   /// profile yabancı anahtarla bağlı olduğu için sıra önemli). Güncelleme
@@ -792,35 +820,35 @@ class SupabaseService {
     String? userSegment,
     required int dailyGoalMinutes,
     List<Map<String, dynamic>> categories = const [],
+    bool? showInSocialFeed,
   }) async {
     if (dailyGoalMinutes < _dailyGoalMin || dailyGoalMinutes > _dailyGoalMax) {
       throw const ServiceException(ServiceErrorCode.invalidInput);
     }
-    // İsteğe bağlı alan: sunucunun CHECK aralığı dışındaysa yazılmaz.
-    final validBirthYear =
-        (birthYear != null && birthYear >= _birthYearMin && birthYear <= _birthYearMax) ? birthYear : null;
     final authUser = _requireAuthUser();
     final epoch = _userEpoch;
     await _guard(() => _ensureOwnProfile(authUser));
     if (categories.isNotEmpty) await setupOnboardingCategories(categories);
     final completedAt = DateTime.now();
-    final rows = await _guard(() => _client
-        .from('profiles')
-        .update({
-          'birth_year': validBirthYear,
-          'user_segment': userSegment,
-          'daily_goal_minutes': dailyGoalMinutes,
-          'onboarding_completed_at': completedAt.toUtc().toIso8601String(),
-        })
-        .eq('id', authUser.id)
-        .select('id'));
+    final update = onboardingProfileUpdate(
+      birthYear: birthYear,
+      userSegment: userSegment,
+      dailyGoalMinutes: dailyGoalMinutes,
+      showInSocialFeed: showInSocialFeed,
+      completedAt: completedAt,
+    );
+    final rows = await _guard(() => _client.from('profiles').update(update).eq('id', authUser.id).select('id'));
     if (rows.isEmpty) throw const ServiceException(ServiceErrorCode.notFound);
+    if (showInSocialFeed != null) {
+      _socialVisibleCache = showInSocialFeed;
+      _socialVisibleCacheUid = authUser.id;
+    }
     _updateUserIfCurrent(
       authUser.id,
       epoch,
       (user) => user.copyWith(
-        birthYear: validBirthYear,
-        userSegment: userSegment,
+        birthYear: update['birth_year'] as int?,
+        userSegment: update['user_segment'] as String?,
         dailyGoalMinutes: dailyGoalMinutes,
         onboardingCompletedAt: completedAt,
       ),

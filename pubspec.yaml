@@ -47,6 +47,8 @@ dependencies:
   timezone: ^0.11.1
   url_launcher: ^6.3.1
   sentry_flutter: ^9.26.0
+  # Profil'deki sürüm satırı ve destek e-postasındaki sürüm bilgisi.
+  package_info_plus: ^10.2.1
 
 dev_dependencies:
   flutter_test:

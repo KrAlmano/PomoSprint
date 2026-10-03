@@ -108,6 +108,14 @@ class AvatarCharacter {
   /// Premium kullanıcı bu avatarı ücretsiz açabilir mi (purchase_avatar).
   bool canUnlockWithPremium(bool isPremium) => isPremiumOnly && isPremium && !isLeagueAward;
 
+  /// Koleksiyonun kum tanesi bölümünde listelenir mi? Uygulamada Premium'u
+  /// edinme yolu (uygulama içi satın alma) olmadığı için Premium'a özel
+  /// avatar yalnızca sahibine ya da Premium kullanıcıya gösterilir; diğer
+  /// herkese kilitli bir "Premium" vitrini gösterilmez (App Store 2.3.1,
+  /// 3.1.1). Lig ödülleri ayrı bölümde listelenir.
+  bool isListedInShop({required List<String> unlockedAvatars, required bool isPremium}) =>
+      !isLeagueAward && (!isPremiumOnly || isPremium || isOwned(unlockedAvatars));
+
   String unlockLabel(bool isPremium) {
     if (isLeagueAward) return '';
     if (isPremiumOnly && !isPremium) return 'Premium';

@@ -642,13 +642,25 @@ void main() {
           _expectNoLayoutError(tester, '$size $step');
         }
 
+        Future<void> choose(Finder option) async {
+          await tester.ensureVisible(option);
+          await tester.pumpAndSettle();
+          await tester.tap(option);
+          await tester.pump();
+        }
+
+        // Yaş sorusu nötr: yıl seçilmeden ilerlenmez; tekerlek çevrilir.
+        await tester.drag(find.byType(CupertinoPicker), const Offset(0, -1040));
+        await tester.pumpAndSettle();
         await next('adım 2');
-        await tester.tap(find.text(l10n.onboardingSegmentYks));
-        await tester.pump();
+        await choose(find.text(l10n.onboardingSegmentYks));
         await next('adım 3');
-        await tester.tap(find.text('Matematik'));
-        await tester.pump();
-        await next('adım 4');
+        await choose(find.text('Matematik'));
+        await next('adım 4 (görünürlük)');
+        await choose(find.text(l10n.onboardingVisibilityNo));
+        await next('adım 5 (kurallar)');
+        expect(find.text(l10n.gameRulesTitle), findsOneWidget, reason: '$size');
+        await next('adım 6 (hedef)');
         expect(find.text(l10n.onboardingFinishBtn), findsOneWidget, reason: '$size');
         // Seçenekler tablette form genişliğini aşmaz.
         expect(tester.getSize(find.text(l10n.onboardingGoal1h)).width, lessThanOrEqualTo(480), reason: '$size');

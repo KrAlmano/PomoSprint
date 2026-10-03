@@ -1,9 +1,10 @@
-import '../services/language_service.dart';
+import '../l10n/app_localizations.dart';
 
 class TextUtil {
-  static String getCategorySelectionLabel(String? userSegment) {
-    final isTurkish = LanguageService.instance.isTurkish;
-    if (userSegment == 'work') return isTurkish ? 'KATEGORİ SEÇ' : 'SELECT CATEGORY';
-    return isTurkish ? 'DERS SEÇ' : 'SELECT SUBJECT';
+  /// Sayaçtaki kategori başlığı: iş segmentinde "KATEGORİ SEÇ", diğerlerinde
+  /// "DERS SEÇ" (metinler ARB'de).
+  static String getCategorySelectionLabel(AppLocalizations l10n, String? userSegment) {
+    if (userSegment == 'work') return l10n.selectCategory;
+    return l10n.selectSubject;
   }
 }

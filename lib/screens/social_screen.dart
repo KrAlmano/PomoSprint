@@ -8,6 +8,7 @@ import '../widgets/avatar_widget.dart';
 import '../widgets/social/load_error_view.dart';
 import '../widgets/social/user_safety.dart';
 import '../services/hidden_users.dart';
+import '../services/language_service.dart';
 import '../services/supabase_service.dart';
 import '../theme.dart';
 import '../utils/responsive.dart';
@@ -265,7 +266,9 @@ class _SocialScreenState extends State<SocialScreen> with WidgetsBindingObserver
 
   Widget _buildActiveUserItem(Map<String, dynamic> user, AppLocalizations l10n, bool isDark) {
     final name = user['name']?.toString() ?? l10n.userDefault;
-    final category = (user['category_name'] ?? user['active_session_category_name'])?.toString().trim() ?? '';
+    // Bilinen varsayılan kategori adları (DB'de Türkçe) arayüz diline çevrilir.
+    final category = LanguageService.instance
+        .translateCatName((user['category_name'] ?? user['active_session_category_name'])?.toString().trim() ?? '');
 
     final card = Container(
       padding: const EdgeInsets.fromLTRB(12, 12, 4, 12),

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 13+ uygulama başına dil ayarı (Ayarlar > Uygulamalar > PomoSprint >
+     Dil). Liste lib/l10n'daki dillerle ve iOS CFBundleLocalizations ile aynı. -->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="tr"/>
+    <locale android:name="en"/>
+</locale-config>

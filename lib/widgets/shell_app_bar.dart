@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.dart';
@@ -97,35 +99,62 @@ AppBar buildShellAppBar(
       ),
       const SizedBox(width: 10),
 
-      // Arkadaş Ekle/Görüntüle Butonu (Dairesel, avatardan biraz büyük)
-      InkWell(
+      // Arkadaş Ekle/Görüntüle Butonu (Dairesel, avatardan biraz büyük).
+      // Ekran okuyucuda etiketli düğme (iki kez dokunma açar); dokunma alanı
+      // en az 48 dp.
+      Semantics(
+        button: true,
+        label: l10n.friendsTitle,
         onTap: onFriendsTap,
-        borderRadius: BorderRadius.circular(compact ? 22 : 32),
-        child: Container(
-          width: friendsSize,
-          height: friendsSize,
-          decoration: BoxDecoration(
-            color: AppColors.primaryContainer.withValues(alpha: 0.15),
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: AppColors.primaryContainer.withValues(alpha: 0.4),
+        excludeSemantics: true,
+        child: Tooltip(
+          message: l10n.friendsTitle,
+          child: InkWell(
+            onTap: onFriendsTap,
+            customBorder: const CircleBorder(),
+            child: SizedBox.square(
+              dimension: math.max(friendsSize, kMinInteractiveDimension),
+              child: Center(
+                child: Container(
+                  width: friendsSize,
+                  height: friendsSize,
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryContainer.withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppColors.primaryContainer.withValues(alpha: 0.4),
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.people_alt_rounded,
+                    color: AppColors.primaryContainer,
+                    size: friendsSize * 33 / 63,
+                  ),
+                ),
+              ),
             ),
-          ),
-          child: Icon(
-            Icons.people_alt_rounded,
-            color: AppColors.primaryContainer,
-            size: friendsSize * 33 / 63,
           ),
         ),
       ),
       const SizedBox(width: 10),
 
-      // Profil avatarı (Profil & Ayarlar'ı açar)
+      // Profil avatarı (Profil & Ayarlar'ı açar; hesap silme de oradadır).
+      // Ekran okuyucuda "Profil ve Ayarlar" düğmesi; dokunma alanı en az 48 dp.
       Padding(
         padding: const EdgeInsets.only(right: 16),
-        child: GestureDetector(
+        child: Semantics(
+          button: true,
+          label: l10n.profileTitle,
           onTap: onProfileTap,
-          child: avatarBuilder(avatarSize),
+          excludeSemantics: true,
+          child: InkWell(
+            onTap: onProfileTap,
+            customBorder: const CircleBorder(),
+            child: SizedBox.square(
+              dimension: math.max(avatarSize, kMinInteractiveDimension),
+              child: Center(child: avatarBuilder(avatarSize)),
+            ),
+          ),
         ),
       ),
     ],

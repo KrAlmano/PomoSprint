@@ -6,6 +6,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n/app_localizations.dart';
 import 'language_service.dart';
@@ -107,6 +108,66 @@ class NotificationService {
       debugPrint('[NOTIF] Bildirim izni alınamadı: $e');
     }
     return false;
+  }
+
+  /// Profil anahtarının göstereceği durum: tercih açık VE sistem izni var.
+  /// İzin bilinmiyorsa ([permission] null) yalnızca tercihe bakılır.
+  static bool effectiveEnabled({required bool preference, required bool? permission}) =>
+      preference && permission != false;
+
+  /// Tercih açık ama sistem izni yok: kullanıcıya ayarları açan yol gösterilir.
+  static bool isBlockedBySystem({required bool preference, required bool? permission}) =>
+      preference && permission == false;
+
+  /// Testlerde sistem izninin ([hasSystemPermission]) ve ayar ekranının
+  /// ([openSystemSettings]) yerine geçer.
+  @visibleForTesting
+  Future<bool?> Function()? debugSystemPermission;
+  @visibleForTesting
+  Future<bool> Function()? debugOpenSystemSettings;
+
+  /// Sistem bildirim izni şu an verilmiş mi? İzin İSTEMEZ. Platform
+  /// desteklemiyorsa ya da okunamazsa null döner (bilinmiyor).
+  Future<bool?> hasSystemPermission() async {
+    final override = debugSystemPermission;
+    if (override != null) return override();
+    if (!await _ready()) return null;
+    try {
+      final android = _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+      if (android != null) return await android.areNotificationsEnabled();
+      final ios = _plugin.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
+      if (ios != null) return (await ios.checkPermissions())?.isEnabled;
+    } catch (e) {
+      debugPrint('[NOTIF] Bildirim izni okunamadı: $e');
+    }
+    return null;
+  }
+
+  /// Bu uygulamanın sistem bildirim ayarlarını açar (izin bir kez
+  /// reddedilince sistem penceresi bir daha çıkmaz). Eklentinin yerleşik
+  /// yolu kullanılır: Android'de uygulama bildirim ayarları (olmazsa uygulama
+  /// bilgisi), iOS'ta uygulamanın Ayarlar sayfası. iOS'ta eklenti açamazsa
+  /// `app-settings:` adresi denenir. Açılabildiyse true.
+  Future<bool> openSystemSettings() async {
+    final override = debugOpenSystemSettings;
+    if (override != null) return override();
+    if (await _ready()) {
+      try {
+        final android = _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+        if (android != null) return await android.openAppNotificationSettings() ?? false;
+        final ios = _plugin.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
+        if (ios != null && (await ios.openAppNotificationSettings() ?? false)) return true;
+      } catch (e) {
+        debugPrint('[NOTIF] Bildirim ayarları açılamadı: $e');
+      }
+    }
+    if (defaultTargetPlatform != TargetPlatform.iOS) return false;
+    try {
+      return await launchUrl(Uri.parse('app-settings:'));
+    } catch (e) {
+      debugPrint('[NOTIF] app-settings: açılamadı: $e');
+      return false;
+    }
   }
 
   /// [after] süre sonra seans bitiş bildirimini zamanlar (önceki zamanlanmış

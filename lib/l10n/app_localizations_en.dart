@@ -34,6 +34,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'You must be at least 13 years old to use PomoSprint.';
 
   @override
+  String get onboardingBirthYearRequired => 'Pick your birth year to continue.';
+
+  @override
+  String get onboardingBirthYearPlaceholder => 'Select your birth year';
+
+  @override
   String get onboardingSessionExpired =>
       'Your session has expired. Please sign in again.';
 
@@ -395,6 +401,77 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get profileSettingSaveError =>
       'Couldn\'t save the setting. Please try again.';
+
+  @override
+  String get profileNotificationsLabelSub =>
+      'Session end alert and lock screen timer';
+
+  @override
+  String get profileNotificationsBlockedSub =>
+      'Notification permission is off. Allow it in your phone\'s settings for the session end alert and the lock screen timer.';
+
+  @override
+  String get profileOpenSettings => 'Open settings';
+
+  @override
+  String get profileSocialVisibilityTitle =>
+      'Appear in rankings and the live list';
+
+  @override
+  String get profileSocialVisibilitySub =>
+      'When on, your name and avatar appear in the monthly ranking, in the public list on pomosprint.app (shortened name) and in your friends\' live list while you study. Your league group and friends always see you.';
+
+  @override
+  String get gameRulesTitle => 'How it works';
+
+  @override
+  String get gameRulesProfileSub => 'Pausing, daily limit, points and sand';
+
+  @override
+  String gameRulesSessions(String pct) {
+    return 'Sessions last 25 or 50 minutes. You get one pause per session; pausing lowers your points by $pct%. Stopping a second time resets the session.';
+  }
+
+  @override
+  String gameRulesPoints(
+    String points25,
+    String points50,
+    String coins,
+    String limit,
+  ) {
+    return 'Every completed session earns points (25 min: $points25, 50 min: $points50) and $coins sand grains. Up to $limit sessions a day count; after that they only add to your study time and streak.';
+  }
+
+  @override
+  String get gameRulesLeague =>
+      'Your points move you up in your league and studying every day earns a streak bonus. Spend sand grains on new hourglasses in your collection.';
+
+  @override
+  String get profileHelpSectionTitle => 'Help';
+
+  @override
+  String get profileSupportTitle => 'Support & feedback';
+
+  @override
+  String get profileSupportSub => 'Email us about a problem or an idea';
+
+  @override
+  String profileAppVersion(String version) {
+    return 'Version $version';
+  }
+
+  @override
+  String get supportEmailSubject => 'PomoSprint support & feedback';
+
+  @override
+  String supportEmailBody(String version, String device) {
+    return 'Your message:\n\n\n---\nApp version: $version\nDevice: $device';
+  }
+
+  @override
+  String supportMailFailed(String email) {
+    return 'Couldn\'t open an email app. You can write to us at $email.';
+  }
 
   @override
   String avatarBalance(int coins) {
@@ -799,6 +876,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectSubject => 'SELECT SUBJECT';
 
   @override
+  String get selectCategory => 'SELECT CATEGORY';
+
+  @override
   String get addSubject => 'Add Subject';
 
   @override
@@ -827,6 +907,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sessionCompleted => 'Congrats! Session Completed 🎉';
+
+  @override
+  String get sessionCompletedTitle => 'Congratulations! 🎉';
+
+  @override
+  String sessionCompletedBody(int minutes) {
+    return 'You successfully completed a $minutes-minute\nfocus session! ⏳';
+  }
+
+  @override
+  String get sessionCompletedOk => 'Awesome!';
+
+  @override
+  String get timerGetReady => 'Get ready! Focusing...';
 
   @override
   String get durationPlanning => 'Duration Planning';
@@ -978,6 +1072,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get googleLogin => 'Sign in with Google';
+
+  @override
+  String get languagePickerLabel => 'App language';
 
   @override
   String get resendVerificationLink => 'Resend Verification Email 📬';
@@ -1348,27 +1445,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingCategoryHint => 'Category name';
 
   @override
-  String get onboardingMaxCategoriesMsg => 'You can select up to 8 categories.';
-
-  @override
   String get onboardingWelcomeTitle => 'Welcome! 👋';
 
   @override
   String get onboardingWelcomeBody =>
-      'I\'m your focus companion. Before I join you, can I know your birth year?';
+      'I\'m your focus companion. Before we start, could you pick your birth year? We only ask to check the minimum age.';
 
   @override
   String get onboardingSegmentTitle => 'So, which journey are you on?';
 
   @override
   String get onboardingSegmentBody =>
-      'What will we study together? Let me pick the best categories for you.';
+      'What will we study together? Let me suggest some categories. If none fits, pick \"Other\".';
 
   @override
-  String get onboardingSegmentLgs => '🎓  LGS';
+  String get onboardingSegmentLgs =>
+      '🎓  LGS (Turkish high school entrance exam)';
 
   @override
-  String get onboardingSegmentYks => '📚  YKS';
+  String get onboardingSegmentYks =>
+      '📚  YKS (Turkish university entrance exam)';
 
   @override
   String get onboardingSegmentUniversity => '🏛️  University';
@@ -1377,11 +1473,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingSegmentWork => '💼  Work & Personal Growth';
 
   @override
-  String get onboardingCategoryStepTitle => 'Great choice! 🎉';
+  String get onboardingSegmentOther => '✨  Other / prefer not to say';
 
   @override
-  String get onboardingCategoryStepBody =>
-      'Now pick the subjects/areas you\'ll study — you can change them anytime. Free plan allows up to 8.';
+  String get onboardingCategoryStepTitle => 'Great choice! 🎉';
 
   @override
   String get onboardingCreateOwnCategory => '+ Create my own category';
@@ -1404,6 +1499,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingGoal4hPlus => '4 Hours+';
+
+  @override
+  String get onboardingVisibilityTitle => 'Do you want to appear in rankings?';
+
+  @override
+  String get onboardingVisibilityBody =>
+      'If you turn this on, your name and avatar appear in the monthly ranking, in the public list on pomosprint.app (with your name shortened) and in your friends\' live list while you study. When it\'s off, you don\'t appear in those places. People in your league group and your friends always see you. You can change this anytime in Profile.';
+
+  @override
+  String get onboardingVisibilityYes => 'Yes, show me in rankings';
+
+  @override
+  String get onboardingVisibilityNo => 'No, keep me out of them';
+
+  @override
+  String get onboardingRulesBody => 'A few rules to know before you start:';
 
   @override
   String get onboardingFinishBtn => 'Finish';
@@ -1459,6 +1570,23 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get timerDurationLocked =>
       'Reset the session first to change its length.';
+
+  @override
+  String timerDurationOption(int minutes) {
+    return '$minutes-minute session';
+  }
+
+  @override
+  String get timerEditCategories => 'Edit categories';
+
+  @override
+  String timerRemainingSemantics(int minutes, int seconds) {
+    return '$minutes min $seconds s remaining';
+  }
+
+  @override
+  String get timerNotificationsDenied =>
+      'No notification permission: we can\'t alert you when the session ends and the lock screen timer won\'t show.';
 
   @override
   String get rankingZonePromotionChip => '↑ Promotion';
