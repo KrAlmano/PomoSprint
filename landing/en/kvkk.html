@@ -29,10 +29,8 @@
   <link rel="icon" href="/favicon.ico" sizes="32x32">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=20261003c">
+  <link rel="stylesheet" href="/css/fonts.css?v=20261003">
+  <link rel="stylesheet" href="/css/style.css?v=20261003d">
   <script src="/js/boot.js?v=20261003b"></script>
   <!-- /partial:head -->
 </head>
@@ -49,6 +47,7 @@
       <nav class="site-nav" id="site-nav" aria-label="Main menu">
         <a href="/en/privacy">Privacy Policy</a>
         <a href="/en/terms">Terms of Use</a>
+        <a href="/en/support">Support</a>
         <a href="/" hreflang="tr" lang="tr">Türkçe site</a>
         <a href="/#yakinda" class="btn btn-primary btn-sm nav-cta" hreflang="tr">Waitlist (Turkish page)</a>
       </nav>
@@ -115,17 +114,18 @@
           Under the Turkish Personal Data Protection Law No. 6698 ("KVKK") and
           related legislation, the developer who operates PomoSprint is the
           "data controller" for personal data processed through the PomoSprint
-          App and Site.
+          App and Site:
         </p>
+        <!-- KVKK-15: The data controller's identity MUST be filled in before
+             publishing. Nothing was invented here. Individual: full name and
+             address for service (or KEP); company: legal name, MERSIS number
+             and address. Must match the developer name in the stores.
+             Check: grep -rn 'data-fill-in' landing/ -->
         <ul>
+          <li><strong>Data controller:</strong> <mark data-fill-in="KVKK-15">[TO BE FILLED IN: full name or company name]</mark></li>
+          <li><strong>Address:</strong> <mark data-fill-in="KVKK-15">[TO BE FILLED IN: address for service; MERSIS number if a company]</mark></li>
           <li><strong>Email:</strong> <a href="mailto:destek@pomosprint.app">destek@pomosprint.app</a></li>
         </ul>
-        <p>
-          For a formal application or notice, the full identity and contact
-          details of the data controller will be sent to you via the email
-          address above once the identity verification process required by
-          the KVKK is completed.
-        </p>
 
         <h2 id="data-purposes">2. Data, Purposes and Legal Grounds</h2>
         <p>
@@ -235,9 +235,8 @@
           <li><strong>Supabase</strong> — database, authentication and server functions. Your account and study data and waitlist entries are hosted in the European Union (Stockholm, Sweden).</li>
           <li><strong>Sentry</strong> — error and crash reports (technical data; email addresses are masked before they are added to reports).</li>
           <li><strong>Resend</strong> — sending transactional emails and the newsletter (email address).</li>
-          <li><strong>Cloudflare</strong> — hosting and content delivery for the Site; forwarding emails sent to destek@pomosprint.app.</li>
+          <li><strong>Cloudflare</strong> — hosting and content delivery for the Site (including its fonts and animation library); forwarding emails sent to destek@pomosprint.app.</li>
           <li><strong>Google and Apple</strong> — authentication if you choose Sign in with Google or Sign in with Apple. In addition, emails you send to destek@pomosprint.app are forwarded to our support inbox hosted on Google's email service.</li>
-          <li><strong>Google Fonts and jsDelivr</strong> — loading fonts and the animation library when you visit the Site (IP address and browser information).</li>
         </ul>
         <p>
           These providers process your data only to provide services to us and,
@@ -342,6 +341,7 @@
       <div class="footer-col">
         <h2 class="footer-title">Support</h2>
         <ul>
+          <li><a href="/en/support">Support &amp; Contact</a></li>
           <li><a href="mailto:destek@pomosprint.app">destek@pomosprint.app</a></li>
         </ul>
       </div>
@@ -354,9 +354,9 @@
   <!-- /partial:footer -->
 
   <!-- partial:scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js" integrity="sha384-HOvlOYPIs/zjoIkWUGXkVmXsjr8GuZLV+Q+rcPwmJOVZVpvTSXQChiN4t9Euv9Vc" crossorigin="anonymous" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js" integrity="sha384-P8VzCVnT9NBUkMrpcIZrJbA7EBjJvh/fJS6PmP+4nLIM284DtsImIv8D0fFjIkeh" crossorigin="anonymous" defer></script>
-  <script src="/js/main.js?v=20261003b" defer></script>
+  <script src="/vendor/gsap-3.13.0/gsap.min.js" integrity="sha384-HOvlOYPIs/zjoIkWUGXkVmXsjr8GuZLV+Q+rcPwmJOVZVpvTSXQChiN4t9Euv9Vc" defer></script>
+  <script src="/vendor/gsap-3.13.0/ScrollTrigger.min.js" integrity="sha384-P8VzCVnT9NBUkMrpcIZrJbA7EBjJvh/fJS6PmP+4nLIM284DtsImIv8D0fFjIkeh" defer></script>
+  <script src="/js/main.js?v=20261003c" defer></script>
   <!-- /partial:scripts -->
 </body>
 </html>

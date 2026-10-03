@@ -29,10 +29,8 @@
   <link rel="icon" href="/favicon.ico" sizes="32x32">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=20261003c">
+  <link rel="stylesheet" href="/css/fonts.css?v=20261003">
+  <link rel="stylesheet" href="/css/style.css?v=20261003d">
   <script src="/js/boot.js?v=20261003b"></script>
   <!-- /partial:head -->
 </head>
@@ -49,6 +47,7 @@
       <nav class="site-nav" id="site-nav" aria-label="Main menu">
         <a href="/en/privacy">Privacy Policy</a>
         <a href="/en/terms">Terms of Use</a>
+        <a href="/en/support">Support</a>
         <a href="/" hreflang="tr" lang="tr">Türkçe site</a>
         <a href="/#yakinda" class="btn btn-primary btn-sm nav-cta" hreflang="tr">Waitlist (Turkish page)</a>
       </nav>
@@ -110,8 +109,9 @@
 
         <h2 id="by-email">2. If You Cannot Access the App</h2>
         <p>
-          If you have removed the app from your device or cannot sign in, send
-          an email from the address registered to your account to
+          If you have removed the app from your device or cannot sign in, you do
+          not need to reinstall it. Send an email from the address registered to
+          your account to
           <a href="mailto:destek@pomosprint.app?subject=Account%20deletion%20request">destek@pomosprint.app</a>
           with the subject line <strong>"Account deletion request"</strong>.
         </p>
@@ -119,6 +119,18 @@
           <li>We verify that the account is yours through your registered email address.</li>
           <li>If you signed up with an Apple private relay address, mention this in your email; we may ask for additional information such as your display name or friend code to verify it.</li>
           <li>Your request is completed within <strong>30 days</strong> at the latest and we confirm the result by email.</li>
+        </ul>
+
+        <h3 id="google-apple">If you signed in with Google or Apple</h3>
+        <p>
+          Accounts created with Google or Apple have no password; you do not
+          need one to delete your account. Choose the option that suits you:
+        </p>
+        <ul>
+          <li><strong>In the app:</strong> sign in to PomoSprint with the same Google account or with Apple and follow the <a href="#in-app">steps above</a>. Sign in with Apple is currently offered only on iPhone and iPad.</li>
+          <li><strong>If you signed up with Google:</strong> the address registered to your account is your Google account's email address (for example your Gmail address). Send your deletion request from that address.</li>
+          <li><strong>If you signed up with Apple and chose "Hide My Email":</strong> the address registered to your account is a relay address created by Apple, ending in <span class="nowrap">@privaterelay.appleid.com</span>; Apple forwards emails sent to it to you. On an iPhone you can find it in Settings by tapping your name and selecting PomoSprint under "Sign in with Apple" (menu names vary by iOS version; the same information is on account.apple.com). Send your request from your own email address and include this relay address in your email. To verify that the account is yours, we may send a verification email to the relay address or ask for additional information such as your display name or friend code.</li>
+          <li><strong>Removing PomoSprint from your Apple ID or Google Account settings does not delete your account;</strong> you still need to delete it in one of the ways on this page.</li>
         </ul>
 
         <h2 id="deleted-data">3. Data That Is Deleted</h2>
@@ -134,7 +146,8 @@
         <p>
           These records are removed from our database when you delete your
           account, and your name also disappears from rankings, your league room
-          and friend lists. All of your personal data is permanently deleted from
+          and friend lists; the public ranking on the Site is updated as well.
+          All of your personal data is permanently deleted from
           our systems within a reasonable period (no later than 30 days). A
           deleted account cannot be restored.
         </p>
@@ -161,6 +174,11 @@
               <td data-label="How long">Deleted automatically when the infrastructure provider's retention period ends.</td>
             </tr>
             <tr>
+              <th scope="row">Email delivery logs (Resend): recipient address, subject, send time and delivery status</th>
+              <td data-label="Why it is kept">To track that confirmation, password reset and newsletter emails are delivered and to fix delivery problems.</td>
+              <td data-label="How long">Deleted automatically when the provider's retention period ends.</td>
+            </tr>
+            <tr>
               <th scope="row">Waitlist entry (the "Notify me at launch" form on the Site)</th>
               <td data-label="Why it is kept">Not linked to your account; used only to let you know when the app launches.</td>
               <td data-label="How long">Until you ask us to delete it.</td>
@@ -185,7 +203,7 @@
           <li>Removing the app from your device does not delete your account; you need to delete it in one of the ways above. Removing the app also deletes the local data on your device (for example the list of users you hid and your preferences).</li>
           <li>Your points, sand grains, characters and league rank are lost with your account; they have no monetary value and cannot be restored.</li>
           <li>PomoSprint is free; there is no subscription to cancel when you delete your account.</li>
-          <li>If you signed in with Google or Apple, you can also remove PomoSprint's connection to your account in your Google Account or Apple ID settings.</li>
+          <li>If you signed in with Google or Apple, after deleting your account you can also remove PomoSprint's connection in your Google Account or Apple ID settings. Removing the connection alone does not delete your account.</li>
           <li>You can sign up again later with the same email address; the new account starts from scratch.</li>
         </ul>
 
@@ -223,6 +241,7 @@
       <div class="footer-col">
         <h2 class="footer-title">Support</h2>
         <ul>
+          <li><a href="/en/support">Support &amp; Contact</a></li>
           <li><a href="mailto:destek@pomosprint.app">destek@pomosprint.app</a></li>
         </ul>
       </div>
@@ -235,9 +254,9 @@
   <!-- /partial:footer -->
 
   <!-- partial:scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js" integrity="sha384-HOvlOYPIs/zjoIkWUGXkVmXsjr8GuZLV+Q+rcPwmJOVZVpvTSXQChiN4t9Euv9Vc" crossorigin="anonymous" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js" integrity="sha384-P8VzCVnT9NBUkMrpcIZrJbA7EBjJvh/fJS6PmP+4nLIM284DtsImIv8D0fFjIkeh" crossorigin="anonymous" defer></script>
-  <script src="/js/main.js?v=20261003b" defer></script>
+  <script src="/vendor/gsap-3.13.0/gsap.min.js" integrity="sha384-HOvlOYPIs/zjoIkWUGXkVmXsjr8GuZLV+Q+rcPwmJOVZVpvTSXQChiN4t9Euv9Vc" defer></script>
+  <script src="/vendor/gsap-3.13.0/ScrollTrigger.min.js" integrity="sha384-P8VzCVnT9NBUkMrpcIZrJbA7EBjJvh/fJS6PmP+4nLIM284DtsImIv8D0fFjIkeh" defer></script>
+  <script src="/js/main.js?v=20261003c" defer></script>
   <!-- /partial:scripts -->
 </body>
 </html>

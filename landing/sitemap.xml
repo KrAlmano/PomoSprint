@@ -42,6 +42,12 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pomosprint.app/en/delete-account"/>
   </url>
   <url>
+    <loc>https://pomosprint.app/destek</loc>
+    <lastmod>2026-10-03</lastmod>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pomosprint.app/destek"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pomosprint.app/en/support"/>
+  </url>
+  <url>
     <loc>https://pomosprint.app/en/privacy</loc>
     <lastmod>2026-10-03</lastmod>
     <xhtml:link rel="alternate" hreflang="tr" href="https://pomosprint.app/privacy"/>
@@ -64,5 +70,11 @@
     <lastmod>2026-10-03</lastmod>
     <xhtml:link rel="alternate" hreflang="tr" href="https://pomosprint.app/hesap-silme"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://pomosprint.app/en/delete-account"/>
+  </url>
+  <url>
+    <loc>https://pomosprint.app/en/support</loc>
+    <lastmod>2026-10-03</lastmod>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pomosprint.app/destek"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pomosprint.app/en/support"/>
   </url>
 </urlset>

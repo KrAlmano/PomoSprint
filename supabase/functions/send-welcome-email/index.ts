@@ -10,15 +10,35 @@
 //   * hoş geldin e-postası daha önce gönderilmemiş (welcome_sent_at).
 // Böylece dışarıdan çağıran biri rastgele adreslere e-posta gönderemez.
 //
-// Gerekli secret: RESEND_API_KEY. Gönderici alan adı (mail.pomosprint.app)
-// Resend'de doğrulanmış olmalı.
-// Deploy: `supabase functions deploy send-welcome-email --no-verify-jwt`
+// Gerekli secret'lar:
+//   RESEND_API_KEY       Gönderici alan adı (mail.pomosprint.app) Resend'de
+//                        doğrulanmış olmalı.
+//   MAIL_SENDER_NAME     Hizmet sağlayıcının (veri sorumlusunun) adı-soyadı ya
+//   MAIL_SENDER_ADDRESS  da unvanı ve iletişim adresi; e-posta altbilgisinde
+//                        yazılır (KVKK-11, KVKK-15). Kodda bilgi UYDURULMAZ:
+//                        ikisinden biri yoksa e-posta GÖNDERİLMEZ (500).
+// Abonelikten çıkma bağlantıları yalnızca token taşır (?token=<uuid>); e-posta
+// adresi URL'ye, dolayısıyla istek günlüklerine ve tarayıcı geçmişine girmez.
+// Deploy (önce secret'lar):
+//   supabase secrets set MAIL_SENDER_NAME="..." MAIL_SENDER_ADDRESS="..."
+//   supabase functions deploy send-welcome-email --no-verify-jwt
 
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const FROM_ADDRESS = "PomoSprint <noreply@mail.pomosprint.app>";
+const SUPPORT_EMAIL = "destek@pomosprint.app";
 const UNSUBSCRIBE_PAGE = "https://pomosprint.app/unsubscribe";
+const PRIVACY_URL = "https://pomosprint.app/privacy";
+const KVKK_URL = "https://pomosprint.app/kvkk";
 const MAX_AGE_MS = 60 * 60 * 1000;
+
+const escapeHtml = (value: string) =>
+  value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 
 const json = (body: unknown, status: number) =>
   new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
@@ -29,6 +49,14 @@ Deno.serve(async (req) => {
   const resendKey = Deno.env.get("RESEND_API_KEY");
   if (!resendKey) {
     console.error("RESEND_API_KEY tanımlı değil");
+    return json({ error: "Server misconfiguration" }, 500);
+  }
+  // Gönderen kimliği olmadan ticari ileti gönderilmez (satır sahiplenilmeden
+  // önce kontrol edilir; welcome_sent_at boş kalır).
+  const senderName = (Deno.env.get("MAIL_SENDER_NAME") ?? "").trim();
+  const senderAddress = (Deno.env.get("MAIL_SENDER_ADDRESS") ?? "").trim();
+  if (!senderName || !senderAddress) {
+    console.error("MAIL_SENDER_NAME / MAIL_SENDER_ADDRESS tanımlı değil; e-posta gönderilmedi");
     return json({ error: "Server misconfiguration" }, 500);
   }
 
@@ -66,9 +94,10 @@ Deno.serve(async (req) => {
   }
 
   const email = String(claimed.email);
-  const query = `email=${encodeURIComponent(email)}&token=${encodeURIComponent(String(claimed.unsubscribe_token))}`;
+  // Yalnızca token: e-posta adresi bağlantıya konmaz.
+  const query = `token=${encodeURIComponent(String(claimed.unsubscribe_token))}`;
   const unsubscribePage = `${UNSUBSCRIBE_PAGE}?${query}`;
-  const oneClickUrl = `${Deno.env.get("SUPABASE_URL")}/functions/v1/unsubscribe?${query}`;
+  const oneClickUrl = `${String(Deno.env.get("SUPABASE_URL")).replace(/\/+$/, "")}/functions/v1/unsubscribe?${query}`;
 
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -85,7 +114,12 @@ Deno.serve(async (req) => {
         "Aramıza hoş geldin!\n\n" +
         "PomoSprint'in gelişimine ortak olduğun ve yeni özelliklerden haberdar olmak istediğin için teşekkürler. " +
         "Sana yalnızca önemli güncellemeleri, yeni özellikleri ve faydalı ipuçlarını göndereceğiz.\n\n" +
-        `Artık e-posta almak istemiyorsan: ${unsubscribePage}`,
+        "Bu e-postayı PomoSprint kaydında bülten iznini işaretlediğin için alıyorsun.\n" +
+        `Artık e-posta almak istemiyorsan: ${unsubscribePage}\n\n` +
+        `Gönderen: ${senderName}, ${senderAddress}\n` +
+        `İletişim: ${SUPPORT_EMAIL}\n` +
+        `Gizlilik Politikası: ${PRIVACY_URL}\n` +
+        `KVKK Aydınlatma Metni: ${KVKK_URL}`,
       html: `
         <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto; color: #333;">
           <h2 style="color: #C2462F;">Aramıza Hoş Geldin! ⏳</h2>
@@ -96,6 +130,12 @@ Deno.serve(async (req) => {
           <p style="font-size: 12px; color: #777; text-align: center;">
             Bu e-postayı PomoSprint kaydında bülten iznini işaretlediğin için alıyorsun.<br/>
             Artık e-posta almak istemiyorsan <a href="${unsubscribePage}" style="color: #C2462F; text-decoration: underline;">abonelikten çıkabilirsin</a>.
+          </p>
+          <p style="font-size: 12px; color: #777; text-align: center;">
+            Gönderen: ${escapeHtml(senderName)}, ${escapeHtml(senderAddress)}<br/>
+            İletişim: <a href="mailto:${SUPPORT_EMAIL}" style="color: #777;">${SUPPORT_EMAIL}</a> ·
+            <a href="${PRIVACY_URL}" style="color: #777;">Gizlilik Politikası</a> ·
+            <a href="${KVKK_URL}" style="color: #777;">KVKK Aydınlatma Metni</a>
           </p>
         </div>
       `,

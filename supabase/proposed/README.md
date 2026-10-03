@@ -59,6 +59,7 @@ sonra ana dosyanın `\echo`/`\quit` satırlarını silip çalıştırın.
 | Dosya | Öncelik | Amaç |
 |---|---|---|
 | `12_delete_own_account.sql` (+ `12_delete_own_account_down.sql`) | P1 KVKK | Hesap silinince yabancı anahtarı olmayan, e-postaya bağlı kişisel veriyi de siler (`waitlist`, `user_id`'si boş `marketing_subscribers` satırı; yalnızca doğrulanmış e-postada); `search_path`'e `pg_temp`. Diğer tablolar canlıda zaten cascade ile siliniyor (3 Ekim'de FK'ler okunarak doğrulandı). Kuru çalıştırma: `tests/proposed_12_delete_own_account_dryrun.sql` (14 senaryo; yerel stub şemada hepsi `true`). |
+| `19_waitlist_consent_token.sql` (+ `19_waitlist_consent_token_down.sql`) | P2 (6563 / KVKK-11) | Bekleme listesine ticari ileti onay kaydı (`marketing_consent`, `consent_text_version`, sunucuda yazılan `consented_at`) ve kişiye özel `unsubscribe_token`. İki aşama: A geriye uyumlu (site yalnızca e-posta gönderse de çalışır); B, site onay alanlarını gönderdikten SONRA anon INSERT'i yalnızca onaylı satıra ve üç kolona daraltır. Kuru çalıştırma: `tests/proposed_19_waitlist_consent_token_dryrun.sql` (12 senaryo; yerel stub şemada hepsi `true`). |
 
 `01` ile `07`'nin D bölümü birlikte düşünülmeli: `01`'deki DEĞİŞİKLİK 5,
 `07`'deki `active_session_client_uuid` kolonuna dayanır.

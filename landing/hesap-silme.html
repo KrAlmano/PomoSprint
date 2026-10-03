@@ -29,10 +29,8 @@
   <link rel="icon" href="/favicon.ico" sizes="32x32">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=20261003c">
+  <link rel="stylesheet" href="/css/fonts.css?v=20261003">
+  <link rel="stylesheet" href="/css/style.css?v=20261003d">
   <script src="/js/boot.js?v=20261003b"></script>
   <!-- /partial:head -->
 </head>
@@ -110,7 +108,7 @@
         <h2 id="e-posta-ile">2. Uygulamaya Erişemiyorsanız</h2>
         <p>
           Uygulamayı cihazınızdan kaldırdıysanız ya da giriş yapamıyorsanız,
-          hesabınıza kayıtlı e-posta adresinden
+          uygulamayı yeniden kurmanız gerekmez. Hesabınıza kayıtlı e-posta adresinden
           <a href="mailto:destek@pomosprint.app?subject=Hesap%20silme%20talebi">destek@pomosprint.app</a>
           adresine konu satırı <strong>"Hesap silme talebi"</strong> olan bir
           e-posta gönderin.
@@ -119,6 +117,18 @@
           <li>Hesabın size ait olduğunu kayıtlı e-posta adresiniz üzerinden doğrularız.</li>
           <li>Apple'ın gizli aktarım adresiyle kaydolduysanız bunu e-postanızda belirtin; doğrulama için görünen adınız veya arkadaşlık kodunuz gibi ek bilgi isteyebiliriz.</li>
           <li>Talebiniz en geç <strong>30 gün</strong> içinde sonuçlandırılır ve sonuç size e-postayla bildirilir.</li>
+        </ul>
+
+        <h3 id="google-apple">Google veya Apple ile giriş yaptıysanız</h3>
+        <p>
+          Google veya Apple ile açılan hesapların şifresi yoktur; silmek için
+          şifre gerekmez. Size uygun yolu seçin:
+        </p>
+        <ul>
+          <li><strong>Uygulamadan:</strong> PomoSprint'e aynı Google hesabıyla ya da Apple ile giriş yapıp <a href="#uygulama-ici">yukarıdaki adımları</a> izleyin. Apple ile giriş şu an yalnızca iPhone ve iPad'de sunuluyor.</li>
+          <li><strong>Google ile kaydolduysanız:</strong> hesabınıza kayıtlı adres, Google hesabınızın e-posta adresidir (ör. Gmail adresiniz). Hesap silme talebinizi bu adresten gönderin.</li>
+          <li><strong>Apple ile kaydolup "E-postamı Gizle"yi seçtiyseniz:</strong> hesabınıza kayıtlı adres <span class="nowrap">@privaterelay.appleid.com</span> ile biten, Apple'ın oluşturduğu bir aktarım adresidir; bu adrese gelen e-postaları Apple size iletir. Adresi iPhone'da Ayarlar'da adınıza dokunup "Apple ile Giriş Yap" listesinde PomoSprint'i seçerek görebilirsiniz (menü adları iOS sürümüne göre değişebilir; aynı bilgi account.apple.com'da da bulunur). Talebinizi kendi e-posta adresinizden gönderin ve bu aktarım adresini e-postanıza yazın. Hesabın size ait olduğunu doğrulamak için aktarım adresine bir doğrulama e-postası gönderebilir ya da görünen adınız veya arkadaşlık kodunuz gibi ek bilgi isteyebiliriz.</li>
+          <li><strong>Apple Kimliği ya da Google Hesabı ayarlarından PomoSprint bağlantısını kaldırmak hesabınızı silmez;</strong> hesabı bu sayfadaki yollardan biriyle ayrıca silmeniz gerekir.</li>
         </ul>
 
         <h2 id="silinen-veriler">3. Silinen Veriler</h2>
@@ -134,7 +144,8 @@
         <p>
           Bu kayıtlar silme işlemiyle birlikte veritabanımızdan kaldırılır;
           adınız sıralamalardan, lig odanızdan ve arkadaş listelerinden de
-          kalkar. Tüm kişisel verileriniz sistemlerimizden makul bir süre
+          kalkar; sitedeki herkese açık sıralama da hesabın silinmesiyle
+          güncellenir. Tüm kişisel verileriniz sistemlerimizden makul bir süre
           içinde (en geç 30 gün) kalıcı olarak silinir. Silinen hesap geri
           getirilemez.
         </p>
@@ -161,6 +172,11 @@
               <td data-label="Ne kadar süre">Altyapı sağlayıcısının saklama süresi dolduğunda kendiliğinden silinir.</td>
             </tr>
             <tr>
+              <th scope="row">E-posta gönderim kayıtları (Resend): alıcı adresi, konu, gönderim zamanı ve teslim durumu</th>
+              <td data-label="Neden tutulur">Onay, şifre sıfırlama ve bülten e-postalarının teslim edildiğini izlemek ve gönderim sorunlarını çözmek.</td>
+              <td data-label="Ne kadar süre">Hizmet sağlayıcının saklama süresi dolduğunda kendiliğinden silinir.</td>
+            </tr>
+            <tr>
               <th scope="row">Bekleme listesi kaydı (Sitedeki "Yayınlanınca haber ver" formu)</th>
               <td data-label="Neden tutulur">Hesabınıza bağlı değildir; yalnızca Uygulama yayınlandığında haber vermek için kullanılır.</td>
               <td data-label="Ne kadar süre">Silinmesini isteyene kadar.</td>
@@ -185,7 +201,7 @@
           <li>Uygulamayı cihazınızdan kaldırmak hesabınızı silmez; hesabı yukarıdaki yollardan biriyle silmeniz gerekir. Uygulamayı kaldırdığınızda cihazdaki yerel veriler (ör. gizlediğiniz kullanıcılar listesi ve tercihleriniz) de silinir.</li>
           <li>Puanlarınız, kum taneleriniz, karakterleriniz ve lig dereceniz hesabınızla birlikte kaybolur; parasal değerleri yoktur ve geri verilemez.</li>
           <li>PomoSprint ücretsizdir; hesap silerken iptal etmeniz gereken bir abonelik yoktur.</li>
-          <li>Google veya Apple ile giriş yaptıysanız, PomoSprint'in hesabınıza bağlantısını Google Hesabı ya da Apple Kimliği ayarlarınızdan ayrıca kaldırabilirsiniz.</li>
+          <li>Google veya Apple ile giriş yaptıysanız, hesabınızı sildikten sonra PomoSprint'in bağlantısını Google Hesabı ya da Apple Kimliği ayarlarınızdan da kaldırabilirsiniz. Yalnızca bağlantıyı kaldırmak hesabınızı silmez.</li>
           <li>Aynı e-posta adresiyle daha sonra yeniden kaydolabilirsiniz; yeni hesap sıfırdan başlar.</li>
         </ul>
 
@@ -222,6 +238,7 @@
       <div class="footer-col">
         <h2 class="footer-title">Destek</h2>
         <ul>
+          <li><a href="/destek">Destek ve İletişim</a></li>
           <li><a href="mailto:destek@pomosprint.app">destek@pomosprint.app</a></li>
           <li><a href="/privacy">Gizlilik Politikası</a></li>
           <li><a href="/terms">Kullanım Şartları</a></li>
@@ -239,9 +256,9 @@
   <!-- /partial:footer -->
 
   <!-- partial:scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js" integrity="sha384-HOvlOYPIs/zjoIkWUGXkVmXsjr8GuZLV+Q+rcPwmJOVZVpvTSXQChiN4t9Euv9Vc" crossorigin="anonymous" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js" integrity="sha384-P8VzCVnT9NBUkMrpcIZrJbA7EBjJvh/fJS6PmP+4nLIM284DtsImIv8D0fFjIkeh" crossorigin="anonymous" defer></script>
-  <script src="/js/main.js?v=20261003b" defer></script>
+  <script src="/vendor/gsap-3.13.0/gsap.min.js" integrity="sha384-HOvlOYPIs/zjoIkWUGXkVmXsjr8GuZLV+Q+rcPwmJOVZVpvTSXQChiN4t9Euv9Vc" defer></script>
+  <script src="/vendor/gsap-3.13.0/ScrollTrigger.min.js" integrity="sha384-P8VzCVnT9NBUkMrpcIZrJbA7EBjJvh/fJS6PmP+4nLIM284DtsImIv8D0fFjIkeh" defer></script>
+  <script src="/js/main.js?v=20261003c" defer></script>
   <!-- /partial:scripts -->
 </body>
 </html>

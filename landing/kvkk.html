@@ -29,10 +29,8 @@
   <link rel="icon" href="/favicon.ico" sizes="32x32">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=20261003c">
+  <link rel="stylesheet" href="/css/fonts.css?v=20261003">
+  <link rel="stylesheet" href="/css/style.css?v=20261003d">
   <script src="/js/boot.js?v=20261003b"></script>
   <!-- /partial:head -->
 </head>
@@ -113,17 +111,17 @@
           6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") ve ilgili
           mevzuat uyarınca, PomoSprint Uygulaması ve Sitesi üzerinden işlenen
           kişisel verileriniz bakımından "veri sorumlusu" sıfatını PomoSprint'i
-          işleten geliştirici taşımaktadır.
+          işleten geliştirici taşımaktadır:
         </p>
+        <!-- KVKK-15: Veri sorumlusunun kimliği YAYINDAN ÖNCE doldurulmalı.
+             Bilgi uydurulmadı. Gerçek kişiysen ad-soyad ve tebligat adresi
+             (varsa KEP); şirketsen unvan, MERSİS numarası ve adres. Mağazadaki
+             geliştirici adıyla aynı olmalı. Kontrol: grep -rn 'data-fill-in' landing/ -->
         <ul>
+          <li><strong>Veri sorumlusu:</strong> <mark data-fill-in="KVKK-15">[DOLDURULACAK: ad-soyad ya da şirket unvanı]</mark></li>
+          <li><strong>Adres:</strong> <mark data-fill-in="KVKK-15">[DOLDURULACAK: tebligat adresi; şirketse MERSİS numarası]</mark></li>
           <li><strong>E-posta:</strong> <a href="mailto:destek@pomosprint.app">destek@pomosprint.app</a></li>
         </ul>
-        <p>
-          Resmi bir başvuru veya bildirim için veri sorumlusunun açık kimlik
-          ve iletişim bilgileri, KVKK'nın öngördüğü kimlik doğrulama süreci
-          tamamlandıktan sonra yukarıdaki e-posta adresi üzerinden tarafınıza
-          iletilir.
-        </p>
 
         <h2 id="veriler-amaclar">2. İşlenen Veriler, Amaçlar ve Hukuki Sebepler</h2>
         <p>
@@ -235,9 +233,8 @@
           <li><strong>Supabase</strong> — veritabanı, kimlik doğrulama ve sunucu fonksiyonları. Hesap ve çalışma verileriniz ile bekleme listesi kayıtları Avrupa Birliği'nde (Stockholm, İsveç) barındırılır.</li>
           <li><strong>Sentry</strong> — hata ve çökme kayıtları (teknik veriler; e-posta adresleri kayıtlara eklenmeden önce maskelenir).</li>
           <li><strong>Resend</strong> — işlemsel e-postaların ve bültenin gönderimi (e-posta adresi).</li>
-          <li><strong>Cloudflare</strong> — Sitenin barındırılması ve içerik dağıtımı; destek@pomosprint.app adresine gelen e-postaların yönlendirilmesi.</li>
+          <li><strong>Cloudflare</strong> — Sitenin (yazı tipleri ve animasyon kütüphanesi dahil) barındırılması ve içerik dağıtımı; destek@pomosprint.app adresine gelen e-postaların yönlendirilmesi.</li>
           <li><strong>Google ve Apple</strong> — Google ile Giriş veya Apple ile Giriş'i tercih ederseniz kimlik doğrulaması. Ayrıca destek@pomosprint.app adresine gönderdiğiniz e-postalar, Google'ın e-posta hizmetinde barındırılan destek gelen kutumuza iletilir.</li>
-          <li><strong>Google Fonts ve jsDelivr</strong> — Siteyi ziyaret ettiğinizde yazı tipleri ve animasyon kütüphanesinin yüklenmesi (IP adresi ve tarayıcı bilgisi).</li>
         </ul>
         <p>
           Bu sağlayıcılar verilerinizi yalnızca bize hizmet sunmak amacıyla
@@ -340,6 +337,7 @@
       <div class="footer-col">
         <h2 class="footer-title">Destek</h2>
         <ul>
+          <li><a href="/destek">Destek ve İletişim</a></li>
           <li><a href="mailto:destek@pomosprint.app">destek@pomosprint.app</a></li>
           <li><a href="/privacy">Gizlilik Politikası</a></li>
           <li><a href="/terms">Kullanım Şartları</a></li>
@@ -357,9 +355,9 @@
   <!-- /partial:footer -->
 
   <!-- partial:scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js" integrity="sha384-HOvlOYPIs/zjoIkWUGXkVmXsjr8GuZLV+Q+rcPwmJOVZVpvTSXQChiN4t9Euv9Vc" crossorigin="anonymous" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js" integrity="sha384-P8VzCVnT9NBUkMrpcIZrJbA7EBjJvh/fJS6PmP+4nLIM284DtsImIv8D0fFjIkeh" crossorigin="anonymous" defer></script>
-  <script src="/js/main.js?v=20261003b" defer></script>
+  <script src="/vendor/gsap-3.13.0/gsap.min.js" integrity="sha384-HOvlOYPIs/zjoIkWUGXkVmXsjr8GuZLV+Q+rcPwmJOVZVpvTSXQChiN4t9Euv9Vc" defer></script>
+  <script src="/vendor/gsap-3.13.0/ScrollTrigger.min.js" integrity="sha384-P8VzCVnT9NBUkMrpcIZrJbA7EBjJvh/fJS6PmP+4nLIM284DtsImIv8D0fFjIkeh" defer></script>
+  <script src="/js/main.js?v=20261003c" defer></script>
   <!-- /partial:scripts -->
 </body>
 </html>

@@ -29,10 +29,8 @@
   <link rel="icon" href="/favicon.ico" sizes="32x32">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=20261003c">
+  <link rel="stylesheet" href="/css/fonts.css?v=20261003">
+  <link rel="stylesheet" href="/css/style.css?v=20261003d">
   <script src="/js/boot.js?v=20261003b"></script>
   <!-- /partial:head -->
 </head>
@@ -109,20 +107,21 @@
           6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") ve ilgili
           mevzuat uyarınca, PomoSprint Uygulaması ve Sitesi üzerinden işlenen
           kişisel verileriniz bakımından "veri sorumlusu" sıfatını PomoSprint'i
-          işleten geliştirici taşımaktadır.
+          işleten geliştirici taşımaktadır:
         </p>
-        <p>
-          Veri sorumlusuna ulaşmak, bu politika hakkında soru sormak veya
-          KVKK'nın 11. maddesinde sayılan haklarınızı kullanmak için:
-        </p>
+        <!-- KVKK-15: Veri sorumlusunun kimliği YAYINDAN ÖNCE doldurulmalı.
+             Bilgi uydurulmadı. Gerçek kişiysen ad-soyad ve tebligat adresi
+             (varsa KEP); şirketsen unvan, MERSİS numarası ve adres. Mağazadaki
+             geliştirici adıyla aynı olmalı. Kontrol: grep -rn 'data-fill-in' landing/ -->
         <ul>
+          <li><strong>Veri sorumlusu:</strong> <mark data-fill-in="KVKK-15">[DOLDURULACAK: ad-soyad ya da şirket unvanı]</mark></li>
+          <li><strong>Adres:</strong> <mark data-fill-in="KVKK-15">[DOLDURULACAK: tebligat adresi; şirketse MERSİS numarası]</mark></li>
           <li><strong>E-posta:</strong> <a href="mailto:destek@pomosprint.app">destek@pomosprint.app</a></li>
         </ul>
         <p>
-          Resmi bir başvuru veya bildirim için veri sorumlusunun açık kimlik
-          ve iletişim bilgileri, KVKK'nın öngördüğü kimlik doğrulama süreci
-          tamamlandıktan sonra yukarıdaki e-posta adresi üzerinden tarafınıza
-          iletilir.
+          Veri sorumlusuna ulaşmak, bu politika hakkında soru sormak veya
+          KVKK'nın 11. maddesinde sayılan haklarınızı kullanmak için yukarıdaki
+          e-posta adresine yazabilirsiniz.
         </p>
         <p>
           KVKK'nın 10. maddesi kapsamındaki aydınlatma metnine
@@ -220,7 +219,9 @@
         <p>
           Sitedeki forma yazdığınız e-posta adresi, Supabase altyapısındaki
           bekleme listemizde saklanır ve yalnızca Uygulama yayınlandığında size
-          haber vermek için kullanılır. Adresinizin listeden silinmesini
+          haber vermek için kullanılır. Kayıt için formdaki ticari elektronik
+          ileti onay kutusunu ayrıca işaretlemeniz gerekir; kutu önceden
+          işaretli gelmez. Adresinizin listeden silinmesini
           dilediğiniz zaman <a href="mailto:destek@pomosprint.app">destek@pomosprint.app</a>
           adresine yazarak isteyebilirsiniz.
         </p>
@@ -229,14 +230,12 @@
         <p>PomoSprint, hizmeti sunabilmek için aşağıdaki hizmet sağlayıcılarla çalışır. Bu sağlayıcılar verilerinizi yalnızca bize hizmet sunmak amacıyla işler.</p>
         <ul>
           <li><strong>Supabase</strong> — veritabanı, kimlik doğrulama ve sunucu fonksiyonları. Hesap bilgileriniz, çalışma verileriniz ve bekleme listesi kayıtları Avrupa Birliği sınırları içindeki (Stockholm, İsveç) sunucularda saklanır. (<a href="https://supabase.com/privacy" target="_blank" rel="noopener">Supabase Gizlilik Politikası</a>)</li>
-          <li><strong>Sentry</strong> — Uygulamadaki hataların ve çökmelerin izlenmesi. Hata kaydı, cihaz modeli, işletim sistemi ve uygulama sürümü gibi teknik veriler Sentry'ye iletilir; bu veriler yalnızca hataları bulup düzeltmek için kullanılır. (<a href="https://sentry.io/privacy/" target="_blank" rel="noopener">Sentry Gizlilik Politikası</a>)</li>
+          <li><strong>Sentry</strong> — Uygulamadaki hataların ve çökmelerin izlenmesi. Hata kaydı, cihaz modeli, işletim sistemi ve uygulama sürümü gibi teknik veriler ile Sentry'nin uygulama kurulumuna atadığı rastgele bir kurulum kimliği Sentry'ye iletilir; bu kimlik hesabınızla ilişkilendirilmez ve veriler yalnızca hataları bulup düzeltmek için kullanılır. (<a href="https://sentry.io/privacy/" target="_blank" rel="noopener">Sentry Gizlilik Politikası</a>)</li>
           <li><strong>Google ile Giriş</strong> — Google hesabınızla giriş yapmayı tercih ederseniz Google, kimlik doğrulaması için adınızı ve e-posta adresinizi bizimle paylaşır. (<a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Gizlilik Politikası</a>)</li>
           <li><strong>Apple ile Giriş</strong> — Apple Kimliğinizle giriş yapmayı tercih ederseniz Apple, kimlik doğrulaması için adınızı ve e-posta adresinizi (veya gizli aktarım adresini) bizimle paylaşır. (<a href="https://www.apple.com/legal/privacy/" target="_blank" rel="noopener">Apple Gizlilik Politikası</a>)</li>
           <li><strong>Resend</strong> — işlemsel e-postaların, lansman duyurusunun ve bültenin gönderimi. E-posta adresiniz yalnızca size e-posta iletmek amacıyla bu hizmetle paylaşılır. (<a href="https://resend.com/legal/privacy-policy" target="_blank" rel="noopener">Resend Gizlilik Politikası</a>)</li>
           <li><strong>Google (destek e-postası)</strong> — <a href="mailto:destek@pomosprint.app">destek@pomosprint.app</a> adresine gönderdiğiniz e-postalar (hesap silme talepleri ve kullanıcı bildirimleri dahil), Google'ın e-posta hizmetinde barındırılan destek gelen kutumuza iletilir.</li>
-          <li><strong>Cloudflare</strong> — pomosprint.app sitesinin barındırılması, içerik dağıtımı ve destek@pomosprint.app adresine gelen e-postaların yönlendirilmesi. Siteyi ziyaret ettiğinizde IP adresi ve tarayıcı bilgisi gibi standart erişim verileri Cloudflare altyapısından geçer. Sitede, çerez kullanmayan ve sizi kişisel olarak tanımlamayan Cloudflare Web Analytics ile toplu ziyaret istatistiği (sayfa görüntüleme, ülke, cihaz türü) tutulur. (<a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">Cloudflare Gizlilik Politikası</a>)</li>
-          <li><strong>Google Fonts</strong> — Sitedeki yazı tipleri Google sunucularından yüklenir; bu sırada IP adresiniz ve tarayıcı bilginiz Google'a iletilir. (<a href="https://developers.google.com/fonts/faq/privacy" target="_blank" rel="noopener">Google Fonts gizlilik bilgisi</a>)</li>
-          <li><strong>jsDelivr</strong> — Sitedeki animasyon kütüphanesi (GSAP) jsDelivr içerik dağıtım ağından yüklenir; bu sırada IP adresiniz ve tarayıcı bilginiz bu ağa iletilir. (<a href="https://www.jsdelivr.com/terms/privacy-policy-jsdelivr-net" target="_blank" rel="noopener">jsDelivr Gizlilik Politikası</a>)</li>
+          <li><strong>Cloudflare</strong> — pomosprint.app sitesinin barındırılması, içerik dağıtımı ve destek@pomosprint.app adresine gelen e-postaların yönlendirilmesi. Siteyi ziyaret ettiğinizde IP adresi ve tarayıcı bilgisi gibi standart erişim verileri Cloudflare altyapısından geçer. Sitede, çerez kullanmayan ve sizi kişisel olarak tanımlamayan Cloudflare Web Analytics ile toplu ziyaret istatistiği (sayfa görüntüleme, ülke, cihaz türü) tutulur. Sitenin yazı tipleri ve animasyon kütüphanesi de kendi alan adımızdan sunulur; Site, Google Fonts veya jsDelivr gibi başka bir sunucudan dosya yüklemez. (<a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">Cloudflare Gizlilik Politikası</a>)</li>
           <li><strong>App Store ve Google Play</strong> — Uygulamayı indirdiğiniz mağaza, kendi gizlilik politikası kapsamında indirme ve cihaz bilgilerini işler.</li>
         </ul>
         <p>
@@ -248,8 +247,8 @@
         <h2 id="veri-aktarimi">9. Uluslararası Veri Aktarımı</h2>
         <p>
           Ana verileriniz (hesap, çalışma verileri ve bekleme listesi) Avrupa
-          Birliği sınırları içinde barındırılır. Sentry, Google, Apple, Resend,
-          Cloudflare ve jsDelivr gibi bazı hizmet sağlayıcılar, altyapılarının
+          Birliği sınırları içinde barındırılır. Sentry, Google, Apple, Resend
+          ve Cloudflare gibi bazı hizmet sağlayıcılar, altyapılarının
           doğası gereği verileri Amerika Birleşik Devletleri dahil farklı
           ülkelerdeki sunucularda işleyebilir. Bu aktarımlar, sağlayıcıların
           gizlilik politikalarında açıklanan veri koruma güvenceleri (ör. AB
@@ -390,6 +389,7 @@
       <div class="footer-col">
         <h2 class="footer-title">Destek</h2>
         <ul>
+          <li><a href="/destek">Destek ve İletişim</a></li>
           <li><a href="mailto:destek@pomosprint.app">destek@pomosprint.app</a></li>
           <li><a href="/privacy">Gizlilik Politikası</a></li>
           <li><a href="/terms">Kullanım Şartları</a></li>
@@ -407,9 +407,9 @@
   <!-- /partial:footer -->
 
   <!-- partial:scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js" integrity="sha384-HOvlOYPIs/zjoIkWUGXkVmXsjr8GuZLV+Q+rcPwmJOVZVpvTSXQChiN4t9Euv9Vc" crossorigin="anonymous" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js" integrity="sha384-P8VzCVnT9NBUkMrpcIZrJbA7EBjJvh/fJS6PmP+4nLIM284DtsImIv8D0fFjIkeh" crossorigin="anonymous" defer></script>
-  <script src="/js/main.js?v=20261003b" defer></script>
+  <script src="/vendor/gsap-3.13.0/gsap.min.js" integrity="sha384-HOvlOYPIs/zjoIkWUGXkVmXsjr8GuZLV+Q+rcPwmJOVZVpvTSXQChiN4t9Euv9Vc" defer></script>
+  <script src="/vendor/gsap-3.13.0/ScrollTrigger.min.js" integrity="sha384-P8VzCVnT9NBUkMrpcIZrJbA7EBjJvh/fJS6PmP+4nLIM284DtsImIv8D0fFjIkeh" defer></script>
+  <script src="/js/main.js?v=20261003c" defer></script>
   <!-- /partial:scripts -->
 </body>
 </html>

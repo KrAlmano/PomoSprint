@@ -6,8 +6,12 @@
   <title>PomoSprint Bülten</title>
   <!--
     Örnek bülten şablonu. scripts/send_newsletter.js çift süslü parantez
-    içindeki iki yer tutucuyu doldurur: unsubscribe_url (kişiye özel
-    abonelikten çıkma linki, ZORUNLU; yoksa gönderim yapılmaz) ve email.
+    içindeki yer tutucuları doldurur: unsubscribe_url (kişiye özel
+    abonelikten çıkma linki, yalnızca token taşır), sender_name ve
+    sender_address (hizmet sağlayıcının kimliği; scripts/.env'deki
+    MAIL_SENDER_NAME / MAIL_SENDER_ADDRESS) ZORUNLU, yoksa gönderim
+    yapılmaz; email isteğe bağlı. Altbilgideki gönderen, iletişim,
+    gizlilik/KVKK bağlantıları ve "neden alıyorsun" cümlesi kaldırılmamalı.
     E-posta istemcileri harici CSS'i desteklemediği için stiller satır içidir.
   -->
 </head>
@@ -41,7 +45,11 @@
           <tr>
             <td align="center" style="padding:16px 32px;font-size:12px;line-height:18px;color:#8A817A;">
               Bu e-posta {{email}} adresine, PomoSprint bültenine abone olduğunuz için gönderildi.<br>
-              Artık almak istemiyorsanız <a href="{{unsubscribe_url}}" style="color:#8A817A;">abonelikten çıkabilirsiniz</a>.
+              Artık almak istemiyorsanız <a href="{{unsubscribe_url}}" style="color:#8A817A;">abonelikten çıkabilirsiniz</a>.<br><br>
+              Gönderen: {{sender_name}}, {{sender_address}}<br>
+              İletişim: <a href="mailto:destek@pomosprint.app" style="color:#8A817A;">destek@pomosprint.app</a> ·
+              <a href="https://pomosprint.app/privacy" style="color:#8A817A;">Gizlilik Politikası</a> ·
+              <a href="https://pomosprint.app/kvkk" style="color:#8A817A;">KVKK Aydınlatma Metni</a>
             </td>
           </tr>
         </table>

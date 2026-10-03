@@ -29,10 +29,8 @@
   <link rel="icon" href="/favicon.ico" sizes="32x32">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=20261003c">
+  <link rel="stylesheet" href="/css/fonts.css?v=20261003">
+  <link rel="stylesheet" href="/css/style.css?v=20261003d">
   <script src="/js/boot.js?v=20261003b"></script>
   <!-- /partial:head -->
 </head>
@@ -49,6 +47,7 @@
       <nav class="site-nav" id="site-nav" aria-label="Main menu">
         <a href="/en/privacy" class="active" aria-current="page">Privacy Policy</a>
         <a href="/en/terms">Terms of Use</a>
+        <a href="/en/support">Support</a>
         <a href="/" hreflang="tr" lang="tr">Türkçe site</a>
         <a href="/#yakinda" class="btn btn-primary btn-sm nav-cta" hreflang="tr">Waitlist (Turkish page)</a>
       </nav>
@@ -113,20 +112,22 @@
           Under the Turkish Personal Data Protection Law No. 6698 ("KVKK") and
           related legislation, the developer who operates PomoSprint is the
           "data controller" for personal data processed through the PomoSprint
-          App and Site.
+          App and Site:
         </p>
-        <p>
-          To contact the data controller, ask a question about this policy, or
-          exercise your rights listed in Article 11 of the KVKK:
-        </p>
+        <!-- KVKK-15: The data controller's identity MUST be filled in before
+             publishing. Nothing was invented here. Individual: full name and
+             address for service (or KEP); company: legal name, MERSIS number
+             and address. Must match the developer name in the stores.
+             Check: grep -rn 'data-fill-in' landing/ -->
         <ul>
+          <li><strong>Data controller:</strong> <mark data-fill-in="KVKK-15">[TO BE FILLED IN: full name or company name]</mark></li>
+          <li><strong>Address:</strong> <mark data-fill-in="KVKK-15">[TO BE FILLED IN: address for service; MERSIS number if a company]</mark></li>
           <li><strong>Email:</strong> <a href="mailto:destek@pomosprint.app">destek@pomosprint.app</a></li>
         </ul>
         <p>
-          For a formal application or notice, the full identity and contact
-          details of the data controller will be sent to you via the email
-          address above once the identity verification process required by
-          the KVKK is completed.
+          To contact the data controller, ask a question about this policy, or
+          exercise your rights listed in Article 11 of the KVKK, write to the
+          email address above.
         </p>
         <p>
           The notice required by Article 10 of the KVKK is available on our
@@ -227,7 +228,9 @@
         <p>
           The email address you enter in the Site's form is stored in our waitlist
           on Supabase's infrastructure and is only used to let you know when the
-          App launches. You can ask us to remove your address at any time by
+          App launches. To sign up you also need to tick the separate consent box
+          for commercial electronic messages in the form; it is never pre-ticked.
+          You can ask us to remove your address at any time by
           writing to <a href="mailto:destek@pomosprint.app">destek@pomosprint.app</a>.
         </p>
 
@@ -235,14 +238,12 @@
         <p>PomoSprint works with the following service providers to deliver the service. These providers process your data only to provide services to us.</p>
         <ul>
           <li><strong>Supabase</strong> — database, authentication and server functions. Your account information, study data and waitlist entries are stored on servers within the European Union (Stockholm, Sweden). (<a href="https://supabase.com/privacy" target="_blank" rel="noopener">Supabase Privacy Policy</a>)</li>
-          <li><strong>Sentry</strong> — monitoring errors and crashes in the App. Technical data such as error reports, device model, operating system and App version is sent to Sentry and used only to find and fix errors. (<a href="https://sentry.io/privacy/" target="_blank" rel="noopener">Sentry Privacy Policy</a>)</li>
+          <li><strong>Sentry</strong> — monitoring errors and crashes in the App. Technical data such as error reports, device model, operating system and App version, together with a random installation ID that Sentry assigns to the App installation, is sent to Sentry; this ID is not linked to your account, and the data is used only to find and fix errors. (<a href="https://sentry.io/privacy/" target="_blank" rel="noopener">Sentry Privacy Policy</a>)</li>
           <li><strong>Sign in with Google</strong> — if you choose to sign in with your Google account, Google shares your name and email address with us for authentication. (<a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a>)</li>
           <li><strong>Sign in with Apple</strong> — if you choose to sign in with your Apple ID, Apple shares your name and email address (or a private relay address) with us for authentication. (<a href="https://www.apple.com/legal/privacy/" target="_blank" rel="noopener">Apple Privacy Policy</a>)</li>
           <li><strong>Resend</strong> — sending transactional emails, the launch announcement and the newsletter. Your email address is shared with this service only to deliver emails to you. (<a href="https://resend.com/legal/privacy-policy" target="_blank" rel="noopener">Resend Privacy Policy</a>)</li>
           <li><strong>Google (support email)</strong> — emails you send to <a href="mailto:destek@pomosprint.app">destek@pomosprint.app</a> (including account deletion requests and user reports) are forwarded to our support inbox hosted on Google's email service.</li>
-          <li><strong>Cloudflare</strong> — hosting and content delivery for the pomosprint.app Site and forwarding of emails sent to destek@pomosprint.app. When you visit the Site, standard access data such as your IP address and browser information passes through Cloudflare's infrastructure. The Site uses Cloudflare Web Analytics, which sets no cookies and does not identify you personally, to keep aggregate visit statistics (page views, country, device type). (<a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">Cloudflare Privacy Policy</a>)</li>
-          <li><strong>Google Fonts</strong> — the Site's fonts are loaded from Google's servers, which transmits your IP address and browser information to Google. (<a href="https://developers.google.com/fonts/faq/privacy" target="_blank" rel="noopener">Google Fonts privacy information</a>)</li>
-          <li><strong>jsDelivr</strong> — the Site's animation library (GSAP) is loaded from the jsDelivr content delivery network, which transmits your IP address and browser information to that network. (<a href="https://www.jsdelivr.com/terms/privacy-policy-jsdelivr-net" target="_blank" rel="noopener">jsDelivr Privacy Policy</a>)</li>
+          <li><strong>Cloudflare</strong> — hosting and content delivery for the pomosprint.app Site and forwarding of emails sent to destek@pomosprint.app. When you visit the Site, standard access data such as your IP address and browser information passes through Cloudflare's infrastructure. The Site uses Cloudflare Web Analytics, which sets no cookies and does not identify you personally, to keep aggregate visit statistics (page views, country, device type). The Site's fonts and animation library are also served from our own domain; the Site does not load files from other servers such as Google Fonts or jsDelivr. (<a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">Cloudflare Privacy Policy</a>)</li>
           <li><strong>App Store and Google Play</strong> — the store you download the App from processes download and device information under its own privacy policy.</li>
         </ul>
         <p>
@@ -255,7 +256,7 @@
         <p>
           Your main data (account, study data and waitlist) is hosted within the
           European Union. Some service providers such as Sentry, Google, Apple,
-          Resend, Cloudflare and jsDelivr may, due to the nature of their
+          Resend and Cloudflare may, due to the nature of their
           infrastructure, process data on servers in other countries, including
           the United States. These transfers are made within the framework of the
           data protection safeguards described in those providers' privacy
@@ -396,6 +397,7 @@
       <div class="footer-col">
         <h2 class="footer-title">Support</h2>
         <ul>
+          <li><a href="/en/support">Support &amp; Contact</a></li>
           <li><a href="mailto:destek@pomosprint.app">destek@pomosprint.app</a></li>
         </ul>
       </div>
@@ -408,9 +410,9 @@
   <!-- /partial:footer -->
 
   <!-- partial:scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js" integrity="sha384-HOvlOYPIs/zjoIkWUGXkVmXsjr8GuZLV+Q+rcPwmJOVZVpvTSXQChiN4t9Euv9Vc" crossorigin="anonymous" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js" integrity="sha384-P8VzCVnT9NBUkMrpcIZrJbA7EBjJvh/fJS6PmP+4nLIM284DtsImIv8D0fFjIkeh" crossorigin="anonymous" defer></script>
-  <script src="/js/main.js?v=20261003b" defer></script>
+  <script src="/vendor/gsap-3.13.0/gsap.min.js" integrity="sha384-HOvlOYPIs/zjoIkWUGXkVmXsjr8GuZLV+Q+rcPwmJOVZVpvTSXQChiN4t9Euv9Vc" defer></script>
+  <script src="/vendor/gsap-3.13.0/ScrollTrigger.min.js" integrity="sha384-P8VzCVnT9NBUkMrpcIZrJbA7EBjJvh/fJS6PmP+4nLIM284DtsImIv8D0fFjIkeh" defer></script>
+  <script src="/js/main.js?v=20261003c" defer></script>
   <!-- /partial:scripts -->
 </body>
 </html>

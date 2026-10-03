@@ -7,9 +7,12 @@
 //
 // Kabul edilen istekler (yalnızca POST; GET silme YAPMAZ, çünkü e-posta
 // güvenlik tarayıcıları linkleri GET ile açar):
-//   POST ?email=..&token=..   RFC 8058 tek tık (List-Unsubscribe-Post)
-//   POST {email, token}       landing/unsubscribe.html'in "Abonelikten çık" butonu
+//   POST ?token=..            RFC 8058 tek tık (List-Unsubscribe-Post); 3 Ekim
+//                             sonrası e-postalar yalnızca token taşır
+//   POST ?email=..&token=..   eski e-postalardaki tek tık bağlantısı
+//   POST ?token=.. {token, email?}  landing/unsubscribe.html'in butonu
 // email isteğe bağlıdır; verilirse token'ın sahibiyle eşleşmesi gerekir.
+// Davranış scripts/test/unsubscribe_function.test.mjs ile sınanır.
 //
 // JWT doğrulaması KAPALI deploy edilir (e-posta istemcisi Authorization
 // başlığı göndermez): `supabase functions deploy unsubscribe --no-verify-jwt`
