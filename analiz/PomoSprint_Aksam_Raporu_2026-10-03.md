@@ -102,13 +102,10 @@ Ayrıntılı adımlar: [magaza_uyum_kontrol_listesi_2026-10-03.md](magaza_uyum_k
 1. **Supabase → Authentication → Providers → Apple → Enable**, Client IDs: `com.pomosprint.app` (yaklaşık 30 dk). Yapılmazsa App Store reddeder.
 2. **Veri sorumlusu bilgisi:** ad-soyad (ya da şirket unvanı) ve tebligat adresi. Bana yazın, dört yasal sayfaya ve e-posta altbilgisine ben işlerim. Şu an sitede geçici, nötr bir ifade var.
 3. **Resend'de `mail.pomosprint.app` doğrulaması ve Supabase özel SMTP ayarı.** Bu yapılmadan kayıt onay ve şifre sıfırlama e-postaları ekip dışındaki kullanıcılara gitmeyebilir.
-4. **SQL Editor'de çalıştırılacak öneriler**, her biri önce `_dryrun`, sonra asıl dosya:
-   - **Bağımsız, şimdi çalıştırılabilir:**
-     - `12_delete_own_account`: hesap silmede bekleme listesi ve abonelik kaydı.
-     - `15_monthly_leaderboard_study_month`: Sıralama > Aylık ile Raporlar aynı ayı saysın.
-     - `16_categories_order_and_privileges`: kategori sırası ve yetkiler.
-     - `19_waitlist_consent_token`: bekleme listesi onay kaydı.
-   - **`13_sunucu_butunluk` ve `14_gizlilik_sosyal`:** Şu an uyumlaştırılıyor, çünkü ikisi aynı iki fonksiyonu değiştiriyor. Bitince tek bir sıra vereceğim; **o zamana kadar bu ikisini çalıştırmayın.**
+4. **SQL Editor'de çalıştırılacak öneriler, TEK SIRA:** `12 → 15 → 16 → 19 → 13 → 14`. Her adımda önce `_dryrun` dosyası (sonda `DRYRUN_RESULT` hatası ve tüm satırlar `true` olmalı), sonra asıl dosya. Adım adım tablo ve beklenen sonuçlar `supabase/proposed/README.md` → "Dosyalar ve uygulama sırası" bölümünde.
+   - 13 ile 14 uyumlu hale getirildi. Sıra dışı uygulanırsa dosyalar hiçbir şey değiştirmeden durur, bu yüzden yanlış sıra veriyi bozmaz.
+   - Yerel kopyada tüm kuru çalıştırmalar başarılı: 12 → 14/14, 15 → 6/6, 16 → 13/13, 19 → 12/12, 13 → 50/50, 14 → 67/67. Geri alma zinciri her adımda bir önceki hale birebir döndü.
+   - 19'un B bölümü ayrı ve daha sonra uygulanır.
 5. **Ürün kararı (öneri 13):** Sunucuda başlangıç kaydı olmayan (çevrimdışı) seanslara günlük üst sınır konsun mu? Varsayılan "sınır yok" ile bugünkü davranış aynen kalır; sınır koymak saat hilesini kapatır ama internetsiz çalışanı etkiler.
 6. **Android:** SDK'lı bir makinede `flutter build appbundle` ve gerçek cihazda kilit ekranı testi. Ardından Play App Signing SHA-1 → Google OAuth ve Play Console'da exact alarm beyanı (gerekçe metni listede hazır).
 7. **Mağaza formları:** App Privacy / Data safety yanıtları, demo hesap ve inceleme notu (şablonlar listede hazır), kişisel Play hesabıysa 14 günlük kapalı test.
