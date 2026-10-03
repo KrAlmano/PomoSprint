@@ -446,37 +446,83 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String get sessionResultSaving => 'Seans kaydediliyor…';
+
+  @override
+  String sessionResultPoints(int points) {
+    return '+$points puan';
+  }
+
+  @override
+  String sessionResultCoins(int coins) {
+    return '+$coins kum';
+  }
+
+  @override
+  String sessionResultStreak(int days) {
+    return '$days günlük seri';
+  }
+
+  @override
+  String get sessionResultDuplicate =>
+      'Bu seans zaten kaydedilmişti; puanların daha önce eklendi.';
+
+  @override
+  String get sessionResultOk => 'Tamam';
+
+  @override
+  String get sessionNotSavedTitle => 'Seans kaydedilemedi';
+
+  @override
   String get sessionQueuedOffline =>
-      '⚠️ Seans şu an buluta kaydedilemedi, bağlantı gelince otomatik gönderilecek.';
+      'Seans cihazına kaydedildi; bağlantı gelince otomatik gönderilecek. Puan ve kum için 24 saat içinde çevrimiçi olman gerekiyor.';
 
   @override
   String get sessionQueuedClockSkew =>
-      '⚠️ Seans bekletiliyor: cihazının saati sunucudan farklı görünüyor. Saat ayarını kontrol et; seans otomatik olarak yeniden denenecek.';
+      'Seans bekletiliyor: cihazının saati sunucudan farklı görünüyor. Saat ayarını kontrol et; seans otomatik olarak yeniden denenecek.';
 
   @override
   String get sessionQueuedOverlap =>
-      '⚠️ Seans önceki bir kayıtla çakışıyor; bekletiliyor ve daha sonra yeniden denenecek.';
+      'Seans önceki bir kayıtla çakışıyor; bekletiliyor ve daha sonra yeniden denenecek.';
 
   @override
   String get sessionRejectedTooOld =>
-      '⚠️ Bu seans 24 saatten eski olduğu için kaydedilemedi.';
+      'Bu seans 24 saatten eski olduğu için kaydedilemedi.';
 
   @override
   String get sessionRejectedClock =>
-      '⚠️ Bu seans kaydedilemedi: cihazının saati ileri görünüyor. Saat ayarını kontrol et.';
+      'Bu seans kaydedilemedi: cihazının saati ileri görünüyor. Saat ayarını kontrol et.';
 
   @override
   String get sessionRejectedOverlap =>
-      '⚠️ Bu seans kaydedilemedi: aynı zaman aralığında kayıtlı başka bir seans var.';
+      'Bu seans kaydedilemedi: aynı zaman aralığında kayıtlı başka bir seans var.';
 
   @override
   String get sessionRejectedGeneric =>
-      '⚠️ Bu seans kaydedilemedi: sunucu doğrulamasından geçmedi.';
+      'Bu seans kaydedilemedi: sunucu doğrulamasından geçmedi.';
 
   @override
   String rejectedSessionsNotice(int count) {
     return '⚠️ Bekleyen $count seans sunucu tarafından reddedildi ve kaydedilemedi.';
   }
+
+  @override
+  String get rejectedSessionsTitle => 'Kaydedilemeyen seanslar';
+
+  @override
+  String get rejectedSessionsInfo =>
+      'Sunucunun kabul etmediği seanslar burada listelenir; puana, kuma ve seriye eklenmezler. Bu cihazda son 50 kayıt tutulur.';
+
+  @override
+  String get rejectedSessionsEmpty => 'Kaydedilemeyen seans yok.';
+
+  @override
+  String rejectedSessionsLink(int count) {
+    return 'Kaydedilemeyen seanslar ($count)';
+  }
+
+  @override
+  String get rejectedSessionsView => 'Göster';
 
   @override
   String get pausedSessionExpired =>
@@ -500,7 +546,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String notifSessionDoneBody(String category) {
-    return '$category seansın bitti. Puanlarını görmek için uygulamaya dön.';
+    return '$category seansın bitti. Puan ve kum kazanman için 24 saat içinde uygulamayı aç.';
   }
 
   @override
@@ -537,7 +583,8 @@ class AppLocalizationsTr extends AppLocalizations {
   String get lockTimerStatusDone => 'Seans tamamlandı';
 
   @override
-  String get lockTimerDoneHint => 'Seansını kaydetmek için PomoSprint\'i aç.';
+  String get lockTimerDoneHint =>
+      'Seansını kaydetmek için 24 saat içinde PomoSprint\'i aç.';
 
   @override
   String get statsLoadErrorTitle => 'İstatistikler yüklenemedi';

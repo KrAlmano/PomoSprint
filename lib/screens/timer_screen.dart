@@ -3,8 +3,11 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+import '../app/session_feedback.dart';
 import '../l10n/app_localizations.dart';
 import '../theme.dart';
+import '../utils/category_names.dart';
+import '../utils/color_hex.dart';
 import '../utils/responsive.dart';
 import '../utils/text_util.dart';
 import '../models/category_model.dart';
@@ -12,7 +15,9 @@ import '../widgets/hourglass_widget.dart';
 import '../services/language_service.dart';
 import '../services/lock_screen_timer.dart';
 import '../services/notification_service.dart';
+import '../services/session_queue.dart';
 import '../services/timer_persistence.dart';
+import 'rejected_sessions_screen.dart';
 
 /// Sayaç diyalogları geniş ekranda tam genişliğe yayılmaz.
 const BoxConstraints kTimerDialogConstraints = BoxConstraints(minWidth: 280, maxWidth: 440);
@@ -27,9 +32,10 @@ class TimerScreen extends StatefulWidget {
   final String? legacySessionOwnerKey;
   final VoidCallback onOpenSettings;
 
-  /// Süre dolunca çağrılır; seans gönderilip sonuç bildirilince tamamlanır.
-  /// Ardından cihazdaki seans kaydı silinir.
-  final Future<void> Function(ActiveTimerSession session) onSessionCompleted;
+  /// Süre dolunca çağrılır; seans gönderilince sunucunun sonucuyla
+  /// tamamlanır (null: sonuç bilinmiyor). Sonuç seans sonu diyaloğunda
+  /// gösterilir, ardından cihazdaki seans kaydı silinir.
+  final Future<SessionSubmitResult?> Function(ActiveTimerSession session) onSessionCompleted;
 
   /// Sayaç başlayınca/devam edince (kalan dakikayla) ve durunca çağrılır.
   final void Function(bool isRunning, String categoryName, int minutesLeft)? onTimerStateChanged;
@@ -209,7 +215,10 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     unawaited(_lockScreen.clear());
     if (_isInForeground) {
       // Gösterilmiş bildirime dokunulmaz; yalnızca bekleyen iptal edilir.
+      // Bitiş, ekrana bakmayan kullanıcıya kısa titreşimle (bildirimler
+      // açıksa bildirim sesiyle de) duyurulur.
       unawaited(NotificationService.instance.cancelSessionEndNotification());
+      unawaited(NotificationService.instance.alertSessionEndInForeground());
     } else {
       // Android'de süreç arka planda yaşıyorsa seans burada biter; alarmın
       // gecikmesini beklemeden bildirim hemen gösterilir.
@@ -218,12 +227,14 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
 
     _resetToIdle();
     widget.onTimerStateChanged?.call(false, completed.categoryName, 0);
-    _showSessionCompletedDialog(completed.durationMinutes);
 
     final owner = widget.sessionOwnerKey;
-    final onCompleted = widget.onSessionCompleted;
+    // Diyalog gönderimin sonucunu bekler: kaydediliyor → puan/kum/seri,
+    // kuyruk ya da ret nedeni.
+    final submission = widget.onSessionCompleted(completed);
+    _showSessionCompletedDialog(completed.durationMinutes, submission);
     try {
-      await onCompleted(completed);
+      await submission;
       await _store.clear(owner, onlyClientUuid: completed.clientUuid);
     } catch (e) {
       // Kayıt silinmez: sonraki açılışta süresi dolmuş seans olarak yeniden gönderilir.
@@ -242,10 +253,30 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     });
   }
 
+  /// Aktif kategorilerde önce kimlikle, yoksa dilden bağımsız adla arar
+  /// ('Fizik' = 'Physics'): yer tutucudan sunucu kategorisine geçişte
+  /// İngilizce kullanıcının seçimi ilk kategoriye atlamaz.
   CourseCategory? _resolveCategory(String id, String name) {
     final active = widget.categories.where((c) => !c.isArchived);
-    return active.where((c) => c.id == id).firstOrNull ??
-        (name.isEmpty ? null : active.where((c) => c.name == name).firstOrNull);
+    final byId = active.where((c) => c.id == id).firstOrNull;
+    if (byId != null || name.trim().isEmpty) return byId;
+    final key = categoryMatchKey(name);
+    return active.where((c) => categoryMatchKey(c.name) == key).firstOrNull;
+  }
+
+  /// Sayaçta gösterilen kategori. Seans varken seansın kategorisi: aktif
+  /// listede yoksa (seans sürerken ya da uygulama kapalıyken arşivlendi)
+  /// seans kaydındaki ad ve renkle gösterilir.
+  CourseCategory? _displayCategory() {
+    final session = _session;
+    if (session == null) return _resolveCategory(selectedCategoryId, selectedCategoryName);
+    return _resolveCategory(session.categoryId, session.categoryName) ??
+        CourseCategory(
+          id: session.categoryId,
+          name: session.categoryName,
+          color: colorFromHex(session.categoryColorHex, fallback: AppColors.primaryContainer),
+          icon: Icons.book_outlined,
+        );
   }
 
   // Seans sürerken ya da duraklatılmışken seçim KİLİTLİDİR: kategori listesi
@@ -425,6 +456,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
         clientUuid: const Uuid().v4(),
         categoryId: category?.id ?? selectedCategoryId,
         categoryName: category?.name ?? selectedCategoryName,
+        categoryColorHex: category?.colorHex,
         durationMinutes: loggedMinutes,
         totalSeconds: totalSeconds,
         now: now,
@@ -526,10 +558,10 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     );
   }
 
-  void _showSessionCompletedDialog(int displayMinutes) {
+  void _showSessionCompletedDialog(int displayMinutes, Future<SessionSubmitResult?> result) {
     showDialog(
       context: context,
-      builder: (ctx) => SessionCompletedDialog(minutes: displayMinutes),
+      builder: (ctx) => SessionCompletedDialog(minutes: displayMinutes, result: result),
     );
   }
 
@@ -543,7 +575,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
         final seconds = (remaining % 60).toString().padLeft(2, '0');
         final isDark = Theme.of(context).brightness == Brightness.dark;
         final activeCategories = widget.categories.where((c) => !c.isArchived).toList();
-        final displayCategory = _resolveCategory(selectedCategoryId, selectedCategoryName);
+        final displayCategory = _displayCategory();
         final hasPauseCredit = _pauseCreditsLeft > 0;
 
         return Scaffold(
@@ -599,7 +631,12 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                   );
                 }
 
-                final categoryChips = [for (final cat in activeCategories) categoryChip(cat)];
+                // Seansın kategorisi arşivlendiyse kilitli, seçili çip olarak başta kalır.
+                final categoryChips = [
+                  if (displayCategory != null && !activeCategories.any((c) => c.id == displayCategory.id))
+                    categoryChip(displayCategory),
+                  for (final cat in activeCategories) categoryChip(cat),
+                ];
 
                 // Ders/kategori başlığı ve düzenleme kısayolu. [inline]: yatay
                 // kaydırılan çip satırının başında (genişlik sınırsız).
@@ -962,16 +999,171 @@ class _TimerLayout {
   final Alignment controlsAlignment;
 }
 
-/// Seans tamamlanınca gösterilen tebrik diyaloğu.
-class SessionCompletedDialog extends StatelessWidget {
+/// Seans tamamlanınca gösterilen diyalog. [result] verilirse sunucunun
+/// sonucunu bekler: önce "kaydediliyor", sonra kazanılan puan, kum ve seri
+/// (yalnızca RPC sonucundan; istemcide formül yok), kuyruk ya da ret
+/// nedeni. Sonuç [resultTimeout] içinde gelmezse "cihazda kayıtlı, bağlantı
+/// gelince gönderilecek" gösterilir; sonuç sonradan gelirse güncellenir.
+class SessionCompletedDialog extends StatefulWidget {
   final int minutes;
 
-  const SessionCompletedDialog({super.key, required this.minutes});
+  /// Gönderimin sonucu (null değer: sonuç bilinmiyor, seans cihazda).
+  final Future<SessionSubmitResult?>? result;
+  final Duration resultTimeout;
+
+  const SessionCompletedDialog({
+    super.key,
+    required this.minutes,
+    this.result,
+    this.resultTimeout = const Duration(seconds: 8),
+  });
+
+  @override
+  State<SessionCompletedDialog> createState() => _SessionCompletedDialogState();
+}
+
+class _SessionCompletedDialogState extends State<SessionCompletedDialog> {
+  bool _waiting = false;
+  bool _timedOut = false;
+  SessionSubmitResult? _result;
+  Timer? _timeoutTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    final future = widget.result;
+    if (future == null) return;
+    _waiting = true;
+    _timeoutTimer = Timer(widget.resultTimeout, () {
+      if (mounted && _waiting) setState(() => _timedOut = true);
+    });
+    future.then<void>(
+      _finish,
+      // Gönderim hata verdiyse seans cihazda kalır ve sonra yeniden
+      // gönderilir (bkz. TimerScreen._completeSession).
+      onError: (Object _) => _finish(null),
+    );
+  }
+
+  void _finish(SessionSubmitResult? result) {
+    _timeoutTimer?.cancel();
+    if (!mounted) return;
+    setState(() {
+      _waiting = false;
+      _result = result;
+    });
+  }
+
+  @override
+  void dispose() {
+    _timeoutTimer?.cancel();
+    super.dispose();
+  }
+
+  void _openRejectedSessions() {
+    final navigator = Navigator.of(context);
+    navigator.pop();
+    unawaited(navigator.push(rejectedSessionsRoute()));
+  }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isTurkish = LanguageService.instance.isTurkish;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final muted = isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant;
+    final accent = isDark ? AppColors.darkPrimary : AppColors.primary;
+    final rejected = _result is SessionSubmitRejected;
+
+    Widget message(String text, IconData icon, Color color) => Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, size: 18, color: color),
+            const SizedBox(width: 8),
+            Expanded(child: Text(text, style: TextStyle(fontSize: 13, height: 1.4, color: muted))),
+          ],
+        );
+
+    Widget chip(IconData icon, String text) => Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: accent.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 16, color: accent),
+              const SizedBox(width: 4),
+              Flexible(
+                child: Text(text, style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: accent)),
+              ),
+            ],
+          ),
+        );
+
+    final queuedOffline = message(l10n.sessionQueuedOffline, Icons.cloud_upload_outlined, muted);
+    final List<Widget> status = switch (_result) {
+      _ when widget.result == null => const [],
+      _ when _waiting && !_timedOut => [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox.square(dimension: 16, child: CircularProgressIndicator(strokeWidth: 2, color: accent)),
+              const SizedBox(width: 10),
+              Flexible(child: Text(l10n.sessionResultSaving, style: TextStyle(fontSize: 13, color: muted))),
+            ],
+          ),
+        ],
+      null => [queuedOffline],
+      SessionSubmitSuccess(duplicate: true) => [
+          message(l10n.sessionResultDuplicate, Icons.check_circle_outline_rounded, accent),
+        ],
+      SessionSubmitSuccess(
+        :final basePoints,
+        :final bonusPoints,
+        :final bonusPct,
+        :final totalPoints,
+        :final coinsEarned,
+        :final streak,
+        :final dailyLimitReached,
+      ) =>
+        [
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              if (totalPoints > 0) chip(Icons.star_rounded, l10n.sessionResultPoints(totalPoints)),
+              if (coinsEarned > 0) chip(Icons.hourglass_bottom_rounded, l10n.sessionResultCoins(coinsEarned)),
+              if (streak != null && streak > 0) chip(Icons.local_fire_department_rounded, l10n.sessionResultStreak(streak)),
+            ],
+          ),
+          if (bonusPoints > 0 && !dailyLimitReached) ...[
+            const SizedBox(height: 10),
+            Text(
+              l10n.sessionPointsBreakdown(basePoints, bonusPoints, bonusPct, totalPoints),
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 12, color: muted),
+            ),
+          ],
+          if (dailyLimitReached) ...[
+            const SizedBox(height: 10),
+            message(l10n.sessionDailyLimitReached(sessionDailyLimit()), Icons.info_outline_rounded, accent),
+          ],
+        ],
+      SessionSubmitQueued(:final reasonCode) => [
+          message(sessionQueuedMessage(l10n, reasonCode), Icons.cloud_upload_outlined, muted),
+        ],
+      SessionSubmitRejected(:final reasonCode) => [
+          message(sessionRejectionMessage(l10n, reasonCode), Icons.error_outline_rounded, Colors.orange.shade800),
+          const SizedBox(height: 4),
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: TextButton(onPressed: _openRejectedSessions, child: Text(l10n.rejectedSessionsTitle)),
+          ),
+        ],
+    };
 
     return AlertDialog(
       // Yatay telefonda dikeyde sığmazsa kayar; tablette makul genişlikte kalır.
@@ -981,10 +1173,12 @@ class SessionCompletedDialog extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       title: Column(
         children: [
-          const Icon(Icons.stars_rounded, color: Colors.amber, size: 48),
+          rejected
+              ? Icon(Icons.cloud_off_rounded, color: Colors.orange.shade800, size: 48)
+              : const Icon(Icons.stars_rounded, color: Colors.amber, size: 48),
           const SizedBox(height: 16),
           Text(
-            isTurkish ? 'Tebrikler! 🎉' : 'Congratulations! 🎉',
+            rejected ? l10n.sessionNotSavedTitle : (isTurkish ? 'Tebrikler! 🎉' : 'Congratulations! 🎉'),
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 22,
@@ -994,16 +1188,26 @@ class SessionCompletedDialog extends StatelessWidget {
           ),
         ],
       ),
-      content: Text(
-        isTurkish
-            ? '$minutes dakikalık odaklanma seansını\nbaşarıyla tamamladın! ⏳'
-            : 'You successfully completed a $minutes-minute\nfocus session! ⏳',
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          fontSize: 14,
-          color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
-          height: 1.5,
-        ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (!rejected)
+            Text(
+              isTurkish
+                  ? '${widget.minutes} dakikalık odaklanma seansını\nbaşarıyla tamamladın! ⏳'
+                  : 'You successfully completed a ${widget.minutes}-minute\nfocus session! ⏳',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14, color: muted, height: 1.5),
+            ),
+          if (status.isNotEmpty) ...[
+            if (!rejected) const SizedBox(height: 16),
+            // Sonuç geldiğinde içerik yumuşakça değişir.
+            AnimatedSize(
+              duration: const Duration(milliseconds: 200),
+              child: Column(mainAxisSize: MainAxisSize.min, children: status),
+            ),
+          ],
+        ],
       ),
       actionsAlignment: MainAxisAlignment.center,
       actions: [
@@ -1021,7 +1225,7 @@ class SessionCompletedDialog extends StatelessWidget {
               elevation: 0,
             ),
             child: Text(
-              isTurkish ? 'Harika!' : 'Awesome!',
+              rejected ? l10n.sessionResultOk : (isTurkish ? 'Harika!' : 'Awesome!'),
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ),

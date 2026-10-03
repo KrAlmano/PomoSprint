@@ -8,6 +8,7 @@ import '../widgets/avatar_widget.dart';
 import '../widgets/social/load_error_view.dart';
 import '../widgets/social/user_safety.dart';
 import '../services/hidden_users.dart';
+import '../services/language_service.dart';
 import '../services/supabase_service.dart';
 import '../theme.dart';
 import '../utils/responsive.dart';
@@ -23,6 +24,16 @@ class SocialScreen extends StatefulWidget {
       for (final r in rows)
         if (!hidden.isHidden(id: r['id']?.toString(), name: r['name']?.toString())) r,
     ];
+  }
+
+  /// Canlı çalışan satırının alt yazısı; hazır kategori adı arayüz dilinde
+  /// ('Fizik' İngilizce arayüzde 'Physics').
+  @visibleForTesting
+  static String liveStatusText(Map<String, dynamic> user, AppLocalizations l10n) {
+    final category = (user['category_name'] ?? user['active_session_category_name'])?.toString().trim() ?? '';
+    return category.isEmpty
+        ? l10n.socialFocusing
+        : l10n.socialFocusingOn(LanguageService.instance.translateCatName(category));
   }
 
   @override
@@ -265,7 +276,6 @@ class _SocialScreenState extends State<SocialScreen> with WidgetsBindingObserver
 
   Widget _buildActiveUserItem(Map<String, dynamic> user, AppLocalizations l10n, bool isDark) {
     final name = user['name']?.toString() ?? l10n.userDefault;
-    final category = (user['category_name'] ?? user['active_session_category_name'])?.toString().trim() ?? '';
 
     final card = Container(
       padding: const EdgeInsets.fromLTRB(12, 12, 4, 12),
@@ -291,7 +301,7 @@ class _SocialScreenState extends State<SocialScreen> with WidgetsBindingObserver
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  category.isEmpty ? l10n.socialFocusing : l10n.socialFocusingOn(category),
+                  SocialScreen.liveStatusText(user, l10n),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(

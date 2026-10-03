@@ -32,6 +32,11 @@ class HistoryScreen extends StatefulWidget {
   final Future<void> Function() onRefresh;
   final VoidCallback? onStartTimer;
 
+  /// Sunucunun reddettiği seans sayısı; 0'dan büyükse listenin sonunda
+  /// "Kaydedilemeyen seanslar" bağlantısı görünür.
+  final int rejectedSessionCount;
+  final VoidCallback? onShowRejectedSessions;
+
   const HistoryScreen({
     super.key,
     required this.sessions,
@@ -40,6 +45,8 @@ class HistoryScreen extends StatefulWidget {
     required this.categories,
     required this.onRefresh,
     this.onStartTimer,
+    this.rejectedSessionCount = 0,
+    this.onShowRejectedSessions,
   });
 
   @override
@@ -99,6 +106,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
               // 4. Ders bazında haftalık analiz
               _buildWeeklyAnalysis(subjects),
+
+              // 5. Kaydedilemeyen (sunucunun reddettiği) seanslar
+              if (widget.rejectedSessionCount > 0 && widget.onShowRejectedSessions != null) ...[
+                const SizedBox(height: 16),
+                Center(
+                  child: TextButton.icon(
+                    onPressed: widget.onShowRejectedSessions,
+                    icon: const Icon(Icons.cloud_off_rounded, size: 18),
+                    label: Text(AppLocalizations.of(context)!.rejectedSessionsLink(widget.rejectedSessionCount)),
+                  ),
+                ),
+              ],
               SizedBox(height: layout.bottomSpacing(100)),
             ],
           );

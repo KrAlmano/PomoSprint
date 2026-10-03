@@ -453,37 +453,83 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get sessionResultSaving => 'Saving your session…';
+
+  @override
+  String sessionResultPoints(int points) {
+    return '+$points pts';
+  }
+
+  @override
+  String sessionResultCoins(int coins) {
+    return '+$coins sand';
+  }
+
+  @override
+  String sessionResultStreak(int days) {
+    return '$days-day streak';
+  }
+
+  @override
+  String get sessionResultDuplicate =>
+      'This session was already saved; its points were added earlier.';
+
+  @override
+  String get sessionResultOk => 'OK';
+
+  @override
+  String get sessionNotSavedTitle => 'Session not saved';
+
+  @override
   String get sessionQueuedOffline =>
-      '⚠️ Couldn\'t save the session to the cloud right now. It will sync automatically once you\'re back online.';
+      'Session saved on your device; it will sync automatically once you\'re back online. To earn points and sand, get online within 24 hours.';
 
   @override
   String get sessionQueuedClockSkew =>
-      '⚠️ Session on hold: your device clock seems different from the server\'s. Check your time settings; the session will be retried automatically.';
+      'Session on hold: your device clock seems different from the server\'s. Check your time settings; the session will be retried automatically.';
 
   @override
   String get sessionQueuedOverlap =>
-      '⚠️ This session overlaps an earlier record; it\'s on hold and will be retried later.';
+      'This session overlaps an earlier record; it\'s on hold and will be retried later.';
 
   @override
   String get sessionRejectedTooOld =>
-      '⚠️ This session couldn\'t be saved because it\'s older than 24 hours.';
+      'This session couldn\'t be saved because it\'s older than 24 hours.';
 
   @override
   String get sessionRejectedClock =>
-      '⚠️ This session couldn\'t be saved: your device clock seems to be ahead. Check your time settings.';
+      'This session couldn\'t be saved: your device clock seems to be ahead. Check your time settings.';
 
   @override
   String get sessionRejectedOverlap =>
-      '⚠️ This session couldn\'t be saved: another session is already recorded for the same time.';
+      'This session couldn\'t be saved: another session is already recorded for the same time.';
 
   @override
   String get sessionRejectedGeneric =>
-      '⚠️ This session couldn\'t be saved: it failed server validation.';
+      'This session couldn\'t be saved: it failed server validation.';
 
   @override
   String rejectedSessionsNotice(int count) {
     return '⚠️ $count pending session(s) were rejected by the server and couldn\'t be saved.';
   }
+
+  @override
+  String get rejectedSessionsTitle => 'Unsaved sessions';
+
+  @override
+  String get rejectedSessionsInfo =>
+      'Sessions the server didn\'t accept are listed here; they don\'t count toward points, sand or your streak. The last 50 are kept on this device.';
+
+  @override
+  String get rejectedSessionsEmpty => 'No unsaved sessions.';
+
+  @override
+  String rejectedSessionsLink(int count) {
+    return 'Unsaved sessions ($count)';
+  }
+
+  @override
+  String get rejectedSessionsView => 'View';
 
   @override
   String get pausedSessionExpired =>
@@ -507,7 +553,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String notifSessionDoneBody(String category) {
-    return 'Your $category session is done. Open the app to see your points.';
+    return 'Your $category session is done. Open the app within 24 hours to earn your points and sand.';
   }
 
   @override
@@ -544,7 +590,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lockTimerStatusDone => 'Session complete';
 
   @override
-  String get lockTimerDoneHint => 'Open PomoSprint to save your session.';
+  String get lockTimerDoneHint =>
+      'Open PomoSprint within 24 hours to save your session.';
 
   @override
   String get statsLoadErrorTitle => 'Couldn\'t load your stats';

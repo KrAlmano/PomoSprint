@@ -96,13 +96,21 @@ struct PomoSprintTimerLiveActivity: Widget {
           .padding(.horizontal, 4)
         }
       } compactLeading: {
-        Image(systemName: phase.symbolName)
+        // Süre dolunca solda uygulama simgesi (kum saati), sağda onay işareti.
+        Image(systemName: phase == .finished ? TimerPhase.running.symbolName : phase.symbolName)
           .foregroundStyle(accent)
       } compactTrailing: {
-        TimerClock(state: state, phase: phase)
-          .font(.system(size: 14, weight: .semibold, design: .rounded))
-          .foregroundStyle(accent)
-          .frame(width: 46, alignment: .trailing)
+        if phase == .finished {
+          // "00:00" yerine onay işareti (context.isStale ya da endsAt geçti).
+          Image(systemName: "checkmark.circle.fill")
+            .font(.system(size: 14, weight: .semibold))
+            .foregroundStyle(accent)
+        } else {
+          TimerClock(state: state, phase: phase)
+            .font(.system(size: 14, weight: .semibold, design: .rounded))
+            .foregroundStyle(accent)
+            .frame(width: 46, alignment: .trailing)
+        }
       } minimal: {
         Image(systemName: phase.symbolName)
           .foregroundStyle(accent)

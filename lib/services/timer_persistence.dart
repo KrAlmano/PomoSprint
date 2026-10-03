@@ -24,6 +24,7 @@ class ActiveTimerSession {
     required this.clientUuid,
     required this.categoryId,
     required this.categoryName,
+    this.categoryColorHex,
     required this.durationMinutes,
     required this.totalSeconds,
     required this.startedAt,
@@ -42,6 +43,11 @@ class ActiveTimerSession {
   /// göndermeden önce isimle eşler).
   final String categoryId;
   final String categoryName;
+
+  /// Seans başladığındaki kategori rengi ('#RRGGBB'). Kategori seans
+  /// sürerken (ya da uygulama kapalıyken) arşivlenirse sayaç seansı yine bu
+  /// ad ve renkle gösterir. Eski kayıtlarda yoktur.
+  final String? categoryColorHex;
 
   /// Sunucuya bildirilen süre (25/50).
   final int durationMinutes;
@@ -64,6 +70,7 @@ class ActiveTimerSession {
     required String clientUuid,
     required String categoryId,
     required String categoryName,
+    String? categoryColorHex,
     required int durationMinutes,
     required int totalSeconds,
     required DateTime now,
@@ -72,6 +79,7 @@ class ActiveTimerSession {
       clientUuid: clientUuid,
       categoryId: categoryId,
       categoryName: categoryName,
+      categoryColorHex: categoryColorHex,
       durationMinutes: durationMinutes,
       totalSeconds: totalSeconds,
       startedAt: now,
@@ -132,6 +140,7 @@ class ActiveTimerSession {
       clientUuid: clientUuid,
       categoryId: categoryId,
       categoryName: categoryName,
+      categoryColorHex: categoryColorHex,
       durationMinutes: durationMinutes,
       totalSeconds: totalSeconds,
       startedAt: startedAt,
@@ -146,6 +155,7 @@ class ActiveTimerSession {
         'client_uuid': clientUuid,
         'category_id': categoryId,
         'category_name': categoryName,
+        if (categoryColorHex != null) 'category_color': categoryColorHex,
         'duration_minutes': durationMinutes,
         'total_seconds': totalSeconds,
         'started_at': startedAt.toUtc().toIso8601String(),
@@ -173,6 +183,7 @@ class ActiveTimerSession {
       clientUuid: uuid,
       categoryId: categoryId,
       categoryName: json['category_name']?.toString() ?? '',
+      categoryColorHex: json['category_color'] is String ? json['category_color'] as String : null,
       durationMinutes: minutes,
       totalSeconds: total,
       startedAt: startedAt.toLocal(),

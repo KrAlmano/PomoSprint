@@ -22,6 +22,7 @@ import '../widgets/stats/stats_load_state.dart';
 import '../widgets/stats/stats_text.dart';
 import 'history_screen.dart';
 import 'monthly_tracking_screen.dart';
+import 'rejected_sessions_screen.dart';
 
 /// Raporlar sekmesi: Günlük / Haftalık / Aylık. Seans verisi tek yerde (bu
 /// ekranda) yüklenir ve alt sekmelere parametre olarak verilir.
@@ -68,6 +69,9 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
   /// Cihazdaki bekleyen seans kuyruğu (ham). İstatistiğe girenler build'de
   /// [pendingStatSessions] ile seçilir.
   List<PendingSession> _pendingQueue = const [];
+
+  /// Sunucunun kalıcı olarak reddettiği (cihazda listelenen) seans sayısı.
+  int _rejectedCount = 0;
 
   /// Gösterilecek veri var (sunucu verisi ya da en azından bekleyenler).
   bool _hasLoaded = false;
@@ -206,6 +210,7 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
       _userId = userId;
       _remoteSessions = const [];
       _pendingQueue = const [];
+      _rejectedCount = 0;
       _hasLoaded = false;
       _remoteLoaded = false;
       _loadError = null;
@@ -252,6 +257,7 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
     // birden olursa client_uuid ile tekilleşir, hiçbirinde olmama durumu
     // oluşmaz.
     final queue = await _readQueue();
+    final rejectedCount = await _readRejectedCount();
     try {
       await _ensureDateFormatting();
       // Aylık sekme önceki ayın aynı dönemini ve ayın ilk haftasının
@@ -266,6 +272,7 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
       setState(() {
         _remoteSessions = remote.map(StatSession.fromStudySession).toList(growable: false);
         _pendingQueue = queue;
+        _rejectedCount = rejectedCount;
         _hasLoaded = true;
         _remoteLoaded = true;
         _loadError = null;
@@ -281,6 +288,7 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
       setState(() {
         _loadError = serviceErrorCodeOf(e);
         _pendingQueue = queue;
+        _rejectedCount = rejectedCount;
         if (delivered.isNotEmpty) _remoteSessions = [..._remoteSessions, ...delivered];
         // Sunucu verisi hiç alınamadıysa bekleyenler yine de gösterilir.
         if (!_hasLoaded && queue.isNotEmpty) {
@@ -297,6 +305,15 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
     } catch (e) {
       debugPrint('Bekleyen seanslar okunamadı: $e');
       return _pendingQueue;
+    }
+  }
+
+  Future<int> _readRejectedCount() async {
+    try {
+      return (await _service.getRejectedSessions()).length;
+    } catch (e) {
+      debugPrint('Reddedilen seanslar okunamadı: $e');
+      return _rejectedCount;
     }
   }
 
@@ -427,6 +444,8 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
           categories: widget.categories,
           onRefresh: _refresh,
           onStartTimer: widget.onStartTimer,
+          rejectedSessionCount: _rejectedCount,
+          onShowRejectedSessions: () => openRejectedSessions(context),
         ),
       _ => MonthlyTrackingScreen(
           sessions: sessions,

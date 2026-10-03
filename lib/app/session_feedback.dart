@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.dart';
+import '../screens/rejected_sessions_screen.dart';
 import '../services/supabase_service.dart';
-import '../theme.dart';
 
 /// Kalıcı ret nedeninin kullanıcı metni.
 String sessionRejectionMessage(AppLocalizations l10n, String reasonCode) => switch (reasonCode) {
@@ -12,62 +12,31 @@ String sessionRejectionMessage(AppLocalizations l10n, String reasonCode) => swit
       _ => l10n.sessionRejectedGeneric,
     };
 
-/// Kuyrukta bekletilen seansın kullanıcı metni.
+/// Kuyrukta bekletilen seansın kullanıcı metni (ağ, zaman aşımı, oturum ve
+/// sunucu hatasında "cihazda kayıtlı, bağlantı gelince gönderilecek").
 String sessionQueuedMessage(AppLocalizations l10n, String reasonCode) => switch (reasonCode) {
       SessionReason.clockSkew => l10n.sessionQueuedClockSkew,
       SessionReason.overlap => l10n.sessionQueuedOverlap,
       _ => l10n.sessionQueuedOffline,
     };
 
-/// Seans gönderiminin sonucunu SnackBar ile bildirir.
-void showSessionResult(BuildContext context, SessionSubmitResult result) {
-  final l10n = AppLocalizations.of(context)!;
-  final messenger = ScaffoldMessenger.of(context);
-  switch (result) {
-    case SessionSubmitSuccess(
-        :final basePoints,
-        :final bonusPoints,
-        :final totalPoints,
-        :final bonusPct,
-        :final dailyLimitReached,
-      ):
-      if (bonusPoints > 0) {
-        messenger.clearSnackBars();
-        messenger.showSnackBar(SnackBar(
-          content: Text(l10n.sessionPointsBreakdown(basePoints, bonusPoints, bonusPct, totalPoints)),
-          backgroundColor: Colors.green.shade700,
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 4),
-        ));
-      }
-      if (dailyLimitReached) {
-        Future.delayed(const Duration(seconds: 1), () {
-          if (!messenger.mounted) return;
-          messenger.showSnackBar(SnackBar(
-            content: Text(l10n.sessionDailyLimitReached(SupabaseService.instance.dailySessionLimit)),
-            backgroundColor: AppColors.primaryContainer,
-            behavior: SnackBarBehavior.floating,
-            duration: const Duration(seconds: 5),
-          ));
-        });
-      }
-    case SessionSubmitQueued(:final reasonCode):
-      _showWarning(messenger, sessionQueuedMessage(l10n, reasonCode));
-    case SessionSubmitRejected(:final reasonCode):
-      _showWarning(messenger, sessionRejectionMessage(l10n, reasonCode));
-  }
-}
+/// Günde puan ve kum kazandıran en fazla seans sayısı (sunucu config'i).
+int sessionDailyLimit() => SupabaseService.instance.dailySessionLimit;
 
-/// Arka planda (kuyruk senkronunda) reddedilen seansları bir kez bildirir.
+/// Arka planda (kuyruk senkronunda) reddedilen seansları bir kez bildirir;
+/// "Göster" kaydedilemeyen seanslar listesini açar.
 void showRejectedSessionsNotice(BuildContext context, int count) {
-  _showWarning(ScaffoldMessenger.of(context), AppLocalizations.of(context)!.rejectedSessionsNotice(count));
-}
-
-void _showWarning(ScaffoldMessengerState messenger, String message) {
-  messenger.showSnackBar(SnackBar(
-    content: Text(message),
+  final l10n = AppLocalizations.of(context)!;
+  final navigator = Navigator.of(context);
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    content: Text(l10n.rejectedSessionsNotice(count)),
     backgroundColor: Colors.orange.shade800,
     behavior: SnackBarBehavior.floating,
-    duration: const Duration(seconds: 5),
+    duration: const Duration(seconds: 6),
+    action: SnackBarAction(
+      label: l10n.rejectedSessionsView,
+      textColor: Colors.white,
+      onPressed: () => navigator.push(rejectedSessionsRoute()),
+    ),
   ));
 }

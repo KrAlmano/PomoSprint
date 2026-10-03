@@ -251,8 +251,9 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
 
   /// Seans önce cihazdaki kuyruğa yazılır, sonra (bekleyen eski seanslarla
   /// birlikte, başlangıç sırasıyla) gönderilir. Başarıda servis kullanıcıyı
-  /// günceller.
-  Future<void> _onSessionCompleted(ActiveTimerSession session) async {
+  /// günceller. Sonucu (puan, kum, seri, kuyruk ya da ret nedeni) sayaç
+  /// ekranının seans sonu diyaloğu gösterir.
+  Future<SessionSubmitResult?> _onSessionCompleted(ActiveTimerSession session) async {
     final result = await _service.submitCompletedSession(
       clientUuid: session.clientUuid,
       categoryId: session.categoryId,
@@ -262,12 +263,12 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
       foregroundSeconds: session.foregroundSeconds,
       startedAt: session.startedAt,
     );
-    if (!mounted) return;
-    showSessionResult(context, result);
+    if (!mounted) return result;
     // Ağ/sunucu yüzünden kuyrukta kaldıysa kendiliğinden yeniden denenir
     // (yalnızca çakışma nedeniyle bekleyen seans için anlamsız).
     if (result is SessionSubmitQueued && result.reasonCode != SessionReason.overlap) _scheduleSyncRetry();
-    await _showRejectedNotices();
+    unawaited(_showRejectedNotices());
+    return result;
   }
 
   Future<void> _logout() async {

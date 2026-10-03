@@ -53,7 +53,7 @@ void main() {
         categories: [category],
         sessionOwnerKey: owner,
         onOpenSettings: () {},
-        onSessionCompleted: (_) async {},
+        onSessionCompleted: (_) async => null,
         lockScreenTimer: lockScreen,
       ),
     ));

@@ -794,46 +794,88 @@ abstract class AppLocalizations {
   /// **'Bugünlük puan ve kum sınırına ulaştın ({limit} seans). Sonraki seanslar yalnızca çalışma süresine ve serine eklenir.'**
   String sessionDailyLimitReached(int limit);
 
+  /// No description provided for @sessionResultSaving.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seans kaydediliyor…'**
+  String get sessionResultSaving;
+
+  /// No description provided for @sessionResultPoints.
+  ///
+  /// In tr, this message translates to:
+  /// **'+{points} puan'**
+  String sessionResultPoints(int points);
+
+  /// No description provided for @sessionResultCoins.
+  ///
+  /// In tr, this message translates to:
+  /// **'+{coins} kum'**
+  String sessionResultCoins(int coins);
+
+  /// No description provided for @sessionResultStreak.
+  ///
+  /// In tr, this message translates to:
+  /// **'{days} günlük seri'**
+  String sessionResultStreak(int days);
+
+  /// No description provided for @sessionResultDuplicate.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu seans zaten kaydedilmişti; puanların daha önce eklendi.'**
+  String get sessionResultDuplicate;
+
+  /// No description provided for @sessionResultOk.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tamam'**
+  String get sessionResultOk;
+
+  /// No description provided for @sessionNotSavedTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seans kaydedilemedi'**
+  String get sessionNotSavedTitle;
+
   /// No description provided for @sessionQueuedOffline.
   ///
   /// In tr, this message translates to:
-  /// **'⚠️ Seans şu an buluta kaydedilemedi, bağlantı gelince otomatik gönderilecek.'**
+  /// **'Seans cihazına kaydedildi; bağlantı gelince otomatik gönderilecek. Puan ve kum için 24 saat içinde çevrimiçi olman gerekiyor.'**
   String get sessionQueuedOffline;
 
   /// No description provided for @sessionQueuedClockSkew.
   ///
   /// In tr, this message translates to:
-  /// **'⚠️ Seans bekletiliyor: cihazının saati sunucudan farklı görünüyor. Saat ayarını kontrol et; seans otomatik olarak yeniden denenecek.'**
+  /// **'Seans bekletiliyor: cihazının saati sunucudan farklı görünüyor. Saat ayarını kontrol et; seans otomatik olarak yeniden denenecek.'**
   String get sessionQueuedClockSkew;
 
   /// No description provided for @sessionQueuedOverlap.
   ///
   /// In tr, this message translates to:
-  /// **'⚠️ Seans önceki bir kayıtla çakışıyor; bekletiliyor ve daha sonra yeniden denenecek.'**
+  /// **'Seans önceki bir kayıtla çakışıyor; bekletiliyor ve daha sonra yeniden denenecek.'**
   String get sessionQueuedOverlap;
 
   /// No description provided for @sessionRejectedTooOld.
   ///
   /// In tr, this message translates to:
-  /// **'⚠️ Bu seans 24 saatten eski olduğu için kaydedilemedi.'**
+  /// **'Bu seans 24 saatten eski olduğu için kaydedilemedi.'**
   String get sessionRejectedTooOld;
 
   /// No description provided for @sessionRejectedClock.
   ///
   /// In tr, this message translates to:
-  /// **'⚠️ Bu seans kaydedilemedi: cihazının saati ileri görünüyor. Saat ayarını kontrol et.'**
+  /// **'Bu seans kaydedilemedi: cihazının saati ileri görünüyor. Saat ayarını kontrol et.'**
   String get sessionRejectedClock;
 
   /// No description provided for @sessionRejectedOverlap.
   ///
   /// In tr, this message translates to:
-  /// **'⚠️ Bu seans kaydedilemedi: aynı zaman aralığında kayıtlı başka bir seans var.'**
+  /// **'Bu seans kaydedilemedi: aynı zaman aralığında kayıtlı başka bir seans var.'**
   String get sessionRejectedOverlap;
 
   /// No description provided for @sessionRejectedGeneric.
   ///
   /// In tr, this message translates to:
-  /// **'⚠️ Bu seans kaydedilemedi: sunucu doğrulamasından geçmedi.'**
+  /// **'Bu seans kaydedilemedi: sunucu doğrulamasından geçmedi.'**
   String get sessionRejectedGeneric;
 
   /// No description provided for @rejectedSessionsNotice.
@@ -841,6 +883,36 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'⚠️ Bekleyen {count} seans sunucu tarafından reddedildi ve kaydedilemedi.'**
   String rejectedSessionsNotice(int count);
+
+  /// No description provided for @rejectedSessionsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydedilemeyen seanslar'**
+  String get rejectedSessionsTitle;
+
+  /// No description provided for @rejectedSessionsInfo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sunucunun kabul etmediği seanslar burada listelenir; puana, kuma ve seriye eklenmezler. Bu cihazda son 50 kayıt tutulur.'**
+  String get rejectedSessionsInfo;
+
+  /// No description provided for @rejectedSessionsEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydedilemeyen seans yok.'**
+  String get rejectedSessionsEmpty;
+
+  /// No description provided for @rejectedSessionsLink.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydedilemeyen seanslar ({count})'**
+  String rejectedSessionsLink(int count);
+
+  /// No description provided for @rejectedSessionsView.
+  ///
+  /// In tr, this message translates to:
+  /// **'Göster'**
+  String get rejectedSessionsView;
 
   /// No description provided for @pausedSessionExpired.
   ///
@@ -881,7 +953,7 @@ abstract class AppLocalizations {
   /// No description provided for @notifSessionDoneBody.
   ///
   /// In tr, this message translates to:
-  /// **'{category} seansın bitti. Puanlarını görmek için uygulamaya dön.'**
+  /// **'{category} seansın bitti. Puan ve kum kazanman için 24 saat içinde uygulamayı aç.'**
   String notifSessionDoneBody(String category);
 
   /// No description provided for @notifChannelName.
@@ -941,7 +1013,7 @@ abstract class AppLocalizations {
   /// No description provided for @lockTimerDoneHint.
   ///
   /// In tr, this message translates to:
-  /// **'Seansını kaydetmek için PomoSprint\'i aç.'**
+  /// **'Seansını kaydetmek için 24 saat içinde PomoSprint\'i aç.'**
   String get lockTimerDoneHint;
 
   /// No description provided for @statsLoadErrorTitle.

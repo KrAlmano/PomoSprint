@@ -1,7 +1,7 @@
 import 'dart:ui' show Color;
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart' show PlatformException;
+import 'package:flutter/services.dart' show HapticFeedback, PlatformException;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -173,6 +173,52 @@ class NotificationService {
     }
   }
 
+  /// Uygulama ön plandayken biten seans: kısa titreşim; bildirim tercihi
+  /// açıksa bitiş bildiriminin sesi de çalar. iOS'ta afiş gösterilmez
+  /// (yalnızca ses), Android'de bildirim birkaç saniye sonra kendiliğinden
+  /// kalkar. Tercih kapalıysa yalnızca titreşim.
+  Future<void> alertSessionEndInForeground() => runForegroundSessionEndAlert(
+        vibrate: HapticFeedback.vibrate,
+        notificationsEnabled: isEnabled,
+        playSound: _playSessionEndSound,
+      );
+
+  Future<void> _playSessionEndSound() async {
+    if (!await _ready()) return;
+    final l10n = _l10n();
+    try {
+      await _plugin.cancelAllPendingNotifications();
+      await _plugin.show(
+        id: _sessionEndId,
+        title: l10n.notifSessionDoneTitle,
+        notificationDetails: NotificationDetails(
+          android: AndroidNotificationDetails(
+            _channelId,
+            l10n.notifChannelName,
+            channelDescription: l10n.notifChannelDescription,
+            importance: Importance.max,
+            priority: Priority.high,
+            color: _brandColor,
+            timeoutAfter: _foregroundAlertTimeout.inMilliseconds,
+          ),
+          iOS: _foregroundDarwinDetails,
+          macOS: _foregroundDarwinDetails,
+        ),
+      );
+    } catch (e) {
+      debugPrint('[NOTIF] Bitiş sesi çalınamadı: $e');
+    }
+  }
+
+  static const Duration _foregroundAlertTimeout = Duration(seconds: 5);
+  static const DarwinNotificationDetails _foregroundDarwinDetails = DarwinNotificationDetails(
+    presentAlert: false,
+    presentBanner: false,
+    presentList: false,
+    presentBadge: false,
+    presentSound: true,
+  );
+
   /// Android: süren seansın kalıcı (kaydırılarak kapatılamayan) bildirimi;
   /// kilit ekranında içeriğiyle görünür. [countdownTo] verilirse o ana geri
   /// sayan kronometre gösterilir. [timeout] dolunca bildirim kendiliğinden
@@ -264,4 +310,20 @@ class NotificationService {
       macOS: darwin,
     );
   }
+}
+
+/// [NotificationService.alertSessionEndInForeground] kuralı: titreşim her
+/// zaman; ses yalnızca kullanıcının bildirim tercihi açıkken.
+@visibleForTesting
+Future<void> runForegroundSessionEndAlert({
+  required Future<void> Function() vibrate,
+  required Future<bool> Function() notificationsEnabled,
+  required Future<void> Function() playSound,
+}) async {
+  try {
+    await vibrate();
+  } catch (e) {
+    debugPrint('[NOTIF] Titreşim çalışmadı: $e');
+  }
+  if (await notificationsEnabled()) await playSound();
 }

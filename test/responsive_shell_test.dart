@@ -9,6 +9,7 @@ import 'package:pomodoro/screens/post_auth_onboarding_screen.dart';
 import 'package:pomodoro/screens/register_screen.dart';
 import 'package:pomodoro/screens/splash_screen.dart';
 import 'package:pomodoro/screens/timer_screen.dart';
+import 'package:pomodoro/services/session_queue.dart';
 import 'package:pomodoro/services/timer_persistence.dart';
 import 'package:pomodoro/theme.dart';
 import 'package:pomodoro/utils/responsive.dart';
@@ -349,7 +350,7 @@ void main() {
             categories: categories,
             sessionOwnerKey: owner,
             onOpenSettings: () {},
-            onSessionCompleted: (_) async {},
+            onSessionCompleted: (_) async => null,
           );
 
       Future<void> unmount() async {
@@ -445,21 +446,43 @@ void main() {
         );
 
     testWidgets('tebrik diyaloğu taşmaz ve geniş ekranda dar kalır', (tester) async {
-      for (final size in _targetSizes) {
-        for (final scale in [1.0, 2.0]) {
-          final label = '$size x$scale';
-          await _pumpAt(tester, size, opener(() => const SessionCompletedDialog(minutes: 25)), textScale: scale);
-          await tester.tap(find.text('aç'));
-          await tester.pumpAndSettle();
-          _expectNoLayoutError(tester, label);
-          final surface = find.descendant(of: find.byType(AlertDialog), matching: find.byType(Material)).first;
-          final rect = tester.getRect(surface);
-          expect(rect.width, lessThanOrEqualTo(kTimerDialogConstraints.maxWidth), reason: label);
-          expect(rect.bottom, lessThanOrEqualTo(size.height), reason: label);
-          // Kapatma düğmesine her boyutta ulaşılır.
-          await tester.tap(find.byType(ElevatedButton));
-          await tester.pumpAndSettle();
-          expect(find.byType(SessionCompletedDialog), findsNothing, reason: label);
+      // Sonuçsuz, en kalabalık başarı (puan, kum, seri, bonus dökümü) ve ret.
+      final variants = <String, Widget Function()>{
+        'sonuçsuz': () => const SessionCompletedDialog(minutes: 25),
+        'başarı': () => SessionCompletedDialog(
+              minutes: 50,
+              result: Future.value(const SessionSubmitSuccess(
+                minutes: 50,
+                basePoints: 12,
+                bonusPoints: 4,
+                bonusPct: 30,
+                totalPoints: 16,
+                coinsEarned: 20,
+                streak: 14,
+              )),
+            ),
+        'ret': () => SessionCompletedDialog(
+              minutes: 25,
+              result: Future.value(const SessionSubmitRejected(SessionReason.overlap)),
+            ),
+      };
+      for (final MapEntry(key: variant, value: dialog) in variants.entries) {
+        for (final size in _targetSizes) {
+          for (final scale in [1.0, 2.0]) {
+            final label = '$variant $size x$scale';
+            await _pumpAt(tester, size, opener(dialog), textScale: scale);
+            await tester.tap(find.text('aç'));
+            await tester.pumpAndSettle();
+            _expectNoLayoutError(tester, label);
+            final surface = find.descendant(of: find.byType(AlertDialog), matching: find.byType(Material)).first;
+            final rect = tester.getRect(surface);
+            expect(rect.width, lessThanOrEqualTo(kTimerDialogConstraints.maxWidth), reason: label);
+            expect(rect.bottom, lessThanOrEqualTo(size.height), reason: label);
+            // Kapatma düğmesine her boyutta ulaşılır.
+            await tester.tap(find.byType(ElevatedButton));
+            await tester.pumpAndSettle();
+            expect(find.byType(SessionCompletedDialog), findsNothing, reason: label);
+          }
         }
       }
     });
