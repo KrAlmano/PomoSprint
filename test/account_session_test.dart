@@ -555,6 +555,93 @@ void main() {
       expect(saved.birthYear, 2008);
       expect(saved.dailyGoalMinutes, 180);
     });
+
+    // Taslağı yazıp onboarding ekranını açar; ekranın kaydettiği son taslağı döndürür.
+    Future<OnboardingDraft> restore(WidgetTester tester, OnboardingDraft draft) async {
+      service.currentUser.value = _user;
+      SharedPreferences.setMockInitialValues({OnboardingDraftStore.keyFor('uid-1'): jsonEncode(draft.toJson())});
+      await _pump(tester, PostAuthOnboardingScreen(onCompleted: () {}));
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
+      await tester.pumpAndSettle();
+      final prefs = await SharedPreferences.getInstance();
+      return OnboardingDraft.fromJson(jsonDecode(prefs.getString(OnboardingDraftStore.keyFor('uid-1'))!))!;
+    }
+
+    // t2-02: "Diğer" ve segmentsiz (segment isteğe bağlı) taslaklar
+    // seçimleri ve adımı kaybetmeden geri gelir.
+    testWidgets('"Diğer" segmentli taslak: genel önerilerden seçim ve adım korunur', (tester) async {
+      final saved = await restore(
+        tester,
+        const OnboardingDraft(
+          step: 4,
+          birthYear: 1990,
+          segment: 'other',
+          selectedCategories: ['Okuma', 'Proje'],
+          showInRankings: false,
+          dailyGoalMinutes: 120,
+        ),
+      );
+      expect(find.text('5/6'), findsOneWidget);
+      expect(saved.segment, 'other');
+      expect(saved.selectedCategories, ['Okuma', 'Proje']);
+      expect(saved.showInRankings, isFalse);
+    });
+
+    testWidgets('segment seçilmemiş taslak: genel önerilerden seçim ve adım korunur', (tester) async {
+      final saved = await restore(
+        tester,
+        const OnboardingDraft(
+          step: 3,
+          birthYear: 2000,
+          selectedCategories: ['Ders Çalışma'],
+          dailyGoalMinutes: 60,
+        ),
+      );
+      expect(find.text('4/6'), findsOneWidget);
+      expect(saved.segment, isNull);
+      expect(saved.selectedCategories, ['Ders Çalışma']);
+    });
+
+    // t2-01: görünürlük yanıtı taslakta tutulur; yanıtsız taslak görünürlük
+    // adımının ilerisine dönmez ve "Bitir" yanıt olmadan kayda gitmez
+    // (sunucu show_in_social_feed'i varsayılan TRUE bırakırdı).
+    testWidgets('görünürlük yanıtı yoksa taslak görünürlük adımına döner', (tester) async {
+      final saved = await restore(
+        tester,
+        const OnboardingDraft(
+          step: 5,
+          birthYear: 2008,
+          segment: 'yks',
+          selectedCategories: ['Fizik'],
+          dailyGoalMinutes: 60,
+        ),
+      );
+      expect(find.text('4/6'), findsOneWidget);
+      expect(find.text(l10n.onboardingVisibilityYes), findsOneWidget);
+      expect(saved.step, 3);
+      expect(saved.showInRankings, isNull);
+    });
+
+    testWidgets('"Hayır" yanıtı taslakla geri gelir ve son adımdan bitirilebilir', (tester) async {
+      final saved = await restore(
+        tester,
+        const OnboardingDraft(
+          step: 5,
+          birthYear: 2008,
+          segment: 'yks',
+          selectedCategories: ['Fizik'],
+          showInRankings: false,
+          dailyGoalMinutes: 60,
+        ),
+      );
+      expect(find.text('6/6'), findsOneWidget);
+      expect(saved.showInRankings, isFalse);
+      // Bulut kapalı: kayıt denenir (doğrulama engellemez) ve hata gösterilir.
+      await tester.tap(find.text(l10n.onboardingFinishBtn));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+      expect(find.text(l10n.onboardingSelectOptionError), findsNothing);
+    });
   });
 }
 

@@ -288,6 +288,7 @@ void main() {
   });
 
   group('providerFirstNameUpdate (Google/Apple ilk ad)', () {
+    const testUid = '9f3a51c2-7d4e-4b8a-9c11-2b3d4e5f6a7b';
     String? update({
       required String current,
       String? email = 'q8x7zz2bnd@privaterelay.appleid.com',
@@ -295,6 +296,7 @@ void main() {
       Map<String, dynamic> metadata = const {},
       bool onboardingCompleted = false,
       String? givenName,
+      String? userId = testUid,
     }) =>
         SupabaseService.providerFirstNameUpdate(
           currentName: current,
@@ -303,6 +305,7 @@ void main() {
           metadata: metadata,
           onboardingCompleted: onboardingCompleted,
           givenName: givenName,
+          userId: userId,
         );
 
     test("Apple: trigger'ın yazdığı gizli röle adı, Apple'ın verdiği ilk adla değişir", () {
@@ -311,8 +314,36 @@ void main() {
       expect(update(current: 'q8x7zz2bnd', givenName: 'Ayşe', onboardingCompleted: true), 'Ayşe');
     });
 
-    test('Apple ad vermediyse (sonraki girişler) dokunulmaz', () {
-      expect(update(current: 'q8x7zz2bnd'), isNull);
+    // t3-EM1: ad bilgisi olmayan Apple girişinde (ad yalnızca ilk
+    // yetkilendirmede gelir; "E-postamı paylaş" seçiliyse yerel kısım gerçek
+    // adresin parçası) e-postadan türetilen ad herkese açık listelerde
+    // maskelenmeden görünüyordu. Nötr ada çekilir.
+    test('Apple ad vermediyse e-postadan türetilen ad nötr adla değişir', () {
+      expect(SupabaseService.neutralProfileName(testUid), 'Pomo 9f3a');
+      expect(
+        update(current: 'erdal.yilmaz.1987', email: 'erdal.yilmaz.1987@icloud.com'),
+        'Pomo 9f3a',
+      );
+      expect(update(current: 'q8x7zz2bnd'), 'Pomo 9f3a');
+      // Sonraki girişlerde nötr ad korunur.
+      expect(update(current: 'Pomo 9f3a', email: 'erdal.yilmaz.1987@icloud.com'), isNull);
+    });
+
+    test('nötr ad (sunucu tohumu) sağlayıcının ilk adıyla değişir', () {
+      expect(update(current: 'Pomo 9f3a', givenName: 'Ayşe'), 'Ayşe');
+    });
+
+    test('ilk ad e-postanın yerel kısmıyla aynıysa gerçek addır, dokunulmaz', () {
+      expect(
+        update(
+          current: 'erdal',
+          email: 'erdal@gmail.com',
+          provider: 'google',
+          metadata: const {'full_name': 'erdal Yılmaz', 'given_name': 'erdal'},
+          onboardingCompleted: true,
+        ),
+        isNull,
+      );
     });
 
     test('Google: onboarding bitmeden tam ad ilk ada iner', () {
@@ -333,8 +364,9 @@ void main() {
       );
     });
 
-    test('tek harfli ilk ad yazılmaz (sunucu/uygulama alt sınırı)', () {
-      expect(update(current: 'q8x7zz2bnd', givenName: 'J'), isNull);
+    test('tek harfli ilk ad yazılmaz (sunucu/uygulama alt sınırı); e-posta adı yerine nötr ad', () {
+      expect(update(current: 'q8x7zz2bnd', givenName: 'J'), 'Pomo 9f3a');
+      expect(update(current: 'Kaptan', givenName: 'J'), isNull);
     });
   });
 }

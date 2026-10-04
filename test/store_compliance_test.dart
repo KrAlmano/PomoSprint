@@ -113,11 +113,14 @@ void main() {
         birthYear: 1850,
         userSegment: 'other',
         dailyGoalMinutes: 60,
+        showInSocialFeed: true,
         completedAt: at,
       );
       expect(other['birth_year'], isNull);
       expect(other['user_segment'], isNull);
-      expect(other.containsKey('show_in_social_feed'), isFalse, reason: 'sorulmadıysa yazılmaz');
+      // Yanıt her zaman yazılır: kolon gönderilmezse sunucu varsayılanı
+      // (TRUE) kalırdı (t2-01).
+      expect(other['show_in_social_feed'], isTrue);
 
       final yks = SupabaseService.onboardingProfileUpdate(
         birthYear: 2008,

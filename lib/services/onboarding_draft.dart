@@ -14,6 +14,11 @@ class OnboardingDraft {
   final String? segment;
   final List<String> selectedCategories;
   final List<String> customCategories;
+
+  /// Sıralamalarda görünürlük yanıtı (null: henüz yanıtlanmadı). Sunucuda
+  /// show_in_social_feed varsayılanı TRUE olduğu için yanıt taslakla
+  /// korunur; yanıtsız taslak görünürlük adımının ilerisine dönmez.
+  final bool? showInRankings;
   final int? dailyGoalMinutes;
 
   const OnboardingDraft({
@@ -22,6 +27,7 @@ class OnboardingDraft {
     this.segment,
     this.selectedCategories = const [],
     this.customCategories = const [],
+    this.showInRankings,
     this.dailyGoalMinutes,
   });
 
@@ -31,6 +37,7 @@ class OnboardingDraft {
         'segment': segment,
         'selected': selectedCategories,
         'custom': customCategories,
+        'show': showInRankings,
         'goal': dailyGoalMinutes,
       };
 
@@ -44,12 +51,14 @@ class OnboardingDraft {
     final birthYear = json['birth_year'];
     final segment = json['segment'];
     final goal = json['goal'];
+    final show = json['show'];
     return OnboardingDraft(
       step: step,
       birthYear: birthYear is int ? birthYear : null,
       segment: segment is String ? segment : null,
       selectedCategories: strings(json['selected']),
       customCategories: strings(json['custom']),
+      showInRankings: show is bool ? show : null,
       dailyGoalMinutes: goal is int ? goal : null,
     );
   }

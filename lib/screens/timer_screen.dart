@@ -49,6 +49,10 @@ class TimerScreen extends StatefulWidget {
   /// rozeti görünür ve biten test seansı [onSessionCompleted]'e verilmez.
   final bool quickTimer;
 
+  /// Saat kaynağı (testte sahtesi). Varsayılan [DateTime.now].
+  @visibleForTesting
+  final DateTime Function()? clock;
+
   const TimerScreen({
     super.key,
     required this.categories,
@@ -60,6 +64,7 @@ class TimerScreen extends StatefulWidget {
     this.userSegment,
     this.lockScreenTimer,
     this.quickTimer = kQuickTimer,
+    this.clock,
   });
 
   @override
@@ -102,6 +107,8 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
 
   static int _minutesLeft(int seconds) => (seconds / 60).ceil();
 
+  DateTime _now() => (widget.clock ?? DateTime.now)();
+
   @override
   void initState() {
     super.initState();
@@ -128,6 +135,9 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
       // Arka planda periyodik timer durmuş olabilir; kalan süreyi bitiş
       // anından yeniden hesapla (süre dolduysa seans tamamlanır).
       if (isRunning) _tick(countForeground: false);
+      // Uygulama açıkken duraklatılmış seans artık 24 saat içinde
+      // bitirilemiyorsa (sunucu too_old ile reddeder) şimdi bırakılır.
+      if (_expireStalePausedSession()) return;
       // Kullanıcı kilit ekranı bildirimini kapatmış ya da sistem Canlı
       // Etkinliği bitirmiş olabilir: süren seans yeniden gösterilir.
       if (_hasSession) _syncLockScreen(force: true);
@@ -170,7 +180,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
       return;
     }
 
-    final now = DateTime.now();
+    final now = _now();
     _foregroundSeconds = saved.foregroundSeconds;
     setState(() {
       loggedMinutes = saved.durationMinutes;
@@ -187,16 +197,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
         _runSession(saved, now);
       }
     } else if (saved.isAbandonedAt(now)) {
-      // Sunucu 24 saatten eski seansı kabul etmez; kayıt silinir.
-      unawaited(_store.clear(widget.sessionOwnerKey, onlyClientUuid: saved.clientUuid));
-      unawaited(_lockScreen.clear());
-      _foregroundSeconds = 0;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context)!.pausedSessionExpired),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      _dropExpiredPausedSession(saved);
     } else {
       setState(() {
         _session = saved;
@@ -206,10 +207,38 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     }
   }
 
+  /// Sunucu başlangıcı 24 saatten eski seansı kabul etmez (too_old).
+  /// Duraklatılmış seans devam ettirilse bile o süre içinde bitemeyecekse
+  /// kayıt silinir ve kullanıcı uyarılır (açılışta, devamda ve ön plana
+  /// dönüşte). Seans yoksa ya da sürüyorsa bir şey yapmaz; bıraktıysa true.
+  bool _expireStalePausedSession() {
+    final session = _session;
+    if (session == null || isRunning || !session.isAbandonedAt(_now())) return false;
+    _timer?.cancel();
+    unawaited(NotificationService.instance.cancelSessionEndNotification());
+    _resetToIdle();
+    _dropExpiredPausedSession(session);
+    return true;
+  }
+
+  void _dropExpiredPausedSession(ActiveTimerSession session) {
+    unawaited(_store.clear(widget.sessionOwnerKey, onlyClientUuid: session.clientUuid));
+    unawaited(_lockScreen.clear());
+    _foregroundSeconds = 0;
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.pausedSessionExpired),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+  }
+
   void _tick({bool countForeground = true}) {
     final session = _session;
     if (!isRunning || session == null || !mounted) return;
-    final left = session.remainingSecondsAt(DateTime.now());
+    final left = session.remainingSecondsAt(_now());
     if (left > 0) {
       // Android'de süreç arka planda da tick atabilir; yalnızca ön plan sayılır.
       if (countForeground && _isInForeground) _foregroundSeconds++;
@@ -323,6 +352,8 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
       }
     } else {
       if (_isStarting) return; // çift tıklama koruması
+      // Süresi dolmuş duraklatılmış seans için geri sayım başlatılmaz.
+      if (_expireStalePausedSession()) return;
       _isStarting = true;
       unawaited(_show321CountdownAndStart());
     }
@@ -333,7 +364,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     if (session == null) return;
     _timer?.cancel();
     unawaited(NotificationService.instance.cancelSessionEndNotification());
-    final now = DateTime.now();
+    final now = _now();
     final paused = session.pauseAt(now);
     setState(() {
       _session = paused;
@@ -491,9 +522,11 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
 
   void _startOrResume() {
     if (!mounted) return;
-    final now = DateTime.now();
+    final now = _now();
     final current = _session;
     if (current != null) {
+      // Geri sayım sırasında da sınır aşılmış olabilir.
+      if (_expireStalePausedSession()) return;
       _runSession(current.resumeAt(now), now);
       return;
     }
