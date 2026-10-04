@@ -185,6 +185,8 @@ abstract final class SessionReason {
 
   /// Sunucu: 'session_not_finished' (saat farkı bunu açıklamıyorsa). Kod
   /// değeri reddedilenler listesinde kalıcı tutulduğu için değiştirilmez.
+  /// Saat farkı ölçülemediyse aynı kodla GEÇİCİ döner (bkz.
+  /// [classifySessionError]); kullanıcıya saat suçlaması yapılmaz.
   static const String notElapsed = 'not_elapsed';
   static const String futureStart = 'future_start';
   static const String invalidData = 'invalid_data';
@@ -196,6 +198,9 @@ abstract final class SessionReason {
   static const String network = 'network';
   static const String timeout = 'timeout';
   static const String auth = 'auth';
+
+  /// Ölçülen saat farkı [ServerClock.significantSkew]'i aşıyor: "cihazının
+  /// saati farklı" metni yalnızca bu kodla gösterilir.
   static const String clockSkew = 'clock_skew';
   static const String serverError = 'server_error';
 }
@@ -274,7 +279,8 @@ enum SessionFailureKind {
   /// Bağlantı/oturum yok; seans kalır ve bu senkron durdurulur.
   offline,
 
-  /// Cihaz saati sapmış olabilir; seans kalır, düzeltmeyle yeniden denenir.
+  /// Cihaz saati sapmış olabilir (ölçülen fark eşiği aşıyor ya da fark
+  /// ölçülemedi); seans kalır, düzeltmeyle yeniden denenir.
   clockSkew,
 
   /// Kategori geçersiz; kategori yeniden eşlenip denenir.
@@ -312,18 +318,23 @@ class SessionFailure {
 /// tanınır.
 ///
 /// [offsetNow] o an bilinen sunucu-cihaz saat farkı, [appliedCorrection]
-/// gönderilen started_at'e uygulanmış düzeltmedir. Saat sapması hataları
-/// ("bitmedi / gelecekte") ancak saat farkı bunu açıklıyorsa ya da fark
-/// bilinmiyorsa geçici ('clock_skew') sayılır; aksi halde seans gerçekten
-/// erkendir (ör. debug build'in kısa sayacı) ve kalıcı reddedilir.
+/// gönderilen started_at'e uygulanmış düzeltmedir. Zaman hataları ("bitmedi
+/// / gelecekte"):
+/// - Ölçülen, düzeltilmemiş fark [ServerClock.significantSkew]'i aşıyorsa
+///   geçici, neden 'clock_skew' (yalnızca bu durumda "cihazının saati
+///   farklı" denir).
+/// - Fark ölçülemediyse geçici (yeniden denenir) ama neden sunucunun
+///   söylediği ('not_elapsed' / 'future_start'): saat suçlanmaz.
+/// - Aksi halde seans gerçekten erkendir (ör. kısaltılmış test sayacı) ve
+///   aynı nedenle kalıcı reddedilir.
 SessionFailure classifySessionError(
   Object error, {
   Duration? offsetNow,
   Duration appliedCorrection = Duration.zero,
 }) {
   SessionFailure timing(String reason) {
-    if (offsetNow == null ||
-        (offsetNow - appliedCorrection).abs() >= ServerClock.significantSkew) {
+    if (offsetNow == null) return SessionFailure(SessionFailureKind.clockSkew, reason);
+    if ((offsetNow - appliedCorrection).abs() >= ServerClock.significantSkew) {
       return const SessionFailure(SessionFailureKind.clockSkew, SessionReason.clockSkew);
     }
     return SessionFailure(SessionFailureKind.permanent, reason);

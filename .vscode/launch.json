@@ -22,6 +22,16 @@
       "request": "launch",
       "type": "dart",
       "program": "lib/dev/lock_screen_preview.dart"
+    },
+    {
+      // Sayaç 25 dk → 5 sn, 50 dk → 10 sn; ekranda TEST rozeti. Bu
+      // seanslar sunucuya ve kuyruğa gönderilmez (puan/kum gelmez). Gerçek
+      // seans için yukarıdaki "PomoSprint" yapılandırmasını kullan.
+      "name": "PomoSprint (hızlı test sayacı, kaydedilmez)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "toolArgs": ["--dart-define=QUICK_TIMER=true"]
     }
   ]
 }

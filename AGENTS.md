@@ -51,7 +51,7 @@
 | `flutter gen-l10n` | Her `.arb` değişikliğinden sonra | `lib/l10n/app_localizations*.dart` yeniden üretilir |
 | `flutter analyze` | Her değişiklikten sonra | `No issues found!` |
 | `flutter test` | Her değişiklikten sonra | Hepsi yeşil (birim + widget testleri; raporlar için `reports_correctness_test`, `reports_findings_test`, kategoriler için `categories_findings_test`). Gün hesabına dokunduysan `TZ=America/New_York flutter test` ile de çalıştır |
-| `flutter run --profile` / `--release` | Gerçek seans ve puan testi | Debug build'de sayaç 5/10 sn'dir, sunucu bu seansları reddeder |
+| `flutter run` (debug dahil) / `--profile` / `--release` | Gerçek seans ve puan testi | Her derlemede sayaç gerçek süreli (25/50 dk). Hızlı deneme: `--dart-define=QUICK_TIMER=true` (VS Code: "PomoSprint (hızlı test sayacı, kaydedilmez)"): 5/10 sn, TEST rozeti, seans sunucuya ve kuyruğa gitmez |
 | `supabase/tests/run_local.sh` | SQL değişikliği; **yalnızca yerel Postgres** | ASSERT'ler geçer. `live_audit_fixes` varsayılan olarak atlanır |
 | `python3 landing/tools/sync_partials.py --check` | Site değişikliğinden sonra | Çıkış kodu 0 |
 | `cd scripts && npm test` | `landing/js`, `supabase/functions`, `scripts/send_newsletter.js` değişikliğinden sonra | Hepsi yeşil. Ağsız: Edge Function'lar sahte Supabase ile, site betikleri sahte DOM ile (`scripts/test/`); Node 22.18+ ya da 23.6+ (bayraksız TypeScript ayıklama ve `module.registerHooks`) |
@@ -142,7 +142,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 - Kalan süre her tick'te ve `resumed`'da `ActiveTimerSession.remainingSecondsAt(now)` ile hesaplanır. Azaltarak sayan koda dönme.
 - `clientUuid` ve `startedAt` seans başına **bir kez** üretilir, duraklat/devam boyunca korunur. `client_uuid` sunucudaki idempotency anahtarıdır.
 - Seans her durum değişiminde diske yazılır. Açılışta: süre dolduysa hemen tamamlanıp gönderilir; 24 saatten eski duraklatılmış seans silinir.
-- Debug build'de süre 5/10 sn (`timerDurationSeconds`, `kDebugMode`). Bilinçli; sunucu bu seansları reddeder.
+- Sayaç her derlemede (debug dahil) gerçek süreli. Kısaltma yalnızca `--dart-define=QUICK_TIMER=true` ile (`kQuickTimer`, `timerDurationSeconds`): 5/10 sn ve TEST rozeti. Kısaltılmış seans (`ActiveTimerSession.isQuickTest`; derleme bayrağına değil seansa bakılır) `onSessionCompleted`'e verilmez, sonuç diyaloğu "Test seansı — kaydedilmez" der; bu modda Shell `start_/cancel_study_session` çağırmaz. Eskiden debug derlemede kendiliğinden kısalıyordu: 5 sn'lik seans 25 dk diye gidip `session_not_finished` ile reddediliyordu.
 - Duraklatma hakkı 1. Seans varken 25/50 değiştirilirse seans sıfırlanır.
 - Bildirim izni açılışta değil, ilk BAŞLAT'ta (`ensurePermission`) istenir. Profil'deki anahtar `notifications_enabled` (bitiş bildirimi + kilit ekranı sayacı); "tercih açık VE sistem izni var"ı gösterir (`hasSystemPermission`, `resumed`'da yeniden okunur). İzin yoksa Profil'de ve ilk BAŞLAT'ta "Ayarları aç" (`openSystemSettings`: eklentinin `openAppNotificationSettings`'i, iOS'ta yedek `app-settings:`).
 - Kilit ekranı sayacı (`LockScreenTimer`) her durum geçişinde çağrılır: başlat/devam/geri yükleme `showRunning`, duraklat `showPaused`, sıfırla/tamamla/çıkış/ekran kapanışı `clear`, ön plana dönüş `force: true`. Bildirim tercihi kapalıysa gösterilmez. Dart arka planda çalışmaz; geri sayımı sistem yürütür (Android kronometre + `timeoutAfter`, iOS `Text(timerInterval:)` + `staleDate`). Foreground service / background mode EKLEME.
@@ -150,6 +150,8 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 
 **Tuzaklar**
 - IndexedStack tüm sekmeleri açılışta kurar ve canlı tutar. Görünmeyen sekme `TickerMode(enabled: false)` alır; periyodik iş yapan ekran `TickerMode.valuesOf(context).enabled`'a bakmalı.
+- `ShellNavigationScaffold` gövdesinin MediaQuery'si Scaffold'un gövdeye verdiğinden türetilir (`Builder`). Dış context'le `MediaQuery.removePadding` üst/alt güvenli alanı geri getiriyordu: sekmelerin `SafeArea`'sı iPhone'da üstte ve altta ikinci kez boşluk bırakıyor, sayaçta BAŞLAT alt gezinmenin altına kayıyordu. `responsive_shell_test` güvenli alanlı iPhone boyutlarıyla (402x874, 393x852, 390x844, 375x667) denetler.
+- Sayaç düzeni (`_TimerLayout`): dikey telefonda kum saati (en çok 275, eskisinin 1,25 katı) kontrol sütununun tahmini yüksekliğinden (`phoneControlsHeight`; yazı satırları `TextPainter` ile ölçülür, seans varken görünen Sıfırla dahil) kalan alana sığdırılır. Kontrollere öğe ya da aralık eklersen tahmini de güncelle, yoksa BAŞLAT kaydırmaya kalır. 25/50 tek satırda eşit genişlikte (`Row` + `Expanded`); `Wrap` içinde hizalı `Container` satırın tamamını alıp 50'yi alt satıra düşürüyordu.
 - Çıkışta süren seans cihazda kalır (aynı hesapla girişte sürer); Shell bildirimi iptal edip `cancel_study_session` çağırır.
 - `onAuthStateChange` son olayı yeni aboneye yeniden verir.
 - Android bildirim ikonu `@drawable/ic_stat_notification` (`res/raw/keep.xml` R8'den korur). Bu makinede Android SDK yok; Android derlemesi doğrulanmadı.
@@ -207,7 +209,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 - Kategori adları DB'de çoğunlukla Türkçe, İngilizce onboarding'de İngilizce saklanır; gösterirken `translateCatName`, eşlemede `categoryMatchKey` (tablo: `utils/category_names.dart`). 50 dk = 2 pomodoro.
 
 **Tuzaklar**
-- Debug build'de istatistiklerin boş görünmesi beklenen durum.
+- Hızlı test sayacıyla (QUICK_TIMER) istatistiklerin değişmemesi beklenen durum: test seansları kaydedilmez.
 - Gün kuralı istemcide de sunucuda da **profil diliminde** 04:00 (`studyDayOf`, `setStudyTimeZone`; `currentUser.timezone` değişince otomatik). `profiles.timezone` istemciden yazılmadığı için fiilen herkes `Europe/Istanbul`: cihazı başka dilimde olan kullanıcı günleri İstanbul'a göre görür (sunucuyla tutarlı, kullanıcının yerel günüyle değil; §10).
 - Sıralama > Aylık (`get_public_monthly_leaderboard`) ayı canlıda `completed_at` + İstanbul gece yarısıyla sayıyor, Raporlar > Aylık `started_at` + 04:00 ile. Düzeltme `proposed/15`; uygulanınca `ranking_models.dart` `nextMonthlyLeaderboardReset` 04:00'e çekilmeli.
 - Yenileme ve gün dönümü zamanlayıcısı TickerMode'a bağlı; sekme görünmezken durur. Üst çubuktaki seri `StudyDayBuilder` ile 04:00'te kendiliğinden tazelenir.
@@ -363,8 +365,8 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 | `duplicate:true` | Başarı, puan tekrar verilmez |
 | `daily_limit_reached:true` | Başarı, 0 puan / 0 kum |
 | `{error:'overlap'}` | Kuyrukta kalır; sunucu yaşı 24 saati geçince `overlap` ile reddedilir |
-| `session_not_finished` | `not_elapsed`. Saat farkı açıklıyorsa ya da bilinmiyorsa geçici (`clock_skew`), aksi halde kalıcı |
-| `started_at cannot be in the future` | `future_start`, aynı saat farkı kuralı |
+| `session_not_finished` | Ölçülen düzeltilmemiş fark eşiği aşıyorsa geçici, neden `clock_skew` ("cihazının saati farklı/ileri" metni YALNIZCA bu nedende). Fark ölçülemediyse geçici, neden `not_elapsed` ("süre sunucuyla henüz doğrulanamadı"). Aksi halde kalıcı `not_elapsed` ("sunucuya göre seans süresi henüz dolmamıştı") |
+| `started_at cannot be in the future` | `future_start`, aynı saat farkı kuralı (kalıcı retteki metin saat suçlamaz) |
 | `started_at is older than 24 hours` | Kalıcı (`too_old`). İstemci 48 saati geçen seansı göndermeden reddeder |
 | `invalid duration…` | Kalıcı (`invalid_duration`) |
 | `category does not belong…`, 22P02 uuid, 23503 kategori | `category_invalid`: bir kez isimle yeniden eşlenir, sonra kalıcı |
@@ -515,7 +517,7 @@ curl -sI https://pomosprint.app/reset-password | grep -i cache-control   # no-st
 | `supabase db push` / `db reset`; MCP ile yıkıcı SQL | DRYRUN → migration dosyası; kullanıcı SQL Editor'de çalıştırır |
 | `proposed/` dosyasını olduğu gibi çalıştırmak | Canlı gövdeye uyarlayıp yeni migration yaz |
 | Kök `.env`'e veya `landing/`'e service role / Resend anahtarı | Yalnızca `scripts/.env` ve Edge secrets |
-| Debug süre kısaltmasını kaldırmak, sunucu doğrulamasını gevşetmek | `--profile` / `--release` ile test |
+| Sayacı derleme moduna göre (`kDebugMode`) kısaltmak; sunucu doğrulamasını gevşetmek | Hızlı deneme yalnızca `QUICK_TIMER` ile ve kaydedilmeden; gerçek seans her derlemede |
 | Yer tutucu kategori id'sini (`'1'..'5'`) RPC'ye göndermek | `isUuidCategoryId` + isimle eşleme |
 | Yeniden denemede yeni `client_uuid` | Kuyruktaki kimliği koru |
 | Seansı sessizce silmek; hata sınıfını testsiz değiştirmek | Reddedilenler listesi + test güncellemesi |

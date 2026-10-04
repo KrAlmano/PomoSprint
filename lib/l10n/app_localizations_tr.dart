@@ -505,6 +505,9 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bu seans zaten kaydedilmişti; puanların daha önce eklendi.';
 
   @override
+  String get sessionResultTestNotSaved => 'Test seansı — kaydedilmez';
+
+  @override
   String get sessionResultOk => 'Tamam';
 
   @override
@@ -519,6 +522,10 @@ class AppLocalizationsTr extends AppLocalizations {
       'Seans bekletiliyor: cihazının saati sunucudan farklı görünüyor. Saat ayarını kontrol et; seans otomatik olarak yeniden denenecek.';
 
   @override
+  String get sessionQueuedTimingUnverified =>
+      'Seans bekletiliyor: seans süresi sunucuyla henüz doğrulanamadı. Otomatik olarak yeniden denenecek.';
+
+  @override
   String get sessionQueuedOverlap =>
       'Seans önceki bir kayıtla çakışıyor; bekletiliyor ve daha sonra yeniden denenecek.';
 
@@ -529,6 +536,14 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get sessionRejectedClock =>
       'Bu seans kaydedilemedi: cihazının saati ileri görünüyor. Saat ayarını kontrol et.';
+
+  @override
+  String get sessionRejectedNotElapsed =>
+      'Bu seans kaydedilemedi: sunucuya göre seans süresi henüz dolmamıştı.';
+
+  @override
+  String get sessionRejectedFutureStart =>
+      'Bu seans kaydedilemedi: başlangıç zamanı sunucu saatiyle doğrulanamadı.';
 
   @override
   String get sessionRejectedOverlap =>
@@ -1559,6 +1574,13 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get timerDurationLocked =>
       'Süreyi değiştirmek için önce seansı sıfırla.';
+
+  @override
+  String get timerQuickTestBadge => 'TEST';
+
+  @override
+  String get timerQuickTestSemantics =>
+      'Hızlı test sayacı: seanslar kaydedilmez';
 
   @override
   String get rankingZonePromotionChip => '↑ Terfi';

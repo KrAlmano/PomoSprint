@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro/models/category_model.dart';
+import 'package:pomodoro/services/server_clock.dart';
 import 'package:pomodoro/services/session_queue.dart';
 import 'package:pomodoro/services/supabase_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -45,10 +46,28 @@ void main() {
           SessionFailureKind.categoryInvalid);
     });
 
-    test('canlı session_not_finished: saat farkı bilinmiyorsa clock_skew (geçici)', () {
+    test('canlı session_not_finished: saat farkı bilinmiyorsa geçici, ama neden saat değil', () {
+      // Yeniden denenir (clockSkew türü), ama fark ölçülmediği için
+      // kullanıcıya "cihazının saati ileri" denmez: neden not_elapsed.
       final f = classifySessionError(p0001('session_not_finished'));
       expect(f.kind, SessionFailureKind.clockSkew);
+      expect(f.reasonCode, SessionReason.notElapsed);
+    });
+
+    test('canlı session_not_finished: ölçülen büyük fark clock_skew nedeni taşır', () {
+      final f = classifySessionError(
+        p0001('session_not_finished'),
+        offsetNow: ServerClock.significantSkew + const Duration(seconds: 1),
+      );
+      expect(f.kind, SessionFailureKind.clockSkew);
       expect(f.reasonCode, SessionReason.clockSkew);
+      // Eşiğin hemen altı saat sapması sayılmaz.
+      final below = classifySessionError(
+        p0001('session_not_finished'),
+        offsetNow: ServerClock.significantSkew - const Duration(seconds: 1),
+      );
+      expect(below.kind, SessionFailureKind.permanent);
+      expect(below.reasonCode, SessionReason.notElapsed);
     });
 
     test('canlı session_not_finished: saat doğruysa kalıcı (ör. debug kısa seans)', () {
@@ -66,6 +85,7 @@ void main() {
         offsetNow: const Duration(minutes: -10),
       );
       expect(f.kind, SessionFailureKind.clockSkew);
+      expect(f.reasonCode, SessionReason.clockSkew);
     });
 
     test('canlı session_not_finished: fark zaten düzeltilmişse kalıcı', () {
@@ -80,6 +100,7 @@ void main() {
 
     test("canlı 'started_at cannot be in the future': saat sapması sınıfı", () {
       expect(classifySessionError(p0001('started_at cannot be in the future')).kind, SessionFailureKind.clockSkew);
+      expect(classifySessionError(p0001('started_at cannot be in the future')).reasonCode, SessionReason.futureStart);
       expect(
         classifySessionError(
           p0001('started_at cannot be in the future'),

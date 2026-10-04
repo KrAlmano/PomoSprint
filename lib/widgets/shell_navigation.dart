@@ -81,12 +81,18 @@ class ShellNavigationScaffold extends StatelessWidget {
             ),
           ],
           // Ray sol güvenli alanı (çentik) kendisi karşılar; içerik ikinci
-          // kez boşluk bırakmasın.
+          // kez boşluk bırakmasın. Builder: Scaffold'un gövdeye verdiği
+          // MediaQuery'den (üst çubuk ve alt çubuk varken üst/alt güvenli
+          // alan düşülmüş) türetilir. Dış context kullanılınca düşülen
+          // dolgu geri geliyor, sekmelerin SafeArea'sı iPhone'da üstte ve
+          // altta ikinci kez boşluk bırakıyordu (sayaçta BAŞLAT aşağı kayıyordu).
           Expanded(
-            child: MediaQuery.removePadding(
-              context: context,
-              removeLeft: useRail,
-              child: body,
+            child: Builder(
+              builder: (context) => MediaQuery.removePadding(
+                context: context,
+                removeLeft: useRail,
+                child: body,
+              ),
             ),
           ),
         ],

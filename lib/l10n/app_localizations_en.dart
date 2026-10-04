@@ -515,6 +515,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'This session was already saved; its points were added earlier.';
 
   @override
+  String get sessionResultTestNotSaved => 'Test session — not saved';
+
+  @override
   String get sessionResultOk => 'OK';
 
   @override
@@ -529,6 +532,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Session on hold: your device clock seems different from the server\'s. Check your time settings; the session will be retried automatically.';
 
   @override
+  String get sessionQueuedTimingUnverified =>
+      'Session on hold: the session time couldn\'t be verified with the server yet. It will be retried automatically.';
+
+  @override
   String get sessionQueuedOverlap =>
       'This session overlaps an earlier record; it\'s on hold and will be retried later.';
 
@@ -539,6 +546,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get sessionRejectedClock =>
       'This session couldn\'t be saved: your device clock seems to be ahead. Check your time settings.';
+
+  @override
+  String get sessionRejectedNotElapsed =>
+      'This session couldn\'t be saved: according to the server, the session time hadn\'t run out yet.';
+
+  @override
+  String get sessionRejectedFutureStart =>
+      'This session couldn\'t be saved: its start time couldn\'t be verified against the server clock.';
 
   @override
   String get sessionRejectedOverlap =>
@@ -1600,6 +1615,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get timerDurationLocked =>
       'Reset the session first to change its length.';
+
+  @override
+  String get timerQuickTestBadge => 'TEST';
+
+  @override
+  String get timerQuickTestSemantics =>
+      'Quick test timer: sessions aren\'t saved';
 
   @override
   String get rankingZonePromotionChip => '↑ Promotion';

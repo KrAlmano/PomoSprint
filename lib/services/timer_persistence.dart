@@ -5,11 +5,21 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utils/async_lock.dart';
 
-/// Sayacın saniye cinsinden uzunluğu. Yalnızca debug build'lerde (flutter
-/// run, --release DEĞİL) test için kısaltılır (25 dk → 5 sn, 50 dk → 10 sn);
-/// gerçek kullanıcılara giden release build'de her zaman gerçek süre.
-int timerDurationSeconds(int minutes, {bool shortened = kDebugMode}) {
-  if (shortened) return minutes == 25 ? 5 : 10;
+/// Hızlı test sayacı: yalnızca `--dart-define=QUICK_TIMER=true` ile
+/// derlenince açıktır (VS Code: "PomoSprint (hızlı test sayacı,
+/// kaydedilmez)"). Sayaç 25 dk → 5 sn, 50 dk → 10 sn sürer, ekranda TEST
+/// rozeti görünür ve bu seanslar sunucuya da kuyruğa da gönderilmez
+/// (bkz. [ActiveTimerSession.isQuickTest]).
+const bool kQuickTimer = bool.fromEnvironment('QUICK_TIMER');
+
+/// Sayacın saniye cinsinden uzunluğu. Varsayılan HER derlemede (debug dahil)
+/// gerçek süre; yalnızca hızlı test sayacında kısalır.
+///
+/// Eskiden debug derlemede kendiliğinden kısalıyordu: 5 sn'lik seans
+/// sunucuya 25 dk diye gidiyor, `session_not_finished` ile reddediliyor ve
+/// kullanıcı "cihazının saati ileri" uyarısı görüyordu.
+int timerDurationSeconds(int minutes, {bool quick = kQuickTimer}) {
+  if (quick) return minutes == 25 ? 5 : 10;
   return minutes * 60;
 }
 
@@ -52,7 +62,7 @@ class ActiveTimerSession {
   /// Sunucuya bildirilen süre (25/50).
   final int durationMinutes;
 
-  /// Sayacın gerçek uzunluğu (debug build'de kısaltılmış olabilir).
+  /// Sayacın gerçek uzunluğu (hızlı test sayacında kısaltılmıştır).
   final int totalSeconds;
   final DateTime startedAt;
   final DateTime? endsAt;
@@ -64,6 +74,14 @@ class ActiveTimerSession {
 
   bool get isRunning => endsAt != null;
   bool get wasPaused => pauseUsedCount > 0;
+
+  /// Kısaltılmış sayaçla (hızlı test sayacı ya da eski debug derlemesi)
+  /// başlatılmış test seansı. Sunucu böyle bir seansı zaten reddeder
+  /// (`session_not_finished`); sunucuya ve kuyruğa gönderilmez. Seansın
+  /// kendisine bakılır, derleme bayrağına değil: hızlı test derlemesinde
+  /// geri yüklenen gerçek seans yine gönderilir, normal derlemede geri
+  /// yüklenen test seansı gönderilmez.
+  bool get isQuickTest => totalSeconds < durationMinutes * 60;
 
   /// Yeni seans: [now] anında başlar, [totalSeconds] sonra biter.
   factory ActiveTimerSession.start({

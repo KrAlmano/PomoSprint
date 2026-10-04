@@ -44,6 +44,11 @@ class TimerScreen extends StatefulWidget {
   /// Kilit ekranı sayacı (varsayılan: [LockScreenTimer.instance]; testte sahtesi).
   final LockScreenTimer? lockScreenTimer;
 
+  /// Hızlı test sayacı (varsayılan: `--dart-define=QUICK_TIMER=true`, bkz.
+  /// [kQuickTimer]). Açıkken yeni seanslar 5/10 sn sürer, ekranda TEST
+  /// rozeti görünür ve biten test seansı [onSessionCompleted]'e verilmez.
+  final bool quickTimer;
+
   const TimerScreen({
     super.key,
     required this.categories,
@@ -54,6 +59,7 @@ class TimerScreen extends StatefulWidget {
     this.onTimerStateChanged,
     this.userSegment,
     this.lockScreenTimer,
+    this.quickTimer = kQuickTimer,
   });
 
   @override
@@ -63,9 +69,12 @@ class TimerScreen extends StatefulWidget {
 class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
   static const int _maxPauses = 1;
 
-  int totalSeconds = timerDurationSeconds(25);
-  int remaining = timerDurationSeconds(25);
+  /// 25/50 seçim satırının en büyük genişliği (tablette de kompakt kalır).
+  static const double _durationRowMaxWidth = 320;
+
   int loggedMinutes = 25;
+  late int totalSeconds = timerDurationSeconds(loggedMinutes, quick: widget.quickTimer);
+  late int remaining = totalSeconds;
   bool isRunning = false;
   bool _isStarting = false; // BAŞLAT butonuna çift tıklama koruması
   Timer? _timer;
@@ -79,6 +88,9 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
   int _foregroundSeconds = 0;
 
   bool get _hasSession => _session != null;
+
+  /// Gösterilen (ya da bir sonraki) seans kısaltılmış test seansı mı?
+  bool get _isQuickTest => totalSeconds < loggedMinutes * 60;
   int get _pauseCreditsLeft => _maxPauses - (_session?.pauseUsedCount ?? 0);
   TimerPersistence get _store => TimerPersistence.instance;
   LockScreenTimer get _lockScreen => widget.lockScreenTimer ?? LockScreenTimer.instance;
@@ -229,6 +241,13 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     widget.onTimerStateChanged?.call(false, completed.categoryName, 0);
 
     final owner = widget.sessionOwnerKey;
+    if (completed.isQuickTest) {
+      // Hızlı test seansı sunucuya ve kuyruğa gönderilmez (sunucu kısa
+      // seansı zaten reddeder); diyalog "kaydedilmez" der.
+      _showSessionCompletedDialog(completed.durationMinutes, null, testSession: true);
+      await _store.clear(owner, onlyClientUuid: completed.clientUuid);
+      return;
+    }
     // Diyalog gönderimin sonucunu bekler: kaydediliyor → puan/kum/seri,
     // kuyruk ya da ret nedeni.
     final submission = widget.onSessionCompleted(completed);
@@ -248,6 +267,9 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
       isRunning = false;
       _isStarting = false;
       _session = null;
+      // Geri yüklenen seansın uzunluğu (ör. eski test seansı) sonraki
+      // seansa taşınmaz.
+      totalSeconds = timerDurationSeconds(loggedMinutes, quick: widget.quickTimer);
       remaining = totalSeconds;
       _validateSelectedCategory();
     });
@@ -374,7 +396,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     if (minutes == loggedMinutes) return;
     setState(() {
       loggedMinutes = minutes;
-      totalSeconds = timerDurationSeconds(minutes);
+      totalSeconds = timerDurationSeconds(minutes, quick: widget.quickTimer);
       remaining = totalSeconds;
       _validateSelectedCategory();
     });
@@ -583,10 +605,10 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     );
   }
 
-  void _showSessionCompletedDialog(int displayMinutes, Future<SessionSubmitResult?> result) {
+  void _showSessionCompletedDialog(int displayMinutes, Future<SessionSubmitResult?>? result, {bool testSession = false}) {
     showDialog(
       context: context,
-      builder: (ctx) => SessionCompletedDialog(minutes: displayMinutes, result: result),
+      builder: (ctx) => SessionCompletedDialog(minutes: displayMinutes, result: result, testSession: testSession),
     );
   }
 
@@ -611,9 +633,14 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
           body: SafeArea(
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final layout = _TimerLayout.of(constraints);
+                final layout = _TimerLayout.of(constraints, lineHeight: _lineHeightMeasurer(context));
                 final dense = layout.dense;
                 final large = layout.large;
+                // Dikey boşluklar: alçak ekran / dikey telefon / diğerleri.
+                // Dikey telefondaki değerler _TimerLayout.phoneControlsHeight
+                // tahminiyle aynı tutulmalı.
+                double gap(double whenDense, double whenCompact, double otherwise) =>
+                    dense ? whenDense : (layout.compact ? whenCompact : otherwise);
 
                 final hourglassWidget = HourglassWidget(
                   size: layout.hourglassSize,
@@ -701,13 +728,75 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                   );
                 }
 
+                Widget durationOption(int mins) {
+                  final isSel = loggedMinutes == mins;
+                  final foreground = isSel
+                      ? Colors.white
+                      : (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant)
+                          .withValues(alpha: _hasSession ? 0.45 : 1);
+                  return Semantics(
+                    button: true,
+                    selected: isSel,
+                    label: l10n.timerDurationOption(mins),
+                    onTap: () => _selectDuration(mins),
+                    excludeSemantics: true,
+                    child: GestureDetector(
+                      // Seans varken kilitli (bkz. _selectDuration).
+                      onTap: () => _selectDuration(mins),
+                      behavior: HitTestBehavior.opaque,
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(minHeight: kMinInteractiveDimension),
+                        child: Center(
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            width: double.infinity,
+                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: dense ? 6 : 10),
+                            decoration: BoxDecoration(
+                              color: isSel
+                                  ? AppColors.primaryContainer
+                                  : (isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: isSel
+                                    ? AppColors.primaryContainer
+                                    : (isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant),
+                              ),
+                            ),
+                            // Büyük yazı ölçeğinde satır kırmadan küçülür.
+                            child: Center(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    if (isSel) ...[
+                                      Icon(Icons.check_rounded, size: 18, color: foreground),
+                                      const SizedBox(width: 4),
+                                    ],
+                                    Text(
+                                      '$mins ${LanguageService.instance.translate('minutes_unit_short')}',
+                                      maxLines: 1,
+                                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: foreground),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }
+
                 final controlsWidget = Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Subject Chips Section. Dikey alanı kıt ekranda başlık
-                    // ayrı satır yerine çiplerin başında durur. Kalem düğmesinin
-                    // dokunma alanı başlıkla çipler arasındaki boşluğu karşılar.
-                    if (!dense) categoryHeader(inline: false),
+                    // Subject Chips Section. Dikey alanı kıt ekranda ve dikey
+                    // telefonda başlık ayrı satır yerine çiplerin başında durur.
+                    // Kalem düğmesinin dokunma alanı başlıkla çipler arasındaki
+                    // boşluğu karşılar.
+                    if (!layout.inlineHeader) categoryHeader(inline: false),
 
                     // Active Category Pills: telefonda yatay kaydırılır,
                     // tablette ortalanmış satırlara sarılır.
@@ -720,12 +809,13 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            if (dense) Padding(padding: const EdgeInsets.only(left: 4, right: 6), child: categoryHeader(inline: true)),
+                            if (layout.inlineHeader)
+                              Padding(padding: const EdgeInsets.only(left: 4, right: 6), child: categoryHeader(inline: true)),
                             ...categoryChips,
                           ],
                         ),
                       ),
-                    SizedBox(height: dense ? 8 : 16),
+                    SizedBox(height: gap(8, 12, 16)),
 
                     // Time Display (yalnızca sütuna sığmazsa satır kırmadan
                     // küçülür). Ekran okuyucu "X dakika Y saniye kaldı" okur.
@@ -747,64 +837,27 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                       ),
                     ),
                     // Süre çiplerinin 48 dp dokunma alanı bu boşluğun bir kısmını alır.
-                    SizedBox(height: dense ? 0 : 6),
+                    SizedBox(height: gap(0, 2, 6)),
 
-                    // Süre Seçimi: 25 dk / 50 dk. Her çip en az 48 dp yüksek
-                    // bir dokunma alanında ortalanır ve ekran okuyucuda seçili
-                    // durumuyla düğme olarak duyurulur.
-                    Wrap(
-                      alignment: WrapAlignment.center,
-                      runSpacing: 8,
-                      children: [25, 50].map((mins) {
-                        final isSel = loggedMinutes == mins;
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 6),
-                          child: Semantics(
-                            button: true,
-                            selected: isSel,
-                            label: l10n.timerDurationOption(mins),
-                            onTap: () => _selectDuration(mins),
-                            excludeSemantics: true,
-                            child: GestureDetector(
-                              // Seans varken kilitli (bkz. _selectDuration).
-                              onTap: () => _selectDuration(mins),
-                              behavior: HitTestBehavior.opaque,
-                              child: Container(
-                                constraints: const BoxConstraints(minHeight: kMinInteractiveDimension),
-                                alignment: Alignment.center,
-                                child: AnimatedContainer(
-                                  duration: const Duration(milliseconds: 200),
-                                  padding: EdgeInsets.symmetric(horizontal: dense ? 16 : 18, vertical: dense ? 6 : 10),
-                                  decoration: BoxDecoration(
-                                    color: isSel
-                                        ? AppColors.primaryContainer
-                                        : (isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow),
-                                    borderRadius: BorderRadius.circular(16),
-                                    border: Border.all(
-                                      color: isSel
-                                          ? AppColors.primaryContainer
-                                          : (isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    '$mins ${LanguageService.instance.translate('minutes_unit_short')}',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: isSel
-                                          ? Colors.white
-                                          : (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant)
-                                                .withValues(alpha: _hasSession ? 0.45 : 1),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
+                    // Süre Seçimi: 25 dk / 50 dk tek satırda, eşit genişlikte
+                    // iki seçenek. Her biri en az 48 dp yüksek dokunma alanı
+                    // ve ekran okuyucuda seçili durumuyla düğme olarak
+                    // duyurulur; seçili olan dolgu rengi ve onay işaretiyle
+                    // (yalnızca renge dayanmadan) ayrılır. Eskiden Wrap
+                    // içindeki hizalı Container satırın tüm genişliğini
+                    // alıyordu: 50 dk her ekranda alt satıra düşüyordu.
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: _durationRowMaxWidth),
+                      child: Row(
+                        children: [
+                          for (final mins in const [25, 50]) ...[
+                            if (mins != 25) const SizedBox(width: 12),
+                            Expanded(child: durationOption(mins)),
+                          ],
+                        ],
+                      ),
                     ),
-                    SizedBox(height: dense ? 4 : 16),
+                    SizedBox(height: gap(4, 10, 16)),
 
                     // Duraklatma Hakkı (Pause Limit)
                     Container(
@@ -847,7 +900,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                         ],
                       ),
                     ),
-                    SizedBox(height: dense ? 8 : 14),
+                    SizedBox(height: gap(8, 12, 14)),
 
                     // Primary Start/Pause Button
                     ElevatedButton(
@@ -874,7 +927,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                     ),
                     // Süren ya da duraklatılmış seansı onayla bırakma.
                     if (_hasSession) ...[
-                      SizedBox(height: dense ? 2 : 6),
+                      SizedBox(height: gap(2, 2, 6)),
                       TextButton.icon(
                         onPressed: _confirmDiscardSession,
                         icon: const Icon(Icons.restart_alt_rounded, size: 18),
@@ -883,9 +936,9 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                           foregroundColor: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
                         ),
                       ),
-                      SizedBox(height: dense ? 4 : 12),
+                      SizedBox(height: gap(4, 4, 12)),
                     ] else
-                      SizedBox(height: dense ? 8 : 24),
+                      SizedBox(height: gap(8, 12, 24)),
                   ],
                 );
 
@@ -918,6 +971,13 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                         ),
                       ),
                     ),
+                    // Hızlı test sayacı: bu seanslar kaydedilmez.
+                    if (_isQuickTest)
+                      PositionedDirectional(
+                        top: 8,
+                        end: 8,
+                        child: IgnorePointer(child: _QuickTestBadge(label: l10n.timerQuickTestBadge, semanticsLabel: l10n.timerQuickTestSemantics)),
+                      ),
                   ],
                 );
               },
@@ -929,11 +989,37 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
   }
 }
 
+/// Verilen yazı boyutu ve kalınlığında bir satırın ekrandaki yüksekliği.
+typedef _LineHeight = double Function(double fontSize, FontWeight fontWeight);
+
+/// Ekranın varsayılan yazı stili ve yazı ölçeğiyle satır yüksekliği ölçer
+/// (cihazın gerçek yazı tipi; Text widget'ı da aynı stili birleştirir).
+_LineHeight _lineHeightMeasurer(BuildContext context) {
+  final base = DefaultTextStyle.of(context).style;
+  final textScaler = MediaQuery.textScalerOf(context);
+  final direction = Directionality.of(context);
+  return (fontSize, fontWeight) {
+    final painter = TextPainter(
+      text: TextSpan(text: '0', style: base.merge(TextStyle(fontSize: fontSize, fontWeight: fontWeight))),
+      textDirection: direction,
+      textScaler: textScaler,
+      maxLines: 1,
+    )..layout();
+    final height = painter.height;
+    painter.dispose();
+    return height;
+  };
+}
+
 /// Sayaç ekranının yerleşimi; ekranın değil sayaca kalan alanın (yan
 /// gezinme ve güvenli alan düşülmüş) ölçüsünden hesaplanır.
 ///
-/// * Dikey telefon: bugünkü konumlar (kum saati üstte 220, kontroller altta).
-///   Çok alçak dikey ekranda kum saati küçülür, aralıklar sıkışır.
+/// * Dikey telefon: kum saati üstte, kontroller hemen altında. Kum saati
+///   kontrollerin (seans sürerken görünen Sıfırla dahil) tahmini
+///   yüksekliğinden kalan alana sığacak kadar büyür, en çok
+///   [_phoneHourglass]; BAŞLAT/DURAKLAT kaydırmadan görünür. Alan çok
+///   kısaysa kum saati eski boyutunun altına inmez, kontroller kayar.
+///   Fazla alan varsa grup dikeyde ortalanır.
 /// * Yatay (genişlik > yükseklik): kum saati solda, kontroller sağda; sağ
 ///   sütun sığmazsa kendi içinde kayar. Geniş ekranda iki sütun ortalanmış
 ///   bir grup olarak kalır.
@@ -944,6 +1030,8 @@ class _TimerLayout {
   const _TimerLayout({
     required this.dense,
     required this.large,
+    required this.compact,
+    required this.inlineHeader,
     required this.hourglassSize,
     required this.hourglassHeight,
     required this.hourglassTop,
@@ -954,19 +1042,45 @@ class _TimerLayout {
     required this.controlsAlignment,
   });
 
-  static const double _phoneHourglass = 220;
-  static const double _maxHourglass = 300;
+  /// Kum saati önceki sürüme göre bu oranda büyütüldü (yer olan yerlerde).
+  static const double _growth = 1.25;
+
+  /// Önceki dikey telefon boyutu; kısa ekranda kum saati bunun altına inmez.
+  static const double _legacyPhoneHourglass = 220;
+  static const double _phoneHourglass = _legacyPhoneHourglass * _growth;
+  static const double _maxHourglass = 300 * _growth;
   static const double _minHourglass = 64;
   static const double _shortPortraitHeight = 540;
   static const double _denseHeight = 420;
   static const double _maxTwoColumnWidth = 960;
   static const double _maxCenteredControlsWidth = 560;
 
+  /// Dikey telefonda kum saatinin üstündeki en az boşluk ve kum saati ile
+  /// kontroller arası.
+  static const double _phoneTop = 8;
+  static const double _phoneGap = 8;
+
   /// Tablet dikeyde kum saati ve kontrolleri dikeyde ortalamak için
   /// kontrollerin yaklaşık yüksekliği (yanılırsa yalnızca ortalama kayar).
   static const double _estimatedControlsHeight = 420;
 
-  factory _TimerLayout.of(BoxConstraints constraints) {
+  /// Dikey telefonda kontrol sütununun (seans varken: Sıfırla dahil)
+  /// yaklaşık yüksekliği. Yazı satırları ekrandaki yazı tipi ve ölçeğiyle
+  /// ölçülür ([lineHeight]); aralıklar sayaç ekranındaki `gap(...)`
+  /// değerleriyle aynıdır: dense / compact.
+  static double phoneControlsHeight({required bool dense, required _LineHeight lineHeight}) {
+    const tap = kMinInteractiveDimension;
+    final chips = math.max(tap, lineHeight(13, FontWeight.bold) + 24); // başlık satır içinde
+    final time = lineHeight(dense ? 42 : 52, FontWeight.bold);
+    final duration = math.max(tap, lineHeight(16, FontWeight.bold) + (dense ? 14 : 22));
+    final pause = math.max(13.0, lineHeight(11, FontWeight.w600)) + 12;
+    final button = math.max(dense ? 44.0 : 48.0, lineHeight(17, FontWeight.bold) + 16);
+    final reset = math.max(tap, lineHeight(14, FontWeight.w500) + 16);
+    final gaps = dense ? (8 + 0 + 4 + 8 + 2 + 4) : (12 + 2 + 10 + 12 + 2 + 4);
+    return chips + time + duration + pause + button + reset + gaps;
+  }
+
+  factory _TimerLayout.of(BoxConstraints constraints, {required _LineHeight lineHeight}) {
     final w = constraints.maxWidth;
     final h = constraints.maxHeight;
     final large = math.min(w, h) >= Responsive.mediumMinWidth;
@@ -976,10 +1090,14 @@ class _TimerLayout {
       final groupLeft = (w - groupWidth) / 2;
       // Kontroller (çipler, süre seçimi) biraz daha geniş sütun alır.
       final columnWidth = groupWidth * 0.45;
-      final size = math.max(_minHourglass, math.min(_maxHourglass, math.min(columnWidth * 0.8, (h - 24) / 1.05)));
+      // Yükseklik çoğunlukla sınırlar; sütun kenarlarına dayanmaz.
+      final size = math.max(_minHourglass, math.min(_maxHourglass, math.min(columnWidth * 0.9, (h - 24) / 1.05)));
+      final dense = h < _denseHeight;
       return _TimerLayout(
-        dense: h < _denseHeight,
+        dense: dense,
         large: large,
+        compact: false,
+        inlineHeader: dense,
         hourglassSize: size,
         hourglassHeight: size * 1.05,
         hourglassTop: (h - size * 1.05) / 2,
@@ -992,36 +1110,34 @@ class _TimerLayout {
     }
 
     if (w < Responsive.mediumMinWidth) {
-      if (h >= _shortPortraitHeight) {
-        return _TimerLayout(
-          dense: false,
-          large: false,
-          hourglassSize: _phoneHourglass,
-          hourglassHeight: 230,
-          hourglassTop: 48,
-          hourglassLeft: (w - _phoneHourglass) / 2,
-          controlsTop: 300,
-          controlsLeft: 0,
-          controlsWidth: w,
-          controlsAlignment: Alignment.center,
-        );
-      }
-      final size = (h * 0.34).clamp(120.0, _phoneHourglass);
+      final dense = h < _shortPortraitHeight;
+      final controls = phoneControlsHeight(dense: dense, lineHeight: lineHeight);
+      final ceiling = math.min(_phoneHourglass, w - 32);
+      final floor = math.min(
+        ceiling,
+        dense ? (h * 0.34).clamp(120.0, _legacyPhoneHourglass) : _legacyPhoneHourglass,
+      );
+      final size = ((h - _phoneTop - _phoneGap - controls) / 1.05).clamp(floor, ceiling);
+      final hourglassHeight = size * 1.05;
+      final spare = h - (_phoneTop + hourglassHeight + _phoneGap + controls);
+      final top = _phoneTop + math.max(0.0, spare / 2);
       return _TimerLayout(
-        dense: true,
+        dense: dense,
         large: false,
+        compact: true,
+        inlineHeader: true,
         hourglassSize: size,
-        hourglassHeight: size * 1.05,
-        hourglassTop: 16,
+        hourglassHeight: hourglassHeight,
+        hourglassTop: top,
         hourglassLeft: (w - size) / 2,
-        controlsTop: 16 + size * 1.05 + 8,
+        controlsTop: top + hourglassHeight + _phoneGap,
         controlsLeft: 0,
         controlsWidth: w,
-        controlsAlignment: Alignment.center,
+        controlsAlignment: Alignment.topCenter,
       );
     }
 
-    final size = (math.min(w, h) * 0.36).clamp(_phoneHourglass, _maxHourglass);
+    final size = (math.min(w, h) * 0.36 * _growth).clamp(_phoneHourglass, _maxHourglass);
     final hourglassHeight = size * 1.05;
     const gap = 20.0;
     final top = math.max(32.0, (h - hourglassHeight - gap - _estimatedControlsHeight) / 2);
@@ -1029,6 +1145,8 @@ class _TimerLayout {
     return _TimerLayout(
       dense: false,
       large: large,
+      compact: false,
+      inlineHeader: false,
       hourglassSize: size,
       hourglassHeight: hourglassHeight,
       hourglassTop: top,
@@ -1046,6 +1164,13 @@ class _TimerLayout {
   /// Tablet: süre ve düğme biraz büyür, kategori çipleri satırlara sarılır.
   final bool large;
 
+  /// Dikey telefon: aralıklar dense ile tablet arasında (BAŞLAT kaydırmadan
+  /// görünsün, kum saati büyük kalsın).
+  final bool compact;
+
+  /// Kategori başlığı ayrı satır yerine çip satırının başında.
+  final bool inlineHeader;
+
   final double hourglassSize;
   final double hourglassHeight;
   final double hourglassTop;
@@ -1054,6 +1179,40 @@ class _TimerLayout {
   final double controlsLeft;
   final double controlsWidth;
   final Alignment controlsAlignment;
+}
+
+/// Hızlı test sayacında sayaç ekranının köşesindeki "TEST" rozeti.
+class _QuickTestBadge extends StatelessWidget {
+  const _QuickTestBadge({required this.label, required this.semanticsLabel});
+
+  final String label;
+  final String semanticsLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: semanticsLabel,
+      excludeSemantics: true,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.amber.shade600,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.science_outlined, size: 14, color: Colors.black87),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1, color: Colors.black87),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 /// Seans tamamlanınca gösterilen diyalog. [result] verilirse sunucunun
@@ -1068,11 +1227,15 @@ class SessionCompletedDialog extends StatefulWidget {
   final Future<SessionSubmitResult?>? result;
   final Duration resultTimeout;
 
+  /// Hızlı test sayacının seansı: gönderilmedi, "kaydedilmez" denir.
+  final bool testSession;
+
   const SessionCompletedDialog({
     super.key,
     required this.minutes,
     this.result,
     this.resultTimeout = const Duration(seconds: 8),
+    this.testSession = false,
   });
 
   @override
@@ -1160,6 +1323,9 @@ class _SessionCompletedDialogState extends State<SessionCompletedDialog> {
 
     final queuedOffline = message(l10n.sessionQueuedOffline, Icons.cloud_upload_outlined, muted);
     final List<Widget> status = switch (_result) {
+      _ when widget.testSession => [
+          message(l10n.sessionResultTestNotSaved, Icons.science_outlined, accent),
+        ],
       _ when widget.result == null => const [],
       _ when _waiting && !_timedOut => [
           Row(

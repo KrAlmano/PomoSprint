@@ -384,7 +384,7 @@ void main() {
     expect(backend.sent[0].startedAt.difference(backend.sent[1].startedAt).inMinutes, inInclusiveRange(9, 10));
   });
 
-  test('düzeltmeye rağmen süre dolmamışsa (debug kısa seans) kalıcı reddedilir', () async {
+  test('düzeltmeye rağmen süre dolmamışsa (kısaltılmış test seansı) kalıcı reddedilir', () async {
     backend.handler = skewedServer;
     final result =
         await queue.submit('u1', _session('a', startedAt: DateTime.now().subtract(const Duration(minutes: 1))));
@@ -401,7 +401,21 @@ void main() {
       _session('a', startedAt: DateTime.now().subtract(const Duration(seconds: 5)), clockOffsetMs: clock.offset!.inMilliseconds),
     );
     expect(result, isA<SessionSubmitRejected>());
+    expect((result as SessionSubmitRejected).reasonCode, SessionReason.notElapsed,
+        reason: 'fark ölçülüp küçük bulundu: saat suçlanmaz');
     expect(backend.sent.length, 1);
+  });
+
+  test("saat farkı ölçülemezse (yanıtta 'date' yok) süre dolmamış seans bekletilir, saat suçlanmaz", () async {
+    // Hiçbir yanıt saat örneği vermiyor (onRequest yok): fark bilinmiyor.
+    backend.handler = (s, c, t) async => throw const PostgrestException(message: 'session_not_finished', code: 'P0001');
+    final result = await queue.submit('u1', _session('a', startedAt: DateTime.now().subtract(const Duration(seconds: 5))));
+    expect(clock.offset, isNull);
+    expect(result, isA<SessionSubmitQueued>());
+    expect((result as SessionSubmitQueued).reasonCode, SessionReason.notElapsed);
+    // Seans silinmez; kuyrukta yeniden denenmek üzere kalır.
+    expect((await queue.pending('u1')).single.lastError, SessionReason.notElapsed);
+    expect(await queue.rejectedSessions('u1'), isEmpty);
   });
 
   test('saat farkı biliniyorsa gönderilen started_at baştan düzeltilir', () async {
