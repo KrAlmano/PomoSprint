@@ -1985,4 +1985,75 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get timerNotificationsDenied =>
       'Bildirim izni yok: seans bitince haber veremeyiz ve kilit ekranında sayaç görünmez.';
+
+  @override
+  String onboardingCategoriesSkippedLimit(int count, int limit) {
+    return 'Kategori sınırına ($limit) ulaşıldığı için seçtiğin $count kategori eklenmedi. Kategorilerim\'den düzenleyebilirsin.';
+  }
+
+  @override
+  String get categoryColorInvalidMsg =>
+      'Bu renk kullanılamıyor. Listeden bir renk seç.';
+
+  @override
+  String get categoryIconInvalidMsg =>
+      'Bu kategori simgesi kullanılamıyor. Lütfen tekrar dene.';
+
+  @override
+  String leagueInfoPromoteMinPoints(int count, int points) {
+    return 'Bu dönem en az $points puan toplayan ilk $count kişi bir üst lige yükselir.';
+  }
+
+  @override
+  String get leagueAloneInRoomTitle => 'Odanda şimdilik yalnızsın';
+
+  @override
+  String get leagueAloneInRoomBody =>
+      'Bu lig odasında şu an yalnızca sen varsın. Odaya katılanlar burada görünür; pomodoro tamamladıkça puan toplarsın.';
+
+  @override
+  String get friendsErrInvalidCode =>
+      'Arkadaş kodu 6–8 harf ve rakamdan oluşur. Kodu kontrol et.';
+
+  @override
+  String get friendsErrRateLimited =>
+      'Çok fazla deneme yaptın. Lütfen bir süre sonra tekrar dene.';
+
+  @override
+  String get friendsErrCooldown =>
+      'Bu kullanıcı isteğini yakın zamanda reddetti. Bir süre sonra tekrar deneyebilirsin.';
+
+  @override
+  String get friendsErrBlocked =>
+      'Bu kullanıcıyı engellediğin için arkadaş olarak ekleyemezsin.';
+
+  @override
+  String leagueAwardsSubMinPoints(int points) {
+    return 'Bir lig dönemini en az $points puanla ilk 3\'te bitirince kazanılır: 1.\'ye Şampiyonluk, 2. ve 3.\'ye Podyum Ödülü.';
+  }
+
+  @override
+  String leagueAwardMinMembersNote(int members) {
+    return 'Ödül yalnızca dönem sonunda en az $members kişi olan odalarda verilir.';
+  }
+
+  @override
+  String leagueAwardLockedBodyMinPoints(int points) {
+    return 'Bu avatarı kazanmak için bu kademede bir lig dönemini en az $points puanla ilk 3\'te bitirmen gerekiyor. Parayla satın alınamaz.';
+  }
+
+  @override
+  String leagueAwardLockedBodyChampionMinPoints(int points) {
+    return 'Bu Şampiyonluk Ödülü\'nü kazanmak için bu kademede bir lig dönemini en az $points puanla 1. sırada bitirmen gerekiyor. Parayla satın alınamaz.';
+  }
+
+  @override
+  String leagueAwardLockedBodyPodiumMinPoints(int points) {
+    return 'Bu Podyum Ödülü\'nü kazanmak için bu kademede bir lig dönemini en az $points puanla 2. veya 3. sırada bitirmen gerekiyor (1. olan Şampiyonluk Ödülü\'nü alır). Parayla satın alınamaz.';
+  }
+
+  @override
+  String rankingZoneNeedsMinPointsMe(int points) {
+    return 'Terfi bölgesindesin ama terfi için en az $points puan gerekiyor. Seans tamamlamaya devam et.';
+  }
 }

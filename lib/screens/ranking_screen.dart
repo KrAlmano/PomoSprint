@@ -120,8 +120,16 @@ class _RankingScreenState extends State<RankingScreen> {
       final List<RankingEntry> entries;
       switch (tab) {
         case _RankingTab.league:
+          // Kural okunamazsa bugünkü kural döner (hata fırlatmaz).
+          final rulesFuture = service.getLeagueRules();
           final rows = await service.getLeagueRanking();
-          league = rows.isEmpty ? null : LeagueSnapshot.fromRows(rows);
+          league = rows.isEmpty
+              ? null
+              : LeagueSnapshot.fromRows(
+                  rows,
+                  rules: await rulesFuture,
+                  hasLeagueHistory: hasLeagueHistory(service.currentUser.value ?? widget.currentUser),
+                );
           entries = [for (final r in rows) RankingEntry.fromRow(r, pointsKey: 'weekly_points')];
         case _RankingTab.monthly:
           final rows = await service.getMonthlyRanking();

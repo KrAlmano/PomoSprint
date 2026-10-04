@@ -2025,4 +2025,81 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get timerNotificationsDenied =>
       'No notification permission: we can\'t alert you when the session ends and the lock screen timer won\'t show.';
+
+  @override
+  String onboardingCategoriesSkippedLimit(int count, int limit) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count selected categories weren\'t added',
+      one: '1 selected category wasn\'t added',
+    );
+    return '$_temp0 because you reached the category limit ($limit). You can manage them in My Categories.';
+  }
+
+  @override
+  String get categoryColorInvalidMsg =>
+      'This color can\'t be used. Pick a color from the list.';
+
+  @override
+  String get categoryIconInvalidMsg =>
+      'This category icon can\'t be used. Please try again.';
+
+  @override
+  String leagueInfoPromoteMinPoints(int count, int points) {
+    return 'This period the top $count who earned at least $points points move up a league.';
+  }
+
+  @override
+  String get leagueAloneInRoomTitle => 'You\'re alone in your room for now';
+
+  @override
+  String get leagueAloneInRoomBody =>
+      'Right now you\'re the only one in this league room. People who join will show up here; complete pomodoros to earn points.';
+
+  @override
+  String get friendsErrInvalidCode =>
+      'A friend code has 6–8 letters and digits. Check the code.';
+
+  @override
+  String get friendsErrRateLimited =>
+      'Too many attempts. Please try again later.';
+
+  @override
+  String get friendsErrCooldown =>
+      'This user recently declined your request. You can try again later.';
+
+  @override
+  String get friendsErrBlocked =>
+      'You can\'t add this user because you blocked them.';
+
+  @override
+  String leagueAwardsSubMinPoints(int points) {
+    return 'Earned by finishing a league period in the top 3 with at least $points points: 1st gets the Champion Award, 2nd and 3rd get the Podium Award.';
+  }
+
+  @override
+  String leagueAwardMinMembersNote(int members) {
+    return 'Awards are only given in rooms with at least $members members at the end of the period.';
+  }
+
+  @override
+  String leagueAwardLockedBodyMinPoints(int points) {
+    return 'To earn this avatar, finish a league period in this tier in the top 3 with at least $points points. It can\'t be purchased.';
+  }
+
+  @override
+  String leagueAwardLockedBodyChampionMinPoints(int points) {
+    return 'To earn this Champion Award, finish a league period in this tier in 1st place with at least $points points. It can\'t be purchased.';
+  }
+
+  @override
+  String leagueAwardLockedBodyPodiumMinPoints(int points) {
+    return 'To earn this Podium Award, finish a league period in this tier in 2nd or 3rd place with at least $points points (1st place gets the Champion Award). It can\'t be purchased.';
+  }
+
+  @override
+  String rankingZoneNeedsMinPointsMe(int points) {
+    return 'You\'re in the promotion zone, but you need at least $points points to move up. Keep completing sessions.';
+  }
 }

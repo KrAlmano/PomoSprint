@@ -28,6 +28,9 @@ String socialErrorText(AppLocalizations l10n, Object error) {
     case ServiceErrorCode.invalidInput:
     case ServiceErrorCode.categoryLimitReached:
     case ServiceErrorCode.categoryNameExists:
+    case ServiceErrorCode.categoryColorInvalid:
+    case ServiceErrorCode.categoryIconInvalid:
+    case ServiceErrorCode.underMinimumAge:
     case ServiceErrorCode.server:
     case ServiceErrorCode.unknown:
       return l10n.socialErrGeneric;

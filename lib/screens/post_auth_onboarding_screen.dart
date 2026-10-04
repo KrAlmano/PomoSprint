@@ -34,10 +34,14 @@ class PostAuthOnboardingScreen extends StatefulWidget {
   /// çıkış düğmesi her durumda gösterilir.
   final VoidCallback? onSignedOut;
 
+  /// Veri katmanı (varsayılan: [SupabaseService.instance]; testte sahtesi).
+  final SupabaseService? service;
+
   const PostAuthOnboardingScreen({
     super.key,
     required this.onCompleted,
     this.onSignedOut,
+    this.service,
   });
 
   @override
@@ -96,7 +100,7 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
   List<String> get _recommendedCategoryNames => recommendedCategoryNames(_userSegment);
 
   int get _categoryLimit =>
-      categoryLimitFor(isPremium: SupabaseService.instance.currentUser.value?.isPremium ?? false);
+      categoryLimitFor(isPremium: _service.currentUser.value?.isPremium ?? false);
 
   static const Set<int> _goalOptions = {60, 120, 180, 240};
 
@@ -107,7 +111,9 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
   bool _changedBeforeDraftLoad = false;
   bool _draftClosed = false;
 
-  String? get _draftOwner => SupabaseService.instance.currentUser.value?.id;
+  SupabaseService get _service => widget.service ?? SupabaseService.instance;
+
+  String? get _draftOwner => _service.currentUser.value?.id;
 
   @override
   void initState() {
@@ -293,12 +299,13 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
       return;
     }
     setState(() => _isSaving = true);
-    final service = SupabaseService.instance;
+    final service = _service;
+    final OnboardingCategoriesResult? categoriesResult;
     try {
       // Servis önce profili garanti eder, sonra kategorileri kurar, en son
       // onboarding_completed_at'i yazar; yarıda kalırsa onboarding tekrar
       // gösterilir ve kategori kurulumu tekrar güvenle çalışır.
-      await service.completeOnboarding(
+      categoriesResult = await service.completeOnboarding(
         birthYear: _birthYear,
         // "Diğer" sunucuda saklanmaz (CHECK'te yok). 'kpss'/'language'yı
         // CHECK'i genişletilmemiş sunucu reddederse servis segmentsiz bitirir.
@@ -318,10 +325,24 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
           await _signOut(message: l10n.onboardingSessionExpired);
         case ServiceErrorCode.timeout || ServiceErrorCode.network || ServiceErrorCode.cloudUnavailable:
           _showSnack(l10n.onboardingTimeoutError, isError: true);
+        case ServiceErrorCode.underMinimumAge:
+          // Sunucu (proposed/24) yılı 13 yaş altı saydı (ör. cihaz saati
+          // geride): istemcideki 13 yaş altı yanıtıyla aynı davranış.
+          setState(() => _ageRejected = true);
+          _goToPage(_ageStep);
+          _showSnack(l10n.onboardingUnder13Error, isError: true);
         default:
           _showSnack(l10n.onboardingSaveError, isError: true);
       }
       return;
+    }
+
+    // proposed/23: kategori sınırı dolduğu için eklenemeyen seçimler (canlı
+    // sunucu sonucu döndürmez; o zaman bilgi yok). Mesaj kök
+    // ScaffoldMessenger'da kabuğa geçişte de görünür kalır.
+    final skippedLimit = categoriesResult?.skippedLimit ?? 0;
+    if (skippedLimit > 0 && mounted) {
+      _showSnack(AppLocalizations.of(context)!.onboardingCategoriesSkippedLimit(skippedLimit, _categoryLimit));
     }
 
     // completeOnboarding kullanıcıyı yalnızca önceden yüklenmişse günceller.
@@ -338,7 +359,7 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
   Future<void> _signOut({String? message}) async {
     if (message != null) _showSnack(message, isError: true);
     setState(() => _isSaving = true);
-    await SupabaseService.instance.signOutFully();
+    await _service.signOutFully();
     if (!mounted) return;
     setState(() => _isSaving = false);
     widget.onSignedOut?.call();
@@ -349,7 +370,7 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
   Future<void> _confirmDeleteAccount() async {
     if (_isSaving) return;
     final l10n = AppLocalizations.of(context)!;
-    final service = SupabaseService.instance;
+    final service = _service;
     final confirmText = deleteAccountConfirmText(
       l10n,
       pendingCount: service.pendingSessionCount.value,

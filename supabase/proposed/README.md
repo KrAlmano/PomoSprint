@@ -338,18 +338,36 @@ zincir + 20–25. Zincirin zaten düzelttiği bulgular için yeni dosya yazılma
 **Zincir + 20–25 sonrası:** tüm BUG satırları `düzgün`; yalnızca t4-F3
 düğmeler açılana kadar bugünkü kuralla kalır (bilinçli).
 
-**İstemci sözleşmesi (20–25 canlıya uygulandıktan SONRA bağlanır):**
+**İstemci sözleşmesi.** İstemci (5 Ekim 2026) aşağıdakilere İLERİYE UYUMLU: aynı
+kod canlıda (eski yanıt) ve 20–25 uygulanınca (yeni yanıt) doğru çalışır;
+iki hâl yerelde sınandı (`test/server_20_25_client_compat_test.dart`,
+`tool/local_supabase/e2e/client_compat/client_compat_e2e_test.dart`: ana kopya
+ve `REST_PORT`'lu zincir kopyası). Yalnızca `league_points_next_period` (21) ve
+`rotate_friend_code` (25) henüz kullanılmıyor.
+
+**23 için sürüm notu:** 23 onboarding'i bitmemiş kullanıcıda yükte OLMAYAN
+seansız aktif kategorileri arşivler. Bu istemciden önceki sürümler onboarding
+yeniden denemesinde yalnız eksik kategorileri gönderiyordu; 23 uygulanınca
+seçimde olan ama zaten var olan kategori arşive gider (yerelde yeniden
+üretildi). Yeni istemci aktif kalacakları da gönderir
+(`OnboardingCategoryPlan.rpcPayload`). 23'ü bu istemci yaygınlaştıktan sonra
+uygulayın (gerekirse 13'ün `min_supported_version` düğmesiyle).
+
+Sunucu tarafı ayrıntı:
 - `complete_study_session` yanıtına `league_points_next_period` (bool) eklenir (21).
-- `get_my_league_ranking`: ligsiz satırda `member_count` 0 (20). Bugünkü
-  `awaitingPlacement` (`<= 1`) aynı davranır; yeni istemci 1'i "odanda
-  şimdilik yalnızsın" diye gösterebilir.
+- `get_my_league_ranking`: ligsiz satırda `member_count` 0 (20). İstemci 0'ı
+  "henüz odada değilsin", odasında tek kalanı "odanda şimdilik yalnızsın"
+  gösterir (canlıda ömür boyu puanla ayırt eder; `LeagueSnapshot.fromRows`).
 - `get_app_config()`: `league_award_min_members`, `league_award_min_points`,
-  `league_promotion_min_points` (20). Değiştirilirse `leagueInfoPromote`,
-  `leagueAwardsSub`, `leagueAwardLocked*` ve `isPromotionRank` aynı kurala.
+  `league_promotion_min_points` (20). İstemci okur (`getLeagueRules`; PGRST202
+  ya da anahtar yoksa bugünkü kural): metinler ve `isPromotionRank` /
+  `zoneOf` / podyum madalyası düğmelere göre kendiliğinden değişir.
 - `setup_onboarding_categories` jsonb döner:
   `{created, restored, skipped_existing, skipped_limit, skipped_invalid, archived}` (23).
 - Yeni hata metinleri (23514): `category_color_invalid`, `category_icon_invalid`
-  (23), `birth_year_under_minimum_age` (24). Bugün `invalidInput`'a düşer.
+  (23), `birth_year_under_minimum_age` (24). İstemci `categoryColorInvalid`,
+  `categoryIconInvalid`, `underMinimumAge` koduyla anlaşılır metin gösterir
+  (13'ün `*_name_not_allowed`'ı `nameNotAllowed`).
 - `rotate_friend_code()` → `{success, code:'rotated'|'rate_limited', friend_code | retry_after}` (25).
 - Onboarding PATCH'i `user_segment` olarak `kpss` / `language` da gönderir
   (istemci bu sürümden itibaren, 26'yı beklemeden). 26 yokken 23514
