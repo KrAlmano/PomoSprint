@@ -1,0 +1,11 @@
+{
+  // F5 ile yapılan iOS derlemeleri Xcode 27 ile yapılsın. Sistemde varsayılan
+  // (xcode-select) Xcode 26.6 olsa bile: 26.6'nın iOS 26.5 derleme bileşeni
+  // kurulu değil, derleme "iOS 26.5 is not installed" hatasıyla düşüyor.
+  // Simülatör penceresi için Xcode 26.6'daki klasik Simulator uygulaması
+  // (open -a Simulator) aynen kullanılabilir; bu ayar onu etkilemez.
+  // Telefona (iOS 27) yükleme için de Xcode 27 gerekiyor.
+  "dart.env": {
+    "DEVELOPER_DIR": "/Applications/Xcode.app/Contents/Developer"
+  }
+}
