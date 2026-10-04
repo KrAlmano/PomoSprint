@@ -65,7 +65,7 @@ main.dart → SplashScreen → AppGate ─┬─ LoginScreen / RegisterScreen
 
 ## 5. Geliştirirken
 
-- Debug build'de sayaç 5/10 sn'dir ve sunucu bu seansları reddeder. Gerçek seans testi için `flutter run --profile` ya da `--release`.
+- Sayaç her derlemede (debug dahil) gerçek süreli. Hızlı deneme için `flutter run --dart-define=QUICK_TIMER=true`: 5/10 sn, ekranda TEST rozeti, seans sunucuya ve kuyruğa gönderilmez.
 - Yeni veri ihtiyacı → `SupabaseService`'e metod; yeni sunucu mantığı → canlı tanımdan yazılmış migration (AGENTS.md §2.4).
 - Test hesabında oluşturduğun sahte veriyi iş bitince temizle.
 - Kullanıcı modern, akıcı ve "premium" hissiyatlı arayüz bekliyor; yer tutucu ya da kaba tasarım bırakma.

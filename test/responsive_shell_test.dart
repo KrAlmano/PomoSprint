@@ -49,12 +49,30 @@ const _targetSizes = <Size>[
 
 bool _isLandscape(Size size) => size.width > size.height;
 
-void _setView(WidgetTester tester, Size size, {double keyboard = 0}) {
+void _setView(WidgetTester tester, Size size, {double keyboard = 0, EdgeInsets safeArea = EdgeInsets.zero}) {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   tester.view.viewInsets = FakeViewPadding(bottom: keyboard);
+  final padding = FakeViewPadding(
+    left: safeArea.left,
+    top: safeArea.top,
+    right: safeArea.right,
+    bottom: safeArea.bottom,
+  );
+  tester.view.padding = padding;
+  tester.view.viewPadding = padding;
   addTearDown(tester.view.reset);
 }
+
+/// Gerçek iPhone'ların dikey ekranı ve güvenli alanı (çentik / Dynamic
+/// Island ve ana ekran çubuğu) ile sayacın önceki kum saati boyutu (gövde
+/// yüksekliği ≥ 540 ise 220, değilse gövde × 0,34).
+const _iPhones = <(String, Size, EdgeInsets, double)>[
+  ('iPhone 16 Pro', Size(402, 874), EdgeInsets.only(top: 62, bottom: 34), 220),
+  ('iPhone 15/16', Size(393, 852), EdgeInsets.only(top: 59, bottom: 34), 220),
+  ('iPhone 12-14', Size(390, 844), EdgeInsets.only(top: 47, bottom: 34), 220),
+  ('iPhone SE 2/3', Size(375, 667), EdgeInsets.only(top: 20), 171),
+];
 
 Widget _app(Widget home, {double textScale = 1}) {
   return MaterialApp(
@@ -221,6 +239,31 @@ void main() {
           }
         }
       }
+    });
+
+    testWidgets('gövdeye güvenli alan ikinci kez verilmez (üst ve alt çubuk karşılar)', (tester) async {
+      const bodyKey = ValueKey('shell-body');
+      EdgeInsets bodyPadding() => MediaQuery.paddingOf(tester.element(find.byKey(bodyKey)));
+      // Dikey iPhone: üst güvenli alanı üst çubuk, alttakini alt gezinme
+      // karşılar. Eskiden gövdeye yeniden veriliyor, sekmelerin SafeArea'sı
+      // üstte ve altta ikinci kez boşluk bırakıyordu.
+      for (final (name, size, safeArea, _) in _iPhones) {
+        _setView(tester, size, safeArea: safeArea);
+        await tester.pumpWidget(_app(_shell(body: const SizedBox.expand(key: bodyKey))));
+        await tester.pumpAndSettle();
+        _expectNoLayoutError(tester, name);
+        expect(bodyPadding(), EdgeInsets.zero, reason: name);
+        final body = tester.getRect(find.byKey(bodyKey));
+        expect(body.top, tester.getRect(find.byType(AppBar)).bottom, reason: name);
+        expect(body.bottom, tester.getRect(find.byType(NavigationBar)).top, reason: name);
+      }
+      // Yatay iPhone: sol çentiği ray karşılar; alt çubuk olmadığından alt
+      // güvenli alan (ana ekran çubuğu) gövdede kalır.
+      _setView(tester, const Size(874, 402), safeArea: const EdgeInsets.only(left: 62, right: 62, bottom: 21));
+      await tester.pumpWidget(_app(_shell(body: const SizedBox.expand(key: bodyKey))));
+      await tester.pumpAndSettle();
+      expect(find.byType(NavigationRail), findsOneWidget);
+      expect(bodyPadding(), const EdgeInsets.only(right: 62, bottom: 21));
     });
 
     testWidgets('raydaki sekmeye dokunmak sekmeyi seçer', (tester) async {
@@ -402,8 +445,9 @@ void main() {
               } else {
                 expect(hourglass.bottom, lessThanOrEqualTo(time.top), reason: label);
               }
-              // Kum saati taşmadan ekranda, abartılı büyümeden.
-              expect(hourglass.width, lessThanOrEqualTo(300), reason: label);
+              // Kum saati taşmadan ekranda, abartılı büyümeden (önceki
+              // üst sınır 300'ün 1,25 katı).
+              expect(hourglass.width, lessThanOrEqualTo(375), reason: label);
               expect(hourglass.top, greaterThanOrEqualTo(0), reason: label);
               expect(hourglass.bottom, lessThanOrEqualTo(size.height), reason: label);
               // 320x568'de kabuksuz tam ekran düzen gerçekte yok (dikeyde sayaç
@@ -420,13 +464,57 @@ void main() {
               expect(reachable.bottom, lessThanOrEqualTo(size.height), reason: label);
               expect(reachable.top, greaterThanOrEqualTo(0), reason: label);
               if (size == _phonePortrait && inShell && scale == 1.0) {
-                // Dikey telefonda bugünkü yerleşim: 220 genişlikte, ortada.
-                expect(hourglass.width, 220, reason: label);
+                // Dikey telefonda kum saati önceki 220'den büyük (en çok
+                // 1,25 katı), ortada.
+                expect(hourglass.width, greaterThan(220), reason: label);
+                expect(hourglass.width, lessThanOrEqualTo(275), reason: label);
                 expect(hourglass.center.dx, closeTo(size.width / 2, 0.5), reason: label);
               }
               await unmount();
             }
           }
+        }
+      }
+
+      // Gerçek iPhone'lar, kabukta (üst çubuk + alt gezinme), güvenli
+      // alanlarıyla: BAŞLAT (seans varken DEVAM) kaydırmadan görünür, 25/50
+      // aynı satırda eşit genişlikte, kum saati önceki boyutundan büyük.
+      for (final (name, size, safeArea, previousHourglass) in _iPhones) {
+        for (final paused in [false, true]) {
+          final label = '$name $size paused=$paused';
+          // Önceki adımlardan kalan duraklatılmış seans boşta durumu bozmasın.
+          paused ? await savePausedSession() : await TimerPersistence.instance.clear(owner);
+          _setView(tester, size, safeArea: safeArea);
+          await tester.pumpWidget(_app(_shell(body: timer())));
+          await tester.pump();
+          await tester.pumpAndSettle();
+          _expectNoLayoutError(tester, label);
+          final l10n = AppLocalizations.of(tester.element(find.byType(TimerScreen)))!;
+          expect(find.text(l10n.timerResetBtn), paused ? findsOneWidget : findsNothing, reason: label);
+
+          final body = tester.getRect(find.byType(TimerScreen));
+          final nav = tester.getRect(find.byType(NavigationBar));
+          final mainButton = tester.getRect(find.byType(ElevatedButton));
+          expect(mainButton.top, greaterThanOrEqualTo(body.top), reason: label);
+          expect(mainButton.bottom, lessThanOrEqualTo(nav.top), reason: '$label: ana düğme kaydırmadan görünür');
+
+          Rect option(String prefix, Type type) =>
+              tester.getRect(find.ancestor(of: find.textContaining(prefix), matching: find.byType(type)).first);
+          final option25 = option('25 ', AnimatedContainer);
+          final option50 = option('50 ', AnimatedContainer);
+          expect(option25.top, option50.top, reason: '$label: 25 ve 50 aynı satırda');
+          expect(option25.right, lessThan(option50.left), reason: label);
+          expect(option25.width, closeTo(option50.width, 0.5), reason: '$label: eşit genişlik');
+          expect(option('25 ', GestureDetector).height, greaterThanOrEqualTo(kMinInteractiveDimension), reason: label);
+          expect(option50.bottom, lessThanOrEqualTo(mainButton.top), reason: label);
+
+          final hourglass = tester.getRect(find.byType(HourglassWidget));
+          expect(hourglass.width, greaterThan(previousHourglass), reason: '$label: kum saati büyüdü');
+          expect(hourglass.width, lessThanOrEqualTo(275), reason: label);
+          expect(hourglass.top, greaterThanOrEqualTo(body.top), reason: label);
+          expect(hourglass.bottom, lessThanOrEqualTo(tester.getRect(find.textContaining(':').first).top), reason: label);
+          expect(hourglass.center.dx, closeTo(size.width / 2, 0.5), reason: label);
+          await unmount();
         }
       }
 

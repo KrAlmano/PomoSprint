@@ -246,6 +246,9 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
 
   void _onTimerStateChanged(bool isRunning, String categoryName, int minutesLeft) {
     if (mounted && _isTimerRunning != isRunning) setState(() => _isTimerRunning = isRunning);
+    // Hızlı test sayacı (QUICK_TIMER) sunucuya hiçbir şey yazmaz: canlı
+    // çalışanlar listesine de girmez (seanslar zaten gönderilmez).
+    if (kQuickTimer) return;
     if (isRunning) {
       unawaited(_service.startStudySession(durationMinutes: minutesLeft, categoryName: categoryName));
     } else {

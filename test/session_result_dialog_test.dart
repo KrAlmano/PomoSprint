@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:pomodoro/app/session_feedback.dart';
 import 'package:pomodoro/l10n/app_localizations.dart';
 import 'package:pomodoro/screens/history_screen.dart';
 import 'package:pomodoro/screens/rejected_sessions_screen.dart';
@@ -152,18 +153,63 @@ void main() {
       expect(find.text(l10n.sessionRejectedOverlap), findsOneWidget);
       expect(find.text(l10n.sessionResultOk), findsOneWidget);
 
-      // session_not_finished (saat) nedeni de kendi metniyle.
+      // session_not_finished: saat farkı ölçülüp küçük bulundu; nötr metin,
+      // "cihazının saati ileri" DEĞİL.
       await tester.tap(find.byType(ElevatedButton));
       await tester.pumpAndSettle();
       await _pumpDialog(tester, Future.value(const SessionSubmitRejected(SessionReason.notElapsed)));
       await tester.pumpAndSettle();
-      expect(find.text(l10n.sessionRejectedClock), findsOneWidget);
+      expect(find.text(l10n.sessionRejectedNotElapsed), findsOneWidget);
+      expect(find.text(l10n.sessionRejectedClock), findsNothing);
 
       // Bağlantı diyaloğu kapatıp listeyi açar.
       await tester.tap(find.text(l10n.rejectedSessionsTitle));
       await tester.pumpAndSettle();
       expect(find.byType(SessionCompletedDialog), findsNothing);
       expect(find.byType(RejectedSessionsScreen), findsOneWidget);
+    });
+
+    testWidgets('saat metni yalnızca ölçülen sapmada (clock_skew); diğer zaman nedenleri nötr', (tester) async {
+      // Kalıcı ret metinleri.
+      expect(sessionRejectionMessage(l10n, SessionReason.clockSkew), l10n.sessionRejectedClock);
+      expect(sessionRejectionMessage(l10n, SessionReason.notElapsed), l10n.sessionRejectedNotElapsed);
+      expect(sessionRejectionMessage(l10n, SessionReason.futureStart), l10n.sessionRejectedFutureStart);
+      // Bekletme metinleri: fark ölçülemeden gelen zaman hatası saat suçlamaz.
+      expect(sessionQueuedMessage(l10n, SessionReason.clockSkew), l10n.sessionQueuedClockSkew);
+      expect(sessionQueuedMessage(l10n, SessionReason.notElapsed), l10n.sessionQueuedTimingUnverified);
+      expect(sessionQueuedMessage(l10n, SessionReason.futureStart), l10n.sessionQueuedTimingUnverified);
+      for (final text in [
+        l10n.sessionRejectedNotElapsed,
+        l10n.sessionRejectedFutureStart,
+        l10n.sessionQueuedTimingUnverified,
+      ]) {
+        expect(text, isNot(contains('cihazının saati')), reason: text);
+      }
+
+      await _pumpDialog(
+        tester,
+        Future.value(const SessionSubmitQueued(reasonCode: SessionReason.notElapsed, pendingCount: 1)),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text(l10n.sessionQueuedTimingUnverified), findsOneWidget);
+      expect(find.text(l10n.sessionQueuedClockSkew), findsNothing);
+    });
+
+    testWidgets('hızlı test seansı: "kaydedilmez" denir, sonuç beklenmez', (tester) async {
+      tester.view.physicalSize = const Size(800, 1600);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(MaterialApp(
+        locale: const Locale('tr'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: const Scaffold(body: SessionCompletedDialog(minutes: 25, testSession: true)),
+      ));
+      await tester.pumpAndSettle();
+      expect(find.text(l10n.sessionResultTestNotSaved), findsOneWidget);
+      expect(find.text(l10n.sessionResultSaving), findsNothing);
+      expect(find.text(l10n.sessionQueuedOffline), findsNothing);
+      expect(find.text(l10n.sessionNotSavedTitle), findsNothing);
     });
 
     testWidgets('zaman aşımında kuyruk mesajı; sonuç sonradan gelince güncellenir', (tester) async {

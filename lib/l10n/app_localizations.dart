@@ -872,6 +872,12 @@ abstract class AppLocalizations {
   /// **'Bu seans zaten kaydedilmişti; puanların daha önce eklendi.'**
   String get sessionResultDuplicate;
 
+  /// No description provided for @sessionResultTestNotSaved.
+  ///
+  /// In tr, this message translates to:
+  /// **'Test seansı — kaydedilmez'**
+  String get sessionResultTestNotSaved;
+
   /// No description provided for @sessionResultOk.
   ///
   /// In tr, this message translates to:
@@ -896,6 +902,12 @@ abstract class AppLocalizations {
   /// **'Seans bekletiliyor: cihazının saati sunucudan farklı görünüyor. Saat ayarını kontrol et; seans otomatik olarak yeniden denenecek.'**
   String get sessionQueuedClockSkew;
 
+  /// No description provided for @sessionQueuedTimingUnverified.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seans bekletiliyor: seans süresi sunucuyla henüz doğrulanamadı. Otomatik olarak yeniden denenecek.'**
+  String get sessionQueuedTimingUnverified;
+
   /// No description provided for @sessionQueuedOverlap.
   ///
   /// In tr, this message translates to:
@@ -913,6 +925,18 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Bu seans kaydedilemedi: cihazının saati ileri görünüyor. Saat ayarını kontrol et.'**
   String get sessionRejectedClock;
+
+  /// No description provided for @sessionRejectedNotElapsed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu seans kaydedilemedi: sunucuya göre seans süresi henüz dolmamıştı.'**
+  String get sessionRejectedNotElapsed;
+
+  /// No description provided for @sessionRejectedFutureStart.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu seans kaydedilemedi: başlangıç zamanı sunucu saatiyle doğrulanamadı.'**
+  String get sessionRejectedFutureStart;
 
   /// No description provided for @sessionRejectedOverlap.
   ///
@@ -2725,6 +2749,18 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Süreyi değiştirmek için önce seansı sıfırla.'**
   String get timerDurationLocked;
+
+  /// No description provided for @timerQuickTestBadge.
+  ///
+  /// In tr, this message translates to:
+  /// **'TEST'**
+  String get timerQuickTestBadge;
+
+  /// No description provided for @timerQuickTestSemantics.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hızlı test sayacı: seanslar kaydedilmez'**
+  String get timerQuickTestSemantics;
 
   /// No description provided for @rankingZonePromotionChip.
   ///

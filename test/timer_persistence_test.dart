@@ -16,11 +16,32 @@ ActiveTimerSession _start(DateTime now, {int totalSeconds = 25 * 60}) => ActiveT
 void main() {
   final t0 = DateTime(2026, 10, 3, 10);
 
-  test('release süreleri gerçek dakika; debug kısaltması yalnızca debug için', () {
-    expect(timerDurationSeconds(25, shortened: false), 25 * 60);
-    expect(timerDurationSeconds(50, shortened: false), 50 * 60);
-    expect(timerDurationSeconds(25, shortened: true), 5);
-    expect(timerDurationSeconds(50, shortened: true), 10);
+  test('her derlemede (debug dahil) gerçek süre; kısaltma yalnızca hızlı test sayacında', () {
+    // flutter test debug derlemedir: varsayılan artık gerçek süre.
+    expect(kQuickTimer, isFalse);
+    expect(timerDurationSeconds(25), 25 * 60);
+    expect(timerDurationSeconds(50), 50 * 60);
+    expect(timerDurationSeconds(25, quick: false), 25 * 60);
+    expect(timerDurationSeconds(50, quick: false), 50 * 60);
+    expect(timerDurationSeconds(25, quick: true), 5);
+    expect(timerDurationSeconds(50, quick: true), 10);
+  });
+
+  test('kısaltılmış sayaçla başlatılan seans test seansıdır (gönderilmez)', () {
+    expect(_start(t0).isQuickTest, isFalse);
+    expect(_start(t0, totalSeconds: timerDurationSeconds(25, quick: true)).isQuickTest, isTrue);
+    // Kayıttan geri yüklenince de (eski debug derlemesinin 5 sn'lik seansı dahil) tanınır.
+    final restored = ActiveTimerSession.fromJson(_start(t0, totalSeconds: 5).toJson())!;
+    expect(restored.isQuickTest, isTrue);
+    final real50 = ActiveTimerSession.start(
+      clientUuid: 'u',
+      categoryId: 'c',
+      categoryName: 'Fizik',
+      durationMinutes: 50,
+      totalSeconds: 50 * 60,
+      now: t0,
+    );
+    expect(real50.isQuickTest, isFalse);
   });
 
   group('ActiveTimerSession', () {

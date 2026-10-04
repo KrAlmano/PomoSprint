@@ -34,7 +34,8 @@ Pomodoro tekniğini oyunlaştıran Flutter çalışma uygulaması: 25/50 dakikal
    ```bash
    flutter pub get
    flutter gen-l10n        # lib/l10n/*.arb değiştiyse
-   flutter run             # debug: sayaç 5/10 sn, sunucu bu seansları reddeder
+   flutter run             # her derlemede gerçek süre (25/50 dk)
+   flutter run --dart-define=QUICK_TIMER=true   # hızlı test sayacı: 5/10 sn, TEST rozeti, kaydedilmez
    flutter run --profile   # gerçek seans ve puan testi
    ```
 
