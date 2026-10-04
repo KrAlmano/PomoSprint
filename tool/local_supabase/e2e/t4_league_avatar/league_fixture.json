@@ -1,0 +1,1428 @@
+{
+    "rooms": {
+        "A": [
+            {
+                "name": "t4-a1",
+                "tier": 1,
+                "is_me": true,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "league_bronze_monthly",
+                "member_count": 4,
+                "weekly_points": 12,
+                "promotion_zone_end": 2,
+                "demotion_zone_start": 999
+            },
+            {
+                "name": "t4-a2",
+                "tier": 1,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 4,
+                "weekly_points": 0,
+                "promotion_zone_end": 2,
+                "demotion_zone_start": 999
+            },
+            {
+                "name": "t4-a3",
+                "tier": 1,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 4,
+                "weekly_points": 0,
+                "promotion_zone_end": 2,
+                "demotion_zone_start": 999
+            },
+            {
+                "name": "t4-a4",
+                "tier": 1,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 4,
+                "weekly_points": 0,
+                "promotion_zone_end": 2,
+                "demotion_zone_start": 999
+            }
+        ],
+        "B": [
+            {
+                "name": "t4-b1",
+                "tier": 2,
+                "is_me": true,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "league_silver_monthly",
+                "member_count": 12,
+                "weekly_points": 50,
+                "promotion_zone_end": 3,
+                "demotion_zone_start": 10
+            },
+            {
+                "name": "t4-b2",
+                "tier": 2,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "league_silver_weekly",
+                "member_count": 12,
+                "weekly_points": 30,
+                "promotion_zone_end": 3,
+                "demotion_zone_start": 10
+            },
+            {
+                "name": "t4-b3",
+                "tier": 2,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "league_silver_weekly",
+                "member_count": 12,
+                "weekly_points": 30,
+                "promotion_zone_end": 3,
+                "demotion_zone_start": 10
+            },
+            {
+                "name": "t4-b4",
+                "tier": 2,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 12,
+                "weekly_points": 20,
+                "promotion_zone_end": 3,
+                "demotion_zone_start": 10
+            },
+            {
+                "name": "t4-b5",
+                "tier": 2,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 12,
+                "weekly_points": 10,
+                "promotion_zone_end": 3,
+                "demotion_zone_start": 10
+            },
+            {
+                "name": "t4-b6",
+                "tier": 2,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 12,
+                "weekly_points": 10,
+                "promotion_zone_end": 3,
+                "demotion_zone_start": 10
+            },
+            {
+                "name": "t4-b7",
+                "tier": 2,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 12,
+                "weekly_points": 5,
+                "promotion_zone_end": 3,
+                "demotion_zone_start": 10
+            },
+            {
+                "name": "t4-b8",
+                "tier": 2,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 12,
+                "weekly_points": 5,
+                "promotion_zone_end": 3,
+                "demotion_zone_start": 10
+            },
+            {
+                "name": "t4-b9",
+                "tier": 2,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 12,
+                "weekly_points": 5,
+                "promotion_zone_end": 3,
+                "demotion_zone_start": 10
+            },
+            {
+                "name": "t4-b10",
+                "tier": 2,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 12,
+                "weekly_points": 0,
+                "promotion_zone_end": 3,
+                "demotion_zone_start": 10
+            },
+            {
+                "name": "t4-b11",
+                "tier": 2,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 12,
+                "weekly_points": 0,
+                "promotion_zone_end": 3,
+                "demotion_zone_start": 10
+            },
+            {
+                "name": "t4-b12",
+                "tier": 2,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 12,
+                "weekly_points": 0,
+                "promotion_zone_end": 3,
+                "demotion_zone_start": 10
+            }
+        ],
+        "C": [
+            {
+                "name": "t4-c1",
+                "tier": 3,
+                "is_me": true,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "league_gold_monthly",
+                "member_count": 22,
+                "weekly_points": 98,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 16
+            },
+            {
+                "name": "t4-c2",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "league_gold_weekly",
+                "member_count": 22,
+                "weekly_points": 96,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 16
+            },
+            {
+                "name": "t4-c3",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "league_gold_weekly",
+                "member_count": 22,
+                "weekly_points": 94,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 16
+            },
+            {
+                "name": "t4-c4",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 22,
+                "weekly_points": 92,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 16
+            },
+            {
+                "name": "t4-c5",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 22,
+                "weekly_points": 90,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 16
+            },
+            {
+                "name": "t4-c6",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 22,
+                "weekly_points": 88,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 16
+            },
+            {
+                "name": "t4-c7",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 22,
+                "weekly_points": 86,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 16
+            },
+            {
+                "name": "t4-c8",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 22,
+                "weekly_points": 84,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 16
+            },
+            {
+                "name": "t4-c9",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 22,
+                "weekly_points": 82,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 16
+            },
+            {
+                "name": "t4-c10",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 22,
+                "weekly_points": 80,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 16
+            },
+            {
+                "name": "t4-c11",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 22,
+                "weekly_points": 78,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 16
+            },
+            {
+                "name": "t4-c12",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 22,
+                "weekly_points": 76,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 16
+            },
+            {
+                "name": "t4-c13",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 22,
+                "weekly_points": 74,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 16
+            },
+            {
+                "name": "t4-c14",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 22,
+                "weekly_points": 72,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 16
+            },
+            {
+                "name": "t4-c15",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 22,
+                "weekly_points": 70,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 16
+            },
+            {
+                "name": "t4-c16",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 22,
+                "weekly_points": 68,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 16
+            },
+            {
+                "name": "t4-c17",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 22,
+                "weekly_points": 66,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 16
+            },
+            {
+                "name": "t4-c18",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 22,
+                "weekly_points": 64,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 16
+            },
+            {
+                "name": "t4-c19",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 22,
+                "weekly_points": 62,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 16
+            },
+            {
+                "name": "t4-c20",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 22,
+                "weekly_points": 60,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 16
+            },
+            {
+                "name": "t4-c21",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 22,
+                "weekly_points": 58,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 16
+            },
+            {
+                "name": "t4-c22",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 22,
+                "weekly_points": 56,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 16
+            }
+        ],
+        "D": [
+            {
+                "name": "t4-d1",
+                "tier": 4,
+                "is_me": true,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "league_sapphire_monthly",
+                "member_count": 1,
+                "weekly_points": 5,
+                "promotion_zone_end": 1,
+                "demotion_zone_start": 999
+            }
+        ],
+        "E": [
+            {
+                "name": "t4-e1",
+                "tier": 5,
+                "is_me": true,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "league_diamond_monthly",
+                "member_count": 30,
+                "weekly_points": 40,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            },
+            {
+                "name": "t4-e2",
+                "tier": 5,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "league_diamond_weekly",
+                "member_count": 30,
+                "weekly_points": 40,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            },
+            {
+                "name": "t4-e3",
+                "tier": 5,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 30,
+                "weekly_points": 0,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            },
+            {
+                "name": "t4-e4",
+                "tier": 5,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 30,
+                "weekly_points": 0,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            },
+            {
+                "name": "t4-e5",
+                "tier": 5,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 30,
+                "weekly_points": 0,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            },
+            {
+                "name": "t4-e6",
+                "tier": 5,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 30,
+                "weekly_points": 0,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            },
+            {
+                "name": "t4-e7",
+                "tier": 5,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 30,
+                "weekly_points": 0,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            },
+            {
+                "name": "t4-e8",
+                "tier": 5,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 30,
+                "weekly_points": 0,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            },
+            {
+                "name": "t4-e9",
+                "tier": 5,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 30,
+                "weekly_points": 0,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            },
+            {
+                "name": "t4-e10",
+                "tier": 5,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 30,
+                "weekly_points": 0,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            },
+            {
+                "name": "t4-e11",
+                "tier": 5,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 30,
+                "weekly_points": 0,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            },
+            {
+                "name": "t4-e12",
+                "tier": 5,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 30,
+                "weekly_points": 0,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            },
+            {
+                "name": "t4-e13",
+                "tier": 5,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 30,
+                "weekly_points": 0,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            },
+            {
+                "name": "t4-e14",
+                "tier": 5,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 30,
+                "weekly_points": 0,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            },
+            {
+                "name": "t4-e15",
+                "tier": 5,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 30,
+                "weekly_points": 0,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            },
+            {
+                "name": "t4-e16",
+                "tier": 5,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 30,
+                "weekly_points": 0,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            },
+            {
+                "name": "t4-e17",
+                "tier": 5,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 30,
+                "weekly_points": 0,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            },
+            {
+                "name": "t4-e18",
+                "tier": 5,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 30,
+                "weekly_points": 0,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            },
+            {
+                "name": "t4-e19",
+                "tier": 5,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 30,
+                "weekly_points": 0,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            },
+            {
+                "name": "t4-e20",
+                "tier": 5,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 30,
+                "weekly_points": 0,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            },
+            {
+                "name": "t4-e21",
+                "tier": 5,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 30,
+                "weekly_points": 0,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            },
+            {
+                "name": "t4-e22",
+                "tier": 5,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 30,
+                "weekly_points": 0,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            },
+            {
+                "name": "t4-e23",
+                "tier": 5,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 30,
+                "weekly_points": 0,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            },
+            {
+                "name": "t4-e24",
+                "tier": 5,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 30,
+                "weekly_points": 0,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            },
+            {
+                "name": "t4-e25",
+                "tier": 5,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 30,
+                "weekly_points": 0,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            },
+            {
+                "name": "t4-e26",
+                "tier": 5,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 30,
+                "weekly_points": 0,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            },
+            {
+                "name": "t4-e27",
+                "tier": 5,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 30,
+                "weekly_points": 0,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            },
+            {
+                "name": "t4-e28",
+                "tier": 5,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 30,
+                "weekly_points": 0,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            },
+            {
+                "name": "t4-e29",
+                "tier": 5,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 30,
+                "weekly_points": 0,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            },
+            {
+                "name": "t4-e30",
+                "tier": 5,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 30,
+                "weekly_points": 0,
+                "promotion_zone_end": 7,
+                "demotion_zone_start": 24
+            }
+        ],
+        "F": [
+            {
+                "name": "t4-f1",
+                "tier": 2,
+                "is_me": true,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 3,
+                "weekly_points": 0,
+                "promotion_zone_end": 2,
+                "demotion_zone_start": 999
+            },
+            {
+                "name": "t4-f2",
+                "tier": 2,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 3,
+                "weekly_points": 0,
+                "promotion_zone_end": 2,
+                "demotion_zone_start": 999
+            },
+            {
+                "name": "t4-f3",
+                "tier": 2,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 3,
+                "weekly_points": 0,
+                "promotion_zone_end": 2,
+                "demotion_zone_start": 999
+            }
+        ],
+        "G": [
+            {
+                "name": "t4-g1",
+                "tier": 3,
+                "is_me": true,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "league_gold_monthly",
+                "member_count": 10,
+                "weekly_points": 9,
+                "promotion_zone_end": 3,
+                "demotion_zone_start": 8
+            },
+            {
+                "name": "t4-g2",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "league_gold_weekly",
+                "member_count": 10,
+                "weekly_points": 8,
+                "promotion_zone_end": 3,
+                "demotion_zone_start": 8
+            },
+            {
+                "name": "t4-g3",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "league_gold_weekly",
+                "member_count": 10,
+                "weekly_points": 7,
+                "promotion_zone_end": 3,
+                "demotion_zone_start": 8
+            },
+            {
+                "name": "t4-g4",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 10,
+                "weekly_points": 6,
+                "promotion_zone_end": 3,
+                "demotion_zone_start": 8
+            },
+            {
+                "name": "t4-g5",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 10,
+                "weekly_points": 5,
+                "promotion_zone_end": 3,
+                "demotion_zone_start": 8
+            },
+            {
+                "name": "t4-g6",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 10,
+                "weekly_points": 4,
+                "promotion_zone_end": 3,
+                "demotion_zone_start": 8
+            },
+            {
+                "name": "t4-g7",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 10,
+                "weekly_points": 3,
+                "promotion_zone_end": 3,
+                "demotion_zone_start": 8
+            },
+            {
+                "name": "t4-g8",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 10,
+                "weekly_points": 2,
+                "promotion_zone_end": 3,
+                "demotion_zone_start": 8
+            },
+            {
+                "name": "t4-g9",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 10,
+                "weekly_points": 1,
+                "promotion_zone_end": 3,
+                "demotion_zone_start": 8
+            },
+            {
+                "name": "t4-g10",
+                "tier": 3,
+                "is_me": false,
+                "end_date": "2026-10-04T20:59:59+00:00",
+                "avatar_id": "avatar_16_basic",
+                "member_count": 10,
+                "weekly_points": 0,
+                "promotion_zone_end": 3,
+                "demotion_zone_start": 8
+            }
+        ]
+    },
+    "outcomes": {
+        "t4-a1": {
+            "awards": [
+                "league_bronze_monthly"
+            ],
+            "tier_after": 2,
+            "tier_before": 1
+        },
+        "t4-a2": {
+            "awards": [
+            ],
+            "tier_after": 1,
+            "tier_before": 1
+        },
+        "t4-a3": {
+            "awards": [
+            ],
+            "tier_after": 1,
+            "tier_before": 1
+        },
+        "t4-a4": {
+            "awards": [
+            ],
+            "tier_after": 1,
+            "tier_before": 1
+        },
+        "t4-b1": {
+            "awards": [
+                "league_silver_monthly"
+            ],
+            "tier_after": 3,
+            "tier_before": 2
+        },
+        "t4-b2": {
+            "awards": [
+                "league_silver_weekly"
+            ],
+            "tier_after": 3,
+            "tier_before": 2
+        },
+        "t4-b3": {
+            "awards": [
+                "league_silver_weekly"
+            ],
+            "tier_after": 3,
+            "tier_before": 2
+        },
+        "t4-b4": {
+            "awards": [
+            ],
+            "tier_after": 2,
+            "tier_before": 2
+        },
+        "t4-b5": {
+            "awards": [
+            ],
+            "tier_after": 2,
+            "tier_before": 2
+        },
+        "t4-b6": {
+            "awards": [
+            ],
+            "tier_after": 2,
+            "tier_before": 2
+        },
+        "t4-b7": {
+            "awards": [
+            ],
+            "tier_after": 2,
+            "tier_before": 2
+        },
+        "t4-b8": {
+            "awards": [
+            ],
+            "tier_after": 2,
+            "tier_before": 2
+        },
+        "t4-b9": {
+            "awards": [
+            ],
+            "tier_after": 2,
+            "tier_before": 2
+        },
+        "t4-c1": {
+            "awards": [
+                "league_gold_monthly"
+            ],
+            "tier_after": 4,
+            "tier_before": 3
+        },
+        "t4-c2": {
+            "awards": [
+                "league_gold_weekly"
+            ],
+            "tier_after": 4,
+            "tier_before": 3
+        },
+        "t4-c3": {
+            "awards": [
+                "league_gold_weekly"
+            ],
+            "tier_after": 4,
+            "tier_before": 3
+        },
+        "t4-c4": {
+            "awards": [
+            ],
+            "tier_after": 4,
+            "tier_before": 3
+        },
+        "t4-c5": {
+            "awards": [
+            ],
+            "tier_after": 4,
+            "tier_before": 3
+        },
+        "t4-c6": {
+            "awards": [
+            ],
+            "tier_after": 4,
+            "tier_before": 3
+        },
+        "t4-c7": {
+            "awards": [
+            ],
+            "tier_after": 4,
+            "tier_before": 3
+        },
+        "t4-c8": {
+            "awards": [
+            ],
+            "tier_after": 3,
+            "tier_before": 3
+        },
+        "t4-c9": {
+            "awards": [
+            ],
+            "tier_after": 3,
+            "tier_before": 3
+        },
+        "t4-d1": {
+            "awards": [
+                "league_sapphire_monthly"
+            ],
+            "tier_after": 5,
+            "tier_before": 4
+        },
+        "t4-e1": {
+            "awards": [
+                "league_diamond_monthly"
+            ],
+            "tier_after": 5,
+            "tier_before": 5
+        },
+        "t4-e2": {
+            "awards": [
+                "league_diamond_weekly"
+            ],
+            "tier_after": 5,
+            "tier_before": 5
+        },
+        "t4-e3": {
+            "awards": [
+            ],
+            "tier_after": 5,
+            "tier_before": 5
+        },
+        "t4-e4": {
+            "awards": [
+            ],
+            "tier_after": 5,
+            "tier_before": 5
+        },
+        "t4-e5": {
+            "awards": [
+            ],
+            "tier_after": 5,
+            "tier_before": 5
+        },
+        "t4-e6": {
+            "awards": [
+            ],
+            "tier_after": 5,
+            "tier_before": 5
+        },
+        "t4-e7": {
+            "awards": [
+            ],
+            "tier_after": 5,
+            "tier_before": 5
+        },
+        "t4-e8": {
+            "awards": [
+            ],
+            "tier_after": 5,
+            "tier_before": 5
+        },
+        "t4-e9": {
+            "awards": [
+            ],
+            "tier_after": 5,
+            "tier_before": 5
+        },
+        "t4-f1": {
+            "awards": [
+            ],
+            "tier_after": 2,
+            "tier_before": 2
+        },
+        "t4-f2": {
+            "awards": [
+            ],
+            "tier_after": 2,
+            "tier_before": 2
+        },
+        "t4-f3": {
+            "awards": [
+            ],
+            "tier_after": 2,
+            "tier_before": 2
+        },
+        "t4-g1": {
+            "awards": [
+                "league_gold_monthly"
+            ],
+            "tier_after": 4,
+            "tier_before": 3
+        },
+        "t4-g2": {
+            "awards": [
+                "league_gold_weekly"
+            ],
+            "tier_after": 4,
+            "tier_before": 3
+        },
+        "t4-g3": {
+            "awards": [
+                "league_gold_weekly"
+            ],
+            "tier_after": 4,
+            "tier_before": 3
+        },
+        "t4-g4": {
+            "awards": [
+            ],
+            "tier_after": 3,
+            "tier_before": 3
+        },
+        "t4-g5": {
+            "awards": [
+            ],
+            "tier_after": 3,
+            "tier_before": 3
+        },
+        "t4-g6": {
+            "awards": [
+            ],
+            "tier_after": 3,
+            "tier_before": 3
+        },
+        "t4-g7": {
+            "awards": [
+            ],
+            "tier_after": 3,
+            "tier_before": 3
+        },
+        "t4-g8": {
+            "awards": [
+            ],
+            "tier_after": 2,
+            "tier_before": 3
+        },
+        "t4-g9": {
+            "awards": [
+            ],
+            "tier_after": 2,
+            "tier_before": 3
+        },
+        "t4-b10": {
+            "awards": [
+            ],
+            "tier_after": 1,
+            "tier_before": 2
+        },
+        "t4-b11": {
+            "awards": [
+            ],
+            "tier_after": 1,
+            "tier_before": 2
+        },
+        "t4-b12": {
+            "awards": [
+            ],
+            "tier_after": 1,
+            "tier_before": 2
+        },
+        "t4-c10": {
+            "awards": [
+            ],
+            "tier_after": 3,
+            "tier_before": 3
+        },
+        "t4-c11": {
+            "awards": [
+            ],
+            "tier_after": 3,
+            "tier_before": 3
+        },
+        "t4-c12": {
+            "awards": [
+            ],
+            "tier_after": 3,
+            "tier_before": 3
+        },
+        "t4-c13": {
+            "awards": [
+            ],
+            "tier_after": 3,
+            "tier_before": 3
+        },
+        "t4-c14": {
+            "awards": [
+            ],
+            "tier_after": 3,
+            "tier_before": 3
+        },
+        "t4-c15": {
+            "awards": [
+            ],
+            "tier_after": 3,
+            "tier_before": 3
+        },
+        "t4-c16": {
+            "awards": [
+            ],
+            "tier_after": 2,
+            "tier_before": 3
+        },
+        "t4-c17": {
+            "awards": [
+            ],
+            "tier_after": 2,
+            "tier_before": 3
+        },
+        "t4-c18": {
+            "awards": [
+            ],
+            "tier_after": 2,
+            "tier_before": 3
+        },
+        "t4-c19": {
+            "awards": [
+            ],
+            "tier_after": 2,
+            "tier_before": 3
+        },
+        "t4-c20": {
+            "awards": [
+            ],
+            "tier_after": 2,
+            "tier_before": 3
+        },
+        "t4-c21": {
+            "awards": [
+            ],
+            "tier_after": 2,
+            "tier_before": 3
+        },
+        "t4-c22": {
+            "awards": [
+            ],
+            "tier_after": 2,
+            "tier_before": 3
+        },
+        "t4-e10": {
+            "awards": [
+            ],
+            "tier_after": 5,
+            "tier_before": 5
+        },
+        "t4-e11": {
+            "awards": [
+            ],
+            "tier_after": 5,
+            "tier_before": 5
+        },
+        "t4-e12": {
+            "awards": [
+            ],
+            "tier_after": 5,
+            "tier_before": 5
+        },
+        "t4-e13": {
+            "awards": [
+            ],
+            "tier_after": 5,
+            "tier_before": 5
+        },
+        "t4-e14": {
+            "awards": [
+            ],
+            "tier_after": 5,
+            "tier_before": 5
+        },
+        "t4-e15": {
+            "awards": [
+            ],
+            "tier_after": 5,
+            "tier_before": 5
+        },
+        "t4-e16": {
+            "awards": [
+            ],
+            "tier_after": 5,
+            "tier_before": 5
+        },
+        "t4-e17": {
+            "awards": [
+            ],
+            "tier_after": 5,
+            "tier_before": 5
+        },
+        "t4-e18": {
+            "awards": [
+            ],
+            "tier_after": 5,
+            "tier_before": 5
+        },
+        "t4-e19": {
+            "awards": [
+            ],
+            "tier_after": 5,
+            "tier_before": 5
+        },
+        "t4-e20": {
+            "awards": [
+            ],
+            "tier_after": 5,
+            "tier_before": 5
+        },
+        "t4-e21": {
+            "awards": [
+            ],
+            "tier_after": 5,
+            "tier_before": 5
+        },
+        "t4-e22": {
+            "awards": [
+            ],
+            "tier_after": 5,
+            "tier_before": 5
+        },
+        "t4-e23": {
+            "awards": [
+            ],
+            "tier_after": 5,
+            "tier_before": 5
+        },
+        "t4-e24": {
+            "awards": [
+            ],
+            "tier_after": 4,
+            "tier_before": 5
+        },
+        "t4-e25": {
+            "awards": [
+            ],
+            "tier_after": 4,
+            "tier_before": 5
+        },
+        "t4-e26": {
+            "awards": [
+            ],
+            "tier_after": 4,
+            "tier_before": 5
+        },
+        "t4-e27": {
+            "awards": [
+            ],
+            "tier_after": 4,
+            "tier_before": 5
+        },
+        "t4-e28": {
+            "awards": [
+            ],
+            "tier_after": 4,
+            "tier_before": 5
+        },
+        "t4-e29": {
+            "awards": [
+            ],
+            "tier_after": 4,
+            "tier_before": 5
+        },
+        "t4-e30": {
+            "awards": [
+            ],
+            "tier_after": 4,
+            "tier_before": 5
+        },
+        "t4-g10": {
+            "awards": [
+            ],
+            "tier_after": 2,
+            "tier_before": 3
+        }
+    },
+    "captured_at": "2026-10-04T21:21:44.744474+00:00"
+}

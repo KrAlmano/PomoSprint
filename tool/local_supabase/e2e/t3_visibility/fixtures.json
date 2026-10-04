@@ -1,0 +1,398 @@
+{
+ "uids": {
+  "A": "fbbaadb5-d42b-419c-aa37-010c6e982844",
+  "B": "79ed21b8-ee60-4abf-8a44-cb97c2053c86",
+  "C": "4c953f3c-e77c-41fc-99a6-81c8bd52457b",
+  "D": "0dbcdbc3-7056-4065-a1a3-cf9ef9c13a8b",
+  "E": "bbfff0f6-3585-410c-97b1-6f51f9edab7e"
+ },
+ "names": {
+  "A": "Ayse Tetik",
+  "B": "Bora Uslu",
+  "C": "Cem",
+  "D": "Deniz Kaya Er",
+  "E": "Ece Su"
+ },
+ "friends_A": [
+  {
+   "id": "79ed21b8-ee60-4abf-8a44-cb97c2053c86",
+   "name": "Bora Uslu",
+   "avatar_id": "avatar_16_basic",
+   "lifetime_points": 0,
+   "total_minutes": 0
+  },
+  {
+   "id": "0dbcdbc3-7056-4065-a1a3-cf9ef9c13a8b",
+   "name": "Deniz Kaya Er",
+   "avatar_id": "avatar_16_basic",
+   "lifetime_points": 0,
+   "total_minutes": 0
+  }
+ ],
+ "incoming_A": [
+  {
+   "id": "4c953f3c-e77c-41fc-99a6-81c8bd52457b",
+   "name": "Cem",
+   "avatar_id": "avatar_16_basic",
+   "lifetime_points": 0,
+   "total_minutes": 0,
+   "created_at": "2026-10-04T21:10:40.38493+00:00"
+  }
+ ],
+ "add_already_friends": {
+  "message": "Bu kullanıcı zaten arkadaşın.",
+  "success": false
+ },
+ "add_not_found": {
+  "message": "Bu kod ile bir kullanıcı bulunamadı.",
+  "success": false
+ },
+ "respond_gone": {
+  "message": "Bekleyen bir istek bulunamadı.",
+  "success": false
+ },
+ "live_A": [
+  {
+   "id": "79ed21b8-ee60-4abf-8a44-cb97c2053c86",
+   "name": "Bora Uslu",
+   "ends_at": "2026-10-04T21:39:44.01392+00:00",
+   "avatar_id": "avatar_16_basic",
+   "category_name": "Matematik"
+  },
+  {
+   "id": "0dbcdbc3-7056-4065-a1a3-cf9ef9c13a8b",
+   "name": "Deniz Kaya Er",
+   "ends_at": "2026-10-04T22:04:44.016739+00:00",
+   "avatar_id": "avatar_16_basic",
+   "category_name": "Gitar"
+  }
+ ],
+ "league": [
+  {
+   "name": "T1 c",
+   "tier": 1,
+   "is_me": false,
+   "end_date": "2026-10-11T20:59:59+00:00",
+   "avatar_id": "league_bronze_monthly",
+   "member_count": 14,
+   "weekly_points": 80,
+   "promotion_zone_end": 3,
+   "demotion_zone_start": 12
+  },
+  {
+   "name": "T1 h",
+   "tier": 1,
+   "is_me": false,
+   "end_date": "2026-10-11T20:59:59+00:00",
+   "avatar_id": "league_bronze_weekly",
+   "member_count": 14,
+   "weekly_points": 80,
+   "promotion_zone_end": 3,
+   "demotion_zone_start": 12
+  },
+  {
+   "name": "T1 a",
+   "tier": 1,
+   "is_me": false,
+   "end_date": "2026-10-11T20:59:59+00:00",
+   "avatar_id": "league_bronze_weekly",
+   "member_count": 14,
+   "weekly_points": 35,
+   "promotion_zone_end": 3,
+   "demotion_zone_start": 12
+  },
+  {
+   "name": "T1 v",
+   "tier": 1,
+   "is_me": false,
+   "end_date": "2026-10-11T20:59:59+00:00",
+   "avatar_id": "avatar_16_basic",
+   "member_count": 14,
+   "weekly_points": 30,
+   "promotion_zone_end": 3,
+   "demotion_zone_start": 12
+  },
+  {
+   "name": "T1 b",
+   "tier": 1,
+   "is_me": false,
+   "end_date": "2026-10-11T20:59:59+00:00",
+   "avatar_id": "avatar_16_basic",
+   "member_count": 14,
+   "weekly_points": 15,
+   "promotion_zone_end": 3,
+   "demotion_zone_start": 12
+  },
+  {
+   "name": "T1 g",
+   "tier": 1,
+   "is_me": false,
+   "end_date": "2026-10-11T20:59:59+00:00",
+   "avatar_id": "avatar_16_basic",
+   "member_count": 14,
+   "weekly_points": 15,
+   "promotion_zone_end": 3,
+   "demotion_zone_start": 12
+  },
+  {
+   "name": "Bora Uslu",
+   "tier": 1,
+   "is_me": false,
+   "end_date": "2026-10-11T20:59:59+00:00",
+   "avatar_id": "avatar_16_basic",
+   "member_count": 14,
+   "weekly_points": 12,
+   "promotion_zone_end": 3,
+   "demotion_zone_start": 12
+  },
+  {
+   "name": "Test Kullanıcı 1",
+   "tier": 1,
+   "is_me": false,
+   "end_date": "2026-10-11T20:59:59+00:00",
+   "avatar_id": "avatar_16_basic",
+   "member_count": 14,
+   "weekly_points": 5,
+   "promotion_zone_end": 3,
+   "demotion_zone_start": 12
+  },
+  {
+   "name": "T2 Kullanıcı",
+   "tier": 1,
+   "is_me": false,
+   "end_date": "2026-10-11T20:59:59+00:00",
+   "avatar_id": "avatar_16_basic",
+   "member_count": 14,
+   "weekly_points": 5,
+   "promotion_zone_end": 3,
+   "demotion_zone_start": 12
+  },
+  {
+   "name": "T1 e",
+   "tier": 1,
+   "is_me": false,
+   "end_date": "2026-10-11T20:59:59+00:00",
+   "avatar_id": "avatar_16_basic",
+   "member_count": 14,
+   "weekly_points": 5,
+   "promotion_zone_end": 3,
+   "demotion_zone_start": 12
+  },
+  {
+   "name": "T2 Kullanıcı",
+   "tier": 1,
+   "is_me": false,
+   "end_date": "2026-10-11T20:59:59+00:00",
+   "avatar_id": "avatar_16_basic",
+   "member_count": 14,
+   "weekly_points": 5,
+   "promotion_zone_end": 3,
+   "demotion_zone_start": 12
+  },
+  {
+   "name": "Deniz Kaya Er",
+   "tier": 1,
+   "is_me": false,
+   "end_date": "2026-10-11T20:59:59+00:00",
+   "avatar_id": "avatar_16_basic",
+   "member_count": 14,
+   "weekly_points": 5,
+   "promotion_zone_end": 3,
+   "demotion_zone_start": 12
+  },
+  {
+   "name": "Cem",
+   "tier": 1,
+   "is_me": false,
+   "end_date": "2026-10-11T20:59:59+00:00",
+   "avatar_id": "avatar_16_basic",
+   "member_count": 14,
+   "weekly_points": 5,
+   "promotion_zone_end": 3,
+   "demotion_zone_start": 12
+  },
+  {
+   "name": "Ayse Tetik",
+   "tier": 1,
+   "is_me": true,
+   "end_date": "2026-10-11T20:59:59+00:00",
+   "avatar_id": "avatar_16_basic",
+   "member_count": 14,
+   "weekly_points": 5,
+   "promotion_zone_end": 3,
+   "demotion_zone_start": 12
+  }
+ ],
+ "monthly": [
+  {
+   "name": "T1 c",
+   "is_me": false,
+   "avatar_id": "avatar_16_basic",
+   "total_points": 80,
+   "total_minutes": 450
+  },
+  {
+   "name": "T1 h",
+   "is_me": false,
+   "avatar_id": "avatar_16_basic",
+   "total_points": 80,
+   "total_minutes": 400
+  },
+  {
+   "name": "T1 a",
+   "is_me": false,
+   "avatar_id": "avatar_16_basic",
+   "total_points": 35,
+   "total_minutes": 175
+  },
+  {
+   "name": "T1 v",
+   "is_me": false,
+   "avatar_id": "avatar_16_basic",
+   "total_points": 30,
+   "total_minutes": 150
+  },
+  {
+   "name": "T1 g",
+   "is_me": false,
+   "avatar_id": "avatar_16_basic",
+   "total_points": 15,
+   "total_minutes": 75
+  },
+  {
+   "name": "T1 b",
+   "is_me": false,
+   "avatar_id": "avatar_16_basic",
+   "total_points": 15,
+   "total_minutes": 75
+  },
+  {
+   "name": "Bora Uslu",
+   "is_me": false,
+   "avatar_id": "avatar_16_basic",
+   "total_points": 12,
+   "total_minutes": 50
+  },
+  {
+   "name": "T2 Kullanıcı",
+   "is_me": false,
+   "avatar_id": "avatar_16_basic",
+   "total_points": 5,
+   "total_minutes": 25
+  },
+  {
+   "name": "Deniz Kaya Er",
+   "is_me": false,
+   "avatar_id": "avatar_16_basic",
+   "total_points": 5,
+   "total_minutes": 25
+  },
+  {
+   "name": "T2 Kullanıcı",
+   "is_me": false,
+   "avatar_id": "avatar_16_basic",
+   "total_points": 5,
+   "total_minutes": 25
+  },
+  {
+   "name": "Cem",
+   "is_me": false,
+   "avatar_id": "avatar_16_basic",
+   "total_points": 5,
+   "total_minutes": 25
+  },
+  {
+   "name": "Test Kullanıcı 1",
+   "is_me": false,
+   "avatar_id": "avatar_16_basic",
+   "total_points": 5,
+   "total_minutes": 25
+  },
+  {
+   "name": "T1 e",
+   "is_me": false,
+   "avatar_id": "avatar_16_basic",
+   "total_points": 5,
+   "total_minutes": 25
+  },
+  {
+   "name": "Ayse Tetik",
+   "is_me": true,
+   "avatar_id": "avatar_16_basic",
+   "total_points": 5,
+   "total_minutes": 25
+  }
+ ],
+ "monthly_anon": [
+  {
+   "name": "T1 C.",
+   "is_me": false,
+   "avatar_id": "avatar_16_basic",
+   "total_points": 80,
+   "total_minutes": 450
+  },
+  {
+   "name": "T1 H.",
+   "is_me": false,
+   "avatar_id": "avatar_16_basic",
+   "total_points": 80,
+   "total_minutes": 400
+  },
+  {
+   "name": "T1 A.",
+   "is_me": false,
+   "avatar_id": "avatar_16_basic",
+   "total_points": 35,
+   "total_minutes": 175
+  },
+  {
+   "name": "T1 V.",
+   "is_me": false,
+   "avatar_id": "avatar_16_basic",
+   "total_points": 30,
+   "total_minutes": 150
+  },
+  {
+   "name": "T1 G.",
+   "is_me": false,
+   "avatar_id": "avatar_16_basic",
+   "total_points": 15,
+   "total_minutes": 75
+  },
+  {
+   "name": "T1 B.",
+   "is_me": false,
+   "avatar_id": "avatar_16_basic",
+   "total_points": 15,
+   "total_minutes": 75
+  },
+  {
+   "name": "Bora U.",
+   "is_me": false,
+   "avatar_id": "avatar_16_basic",
+   "total_points": 12,
+   "total_minutes": 50
+  },
+  {
+   "name": "T2 K.",
+   "is_me": false,
+   "avatar_id": "avatar_16_basic",
+   "total_points": 5,
+   "total_minutes": 25
+  },
+  {
+   "name": "Deniz K.",
+   "is_me": false,
+   "avatar_id": "avatar_16_basic",
+   "total_points": 5,
+   "total_minutes": 25
+  },
+  {
+   "name": "T2 K.",
+   "is_me": false,
+   "avatar_id": "avatar_16_basic",
+   "total_points": 5,
+   "total_minutes": 25
+  }
+ ]
+}
