@@ -29,10 +29,12 @@ dağıtıyor). Canlı gövdeyi bilmeden repodaki eski sürümden
 
 ## Dosyalar ve uygulama sırası
 
-### Canlıya hazır paketler: TEK SIRA 12 → 15 → 16 → 19 → 13 → 14
+### Canlıya hazır paketler: TEK SIRA 12 → 15 → 16 → 19 → 13 → 14 (→ 20 → 21 → 22 → 23 → 24 → 25)
 
-Bu altı paket canlı tanımlardan (3 Ekim 2026, `pg_get_functiondef`) yazıldı,
-`11`'e bağımlı değildir ve **yalnızca bu sırayla** uygulanır. Her adım SQL
+İlk altı paket canlı tanımlardan (3 Ekim 2026, `pg_get_functiondef`) yazıldı,
+`11`'e bağımlı değildir ve **yalnızca bu sırayla** uygulanır. 20–25 (5 Ekim
+2026, test ajanı bulguları) zincir UYGULANMIŞ hâlin gövdelerinden yazıldı ve
+14'ten SONRA gelir; md5 ön koşulları zincirdeki gövdeleri bekler. Her adım SQL
 Editor'de iki çalıştırmadır: (1) DRYRUN dosyası olduğu gibi yapıştırılır;
 öneriyi ve senaryoları geri alınan bir transaction'da çalıştırır ve bilinçli
 bir `DRYRUN_RESULT >> ...` hatasıyla biter; her madde `true` olmalı.
@@ -47,18 +49,32 @@ Bir adım beklenen sonucu vermezse SONRAKİNE GEÇMEYİN.
 | 4 | `tests/proposed_19_waitlist_consent_token_dryrun.sql` | `19_waitlist_consent_token.sql` (A bölümü; B site onay alanlarını gönderdikten SONRA, ayrı) | DRYRUN 12/12 `true` (A + B). Sonra `waitlist`'te `marketing_consent`, `consent_text_version`, `consented_at`, `unsubscribe_token` kolonları ve `waitlist_set_consent_time` trigger'ı |
 | 5 | `tests/proposed_13_sunucu_butunluk_dryrun.sql` | `13_sunucu_butunluk.sql` | DRYRUN 50/50 `true` (14 uygulanmışsa `proposed/13 ön koşulu: ...` ile durur). Sonra `select public.get_app_config();` çalışır ve md5'ler: `handle_new_user()` `92dcc142fbec96ca2fb79a7aa3d14289`, `add_friend_by_code(text)` `eab30b000bbd223a3eef0af8e9900b30`, `respond_friend_request(uuid,boolean)` `785731c7b2c628d65a5f9e84a60be5d5`, `handle_newsletter_subscription()` `ecf943e2d250d60989ca04bd79e90152` (14'ün ön koşulu tam bunları bekler) |
 | 6 | `tests/proposed_14_gizlilik_sosyal_dryrun.sql` | `14_gizlilik_sosyal.sql` | DRYRUN `T00 özet 67/67: true` (13 yoksa `proposed/14 ön koşulu: önce proposed/13 ...`). Sonra `select * from cron.job;` içinde `privacy_retention_daily` (`17 3 * * *`), `ops` şemasında 14 fonksiyon, `select * from ops.open_user_reports;` çalışır |
+| 7 | `tests/proposed_20_lig_donemi_dryrun.sql` | `20_lig_donemi.sql` | DRYRUN 15/15 `true` (zincir yoksa `proposed/20 ön koşulu: ...`). Sonra `league_memberships.carry_points` var; `app_config`'te `league_award_min_members`, `league_award_min_points`, `league_promotion_min_points` (= 1); md5: `ensure_user_in_league(uuid,integer)` `8fd1f1a6fa0af892c73a8f37456ee29d`, `process_weekly_leagues()` `094ff2f6076341f33cf6cbabad297cae`, `get_league_ranking(uuid)` `b49f8d84ac55437f1d45ea7dcab362ea` |
+| 8 | `tests/proposed_21_seans_kilit_gec_bonus_dryrun.sql` | `21_seans_kilit_gec_bonus.sql` | DRYRUN 10/10 `true` (20 yoksa `proposed/21 ön koşulu: önce proposed/20 ...`). Sonra `complete_study_session(...)` md5 = `f0f2b9bcc09ae8440a66d889b5f22fcc` |
+| 9 | `tests/proposed_22_avatar_satin_alma_dryrun.sql` | `22_avatar_satin_alma.sql` | DRYRUN 9/9 `true`. Sonra md5: `purchase_avatar(text)` `38689aed887865e04bc6c23db8daeb32`, `set_equipped_avatar(text)` `5a3e3e513a9fbf41619f842cdffc8a96` |
+| 10 | `tests/proposed_23_kategori_butunluk_dryrun.sql` | `23_kategori_butunluk.sql` | DRYRUN 13/13 `true`. Sonra `categories`'te `enforce_category_rules` trigger'ı; `setup_onboarding_categories(jsonb)` jsonb döner (md5 `4721be2abe083a358e59867e8a11251e`); `create_category` `728c31888e49ef9cd230d900ef75ca5e`, `enforce_category_limit()` `7d0575e8b353d4b2658414ff300f022c` |
+| 11 | `tests/proposed_24_onboarding_profil_dryrun.sql` | `24_onboarding_profil.sql` | DRYRUN 9/9 `true`. Sonra `profiles`'ta `enforce_minimum_age` trigger'ı; `select count(*) from ops.proposed24_social_feed_reset;` (görünürlüğü kapatılan, onboarding'i bitmemiş profiller) |
+| 12 | `tests/proposed_25_sosyal_erisim_dryrun.sql` | `25_sosyal_erisim.sql` | DRYRUN 9/9 `true`. Sonra authenticated'da `leagues` / `league_memberships` SELECT yok; `rotate_friend_code()` var (md5 `ad91379e137be7dcf51d0cb535a3d4c8`) |
 
 Ürün/hukuk kararları ilgili adımdan ÖNCE: 13 için UX-01 düğmesi
 (`app_config.unverified_session_daily_cap`, varsayılan `null` = bugünkü
 davranış), 14 için görünürlük varsayılanı, nötr ad, saklama süreleri ve Apple
 istemci ön koşulu (aşağıda "Öneri 14").
+20 için ödül/terfi düğmeleri (varsayılan bugünkü kural; önerilen 3/25/25,
+istemci metinleriyle birlikte), 21 için geç seans bonusu kuralı (dosyada "o
+günün serisi"; alternatifi "bonus yok"). Ayrıntı aşağıda "Öneriler 20–25".
 
-**Geri alma (ters sıra):** `14_gizlilik_sosyal_down.sql` → `13_sunucu_butunluk_down.sql`
+**Geri alma (ters sıra):** `25_sosyal_erisim_down.sql` → `24_onboarding_profil_down.sql`
+→ `23_kategori_butunluk_down.sql` → `22_avatar_satin_alma_down.sql`
+→ `21_seans_kilit_gec_bonus_down.sql` → `20_lig_donemi_down.sql`
+→ `14_gizlilik_sosyal_down.sql` → `13_sunucu_butunluk_down.sql`
 → `19_waitlist_consent_token_down.sql` → `16_categories_order_and_privileges_down.sql`
 → `15_monthly_leaderboard_study_month_down.sql` → `12_delete_own_account_down.sql`.
 Her `_down` bir önceki adımdaki şemaya birebir döner (veri kaybı notları her
 dosyanın başında). `14_down` 13 uygulanmış hâle döner; `13_down` 14 hâlâ
-yerindeyse hiçbir şey yapmadan durur.
+yerindeyse hiçbir şey yapmadan durur. `20_down` 21 yerindeyse durur; 22–25
+birbirinden ve 20/21'den bağımsızdır (yalnızca zincire dayanır), ama ters
+sıra her zaman güvenlidir.
 
 **Sıra neden böyle?**
 - `14`, `handle_new_user` ve `add_friend_by_code`'u `13`'ün gövdesi üzerine
@@ -77,8 +93,26 @@ yerindeyse hiçbir şey yapmadan durur.
 - `16` ve `19` diğerleriyle çakışmaz; küçük ve bağımsız oldukları için önce.
 - 12, 15, 16, 19 atlanabilir (kalanların sırası aynı kalır); 13 atlanırsa 14
   uygulanamaz.
+- 20–25 zincirin (14 dahil) SONRASINA yazıldı: md5 ön koşulları 13/14
+  uygulanmış gövdeleri bekler (`complete_study_session` 13'ün,
+  `get_league_ranking` 14'ün gövdesi). 21, 20'nin `carry_points` kolonuna
+  dayanır; 22, 23, 24, 25 tek başına da uygulanabilir.
 
-**Yerel doğrulama:** `supabase/tests/proposed_sira_run_local.sh` (yerel, tek
+**Yerel doğrulama (gerçek kopya):** `tool/local_supabase/proposed_chain_check.sh`.
+Yerel Supabase'in (Docker, canlıyla birebir; `parity_check.sh`) `public`,
+`auth` ve `supabase_migrations` şemalarını şema + veriyle ayrı bir
+veritabanına (`pomosprint_chain`) kopyalar, ana kopyaya dokunmaz; zinciri
+(12 → … → 14) ve 20–25'i her adımda önce DRYRUN'la uygular, DRYRUN'lara
+gömülü gövdelerin ana dosyalarla aynı olduğunu ve 25 → 20 `_down`
+dosyalarının şemayı birebir geri getirdiğini denetler. 5 Ekim 2026 sonucu:
+14/14, 6/6, 13/13, 12/12, 50/50, 67/67, 15/15, 10/10, 9/9, 13/13, 9/9, 9/9
+`true`; altı `_down` önceki şemaya birebir döndü. Test bulguları için
+`supabase/tests/proposed_20_25_bulgu_repro_local.sql` (geri alınan
+transaction; canlı / zincir / zincir + 20–25 hâllerinde 'BUG' / 'düzgün') ve
+`supabase/tests/proposed_20_25_race_local.sh` (iki bağlantılı eşzamanlılık;
+yalnızca kopya veritabanında).
+
+**Yerel doğrulama (taklit taban):** `supabase/tests/proposed_sira_run_local.sh` (yerel, tek
 kullanımlık Postgres 16+; `PG*` ortam değişkenleri). Taban
 `tests/proposed_sira_local_stub.sql`: canlıdan salt okunarak kuruldu; public'teki
 33 fonksiyonun md5'i ve kolon/kısıt/index/politika/yetki/trigger parmak izleri
@@ -100,6 +134,12 @@ birebir döndü. Ayrıca 13 DRYRUN canlı hâlde 50/50, 14 DRYRUN 15'siz (yalnı
 | `19_waitlist_consent_token.sql` | P2 (6563 / KVKK-11) | Bekleme listesine ticari ileti onay kaydı (`marketing_consent`, `consent_text_version`, sunucuda yazılan `consented_at`) ve kişiye özel `unsubscribe_token`. A geriye uyumlu; B, site onay alanlarını gönderdikten SONRA anon INSERT'i yalnızca onaylı satıra ve üç kolona daraltır. |
 | `13_sunucu_butunluk.sql` | P1 | **Ürün kararı gerekir (UX-01), ama karar düğmesi kapalıyken canlı davranışı değiştirmeden uygulanabilir.** UX-01: `register_session_start` + `session_starts`; `complete_study_session` eşleşen sunucu başlangıcında `started_at`'i sunucudan alır (`start_verified`), doğrulanmamış seanslara `app_config.unverified_session_daily_cap` (vars. `null`). Lig dönemi: kapanmış döneme ait geç seans lig puanı almaz (`league_period_closed`). `handle_new_user` friend_code çakışmasında yeniden dener; Crockford arkadaş kodu, saatlik deneme sınırı, bekleyen istekte id yok (KVKK-17). `profiles.email` boşaltılır (KVKK-20, 2. aşama dosya sonunda). `app_config` + anon okunabilir `get_app_config()` (UX-08). 10 SECURITY DEFINER'a `pg_temp`. `profiles.name`/`categories.name` içerik trigger'ı, `start_study_session` doğrulaması. İstemci sözleşmesi dosya başında. |
 | `14_gizlilik_sosyal.sql` | P1/P2 (PLAY-04, PLAY-05, ACC-06, KVKK-01, KVKK-03, KVKK-06, KVKK-10, ACC-13, KVKK-09) | Sunucu tarafı engelleme ve arkadaş yönetimi, kullanıcı bildirimi + operatör araçları, nötr görünen ad ve tek kelimelik ad maskesi, görünürlük varsayılan kapalı, anon sıralama sınırı, activity_feed durdurma, onay kayıt defteri, saklama işleri (pg_cron), bülten onayı RPC'leri. `11` §2 / `07` A-B-E / `03`'ü kapsar. Ayrıntı: aşağıda "Öneri 14". |
+| `20_lig_donemi.sql` | P2 (t4-F2, t4-F3, t4-F5, t4-F6, t4-F7, t4-F8, t4-F10) | Terfi/düşme hedefi aynı dönem sonlu oda (yarılanmış odaya girmez); taşınanın `joined_at`'ı = taşınma; bitmiş odaya yerleştirme yok; kademe başına yerleştirme kilidi (eşzamanlı ilk seanslar aynı odaya, 30 sınırı); `carry_points` (oda bitişi ile cron arası seansların puanı yeni döneme); ligsiz satırda `member_count` 0; `league_promotion` tarihi TR günü; ödül/terfi düğmeleri (varsayılan bugünkü kural). |
+| `21_seans_kilit_gec_bonus.sql` | P1 (t1-01, t1-05, t4-F5) | `complete_study_session` başta profil kilidi: iki cihazdan eşzamanlı çakışan seans `overlap`, aynı `client_uuid` `duplicate` (puan/kum/lig iki kat sayılmaz); geç seans kendi gününün serisiyle; oda bitişinden sonra biten seans `carry_points`'e (`league_points_next_period`). |
+| `22_avatar_satin_alma.sql` | P2 (t4-F1, t4-F9) | `purchase_avatar` profil kilidi + göreli koşullu düşüm (300 kumla 400'lük alım ve +20 kum ezilmesi biter; `05`'in yerini alır); sonradan eklenen varsayılan avatar kuşanılır. |
+| `23_kategori_butunluk.sql` | P2 (t2-03, t2-06, t2-07) | Onboarding yeniden denenince seansız eski kategoriler arşive (TR/EN çift yok), geçersiz öğe çağrıyı düşürmez, `{created, restored, skipped_*, archived}` döner; büyük/küçük harf duyarsız tekil ad, renk/ikon doğrulaması (yalnız yazılan alan); kategori yazımları kullanıcı başına kilitli (limit aşılmaz). |
+| `24_onboarding_profil.sql` | P1/P2 (t2-01 sunucu, t2-05) | 13 yaş sınırı sunucuda (`birth_year_under_minimum_age`); onboarding'i bitmemiş eski profillerde görünürlük seçim yapılana kadar kapalı (14'ün varsayılanını eskiye taşır). |
+| `25_sosyal_erisim.sql` | P2 (t3-LG5, t3-K1) | `leagues` / `league_memberships` doğrudan okunamaz (yalnız RPC); `rotate_friend_code()` (24 saatte bir). |
 
 ### Eski öneriler (01–10): `11`'e bağlı, canlıya göre yeniden yazılmalı
 
@@ -244,6 +284,64 @@ Görünen ad / ders adı için sunucu tarafı içerik filtresi ve
 (`profiles.name`/`categories.name` trigger'ları); 14 bunlara dayanır.
 Kapsam dışı (ayrı iş): bekleme listesinde çift onay, `profiles`'ta askıya
 alma kolonu.
+
+## Öneriler 20–25: test ajanı bulguları (5 Ekim 2026)
+
+Dört test ajanının (t1 seans/puan, t2 onboarding/kategori, t3 görünürlük,
+t4 lig/avatar) sunucu bulguları yerel kopyada yeniden üretildi
+(`tests/proposed_20_25_bulgu_repro_local.sql`, `tests/proposed_20_25_race_local.sh`)
+ve üç hâlde sınandı: canlı (= ana yerel kopya), zincir (12 → … → 14) ve
+zincir + 20–25. Zincirin zaten düzelttiği bulgular için yeni dosya yazılmadı.
+
+| Bulgu | Canlı | Zincirden sonra | Çözen |
+|---|---|---|---|
+| t1-01 eşzamanlı çakışan seans iki kez sayılıyor (medium) | BUG | BUG | 21 |
+| t1-02 / t3-L7 `start_study_session` süre/ad sınırsız | BUG | düzgün | 13 (B) |
+| t1-03 duplicate yanıtı ilk kaydın puanını döndürüyor | belge | belge | AGENTS.md §5.2/§5.3 düzeltildi |
+| t1-05 geç seans bugünkü serinin bonusunu alıyor | BUG | BUG | 21 (ürün kararı: o günün serisi) |
+| t1-06 yeni oda ilk dönemde 7–14 gün | bilgi | bilgi | ürün kararı; AGENTS.md §6.4 belgelendi |
+| t1-07 24 saatten eski seans kalıcı ret | bilgi | bilgi | ürün kararı (13'ün `register_session_start`'ı ile pencere genişletilebilir) |
+| t1-08 `ensure_user_in_league` `pg_temp` yok | BUG | düzgün | 13 (H) |
+| t2-01 görünürlük seçilmeden onboarding (high, sunucu kısmı) | BUG | düzgün (yeni kayıt) | 14 (C) + 24 (eski, bitmemiş profiller); istemci ayrı |
+| t2-03 onboarding kategorileri uzlaşmıyor (medium) | BUG | BUG | 23 |
+| t2-04 KPSS / dil segmenti yok | bilgi | bilgi | ürün kararı (CHECK + istemci birlikte) |
+| t2-05 13 yaş sınırı yalnız istemcide | BUG | BUG | 24 |
+| t2-06 kategori ad/renk/ikon doğrulaması | BUG | BUG (ve kurulum tümden düşüyor) | 13 (ad) + 23 |
+| t2-07 eşzamanlı kurulum limiti aşıyor | BUG | BUG | 23 |
+| t2-08 timezone istemciden yazılmıyor | bilgi | bilgi | istemci işi; sunucu hazır |
+| t3-K1 arkadaş kodu taranabilir (medium) | BUG | düzgün (sınır, Crockford, id yok) | 13 (D) + 25 (`rotate_friend_code`) |
+| t3-AF1 `activity_feed` görünürlüğe uymuyor | BUG | düzgün | 14 (G) |
+| t3-EM1 e-postadan türeyen ad maskesiz | BUG | düzgün | 14 (C, E); istemci ön koşulu Öneri 14'te |
+| t3-LG5 lig tabloları doğrudan okunuyor | BUG | BUG | 25 |
+| t3-F14 reddedilen hemen yeniden istek atıyor | BUG | düzgün | 14 (D, 7 gün bekleme) |
+| t3-K2 `friend_code` çakışmasında kayıt düşüyor | BUG | düzgün | 13 (D) |
+| t4-F1 `purchase_avatar` kayıp güncelleme (medium) | BUG | BUG | 22 |
+| t4-F2 terfi eden yarılanmış odaya giriyor (medium) | BUG | BUG | 20 |
+| t4-F3 tek üyeli odada şampiyonluk (medium) | BUG | BUG | 20 (düğme; varsayılan bugünkü kural, ürün kararı) |
+| t4-F4 önceki döneme ait geç seans yeni döneme (medium) | BUG | düzgün | 13 (F) |
+| t4-F5 bitiş ile cron arası seanslar | BUG | BUG | 20 + 21 |
+| t4-F6 ligsiz satır = tek kişilik oda | BUG | BUG | 20 (+ istemci `awaitingPlacement`) |
+| t4-F7 oda seçimi kilitsiz | BUG | BUG | 20 |
+| t4-F8 `league_promotion` tarihi UTC | BUG | BUG (14 akışı kapatır) | 20 |
+| t4-F9 sonradan eklenen varsayılan avatar | BUG | BUG | 22 |
+| t4-F10 taşınanın `joined_at`'ı eski | BUG | BUG | 20 |
+
+**Zincir + 20–25 sonrası:** tüm BUG satırları `düzgün`; yalnızca t4-F3
+düğmeler açılana kadar bugünkü kuralla kalır (bilinçli).
+
+**İstemci sözleşmesi (20–25 canlıya uygulandıktan SONRA bağlanır):**
+- `complete_study_session` yanıtına `league_points_next_period` (bool) eklenir (21).
+- `get_my_league_ranking`: ligsiz satırda `member_count` 0 (20). Bugünkü
+  `awaitingPlacement` (`<= 1`) aynı davranır; yeni istemci 1'i "odanda
+  şimdilik yalnızsın" diye gösterebilir.
+- `get_app_config()`: `league_award_min_members`, `league_award_min_points`,
+  `league_promotion_min_points` (20). Değiştirilirse `leagueInfoPromote`,
+  `leagueAwardsSub`, `leagueAwardLocked*` ve `isPromotionRank` aynı kurala.
+- `setup_onboarding_categories` jsonb döner:
+  `{created, restored, skipped_existing, skipped_limit, skipped_invalid, archived}` (23).
+- Yeni hata metinleri (23514): `category_color_invalid`, `category_icon_invalid`
+  (23), `birth_year_under_minimum_age` (24). Bugün `invalidInput`'a düşer.
+- `rotate_friend_code()` → `{success, code:'rotated'|'rate_limited', friend_code | retry_after}` (25).
 
 ## `20261003150000_live_audit_fixes` ile ilişkisi
 

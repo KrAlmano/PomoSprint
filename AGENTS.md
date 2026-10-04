@@ -27,7 +27,7 @@
 
 ## 1. Proje bir bakışta
 
-- **Ne:** Oyunlaştırılmış Pomodoro uygulaması. 25 veya 50 dk seans (mola sayacı yok), kategoriler, raporlar, seri bonusu, 14 günlük ligler, avatarlar, arkadaşlar.
+- **Ne:** Oyunlaştırılmış Pomodoro uygulaması. 25 veya 50 dk seans (mola sayacı yok), kategoriler, raporlar, seri bonusu, 14 günlük ligler (yeni açılan odanın ilk dönemi 7–14 gün, §6.4), avatarlar, arkadaşlar.
 - **İstemci:** Flutter 3.44 / Dart ^3.12, yalnızca **Android ve iOS**. `macos/ linux/ windows/ web/` çalışmayan şablonlar (macOS bundle id hâlâ `com.example.pomodoro`).
 - **Backend:** Supabase projesi `Pomodoro App`, ref `eoosnyakvxmifmexpgxa`, bölge `eu-north-1`. Postgres + RLS + SECURITY DEFINER RPC, Auth (e-posta, Google, Apple), pg_cron, Edge Functions.
 - **Temel ilke:** Puan, kum (coins), seri ve lig **sunucuda** hesaplanır. İstemci seans meta verisini gönderir, RPC sonucunu gösterir.
@@ -54,6 +54,7 @@
 | `flutter run` (debug dahil) / `--profile` / `--release` | Gerçek seans ve puan testi | Her derlemede sayaç gerçek süreli (25/50 dk). Hızlı deneme: `--dart-define=QUICK_TIMER=true` (VS Code: "PomoSprint (hızlı test sayacı, kaydedilmez)"): 5/10 sn, TEST rozeti, seans sunucuya ve kuyruğa gitmez |
 | `supabase/tests/run_local.sh` | SQL değişikliği; **yalnızca yerel Postgres** | ASSERT'ler geçer. `live_audit_fixes` varsayılan olarak atlanır |
 | `supabase start --workdir tool/local_supabase` | Test hesabıyla deneme (canlının Docker'daki birebir kopyası; uygulama `--dart-define` / VS Code "PomoSprint (yerel Supabase)") | `tool/local_supabase/parity_check.sh` → hepsi `aynı`. Test hesapları yalnızca burada; ayrıntı `tool/local_supabase/README.md` |
+| `tool/local_supabase/proposed_chain_check.sh` | `supabase/proposed/` dosyası yazınca ya da değiştirince (yerel kopya açıkken) | Kopya veritabanında (ana kopyaya dokunmaz) zincir 12 → … → 14 ve 20–25: her DRYRUN maddesi `true`, DRYRUN'daki gövde = ana dosya, `_down`'lar şemayı birebir geri getirir; `SONUÇ: tüm adımlar beklendiği gibi` |
 | `python3 landing/tools/sync_partials.py --check` | Site değişikliğinden sonra | Çıkış kodu 0 |
 | `cd scripts && npm test` | `landing/js`, `supabase/functions`, `scripts/send_newsletter.js` değişikliğinden sonra | Hepsi yeşil. Ağsız: Edge Function'lar sahte Supabase ile, site betikleri sahte DOM ile (`scripts/test/`); Node 22.18+ ya da 23.6+ (bayraksız TypeScript ayıklama ve `module.registerHooks`) |
 | `cd scripts && node security_regression_test.js` | **Yalnızca kullanıcı onayıyla.** Gerçek hesap açar ve siler | Bazı senaryolar canlıda olmayan `proposed/11` yüzünden bilinçli kırmızı |
@@ -124,7 +125,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 | `test/` | Birim ve widget testleri (E2E yok). `test/support/fake_supabase_service.dart`: Raporlar ve Kategorilerim'e `service:` ile verilen sahte servis |
 | `supabase/migrations/` | İleri migration'lar. Yalnızca `20261003150000_live_audit_fixes` canlıda (§4.6) |
 | `supabase/rollbacks/` | Down betikleri; CLI uygulamaz |
-| `supabase/proposed/` | Canlıya uygulanmamış öneriler (`01`–`11`). Her dosya `\quit` ile başlar |
+| `supabase/proposed/` | Canlıya uygulanmamış öneriler (`01`–`25`; sıra `proposed/README.md`). Her dosya `\quit` ile başlar |
 | `supabase/tests/` | `run_local.sh` (yerel), `*_dryrun.sql` (canlıda, geri alınan transaction) |
 | `supabase/functions/` | `unsubscribe`, `send-welcome-email` (repodaki sürümler canlıdan yeni, §10), `delete-account` (canlıda yok; istemci 404/5xx'te `delete_own_account`'a düşer, §5.6) |
 | `scripts/` | `security_regression_test.js` (canlı), `send_newsletter.js` (+ `lib/newsletter_mail.js`), `templates/`, `test/` (`npm test`, ağsız). Sırlar `scripts/.env` (şablon `.env.example`) |
@@ -225,7 +226,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 - Sekmeler: **Lig | Aylık | Arkadaşlar**. "Tüm zamanlar" sekmesi kaldırıldı (`getAllTimeRanking` ve `getLeagueZones` servis metodları çağrılmıyor).
 - "Ben" satırı yalnızca `is_me` ile bulunur. İsimle eşleme yapma. Arkadaşlar sekmesinde kendi satırı yerel profilden eklenir.
 - Lig verisi `get_my_league_ranking()` ile okunur; terfi/düşme bölgeleri satırla birlikte sunucudan gelir (`LeagueSnapshot`).
-- Lig: 14 gün, 5 kademe (1 Bronz … 5 Elmas), en fazla 30 üye. Puan sabitleri `get_points_config`'ten okunur; `league_info_sheet`'teki sayılar yalnızca yedek.
+- Lig: 14 gün (yeni açılan odanın ilk dönemi 7–14 gün, §6.4), 5 kademe (1 Bronz … 5 Elmas), en fazla 30 üye. Puan sabitleri `get_points_config`'ten okunur; `league_info_sheet`'teki sayılar yalnızca yedek.
 - Avatar sahipliği = `avatar_unlocks` kaydı ya da ücretsiz (`isOwned`). Lig ödülü avatarları satın alınamaz. Premium'a özel avatarlar (edinme yolu / IAP yok, App Store 2.3.1) yalnızca sahibine ya da Premium kullanıcıya listelenir (`isListedInShop`).
 - Profil ve Koleksiyon `currentUser`'ı dinler; kopya tutmaz.
 - Başka kullanıcının verisi yalnızca RPC ile gelir.
@@ -281,6 +282,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 | `proposed/01`–`10` | Uygulanmadı. Sıra ve kapsam `proposed/README.md`'de |
 | `proposed/13_sunucu_butunluk.sql` (+ `_down`, `tests/proposed_13_*`) | **Uygulanmadı.** Sıra: 12 → 15 → 16 → 19 → **13** → 14 (`proposed/README.md`). UX-01 sunucu başlangıç kaydı (`register_session_start`), lig dönemi sınırı, friend_code yeniden deneme + deneme sınırı, `profiles.email` boşaltma, `app_config`/`get_app_config`, içerik trigger'ları, `pg_temp`. İstemci sözleşmesi dosya başında; istemci bu RPC'leri canlıya uygulanmadan çağırmaz |
 | `proposed/14_gizlilik_sosyal` (+ `_down`, `tests/proposed_14_gizlilik_sosyal_dryrun.sql`) | **Uygulanmadı.** Engelleme, bildirim, onay kaydı, saklama işleri, bülten RPC'leri. 13 uygulanmış hâlin üzerine yazıldı (sıranın son adımı); md5 ön koşulu 13'ü bekler. Zincirin yerel doğrulaması: `tests/proposed_sira_run_local.sh`. İstemci sözleşmesi ve sıra `proposed/README.md` "Öneri 14" |
+| `proposed/20`–`25` (+ `_down`, `tests/proposed_2N_*_dryrun.sql`) | **Uygulanmadı.** 5 Ekim test bulguları; zincirden (14) SONRA, sırayla 20 → 25. 20 lig dönemi/oda yerleştirme (+ ödül/terfi düğmeleri), 21 `complete_study_session` kilidi + geç seans bonusu + `carry_points`, 22 `purchase_avatar` kilidi, 23 kategori uzlaştırma/doğrulama/kilit, 24 13 yaş sınırı + bitmemiş onboarding'de görünürlük, 25 lig tabloları yalnız RPC + `rotate_friend_code`. Yerel doğrulama `tool/local_supabase/proposed_chain_check.sh`; bulgu ↔ dosya tablosu ve istemci sözleşmesi `proposed/README.md` "Öneriler 20–25" |
 
 **Canlıda olmayan RPC'ler:** `reorder_categories`, `remove_friend`, `cancel_friend_request`, `get_outgoing_friend_requests`, `set_my_timezone`, `get_my_category_limit` (ayrıca `get_my_streak`, `study_day_of`, `my_friend_ids`, `synced_at` kolonu). Gerekirse `proposed/11`'den canlı gövdelere göre ayrı migration yaz.
 
@@ -355,7 +357,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 İstemci `reorder_categories`'i çağırmaz (canlıda yok); sıralama satır başına paralel `update(sort_order)` ile yazılır (§4.2).
 
 ### 5.2 `complete_study_session` kuralları
-- İlk kontrol idempotency: aynı `(user_id, client_uuid)` → `duplicate:true`, puan ve kum 0.
+- İlk kontrol idempotency: aynı `(user_id, client_uuid)` → `duplicate:true`; yanıtta ilk kaydın `base_points`/`bonus_points`/`total_points`'i döner, `coins_earned` 0; `bonus_pct` 0 ve `daily_limit_reached` false SABİT (ilk kayıttaki değerler değil, güvenme). Profil/lig yeniden yazılmaz; istemci delta eklemez.
 - Doğrulama sırası: süre 25/50 → `started_at` gelecekte değil (null da reddedilir) → 24 saatten eski değil → `started_at + süre <= now() + 5 dk` → kategori kullanıcıya ait → gerçek aralıkla çakışma (`{error:'overlap'}`).
 - Puan: 25 dk = 5, 50 dk = 12. Duraklatma cezası `ceil(%20)` (25 dk → 4, 50 dk → 9). Seri bonusu 3/7/14 günde %10/%20/%30 (`ceil`). Kum: seans başına 20.
 - Günlük tavan: aynı çalışma gününde 16 seans dolunca puan, kum ve lig puanı 0. `total_minutes` artmaya devam eder.
@@ -366,7 +368,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 
 | Sunucu yanıtı | İstemci davranışı |
 |---|---|
-| `duplicate:true` | Başarı, puan tekrar verilmez |
+| `duplicate:true` | Başarı, puan tekrar verilmez (yanıttaki puan ilk kaydınki; `_onSessionAccepted` delta eklemez, diyalog "zaten kaydedilmişti") |
 | `daily_limit_reached:true` | Başarı, 0 puan / 0 kum |
 | `{error:'overlap'}` | Kuyrukta kalır; sunucu yaşı 24 saati geçince `overlap` ile reddedilir |
 | `session_not_finished` | Ölçülen düzeltilmemiş fark eşiği aşıyorsa geçici, neden `clock_skew` ("cihazının saati farklı/ileri" metni YALNIZCA bu nedende). Fark ölçülemediyse geçici, neden `not_elapsed` ("süre sunucuyla henüz doğrulanamadı"). Aksi halde kalıcı `not_elapsed` ("sunucuya göre seans süresi henüz dolmamıştı") |
@@ -438,7 +440,8 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
    - **Ödül avatarı:** ilk 3 ve puanı > 0 → `league_award_avatar_id(tier, sıra)`.
    - **Terfi:** puan > 0, sıra ≤ terfi kotası, kademe < 5 → üst kademede 30'dan az üyeli lig (yoksa yeni).
    - **Düşme:** sıra ≥ düşme sınırı ve kademe > 1.
-   - Herkesin `weekly_points` = 0; `end_date` + 14 gün. Yeni lig, 2 hafta sonraki Pazar 23:59:59 TR'de biter.
+   - Herkesin `weekly_points` = 0; `end_date` + 14 gün. Dönem devrinde açılan oda 2 hafta sonraki Pazar 23:59:59 TR'de biter (14 gün).
+   - `ensure_user_in_league`'in (ilk seans) açtığı oda **bu haftanın Pazartesi'si + 13 gün** biter: ilk dönem açılış gününe göre 7–14 gün (Pazar açılan oda 7 gün). Odalar bu yüzden iki hafta paritesinde; sabit 14 gün ürün kararı (t1-06). `proposed/20` terfi/düşme hedefini aynı dönem sonlu odayla sınırlar.
 5. Bölgeler (`get_league_zones`):
 
 | Üye sayısı | Terfi | Düşme |
@@ -558,6 +561,7 @@ curl -sI https://pomosprint.app/reset-password | grep -i cache-control   # no-st
 | P2 | `proposed/11` RPC'leri canlıda yok | Arkadaş silme/iptal UI'ı ve toplu kategori sıralaması bunlara bağlı |
 | P2 | `proposed/15` (aylık sıralama = çalışma ayı) ve `proposed/16` (kategori sırası, silme/kolon yetkileri) uygulanmadı | Sıranın 2. ve 3. adımları (15, 14'ten önce olmalı). Kullanıcı SQL Editor'de önce DRYRUN, sonra dosyayı çalıştırır |
 | P2 | `proposed/19` (bekleme listesi onay kaydı ve abonelikten çıkma token'ı) uygulanmadı | Sıranın 4. adımı (A bölümü; geriye uyumlu). B yalnızca site onay alanlarını gönderdikten sonra. Sonra `unsubscribe` waitlist token'ını da tanımalı ve lansman e-postası yalnızca `marketing_consent = true` satırlara gitmeli |
+| P1 | Eşzamanlı (iki cihaz) seans, kategori ve avatar yazımları kilitsiz; lig dönemi/oda yerleştirme hataları (5 Ekim test bulguları) | `proposed/20`–`25`, zincirden SONRA (sıra `proposed/README.md`). Ürün kararları: lig ödül/terfi düğmeleri (20, varsayılan bugünkü kural), geç seans bonusu (21), yeni oda ilk dönemi 7–14 gün (t1-06), 24 saat penceresi (t1-07), KPSS/dil segmenti (t2-04) |
 | P2 | `proposed/01`–`10` kalan maddeler | Puan sabitleri tek kaynak, `purchase_avatar` kilidi (05), `activity_feed` RLS ve `get_friends_feed` (07), `profiles` kolon bazlı SELECT (06), kategori ad kuralları (09), varsayılan yetkiler (08), veri temizliği (10) |
 | P2 | Herkese açık sıralama oturum açıkken tam ad döndürüyor | Ürün kararı (`proposed/README.md`, 03 satırı) |
 | P2 | `profiles.timezone` istemciden yazılmıyor | Yetki ve doğrulama canlıda hazır; `set_my_timezone` yok. Cihaz IANA adı için ek paket (`flutter_timezone`) gerekir |
