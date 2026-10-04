@@ -10,6 +10,7 @@ import '../widgets/social/social_error_text.dart';
 import '../widgets/social/user_safety.dart';
 import '../services/supabase_service.dart';
 import '../theme.dart';
+import '../utils/friend_code.dart';
 import '../utils/responsive.dart';
 
 /// [FriendsSheet]'i alttan açar. Tablette ve yatay telefonda sheet tam
@@ -25,10 +26,11 @@ Future<void> showFriendsSheet(BuildContext context) {
 }
 
 /// Arkadaşlık RPC yanıtının makine-okunur kodu (not_found, self_add,
-/// already_friends, already_pending, accepted). Canlı add_friend_by_code ve
-/// respond_friend_request yalnızca {success, message} döndürüyor ('code'
-/// alanı proposed/07 E ile gelecek); kod yoksa sunucunun sabit Türkçe
-/// mesajından çıkarılır. Tanınmayan yanıtta null.
+/// already_friends, already_pending, accepted, request_sent; proposed/13 ve
+/// 14 ile rate_limited, cooldown, blocked, respond'da rejected). Canlı
+/// add_friend_by_code ve respond_friend_request yalnızca {success, message}
+/// döndürüyor ('code' alanı 13/14 ile gelir); kod yoksa sunucunun sabit
+/// Türkçe mesajından çıkarılır. Tanınmayan yanıtta null.
 @visibleForTesting
 String? friendResponseCode(Map<String, dynamic>? result) {
   final code = result?['code'];
@@ -54,8 +56,6 @@ class FriendsSheet extends StatefulWidget {
 }
 
 class _FriendsSheetState extends State<FriendsSheet> {
-  static const int _codeLength = 6;
-
   final _codeController = TextEditingController();
   String? _myCode;
   List<Map<String, dynamic>> _friends = const [];
@@ -111,13 +111,17 @@ class _FriendsSheetState extends State<FriendsSheet> {
 
   static int _asInt(Object? value) => value is num ? value.toInt() : 0;
 
-  static String _normalizeCode(String raw) => raw.replaceAll(RegExp(r'\s'), '').toUpperCase();
-
   Future<void> _handleAddFriend() async {
     final l10n = AppLocalizations.of(context)!;
-    final code = _normalizeCode(_codeController.text);
+    final code = normalizeFriendCode(_codeController.text);
     if (code.isEmpty || _isAdding) return;
-    if (_myCode != null && code == _normalizeCode(_myCode!)) {
+    // Biçimce geçersiz kod gönderilmez (proposed/13 her denemeyi saatlik
+    // sınıra sayar; canlıda da yalnızca "bulunamadı" döner).
+    if (!isValidFriendCode(code)) {
+      setState(() => _errorMessage = l10n.friendsErrInvalidCode);
+      return;
+    }
+    if (_myCode != null && code == normalizeFriendCode(_myCode!)) {
       setState(() => _errorMessage = l10n.friendsErrSelf);
       return;
     }
@@ -168,6 +172,12 @@ class _FriendsSheetState extends State<FriendsSheet> {
         return l10n.friendsErrAlreadyFriends;
       case 'already_pending':
         return l10n.friendsErrAlreadyPending;
+      case 'rate_limited':
+        return l10n.friendsErrRateLimited;
+      case 'cooldown':
+        return l10n.friendsErrCooldown;
+      case 'blocked':
+        return l10n.friendsErrBlocked;
     }
     final message = result?['message']?.toString().trim() ?? '';
     if (l10n.localeName == 'tr' && message.isNotEmpty) return message;
@@ -417,13 +427,10 @@ class _FriendsSheetState extends State<FriendsSheet> {
               textCapitalization: TextCapitalization.characters,
               autocorrect: false,
               enableSuggestions: false,
-              // Yapıştırılan koddaki boşluklar önce silinir, sonra kısaltılır;
-              // küçük harf büyüğe çevrilir (kodlar büyük harf üretilir).
-              inputFormatters: [
-                FilteringTextInputFormatter.deny(RegExp(r'\s')),
-                _UpperCaseTextFormatter(),
-                LengthLimitingTextInputFormatter(_codeLength),
-              ],
+              // Eski 6 hex ve yeni 6–8 karakterlik Crockford kodlar: yapıştırılan
+              // koddaki boşluk/tire önce silinir, büyük harfe çevrilir, O/I/L
+              // rakama eşlenir, sonra kısaltılır (bkz. normalizeFriendCode).
+              inputFormatters: const [FriendCodeInputFormatter()],
               onSubmitted: (_) => _handleAddFriend(),
               decoration: InputDecoration(
                 hintText: l10n.friendsCodeHint,
@@ -613,12 +620,5 @@ class _FriendsSheetState extends State<FriendsSheet> {
         ],
       ),
     );
-  }
-}
-
-class _UpperCaseTextFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
-    return newValue.copyWith(text: newValue.text.toUpperCase());
   }
 }

@@ -113,6 +113,13 @@ enum ServiceErrorCode {
   avatarLocked,
   categoryLimitReached,
   categoryNameExists,
+  /// Kategori rengi '#RRGGBB' değil (proposed/23, 'category_color_invalid').
+  categoryColorInvalid,
+  /// Kategori ikon adı geçersiz (proposed/23, 'category_icon_invalid').
+  categoryIconInvalid,
+  /// Doğum yılı 13 yaş sınırının altında (proposed/24,
+  /// 'birth_year_under_minimum_age').
+  underMinimumAge,
   server,
   unknown,
 }
@@ -141,6 +148,14 @@ ServiceErrorCode serviceErrorCodeOf(Object error) {
     final message = error.message.toLowerCase();
     final code = error.code ?? '';
     if (message.contains('not authenticated')) return ServiceErrorCode.notSignedIn;
+    // Canlıda henüz olmayan önerilerin makine-okunur RAISE metinleri (SQLSTATE
+    // 23514). Bugünkü sunucu bunları üretmez; uygulanınca genel
+    // invalidInput yerine anlaşılır metin gösterilir.
+    if (message.contains('category_color_invalid')) return ServiceErrorCode.categoryColorInvalid; // 23
+    if (message.contains('category_icon_invalid')) return ServiceErrorCode.categoryIconInvalid; // 23
+    if (message.contains('birth_year_under_minimum_age')) return ServiceErrorCode.underMinimumAge; // 24
+    // 13: 'profile_name_not_allowed', 'category_name_not_allowed'
+    if (message.contains('name_not_allowed')) return ServiceErrorCode.nameNotAllowed;
     // Sunucudaki RAISE metinleri (create_category, enforce_category_limit,
     // purchase_avatar, set_equipped_avatar) henüz makine-okunur kod
     // döndürmüyor; bu eşleştirme onlar için.
@@ -162,6 +177,11 @@ ServiceErrorCode serviceErrorCodeOf(Object error) {
   if (_looksLikeNetworkError(error.toString().toLowerCase())) return ServiceErrorCode.network;
   return ServiceErrorCode.unknown;
 }
+
+/// Çağrılan RPC sunucuda yok mu (PostgREST PGRST202)? Canlıda henüz
+/// olmayan bir öneri RPC'sini deneyen kod bunu "eski sunucu" diye okur ve
+/// bugünkü davranışa döner.
+bool isMissingRpcError(Object error) => error is PostgrestException && error.code == 'PGRST202';
 
 /// Ağ katmanı hatası mı? (dart:io'ya bağımlı olmamak için metinden bakılır.)
 bool isNetworkError(Object error) =>

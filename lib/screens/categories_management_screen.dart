@@ -94,6 +94,9 @@ class _CategoriesManagementScreenState extends State<CategoriesManagementScreen>
     return switch (serviceErrorCodeOf(error)) {
       ServiceErrorCode.categoryLimitReached => l10n.categoryLimitReachedMsg(_limit),
       ServiceErrorCode.categoryNameExists => l10n.categoryNameExistsMsg,
+      ServiceErrorCode.nameNotAllowed => l10n.nameNotAllowed,
+      ServiceErrorCode.categoryColorInvalid => l10n.categoryColorInvalidMsg,
+      ServiceErrorCode.categoryIconInvalid => l10n.categoryIconInvalidMsg,
       _ => l10n.categorySaveError,
     };
   }

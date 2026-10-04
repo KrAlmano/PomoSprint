@@ -4,8 +4,10 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../models/avatar_model.dart';
+import '../models/league_rules.dart';
 import '../models/user_model.dart';
 import '../widgets/avatar_widget.dart';
+import '../widgets/social/league_rule_texts.dart';
 import '../widgets/social/social_error_text.dart';
 import '../services/supabase_service.dart';
 import '../theme.dart';
@@ -35,6 +37,8 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
       AvatarCharacter.allAvatars().where((a) => a.isLeagueAward).toList();
   bool _isSaving = false;
   String? _purchasingId;
+  // Lig ödülü kuralı (proposed/20; okunamazsa bugünkü kural).
+  LeagueRules _leagueRules = SupabaseService.instance.leagueRules;
 
   // Izgara ~120 px hücrelerle kurulur: dikey telefonda bugünkü gibi 3 sütun,
   // yatay telefonda ve tablette genişliğe göre daha fazla sütun.
@@ -50,6 +54,9 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
     super.initState();
     _sortShop();
     SupabaseService.instance.currentUser.addListener(_onUserChanged);
+    unawaited(SupabaseService.instance.getLeagueRules().then((rules) {
+      if (mounted && rules != _leagueRules) setState(() => _leagueRules = rules);
+    }));
   }
 
   @override
@@ -99,10 +106,7 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
       setState(() => _selection = avatar.id);
     } else if (avatar.isLeagueAward) {
       final l10n = AppLocalizations.of(context)!;
-      // Canlı ödül kuralı: 1. → *_monthly (Şampiyonluk), 2.-3. → *_weekly (Podyum).
-      final body = avatar.isChampionAward
-          ? l10n.leagueAwardLockedBodyChampion
-          : (avatar.isPodiumAward ? l10n.leagueAwardLockedBodyPodium : l10n.leagueAwardLockedBody);
+      final body = leagueAwardLockedText(l10n, avatar, _leagueRules);
       unawaited(_showInfoDialog(avatar, l10n.leagueAwardLockedTitle, body));
     } else if (avatar.isPremiumOnly && !widget.user.isPremium) {
       final l10n = AppLocalizations.of(context)!;
@@ -390,7 +394,7 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
                                         style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: onSurface),
                                       ),
                                       const SizedBox(height: 2),
-                                      Text(l10n.leagueAwardsSub, style: TextStyle(fontSize: 12, color: muted)),
+                                      Text(leagueAwardsSubText(l10n, _leagueRules), style: TextStyle(fontSize: 12, color: muted)),
                                     ],
                                   ),
                                 ),

@@ -1,3 +1,6 @@
+import '../../models/league_rules.dart';
+import '../../models/user_model.dart';
+
 /// Sıralama ekranlarının ortak satır modeli. Her sekme kendi puan anahtarını
 /// açıkça eşler (lig: weekly_points, aylık: total_points, arkadaşlar:
 /// lifetime_points); aynı anahtara farklı anlamlar yüklenmez.
@@ -57,10 +60,12 @@ class RankingEntry {
 /// (get_my_league_ranking). Kural sayıları istemcide sabitlenmez.
 ///
 /// Kullanıcı henüz bir lig odasında değilse sunucu tek satır döndürür:
-/// is_me=true, weekly_points 0, member_count 1, promotion_zone_end 1,
-/// demotion_zone_start 999 ve end_date 14 günlük dönemin sonu. Bu durum
+/// is_me=true, weekly_points 0, promotion_zone_end 1, demotion_zone_start
+/// 999, end_date 14 günlük dönemin sonu ve member_count: canlıda 1 (tek
+/// kişilik gerçek odayla aynı satır), proposed/20 sonrası 0. Bu durum
 /// [awaitingPlacement] ile ayırt edilir; ekran "#1 · 0 puan" yerine
-/// yerleştirme bilgisini gösterir.
+/// yerleştirme bilgisini gösterir. Odada tek başına olan kullanıcı
+/// [isAloneInRoom] (t4-F6).
 class LeagueSnapshot {
   final int tier;
   final DateTime? endDate;
@@ -71,6 +76,13 @@ class LeagueSnapshot {
   /// Kullanıcının bu dönemki lig puanı (kendi satırının weekly_points'i).
   final int myPoints;
 
+  /// Dönem sonu ödül/terfi kuralı (proposed/20; okunamazsa bugünkü kural).
+  final LeagueRules rules;
+
+  /// Kullanıcı gerçekten bir odada mı? null: bilinmiyor; o zaman satırdan
+  /// eski kuralla tahmin edilir (tek kişi ve puansız = odada değil).
+  final bool? inRoom;
+
   const LeagueSnapshot({
     required this.tier,
     required this.endDate,
@@ -78,40 +90,85 @@ class LeagueSnapshot {
     required this.demotionZoneStart,
     required this.memberCount,
     this.myPoints = 0,
+    this.rules = LeagueRules.standard,
+    this.inRoom,
   });
 
   /// [rows] boş olmamalı. Tier/bitiş/bölge değerleri her satırda aynıdır;
   /// varsa kullanıcının kendi satırı esas alınır. Sunucu end_date
   /// döndürmezse 14 günlük dönem varsayımıyla tahmin edilir
   /// ([assumedLeaguePeriodEnd]).
-  factory LeagueSnapshot.fromRows(List<Map<String, dynamic>> rows, {DateTime? now}) {
+  ///
+  /// Odada olup olmadığı ([inRoom]) sırasıyla: satırda has_league varsa o;
+  /// member_count 0 → odada değil (proposed/20); birden çok üye ya da puan
+  /// → odada; [rules] sunucudan geldiyse (20 uygulanmış, ligsiz satır 0
+  /// döner) tek kişilik satır gerçek odadır. Aksi halde (canlı sunucu: ligsiz
+  /// satır ile tek kişilik puansız oda aynı) [hasLeagueHistory]: canlıda
+  /// puan kazandıran her seans kullanıcıyı bir odaya yerleştirir ve üyelik
+  /// silinmez; ömür boyu puanı olan kullanıcı bir odadadır (terfi/düşme
+  /// sonrası yeni odasında tek kalan dahil). null ise eski kural.
+  factory LeagueSnapshot.fromRows(
+    List<Map<String, dynamic>> rows, {
+    DateTime? now,
+    LeagueRules rules = LeagueRules.standard,
+    bool? hasLeagueHistory,
+  }) {
     final myRow = rows.where((r) => r['is_me'] == true).firstOrNull;
     final me = myRow ?? rows.first;
+    final memberCount = _asInt(me['member_count'], fallback: rows.length);
+    final myPoints = myRow == null ? 0 : _asInt(myRow['weekly_points']);
+    final hasLeague = me['has_league'];
+    final bool? inRoom;
+    if (hasLeague is bool) {
+      inRoom = hasLeague;
+    } else if (memberCount <= 0) {
+      inRoom = false;
+    } else if (memberCount > 1 || myPoints > 0 || rules.fromServer) {
+      inRoom = true;
+    } else {
+      inRoom = hasLeagueHistory;
+    }
     return LeagueSnapshot(
       tier: _asInt(me['tier'], fallback: 1).clamp(1, kLeagueTierCount),
       endDate: DateTime.tryParse(me['end_date']?.toString() ?? '') ?? assumedLeaguePeriodEnd(now ?? DateTime.now()),
       promotionZoneEnd: _asInt(me['promotion_zone_end'], fallback: 0),
       demotionZoneStart: _asInt(me['demotion_zone_start'], fallback: 999),
-      memberCount: _asInt(me['member_count'], fallback: rows.length),
-      myPoints: myRow == null ? 0 : _asInt(myRow['weekly_points']),
+      memberCount: memberCount,
+      myPoints: myPoints,
+      rules: rules,
+      inRoom: inRoom,
     );
   }
 
   bool get isTopTier => tier >= kLeagueTierCount;
   bool get isBottomTier => tier <= 1;
 
-  /// Kullanıcı henüz bir lig odasına yerleşmedi (ya da odada tek başına ve
-  /// puansız): kıyaslanacak kimse yok, terfi/düşme bölgesi gösterilmez.
-  /// Sunucu ilk puanlı seansta kullanıcıyı bir odaya yerleştirir.
-  bool get awaitingPlacement => memberCount <= 1 && myPoints <= 0;
+  /// Kullanıcı henüz bir lig odasına yerleşmedi: kıyaslanacak kimse yok,
+  /// terfi/düşme bölgesi gösterilmez. Sunucu ilk puanlı seansta kullanıcıyı
+  /// bir odaya yerleştirir. [inRoom] bilinmiyorsa eski kural: tek kişi ve
+  /// puansız.
+  bool get awaitingPlacement => inRoom == null ? memberCount <= 1 && myPoints <= 0 : !inRoom!;
+
+  /// Kullanıcı bir odada ama odada şimdilik yalnız (ör. terfi edip yeni
+  /// odasında tek kalan; t4-F6).
+  bool get isAloneInRoom => !awaitingPlacement && memberCount <= 1;
 
   int get demotionCount =>
       demotionZoneStart > memberCount ? 0 : memberCount - demotionZoneStart + 1;
 
-  // Sunucu 0 puanla terfi ettirmez (process_weekly_leagues).
-  bool isPromotionRank(int rank, int points) => !isTopTier && points > 0 && rank <= promotionZoneEnd;
+  // Sunucu terfi için en az [LeagueRules.promotionMinPoints] puan ister
+  // (bugünkü kural: 0 puanla terfi yok; process_weekly_leagues).
+  bool isPromotionRank(int rank, int points) =>
+      !isTopTier && points >= rules.promotionMinPoints && rank <= promotionZoneEnd;
 
   bool isDemotionRank(int rank) => !isBottomTier && rank >= demotionZoneStart;
+
+  /// [rank]. sıradaki [points] puanlı üye dönem böyle biterse lig ödülü
+  /// (avatar) alır mı? İlk 3, en az [LeagueRules.awardMinPoints] puan ve
+  /// odada en az [LeagueRules.awardMinMembers] üye (bugünkü kural: puanı >
+  /// 0 olan ilk 3).
+  bool earnsAward(int rank, int points) =>
+      rank >= 1 && rank <= 3 && points >= rules.awardMinPoints && memberCount >= rules.awardMinMembers;
 
   /// [rank]. sıradaki [points] puanlı üyenin dönem sonu durumu. Podyum
   /// (1-3) dahil her sıra için aynı kural; küçük odalarda terfi bölgesi
@@ -119,19 +176,26 @@ class LeagueSnapshot {
   LeagueZone zoneOf(int rank, int points) {
     if (awaitingPlacement) return LeagueZone.none;
     if (!isTopTier && rank <= promotionZoneEnd) {
-      return points > 0 ? LeagueZone.promotion : LeagueZone.promotionNeedsPoints;
+      return points >= rules.promotionMinPoints ? LeagueZone.promotion : LeagueZone.promotionNeedsPoints;
     }
     if (isDemotionRank(rank)) return LeagueZone.demotion;
     return LeagueZone.none;
   }
 }
 
+/// Kullanıcı daha önce bir lig odasına yerleşti mi ([LeagueSnapshot.fromRows]
+/// `hasLeagueHistory`)? Canlıda puan kazandıran her seans kullanıcıyı bir
+/// odaya yerleştirir (ensure_user_in_league) ve üyelik silinmez: ömür boyu
+/// puanı olan kullanıcı bir odadadır. Kullanıcı bilinmiyorsa null.
+bool? hasLeagueHistory(UserModel? user) => user == null ? null : user.lifetimePoints > 0;
+
 /// Lig odasındaki bir sıranın dönem sonu durumu.
 enum LeagueZone {
   /// Terfi eder (terfi bölgesinde ve puanı var).
   promotion,
 
-  /// Terfi bölgesinde ama 0 puanlı: sunucu terfi ettirmez.
+  /// Terfi bölgesinde ama puanı terfi için yetmiyor (bugünkü kural: 0
+  /// puan; bkz. [LeagueRules.promotionMinPoints]): sunucu terfi ettirmez.
   promotionNeedsPoints,
 
   /// Bir alt lige düşer.

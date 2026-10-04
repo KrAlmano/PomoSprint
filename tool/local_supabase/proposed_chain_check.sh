@@ -28,14 +28,25 @@
 #   UNTIL=0 KEEP_DB=1 ...                                     # yalnızca kopya (canlı hâl; hiçbir öneri uygulanmaz)
 #   CHECK_BASE=1 ...                                          # kopyada parity_check.sh (kurulumdan hemen sonra)
 #   psql postgresql://postgres:postgres@127.0.0.1:54322/pomosprint_chain   # kopyayı incelemek
+#
+# İstemciyi kopyaya bağlamak (REST_PORT, yalnızca KEEP_DB ile): sonda kopyaya
+# bağlı ayrı bir PostgREST konteyneri (<CHAIN_DB>_rest; yerel REST'in imajı,
+# JWT anahtarı ve rolleriyle) 127.0.0.1:REST_PORT'ta açılır. Giriş (Auth) ana
+# yerel kopyada kalır: aynı anahtarla imzalanmış oturum kopyada da geçer;
+# kullanıcı satırı kopyaya ayrıca aktarılmalıdır (ör.
+# tool/local_supabase/e2e/client_compat/). Ana kopyanın REST'i (54321) değişmez.
+#   CHAIN_DB=pomosprint_chain_client NO_DOWN=1 KEEP_DB=1 REST_PORT=54331 tool/local_supabase/proposed_chain_check.sh
+#   CHAIN_DB=pomosprint_chain_client DROP_ONLY=1 tool/local_supabase/proposed_chain_check.sh   # konteyner + kopya silinir
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$HERE/../.." && pwd)"
 CONTAINER="${LOCAL_DB_CONTAINER:-supabase_db_pomosprint-local}"
+REST_SOURCE="${LOCAL_REST_CONTAINER:-supabase_rest_pomosprint-local}"
 DB="${CHAIN_DB:-pomosprint_chain}"
 UNTIL="${UNTIL:-99}"
 HOST_URL="postgresql://postgres:postgres@127.0.0.1:54322/$DB"
+REST_CONTAINER="$(printf '%s' "$DB" | tr -c 'A-Za-z0-9_.-' '_')_rest"
 
 case "$DB" in
   postgres|template0|template1|_supabase|storage_vectors|"")
@@ -43,6 +54,17 @@ case "$DB" in
 esac
 if ! docker inspect -f '{{.State.Running}}' "$CONTAINER" 2>/dev/null | grep -q true; then
   echo "HATA: $CONTAINER çalışmıyor. Önce: supabase start --workdir tool/local_supabase" >&2; exit 2
+fi
+if [[ -n "${REST_PORT:-}" && -z "${KEEP_DB:-}" ]]; then
+  echo "HATA: REST_PORT yalnızca KEEP_DB=1 ile (kopya sonda silinirse REST boşa bağlanır)." >&2; exit 2
+fi
+
+# Önceki koşunun REST konteyneri (varsa) her durumda kaldırılır.
+docker rm -f "$REST_CONTAINER" >/dev/null 2>&1 || true
+if [[ -n "${DROP_ONLY:-}" ]]; then
+  docker exec "$CONTAINER" psql -U supabase_admin -d postgres -q -c "DROP DATABASE IF EXISTS \"$DB\" WITH (FORCE)" >/dev/null
+  echo "SONUÇ: $REST_CONTAINER ve $DB kaldırıldı"
+  exit 0
 fi
 
 TMP="$(mktemp -d)"
@@ -283,3 +305,28 @@ if [[ $FAILED -ne 0 ]]; then
   exit 1
 fi
 echo "SONUÇ: tüm adımlar beklendiği gibi${KEEP_DB:+ (kopya: $HOST_URL)}"
+
+# ---------------------------------------------------------------------------
+# 5. (İsteğe bağlı) Kopyaya bağlı PostgREST: REST_PORT=54331 KEEP_DB=1 ...
+# ---------------------------------------------------------------------------
+if [[ -n "${REST_PORT:-}" ]]; then
+  NETWORK="$(docker inspect -f '{{range $k, $v := .NetworkSettings.Networks}}{{$k}}{{end}}' "$CONTAINER")"
+  IMAGE="$(docker inspect -f '{{.Config.Image}}' "$REST_SOURCE")"
+  # Yerel REST'in ayarları (yerel demo JWT anahtarı dahil; canlıda geçmez),
+  # yalnızca bağlantı ve şema listesi kopyaya göre değişir.
+  docker inspect -f '{{range .Config.Env}}{{println .}}{{end}}' "$REST_SOURCE" \
+    | grep -E '^PGRST_' | grep -vE '^PGRST_(DB_URI|DB_SCHEMAS)=' > "$TMP/rest.env"
+  docker run -d --name "$REST_CONTAINER" --network "$NETWORK" -p "127.0.0.1:$REST_PORT:3000" \
+    --env-file "$TMP/rest.env" \
+    -e "PGRST_DB_URI=postgresql://authenticator:postgres@$CONTAINER:5432/$DB" \
+    -e "PGRST_DB_SCHEMAS=public" \
+    "$IMAGE" >/dev/null
+  for _ in $(seq 1 30); do
+    if curl -fsS -o /dev/null "http://127.0.0.1:$REST_PORT/" 2>/dev/null; then break; fi
+    sleep 1
+  done
+  if ! curl -fsS -o /dev/null "http://127.0.0.1:$REST_PORT/"; then
+    echo "HATA: $REST_CONTAINER yanıt vermiyor:" >&2; docker logs --tail 20 "$REST_CONTAINER" >&2; exit 1
+  fi
+  echo "REST: http://127.0.0.1:$REST_PORT ($REST_CONTAINER → $DB). Kaldırmak: CHAIN_DB=$DB DROP_ONLY=1 $0"
+fi

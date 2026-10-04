@@ -6,6 +6,7 @@ import '../l10n/app_localizations.dart';
 import '../theme.dart';
 import '../services/supabase_service.dart';
 import '../utils/responsive.dart';
+import 'social/league_rule_texts.dart';
 import 'social/league_tiers.dart';
 import 'social/ranking_models.dart';
 
@@ -54,9 +55,16 @@ class _LeagueInfoSheetState extends State<LeagueInfoSheet> {
     final service = SupabaseService.instance;
     final configFuture = service.getPointsConfig();
     if (_league == null) {
+      final rulesFuture = service.getLeagueRules();
       try {
         final rows = await service.getLeagueRanking();
-        if (rows.isNotEmpty) _league = LeagueSnapshot.fromRows(rows);
+        if (rows.isNotEmpty) {
+          _league = LeagueSnapshot.fromRows(
+            rows,
+            rules: await rulesFuture,
+            hasLeagueHistory: hasLeagueHistory(service.currentUser.value),
+          );
+        }
       } catch (e) {
         // Lig bilgisi alınamazsa kurallar genel metinle gösterilir.
         debugPrint('[RANKING] Lig bilgisi alınamadı: $e');
@@ -376,12 +384,15 @@ class _LeagueInfoSheetState extends State<LeagueInfoSheet> {
 }
 
 /// Yükselme ve düşme kuralı; her durum ayrı tam cümleyle yazılır. Kullanıcı
-/// henüz bir odada değilse (sunucunun lig-yok satırı: tek kişi, bölge 1/999)
-/// oda kuralı yerine yerleştirme bilgisi gösterilir.
+/// henüz bir odada değilse ([LeagueSnapshot.awaitingPlacement]) oda kuralı
+/// yerine yerleştirme bilgisi gösterilir. Terfi için gereken puan sunucu
+/// kuralından ([LeagueSnapshot.rules], proposed/20).
 @visibleForTesting
 String promotionDemotionText(AppLocalizations l10n, LeagueSnapshot league) {
   if (league.awaitingPlacement) return l10n.leagueAwaitingPlacementBody;
-  final promotion = league.isTopTier ? l10n.leagueInfoTopTier : l10n.leagueInfoPromote(league.promotionZoneEnd);
+  final promotion = league.isTopTier
+      ? l10n.leagueInfoTopTier
+      : leagueInfoPromoteText(l10n, league.promotionZoneEnd, league.rules);
   final String demotion;
   if (league.isBottomTier) {
     demotion = l10n.leagueInfoNoDemotionBronze;

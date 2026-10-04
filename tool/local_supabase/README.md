@@ -163,6 +163,26 @@ supabase/tests/proposed_20_25_race_local.sh postgresql://postgres:postgres@127.0
 Kopyalar işin sonunda `DROP DATABASE ... WITH (FORCE)` ile silinmeli (ya da
 betik `KEEP_DB` olmadan bir kez çalıştırılır).
 
+### İstemciyi zincir kopyasına bağlamak (`REST_PORT`)
+
+`REST_PORT` (yalnızca `KEEP_DB` ile) kopyaya bağlı ayrı bir PostgREST
+konteyneri (`<CHAIN_DB>_rest`; yerel REST'in imajı, rolleri ve yerel demo JWT
+anahtarıyla) açar. Giriş (Auth) ana kopyada kalır: aynı anahtarla imzalı oturum
+kopyada da geçer; kullanıcının `auth.users` satırı kopyaya ayrıca aktarılır
+(kopyadaki `handle_new_user` tetiklenir). Ana kopyanın REST'i değişmez.
+
+```sh
+CHAIN_DB=pomosprint_chain_client NO_DOWN=1 KEEP_DB=1 REST_PORT=54331 tool/local_supabase/proposed_chain_check.sh
+flutter test tool/local_supabase/e2e/client_compat/client_compat_e2e_test.dart   # ESKİ + YENİ
+CHAIN_DB=pomosprint_chain_client DROP_ONLY=1 tool/local_supabase/proposed_chain_check.sh  # konteyner + kopya silinir
+```
+
+`client_compat_e2e_test.dart` uygulamanın karar kodunu (`LeagueSnapshot`,
+`LeagueRules`, `reconcileOnboardingCategories`, `equipAvatarWithDefaultUnlock`,
+`normalizeFriendCode`, `serviceErrorCodeOf`) iki sunucuya gerçek HTTP ile
+çalıştırır; kendi `compat-…` hesaplarını açıp sonda iki veritabanından da siler.
+5 Ekim 2026: 18/18 (ESKİ 9, YENİ 9).
+
 ## Bilinçli farklar
 
 | Fark | Neden |

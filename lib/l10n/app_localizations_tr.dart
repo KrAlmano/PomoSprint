@@ -47,7 +47,20 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String onboardingCategoriesSkippedLimit(int count, int limit) {
+    return 'Kategori sınırına ($limit) ulaşıldığı için seçtiğin $count kategori eklenmedi. Kategorilerim\'den düzenleyebilirsin.';
+  }
+
+  @override
   String get categoryNameExistsMsg => 'Bu isimde bir kategori zaten var.';
+
+  @override
+  String get categoryColorInvalidMsg =>
+      'Bu renk kullanılamıyor. Listeden bir renk seç.';
+
+  @override
+  String get categoryIconInvalidMsg =>
+      'Bu kategori simgesi kullanılamıyor. Lütfen tekrar dene.';
 
   @override
   String get categoriesLoadError =>
@@ -243,6 +256,11 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String leagueInfoPromoteMinPoints(int count, int points) {
+    return 'Bu dönem en az $points puan toplayan ilk $count kişi bir üst lige yükselir.';
+  }
+
+  @override
   String leagueInfoDemote(int count) {
     return 'Son $count kişi bir alt lige düşer.';
   }
@@ -259,6 +277,13 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get leagueAwaitingPlacementBody =>
       'Bu dönem ilk pomodoronu tamamladığında seninle benzer seviyedeki en fazla 30 kişilik bir odaya yerleşirsin. Sıralaman ve yükselme durumun burada görünür.';
+
+  @override
+  String get leagueAloneInRoomTitle => 'Odanda şimdilik yalnızsın';
+
+  @override
+  String get leagueAloneInRoomBody =>
+      'Bu lig odasında şu an yalnızca sen varsın. Odaya katılanlar burada görünür; pomodoro tamamladıkça puan toplarsın.';
 
   @override
   String get leagueInfoDailyLimitTitle => 'Günlük Sınır';
@@ -327,6 +352,22 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get friendsErrAlreadyPending =>
       'Bu kullanıcıyla bekleyen bir arkadaşlık isteğin zaten var.';
+
+  @override
+  String get friendsErrInvalidCode =>
+      'Arkadaş kodu 6–8 harf ve rakamdan oluşur. Kodu kontrol et.';
+
+  @override
+  String get friendsErrRateLimited =>
+      'Çok fazla deneme yaptın. Lütfen bir süre sonra tekrar dene.';
+
+  @override
+  String get friendsErrCooldown =>
+      'Bu kullanıcı isteğini yakın zamanda reddetti. Bir süre sonra tekrar deneyebilirsin.';
+
+  @override
+  String get friendsErrBlocked =>
+      'Bu kullanıcıyı engellediğin için arkadaş olarak ekleyemezsin.';
 
   @override
   String get friendsErrAddFailed =>
@@ -1002,6 +1043,16 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bir lig dönemini puan toplayarak ilk 3\'te bitirince kazanılır: 1.\'ye Şampiyonluk, 2. ve 3.\'ye Podyum Ödülü.';
 
   @override
+  String leagueAwardsSubMinPoints(int points) {
+    return 'Bir lig dönemini en az $points puanla ilk 3\'te bitirince kazanılır: 1.\'ye Şampiyonluk, 2. ve 3.\'ye Podyum Ödülü.';
+  }
+
+  @override
+  String leagueAwardMinMembersNote(int members) {
+    return 'Ödül yalnızca dönem sonunda en az $members kişi olan odalarda verilir.';
+  }
+
+  @override
   String get leagueAwardLockedTitle => 'Bu Avatar Kilitli';
 
   @override
@@ -1009,12 +1060,27 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bu avatarı kazanmak için bu kademede bir lig dönemini puan toplayarak ilk 3\'te bitirmen gerekiyor. Parayla satın alınamaz.';
 
   @override
+  String leagueAwardLockedBodyMinPoints(int points) {
+    return 'Bu avatarı kazanmak için bu kademede bir lig dönemini en az $points puanla ilk 3\'te bitirmen gerekiyor. Parayla satın alınamaz.';
+  }
+
+  @override
   String get leagueAwardLockedBodyChampion =>
       'Bu Şampiyonluk Ödülü\'nü kazanmak için bu kademede bir lig dönemini puan toplayarak 1. sırada bitirmen gerekiyor. Parayla satın alınamaz.';
 
   @override
+  String leagueAwardLockedBodyChampionMinPoints(int points) {
+    return 'Bu Şampiyonluk Ödülü\'nü kazanmak için bu kademede bir lig dönemini en az $points puanla 1. sırada bitirmen gerekiyor. Parayla satın alınamaz.';
+  }
+
+  @override
   String get leagueAwardLockedBodyPodium =>
       'Bu Podyum Ödülü\'nü kazanmak için bu kademede bir lig dönemini puan toplayarak 2. veya 3. sırada bitirmen gerekiyor (1. olan Şampiyonluk Ödülü\'nü alır). Parayla satın alınamaz.';
+
+  @override
+  String leagueAwardLockedBodyPodiumMinPoints(int points) {
+    return 'Bu Podyum Ödülü\'nü kazanmak için bu kademede bir lig dönemini en az $points puanla 2. veya 3. sırada bitirmen gerekiyor (1. olan Şampiyonluk Ödülü\'nü alır). Parayla satın alınamaz.';
+  }
 
   @override
   String get leagueAwardLockedOk => 'Anladım';
@@ -1596,6 +1662,11 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get rankingZoneNeedsPointsMe =>
       'Terfi bölgesindesin ama 0 puanla terfi edilmez. Bir seans tamamla.';
+
+  @override
+  String rankingZoneNeedsMinPointsMe(int points) {
+    return 'Terfi bölgesindesin ama terfi için en az $points puan gerekiyor. Seans tamamlamaya devam et.';
+  }
 
   @override
   String get rankingZoneDemotionMe =>

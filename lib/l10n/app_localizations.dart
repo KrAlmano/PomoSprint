@@ -158,11 +158,29 @@ abstract class AppLocalizations {
   /// **'Şimdi çalışacağın dersleri/alanları seç; istediğin zaman değiştirebilirsin. En fazla {limit} tane seçebilirsin.'**
   String onboardingCategoryStepBodyLimit(int limit);
 
+  /// No description provided for @onboardingCategoriesSkippedLimit.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategori sınırına ({limit}) ulaşıldığı için seçtiğin {count} kategori eklenmedi. Kategorilerim\'den düzenleyebilirsin.'**
+  String onboardingCategoriesSkippedLimit(int count, int limit);
+
   /// No description provided for @categoryNameExistsMsg.
   ///
   /// In tr, this message translates to:
   /// **'Bu isimde bir kategori zaten var.'**
   String get categoryNameExistsMsg;
+
+  /// No description provided for @categoryColorInvalidMsg.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu renk kullanılamıyor. Listeden bir renk seç.'**
+  String get categoryColorInvalidMsg;
+
+  /// No description provided for @categoryIconInvalidMsg.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu kategori simgesi kullanılamıyor. Lütfen tekrar dene.'**
+  String get categoryIconInvalidMsg;
 
   /// No description provided for @categoriesLoadError.
   ///
@@ -470,6 +488,12 @@ abstract class AppLocalizations {
   /// **'Bu dönem puan toplayan ilk {count} kişi bir üst lige yükselir.'**
   String leagueInfoPromote(int count);
 
+  /// No description provided for @leagueInfoPromoteMinPoints.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu dönem en az {points} puan toplayan ilk {count} kişi bir üst lige yükselir.'**
+  String leagueInfoPromoteMinPoints(int count, int points);
+
   /// No description provided for @leagueInfoDemote.
   ///
   /// In tr, this message translates to:
@@ -499,6 +523,18 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Bu dönem ilk pomodoronu tamamladığında seninle benzer seviyedeki en fazla 30 kişilik bir odaya yerleşirsin. Sıralaman ve yükselme durumun burada görünür.'**
   String get leagueAwaitingPlacementBody;
+
+  /// No description provided for @leagueAloneInRoomTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Odanda şimdilik yalnızsın'**
+  String get leagueAloneInRoomTitle;
+
+  /// No description provided for @leagueAloneInRoomBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu lig odasında şu an yalnızca sen varsın. Odaya katılanlar burada görünür; pomodoro tamamladıkça puan toplarsın.'**
+  String get leagueAloneInRoomBody;
 
   /// No description provided for @leagueInfoDailyLimitTitle.
   ///
@@ -613,6 +649,30 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Bu kullanıcıyla bekleyen bir arkadaşlık isteğin zaten var.'**
   String get friendsErrAlreadyPending;
+
+  /// No description provided for @friendsErrInvalidCode.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arkadaş kodu 6–8 harf ve rakamdan oluşur. Kodu kontrol et.'**
+  String get friendsErrInvalidCode;
+
+  /// No description provided for @friendsErrRateLimited.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çok fazla deneme yaptın. Lütfen bir süre sonra tekrar dene.'**
+  String get friendsErrRateLimited;
+
+  /// No description provided for @friendsErrCooldown.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu kullanıcı isteğini yakın zamanda reddetti. Bir süre sonra tekrar deneyebilirsin.'**
+  String get friendsErrCooldown;
+
+  /// No description provided for @friendsErrBlocked.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu kullanıcıyı engellediğin için arkadaş olarak ekleyemezsin.'**
+  String get friendsErrBlocked;
 
   /// No description provided for @friendsErrAddFailed.
   ///
@@ -1718,6 +1778,18 @@ abstract class AppLocalizations {
   /// **'Bir lig dönemini puan toplayarak ilk 3\'te bitirince kazanılır: 1.\'ye Şampiyonluk, 2. ve 3.\'ye Podyum Ödülü.'**
   String get leagueAwardsSub;
 
+  /// No description provided for @leagueAwardsSubMinPoints.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir lig dönemini en az {points} puanla ilk 3\'te bitirince kazanılır: 1.\'ye Şampiyonluk, 2. ve 3.\'ye Podyum Ödülü.'**
+  String leagueAwardsSubMinPoints(int points);
+
+  /// No description provided for @leagueAwardMinMembersNote.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ödül yalnızca dönem sonunda en az {members} kişi olan odalarda verilir.'**
+  String leagueAwardMinMembersNote(int members);
+
   /// No description provided for @leagueAwardLockedTitle.
   ///
   /// In tr, this message translates to:
@@ -1730,17 +1802,35 @@ abstract class AppLocalizations {
   /// **'Bu avatarı kazanmak için bu kademede bir lig dönemini puan toplayarak ilk 3\'te bitirmen gerekiyor. Parayla satın alınamaz.'**
   String get leagueAwardLockedBody;
 
+  /// No description provided for @leagueAwardLockedBodyMinPoints.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu avatarı kazanmak için bu kademede bir lig dönemini en az {points} puanla ilk 3\'te bitirmen gerekiyor. Parayla satın alınamaz.'**
+  String leagueAwardLockedBodyMinPoints(int points);
+
   /// No description provided for @leagueAwardLockedBodyChampion.
   ///
   /// In tr, this message translates to:
   /// **'Bu Şampiyonluk Ödülü\'nü kazanmak için bu kademede bir lig dönemini puan toplayarak 1. sırada bitirmen gerekiyor. Parayla satın alınamaz.'**
   String get leagueAwardLockedBodyChampion;
 
+  /// No description provided for @leagueAwardLockedBodyChampionMinPoints.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu Şampiyonluk Ödülü\'nü kazanmak için bu kademede bir lig dönemini en az {points} puanla 1. sırada bitirmen gerekiyor. Parayla satın alınamaz.'**
+  String leagueAwardLockedBodyChampionMinPoints(int points);
+
   /// No description provided for @leagueAwardLockedBodyPodium.
   ///
   /// In tr, this message translates to:
   /// **'Bu Podyum Ödülü\'nü kazanmak için bu kademede bir lig dönemini puan toplayarak 2. veya 3. sırada bitirmen gerekiyor (1. olan Şampiyonluk Ödülü\'nü alır). Parayla satın alınamaz.'**
   String get leagueAwardLockedBodyPodium;
+
+  /// No description provided for @leagueAwardLockedBodyPodiumMinPoints.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu Podyum Ödülü\'nü kazanmak için bu kademede bir lig dönemini en az {points} puanla 2. veya 3. sırada bitirmen gerekiyor (1. olan Şampiyonluk Ödülü\'nü alır). Parayla satın alınamaz.'**
+  String leagueAwardLockedBodyPodiumMinPoints(int points);
 
   /// No description provided for @leagueAwardLockedOk.
   ///
@@ -2785,6 +2875,12 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Terfi bölgesindesin ama 0 puanla terfi edilmez. Bir seans tamamla.'**
   String get rankingZoneNeedsPointsMe;
+
+  /// No description provided for @rankingZoneNeedsMinPointsMe.
+  ///
+  /// In tr, this message translates to:
+  /// **'Terfi bölgesindesin ama terfi için en az {points} puan gerekiyor. Seans tamamlamaya devam et.'**
+  String rankingZoneNeedsMinPointsMe(int points);
 
   /// No description provided for @rankingZoneDemotionMe.
   ///

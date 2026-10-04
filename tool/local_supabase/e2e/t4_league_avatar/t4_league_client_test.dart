@@ -82,16 +82,20 @@ void main() {
     expect(snap.endDate, DateTime.utc(2026, 10, 18, 20, 59, 59));
   });
 
-  // BULGU repro: terfi edip yeni (boş) odaya tek başına yerleşen kullanıcının
-  // satırı ligsiz satırla birebir aynı; istemci "Henüz bir lig odasında
-  // değilsin" gösterir. Satır t4-02 çıktısından (d1, tier 5, yeni oda).
-  test('BULGU: terfi sonrası yeni odada tek kalan kullanıcı "odada değilsin" görmemeli', () {
-    final snap = LeagueSnapshot.fromRows([
-      {'name': 't4-d1', 'avatar_id': 'avatar_16_basic', 'weekly_points': 0, 'tier': 5,
+  // t4-F6 (istemcide düzeldi): terfi edip yeni (boş) odaya tek başına
+  // yerleşen kullanıcının satırı canlıda ligsiz satırla birebir aynı. Uygulama
+  // satırı kullanıcının ömür boyu puanıyla okur (terfi eden puan kazanmıştır;
+  // LeagueSnapshot.fromRows hasLeagueHistory). Satır t4-02 çıktısından (d1,
+  // tier 5, yeni oda). proposed/20 sonrası ligsiz satır member_count 0 döner.
+  test('t4-F6: terfi sonrası yeni odada tek kalan kullanıcı "odada değilsin" görmez', () {
+    final row = {'name': 't4-d1', 'avatar_id': 'avatar_16_basic', 'weekly_points': 0, 'tier': 5,
        'end_date': '2026-10-18T20:59:59+00:00', 'is_me': true, 'promotion_zone_end': 1,
-       'demotion_zone_start': 999, 'member_count': 1},
-    ]);
-    expect(snap.awaitingPlacement, isFalse, reason: 'kullanıcı tier-5 odasında; sunucu satırı ayırt etmiyor');
+       'demotion_zone_start': 999, 'member_count': 1};
+    final snap = LeagueSnapshot.fromRows([row], hasLeagueHistory: true);
+    expect(snap.awaitingPlacement, isFalse, reason: 'kullanıcı tier-5 odasında');
+    expect(snap.isAloneInRoom, isTrue);
+    expect(LeagueSnapshot.fromRows([row], hasLeagueHistory: false).awaitingPlacement, isTrue,
+        reason: 'puanı hiç olmamış kullanıcı canlıda gerçekten ligsizdir');
   });
 
   group('Sunucu hata metinleri → ServiceErrorCode (purchase_avatar / set_equipped_avatar)', () {

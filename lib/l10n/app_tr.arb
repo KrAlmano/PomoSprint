@@ -24,7 +24,20 @@
       }
     }
   },
+  "onboardingCategoriesSkippedLimit": "Kategori sınırına ({limit}) ulaşıldığı için seçtiğin {count} kategori eklenmedi. Kategorilerim'den düzenleyebilirsin.",
+  "@onboardingCategoriesSkippedLimit": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
   "categoryNameExistsMsg": "Bu isimde bir kategori zaten var.",
+  "categoryColorInvalidMsg": "Bu renk kullanılamıyor. Listeden bir renk seç.",
+  "categoryIconInvalidMsg": "Bu kategori simgesi kullanılamıyor. Lütfen tekrar dene.",
   "categoriesLoadError": "Kategoriler yüklenemedi. İnternet bağlantını kontrol edip tekrar dene.",
   "categorySaveError": "Değişiklik kaydedilemedi. Lütfen tekrar dene.",
   "categoriesRetryBtn": "Tekrar Dene",
@@ -201,6 +214,17 @@
       }
     }
   },
+  "leagueInfoPromoteMinPoints": "Bu dönem en az {points} puan toplayan ilk {count} kişi bir üst lige yükselir.",
+  "@leagueInfoPromoteMinPoints": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "points": {
+        "type": "int"
+      }
+    }
+  },
   "leagueInfoDemote": "Son {count} kişi bir alt lige düşer.",
   "@leagueInfoDemote": {
     "placeholders": {
@@ -213,6 +237,8 @@
   "leagueInfoNoDemotionThisPeriod": "Bu dönem bu ligde düşme yok.",
   "leagueAwaitingPlacementTitle": "Henüz bir lig odasında değilsin",
   "leagueAwaitingPlacementBody": "Bu dönem ilk pomodoronu tamamladığında seninle benzer seviyedeki en fazla 30 kişilik bir odaya yerleşirsin. Sıralaman ve yükselme durumun burada görünür.",
+  "leagueAloneInRoomTitle": "Odanda şimdilik yalnızsın",
+  "leagueAloneInRoomBody": "Bu lig odasında şu an yalnızca sen varsın. Odaya katılanlar burada görünür; pomodoro tamamladıkça puan toplarsın.",
   "leagueInfoDailyLimitTitle": "Günlük Sınır",
   "leagueInfoDailyLimitBody": "Günde en fazla {limit} seans puan ve kum kazandırır (lig puanı, aylık sıralama, toplam puan). Sonraki seanslar yalnızca çalışma süresine ve serine eklenir.",
   "@leagueInfoDailyLimitBody": {
@@ -260,6 +286,10 @@
   "friendsErrSelf": "Kendi kodunu ekleyemezsin.",
   "friendsErrAlreadyFriends": "Bu kullanıcıyla zaten arkadaşsınız.",
   "friendsErrAlreadyPending": "Bu kullanıcıyla bekleyen bir arkadaşlık isteğin zaten var.",
+  "friendsErrInvalidCode": "Arkadaş kodu 6–8 harf ve rakamdan oluşur. Kodu kontrol et.",
+  "friendsErrRateLimited": "Çok fazla deneme yaptın. Lütfen bir süre sonra tekrar dene.",
+  "friendsErrCooldown": "Bu kullanıcı isteğini yakın zamanda reddetti. Bir süre sonra tekrar deneyebilirsin.",
+  "friendsErrBlocked": "Bu kullanıcıyı engellediğin için arkadaş olarak ekleyemezsin.",
   "friendsErrAddFailed": "Arkadaş eklenemedi. Kodu kontrol edip tekrar dene.",
   "friendsIncoming": "Gelen İstekler ({count})",
   "@friendsIncoming": {
@@ -673,10 +703,50 @@
   "confirmSelection": "Seçimi Onayla",
   "leagueAwardsTitle": "Lig Kazanımları",
   "leagueAwardsSub": "Bir lig dönemini puan toplayarak ilk 3'te bitirince kazanılır: 1.'ye Şampiyonluk, 2. ve 3.'ye Podyum Ödülü.",
+  "leagueAwardsSubMinPoints": "Bir lig dönemini en az {points} puanla ilk 3'te bitirince kazanılır: 1.'ye Şampiyonluk, 2. ve 3.'ye Podyum Ödülü.",
+  "@leagueAwardsSubMinPoints": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "leagueAwardMinMembersNote": "Ödül yalnızca dönem sonunda en az {members} kişi olan odalarda verilir.",
+  "@leagueAwardMinMembersNote": {
+    "placeholders": {
+      "members": {
+        "type": "int"
+      }
+    }
+  },
   "leagueAwardLockedTitle": "Bu Avatar Kilitli",
   "leagueAwardLockedBody": "Bu avatarı kazanmak için bu kademede bir lig dönemini puan toplayarak ilk 3'te bitirmen gerekiyor. Parayla satın alınamaz.",
+  "leagueAwardLockedBodyMinPoints": "Bu avatarı kazanmak için bu kademede bir lig dönemini en az {points} puanla ilk 3'te bitirmen gerekiyor. Parayla satın alınamaz.",
+  "@leagueAwardLockedBodyMinPoints": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
   "leagueAwardLockedBodyChampion": "Bu Şampiyonluk Ödülü'nü kazanmak için bu kademede bir lig dönemini puan toplayarak 1. sırada bitirmen gerekiyor. Parayla satın alınamaz.",
+  "leagueAwardLockedBodyChampionMinPoints": "Bu Şampiyonluk Ödülü'nü kazanmak için bu kademede bir lig dönemini en az {points} puanla 1. sırada bitirmen gerekiyor. Parayla satın alınamaz.",
+  "@leagueAwardLockedBodyChampionMinPoints": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
   "leagueAwardLockedBodyPodium": "Bu Podyum Ödülü'nü kazanmak için bu kademede bir lig dönemini puan toplayarak 2. veya 3. sırada bitirmen gerekiyor (1. olan Şampiyonluk Ödülü'nü alır). Parayla satın alınamaz.",
+  "leagueAwardLockedBodyPodiumMinPoints": "Bu Podyum Ödülü'nü kazanmak için bu kademede bir lig dönemini en az {points} puanla 2. veya 3. sırada bitirmen gerekiyor (1. olan Şampiyonluk Ödülü'nü alır). Parayla satın alınamaz.",
+  "@leagueAwardLockedBodyPodiumMinPoints": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
   "leagueAwardLockedOk": "Anladım",
   "lockedCharacter": "Kilitli Karakter",
   "welcomeBackTitle": "Tekrar hoş geldin. Odaklanmaya hazır mısın?",
@@ -872,6 +942,14 @@
   "rankingZoneDemotionChip": "↓ Düşme",
   "rankingZonePromotionMe": "Terfi bölgesindesin: dönem böyle biterse bir üst lige çıkarsın.",
   "rankingZoneNeedsPointsMe": "Terfi bölgesindesin ama 0 puanla terfi edilmez. Bir seans tamamla.",
+  "rankingZoneNeedsMinPointsMe": "Terfi bölgesindesin ama terfi için en az {points} puan gerekiyor. Seans tamamlamaya devam et.",
+  "@rankingZoneNeedsMinPointsMe": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
   "rankingZoneDemotionMe": "Düşme bölgesindesin: dönem böyle biterse bir alt lige inersin.",
   "authSocialNoticePrefix": "Devam ederek ",
   "authSocialNoticeTermsLink": "Kullanım Şartları'nı",

@@ -13,11 +13,14 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/avatar_model.dart';
 import '../models/category_model.dart';
+import '../models/league_rules.dart';
 import '../models/registration_consent.dart';
 import '../models/study_session.dart';
 import '../models/user_model.dart';
+import '../utils/friend_code.dart';
 import '../utils/name_filter.dart';
 import '../utils/study_day.dart';
+import 'avatar_equip.dart';
 import 'backend_config.dart';
 import 'hidden_users.dart';
 import 'language_service.dart';
@@ -1219,8 +1222,10 @@ class SupabaseService {
   /// Onboarding'i tek adımda tamamlar: profil satırını garanti eder,
   /// kategorileri oluşturur, ardından profil alanlarını yazar (kategoriler
   /// profile yabancı anahtarla bağlı olduğu için sıra önemli). Güncelleme
-  /// hiçbir satıra uymazsa hata fırlatır.
-  Future<void> completeOnboarding({
+  /// hiçbir satıra uymazsa hata fırlatır. Kategori kurulumunun sunucu
+  /// sonucunu döndürür (canlı sunucu void döndürdüğü için çoğu zaman null;
+  /// proposed/23 sonrası skipped_limit gibi sayılar).
+  Future<OnboardingCategoriesResult?> completeOnboarding({
     int? birthYear,
     String? userSegment,
     required int dailyGoalMinutes,
@@ -1233,7 +1238,8 @@ class SupabaseService {
     final authUser = _requireAuthUser();
     final epoch = _userEpoch;
     await _guard(() => _ensureOwnProfile(authUser));
-    if (categories.isNotEmpty) await _setupOnboardingCategoriesReconciled(authUser.id, categories);
+    final categoriesResult =
+        categories.isEmpty ? null : await _setupOnboardingCategoriesReconciled(authUser.id, categories);
     final completedAt = DateTime.now();
     final update = onboardingProfileUpdate(
       birthYear: birthYear,
@@ -1256,6 +1262,7 @@ class SupabaseService {
         onboardingCompletedAt: completedAt,
       ),
     );
+    return categoriesResult;
   }
 
   /// Onboarding kategorilerini sunucudaki mevcut kategorilerle uzlaştırarak
@@ -1264,22 +1271,23 @@ class SupabaseService {
   /// takılmaz ve dil değişince aynı kategorinin TR/EN çifti oluşmaz.
   /// Arşivleme yalnızca onboarding'i bitmemiş, hiç seansı (sunucuda ya da
   /// kuyrukta) olmayan hesapta yapılır. Adımlar idempotent: yarıda kalırsa
-  /// bir sonraki "Bitir" kaldığı yerden tamamlar.
-  Future<void> _setupOnboardingCategoriesReconciled(String uid, List<Map<String, dynamic>> categories) async {
-    final existing = await fetchUserCategories(includeArchived: true);
-    if (existing.isEmpty) return setupOnboardingCategories(categories);
-    final canArchive = currentUser.value?.onboardingCompletedAt == null &&
-        pendingSessionCount.value == 0 &&
-        !await _hasAnyStudySession(uid);
-    final plan = planOnboardingCategories(requested: categories, existing: existing, canArchive: canArchive);
-    for (final id in plan.archiveIds) {
-      await archiveCategory(id);
-    }
-    for (final id in plan.unarchiveIds) {
-      await unarchiveCategory(id);
-    }
-    if (plan.payload.isNotEmpty) await setupOnboardingCategories(plan.payload);
-  }
+  /// bir sonraki "Bitir" kaldığı yerden tamamlar. Gönderilen yük aktif
+  /// kalacak kategorileri de içerir ([OnboardingCategoryPlan.rpcPayload]).
+  Future<OnboardingCategoriesResult?> _setupOnboardingCategoriesReconciled(
+    String uid,
+    List<Map<String, dynamic>> categories,
+  ) =>
+      reconcileOnboardingCategories(
+        requested: categories,
+        fetchAll: () => fetchUserCategories(includeArchived: true),
+        canArchive: () async =>
+            currentUser.value?.onboardingCompletedAt == null &&
+            pendingSessionCount.value == 0 &&
+            !await _hasAnyStudySession(uid),
+        archive: archiveCategory,
+        unarchive: unarchiveCategory,
+        setup: setupOnboardingCategories,
+      );
 
   Future<bool> _hasAnyStudySession(String uid) async {
     final rows = await _guard(() => _client.from('study_sessions').select('id').eq('user_id', uid).limit(1));
@@ -1579,10 +1587,12 @@ class SupabaseService {
   }
 
   /// Kodla arkadaş ekler. Sunucunun yanıtını (success, friend, auto_accepted,
-  /// …) döndürür; istemci tarafı hatalarda [ServiceException] fırlatır.
+  /// …; proposed/13–14 ile 'code') döndürür; istemci tarafı hatalarda
+  /// [ServiceException] fırlatır. Kod sunucunun beklediği biçime getirilir
+  /// ([normalizeFriendCode]): canlı sunucu yalnızca upper(trim()) yapıyor.
   Future<Map<String, dynamic>> addFriendByCode(String code) async {
     _requireUserId();
-    final normalized = code.replaceAll(RegExp(r'\s+'), '');
+    final normalized = normalizeFriendCode(code);
     final response = await _guard(() => _client.rpc('add_friend_by_code', params: {'p_code': normalized}));
     if (response is Map) return Map<String, dynamic>.from(response);
     throw const ServiceException(ServiceErrorCode.server);
@@ -1643,9 +1653,10 @@ class SupabaseService {
 
   /// Oturum sahibinin lig odası (14 günlük dönem): get_my_league_ranking →
   /// (name, avatar_id, weekly_points, tier, end_date, is_me,
-  /// promotion_zone_end, demotion_zone_start, member_count). Kullanıcı henüz
-  /// bir odada değilse sunucu tek satır döndürür (is_me, 0 puan, member_count
-  /// 1); bkz. `LeagueSnapshot.awaitingPlacement`. Hata durumunda fırlatır.
+  /// promotion_zone_end, demotion_zone_start, member_count; proposed/14 ile
+  /// id, is_blocked). Kullanıcı henüz bir odada değilse sunucu tek satır
+  /// döndürür (is_me, 0 puan, member_count canlıda 1, proposed/20 sonrası 0);
+  /// bkz. `LeagueSnapshot.awaitingPlacement`. Hata durumunda fırlatır.
   Future<List<Map<String, dynamic>>> getLeagueRanking() async {
     _requireUserId();
     return _rows(await _guard(() => _client.rpc('get_my_league_ranking')));
@@ -1679,6 +1690,40 @@ class SupabaseService {
       }
     }
     return {};
+  }
+
+  // Lig ödül/terfi kuralı (proposed/20). Süreç boyunca bir kez okunur.
+  LeagueRules _leagueRules = LeagueRules.standard;
+  bool _leagueRulesKnown = false;
+  Future<LeagueRules>? _leagueRulesRequest;
+
+  /// Son okunan lig ödül/terfi kuralı (henüz okunmadıysa bugünkü kural).
+  LeagueRules get leagueRules => _leagueRules;
+
+  /// Lig düğmelerini get_app_config()'ten okur ve süreç boyunca saklar.
+  /// RPC canlıda yok (PGRST202: proposed/13 uygulanmadı) ya da anahtarlar
+  /// yoksa bugünkü kural ([LeagueRules.standard]). Ağ/sunucu hatasında da
+  /// bugünkü kuralı döndürür ama saklamaz (sonraki çağrı yeniden dener).
+  /// Hata fırlatmaz.
+  Future<LeagueRules> getLeagueRules() {
+    if (_leagueRulesKnown || !_isCloudActive) return Future.value(_leagueRules);
+    return _leagueRulesRequest ??= _fetchLeagueRules().whenComplete(() => _leagueRulesRequest = null);
+  }
+
+  Future<LeagueRules> _fetchLeagueRules() async {
+    try {
+      final response = await _client.rpc('get_app_config').timeout(_requestTimeout);
+      _leagueRules = LeagueRules.fromAppConfigResponse(response);
+      _leagueRulesKnown = true;
+    } catch (e) {
+      if (isMissingRpcError(e)) {
+        _leagueRules = LeagueRules.standard;
+        _leagueRulesKnown = true;
+      } else {
+        debugPrint('[RANKING] get_app_config okunamadı: $e');
+      }
+    }
+    return _leagueRules;
   }
 
   // ---- Avatar ekonomisi ----
@@ -1751,11 +1796,27 @@ class SupabaseService {
 
   /// Avatarı kuşanır; [currentUser] güncellenir. Sahip olunmayan avatar için
   /// sunucu reddeder ve [ServiceException] (avatarLocked) fırlatılır.
+  /// Kaydı olmayan varsayılan avatar (t4-F9) proposed/22 öncesinde de
+  /// kuşanılır: bkz. [equipAvatarWithDefaultUnlock].
   Future<void> setEquippedAvatar(String avatarId) async {
     final uid = _requireUserId();
     final epoch = _userEpoch;
-    await _guard(() => _client.rpc('set_equipped_avatar', params: {'p_avatar_id': avatarId}));
-    _updateUserIfCurrent(uid, epoch, (user) => user.copyWith(avatarId: avatarId));
+    await equipAvatarWithDefaultUnlock(
+      avatarId: avatarId,
+      equip: () => _guard(() => _client.rpc('set_equipped_avatar', params: {'p_avatar_id': avatarId})),
+      unlockFree: () => _guard(() => _client.rpc('purchase_avatar', params: {'p_avatar_id': avatarId})),
+    );
+    // Kuşanma başarılıysa sunucuda sahiplik kaydı vardır (22 varsayılan
+    // avatarınkini kendisi yazar).
+    _updateUserIfCurrent(
+      uid,
+      epoch,
+      (user) => user.copyWith(
+        avatarId: avatarId,
+        unlockedAvatars:
+            user.unlockedAvatars.contains(avatarId) ? user.unlockedAvatars : [...user.unlockedAvatars, avatarId],
+      ),
+    );
   }
 
   // ---- Kategoriler ----
@@ -1818,12 +1879,15 @@ class SupabaseService {
     return result as String?;
   }
 
-  Future<void> setupOnboardingCategories(List<Map<String, dynamic>> categories) async {
+  /// setup_onboarding_categories. Canlı sunucu void döndürür (sonuç null);
+  /// proposed/23 sonrası sayıları döndürür ([OnboardingCategoriesResult]).
+  Future<OnboardingCategoriesResult?> setupOnboardingCategories(List<Map<String, dynamic>> categories) async {
     _requireUserId();
-    await _client.rpc('setup_onboarding_categories', params: {
+    final response = await _client.rpc('setup_onboarding_categories', params: {
       'p_categories': categories,
     }).timeout(_requestTimeout);
     _bumpCategories();
+    return OnboardingCategoriesResult.fromResponse(response);
   }
 
   Future<void> archiveCategory(String categoryId) async {

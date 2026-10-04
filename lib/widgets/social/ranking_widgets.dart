@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../models/avatar_model.dart';
+import '../../models/league_rules.dart';
 import '../../theme.dart';
 import '../../utils/responsive.dart';
 import '../avatar_widget.dart';
 import 'countdown_text.dart';
+import 'league_rule_texts.dart';
 import 'ranking_models.dart';
 import 'user_safety.dart';
 
@@ -103,14 +105,23 @@ class MyRankCard extends StatelessWidget {
   final int points;
   final LeagueZone? zone;
 
-  const MyRankCard({super.key, required this.rank, required this.points, this.zone});
+  /// Lig kuralı (terfi için gereken puan metni; bugünkü kural: 0 puanla terfi yok).
+  final LeagueRules rules;
+
+  const MyRankCard({
+    super.key,
+    required this.rank,
+    required this.points,
+    this.zone,
+    this.rules = LeagueRules.standard,
+  });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final (String? zoneText, Color zoneColor, IconData zoneIcon) = switch (zone) {
       LeagueZone.promotion => (l10n.rankingZonePromotionMe, kPromotionZoneColor, Icons.arrow_upward_rounded),
-      LeagueZone.promotionNeedsPoints => (l10n.rankingZoneNeedsPointsMe, Colors.orange.shade800, Icons.info_outline),
+      LeagueZone.promotionNeedsPoints => (promotionNeedsPointsText(l10n, rules), Colors.orange.shade800, Icons.info_outline),
       LeagueZone.demotion => (l10n.rankingZoneDemotionMe, kDemotionZoneColor, Icons.arrow_downward_rounded),
       _ => (null, AppColors.primary, Icons.info_outline),
     };
@@ -195,10 +206,15 @@ class RankingEmptyView extends StatelessWidget {
 }
 
 /// Lig sekmesi: kullanıcı henüz bir lig odasında değil
-/// ([LeagueSnapshot.awaitingPlacement]). Tek kişilik "#1 · 0 puan" podyumu
-/// yerine gösterilir.
+/// ([LeagueSnapshot.awaitingPlacement]) ya da odasında şimdilik yalnız ve
+/// puansız ([alone], [LeagueSnapshot.isAloneInRoom]; ör. terfi edip yeni
+/// odasında tek kalan, t4-F6). Tek kişilik "#1 · 0 puan" podyumu yerine
+/// gösterilir.
 class LeaguePlacementView extends StatelessWidget {
-  const LeaguePlacementView({super.key});
+  /// Kullanıcı bir odada ama odada yalnız: "henüz odada değilsin" denmez.
+  final bool alone;
+
+  const LeaguePlacementView({super.key, this.alone = false});
 
   @override
   Widget build(BuildContext context) {
@@ -214,16 +230,20 @@ class LeaguePlacementView extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.hourglass_empty_rounded, size: 48, color: AppColors.primaryContainer),
+          Icon(
+            alone ? Icons.person_outline_rounded : Icons.hourglass_empty_rounded,
+            size: 48,
+            color: AppColors.primaryContainer,
+          ),
           const SizedBox(height: 12),
           Text(
-            l10n.leagueAwaitingPlacementTitle,
+            alone ? l10n.leagueAloneInRoomTitle : l10n.leagueAwaitingPlacementTitle,
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
-            l10n.leagueAwaitingPlacementBody,
+            alone ? l10n.leagueAloneInRoomBody : l10n.leagueAwaitingPlacementBody,
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 14, height: 1.4, color: _muted(isDark)),
           ),
@@ -279,8 +299,12 @@ class RankingStandings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final league = this.league;
-    // Lig-yok satırı (tek kişi, 0 puan): sahte "#1" podyumu gösterilmez.
+    // Lig-yok satırı: sahte "#1" podyumu gösterilmez. Odasında yalnız ve
+    // puansız kullanıcıya "henüz odada değilsin" denmez (t4-F6).
     if (league != null && league.awaitingPlacement) return const ContentWidth(child: LeaguePlacementView());
+    if (league != null && league.isAloneInRoom && league.myPoints <= 0) {
+      return const ContentWidth(child: LeaguePlacementView(alone: true));
+    }
     if (entries.isEmpty) return const ContentWidth(child: RankingEmptyView());
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -301,10 +325,13 @@ class RankingStandings extends StatelessWidget {
             rank: myIndex + 1,
             points: entries[myIndex].points,
             zone: league == null ? null : zoneOf(entries[myIndex], myIndex + 1),
+            rules: league?.rules ?? LeagueRules.standard,
           );
     final podium = RankingPodium(
       top: entries.take(3).toList(),
       zoneOf: league == null ? null : zoneOf,
+      // Lig sekmesinde madalya dönem sonu ödülünün kuralıyla (proposed/20).
+      showMedal: league == null ? null : (entry, rank) => league.earnsAward(rank, entry.points),
       compact: compact,
       actionsFor: onEntryActions == null ? null : _actionsFor,
     );
@@ -396,7 +423,19 @@ class RankingPodium extends StatelessWidget {
   /// Koltuğa uzun basınca açılan güvenlik menüsü (null: menü yok).
   final VoidCallback? Function(RankingEntry entry)? actionsFor;
 
-  const RankingPodium({super.key, required this.top, this.zoneOf, this.compact = false, this.actionsFor});
+  /// Koltukta madalya gösterilir mi (sıra 1'den başlar)? null: puanı > 0
+  /// olan koltuk. Lig sekmesi dönem sonu ödül kuralını verir
+  /// ([LeagueSnapshot.earnsAward]).
+  final bool Function(RankingEntry entry, int rank)? showMedal;
+
+  const RankingPodium({
+    super.key,
+    required this.top,
+    this.zoneOf,
+    this.compact = false,
+    this.actionsFor,
+    this.showMedal,
+  });
 
   static const double _compactScale = 0.75;
   static const double _horizontalPadding = 12;
@@ -419,6 +458,7 @@ class RankingPodium extends StatelessWidget {
                 entry: top[index],
                 rank: index + 1,
                 zone: zoneOf?.call(top[index], index + 1),
+                medal: showMedal?.call(top[index], index + 1) ?? top[index].points > 0,
                 scale: scale,
                 onActions: actionsFor?.call(top[index]),
               ),
@@ -477,7 +517,17 @@ class _PodiumSeat extends StatelessWidget {
   /// Uzun basınca güvenlik menüsü (başka kullanıcının koltuğu).
   final VoidCallback? onActions;
 
-  const _PodiumSeat({required this.entry, required this.rank, this.zone, this.scale = 1, this.onActions});
+  /// Koltukta madalya var mı (bkz. [RankingPodium.showMedal]).
+  final bool medal;
+
+  const _PodiumSeat({
+    required this.entry,
+    required this.rank,
+    this.zone,
+    this.scale = 1,
+    this.onActions,
+    required this.medal,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -491,10 +541,10 @@ class _PodiumSeat extends StatelessWidget {
       children: [
         Padding(
           padding: EdgeInsets.only(bottom: small ? 4 : 6),
-          // Madalya yalnızca puanı olan koltukta: sunucu lig ödülünü (ve
-          // ödül avatarını) puanı > 0 olan ilk 3'e verir. Puansız koltukta
-          // yer korunur, podyum hizası bozulmaz.
-          child: entry.points > 0
+          // Madalya yalnızca ödül alacak koltukta: sunucu lig ödülünü (ve
+          // ödül avatarını) bugünkü kuralla puanı > 0 olan ilk 3'e verir.
+          // Madalyasız koltukta yer korunur, podyum hizası bozulmaz.
+          child: medal
               ? Icon(
                   Icons.workspace_premium,
                   key: ValueKey('podium-medal-$rank'),
