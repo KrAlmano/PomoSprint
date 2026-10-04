@@ -328,7 +328,6 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
       l10n,
       pendingCount: service.pendingSessionCount.value,
       appleReauthorization: service.canReauthorizeWithApple,
-      dataCopyHint: false,
     );
     final confirmed = await showDialog<bool>(
       context: context,

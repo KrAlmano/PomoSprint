@@ -14,14 +14,12 @@ void main() {
       expect(legalPageUri(LegalPage.terms, tr).toString(), 'https://pomosprint.app/terms');
       expect(legalPageUri(LegalPage.privacy, tr).toString(), 'https://pomosprint.app/privacy');
       expect(legalPageUri(LegalPage.kvkk, tr).toString(), 'https://pomosprint.app/kvkk');
-      expect(legalPageUri(LegalPage.accountDeletion, tr).toString(), 'https://pomosprint.app/hesap-silme');
     });
 
     test('diğer diller /en/ altında', () {
       expect(legalPageUri(LegalPage.terms, en).toString(), 'https://pomosprint.app/en/terms');
       expect(legalPageUri(LegalPage.privacy, en).toString(), 'https://pomosprint.app/en/privacy');
       expect(legalPageUri(LegalPage.kvkk, en).toString(), 'https://pomosprint.app/en/kvkk');
-      expect(legalPageUri(LegalPage.accountDeletion, en).toString(), 'https://pomosprint.app/en/delete-account');
       expect(legalPageUri(LegalPage.kvkk, const Locale('de')).toString(), 'https://pomosprint.app/en/kvkk');
     });
 

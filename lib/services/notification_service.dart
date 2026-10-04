@@ -11,6 +11,43 @@ import 'package:url_launcher/url_launcher.dart';
 import '../l10n/app_localizations.dart';
 import 'language_service.dart';
 
+/// Sistem bildirim izninin durumu ([NotificationService.permissionStatus]).
+enum NotificationPermissionStatus {
+  /// İzin var (iOS'ta geçici "provisional" izin de sayılır).
+  granted,
+
+  /// Soruldu ama verilmedi ya da sonradan ayarlardan kapatıldı. Sistem
+  /// penceresi bir daha çıkmayabilir; yol sistem ayarlarıdır.
+  denied,
+
+  /// Henüz hiç sorulmadı: açmak sistem penceresini gösterir. Bu durumda
+  /// "Ayarları aç" gösterilmez (iOS'ta uygulamanın ayar sayfasında izin
+  /// istenmeden Bildirimler satırı bile yoktur).
+  notDetermined,
+
+  /// Platform desteklemiyor ya da okunamadı: yalnızca tercihe bakılır.
+  unknown,
+}
+
+/// Bildirim izninin platform katmanı. Varsayılanı flutter_local_notifications
+/// eklentisidir; testte sahtesi [NotificationService.debugPermissionPlatform]
+/// ile verilir.
+abstract class NotificationPermissionPlatform {
+  const NotificationPermissionPlatform();
+
+  /// İzin şu an var mı? SORMAZ. Okunamazsa null. iOS "hiç sorulmadı" ile
+  /// "reddedildi"yi ayırmaz (ikisi de false); ayrımı servis yapar.
+  Future<bool?> isGranted();
+
+  /// Sistem izin penceresini ister; izin verildiyse true. İzin daha önce
+  /// reddedildiyse sistem pencere göstermeden false döndürebilir (iOS her
+  /// zaman, Android 13+ iki retten sonra).
+  Future<bool> request();
+
+  /// Uygulamanın sistem bildirim ayarlarını açar; açılabildiyse true.
+  Future<bool> openSettings();
+}
+
 /// Seans bitiş bildirimi ve (Android) süren seansın kilit ekranında da
 /// görünen kalıcı bildirimi. İzin açılışta İSTENMEZ; ilk BAŞLAT'ta
 /// [ensurePermission] ile bağlamı olan bir anda sorulur.
@@ -37,7 +74,23 @@ class NotificationService {
 
   /// Eklentiyi başlatır (izin istemeden). Desteklenmeyen platformda hata
   /// fırlatır; çağıran raporlar, bildirimler sessizce devre dışı kalır.
-  Future<void> initialize() => _initialization ??= _initialize();
+  /// Başarısız deneme saklanmaz: bir sonraki çağrı yeniden dener (aksi halde
+  /// tek bir açılış hatası izin isteğini süreç boyunca "verilmedi"ye
+  /// düşürüyordu).
+  Future<void> initialize() => _initialization ??= (debugInitializePlugin ?? _initialize)().catchError(
+        (Object error, StackTrace stackTrace) {
+          _initialization = null;
+          Error.throwWithStackTrace(error, stackTrace);
+        },
+      );
+
+  /// Testte eklenti başlatmasının yerine geçer.
+  @visibleForTesting
+  Future<void> Function()? debugInitializePlugin;
+
+  /// Testte başarılı ya da başarısız başlatmayı unutturur.
+  @visibleForTesting
+  void debugResetInitialization() => _initialization = null;
 
   Future<void> _initialize() async {
     // Veri study_day.dart tarafından zaten yüklenmiş olabilir.
@@ -75,35 +128,42 @@ class NotificationService {
     }
   }
 
-  /// Tercihi kaydeder. Kapatınca zamanlanmış bildirim iptal edilir, açınca
-  /// izin istenir.
-  Future<void> setEnabled(bool value) async {
+  /// Tercihi kaydeder ve sonucu döndürür: true = tercih açık VE izin var.
+  /// Kapatınca bekleyen (zamanlanmış) bildirim iptal edilir; kilit ekranı
+  /// sayacı [preferenceRevision] ile kaldırılır. Açınca izin istenir (hiç
+  /// sorulmadıysa sistem penceresi çıkar). İzin verilmezse tercih AÇIK kalır:
+  /// anahtar kapalı görünür, "Ayarları aç" yolu çıkar ve kullanıcı ayarlardan
+  /// izin verip dönünce anahtar kendiliğinden açılır.
+  Future<bool> setEnabled(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_enabledKey, value);
     preferenceRevision.value++;
-    if (value) {
-      await ensurePermission(force: true);
-    } else {
+    if (!value) {
       await cancelSessionEndNotification();
+      return false;
     }
+    return ensurePermission(force: true);
   }
 
   /// Bildirim izni varsa true. Tercih kapalıysa sormaz. Kullanıcıya
   /// kendiliğinden yalnızca bir kez sorulur; [force] ile (ör. ayardan
   /// açılınca) yeniden sorulur.
   Future<bool> ensurePermission({bool force = false}) async {
-    if (!await _ready() || !await isEnabled()) return false;
+    if (!await isEnabled()) return false;
     try {
-      final android = _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
-      final ios = _plugin.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
-      if (android != null && (await android.areNotificationsEnabled() ?? false)) return true;
-      if (ios != null && ((await ios.checkPermissions())?.isEnabled ?? false)) return true;
-
+      final permissions = _permissions;
+      final granted = await permissions.isGranted();
+      // Okunamadıysa (eklenti hazır değil, desteklenmeyen platform) sorulmaz
+      // ve "soruldu" yazılmaz: aksi halde hiç görülmemiş pencere "reddedildi"
+      // sayılıp kullanıcı iOS'ta Bildirimler satırı olmayan ayarlara
+      // yönlendiriliyordu.
+      if (granted == null) return false;
+      if (granted) return true;
       final prefs = await SharedPreferences.getInstance();
       if (!force && (prefs.getBool(_permissionAskedKey) ?? false)) return false;
+      final result = await permissions.request();
       await prefs.setBool(_permissionAskedKey, true);
-      if (android != null) return await android.requestNotificationsPermission() ?? false;
-      if (ios != null) return await ios.requestPermissions(alert: true, badge: true, sound: true) ?? false;
+      return result;
     } catch (e) {
       debugPrint('[NOTIF] Bildirim izni alınamadı: $e');
     }
@@ -111,64 +171,48 @@ class NotificationService {
   }
 
   /// Profil anahtarının göstereceği durum: tercih açık VE sistem izni var.
-  /// İzin bilinmiyorsa ([permission] null) yalnızca tercihe bakılır.
-  static bool effectiveEnabled({required bool preference, required bool? permission}) =>
-      preference && permission != false;
+  /// İzin okunamıyorsa ([NotificationPermissionStatus.unknown]) yalnızca
+  /// tercihe bakılır. Hiç sorulmamış izin "yok" sayılır: anahtar kapalıdır,
+  /// açmak sistem penceresini gösterir.
+  static bool effectiveEnabled({required bool preference, required NotificationPermissionStatus permission}) =>
+      preference &&
+      (permission == NotificationPermissionStatus.granted || permission == NotificationPermissionStatus.unknown);
 
-  /// Tercih açık ama sistem izni yok: kullanıcıya ayarları açan yol gösterilir.
-  static bool isBlockedBySystem({required bool preference, required bool? permission}) =>
-      preference && permission == false;
+  /// Tercih açık ama izin reddedilmiş: kullanıcıya ayarları açan yol
+  /// gösterilir. Hiç sorulmamış izin engel sayılmaz (sistem penceresi çıkar).
+  static bool isBlockedBySystem({required bool preference, required NotificationPermissionStatus permission}) =>
+      preference && permission == NotificationPermissionStatus.denied;
 
-  /// Testlerde sistem izninin ([hasSystemPermission]) ve ayar ekranının
-  /// ([openSystemSettings]) yerine geçer.
+  /// Testte izin platformunun (okuma, isteme, ayarları açma) yerine geçer.
   @visibleForTesting
-  Future<bool?> Function()? debugSystemPermission;
-  @visibleForTesting
-  Future<bool> Function()? debugOpenSystemSettings;
+  NotificationPermissionPlatform? debugPermissionPlatform;
 
-  /// Sistem bildirim izni şu an verilmiş mi? İzin İSTEMEZ. Platform
-  /// desteklemiyorsa ya da okunamazsa null döner (bilinmiyor).
-  Future<bool?> hasSystemPermission() async {
-    final override = debugSystemPermission;
-    if (override != null) return override();
-    if (!await _ready()) return null;
+  late final NotificationPermissionPlatform _pluginPermissions = _PluginNotificationPermissions(this);
+
+  NotificationPermissionPlatform get _permissions => debugPermissionPlatform ?? _pluginPermissions;
+
+  /// Sistem bildirim izninin durumu. İzin İSTEMEZ. iOS'un ve Android'in
+  /// "izin yok" yanıtı, iznin bu uygulamada daha önce sorulup sorulmadığına
+  /// göre [NotificationPermissionStatus.denied] ya da
+  /// [NotificationPermissionStatus.notDetermined] olur.
+  Future<NotificationPermissionStatus> permissionStatus() async {
     try {
-      final android = _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
-      if (android != null) return await android.areNotificationsEnabled();
-      final ios = _plugin.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
-      if (ios != null) return (await ios.checkPermissions())?.isEnabled;
+      final granted = await _permissions.isGranted();
+      if (granted == null) return NotificationPermissionStatus.unknown;
+      if (granted) return NotificationPermissionStatus.granted;
+      final prefs = await SharedPreferences.getInstance();
+      return (prefs.getBool(_permissionAskedKey) ?? false)
+          ? NotificationPermissionStatus.denied
+          : NotificationPermissionStatus.notDetermined;
     } catch (e) {
       debugPrint('[NOTIF] Bildirim izni okunamadı: $e');
+      return NotificationPermissionStatus.unknown;
     }
-    return null;
   }
 
   /// Bu uygulamanın sistem bildirim ayarlarını açar (izin bir kez
-  /// reddedilince sistem penceresi bir daha çıkmaz). Eklentinin yerleşik
-  /// yolu kullanılır: Android'de uygulama bildirim ayarları (olmazsa uygulama
-  /// bilgisi), iOS'ta uygulamanın Ayarlar sayfası. iOS'ta eklenti açamazsa
-  /// `app-settings:` adresi denenir. Açılabildiyse true.
-  Future<bool> openSystemSettings() async {
-    final override = debugOpenSystemSettings;
-    if (override != null) return override();
-    if (await _ready()) {
-      try {
-        final android = _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
-        if (android != null) return await android.openAppNotificationSettings() ?? false;
-        final ios = _plugin.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
-        if (ios != null && (await ios.openAppNotificationSettings() ?? false)) return true;
-      } catch (e) {
-        debugPrint('[NOTIF] Bildirim ayarları açılamadı: $e');
-      }
-    }
-    if (defaultTargetPlatform != TargetPlatform.iOS) return false;
-    try {
-      return await launchUrl(Uri.parse('app-settings:'));
-    } catch (e) {
-      debugPrint('[NOTIF] app-settings: açılamadı: $e');
-      return false;
-    }
-  }
+  /// reddedilince sistem penceresi bir daha çıkmaz). Açılabildiyse true.
+  Future<bool> openSystemSettings() => _permissions.openSettings();
 
   /// [after] süre sonra seans bitiş bildirimini zamanlar (önceki zamanlanmış
   /// bildirimin yerini alır).
@@ -370,6 +414,76 @@ class NotificationService {
       iOS: darwin,
       macOS: darwin,
     );
+  }
+}
+
+/// flutter_local_notifications 22.x üzerinden izin. iOS `checkPermissions`:
+/// `isEnabled` yalnızca "authorized", `isProvisionalEnabled` "provisional";
+/// "notDetermined" ve "denied" ikisi de false döner (ephemeral yalnızca App
+/// Clip'te). Android: `areNotificationsEnabled` (13+'ta POST_NOTIFICATIONS
+/// dahil), istek 13 altında pencere göstermeden mevcut durumu döndürür.
+class _PluginNotificationPermissions extends NotificationPermissionPlatform {
+  _PluginNotificationPermissions(this._service);
+
+  final NotificationService _service;
+
+  AndroidFlutterLocalNotificationsPlugin? get _android =>
+      _service._plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+
+  IOSFlutterLocalNotificationsPlugin? get _ios =>
+      _service._plugin.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
+
+  @override
+  Future<bool?> isGranted() async {
+    if (!await _service._ready()) return null;
+    try {
+      final android = _android;
+      if (android != null) return await android.areNotificationsEnabled();
+      final ios = _ios;
+      if (ios != null) {
+        final options = await ios.checkPermissions();
+        if (options == null) return null;
+        return options.isEnabled || options.isProvisionalEnabled;
+      }
+    } catch (e) {
+      debugPrint('[NOTIF] Bildirim izni okunamadı: $e');
+    }
+    return null;
+  }
+
+  @override
+  Future<bool> request() async {
+    if (!await _service._ready()) return false;
+    final android = _android;
+    if (android != null) return await android.requestNotificationsPermission() ?? false;
+    final ios = _ios;
+    if (ios != null) return await ios.requestPermissions(alert: true, badge: true, sound: true) ?? false;
+    return false;
+  }
+
+  /// Eklentinin yerleşik yolu: Android'de uygulama bildirim ayarları
+  /// (olmazsa uygulama bilgisi), iOS'ta uygulamanın Bildirimler sayfası
+  /// (15.4+; olmazsa uygulamanın Ayarlar sayfası). iOS'ta eklenti açamazsa
+  /// `app-settings:` adresi denenir.
+  @override
+  Future<bool> openSettings() async {
+    if (await _service._ready()) {
+      try {
+        final android = _android;
+        if (android != null) return await android.openAppNotificationSettings() ?? false;
+        final ios = _ios;
+        if (ios != null && (await ios.openAppNotificationSettings() ?? false)) return true;
+      } catch (e) {
+        debugPrint('[NOTIF] Bildirim ayarları açılamadı: $e');
+      }
+    }
+    if (defaultTargetPlatform != TargetPlatform.iOS) return false;
+    try {
+      return await launchUrl(Uri.parse('app-settings:'));
+    } catch (e) {
+      debugPrint('[NOTIF] app-settings: açılamadı: $e');
+      return false;
+    }
   }
 }
 

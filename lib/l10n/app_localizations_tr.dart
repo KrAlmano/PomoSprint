@@ -398,8 +398,9 @@ class AppLocalizationsTr extends AppLocalizations {
       'Apple ile giriş yaptığın için silmeden önce Apple seni bir kez daha doğrulayacak; böylece PomoSprint\'in Apple ile Giriş bağlantısı da kaldırılır.';
 
   @override
-  String get profileDeleteConfirmCopyHint =>
-      'Verilerinin bir kopyasını istiyorsan önce \"Gizlilik ve yasal\" bölümündeki \"Verilerimin kopyasını iste\"yi kullan.';
+  String profileDeleteConfirmCopyHint(String email) {
+    return 'Verilerinin bir kopyasını istiyorsan silmeden önce hesabındaki e-posta adresinden $email adresine yaz.';
+  }
 
   @override
   String get accountDeletedNotice => 'Hesabın ve tüm verilerin silindi.';
@@ -1743,33 +1744,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get kvkkNoticeLink => 'KVKK Aydınlatma Metni';
-
-  @override
-  String get accountDeletionInfoLink => 'Hesap silme hakkında';
-
-  @override
-  String get accountDeletionInfoSub =>
-      'Hangi verilerin silindiği ve web üzerinden silme talebi';
-
-  @override
-  String get dataCopyRequestTile => 'Verilerimin kopyasını iste';
-
-  @override
-  String get dataCopyRequestSub =>
-      'KVKK m.11 kapsamında. E-posta uygulaman açılır; hesabındaki e-posta adresinden gönder.';
-
-  @override
-  String get dataCopyEmailSubject =>
-      'PomoSprint kişisel veri kopyası talebi (KVKK m.11)';
-
-  @override
-  String get dataCopyEmailBody =>
-      'Merhaba,\n\nKVKK m.11 kapsamında PomoSprint hesabıma ait kişisel verilerin bir kopyasını talep ediyorum. Bu e-postayı hesabımda kayıtlı e-posta adresinden gönderiyorum.\n\nTercih ettiğim biçim (ör. JSON, PDF):\n';
-
-  @override
-  String dataCopyMailFailed(String email) {
-    return 'E-posta uygulaması açılamadı. Talebini hesabındaki e-posta adresinden $email adresine gönderebilirsin.';
-  }
 
   @override
   String get deleteAccountSub =>

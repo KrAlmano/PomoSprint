@@ -177,8 +177,10 @@ class SupabaseService {
 
   String _requireUserId() => _requireAuthUser().id;
 
-  void _requireCloudForAuth() {
-    if (!_isCloudActive) throw const AuthFailure(AuthErrorCode.cloudUnavailable);
+  // Açılışta başlatılamamış bulut giriş anında yeniden denenir; aksi halde
+  // giriş ekranı uygulama yeniden açılana dek "Sunucuya bağlanılamadı" diyordu.
+  Future<void> _ensureCloudForAuth() async {
+    if (!await ensureCloud()) throw const AuthFailure(AuthErrorCode.cloudUnavailable);
   }
 
   /// Auth isteğini zaman aşımıyla çalıştırır. Zaman aşımı
@@ -268,6 +270,45 @@ class SupabaseService {
       _isCloudActive = false;
     }
   }
+
+  Future<bool>? _cloudAttempt;
+
+  /// Testte bulut başlatmasının yerine geçer. Test ortamında verilmezse
+  /// [ensureCloud] başlatmayı denemez (gerçek .env ile canlı projeye
+  /// bağlanılmasın).
+  @visibleForTesting
+  Future<void> Function()? debugCloudInitializer;
+
+  /// Bulut kullanılabilir mi? Değilse başlatmayı (yeniden) dener. Açılıştaki
+  /// başlatma hata verdiyse ya da splash'in süresi içinde bitmediyse uygulama
+  /// süreç boyunca çevrimdışı kalıyordu: giriş "Sunucuya bağlanılamadı"
+  /// diyor, kabuk kuyruğu hiç göndermiyordu. Eşzamanlı çağrılar tek denemede
+  /// birleşir; [timeout] yalnızca bekleyeni bırakır, deneme sürer. Supabase
+  /// bilgisi yoksa (.env boş) false.
+  Future<bool> ensureCloud({Duration timeout = _requestTimeout}) async {
+    if (_isCloudActive) return true;
+    final attempt = _cloudAttempt ??= _attemptCloud().whenComplete(() => _cloudAttempt = null);
+    try {
+      return await attempt.timeout(timeout);
+    } on TimeoutException {
+      return _isCloudActive;
+    }
+  }
+
+  Future<bool> _attemptCloud() async {
+    final init = debugCloudInitializer ?? (isFlutterTestEnvironment ? null : initialize);
+    if (init == null) return _isCloudActive;
+    try {
+      await init();
+    } catch (e) {
+      debugPrint('[INIT] Bulut başlatılamadı: $e');
+    }
+    return _isCloudActive;
+  }
+
+  /// Testte bulutun durumunu ayarlar ([ensureCloud] senaryoları).
+  @visibleForTesting
+  set debugCloudActive(bool value) => _isCloudActive = value;
 
   // ---- Kimlik doğrulama ----
 
@@ -401,7 +442,7 @@ class SupabaseService {
   }) async {
     // Zorunlu onaylar olmadan istek hiç gönderilmez (UI da engeller).
     final data = signUpMetadata(email: email, avatarId: avatarId, consent: consent, name: name);
-    _requireCloudForAuth();
+    await _ensureCloudForAuth();
     final cleanEmail = email.trim().toLowerCase();
 
     try {
@@ -430,7 +471,7 @@ class SupabaseService {
   }
 
   Future<UserModel?> loginUser(String email, String password) async {
-    _requireCloudForAuth();
+    await _ensureCloudForAuth();
     final response = await runAuthRequest(() => _client.auth.signInWithPassword(
           email: email.trim().toLowerCase(),
           password: password,
@@ -441,7 +482,7 @@ class SupabaseService {
 
   /// Google ile giriş. Kullanıcı vazgeçerse null döner.
   Future<UserModel?> signInWithGoogle() async {
-    _requireCloudForAuth();
+    await _ensureCloudForAuth();
 
     GoogleSignInAccount? googleUser;
     String? idToken;
@@ -474,7 +515,7 @@ class SupabaseService {
 
   /// Apple ile giriş. Kullanıcı vazgeçerse null döner.
   Future<UserModel?> signInWithApple() async {
-    _requireCloudForAuth();
+    await _ensureCloudForAuth();
 
     final rawNonce = _client.auth.generateRawNonce();
     final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
@@ -615,7 +656,7 @@ class SupabaseService {
   }
 
   Future<void> resendConfirmationEmail(String email) async {
-    _requireCloudForAuth();
+    await _ensureCloudForAuth();
     await runAuthRequest(() => _client.auth.resend(
           type: OtpType.signup,
           email: email.trim().toLowerCase(),
@@ -626,7 +667,7 @@ class SupabaseService {
   // Supabase, hesap keşfini önlemek için e-posta kayıtlı olsun ya da olmasın
   // aynı şekilde davranır; başarılı dönüş e-postanın var olduğunu göstermez.
   Future<void> resetPassword(String email) async {
-    _requireCloudForAuth();
+    await _ensureCloudForAuth();
     await runAuthRequest(() => _client.auth.resetPasswordForEmail(
           email.trim().toLowerCase(),
           redirectTo: 'https://pomosprint.app/reset-password.html',
@@ -659,7 +700,7 @@ class SupabaseService {
   /// (yanlışsa [AuthErrorCode.invalidCredentials]), sonra yeni şifre
   /// yazılır. GoTrue şifre değişince hesabın diğer oturumlarını kapatır.
   Future<void> changePassword({required String currentPassword, required String newPassword}) async {
-    _requireCloudForAuth();
+    await _ensureCloudForAuth();
     final email = _client.auth.currentUser?.email;
     if (email == null || email.isEmpty) throw const AuthFailure(AuthErrorCode.unknown);
     if (newPassword == currentPassword) throw const AuthFailure(AuthErrorCode.samePassword);
@@ -1378,6 +1419,11 @@ class SupabaseService {
   void addStatsChangedListener(VoidCallback listener) => _statsListeners.add(listener);
 
   void removeStatsChangedListener(VoidCallback listener) => _statsListeners.remove(listener);
+
+  /// Bağlantı geri geldi ya da bulut sonradan başlatıldı: bağlantısızken
+  /// yüklenemeyen veri ekranları (Raporlar, Sıralama) aynı dinleyicilerle
+  /// yenilenir; görünmeyen ekran görünür olunca yeniler.
+  void notifyConnectionRestored() => _notifyStatsChanged();
 
   void _notifyStatsChanged() {
     for (final listener in List.of(_statsListeners)) {

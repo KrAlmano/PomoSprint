@@ -453,6 +453,7 @@ OTHER
 - ✅ `/hesap-silme` ve `/en/delete-account`: uygulama ve paket adı, uygulama içi adımlar, uygulamayı yeniden kurmadan e-postayla silme (30 gün), **Google/Apple ile girmiş hesaplar için ayrı bölüm** (PLAY-11), silinen ve tutulan veriler ile süreleri (Sentry, sunucu erişim kayıtları, Resend gönderim kayıtları, bekleme listesi, destek e-postaları), hesabı silmeden veri silme.
 - ⚠️ Sayfalarda geliştirici adı "PomoSprint"; Play kaydındaki geliştirici adı farklıysa düzelt (1.1 adım 5).
 - 👤 Play Console → Uygulama içeriği → Veri güvenliği → "Hesap silme URL'si": `https://pomosprint.app/hesap-silme` (sayfa EN sürüme bağlantı veriyor).
+- ✅ Uygulamada ayrı "Hesap silme hakkında" maddesi yok (4 Ekim'de kaldırıldı): Play bu adresi uygulamada değil Console'da istiyor; uygulama içi silme Profil ve Ayarlar → Hesabımı Sil (Apple 5.1.1(v)).
 
 ### 4.3 Exact alarm beyanı (PLAY-06) gerekçe taslağı
 
@@ -466,7 +467,7 @@ sets no other alarms and collects no data through this permission.
 
 ### 4.4 Bildirim izni, hedef API, 16 KB
 
-- ✅ `POST_NOTIFICATIONS` manifestte; izin açılışta değil ilk BAŞLAT'ta isteniyor (AGENTS §4.1). ⚠️ İzin reddedilince Profil'deki anahtarın durumu ve kullanıcıya açıklama (UX-07, kod).
+- ✅ `POST_NOTIFICATIONS` manifestte; izin açılışta değil ilk BAŞLAT'ta isteniyor (AGENTS §4.1). ✅ İzin reddedilince Profil'deki anahtar kapalı görünür, "Ayarları aç" yolu çıkar ve ayarlardan dönünce anahtar kendiliğinden güncellenir; hiç sorulmamış izinde anahtar sistem penceresini açar (UX-07, 4 Ekim).
 - ✅ Flutter 3.44.8: `compileSdk`/`targetSdk` 36, `minSdk` 24, NDK 28.2. ⚠️ Play'in güncel hedef API şartını Console uyarılarından teyit et.
 - ⚠️ 16 KB sayfa boyutu: NDK r28 ve Flutter 3.44 destekliyor; native kütüphane getiren `sentry_flutter` için App bundle explorer'dan doğrula (PLAY-02 adım 6). Bu makinede **doğrulanmadı**.
 
@@ -485,6 +486,7 @@ sets no other alarms and collects no data through this permission.
 ### 5.1 Aydınlatma
 
 - ✅ `/kvkk` (+ `/en/kvkk`): veri kategorileri tablosu, amaçlar, hukuki sebepler (açık rıza yalnızca ticari elektronik ileti), yalnızca cihazda kalan veriler, aktarım, saklama süreleri, m.11 hakları, başvuru usulü.
+- ✅ Veri erişim hakkı (m.11, veri kopyası) Aydınlatma Metni §9'daki e-posta yoluyla (`destek@pomosprint.app`) kullanılır; uygulamadaki "Verilerimin kopyasını iste" maddesi 4 Ekim'de kaldırıldı, hesap silme onayı bu adresi hatırlatır.
 - ⚠️ Veri sorumlusu kimliği: 1.1 (KVKK-15).
 - ✅ Kayıt ekranında aydınlatma teyidi, şartlar kabulü ve bülten onayı ayrı; bülten kutusu önceden işaretsiz (AGENTS §4.5).
 - ⚖️ Doğum yılı kayıttan sonra soruluyor; 18 yaş altının bülten onayı için 1.10 adım 5.

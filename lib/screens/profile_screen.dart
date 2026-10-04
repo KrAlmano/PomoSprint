@@ -137,16 +137,20 @@ class _ProfileScreenState extends State<ProfileScreen> with WidgetsBindingObserv
   }
 
   // Yalnızca kayıtlı tercihe değil sistem iznine de bakılır: izin
-  // reddedildiyse anahtar kapalı görünür ve ayarları açan yol gösterilir.
+  // reddedildiyse anahtar kapalı görünür ve ayarları açan yol gösterilir;
+  // hiç sorulmadıysa anahtar kapalıdır ama açınca sistem penceresi çıkar.
   Future<void> _loadNotificationPreference() async {
     final notifications = NotificationService.instance;
     final preference = await notifications.isEnabled();
-    final permission = await notifications.hasSystemPermission();
-    if (!mounted) return;
-    setState(() {
-      _notificationsEnabled = NotificationService.effectiveEnabled(preference: preference, permission: permission);
-      _notificationsBlocked = NotificationService.isBlockedBySystem(preference: preference, permission: permission);
-    });
+    final permission = await notifications.permissionStatus();
+    // Anahtar bu arada değiştirildiyse sonucu o akış yazar.
+    if (!mounted || _isUpdatingNotifications) return;
+    setState(() => _applyNotificationState(preference, permission));
+  }
+
+  void _applyNotificationState(bool preference, NotificationPermissionStatus permission) {
+    _notificationsEnabled = NotificationService.effectiveEnabled(preference: preference, permission: permission);
+    _notificationsBlocked = NotificationService.isBlockedBySystem(preference: preference, permission: permission);
   }
 
   Future<void> _openNotificationSettings() async {
@@ -228,25 +232,25 @@ class _ProfileScreenState extends State<ProfileScreen> with WidgetsBindingObserv
       _notificationsEnabled = value;
       _isUpdatingNotifications = true;
     });
-    var permissionDenied = false;
     var failed = false;
     try {
+      // Açınca izin istenir (hiç sorulmadıysa sistem penceresi çıkar). İzin
+      // verilmezse tercih açık kalır: anahtar kapalı görünür, "Ayarları aç"
+      // çıkar ve izin ayarlardan verilip dönülünce anahtar kendiliğinden açılır.
       await notifications.setEnabled(value);
-      // Sistem izni verilmediyse tercih kapalı kalır; kullanıcı ayarlara yönlendirilir.
-      if (value && !await notifications.ensurePermission()) {
-        await notifications.setEnabled(false);
-        permissionDenied = true;
-      }
     } catch (e) {
       debugPrint('[PROFILE] Bildirim tercihi kaydedilemedi: $e');
       failed = true;
     }
     final preference = await notifications.isEnabled();
-    final permission = await notifications.hasSystemPermission();
+    final permission = await notifications.permissionStatus();
     if (!mounted) return;
+    final blocked = NotificationService.isBlockedBySystem(preference: preference, permission: permission);
+    final permissionDenied = !failed &&
+        value &&
+        !NotificationService.effectiveEnabled(preference: preference, permission: permission);
     setState(() {
-      _notificationsEnabled = NotificationService.effectiveEnabled(preference: preference, permission: permission);
-      _notificationsBlocked = NotificationService.isBlockedBySystem(preference: preference, permission: permission);
+      _applyNotificationState(preference, permission);
       _isUpdatingNotifications = false;
     });
     if (permissionDenied || failed) {
@@ -256,7 +260,7 @@ class _ProfileScreenState extends State<ProfileScreen> with WidgetsBindingObserv
           behavior: SnackBarBehavior.floating,
           // İzin bir kez reddedilince sistem penceresi bir daha çıkmaz;
           // izin yalnızca sistem ayarlarından verilebilir.
-          action: permissionDenied
+          action: permissionDenied && blocked
               ? SnackBarAction(label: l10n.profileOpenSettings, onPressed: () => unawaited(_openNotificationSettings()))
               : null,
         ),
@@ -800,11 +804,10 @@ class _ProfileScreenState extends State<ProfileScreen> with WidgetsBindingObserv
     final subtitleStyle = TextStyle(fontSize: 12, color: muted);
     final hiddenCount = _hiddenUsers.length;
 
-    Widget legalLink(IconData icon, String title, LegalPage page, {String? subtitle}) => ListTile(
+    Widget legalLink(IconData icon, String title, LegalPage page) => ListTile(
           contentPadding: EdgeInsets.zero,
           leading: Icon(icon, color: muted),
           title: Text(title, style: titleStyle),
-          subtitle: subtitle == null ? null : Text(subtitle, style: subtitleStyle),
           trailing: Icon(Icons.open_in_new_rounded, size: 18, color: muted),
           onTap: () => openLegalPage(context, page),
         );
@@ -827,22 +830,6 @@ class _ProfileScreenState extends State<ProfileScreen> with WidgetsBindingObserv
             legalLink(Icons.description_outlined, l10n.termsOfServiceLink, LegalPage.terms),
             legalLink(Icons.privacy_tip_outlined, l10n.privacyPolicyLink, LegalPage.privacy),
             legalLink(Icons.gavel_rounded, l10n.kvkkNoticeLink, LegalPage.kvkk),
-            legalLink(
-              Icons.help_outline_rounded,
-              l10n.accountDeletionInfoLink,
-              LegalPage.accountDeletion,
-              subtitle: l10n.accountDeletionInfoSub,
-            ),
-            // KVKK m.11 bilgi talebi: destek adresine kullanıcının kendi e-posta
-            // uygulamasından gider (e-posta/kimlik URL'ye konmaz).
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: Icon(Icons.file_download_outlined, color: muted),
-              title: Text(l10n.dataCopyRequestTile, style: titleStyle),
-              subtitle: Text(l10n.dataCopyRequestSub, style: subtitleStyle),
-              trailing: Icon(Icons.mail_outline_rounded, size: 18, color: muted),
-              onTap: _requestDataCopy,
-            ),
             const Divider(height: 16),
             // Uygulama içi hesap silme (App Store 5.1.1(v), Google Play).
             ListTile(
@@ -940,30 +927,6 @@ class _ProfileScreenState extends State<ProfileScreen> with WidgetsBindingObserv
       return;
     }
     messenger.showSnackBar(SnackBar(content: Text(l10n.hiddenUsersCleared), behavior: SnackBarBehavior.floating));
-  }
-
-  // KVKK m.11 veri kopyası talebi: destek adresine, kullanıcının kendi e-posta
-  // uygulamasından (gönderen adres hesabı tanıtır; URL'de kişisel veri yok).
-  Future<void> _requestDataCopy() async {
-    final l10n = AppLocalizations.of(context)!;
-    final messenger = ScaffoldMessenger.of(context);
-    final uri = buildUserReportUri(subject: l10n.dataCopyEmailSubject, body: l10n.dataCopyEmailBody);
-    var opened = false;
-    try {
-      opened = await launchUrl(uri);
-    } catch (e) {
-      debugPrint('[PROFILE] E-posta uygulaması açılamadı: $e');
-    }
-    if (opened) return;
-    messenger.showSnackBar(SnackBar(
-      content: Text(l10n.dataCopyMailFailed(kSupportEmail)),
-      behavior: SnackBarBehavior.floating,
-      duration: const Duration(seconds: 6),
-      action: SnackBarAction(
-        label: l10n.reportCopyAddress,
-        onPressed: () => unawaited(Clipboard.setData(const ClipboardData(text: kSupportEmail))),
-      ),
-    ));
   }
 
   Future<int> _pendingCount() async {

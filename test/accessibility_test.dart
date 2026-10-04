@@ -18,6 +18,8 @@ import 'package:pomodoro/widgets/hourglass_widget.dart';
 import 'package:pomodoro/widgets/shell_app_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'support/fake_notification_permissions.dart';
+
 // Erişilebilirlik ve uygulama içi metinler: ekran okuyucu etiketleri ve 48 dp
 // dokunma hedefleri (UX-05), koyu temada metin kontrastı (UX-06), ARB'ye
 // taşınan metinler (UX-13), Hareketi Azalt (UX-19).
@@ -186,8 +188,10 @@ void main() {
 
       testWidgets('Profil (koyu=$dark)', (tester) async {
         final semantics = tester.ensureSemantics();
-        NotificationService.instance.debugSystemPermission = () async => false;
-        addTearDown(() => NotificationService.instance.debugSystemPermission = null);
+        // İzin reddedilmiş: "Ayarları aç" düğmesi de denetlenir.
+        SharedPreferences.setMockInitialValues({'notification_permission_asked': true});
+        NotificationService.instance.debugPermissionPlatform = FakeNotificationPermissions(systemDenied: true);
+        addTearDown(() => NotificationService.instance.debugPermissionPlatform = null);
         tester.view.physicalSize = const Size(400, 3000);
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);

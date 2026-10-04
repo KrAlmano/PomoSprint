@@ -27,6 +27,7 @@ import '../widgets/shell_app_bar.dart';
 import '../widgets/shell_navigation.dart';
 import '../widgets/shell_pending_banner.dart';
 import 'category_cache.dart';
+import 'connection_watcher.dart';
 import 'session_feedback.dart';
 import 'theme_controller.dart';
 
@@ -66,11 +67,14 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
   int _currentIndex = 0;
   late List<CourseCategory> _categories;
   bool _isTimerRunning = false;
-  bool _wasOffline = false;
   bool _categorySeedAttempted = false;
+  // Bulut hazırken yapılan açılış işleri (auth dinleyicisi, profil,
+  // kategoriler) bu kabukta yapıldı mı? Bulut açılıştan sonra gelirse
+  // (başlatma hatası ya da splash zaman aşımı) bir kez yapılır.
+  late bool _cloudSeen;
 
   StreamSubscription<AuthState>? _authSubscription;
-  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
+  late final ConnectionWatcher _connection = ConnectionWatcher(onOnline: _onConnectivityOnline);
   Timer? _syncRetryTimer;
   int _syncRetryAttempt = 0;
 
@@ -83,6 +87,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
   void initState() {
     super.initState();
     _categories = List.of(widget.initialCategories);
+    _cloudSeen = _service.isCloudActive;
     WidgetsBinding.instance.addObserver(this);
     // Kategori ekleme/düzenleme/arşiv/sıralama sonrası liste yeniden yüklenir.
     _service.categoriesRevision.addListener(_loadCategories);
@@ -102,7 +107,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
     WidgetsBinding.instance.removeObserver(this);
     _service.categoriesRevision.removeListener(_loadCategories);
     _authSubscription?.cancel();
-    _connectivitySubscription?.cancel();
+    unawaited(_connection.dispose());
     _cancelSyncRetry();
     super.dispose();
   }
@@ -116,9 +121,10 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
-        // Ön plana dönüş: askıdayken kaçan bağlantı olayı yerine bekleyenler denenir.
+        // Ön plana dönüş: askıdayken kaçan bağlantı olayı yerine bekleyenler
+        // denenir; bulut başlatılamamışsa yeniden denenir.
         _syncRetryAttempt = 0;
-        if (_service.pendingSessionCount.value > 0) unawaited(_syncPendingSessions());
+        if (_service.pendingSessionCount.value > 0 || !_service.isCloudActive) unawaited(_syncPendingSessions());
         unawaited(_service.verifyAppleCredential());
       case AppLifecycleState.paused || AppLifecycleState.hidden || AppLifecycleState.detached:
         _cancelSyncRetry();
@@ -128,7 +134,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
   }
 
   void _listenAuthChanges() {
-    if (!_service.isCloudActive) return;
+    if (!_service.isCloudActive || _authSubscription != null) return;
     // Oturumun düşmesi (signedOut) serviste işlenir: kullanıcı null olur ve
     // AppGate giriş ekranını gösterir.
     _authSubscription = Supabase.instance.client.auth.onAuthStateChange.listen(
@@ -150,30 +156,39 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
 
   void _listenConnectivity() {
     final connectivity = Connectivity();
-    _connectivitySubscription = connectivity.onConnectivityChanged.listen(_onConnectivityChanged);
-    unawaited(_readInitialConnectivity(connectivity));
+    _connection.start(changes: connectivity.onConnectivityChanged, check: connectivity.checkConnectivity);
   }
 
-  Future<void> _readInitialConnectivity(Connectivity connectivity) async {
-    try {
-      _wasOffline = (await connectivity.checkConnectivity()).contains(ConnectivityResult.none);
-    } catch (e) {
-      debugPrint('[SHELL] Bağlantı durumu okunamadı: $e');
-    }
-  }
-
-  void _onConnectivityChanged(List<ConnectivityResult> results) {
-    final offline = results.contains(ConnectivityResult.none);
-    final cameOnline = !offline && _wasOffline;
-    _wasOffline = offline;
-    if (offline) return;
+  // Bağlı görünen her olayda kuyruk (ve gerekirse bulut başlatması) denenir;
+  // bağlantı geri geldiyse profil, katalog ve bağlantısız yüklenemeyen
+  // ekranlar da tazelenir. "none" olayı hiçbir şeyi engellemez (bkz.
+  // ConnectionWatcher).
+  void _onConnectivityOnline({required bool cameOnline}) {
     if (_needsCategoryReload) unawaited(_loadCategories());
     if (cameOnline) _syncRetryAttempt = 0;
     unawaited(_syncPendingSessions());
     if (cameOnline) {
       unawaited(_refreshUser());
       unawaited(_service.refreshAvatarCatalog());
+      _service.notifyConnectionRestored();
     }
+  }
+
+  /// Bulut yoksa başlatmayı yeniden dener (bkz. SupabaseService.ensureCloud).
+  /// Bulut bu kabuk açıldıktan sonra geldiyse açılışta atlanan işler bir kez
+  /// yapılır: auth dinleyicisi, kategoriler, profil, avatar kataloğu ve veri
+  /// ekranlarının yenilenmesi. Bulut kullanılabiliyorsa true.
+  Future<bool> _ensureCloud() async {
+    if (!await _service.ensureCloud()) return false;
+    if (!_cloudSeen && mounted) {
+      _cloudSeen = true;
+      _listenAuthChanges();
+      unawaited(_loadCategories());
+      unawaited(_refreshUser());
+      unawaited(_service.refreshAvatarCatalog());
+      _service.notifyConnectionRestored();
+    }
+    return true;
   }
 
   /// Profili sunucudan tazeler; sonuç servisteki kullanıcıya (ve AppGate
@@ -188,7 +203,12 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
   }
 
   Future<void> _syncPendingSessions() async {
-    if (!_service.isCloudActive) return;
+    if (!await _ensureCloud()) {
+      // Bulut başlatılamadı: ön plandayken artan aralıklarla yeniden denenir
+      // (önceden süreç boyunca çevrimdışı kalınıyordu).
+      _scheduleSyncRetry();
+      return;
+    }
     _cancelSyncRetry();
     var retry = false;
     try {

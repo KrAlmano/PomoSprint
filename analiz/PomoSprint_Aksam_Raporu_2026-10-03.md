@@ -39,7 +39,7 @@ Bu rapor, sabahki uçtan uca raporun ([PomoSprint_Analiz_Raporu_2026-10-03.md](P
   - Sıralama ve canlı akışta "Kullanıcıyı bildir" (destek@ e-postası) ve "Gizle" seçenekleri var.
   - Uygunsuz görünen ad filtresi var.
 - **Profil:**
-  - "Gizlilik ve yasal" bölümü: şartlar, gizlilik, KVKK, hesap silme bilgisi, verilerimin kopyasını iste.
+  - "Gizlilik ve yasal" bölümü: gizlenen kullanıcılar, şartlar, gizlilik, KVKK ve Hesabımı Sil. (4 Ekim: "Hesap silme hakkında" ve "Verilerimin kopyasını iste" kaldırıldı; silme web adresi Play Console'da isteniyor, veri kopyası Aydınlatma Metni'ndeki e-posta yoluyla isteniyor.)
   - Destek ve geri bildirim girişi, görünür sürüm numarası.
 - **Mağaza riskleri giderildi:**
   - Satın alınamayan "Premium" avatarlar ve limit metinleri gizlendi.

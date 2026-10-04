@@ -1,7 +1,7 @@
 // Hesap ve oturum akışları: oturum kapanış kancası ve açıklaması, hesap
 // silme yardımcıları (Apple iptali, Edge Function yedeği, kayıp yanıt),
 // auth zaman aşımı, çıkış/silme onay metinleri, şifre kuralı ve değiştirme,
-// kayıttan onay bekleyerek dönüş, onboarding taslağı, veri kopyası talebi.
+// kayıttan onay bekleyerek dönüş, onboarding taslağı, gizlilik kartı.
 //
 // Supabase başlatılmadan çalışır (bulut kapalı).
 
@@ -228,10 +228,11 @@ void main() {
       expect(full, contains(l10n.profileDeleteConfirmPending(3)));
       expect(full, contains('3 seansın'));
       expect(full, contains(l10n.profileDeleteConfirmApple));
-      expect(full, contains(l10n.profileDeleteConfirmCopyHint));
-      // Onboarding'de Profil'e erişilemez: veri kopyası yönlendirmesi yok.
-      final onboarding = deleteAccountConfirmText(l10n, pendingCount: 0, appleReauthorization: false, dataCopyHint: false);
-      expect(onboarding, isNot(contains(l10n.profileDeleteConfirmCopyHint)));
+      // Veri kopyası uygulama içinden değil, Aydınlatma Metni'ndeki e-posta
+      // yoluyla istenir; ipucu Profil'de de onboarding'de de geçerli.
+      expect(plain, contains(l10n.profileDeleteConfirmCopyHint('destek@pomosprint.app')));
+      expect(full, contains('destek@pomosprint.app'));
+      expect(plain, isNot(contains('Verilerimin kopyasını iste')));
     });
   });
 
@@ -365,16 +366,23 @@ void main() {
     });
   });
 
-  group('Profil: veri kopyası ve şifre', () {
-    testWidgets('"Verilerimin kopyasını iste" görünür; e-posta uygulaması yoksa adres söylenir', (tester) async {
+  group('Profil: gizlilik kartı ve şifre', () {
+    testWidgets('"Gizlilik ve yasal" yalın: gizlenenler, üç yasal metin, Hesabımı Sil', (tester) async {
       service.currentUser.value = _user;
       await _pump(tester, ProfileScreen(onDarkModeChanged: (_) {}, onLogout: () {}));
-      final tile = find.text(l10n.dataCopyRequestTile);
-      await tester.ensureVisible(tile);
-      await tester.tap(tile);
-      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
-      await tester.pumpAndSettle();
-      expect(find.text(l10n.dataCopyMailFailed('destek@pomosprint.app')), findsOneWidget);
+      for (final title in [
+        l10n.hiddenUsersTitle,
+        l10n.termsOfServiceLink,
+        l10n.privacyPolicyLink,
+        l10n.kvkkNoticeLink,
+        l10n.deleteAccount,
+      ]) {
+        expect(find.text(title), findsOneWidget, reason: title);
+      }
+      // Hesap silme bilgisi Play Console'daki web adresinde, veri kopyası
+      // Aydınlatma Metni'ndeki e-posta yolunda; uygulamada ayrı madde yok.
+      expect(find.text('Hesap silme hakkında'), findsNothing);
+      expect(find.text('Verilerimin kopyasını iste'), findsNothing);
       // Bulut kapalı: şifre değiştirme yalnızca e-posta hesabında görünür.
       expect(find.text(l10n.changePasswordTile), findsNothing);
     });

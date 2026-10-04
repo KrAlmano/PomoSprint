@@ -450,7 +450,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     if (_notificationNoticeShown) return;
     final notifications = NotificationService.instance;
     final preference = await notifications.isEnabled();
-    final permission = await notifications.hasSystemPermission();
+    final permission = await notifications.permissionStatus();
     if (!mounted || !NotificationService.isBlockedBySystem(preference: preference, permission: permission)) return;
     _notificationNoticeShown = true;
     final l10n = AppLocalizations.of(context)!;
