@@ -98,10 +98,10 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 |---|---|
 | `lib/main.dart` | Açılış: `.env` → Sentry → `LanguageService` → `ThemeController` → `NotificationService` (beklenmez) → `runApp`. `home: SplashScreen` → `AppGate` |
 | `lib/app/app_gate.dart` | **Tek yönlendirme kapısı**: `currentUser` null → Login; `onboardingCompletedAt` null → PostAuthOnboarding; aksi halde Shell |
-| `lib/app/main_shell.dart` | `MainNavigationShell`: 4 sekme (Pomo, Raporlar, Sıralama, Sosyal) IndexedStack + TickerMode, bekleyen seans banner'ı, bağlantı dinleyicisi, `PopScope` |
+| `lib/app/main_shell.dart` | `MainNavigationShell`: 4 sekme (Pomo, Raporlar, Sıralama, Sosyal) IndexedStack + TickerMode, bekleyen seans banner'ı, bağlantı dinleyicisi (`app/connection_watcher.dart`), bulutun yeniden denenmesi, `PopScope` |
 | `lib/app/` (diğer) | `theme_controller` (`theme_mode`), `session_feedback` (seans sonucu diyalogları), `category_cache` (`saved_categories_uid_<uid>`; eski `saved_categories_<email>` ilk okumada taşınır), `error_reporting` (Sentry, e-posta maskeleme) |
 | `lib/screens/timer_screen.dart` | Sayaç durum makinesi (25/50 dk, tek duraklatma, 3-2-1 geri sayım) |
-| `lib/screens/splash_screen.dart` | Önce yerel önbellek, sonra `SupabaseService.initialize` (süreçte tek kez), sonra profil ve kategori tazeleme |
+| `lib/screens/splash_screen.dart` | Önce yerel önbellek, sonra `SupabaseService.ensureCloud` (5 sn bekler; başlatma süreçte bir kez başarır, başarısızsa kabuk/giriş yeniden dener), sonra profil ve kategori tazeleme |
 | `lib/screens/login_ / register_ / post_auth_onboarding_screen.dart` | Giriş (e-posta, Google, iOS'ta Apple), kayıt, onboarding |
 | `lib/screens/categories_management_screen.dart` | Kategori yönetimi (Profil'den açılır) |
 | `lib/screens/reports_screen.dart` | Raporlar sekmesi; `history_screen` (**Haftalık**, dosya adı yanıltıcı) ve `monthly_tracking_screen`'e veri verir |
@@ -144,14 +144,16 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 - Seans her durum değişiminde diske yazılır. Açılışta: süre dolduysa hemen tamamlanıp gönderilir; 24 saatten eski duraklatılmış seans silinir.
 - Debug build'de süre 5/10 sn (`timerDurationSeconds`, `kDebugMode`). Bilinçli; sunucu bu seansları reddeder.
 - Duraklatma hakkı 1. Seans varken 25/50 değiştirilirse seans sıfırlanır.
-- Bildirim izni açılışta değil, ilk BAŞLAT'ta (`ensurePermission`) istenir. Profil'deki anahtar `notifications_enabled` (bitiş bildirimi + kilit ekranı sayacı); "tercih açık VE sistem izni var"ı gösterir (`hasSystemPermission`, `resumed`'da yeniden okunur). İzin yoksa Profil'de ve ilk BAŞLAT'ta "Ayarları aç" (`openSystemSettings`: eklentinin `openAppNotificationSettings`'i, iOS'ta yedek `app-settings:`).
-- Kilit ekranı sayacı (`LockScreenTimer`) her durum geçişinde çağrılır: başlat/devam/geri yükleme `showRunning`, duraklat `showPaused`, sıfırla/tamamla/çıkış/ekran kapanışı `clear`, ön plana dönüş `force: true`. Bildirim tercihi kapalıysa gösterilmez. Dart arka planda çalışmaz; geri sayımı sistem yürütür (Android kronometre + `timeoutAfter`, iOS `Text(timerInterval:)` + `staleDate`). Foreground service / background mode EKLEME.
+- Bildirim izni açılışta değil, ilk BAŞLAT'ta (`ensurePermission`) istenir. Profil'deki anahtar `notifications_enabled` (bitiş bildirimi + kilit ekranı sayacı); "tercih açık VE izin var"ı gösterir (`permissionStatus`: `granted` / `denied` / `notDetermined` / `unknown`, `resumed`'da yeniden okunur). iOS `checkPermissions` hiç sorulmamışla reddedilmişi ayırmaz (ikisi de `isEnabled: false`; `isProvisionalEnabled` izin sayılır); ayrım `notification_permission_asked` ile yapılır. Hiç sorulmamışsa anahtar kapalı, uyarısız; açınca sistem penceresi çıkar. Reddedilirse tercih AÇIK kalır: anahtar kapalı + "Ayarları aç" (Profil'de ve ilk BAŞLAT'ta; `openSystemSettings`: eklentinin `openAppNotificationSettings`'i, iOS'ta yedek `app-settings:`), ayarlardan izin verilip dönülünce anahtar kendiliğinden açılır. İzin platformu testte `debugPermissionPlatform` ile değiştirilir (`test/support/fake_notification_permissions.dart`).
+- Kilit ekranı sayacı (`LockScreenTimer`) her durum geçişinde çağrılır: başlat/devam/geri yükleme `showRunning`, duraklat `showPaused`, sıfırla/tamamla/çıkış/ekran kapanışı `clear`, ön plana dönüş `force: true`. Bildirim tercihi kapalıysa gösterilmez; kapatınca `preferenceRevision` ile kaldırılır. iOS Canlı Etkinlik bildirim izni istemez: izin reddedilmiş ama tercih açıksa (anahtar kapalı + "Ayarları aç") sayaç yine görünür. Dart arka planda çalışmaz; geri sayımı sistem yürütür (Android kronometre + `timeoutAfter`, iOS `Text(timerInterval:)` + `staleDate`). Foreground service / background mode EKLEME.
 - `start_study_session` / `cancel_study_session` çağrıları Shell'in `onTimerStateChanged` callback'inde yapılır.
 
 **Tuzaklar**
 - IndexedStack tüm sekmeleri açılışta kurar ve canlı tutar. Görünmeyen sekme `TickerMode(enabled: false)` alır; periyodik iş yapan ekran `TickerMode.valuesOf(context).enabled`'a bakmalı.
 - Çıkışta süren seans cihazda kalır (aynı hesapla girişte sürer); Shell bildirimi iptal edip `cancel_study_session` çağırır.
 - `onAuthStateChange` son olayı yeni aboneye yeniden verir.
+- connectivity_plus yalnızca ipucu (`ConnectionWatcher`): iOS'ta dinleme başında ve `checkConnectivity`'de yeni NWPathMonitor'ün ilk yolu sahte `none` olabilir, simülatörde geri geliş olayı gelmeyebilir. `none` hiçbir isteği engellemez ve çevrimdışı göstergesi üretmez; kuyruk zamanlayıcı, ön plana dönüş ve banner ile de denenir.
+- Bulut başlatması (`SupabaseService.ensureCloud`) kalıcı olarak düşmez: açılışta hata ya da splash zaman aşımı olursa kabuk (kuyruk turu, ön plana dönüş, bağlantı olayı) ve her giriş denemesi yeniden dener; eşzamanlı çağrılar tek denemede birleşir. Bulut sonradan gelirse kabuk auth dinleyicisini bağlar, profil/kategori/kataloğu okur ve veri ekranlarını yeniler (`notifyConnectionRestored`). Test ortamında `debugCloudInitializer` verilmezse denenmez (gerçek `.env` ile canlıya bağlanılmasın).
 - Android bildirim ikonu `@drawable/ic_stat_notification` (`res/raw/keep.xml` R8'den korur). Bu makinede Android SDK yok; Android derlemesi doğrulanmadı.
 - Android 14+ kullanıcı kalıcı bildirimi kaydırıp kapatabilir; uygulama ön plana dönünce yeniden gösterilir. Bildirim kimlikleri: 0 bitiş, 1 süren seans (`pomodoro_running_channel`).
 - iOS Canlı Etkinlik bitişte "eskir" ("Seans tamamlandı" görünümü); uygulama açılınca seans tamamlanır ve etkinlik kaldırılır. Sistem etkinliği ~8 saatte bitirir.
@@ -243,7 +245,8 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 - Onboarding 6 adım: yaş (tekerlek önceden ayarlı değil, "Devam"da değerlendirilir; 13 altı yanıttan sonra yıl kilitlenir, çıkış / hesap silme kalır), segment (isteğe bağlı; "Diğer" → `user_segment` null), kategoriler, sıralamalarda görünürlük (varsayılansız açık seçim → `show_in_social_feed`), oyun kuralları (`GameRulesList`, `get_points_config`), hedef.
 - Kategori limiti ücretsiz 8, premium 15 (`categoryLimitFor`). Sunucu trigger'ı eklemede ve arşivden çıkarmada uygular; istemci kontrolü UX içindir. Kategori silinmez, arşivlenir.
 - Yeni metin **yalnızca ARB'ye** (iki dosyaya da) eklenir, sonra `flutter gen-l10n`.
-- Yasal sayfalar (`legal_links.dart`, `LegalPage`): TR `pomosprint.app/terms|privacy|kvkk|hesap-silme`, diğer diller `/en/terms|/en/privacy|/en/kvkk|/en/delete-account`. Metin sürümü tek sabit: `kLegalDocumentsVersion`; yasal metin değişince artır.
+- Yasal sayfalar (`legal_links.dart`, `LegalPage`): TR `pomosprint.app/terms|privacy|kvkk`, diğer diller `/en/terms|/en/privacy|/en/kvkk`. Metin sürümü tek sabit: `kLegalDocumentsVersion`; yasal metin değişince artır.
+- Profil > "Gizlilik ve yasal": Gizlenen kullanıcıları göster, Kullanım Şartları, Gizlilik Politikası, KVKK Aydınlatma Metni, Hesabımı Sil. Uygulama içi silme Apple 5.1.1(v) için yeterli; hesap silme web sayfası (`/hesap-silme`, `/en/delete-account`) Play Console'daki silme URL'sidir, uygulamada bağlanmaz. Veri kopyası (KVKK m.11 erişim hakkı) Aydınlatma Metni'ndeki e-posta yoluyla istenir; silme onayı bunu `destek@pomosprint.app` ile hatırlatır.
 - Kayıt onayları: iki zorunlu (Kullanım Şartları kabulü; KVKK Aydınlatma Metni + Gizlilik Politikası okundu, rıza değil bilgilendirme teyidi), bir isteğe bağlı (ticari elektronik ileti, varsayılan kapalı). "Tümünü kabul et" yok. Zorunlular olmadan `registerUser` çağrılmaz; servis de `StateError` fırlatır. Metadata sözleşmesi §5.5.
 - Google/Apple ile devam: giriş ekranındaki `SocialSignInNotice` (Kullanım Şartları + KVKK Aydınlatma Metni bağlantılı). Bu yolda onay metadata'sı yazılmıyor (§10).
 
@@ -412,13 +415,13 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 7. **Sonuç:** Başarı → `currentUser` güncellenir, seans kuyruktan silinir, `statsChanged`. Kalıcı ret → reddedilenler listesi + tek seferlik bildirim. Geçici → kuyrukta kalır, banner.
 
 ### 6.2 Çevrimdışı kuyruk
-- **Tetikleyiciler:** Shell açılışı, bağlantı geri gelince, banner'a dokunma, yeni seans.
+- **Tetikleyiciler:** Shell açılışı, bağlı görünen her bağlantı olayı, ön plana dönüş, artan aralıklı zamanlayıcı (30 sn → 15 dk; bulut başlatılamadıysa da kurulur), banner'a dokunma, yeni seans.
 - **Yer tutucu kategori:** isimle buluttaki kategoriye eşlenir; bulutta hiç kategori yoksa varsayılanlar oluşturulur.
 - **Kimliksiz önbellek:** uid bilinmiyorsa `pending_sessions_<email>`'e yazılır, uid öğrenilince taşınır.
 - Çıkışta kuyruk uid'e bağlı kalır, başka hesaba gönderilmez. Hesap silinince temizlenir.
 
 ### 6.3 Giriş ve onboarding
-1. **Splash:** `restoreCachedUser` + kategori önbelleği + avatar kataloğu (ağsız) → `SupabaseService.initialize` (zaman aşımlı) → oturum varsa `fetchCurrentUserModel` + kategoriler → `AppGate`.
+1. **Splash:** `restoreCachedUser` + kategori önbelleği + avatar kataloğu (ağsız) → `SupabaseService.ensureCloud` (5 sn; bitmezse ya da hata verirse kabuk ve giriş yeniden dener) → oturum varsa `fetchCurrentUserModel` + kategoriler → `AppGate`.
 2. **Login:** e-posta `signInWithPassword`; Google/Apple native idToken → `signInWithIdToken` → `cleanup_unconfirmed_duplicate_identity`.
 3. **Profil:** `handle_new_user` trigger'ı (varsayılan avatar, `friend_code`).
 4. **Onboarding:** `completeOnboarding` → `setup_onboarding_categories` → `profiles.update(birth_year, user_segment, daily_goal_minutes, show_in_social_feed, onboarding_completed_at)` → `currentUser` güncellenir → AppGate Shell'e geçer.

@@ -298,7 +298,14 @@
     }
   },
   "profileDeleteConfirmApple": "Apple ile giriş yaptığın için silmeden önce Apple seni bir kez daha doğrulayacak; böylece PomoSprint'in Apple ile Giriş bağlantısı da kaldırılır.",
-  "profileDeleteConfirmCopyHint": "Verilerinin bir kopyasını istiyorsan önce \"Gizlilik ve yasal\" bölümündeki \"Verilerimin kopyasını iste\"yi kullan.",
+  "profileDeleteConfirmCopyHint": "Verilerinin bir kopyasını istiyorsan silmeden önce hesabındaki e-posta adresinden {email} adresine yaz.",
+  "@profileDeleteConfirmCopyHint": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
   "accountDeletedNotice": "Hesabın ve tüm verilerin silindi.",
   "accountDeletedAppleNotice": "Apple ile Giriş bağlantısını da kaldırmak için iPhone'da Ayarlar > Apple Hesabı (adın) > Apple ile Giriş > PomoSprint > Kullanmayı Durdur adımlarını izle.",
   "sessionExpiredNotice": "Oturumun sona erdi. Şifren değişmiş ya da hesabın başka bir cihazdan kapatılmış olabilir; lütfen yeniden giriş yap.",
@@ -912,20 +919,6 @@
   "errAcknowledgePrivacy": "Devam etmek için KVKK Aydınlatma Metni'ni ve Gizlilik Politikası'nı okuduğunu onaylamalısın.",
   "profileLegalSectionTitle": "Gizlilik ve yasal",
   "kvkkNoticeLink": "KVKK Aydınlatma Metni",
-  "accountDeletionInfoLink": "Hesap silme hakkında",
-  "accountDeletionInfoSub": "Hangi verilerin silindiği ve web üzerinden silme talebi",
-  "dataCopyRequestTile": "Verilerimin kopyasını iste",
-  "dataCopyRequestSub": "KVKK m.11 kapsamında. E-posta uygulaman açılır; hesabındaki e-posta adresinden gönder.",
-  "dataCopyEmailSubject": "PomoSprint kişisel veri kopyası talebi (KVKK m.11)",
-  "dataCopyEmailBody": "Merhaba,\n\nKVKK m.11 kapsamında PomoSprint hesabıma ait kişisel verilerin bir kopyasını talep ediyorum. Bu e-postayı hesabımda kayıtlı e-posta adresinden gönderiyorum.\n\nTercih ettiğim biçim (ör. JSON, PDF):\n",
-  "dataCopyMailFailed": "E-posta uygulaması açılamadı. Talebini hesabındaki e-posta adresinden {email} adresine gönderebilirsin.",
-  "@dataCopyMailFailed": {
-    "placeholders": {
-      "email": {
-        "type": "String"
-      }
-    }
-  },
   "deleteAccountSub": "Hesabını ve tüm verilerini kalıcı olarak siler.",
   "hiddenUsersTitle": "Gizlenen kullanıcıları göster",
   "hiddenUsersCount": "{count, plural, =0{Gizlenen kullanıcı yok} other{{count} kullanıcı gizli · dokununca liste sıfırlanır}}",

@@ -406,8 +406,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Because you signed in with Apple, Apple will verify you once more before deletion so that PomoSprint\'s Sign in with Apple connection is removed too.';
 
   @override
-  String get profileDeleteConfirmCopyHint =>
-      'If you\'d like a copy of your data, use \"Request a copy of my data\" under \"Privacy & legal\" first.';
+  String profileDeleteConfirmCopyHint(String email) {
+    return 'If you\'d like a copy of your data, email $email from your account\'s email address before deleting.';
+  }
 
   @override
   String get accountDeletedNotice =>
@@ -1765,33 +1766,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get kvkkNoticeLink => 'Privacy Notice (KVKK)';
-
-  @override
-  String get accountDeletionInfoLink => 'About account deletion';
-
-  @override
-  String get accountDeletionInfoSub =>
-      'What gets deleted and how to request deletion on the web';
-
-  @override
-  String get dataCopyRequestTile => 'Request a copy of my data';
-
-  @override
-  String get dataCopyRequestSub =>
-      'Under KVKK Art. 11 and GDPR. Your email app opens; send it from your account\'s email address.';
-
-  @override
-  String get dataCopyEmailSubject =>
-      'PomoSprint personal data copy request (KVKK Art. 11 / GDPR)';
-
-  @override
-  String get dataCopyEmailBody =>
-      'Hello,\n\nUnder KVKK Art. 11 and GDPR, I request a copy of the personal data associated with my PomoSprint account. I\'m sending this email from the email address registered to my account.\n\nPreferred format (e.g. JSON, PDF):\n';
-
-  @override
-  String dataCopyMailFailed(String email) {
-    return 'Couldn\'t open your email app. You can send your request from your account\'s email address to $email.';
-  }
 
   @override
   String get deleteAccountSub =>

@@ -719,8 +719,8 @@ abstract class AppLocalizations {
   /// No description provided for @profileDeleteConfirmCopyHint.
   ///
   /// In tr, this message translates to:
-  /// **'Verilerinin bir kopyasını istiyorsan önce \"Gizlilik ve yasal\" bölümündeki \"Verilerimin kopyasını iste\"yi kullan.'**
-  String get profileDeleteConfirmCopyHint;
+  /// **'Verilerinin bir kopyasını istiyorsan silmeden önce hesabındaki e-posta adresinden {email} adresine yaz.'**
+  String profileDeleteConfirmCopyHint(String email);
 
   /// No description provided for @accountDeletedNotice.
   ///
@@ -3025,48 +3025,6 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'KVKK Aydınlatma Metni'**
   String get kvkkNoticeLink;
-
-  /// No description provided for @accountDeletionInfoLink.
-  ///
-  /// In tr, this message translates to:
-  /// **'Hesap silme hakkında'**
-  String get accountDeletionInfoLink;
-
-  /// No description provided for @accountDeletionInfoSub.
-  ///
-  /// In tr, this message translates to:
-  /// **'Hangi verilerin silindiği ve web üzerinden silme talebi'**
-  String get accountDeletionInfoSub;
-
-  /// No description provided for @dataCopyRequestTile.
-  ///
-  /// In tr, this message translates to:
-  /// **'Verilerimin kopyasını iste'**
-  String get dataCopyRequestTile;
-
-  /// No description provided for @dataCopyRequestSub.
-  ///
-  /// In tr, this message translates to:
-  /// **'KVKK m.11 kapsamında. E-posta uygulaman açılır; hesabındaki e-posta adresinden gönder.'**
-  String get dataCopyRequestSub;
-
-  /// No description provided for @dataCopyEmailSubject.
-  ///
-  /// In tr, this message translates to:
-  /// **'PomoSprint kişisel veri kopyası talebi (KVKK m.11)'**
-  String get dataCopyEmailSubject;
-
-  /// No description provided for @dataCopyEmailBody.
-  ///
-  /// In tr, this message translates to:
-  /// **'Merhaba,\n\nKVKK m.11 kapsamında PomoSprint hesabıma ait kişisel verilerin bir kopyasını talep ediyorum. Bu e-postayı hesabımda kayıtlı e-posta adresinden gönderiyorum.\n\nTercih ettiğim biçim (ör. JSON, PDF):\n'**
-  String get dataCopyEmailBody;
-
-  /// No description provided for @dataCopyMailFailed.
-  ///
-  /// In tr, this message translates to:
-  /// **'E-posta uygulaması açılamadı. Talebini hesabındaki e-posta adresinden {email} adresine gönderebilirsin.'**
-  String dataCopyMailFailed(String email);
 
   /// No description provided for @deleteAccountSub.
   ///

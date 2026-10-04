@@ -1,21 +1,21 @@
 import '../../l10n/app_localizations.dart';
 import '../../services/sign_out_notice.dart';
+import '../../utils/user_report.dart';
 
-/// Hesap silme onayı: neyin silineceği, bu cihazdaki gönderilmemiş seanslar
-/// ve (iOS'ta Apple kimliği olan hesapta) Apple'ın yeniden doğrulayacağı.
-/// [dataCopyHint]: Profil'deki "Verilerimin kopyasını iste"ye yönlendirme
-/// (onboarding'de Profil'e erişilemediği için kapalı).
+/// Hesap silme onayı: neyin silineceği, bu cihazdaki gönderilmemiş seanslar,
+/// (iOS'ta Apple kimliği olan hesapta) Apple'ın yeniden doğrulayacağı ve
+/// veri kopyasının silmeden önce destek adresinden istenebileceği (KVKK m.11
+/// başvurusu Aydınlatma Metni'ndeki e-posta yoluyla yapılır).
 String deleteAccountConfirmText(
   AppLocalizations l10n, {
   required int pendingCount,
   required bool appleReauthorization,
-  bool dataCopyHint = true,
 }) {
   return [
     l10n.profileDeleteConfirm,
     if (pendingCount > 0) l10n.profileDeleteConfirmPending(pendingCount),
     if (appleReauthorization) l10n.profileDeleteConfirmApple,
-    if (dataCopyHint) l10n.profileDeleteConfirmCopyHint,
+    l10n.profileDeleteConfirmCopyHint(kSupportEmail),
   ].join('\n\n');
 }
 

@@ -67,7 +67,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     // bir süre beklenir; internet yoksa/timeout olursa yukarıdaki yerel
     // veriyle devam edilir, açılış ASLA bloklanmaz.
     try {
-      await service.initialize().timeout(_networkTimeout);
+      // Süresi içinde bitmeyen ya da hata veren başlatma kalıcı değildir:
+      // ana kabuk ve giriş aynı denemeye katılır ya da yeniden dener.
+      await service.ensureCloud(timeout: _networkTimeout);
 
       if (service.isCloudActive) {
         final session = Supabase.instance.client.auth.currentSession;

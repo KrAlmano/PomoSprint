@@ -11,7 +11,7 @@ import '../../theme.dart';
 /// privacy_version olarak yazılır.
 const String kLegalDocumentsVersion = '2026-10-03';
 
-enum LegalPage { terms, privacy, kvkk, accountDeletion }
+enum LegalPage { terms, privacy, kvkk }
 
 /// Yasal sayfanın adresi. Türkçe sayfalar kökte, diğer diller /en/ altında.
 /// Bu adresler (/terms, /privacy) gönderilmiş e-postalarda ve eski uygulama
@@ -22,7 +22,6 @@ Uri legalPageUri(LegalPage page, Locale locale) {
     LegalPage.terms => turkish ? 'terms' : 'en/terms',
     LegalPage.privacy => turkish ? 'privacy' : 'en/privacy',
     LegalPage.kvkk => turkish ? 'kvkk' : 'en/kvkk',
-    LegalPage.accountDeletion => turkish ? 'hesap-silme' : 'en/delete-account',
   };
   return Uri.parse('https://pomosprint.app/$path');
 }
