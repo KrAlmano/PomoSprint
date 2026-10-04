@@ -485,12 +485,23 @@ class _PodiumSeat extends StatelessWidget {
     final style = _PodiumStyle.forRank(rank);
     final small = scale < 1;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final medalSize = style.medalSize * scale;
     final seat = Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Padding(
           padding: EdgeInsets.only(bottom: small ? 4 : 6),
-          child: Icon(Icons.workspace_premium, color: style.medal, size: style.medalSize * scale),
+          // Madalya yalnızca puanı olan koltukta: sunucu lig ödülünü (ve
+          // ödül avatarını) puanı > 0 olan ilk 3'e verir. Puansız koltukta
+          // yer korunur, podyum hizası bozulmaz.
+          child: entry.points > 0
+              ? Icon(
+                  Icons.workspace_premium,
+                  key: ValueKey('podium-medal-$rank'),
+                  color: style.medal,
+                  size: medalSize,
+                )
+              : SizedBox.square(dimension: medalSize),
         ),
         Stack(
           clipBehavior: Clip.none,

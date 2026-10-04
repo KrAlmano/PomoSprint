@@ -7,6 +7,7 @@ import '../l10n/app_localizations.dart';
 import '../models/category_model.dart';
 import '../theme.dart';
 import '../services/language_service.dart';
+import '../services/onboarding_categories.dart';
 import '../services/onboarding_draft.dart';
 import '../services/supabase_service.dart';
 import '../utils/responsive.dart';
@@ -57,16 +58,9 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
   /// "Diğer / belirtmek istemiyorum": sunucuya segment yazılmaz (null).
   static const String _otherSegment = 'other';
 
-  // Hazır öneriler Türkçe anahtarlarla tutulur; ekranda ve kayıtta
-  // kullanıcının diline çevrilir (LanguageService.translateCatName).
-  static const Map<String, List<String>> _recommendedBySegment = {
-    'lgs': ['Matematik', 'Fen Bilimleri', 'Türkçe', 'T.C. İnkılap Tarihi', 'İngilizce', 'Din Kültürü'],
-    'yks': ['Matematik', 'Fizik', 'Kimya', 'Biyoloji', 'Türkçe', 'Tarih', 'Coğrafya', 'Felsefe', 'İngilizce'],
-    'university': ['Ders Çalışma', 'Ödev', 'Proje', 'Sınav Hazırlık'],
-    'work': ['Derin Çalışma', 'Okuma', 'Öğrenme', 'Proje'],
-  };
-  // Segment seçilmediğinde ya da "Diğer" seçildiğinde genel öneriler.
-  static const List<String> _generalRecommendations = ['Ders Çalışma', 'Okuma', 'Öğrenme', 'Proje'];
+  // Hazır öneriler (segment → kategori) Türkçe anahtarlarla tutulur; ekranda
+  // ve kayıtta kullanıcının diline çevrilir. Tablo kategorisiz hesabın
+  // varsayılan tohumuyla ortak: kRecommendedCategoriesBySegment.
 
   final PageController _pageController = PageController();
   final int _currentYear = DateTime.now().year;
@@ -94,7 +88,7 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
     return year != null && _currentYear - year < _minimumAge;
   }
 
-  List<String> get _recommendedCategoryNames => _recommendedBySegment[_userSegment] ?? _generalRecommendations;
+  List<String> get _recommendedCategoryNames => recommendedCategoryNames(_userSegment);
 
   int get _categoryLimit =>
       categoryLimitFor(isPremium: SupabaseService.instance.currentUser.value?.isPremium ?? false);
@@ -138,6 +132,7 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
         segment: _userSegment,
         selectedCategories: _selectedCategoryNames.toList(),
         customCategories: List.of(_customCategoryNames),
+        showInRankings: _showInRankings,
         dailyGoalMinutes: _dailyGoalMinutes,
       ),
     ));
@@ -150,22 +145,30 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
     _draftLoaded = true;
     if (draft == null || _changedBeforeDraftLoad) return;
 
-    final segment = _recommendedBySegment.containsKey(draft.segment) ? draft.segment : null;
+    // "Diğer" de geçerli bir seçimdir (sunucuya null yazılır); segment
+    // isteğe bağlı olduğu için seçilmemiş olması adımı geri çekmez.
+    final segment =
+        (draft.segment == _otherSegment || kRecommendedCategoriesBySegment.containsKey(draft.segment))
+            ? draft.segment
+            : null;
     final year = draft.birthYear;
     final birthYear = (year != null && year <= _currentYear && year > _currentYear - _birthYearCount) ? year : _birthYear;
     final custom = draft.customCategories.toSet().take(_categoryLimit).toList();
-    final allowed = {...?_recommendedBySegment[segment], ...custom};
+    // Ekranın o segmentte gösterdiği öneriler (segmentsiz/"Diğer": genel öneriler).
+    final allowed = {...recommendedCategoryNames(segment), ...custom};
     final selected = draft.selectedCategories.where(allowed.contains).toSet().take(_categoryLimit).toList();
     final goal = _goalOptions.contains(draft.dailyGoalMinutes) ? draft.dailyGoalMinutes! : _dailyGoalMinutes;
+    final showInRankings = draft.showInRankings;
     // Adım, doğrulamanın izin verdiği yerden ileride olamaz.
     var step = draft.step.clamp(0, _totalSteps - 1);
     if (birthYear == null || _currentYear - birthYear < _minimumAge) step = 0;
-    if (segment == null && step > 1) step = 1;
-    if (selected.isEmpty && step > 2) step = 2;
+    if (selected.isEmpty && step > _categoryStep) step = _categoryStep;
+    if (showInRankings == null && step > _visibilityStep) step = _visibilityStep;
 
     setState(() {
       _birthYear = birthYear;
       _userSegment = segment;
+      _showInRankings = showInRankings;
       _customCategoryNames
         ..clear()
         ..addAll(custom);
@@ -252,21 +255,22 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
   /// gönderilir. Seçim boşsa (doğrulama atlanmışsa) segment önerilerinin
   /// ilk üçü kullanılır; kullanıcı asla kategorisiz kalmaz.
   List<Map<String, dynamic>> _categoryPayload() {
-    final lang = LanguageService.instance;
     final names = _selectedCategoryNames.isNotEmpty
         ? _selectedCategoryNames.toList()
         : _recommendedCategoryNames.take(3).toList();
-    return [
-      for (var i = 0; i < names.length; i++)
-        {
-          'name': lang.translateCatName(names[i]),
-          'color_hex': kCategoryPalette[i % kCategoryPalette.length],
-          'icon_name': 'book',
-        },
-    ];
+    return categorySeedPayload(names, turkish: LanguageService.instance.isTurkish);
   }
 
   Future<void> _finishOnboarding() async {
+    // Görünürlük açıkça yanıtlanmadan kayda gidilmez: sunucuda
+    // show_in_social_feed varsayılanı TRUE (yanıtsız kullanıcı herkese açık
+    // sıralamaya girerdi).
+    final showInRankings = _showInRankings;
+    if (showInRankings == null) {
+      _goToPage(_visibilityStep);
+      _showSnack(AppLocalizations.of(context)!.onboardingSelectOptionError);
+      return;
+    }
     setState(() => _isSaving = true);
     final service = SupabaseService.instance;
     try {
@@ -279,7 +283,7 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
         userSegment: _userSegment == _otherSegment ? null : _userSegment,
         dailyGoalMinutes: _dailyGoalMinutes,
         categories: _categoryPayload(),
-        showInSocialFeed: _showInRankings,
+        showInSocialFeed: showInRankings,
       );
       await _closeDraft();
     } catch (e) {

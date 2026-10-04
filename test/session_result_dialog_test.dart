@@ -121,10 +121,25 @@ void main() {
     });
 
     testWidgets('daha önce kaydedilmiş seans (duplicate)', (tester) async {
-      await _pumpDialog(tester, Future.value(const SessionSubmitSuccess(minutes: 25, duplicate: true)));
+      // Canlı yanıt (t1-03): ilk kaydın puanı döner, kum 0; bonus_pct ve
+      // daily_limit_reached ilk kayıttan gelmez. Puan ikinci kez gösterilmez.
+      final duplicate = SessionSubmitSuccess.fromResponse({
+        'duplicate': true,
+        'base_points': 5,
+        'bonus_points': 0,
+        'total_points': 5,
+        'coins_earned': 0,
+        'bonus_pct': 0,
+        'daily_limit_reached': false,
+      }, minutes: 25);
+      expect(duplicate.duplicate, isTrue);
+      expect(duplicate.totalPoints, 5);
+      expect(duplicate.coinsEarned, 0);
+      await _pumpDialog(tester, Future.value(duplicate));
       await tester.pumpAndSettle();
       expect(find.text(l10n.sessionResultDuplicate), findsOneWidget);
       expect(find.text(l10n.sessionResultPoints(0)), findsNothing);
+      expect(find.text(l10n.sessionResultPoints(5)), findsNothing);
     });
 
     testWidgets('çevrimdışı: cihazda kayıtlı, bağlantı gelince gönderilecek', (tester) async {

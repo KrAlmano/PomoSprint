@@ -20,8 +20,10 @@ import '../utils/name_filter.dart';
 import '../utils/study_day.dart';
 import 'backend_config.dart';
 import 'hidden_users.dart';
+import 'language_service.dart';
 import 'lock_screen_timer.dart';
 import 'notification_service.dart';
+import 'onboarding_categories.dart';
 import 'onboarding_draft.dart';
 import 'platform_env.dart' if (dart.library.io) 'platform_env_io.dart';
 import 'server_clock.dart';
@@ -576,6 +578,7 @@ class SupabaseService {
       metadata: authUser.userMetadata ?? const <String, dynamic>{},
       onboardingCompleted: user.onboardingCompletedAt != null,
       givenName: givenName,
+      userId: authUser.id,
     );
     if (desired == null) return user;
     try {
@@ -584,6 +587,14 @@ class SupabaseService {
       debugPrint('[AUTH] Profil adı sağlayıcının ilk adına çekilemedi (yok sayılıyor): $e');
     }
     return currentUser.value ?? user;
+  }
+
+  /// E-postadan türetilmeyen, herkese açık listelerde güvenle görünebilecek
+  /// varsayılan ad: 'Pomo ' + kullanıcı kimliğinin ilk 4 karakteri
+  /// (proposed: handle_new_user'ın e-posta yedeği yerine aynı biçim).
+  static String neutralProfileName(String? userId) {
+    final suffix = (userId ?? '').replaceAll('-', '').toLowerCase();
+    return suffix.length < 4 ? 'Pomo' : 'Pomo ${suffix.substring(0, 4)}';
   }
 
   /// [_applyProviderFirstName]'in kararı: profil adı hâlâ handle_new_user'ın
@@ -597,20 +608,27 @@ class SupabaseService {
     required Map<String, dynamic> metadata,
     required bool onboardingCompleted,
     String? givenName,
+    String? userId,
   }) {
     const triggerNameMax = 50; // handle_new_user: left(..., 50)
     String clip(String v) => v.length > triggerNameMax ? v.substring(0, triggerNameMax) : v;
     final current = currentName.trim();
     final emailLocal = (email ?? '').split('@').first.trim();
     final fullName = (metadata['full_name'] ?? metadata['name'])?.toString().trim() ?? '';
+    final neutral = neutralProfileName(userId);
     final isEmailDefault = emailLocal.isNotEmpty && current == clip(emailLocal);
+    final isNeutralDefault = userId != null && current == neutral;
     final isFullNameDefault = !onboardingCompleted && fullName.contains(RegExp(r'\s')) && current == clip(fullName);
-    if (!isEmailDefault && !isFullNameDefault) return null;
-    final desired = _initialProfileNameFrom(provider: provider, metadata: metadata, email: email, nameHint: givenName);
-    if (desired == current || desired == emailLocal || desired.length < _nameMinLength) return null;
+    if (!isEmailDefault && !isNeutralDefault && !isFullNameDefault) return null;
+    final providerName = _providerGivenName(provider: provider, metadata: metadata, nameHint: givenName);
+    final desired = providerName == null ? '' : _clipName(providerName);
     // Sağlayıcıdaki ad başkalarına görünecek; küfür içeriyorsa yazılmaz.
-    if (NameFilter.isOffensive(desired)) return null;
-    return desired;
+    final usable = desired.length >= _nameMinLength && !NameFilter.isOffensive(desired);
+    if (usable) return desired == current ? null : desired;
+    // Kullanılabilir ad yok (Apple adı yalnızca ilk yetkilendirmede verir):
+    // e-postanın yerel kısmı herkese açık listelerde (anon dahil, tek parça
+    // olduğu için maskelenmeden) görünmesin; nötr ad yazılır.
+    return isEmailDefault && current != neutral ? neutral : null;
   }
 
   // Aynı e-postayla onaylanmamış e-posta/şifre kaydı varsa temizler.
@@ -1005,30 +1023,43 @@ class SupabaseService {
   static String _initialProfileName(User authUser, String? nameHint) => _initialProfileNameFrom(
         provider: authUser.appMetadata['provider']?.toString(),
         metadata: authUser.userMetadata ?? const <String, dynamic>{},
-        email: authUser.email,
+        userId: authUser.id,
         nameHint: nameHint,
       );
 
   static String _initialProfileNameFrom({
     required String? provider,
     required Map<String, dynamic> metadata,
-    required String? email,
+    required String? userId,
     String? nameHint,
   }) {
-    String? candidate;
+    final String? candidate;
     if ((provider ?? 'email') == 'email') {
-      candidate = metadata['name']?.toString();
+      candidate = metadata['name']?.toString().trim();
     } else {
-      final full = (metadata['full_name'] ?? metadata['name'])?.toString().trim();
-      candidate = (nameHint != null && nameHint.trim().isNotEmpty)
-          ? nameHint
-          : (metadata['given_name']?.toString() ?? full?.split(RegExp(r'\s+')).first);
+      candidate = _providerGivenName(provider: provider, metadata: metadata, nameHint: nameHint);
     }
-    var name = candidate?.trim() ?? '';
-    if (name.isEmpty) name = (email ?? '').split('@').first;
-    if (name.isEmpty) name = 'Pomo';
-    return name.length > _nameMaxLength ? name.substring(0, _nameMaxLength) : name;
+    // Ad yoksa e-postanın yerel kısmı değil nötr ad: profil adı herkese
+    // açık sıralamalarda görünür.
+    return (candidate == null || candidate.isEmpty) ? neutralProfileName(userId) : _clipName(candidate);
   }
+
+  /// Google/Apple'ın verdiği ilk ad (Apple'da yalnızca ilk yetkilendirmede
+  /// gelen [nameHint]); yoksa null.
+  static String? _providerGivenName({
+    required String? provider,
+    required Map<String, dynamic> metadata,
+    String? nameHint,
+  }) {
+    final full = (metadata['full_name'] ?? metadata['name'])?.toString().trim();
+    final candidate = (nameHint != null && nameHint.trim().isNotEmpty)
+        ? nameHint
+        : (metadata['given_name']?.toString() ?? full?.split(RegExp(r'\s+')).first);
+    final name = candidate?.trim() ?? '';
+    return name.isEmpty ? null : name;
+  }
+
+  static String _clipName(String name) => name.length > _nameMaxLength ? name.substring(0, _nameMaxLength) : name;
 
   /// Önbellekteki ('saved_user') kullanıcıyı ağsız okur ve [currentUser]'a
   /// koyar. Çevrimdışı açılış için.
@@ -1161,15 +1192,17 @@ class SupabaseService {
 
   /// Onboarding'in profiles satırına yazdığı alanlar. Doğum yılı CHECK
   /// aralığı (1900..2100) dışındaysa, segment bilinen kümede değilse null
-  /// yazılır. [showInSocialFeed] verilirse kullanıcının onboarding'de açıkça
-  /// verdiği "sıralamalarda görün" yanıtı da aynı güncellemeyle yazılır
-  /// (authenticated rolün bu kolonda UPDATE yetkisi var).
+  /// yazılır. Kullanıcının onboarding'de açıkça verdiği "sıralamalarda
+  /// görün" yanıtı ([showInSocialFeed]) her zaman aynı güncellemeyle yazılır
+  /// (authenticated rolün bu kolonda UPDATE yetkisi var): kolon
+  /// gönderilmezse sunucu varsayılanı TRUE kalır ve "Hayır" diyen kullanıcı
+  /// herkese açık sıralamaya girer.
   @visibleForTesting
   static Map<String, dynamic> onboardingProfileUpdate({
     int? birthYear,
     String? userSegment,
     required int dailyGoalMinutes,
-    bool? showInSocialFeed,
+    required bool showInSocialFeed,
     required DateTime completedAt,
   }) {
     final validBirthYear =
@@ -1178,7 +1211,7 @@ class SupabaseService {
       'birth_year': validBirthYear,
       'user_segment': validUserSegments.contains(userSegment) ? userSegment : null,
       'daily_goal_minutes': dailyGoalMinutes,
-      'show_in_social_feed': ?showInSocialFeed,
+      'show_in_social_feed': showInSocialFeed,
       'onboarding_completed_at': completedAt.toUtc().toIso8601String(),
     };
   }
@@ -1192,7 +1225,7 @@ class SupabaseService {
     String? userSegment,
     required int dailyGoalMinutes,
     List<Map<String, dynamic>> categories = const [],
-    bool? showInSocialFeed,
+    required bool showInSocialFeed,
   }) async {
     if (dailyGoalMinutes < _dailyGoalMin || dailyGoalMinutes > _dailyGoalMax) {
       throw const ServiceException(ServiceErrorCode.invalidInput);
@@ -1200,7 +1233,7 @@ class SupabaseService {
     final authUser = _requireAuthUser();
     final epoch = _userEpoch;
     await _guard(() => _ensureOwnProfile(authUser));
-    if (categories.isNotEmpty) await setupOnboardingCategories(categories);
+    if (categories.isNotEmpty) await _setupOnboardingCategoriesReconciled(authUser.id, categories);
     final completedAt = DateTime.now();
     final update = onboardingProfileUpdate(
       birthYear: birthYear,
@@ -1211,10 +1244,8 @@ class SupabaseService {
     );
     final rows = await _guard(() => _client.from('profiles').update(update).eq('id', authUser.id).select('id'));
     if (rows.isEmpty) throw const ServiceException(ServiceErrorCode.notFound);
-    if (showInSocialFeed != null) {
-      _socialVisibleCache = showInSocialFeed;
-      _socialVisibleCacheUid = authUser.id;
-    }
+    _socialVisibleCache = showInSocialFeed;
+    _socialVisibleCacheUid = authUser.id;
     _updateUserIfCurrent(
       authUser.id,
       epoch,
@@ -1225,6 +1256,34 @@ class SupabaseService {
         onboardingCompletedAt: completedAt,
       ),
     );
+  }
+
+  /// Onboarding kategorilerini sunucudaki mevcut kategorilerle uzlaştırarak
+  /// kurar (bkz. [planOnboardingCategories]). Önceki deneme kategorileri
+  /// kurup profil yazılamadan yarıda kaldıysa yeni seçim artık limite
+  /// takılmaz ve dil değişince aynı kategorinin TR/EN çifti oluşmaz.
+  /// Arşivleme yalnızca onboarding'i bitmemiş, hiç seansı (sunucuda ya da
+  /// kuyrukta) olmayan hesapta yapılır. Adımlar idempotent: yarıda kalırsa
+  /// bir sonraki "Bitir" kaldığı yerden tamamlar.
+  Future<void> _setupOnboardingCategoriesReconciled(String uid, List<Map<String, dynamic>> categories) async {
+    final existing = await fetchUserCategories(includeArchived: true);
+    if (existing.isEmpty) return setupOnboardingCategories(categories);
+    final canArchive = currentUser.value?.onboardingCompletedAt == null &&
+        pendingSessionCount.value == 0 &&
+        !await _hasAnyStudySession(uid);
+    final plan = planOnboardingCategories(requested: categories, existing: existing, canArchive: canArchive);
+    for (final id in plan.archiveIds) {
+      await archiveCategory(id);
+    }
+    for (final id in plan.unarchiveIds) {
+      await unarchiveCategory(id);
+    }
+    if (plan.payload.isNotEmpty) await setupOnboardingCategories(plan.payload);
+  }
+
+  Future<bool> _hasAnyStudySession(String uid) async {
+    final rows = await _guard(() => _client.from('study_sessions').select('id').eq('user_id', uid).limit(1));
+    return rows.isNotEmpty;
   }
 
   // Seans sonrası profildeki sayaçları sunucudan tazeler (deltaların doğruluğu).
@@ -1724,17 +1783,27 @@ class SupabaseService {
     return rows.map(CourseCategory.fromServerRow).toList();
   }
 
-  /// Bulutta hiç aktif kategori yoksa yerel listeyi (yoksa varsayılanları)
-  /// sunucuda oluşturur; kimlikleri sunucu üretir. Güncel bulut listesini
-  /// döndürür. Yer tutucu kategorilerden kurtulmanın tek yolu budur.
+  /// Bulutta hiç aktif kategori yoksa yerel listeyi (önbellekteki sunucu
+  /// kategorileri; yoksa kullanıcının segmentine ve diline göre
+  /// varsayılanları, [defaultCategorySeedForCurrentUser]) sunucuda
+  /// oluşturur; kimlikleri sunucu üretir. Güncel bulut listesini döndürür.
+  /// Yer tutucu kategorilerden kurtulmanın tek yolu budur.
   Future<List<CourseCategory>> ensureServerCategories(List<CourseCategory> localFallback) async {
     final active = await fetchUserCategories();
     if (active.isNotEmpty) return active;
-    final source = localFallback.where((c) => !c.isArchived).toList();
-    final seed = (source.isNotEmpty ? source : CourseCategory.initialCategories()).map((c) => c.toServerJson()).toList();
+    // Yer tutucular ('1'..'5') yalnızca cihazdaki varsayılan listedir; tohum olmaz.
+    final source = localFallback.where((c) => !c.isArchived && isUuidCategoryId(c.id)).toList();
+    final seed = source.isNotEmpty ? source.map((c) => c.toServerJson()).toList() : defaultCategorySeedForCurrentUser();
     await setupOnboardingCategories(seed);
     return fetchUserCategories();
   }
+
+  /// Kategorisiz hesabın varsayılanları: profildeki segmentin önerileri,
+  /// arayüz dilinde ('work' kullanıcısına okul dersleri açılmaz).
+  List<Map<String, dynamic>> defaultCategorySeedForCurrentUser() => defaultCategorySeed(
+        segment: currentUser.value?.userSegment,
+        turkish: LanguageService.instance.isTurkish,
+      );
 
   /// Yeni kategori (create_category RPC). Limit ve aynı isim kontrolü
   /// sunucuda; reddedilirse ham hata fırlatılır (bkz. [serviceErrorCodeOf]).
@@ -1846,7 +1915,6 @@ class _SupabaseQueueBackend implements SessionQueueBackend {
       ];
 
   @override
-  Future<void> createDefaultCategories() => _service.setupOnboardingCategories(
-        [for (final c in CourseCategory.initialCategories()) c.toServerJson()],
-      );
+  Future<void> createDefaultCategories() =>
+      _service.setupOnboardingCategories(_service.defaultCategorySeedForCurrentUser());
 }

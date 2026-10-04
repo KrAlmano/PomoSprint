@@ -142,7 +142,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 **Kurallar**
 - Kalan süre her tick'te ve `resumed`'da `ActiveTimerSession.remainingSecondsAt(now)` ile hesaplanır. Azaltarak sayan koda dönme.
 - `clientUuid` ve `startedAt` seans başına **bir kez** üretilir, duraklat/devam boyunca korunur. `client_uuid` sunucudaki idempotency anahtarıdır.
-- Seans her durum değişiminde diske yazılır. Açılışta: süre dolduysa hemen tamamlanıp gönderilir; 24 saatten eski duraklatılmış seans silinir.
+- Seans her durum değişiminde diske yazılır. Açılışta: süre dolduysa hemen tamamlanıp gönderilir. Duraklatılmış seans, devam ettirilse bile bitişi başlangıçtan 24 saat sonraya kalacaksa (`isAbandonedAt`; sunucu `too_old` ile reddeder) silinir ve `pausedSessionExpired` gösterilir: açılışta, BAŞLAT'ta (3-2-1'den önce ve sonra) ve ön plana dönüşte (`test/timer_paused_expiry_test.dart`).
 - Sayaç her derlemede (debug dahil) gerçek süreli. Kısaltma yalnızca `--dart-define=QUICK_TIMER=true` ile (`kQuickTimer`, `timerDurationSeconds`): 5/10 sn ve TEST rozeti. Kısaltılmış seans (`ActiveTimerSession.isQuickTest`; derleme bayrağına değil seansa bakılır) `onSessionCompleted`'e verilmez, sonuç diyaloğu "Test seansı — kaydedilmez" der; bu modda Shell `start_/cancel_study_session` çağırmaz. Eskiden debug derlemede kendiliğinden kısalıyordu: 5 sn'lik seans 25 dk diye gidip `session_not_finished` ile reddediliyordu.
 - Duraklatma hakkı 1. Seans varken 25/50 değiştirilirse seans sıfırlanır.
 - Bildirim izni açılışta değil, ilk BAŞLAT'ta (`ensurePermission`) istenir. Profil'deki anahtar `notifications_enabled` (bitiş bildirimi + kilit ekranı sayacı); "tercih açık VE izin var"ı gösterir (`permissionStatus`: `granted` / `denied` / `notDetermined` / `unknown`, `resumed`'da yeniden okunur). iOS `checkPermissions` hiç sorulmamışla reddedilmişi ayırmaz (ikisi de `isEnabled: false`; `isProvisionalEnabled` izin sayılır); ayrım `notification_permission_asked` ile yapılır. Hiç sorulmamışsa anahtar kapalı, uyarısız; açınca sistem penceresi çıkar. Reddedilirse tercih AÇIK kalır: anahtar kapalı + "Ayarları aç" (Profil'de ve ilk BAŞLAT'ta; `openSystemSettings`: eklentinin `openAppNotificationSettings`'i, iOS'ta yedek `app-settings:`), ayarlardan izin verilip dönülünce anahtar kendiliğinden açılır. İzin platformu testte `debugPermissionPlatform` ile değiştirilir (`test/support/fake_notification_permissions.dart`).
@@ -232,10 +232,12 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 - Kullanıcı içeriği (App Store 1.2): başkasının satırında uzun basma / "⋮" ile `showUserSafetySheet` (`widgets/social/user_safety.dart`). Sıralama ve canlı akışta "Bildir" + "Gizle", arkadaş listesi ve isteklerde yalnızca "Bildir"; kendi satırında menü yok. Bildirim `mailto:destek@pomosprint.app` (görünen ad, varsa genel kimlik, yer; bildirenin bilgisi URL'ye konmaz).
 - Gizleme cihazda, hesaba bağlı (`HiddenUsersStore`, `hidden_users_uid_<uid>`). Lig/Aylık RPC'leri kimlik döndürmediği için orada adla eşlenir; sıralamada satır silinmez, ad/avatar "Gizlenen kullanıcı" olur (sıra ve lig bölgeleri bozulmaz). Profil > Gizlilik ve yasal'dan sıfırlanır.
 - Görünen ad denetimi `utils/name_filter.dart` (kayıt, profil ad düzenleme, Google/Apple ilk adı). Sunucuda içerik denetimi yok (§10).
+- Profil adı e-postadan türetilmez: sağlayıcı ad vermezse (Apple adı yalnızca ilk yetkilendirmede verir) ya da ad kullanılamazsa (küfür, tek harf) ad `SupabaseService.neutralProfileName` olur: `'Pomo ' + kimliğin ilk 4 karakteri`. `handle_new_user` canlıda hâlâ e-postanın yerel kısmını yazıyor; istemci (`providerFirstNameUpdate`) bunu Google/Apple girişinde nötr ada çeker, nötr adı da sunucu tohumu sayar (sağlayıcı adı gelirse onunla değişir). Sunucu bu biçime geçerse ikisi uyumlu kalır.
 
 **Tuzaklar**
 - Arkadaş silme ve giden isteği iptal UI'ı yok: `remove_friend`, `cancel_friend_request`, `get_outgoing_friend_requests` canlıda yok (öneri: `proposed/14`; uygulanmadan istemciden çağırma).
-- `add_friend_by_code` / `respond_friend_request` yanıtında makine-okunur `code` yok (`proposed/07` E bölümü); İngilizce arayüzde metin eşlemesi zayıf.
+- `add_friend_by_code` / `respond_friend_request` yanıtında makine-okunur `code` yok (`proposed/07` E bölümü). İstemci `friendResponseCode` ile önce `code`'a, yoksa sunucunun sabit Türkçe mesajına bakar (`bulunamad` → `not_found`, `kendini`, `zaten arkadaş`, `zaten istek`); mesaj metni değişirse `test/friends_sheet_test.dart`'ı güncelle. Yanıtlanamayan istekte (sunucu cevap verdiyse) liste her zaman tazelenir, bayat kart kalmaz.
+- Podyumda madalya yalnızca puanı > 0 olan koltukta (sunucu lig ödülünü puanı > 0 olan ilk 3'e verir); sıra rozeti (#1–#3) her zaman.
 - Sosyal ekran 30 sn'de bir poll yapar; görünmezken durur.
 - Avatar görseli: uygulamada `assets/avatars/<asset_key>`, sitede `landing/avatars/<id>.webp`.
 
@@ -244,8 +246,10 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 
 **Kurallar**
 - Yönlendirme yalnızca `AppGate`'te. Ekranlar kendi aralarında Login/Onboarding/Shell'e geçiş yapmaz; `currentUser`'ı günceller.
-- Onboarding `completeOnboarding()` ile biter (önce kategoriler, sonra profil). Profili `handle_new_user` trigger'ı oluşturur; istemci upsert'i yedektir ve avatar sunucuda varsayılana zorlanır.
+- Onboarding `completeOnboarding()` ile biter (önce kategoriler, sonra profil). Profili `handle_new_user` trigger'ı oluşturur; istemci upsert'i yedektir ve avatar sunucuda varsayılana zorlanır. `showInSocialFeed` zorunlu ve her zaman yazılır (gönderilmezse sunucu varsayılanı TRUE kalır).
+- Kategoriler `planOnboardingCategories` (`services/onboarding_categories.dart`) ile mevcut kategorilerle uzlaştırılır: ad eşlemesi dilden bağımsız (`categoryMatchKey`), zaten olan yeniden gönderilmez, önceki denemede arşivlenen geri açılır. Onboarding'i bitmemiş, sunucuda ve kuyrukta hiç seansı olmayan hesapta yeni seçimde olmayan aktif kategoriler arşivlenir (önceki deneme yarıda kaldıysa yeni seçim limite takılmaz, TR/EN çifti oluşmaz). Öneri tablosu (`kRecommendedCategoriesBySegment`) ekranla ortak; hiç kategorisi olmayan hesabın varsayılanı (`ensureServerCategories`, kuyruk `createDefaultCategories`) segmentin ilk 5 önerisi, arayüz dilinde (`defaultCategorySeed`).
 - Onboarding 6 adım: yaş (tekerlek önceden ayarlı değil, "Devam"da değerlendirilir; 13 altı yanıttan sonra yıl kilitlenir, çıkış / hesap silme kalır), segment (isteğe bağlı; "Diğer" → `user_segment` null), kategoriler, sıralamalarda görünürlük (varsayılansız açık seçim → `show_in_social_feed`), oyun kuralları (`GameRulesList`, `get_points_config`), hedef.
+- Taslak (`OnboardingDraft`) görünürlük yanıtını da tutar (`show`). Geri yüklemede "Diğer" ve segmentsiz seçimler korunur (izinli adlar: segmentin ya da genel öneriler + özel adlar); adım yaş, kategori ve görünürlük yanıtı eksikse o adıma çekilir. "Bitir" görünürlük yanıtı yoksa görünürlük adımına döner (`test/account_session_test.dart` "Onboarding taslağı").
 - Kategori limiti ücretsiz 8, premium 15 (`categoryLimitFor`). Sunucu trigger'ı eklemede ve arşivden çıkarmada uygular; istemci kontrolü UX içindir. Kategori silinmez, arşivlenir.
 - Yeni metin **yalnızca ARB'ye** (iki dosyaya da) eklenir, sonra `flutter gen-l10n`.
 - Yasal sayfalar (`legal_links.dart`, `LegalPage`): TR `pomosprint.app/terms|privacy|kvkk`, diğer diller `/en/terms|/en/privacy|/en/kvkk`. Metin sürümü tek sabit: `kLegalDocumentsVersion`; yasal metin değişince artır.
@@ -344,7 +348,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 | `respond_friend_request` | `p_from_user_id uuid, p_accept bool` | jsonb | FriendsSheet | Hayır |
 | `get_live_friends` | — | jsonb dizi `[{id, name, avatar_id, category_name, ends_at}]` | SocialScreen | Hayır |
 | `create_category` | `p_name, p_color_hex, p_icon_name` | yeni id | Kategori yönetimi | Hayır |
-| `setup_onboarding_categories` | `p_categories jsonb` | void (limitte sessizce durur) | Onboarding, `ensureServerCategories`, kuyruk | Hayır |
+| `setup_onboarding_categories` | `p_categories jsonb` | void (limitte sessizce durur; yalnızca birebir aynı aktif adı atlar) | Onboarding (önce `planOnboardingCategories`), `ensureServerCategories`, kuyruk | Hayır |
 | `purchase_avatar` | `p_avatar_id text` | int (yeni bakiye) | Koleksiyon | Hayır |
 | `set_equipped_avatar` | `p_avatar_id text` | void | Koleksiyon | Hayır |
 | `delete_own_account` | — | void | Profil | Hayır |
@@ -355,7 +359,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 İstemci `reorder_categories`'i çağırmaz (canlıda yok); sıralama satır başına paralel `update(sort_order)` ile yazılır (§4.2).
 
 ### 5.2 `complete_study_session` kuralları
-- İlk kontrol idempotency: aynı `(user_id, client_uuid)` → `duplicate:true`, puan ve kum 0.
+- İlk kontrol idempotency: aynı `(user_id, client_uuid)` → `duplicate:true`; yanıtta **ilk kaydın** `base_points`, `bonus_points`, `total_points`'i döner, `coins_earned` 0. `bonus_pct` her zaman 0 ve `daily_limit_reached` her zaman `false` gelir (ilk kaydın değeri değil); duplicate yanıtında bu ikisine güvenme. İstemci duplicate'te kullanıcıya delta eklemez (`_onSessionAccepted`), diyalog yalnızca "zaten kaydedilmişti" der.
 - Doğrulama sırası: süre 25/50 → `started_at` gelecekte değil (null da reddedilir) → 24 saatten eski değil → `started_at + süre <= now() + 5 dk` → kategori kullanıcıya ait → gerçek aralıkla çakışma (`{error:'overlap'}`).
 - Puan: 25 dk = 5, 50 dk = 12. Duraklatma cezası `ceil(%20)` (25 dk → 4, 50 dk → 9). Seri bonusu 3/7/14 günde %10/%20/%30 (`ceil`). Kum: seans başına 20.
 - Günlük tavan: aynı çalışma gününde 16 seans dolunca puan, kum ve lig puanı 0. `total_minutes` artmaya devam eder.
@@ -366,7 +370,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 
 | Sunucu yanıtı | İstemci davranışı |
 |---|---|
-| `duplicate:true` | Başarı, puan tekrar verilmez |
+| `duplicate:true` | Başarı; yanıttaki puan ilk kaydınkidir, kum 0. Delta eklenmez, puan/kum gösterilmez |
 | `daily_limit_reached:true` | Başarı, 0 puan / 0 kum |
 | `{error:'overlap'}` | Kuyrukta kalır; sunucu yaşı 24 saati geçince `overlap` ile reddedilir |
 | `session_not_finished` | Ölçülen düzeltilmemiş fark eşiği aşıyorsa geçici, neden `clock_skew` ("cihazının saati farklı/ileri" metni YALNIZCA bu nedende). Fark ölçülemediyse geçici, neden `not_elapsed` ("süre sunucuyla henüz doğrulanamadı"). Aksi halde kalıcı `not_elapsed` ("sunucuya göre seans süresi henüz dolmamıştı") |
@@ -419,7 +423,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 
 ### 6.2 Çevrimdışı kuyruk
 - **Tetikleyiciler:** Shell açılışı, bağlı görünen her bağlantı olayı, ön plana dönüş, artan aralıklı zamanlayıcı (30 sn → 15 dk; bulut başlatılamadıysa da kurulur), banner'a dokunma, yeni seans.
-- **Yer tutucu kategori:** isimle buluttaki kategoriye eşlenir; bulutta hiç kategori yoksa varsayılanlar oluşturulur.
+- **Yer tutucu kategori:** isimle buluttaki kategoriye eşlenir (yoksa ilk aktif kategoriye); bulutta hiç kategori yoksa kullanıcının segmentine ve diline göre varsayılanlar oluşturulur.
 - **Kimliksiz önbellek:** uid bilinmiyorsa `pending_sessions_<email>`'e yazılır, uid öğrenilince taşınır.
 - Çıkışta kuyruk uid'e bağlı kalır, başka hesaba gönderilmez. Hesap silinince temizlenir.
 
@@ -427,7 +431,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 1. **Splash:** `restoreCachedUser` + kategori önbelleği + avatar kataloğu (ağsız) → `SupabaseService.ensureCloud` (5 sn; bitmezse ya da hata verirse kabuk ve giriş yeniden dener) → oturum varsa `fetchCurrentUserModel` + kategoriler → `AppGate`.
 2. **Login:** e-posta `signInWithPassword`; Google/Apple native idToken → `signInWithIdToken` → `cleanup_unconfirmed_duplicate_identity`.
 3. **Profil:** `handle_new_user` trigger'ı (varsayılan avatar, `friend_code`).
-4. **Onboarding:** `completeOnboarding` → `setup_onboarding_categories` → `profiles.update(birth_year, user_segment, daily_goal_minutes, show_in_social_feed, onboarding_completed_at)` → `currentUser` güncellenir → AppGate Shell'e geçer.
+4. **Onboarding:** `completeOnboarding` → mevcut kategorilerle uzlaştırma (arşivle / arşivden aç) → `setup_onboarding_categories` (yalnızca eksikler) → `profiles.update(birth_year, user_segment, daily_goal_minutes, show_in_social_feed, onboarding_completed_at)` → `currentUser` güncellenir → AppGate Shell'e geçer.
 5. **Çıkış / oturum düşmesi:** `signOutFully` ya da `signedOut` olayı → `currentUser = null` → AppGate Login gösterir.
 
 ### 6.4 Lig döngüsü

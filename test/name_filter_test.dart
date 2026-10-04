@@ -110,8 +110,11 @@ void main() {
         metadata: const {'full_name': 'Siktir Git', 'given_name': 'Siktir'},
         onboardingCompleted: false,
         givenName: 'Siktir',
+        userId: '0b7c9e2a-1111-4222-8333-944455556666',
       );
-      expect(update, isNull);
+      // Küfürlü ad yazılmaz; e-postadan türetilen ad da herkese açık
+      // kalmasın diye nötr ada çekilir (t3-EM1).
+      expect(update, 'Pomo 0b7c');
     });
 
     test('normal ilk ad yazılır', () {

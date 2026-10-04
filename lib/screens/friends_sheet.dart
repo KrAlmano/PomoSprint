@@ -24,10 +24,30 @@ Future<void> showFriendsSheet(BuildContext context) {
   );
 }
 
+/// Arkadaşlık RPC yanıtının makine-okunur kodu (not_found, self_add,
+/// already_friends, already_pending, accepted). Canlı add_friend_by_code ve
+/// respond_friend_request yalnızca {success, message} döndürüyor ('code'
+/// alanı proposed/07 E ile gelecek); kod yoksa sunucunun sabit Türkçe
+/// mesajından çıkarılır. Tanınmayan yanıtta null.
+@visibleForTesting
+String? friendResponseCode(Map<String, dynamic>? result) {
+  final code = result?['code'];
+  if (code is String && code.isNotEmpty) return code;
+  final message = result?['message']?.toString().toLowerCase() ?? '';
+  if (message.contains('bulunamad')) return 'not_found';
+  if (message.contains('kendini')) return 'self_add';
+  if (message.contains('zaten arkadaş')) return 'already_friends';
+  if (message.contains('zaten istek')) return 'already_pending';
+  return null;
+}
+
 /// Arkadaş ekleme ve arkadaş listesi pop-up ekranı.
 /// Ana ekranın sağ üstündeki dairesel "arkadaşlar" butonuna basılınca açılır.
 class FriendsSheet extends StatefulWidget {
-  const FriendsSheet({super.key});
+  /// Veri katmanı (varsayılan: [SupabaseService.instance]; testte sahtesi).
+  final SupabaseService? service;
+
+  const FriendsSheet({super.key, this.service});
 
   @override
   State<FriendsSheet> createState() => _FriendsSheetState();
@@ -47,6 +67,8 @@ class _FriendsSheetState extends State<FriendsSheet> {
   String? _respondingId;
   String? _errorMessage;
 
+  SupabaseService get _service => widget.service ?? SupabaseService.instance;
+
   @override
   void initState() {
     super.initState();
@@ -61,7 +83,7 @@ class _FriendsSheetState extends State<FriendsSheet> {
 
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
-    final service = SupabaseService.instance;
+    final service = _service;
     final codeFuture = service.getMyFriendCode();
     List<Map<String, dynamic>>? friends;
     List<Map<String, dynamic>>? pending;
@@ -108,7 +130,7 @@ class _FriendsSheetState extends State<FriendsSheet> {
     Map<String, dynamic>? result;
     String? error;
     try {
-      result = await SupabaseService.instance.addFriendByCode(code);
+      result = await _service.addFriendByCode(code);
     } catch (e) {
       error = socialErrorText(l10n, e);
     }
@@ -119,7 +141,7 @@ class _FriendsSheetState extends State<FriendsSheet> {
     if (result != null && result['success'] == true) {
       _codeController.clear();
       final name = result['friend']?['name']?.toString() ?? l10n.userDefault;
-      final autoAccepted = result['auto_accepted'] == true || result['code'] == 'accepted';
+      final autoAccepted = result['auto_accepted'] == true || friendResponseCode(result) == 'accepted';
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(autoAccepted ? l10n.friendsAdded(name) : l10n.friendsRequestSent(name)),
@@ -133,11 +155,11 @@ class _FriendsSheetState extends State<FriendsSheet> {
     }
   }
 
-  // Sunucunun makine-okunur 'code' alanı yerelleştirilir. Kod henüz yoksa
-  // (eski sunucu sürümü) yalnızca Türkçe arayüzde sunucunun Türkçe mesajı
+  // Sunucunun yanıt kodu (bkz. [friendResponseCode]) yerelleştirilir.
+  // Tanınmayan yanıtta yalnızca Türkçe arayüzde sunucunun Türkçe mesajı
   // gösterilir; aksi halde genel metin.
   String _addFailureText(AppLocalizations l10n, Map<String, dynamic>? result) {
-    switch (result?['code']) {
+    switch (friendResponseCode(result)) {
       case 'not_found':
         return l10n.friendsErrNotFound;
       case 'self_add':
@@ -160,7 +182,7 @@ class _FriendsSheetState extends State<FriendsSheet> {
     Map<String, dynamic>? result;
     String? error;
     try {
-      result = await SupabaseService.instance.respondToFriendRequest(fromUserId, accept);
+      result = await _service.respondToFriendRequest(fromUserId, accept);
     } catch (e) {
       error = socialErrorText(l10n, e);
     }
@@ -181,7 +203,7 @@ class _FriendsSheetState extends State<FriendsSheet> {
       }
       await _loadData();
     } else {
-      final gone = result?['code'] == 'not_found';
+      final gone = friendResponseCode(result) == 'not_found';
       messenger.showSnackBar(
         SnackBar(
           content: Text(error ?? (gone ? l10n.friendsRequestGone : l10n.friendsRespondFailed)),
@@ -189,7 +211,10 @@ class _FriendsSheetState extends State<FriendsSheet> {
           behavior: SnackBarBehavior.floating,
         ),
       );
-      if (gone) await _loadData();
+      // Sunucu yanıt verdiyse liste tazelenir: istek başka cihazdan
+      // yanıtlanmış ya da gönderen hesabını silmiş olabilir; bayat kart
+      // kalıp her dokunuşta hata vermez.
+      if (result != null) await _loadData();
     }
   }
 
