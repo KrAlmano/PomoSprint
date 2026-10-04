@@ -24,6 +24,14 @@
       }
     }
   },
+  "onboardingCategoryStepPreparedBody": "Derslerin/alanların seçili geldi; istersen değiştir. Dokunarak çıkarabilir ya da yenisini ekleyebilirsin. En fazla {limit} tane seçebilirsin.",
+  "@onboardingCategoryStepPreparedBody": {
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
   "categoryNameExistsMsg": "Bu isimde bir kategori zaten var.",
   "categoriesLoadError": "Kategoriler yüklenemedi. İnternet bağlantını kontrol edip tekrar dene.",
   "categorySaveError": "Değişiklik kaydedilemedi. Lütfen tekrar dene.",
@@ -833,9 +841,12 @@
   "onboardingSegmentBody": "Beraber neye çalışacağız? Sana uygun kategorileri önereyim. Uymuyorsa \"Diğer\"i seç.",
   "onboardingSegmentLgs": "🎓  LGS",
   "onboardingSegmentYks": "📚  YKS",
+  "onboardingSegmentKpss": "📝  KPSS",
+  "onboardingSegmentLanguage": "🌍  Dil sınavı (YDS, YÖKDİL, IELTS, TOEFL)",
   "onboardingSegmentUniversity": "🏛️  Üniversite",
   "onboardingSegmentWork": "💼  İş & Kişisel Gelişim",
   "onboardingCategoryStepTitle": "Harika seçim! 🎉",
+  "onboardingCategoryStepPreparedTitle": "Hedefine göre hazırladık 🎯",
   "onboardingCreateOwnCategory": "+ Kendi kategorimi oluştur",
   "onboardingGoalStepTitle": "Son bir adım kaldı! 🚀",
   "onboardingGoalStepBody": "Günde ne kadar birlikte odaklanmak istersin?",

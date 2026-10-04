@@ -5,12 +5,15 @@ import '../utils/category_names.dart';
 import '../widgets/auth/category_name_dialog.dart' show kCategoryPalette;
 
 /// Segmente göre önerilen kategoriler. Türkçe anahtarlarla tutulur; ekranda
-/// ve kayıtta kullanıcının diline çevrilir ([localizedKnownCategoryName]).
-/// Onboarding ekranı ve kategorisiz hesabın varsayılan tohumu aynı tabloyu
-/// kullanır.
+/// ve kayıtta kullanıcının diline çevrilir ([localizedKnownCategoryName];
+/// her ad kKnownCategoryNames'te olmalı). Onboarding ekranı ve kategorisiz
+/// hesabın varsayılan tohumu aynı tabloyu kullanır. 'kpss' ve 'language'
+/// sunucuda proposed/26 ile kabul edilir (bkz. SupabaseService.completeOnboarding).
 const Map<String, List<String>> kRecommendedCategoriesBySegment = {
   'lgs': ['Matematik', 'Fen Bilimleri', 'Türkçe', 'T.C. İnkılap Tarihi', 'İngilizce', 'Din Kültürü'],
   'yks': ['Matematik', 'Fizik', 'Kimya', 'Biyoloji', 'Türkçe', 'Tarih', 'Coğrafya', 'Felsefe', 'İngilizce'],
+  'kpss': ['Türkçe', 'Matematik', 'Tarih', 'Coğrafya', 'Vatandaşlık', 'Güncel Bilgiler', 'Eğitim Bilimleri'],
+  'language': ['Kelime', 'Okuma', 'Dilbilgisi', 'Dinleme', 'Yazma', 'Konuşma'],
   'university': ['Ders Çalışma', 'Ödev', 'Proje', 'Sınav Hazırlık'],
   'work': ['Derin Çalışma', 'Okuma', 'Öğrenme', 'Proje'],
 };
@@ -21,6 +24,26 @@ const List<String> kGeneralCategoryRecommendations = ['Ders Çalışma', 'Okuma'
 /// [segment] için öneriler (bilinmeyen/boş segment: genel öneriler).
 List<String> recommendedCategoryNames(String? segment) =>
     kRecommendedCategoriesBySegment[segment] ?? kGeneralCategoryRecommendations;
+
+/// [name] herhangi bir segmentin (ya da genel listenin) önerisi mi? Segment
+/// değişince elle seçilip korunan öneri de taslaktan geri gelebilsin diye.
+bool isRecommendedCategoryName(String name) =>
+    kGeneralCategoryRecommendations.contains(name) ||
+    kRecommendedCategoriesBySegment.values.any((names) => names.contains(name));
+
+/// Segment seçilince otomatik seçili gelen öneriler: [segment]'in önerileri
+/// sırayla, [kept] (kullanıcının elle seçtikleri; korunur) ile aynı kategori
+/// olmayanlar ([categoryMatchKey]), toplam seçim [limit]'i aşmayacak kadar.
+List<String> autoSelectedCategoryNames(String? segment, {required Iterable<String> kept, required int limit}) {
+  final keptNames = kept.toList();
+  final taken = {for (final name in keptNames) categoryMatchKey(name)};
+  final picked = <String>[];
+  for (final name in recommendedCategoryNames(segment)) {
+    if (keptNames.length + picked.length >= limit) break;
+    if (taken.add(categoryMatchKey(name))) picked.add(name);
+  }
+  return picked;
+}
 
 /// setup_onboarding_categories gövdesi: adlar kullanıcının dilinde, renkler
 /// paletten sırayla.

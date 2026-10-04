@@ -221,7 +221,9 @@ void main() {
         await tapAndSettle(find.text(l10n.onboardingSegmentOther));
         await expectGuidelines(tester, 'segment');
         await tapAndSettle(find.text(l10n.continueBtn));
-        // Seçili kategori çipi koyu temada da okunur.
+        // Segment seçilince öneriler seçili gelir: seçili çipler koyu temada
+        // da okunur. Biri kaldırılınca seçilmemiş çip de denetlenir.
+        expect(tester.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, 'Okuma')).selected, isTrue);
         await tapAndSettle(find.text('Okuma'));
         await expectGuidelines(tester, 'kategoriler');
         await tapAndSettle(find.text(l10n.continueBtn));

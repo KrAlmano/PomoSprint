@@ -29,12 +29,14 @@ dağıtıyor). Canlı gövdeyi bilmeden repodaki eski sürümden
 
 ## Dosyalar ve uygulama sırası
 
-### Canlıya hazır paketler: TEK SIRA 12 → 15 → 16 → 19 → 13 → 14 (→ 20 → 21 → 22 → 23 → 24 → 25)
+### Canlıya hazır paketler: TEK SIRA 12 → 15 → 16 → 19 → 13 → 14 (→ 20 → 21 → 22 → 23 → 24 → 25 → 26)
 
 İlk altı paket canlı tanımlardan (3 Ekim 2026, `pg_get_functiondef`) yazıldı,
 `11`'e bağımlı değildir ve **yalnızca bu sırayla** uygulanır. 20–25 (5 Ekim
 2026, test ajanı bulguları) zincir UYGULANMIŞ hâlin gövdelerinden yazıldı ve
-14'ten SONRA gelir; md5 ön koşulları zincirdeki gövdeleri bekler. Her adım SQL
+14'ten SONRA gelir; md5 ön koşulları zincirdeki gövdeleri bekler. 26 (segment
+genişletme) bağımsızdır: canlı hâlde de zincirden sonra da uygulanabilir;
+tabloda sonda. Her adım SQL
 Editor'de iki çalıştırmadır: (1) DRYRUN dosyası olduğu gibi yapıştırılır;
 öneriyi ve senaryoları geri alınan bir transaction'da çalıştırır ve bilinçli
 bir `DRYRUN_RESULT >> ...` hatasıyla biter; her madde `true` olmalı.
@@ -55,6 +57,7 @@ Bir adım beklenen sonucu vermezse SONRAKİNE GEÇMEYİN.
 | 10 | `tests/proposed_23_kategori_butunluk_dryrun.sql` | `23_kategori_butunluk.sql` | DRYRUN 13/13 `true`. Sonra `categories`'te `enforce_category_rules` trigger'ı; `setup_onboarding_categories(jsonb)` jsonb döner (md5 `4721be2abe083a358e59867e8a11251e`); `create_category` `728c31888e49ef9cd230d900ef75ca5e`, `enforce_category_limit()` `7d0575e8b353d4b2658414ff300f022c` |
 | 11 | `tests/proposed_24_onboarding_profil_dryrun.sql` | `24_onboarding_profil.sql` | DRYRUN 9/9 `true`. Sonra `profiles`'ta `enforce_minimum_age` trigger'ı; `select count(*) from ops.proposed24_social_feed_reset;` (görünürlüğü kapatılan, onboarding'i bitmemiş profiller) |
 | 12 | `tests/proposed_25_sosyal_erisim_dryrun.sql` | `25_sosyal_erisim.sql` | DRYRUN 9/9 `true`. Sonra authenticated'da `leagues` / `league_memberships` SELECT yok; `rotate_friend_code()` var (md5 `ad91379e137be7dcf51d0cb535a3d4c8`) |
+| 13 | `tests/proposed_26_segment_genisletme_dryrun.sql` | `26_segment_genisletme.sql` (bağımsız; canlı hâlde de) | DRYRUN 9/9 `true` (kısıt beklenen tanımda değilse `proposed/26 ön koşulu: ...`). Sonra `profiles_user_segment_check` = `user_segment = ANY (ARRAY['lgs','yks','kpss','language','university','work'])` |
 
 Ürün/hukuk kararları ilgili adımdan ÖNCE: 13 için UX-01 düğmesi
 (`app_config.unverified_session_daily_cap`, varsayılan `null` = bugünkü
@@ -64,7 +67,7 @@ istemci ön koşulu (aşağıda "Öneri 14").
 istemci metinleriyle birlikte), 21 için geç seans bonusu kuralı (dosyada "o
 günün serisi"; alternatifi "bonus yok"). Ayrıntı aşağıda "Öneriler 20–25".
 
-**Geri alma (ters sıra):** `25_sosyal_erisim_down.sql` → `24_onboarding_profil_down.sql`
+**Geri alma (ters sıra):** `26_segment_genisletme_down.sql` → `25_sosyal_erisim_down.sql` → `24_onboarding_profil_down.sql`
 → `23_kategori_butunluk_down.sql` → `22_avatar_satin_alma_down.sql`
 → `21_seans_kilit_gec_bonus_down.sql` → `20_lig_donemi_down.sql`
 → `14_gizlilik_sosyal_down.sql` → `13_sunucu_butunluk_down.sql`
@@ -84,6 +87,9 @@ sıra her zaman güvenlidir.
   Bu yüzden 14'ün md5 ön koşulu 13 UYGULANMIŞ gövdeleri bekler; 13 de kendi
   ön koşuluyla 14'ten sonra uygulanmayı reddeder (yoksa 14'ün değişikliklerini
   sessizce ezerdi).
+- `26` yalnızca `profiles_user_segment_check`'e dokunur; ön koşulu kısıtın
+  canlı tanımıdır (zincirdeki hiçbir adım onu değiştirmez). `26_down`
+  'kpss'/'language' satırlarını NULL yapıp eski kısıtı kurar.
 - `15`, `14`'ten önce: 14 iki aylık sıralama gövdesini de tanır; 14'ten sonra
   15 uygulanamaz (dönüş tipi farklı).
 - `12`, `13`'ten önce: 12 `delete_own_account`'u `pg_temp`'li yazar; 13'ün
@@ -105,8 +111,10 @@ veritabanına (`pomosprint_chain`) kopyalar, ana kopyaya dokunmaz; zinciri
 (12 → … → 14) ve 20–25'i her adımda önce DRYRUN'la uygular, DRYRUN'lara
 gömülü gövdelerin ana dosyalarla aynı olduğunu ve 25 → 20 `_down`
 dosyalarının şemayı birebir geri getirdiğini denetler. 5 Ekim 2026 sonucu:
-14/14, 6/6, 13/13, 12/12, 50/50, 67/67, 15/15, 10/10, 9/9, 13/13, 9/9, 9/9
-`true`; altı `_down` önceki şemaya birebir döndü. Test bulguları için
+14/14, 6/6, 13/13, 12/12, 50/50, 67/67, 15/15, 10/10, 9/9, 13/13, 9/9, 9/9,
+9/9 (26) `true`; yedi `_down` önceki şemaya birebir döndü. 26 ayrıca canlı
+hâldeki kopyada (`UNTIL=0`) DRYRUN 9/9, uygula → yeniden uygula (ön koşulla
+durur) → `_down` → şema (kısıtlar, geçmiş) birebir aynı. Test bulguları için
 `supabase/tests/proposed_20_25_bulgu_repro_local.sql` (geri alınan
 transaction; canlı / zincir / zincir + 20–25 hâllerinde 'BUG' / 'düzgün') ve
 `supabase/tests/proposed_20_25_race_local.sh` (iki bağlantılı eşzamanlılık;
@@ -140,6 +148,7 @@ birebir döndü. Ayrıca 13 DRYRUN canlı hâlde 50/50, 14 DRYRUN 15'siz (yalnı
 | `23_kategori_butunluk.sql` | P2 (t2-03, t2-06, t2-07) | Onboarding yeniden denenince seansız eski kategoriler arşive (TR/EN çift yok), geçersiz öğe çağrıyı düşürmez, `{created, restored, skipped_*, archived}` döner; büyük/küçük harf duyarsız tekil ad, renk/ikon doğrulaması (yalnız yazılan alan); kategori yazımları kullanıcı başına kilitli (limit aşılmaz). |
 | `24_onboarding_profil.sql` | P1/P2 (t2-01 sunucu, t2-05) | 13 yaş sınırı sunucuda (`birth_year_under_minimum_age`); onboarding'i bitmemiş eski profillerde görünürlük seçim yapılana kadar kapalı (14'ün varsayılanını eskiye taşır). |
 | `25_sosyal_erisim.sql` | P2 (t3-LG5, t3-K1) | `leagues` / `league_memberships` doğrudan okunamaz (yalnız RPC); `rotate_friend_code()` (24 saatte bir). |
+| `26_segment_genisletme.sql` | P2 (t2-04) | `profiles_user_segment_check`'e `kpss` ve `language` (YDS/YÖKDİL/IELTS/TOEFL) eklenir. Bağımsız; istemci 26'dan önce de çalışır (23514'te segmentsiz tamamlar). |
 
 ### Eski öneriler (01–10): `11`'e bağlı, canlıya göre yeniden yazılmalı
 
@@ -304,7 +313,7 @@ zincir + 20–25. Zincirin zaten düzelttiği bulgular için yeni dosya yazılma
 | t1-08 `ensure_user_in_league` `pg_temp` yok | BUG | düzgün | 13 (H) |
 | t2-01 görünürlük seçilmeden onboarding (high, sunucu kısmı) | BUG | düzgün (yeni kayıt) | 14 (C) + 24 (eski, bitmemiş profiller); istemci ayrı |
 | t2-03 onboarding kategorileri uzlaşmıyor (medium) | BUG | BUG | 23 |
-| t2-04 KPSS / dil segmenti yok | bilgi | bilgi | ürün kararı (CHECK + istemci birlikte) |
+| t2-04 KPSS / dil segmenti yok | bilgi | bilgi | 26 (CHECK) + istemci (hedefler, öneriler, 23514 geri düşüşü) |
 | t2-05 13 yaş sınırı yalnız istemcide | BUG | BUG | 24 |
 | t2-06 kategori ad/renk/ikon doğrulaması | BUG | BUG (ve kurulum tümden düşüyor) | 13 (ad) + 23 |
 | t2-07 eşzamanlı kurulum limiti aşıyor | BUG | BUG | 23 |
@@ -342,6 +351,11 @@ düğmeler açılana kadar bugünkü kuralla kalır (bilinçli).
 - Yeni hata metinleri (23514): `category_color_invalid`, `category_icon_invalid`
   (23), `birth_year_under_minimum_age` (24). Bugün `invalidInput`'a düşer.
 - `rotate_friend_code()` → `{success, code:'rotated'|'rate_limited', friend_code | retry_after}` (25).
+- Onboarding PATCH'i `user_segment` olarak `kpss` / `language` da gönderir
+  (istemci bu sürümden itibaren, 26'yı beklemeden). 26 yokken 23514
+  (`profiles_user_segment_check`) → istemci aynı PATCH'i `user_segment =
+  null` ile yeniden yazar; onboarding tamamlanır. 26'dan sonra hedef saklanır.
+  Uçtan uca: `tool/local_supabase/e2e/t2_onboarding_categories/segment_fallback_e2e_test.dart`.
 
 ## `20261003150000_live_audit_fixes` ile ilişkisi
 

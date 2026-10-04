@@ -11,7 +11,7 @@
 #     fonksiyon, kolon, kısıt, index, politika, yetki ve trigger'lar ana
 #     kopyayla (= canlı) aynıdır: CHECK_BASE=1 ile parity_check.sh kopyada
 #     da çalıştırılır.
-#  2. İleri: 12 → 15 → 16 → 19 → 13 → 14 → 20 → 21 → ... Her adımda önce
+#  2. İleri: 12 → 15 → 16 → 19 → 13 → 14 → 20 → 21 → ... → 26. Her adımda önce
 #     DRYRUN (DRYRUN_RESULT satırındaki her madde 'true'), sonra dosya
 #     (\echo/\quit satırları silinerek, postgres rolüyle: SQL Editor'deki gibi).
 #  3. Yeni adımlar (20+): DRYRUN dosyasındaki öneri gövdesi kopyası ana
@@ -245,6 +245,7 @@ NEW_STEPS=(
   "23|23_kategori_butunluk"
   "24|24_onboarding_profil"
   "25|25_sosyal_erisim"
+  "26|26_segment_genisletme"
 )
 
 APPLIED=()

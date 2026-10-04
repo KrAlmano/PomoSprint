@@ -47,6 +47,11 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String onboardingCategoryStepPreparedBody(int limit) {
+    return 'Derslerin/alanların seçili geldi; istersen değiştir. Dokunarak çıkarabilir ya da yenisini ekleyebilirsin. En fazla $limit tane seçebilirsin.';
+  }
+
+  @override
   String get categoryNameExistsMsg => 'Bu isimde bir kategori zaten var.';
 
   @override
@@ -1491,6 +1496,13 @@ class AppLocalizationsTr extends AppLocalizations {
   String get onboardingSegmentYks => '📚  YKS';
 
   @override
+  String get onboardingSegmentKpss => '📝  KPSS';
+
+  @override
+  String get onboardingSegmentLanguage =>
+      '🌍  Dil sınavı (YDS, YÖKDİL, IELTS, TOEFL)';
+
+  @override
   String get onboardingSegmentUniversity => '🏛️  Üniversite';
 
   @override
@@ -1498,6 +1510,10 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get onboardingCategoryStepTitle => 'Harika seçim! 🎉';
+
+  @override
+  String get onboardingCategoryStepPreparedTitle =>
+      'Hedefine göre hazırladık 🎯';
 
   @override
   String get onboardingCreateOwnCategory => '+ Kendi kategorimi oluştur';

@@ -47,6 +47,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String onboardingCategoryStepPreparedBody(int limit) {
+    return 'Your subjects/areas are preselected; change them if you like. Tap one to remove it or add your own. You can pick up to $limit.';
+  }
+
+  @override
   String get categoryNameExistsMsg =>
       'A category with this name already exists.';
 
@@ -1532,6 +1537,13 @@ class AppLocalizationsEn extends AppLocalizations {
       '📚  YKS (Turkish university entrance exam)';
 
   @override
+  String get onboardingSegmentKpss => '📝  KPSS (Turkish civil service exam)';
+
+  @override
+  String get onboardingSegmentLanguage =>
+      '🌍  Language exam (YDS, YÖKDİL, IELTS, TOEFL)';
+
+  @override
   String get onboardingSegmentUniversity => '🏛️  University';
 
   @override
@@ -1539,6 +1551,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingCategoryStepTitle => 'Great choice! 🎉';
+
+  @override
+  String get onboardingCategoryStepPreparedTitle => 'Picked for your goal 🎯';
 
   @override
   String get onboardingCreateOwnCategory => '+ Create my own category';

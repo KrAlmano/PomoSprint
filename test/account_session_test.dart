@@ -516,13 +516,18 @@ void main() {
         segment: 'yks',
         selectedCategories: ['Fizik', 'Kendi'],
         customCategories: ['Kendi'],
+        autoCategories: ['Fizik'],
         dailyGoalMinutes: 120,
       );
       final back = OnboardingDraft.fromJson(jsonDecode(jsonEncode(draft.toJson())))!;
       expect(back.step, 2);
       expect(back.segment, 'yks');
       expect(back.selectedCategories, ['Fizik', 'Kendi']);
+      expect(back.autoCategories, ['Fizik']);
       expect(back.dailyGoalMinutes, 120);
+      // Otomatik seçimden önceki sürümün taslağı: 'auto' yok (null), boş liste değil.
+      expect(OnboardingDraft.fromJson({'step': 2, 'segment': 'yks'})!.autoCategories, isNull);
+      expect(OnboardingDraft.fromJson({'step': 2, 'auto': <String>[]})!.autoCategories, isEmpty);
       expect(OnboardingDraft.fromJson('x'), isNull);
       expect(OnboardingDraft.fromJson({'step': 'iki'}), isNull);
       expect(OnboardingDraft.fromJson({'step': 1, 'selected': [1, 'Fizik', '']})!.selectedCategories, ['Fizik']);
@@ -536,7 +541,7 @@ void main() {
           birthYear: 2008,
           segment: 'yks',
           // Önerilerde olmayan, özel de olmayan ad atılır; kategori kalmayınca
-          // adım 3'e (kategoriler) geri çekilir.
+          // segmentin önerileri seçilir ve adım 3'e (kategoriler) geri çekilir.
           selectedCategories: ['Yok Böyle'],
           dailyGoalMinutes: 180,
         ).toJson()),
@@ -554,6 +559,9 @@ void main() {
       expect(saved.segment, 'yks');
       expect(saved.birthYear, 2008);
       expect(saved.dailyGoalMinutes, 180);
+      const yksFirst8 = ['Matematik', 'Fizik', 'Kimya', 'Biyoloji', 'Türkçe', 'Tarih', 'Coğrafya', 'Felsefe'];
+      expect(saved.selectedCategories, yksFirst8);
+      expect(saved.autoCategories, yksFirst8);
     });
 
     // Taslağı yazıp onboarding ekranını açar; ekranın kaydettiği son taslağı döndürür.
@@ -600,6 +608,56 @@ void main() {
       expect(find.text('4/6'), findsOneWidget);
       expect(saved.segment, isNull);
       expect(saved.selectedCategories, ['Ders Çalışma']);
+    });
+
+    // Hedefe göre otomatik seçim: hangi kategorilerin otomatik geldiği
+    // taslakta tutulur; geri dönülüp segment değişince yalnızca onlar değişir.
+    testWidgets('otomatik seçim taslakla geri gelir; segment değişince elle seçilen korunur', (tester) async {
+      final restored = await restore(
+        tester,
+        const OnboardingDraft(
+          step: 2,
+          birthYear: 2000,
+          segment: 'yks',
+          selectedCategories: ['Matematik', 'Fizik', 'Felsefe'],
+          autoCategories: ['Matematik', 'Fizik'],
+          dailyGoalMinutes: 60,
+        ),
+      );
+      expect(find.text('3/6'), findsOneWidget);
+      expect(restored.autoCategories, ['Matematik', 'Fizik']);
+
+      await tester.tap(find.byTooltip(MaterialLocalizations.of(tester.element(find.byType(Scaffold))).backButtonTooltip));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text(l10n.onboardingSegmentKpss));
+      await tester.tap(find.text(l10n.onboardingSegmentKpss));
+      await tester.pumpAndSettle();
+      final prefs = await SharedPreferences.getInstance();
+      final saved = OnboardingDraft.fromJson(jsonDecode(prefs.getString(OnboardingDraftStore.keyFor('uid-1'))!))!;
+      const kpss = ['Türkçe', 'Matematik', 'Tarih', 'Coğrafya', 'Vatandaşlık', 'Güncel Bilgiler', 'Eğitim Bilimleri'];
+      expect(saved.segment, 'kpss');
+      expect(saved.selectedCategories, ['Felsefe', ...kpss], reason: "'Fizik' otomatikti, 'Felsefe' elle seçilmişti");
+      expect(saved.autoCategories, kpss);
+    });
+
+    testWidgets('eski sürüm taslağı: segment seçili ama kategori yoksa öneriler seçili gelir', (tester) async {
+      final saved = await restore(
+        tester,
+        const OnboardingDraft(step: 1, birthYear: 2000, segment: 'kpss', dailyGoalMinutes: 60),
+      );
+      expect(find.text('2/6'), findsOneWidget, reason: 'adım korunur');
+      expect(saved.selectedCategories, saved.autoCategories);
+      expect(saved.autoCategories, ['Türkçe', 'Matematik', 'Tarih', 'Coğrafya', 'Vatandaşlık', 'Güncel Bilgiler', 'Eğitim Bilimleri']);
+    });
+
+    testWidgets('kullanıcının boşalttığı seçim (yeni sürüm taslağı) yeniden doldurulmaz', (tester) async {
+      final saved = await restore(
+        tester,
+        const OnboardingDraft(step: 4, birthYear: 2000, segment: 'yks', autoCategories: [], showInRankings: true),
+      );
+      expect(find.text('3/6'), findsOneWidget, reason: 'kategorisiz taslak kategori adımına döner');
+      expect(saved.selectedCategories, isEmpty);
+      expect(saved.autoCategories, isEmpty);
     });
 
     // t2-01: görünürlük yanıtı taslakta tutulur; yanıtsız taslak görünürlük

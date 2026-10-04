@@ -158,6 +158,12 @@ abstract class AppLocalizations {
   /// **'Şimdi çalışacağın dersleri/alanları seç; istediğin zaman değiştirebilirsin. En fazla {limit} tane seçebilirsin.'**
   String onboardingCategoryStepBodyLimit(int limit);
 
+  /// No description provided for @onboardingCategoryStepPreparedBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Derslerin/alanların seçili geldi; istersen değiştir. Dokunarak çıkarabilir ya da yenisini ekleyebilirsin. En fazla {limit} tane seçebilirsin.'**
+  String onboardingCategoryStepPreparedBody(int limit);
+
   /// No description provided for @categoryNameExistsMsg.
   ///
   /// In tr, this message translates to:
@@ -2594,6 +2600,18 @@ abstract class AppLocalizations {
   /// **'📚  YKS'**
   String get onboardingSegmentYks;
 
+  /// No description provided for @onboardingSegmentKpss.
+  ///
+  /// In tr, this message translates to:
+  /// **'📝  KPSS'**
+  String get onboardingSegmentKpss;
+
+  /// No description provided for @onboardingSegmentLanguage.
+  ///
+  /// In tr, this message translates to:
+  /// **'🌍  Dil sınavı (YDS, YÖKDİL, IELTS, TOEFL)'**
+  String get onboardingSegmentLanguage;
+
   /// No description provided for @onboardingSegmentUniversity.
   ///
   /// In tr, this message translates to:
@@ -2611,6 +2629,12 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Harika seçim! 🎉'**
   String get onboardingCategoryStepTitle;
+
+  /// No description provided for @onboardingCategoryStepPreparedTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedefine göre hazırladık 🎯'**
+  String get onboardingCategoryStepPreparedTitle;
 
   /// No description provided for @onboardingCreateOwnCategory.
   ///

@@ -147,14 +147,14 @@ veritabanına (`CHAIN_DB`, vars. `pomosprint_chain`) alır; ana kopya
 (`postgres`) değişmez, `parity_check.sh` geçmeye devam eder. pg_cron yalnızca
 `postgres`'te kurulabildiği için kopyada `cron.job` / `schedule` /
 `unschedule` taklit edilir. Sonra `supabase/proposed/README.md`'deki sırayla
-(12 → 15 → 16 → 19 → 13 → 14 → 20 → … → 25) her adımda önce DRYRUN'u, sonra
+(12 → 15 → 16 → 19 → 13 → 14 → 20 → … → 25 → 26) her adımda önce DRYRUN'u, sonra
 dosyayı postgres rolüyle (SQL Editor'deki gibi) uygular; yeni adımların
 DRYRUN gövdesini ana dosyayla karşılaştırır ve `_down` dosyalarını ters
 sırada uygulayıp şemanın önceki adımla birebir aynı olduğunu denetler.
 
 ```sh
 tool/local_supabase/proposed_chain_check.sh                          # hepsi; sonda kopya silinir
-CHAIN_DB=pomosprint_chain NO_DOWN=1 KEEP_DB=1 tool/local_supabase/proposed_chain_check.sh   # zincir + 20–25 hâli kalır
+CHAIN_DB=pomosprint_chain NO_DOWN=1 KEEP_DB=1 tool/local_supabase/proposed_chain_check.sh   # zincir + 20–26 hâli kalır
 CHAIN_DB=pomosprint_base UNTIL=0 KEEP_DB=1 tool/local_supabase/proposed_chain_check.sh      # yalnız kopya (canlı hâl)
 psql postgresql://postgres:postgres@127.0.0.1:54322/pomosprint_chain -X -f supabase/tests/proposed_20_25_bulgu_repro_local.sql
 supabase/tests/proposed_20_25_race_local.sh postgresql://postgres:postgres@127.0.0.1:54322/pomosprint_chain

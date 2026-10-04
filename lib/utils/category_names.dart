@@ -24,6 +24,15 @@ const List<(String tr, String en)> kKnownCategoryNames = [
   ('Okuma', 'Reading'),
   ('Öğrenme', 'Learning'),
   ('T.C. İnkılap Tarihi', 'Turkish Revolution History'),
+  // KPSS ve dil sınavı önerileri.
+  ('Vatandaşlık', 'Citizenship'),
+  ('Güncel Bilgiler', 'Current Affairs'),
+  ('Eğitim Bilimleri', 'Educational Sciences'),
+  ('Kelime', 'Vocabulary'),
+  ('Dilbilgisi', 'Grammar'),
+  ('Dinleme', 'Listening'),
+  ('Yazma', 'Writing'),
+  ('Konuşma', 'Speaking'),
 ];
 
 // Dart'ın toLowerCase()'i Türkçeye özgü değil: 'İ' → 'i' + U+0307 (birleşik

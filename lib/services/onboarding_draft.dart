@@ -15,6 +15,11 @@ class OnboardingDraft {
   final List<String> selectedCategories;
   final List<String> customCategories;
 
+  /// [selectedCategories] içinde segment seçilince otomatik gelenler; segment
+  /// değişince yalnızca bunlar değişir. null: otomatik seçimden önceki sürümün
+  /// taslağı (o sürümde seçimlerin hepsini kullanıcı yapıyordu).
+  final List<String>? autoCategories;
+
   /// Sıralamalarda görünürlük yanıtı (null: henüz yanıtlanmadı). Sunucuda
   /// show_in_social_feed varsayılanı TRUE olduğu için yanıt taslakla
   /// korunur; yanıtsız taslak görünürlük adımının ilerisine dönmez.
@@ -27,6 +32,7 @@ class OnboardingDraft {
     this.segment,
     this.selectedCategories = const [],
     this.customCategories = const [],
+    this.autoCategories,
     this.showInRankings,
     this.dailyGoalMinutes,
   });
@@ -37,6 +43,7 @@ class OnboardingDraft {
         'segment': segment,
         'selected': selectedCategories,
         'custom': customCategories,
+        if (autoCategories != null) 'auto': autoCategories,
         'show': showInRankings,
         'goal': dailyGoalMinutes,
       };
@@ -58,6 +65,7 @@ class OnboardingDraft {
       segment: segment is String ? segment : null,
       selectedCategories: strings(json['selected']),
       customCategories: strings(json['custom']),
+      autoCategories: json['auto'] is List ? strings(json['auto']) : null,
       showInRankings: show is bool ? show : null,
       dailyGoalMinutes: goal is int ? goal : null,
     );

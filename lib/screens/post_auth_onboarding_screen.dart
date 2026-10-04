@@ -10,6 +10,7 @@ import '../services/language_service.dart';
 import '../services/onboarding_categories.dart';
 import '../services/onboarding_draft.dart';
 import '../services/supabase_service.dart';
+import '../utils/category_names.dart';
 import '../utils/responsive.dart';
 import '../widgets/auth/account_texts.dart';
 import '../widgets/auth/category_name_dialog.dart';
@@ -73,6 +74,10 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
   String? _userSegment;
   // Seçim sırası korunur; sunucudaki sıralama bu sırayla oluşur.
   final Set<String> _selectedCategoryNames = {};
+  // Seçimin, segment seçilince otomatik gelen kısmı (kullanıcının elle
+  // seçtikleri ve özel kategoriler burada değildir). Segment değişince
+  // yalnızca bunlar yeni segmentin önerileriyle değişir.
+  final Set<String> _autoCategoryNames = {};
   final List<String> _customCategoryNames = [];
   // Sıralamalarda görünürlük açıkça sorulur; varsayılan seçim yoktur.
   bool? _showInRankings;
@@ -132,6 +137,7 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
         segment: _userSegment,
         selectedCategories: _selectedCategoryNames.toList(),
         customCategories: List.of(_customCategoryNames),
+        autoCategories: _autoCategoryNames.toList(),
         showInRankings: _showInRankings,
         dailyGoalMinutes: _dailyGoalMinutes,
       ),
@@ -154,15 +160,27 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
     final year = draft.birthYear;
     final birthYear = (year != null && year <= _currentYear && year > _currentYear - _birthYearCount) ? year : _birthYear;
     final custom = draft.customCategories.toSet().take(_categoryLimit).toList();
-    // Ekranın o segmentte gösterdiği öneriler (segmentsiz/"Diğer": genel öneriler).
-    final allowed = {...recommendedCategoryNames(segment), ...custom};
-    final selected = draft.selectedCategories.where(allowed.contains).toSet().take(_categoryLimit).toList();
+    // Öneriler (herhangi bir segmentin: segment değişince elle seçilen öneri
+    // korunur) ve özel adlar; başka ad atılır.
+    final selected = draft.selectedCategories
+        .where((name) => custom.contains(name) || isRecommendedCategoryName(name))
+        .toSet()
+        .take(_categoryLimit)
+        .toList();
+    // Otomatik gelenler seçimin alt kümesidir. Otomatik seçimden önceki
+    // sürümün taslağında ('auto' yok) segment seçilmiş ama kategori
+    // seçilmemişse öneriler bugünkü gibi seçilir ve kategori adımı gösterilir.
+    final legacyAutoFill = draft.autoCategories == null && segment != null && selected.isEmpty;
+    final auto = legacyAutoFill
+        ? autoSelectedCategoryNames(segment, kept: const [], limit: _categoryLimit)
+        : [for (final name in draft.autoCategories ?? const <String>[]) if (selected.contains(name)) name];
+    if (legacyAutoFill) selected.addAll(auto);
     final goal = _goalOptions.contains(draft.dailyGoalMinutes) ? draft.dailyGoalMinutes! : _dailyGoalMinutes;
     final showInRankings = draft.showInRankings;
     // Adım, doğrulamanın izin verdiği yerden ileride olamaz.
     var step = draft.step.clamp(0, _totalSteps - 1);
     if (birthYear == null || _currentYear - birthYear < _minimumAge) step = 0;
-    if (selected.isEmpty && step > _categoryStep) step = _categoryStep;
+    if ((selected.isEmpty || legacyAutoFill) && step > _categoryStep) step = _categoryStep;
     if (showInRankings == null && step > _visibilityStep) step = _visibilityStep;
 
     setState(() {
@@ -175,6 +193,9 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
       _selectedCategoryNames
         ..clear()
         ..addAll(selected);
+      _autoCategoryNames
+        ..clear()
+        ..addAll(auto);
       _dailyGoalMinutes = goal;
     });
     final restoredYear = _birthYear;
@@ -279,7 +300,8 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
       // gösterilir ve kategori kurulumu tekrar güvenle çalışır.
       await service.completeOnboarding(
         birthYear: _birthYear,
-        // "Diğer" sunucuda saklanmaz (CHECK yalnızca dört segmenti kabul eder).
+        // "Diğer" sunucuda saklanmaz (CHECK'te yok). 'kpss'/'language'yı
+        // CHECK'i genişletilmemiş sunucu reddederse servis segmentsiz bitirir.
         userSegment: _userSegment == _otherSegment ? null : _userSegment,
         dailyGoalMinutes: _dailyGoalMinutes,
         categories: _categoryPayload(),
@@ -371,17 +393,42 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
     }
   }
 
+  /// Segment seçilince önerileri otomatik seçili gelir (limite kadar).
+  /// Önceki segmentten otomatik gelenler çıkar; kullanıcının elle seçtikleri
+  /// ve özel kategorileri korunur.
   void _selectSegment(String value) {
     if (_userSegment == value) return;
     setState(() {
       _userSegment = value;
-      _selectedCategoryNames.clear();
+      _selectedCategoryNames.removeAll(_autoCategoryNames);
+      _autoCategoryNames
+        ..clear()
+        ..addAll(autoSelectedCategoryNames(value, kept: _selectedCategoryNames, limit: _categoryLimit));
+      _selectedCategoryNames.addAll(_autoCategoryNames);
     });
+  }
+
+  /// Kategori adımındaki çipler: segmentin önerileri, özel kategoriler ve
+  /// önceki segmentten elle seçilip korunanlar. Aynı kategori (dilden
+  /// bağımsız ad) bir kez görünür; seçili olan ad öne geçer.
+  List<String> get _categoryChipNames {
+    final byKey = <String, String>{};
+    for (final name in [..._recommendedCategoryNames, ..._customCategoryNames, ..._selectedCategoryNames]) {
+      final key = categoryMatchKey(name);
+      final shown = byKey[key];
+      if (shown == null || (!_selectedCategoryNames.contains(shown) && _selectedCategoryNames.contains(name))) {
+        byKey[key] = name;
+      }
+    }
+    return byKey.values.toList();
   }
 
   void _toggleCategory(String name, bool select) {
     if (!select) {
-      setState(() => _selectedCategoryNames.remove(name));
+      setState(() {
+        _selectedCategoryNames.remove(name);
+        _autoCategoryNames.remove(name);
+      });
       return;
     }
     if (_selectedCategoryNames.length >= _categoryLimit) {
@@ -403,7 +450,7 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
       hintText: l10n.onboardingCategoryHint,
       confirmLabel: l10n.addBtn,
       showColorPicker: false,
-      takenNames: [..._recommendedCategoryNames, ..._customCategoryNames],
+      takenNames: _categoryChipNames,
     );
     if (result == null || !mounted) return;
     setState(() {
@@ -725,6 +772,9 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
     final options = [
       _optionButton(l10n.onboardingSegmentLgs, _userSegment == 'lgs', () => _selectSegment('lgs'), isDark, textColor),
       _optionButton(l10n.onboardingSegmentYks, _userSegment == 'yks', () => _selectSegment('yks'), isDark, textColor),
+      _optionButton(l10n.onboardingSegmentKpss, _userSegment == 'kpss', () => _selectSegment('kpss'), isDark, textColor),
+      _optionButton(l10n.onboardingSegmentLanguage, _userSegment == 'language', () => _selectSegment('language'),
+          isDark, textColor),
       _optionButton(l10n.onboardingSegmentUniversity, _userSegment == 'university',
           () => _selectSegment('university'), isDark, textColor),
       _optionButton(l10n.onboardingSegmentWork, _userSegment == 'work', () => _selectSegment('work'), isDark, textColor),
@@ -814,11 +864,13 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
         onSelected: (val) => _toggleCategory(name, val),
       );
     }
-    final title = Text(l10n.onboardingCategoryStepTitle,
+    // Hedef seçildiyse öneriler hazır gelir: başlık ve açıklama bunu söyler.
+    final prepared = _userSegment != null && _userSegment != _otherSegment;
+    final title = Text(prepared ? l10n.onboardingCategoryStepPreparedTitle : l10n.onboardingCategoryStepTitle,
         textAlign: TextAlign.center,
         style: TextStyle(fontSize: sideBySide ? 22 : 26, fontWeight: FontWeight.bold, color: textColor));
     final body = Text(
-      l10n.onboardingCategoryStepBodyLimit(limit),
+      prepared ? l10n.onboardingCategoryStepPreparedBody(limit) : l10n.onboardingCategoryStepBodyLimit(limit),
       textAlign: TextAlign.center,
       style: TextStyle(fontSize: 13, color: textColor.withValues(alpha: 0.7)),
     );
@@ -840,7 +892,7 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
       runSpacing: 10,
       alignment: WrapAlignment.center,
       children: [
-        for (final name in [..._recommendedCategoryNames, ..._customCategoryNames]) chip(name),
+        for (final name in _categoryChipNames) chip(name),
       ],
     );
     // Metin '+' içerdiği için ayrıca ikon kullanılmaz.

@@ -1186,9 +1186,12 @@ class SupabaseService {
     await prefs.setBool(_dailyGoalMigratedKey(uid), true);
   }
 
-  /// Sunucudaki profiles_user_segment_check ile aynı küme; dışındaki değer
-  /// (ör. onboarding'deki "Diğer") null yazılır.
-  static const Set<String> validUserSegments = {'lgs', 'yks', 'university', 'work'};
+  /// Onboarding'in yazdığı hedefler; dışındaki değer (ör. "Diğer") null
+  /// yazılır. Canlıdaki profiles_user_segment_check yalnızca 'lgs', 'yks',
+  /// 'university', 'work'ü kabul eder; 'kpss' ve 'language' supabase/proposed/26
+  /// ile eklenir. 26 uygulanmadan reddedilirse [completeOnboarding] segmentsiz
+  /// tamamlar ([writeOnboardingProfileWithSegmentFallback]).
+  static const Set<String> validUserSegments = {'lgs', 'yks', 'kpss', 'language', 'university', 'work'};
 
   /// Onboarding'in profiles satırına yazdığı alanlar. Doğum yılı CHECK
   /// aralığı (1900..2100) dışındaysa, segment bilinen kümede değilse null
@@ -1216,10 +1219,42 @@ class SupabaseService {
     };
   }
 
+  /// Hata, profiles_user_segment_check ihlali mi (23514)? Sunucu yeni hedefi
+  /// ('kpss', 'language'; proposed/26) henüz tanımıyor demektir.
+  @visibleForTesting
+  static bool isUserSegmentCheckViolation(Object error) {
+    final cause = error is ServiceException ? error.cause : error;
+    if (cause is! PostgrestException || cause.code != '23514') return false;
+    return '${cause.message} ${cause.details ?? ''}'.toLowerCase().contains('user_segment');
+  }
+
+  /// Onboarding profil güncellemesini [write] ile yazar ve yazılan değerleri
+  /// döndürür. Sunucu segmenti CHECK ile reddederse (proposed/26 canlıda
+  /// değil) güncelleme segment null olarak bir kez daha yazılır: onboarding
+  /// tamamlanır, kullanıcı hata görmez (kategoriler bundan önce kuruldu).
+  /// Diğer hatalar olduğu gibi fırlatılır.
+  @visibleForTesting
+  static Future<Map<String, dynamic>> writeOnboardingProfileWithSegmentFallback(
+    Map<String, dynamic> update,
+    Future<void> Function(Map<String, dynamic> values) write,
+  ) async {
+    try {
+      await write(update);
+      return update;
+    } catch (e) {
+      if (update['user_segment'] == null || !isUserSegmentCheckViolation(e)) rethrow;
+      debugPrint('[DATA] Sunucu segmenti tanımıyor (proposed/26 yok); onboarding segmentsiz tamamlanıyor.');
+      final fallback = {...update, 'user_segment': null};
+      await write(fallback);
+      return fallback;
+    }
+  }
+
   /// Onboarding'i tek adımda tamamlar: profil satırını garanti eder,
   /// kategorileri oluşturur, ardından profil alanlarını yazar (kategoriler
   /// profile yabancı anahtarla bağlı olduğu için sıra önemli). Güncelleme
-  /// hiçbir satıra uymazsa hata fırlatır.
+  /// hiçbir satıra uymazsa hata fırlatır. Segment sunucuda tanınmıyorsa
+  /// segmentsiz yazılır ([writeOnboardingProfileWithSegmentFallback]).
   Future<void> completeOnboarding({
     int? birthYear,
     String? userSegment,
@@ -1242,16 +1277,18 @@ class SupabaseService {
       showInSocialFeed: showInSocialFeed,
       completedAt: completedAt,
     );
-    final rows = await _guard(() => _client.from('profiles').update(update).eq('id', authUser.id).select('id'));
-    if (rows.isEmpty) throw const ServiceException(ServiceErrorCode.notFound);
+    final written = await writeOnboardingProfileWithSegmentFallback(update, (values) async {
+      final rows = await _guard(() => _client.from('profiles').update(values).eq('id', authUser.id).select('id'));
+      if (rows.isEmpty) throw const ServiceException(ServiceErrorCode.notFound);
+    });
     _socialVisibleCache = showInSocialFeed;
     _socialVisibleCacheUid = authUser.id;
     _updateUserIfCurrent(
       authUser.id,
       epoch,
       (user) => user.copyWith(
-        birthYear: update['birth_year'] as int?,
-        userSegment: update['user_segment'] as String?,
+        birthYear: written['birth_year'] as int?,
+        userSegment: written['user_segment'] as String?,
         dailyGoalMinutes: dailyGoalMinutes,
         onboardingCompletedAt: completedAt,
       ),

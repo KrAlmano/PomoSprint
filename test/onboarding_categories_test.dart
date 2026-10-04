@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro/models/category_model.dart';
 import 'package:pomodoro/services/onboarding_categories.dart';
+import 'package:pomodoro/utils/category_names.dart';
 
 CourseCategory _cat(String id, String name, {bool archived = false}) =>
     CourseCategory(id: id, name: name, color: Colors.red, icon: Icons.book, isArchived: archived);
@@ -80,6 +81,68 @@ void main() {
       expect(_names(general), ['Ders Çalışma', 'Okuma', 'Öğrenme', 'Proje']);
       expect(general.map((c) => c['color_hex']).toSet(), hasLength(general.length));
       expect(general.every((c) => c['icon_name'] == 'book'), isTrue);
+    });
+  });
+
+  group('Yeni hedefler: KPSS ve dil sınavı', () {
+    test('öneriler ve kategorisiz hesabın varsayılanı', () {
+      expect(recommendedCategoryNames('kpss'),
+          ['Türkçe', 'Matematik', 'Tarih', 'Coğrafya', 'Vatandaşlık', 'Güncel Bilgiler', 'Eğitim Bilimleri']);
+      expect(recommendedCategoryNames('language'), ['Kelime', 'Okuma', 'Dilbilgisi', 'Dinleme', 'Yazma', 'Konuşma']);
+      expect(_names(defaultCategorySeed(segment: 'kpss', turkish: false)),
+          ['Turkish', 'Mathematics', 'History', 'Geography', 'Citizenship']);
+      expect(_names(defaultCategorySeed(segment: 'language', turkish: false)),
+          ['Vocabulary', 'Reading', 'Grammar', 'Listening', 'Writing']);
+    });
+
+    test('her öneri iki dilde bilinir; TR ve EN adı aynı kategori anahtarına düşer', () {
+      final all = {...kGeneralCategoryRecommendations, for (final names in kRecommendedCategoriesBySegment.values) ...names};
+      for (final name in all) {
+        final en = localizedKnownCategoryName(name, turkish: false);
+        expect(en, isNot(name), reason: '$name için İngilizce karşılık yok');
+        expect(localizedKnownCategoryName(en, turkish: true), name);
+        expect(categoryMatchKey(en), categoryMatchKey(name));
+        expect(isRecommendedCategoryName(name), isTrue);
+      }
+      expect(isRecommendedCategoryName('Kendi Kategorim'), isFalse);
+    });
+
+    test('dilden bağımsız eşleme bozulmaz: hiçbir ad iki ayrı kategoriye düşmez', () {
+      final keyOfName = <String, String>{};
+      for (final (tr, en) in kKnownCategoryNames) {
+        for (final name in [tr, en]) {
+          final normalized = name.trim().toLowerCase().replaceAll('\u0307', '');
+          final previous = keyOfName[normalized];
+          expect(previous == null || previous == tr, isTrue, reason: "'$name' hem '$previous' hem '$tr' eşinde");
+          keyOfName[normalized] = tr;
+        }
+      }
+      // Yeni eşler mevcut eşlemeyi değiştirmez.
+      expect(categoryMatchKey('Reading'), categoryMatchKey('Okuma'));
+      expect(categoryMatchKey('Grammar'), isNot(categoryMatchKey('Türkçe')));
+      expect(categoryMatchKey('Speaking'), categoryMatchKey('konuşma'));
+    });
+  });
+
+  group('Hedefe göre otomatik seçilen öneriler', () {
+    test('segmentin önerileri sırayla, limite kadar', () {
+      expect(autoSelectedCategoryNames('yks', kept: const [], limit: 8),
+          ['Matematik', 'Fizik', 'Kimya', 'Biyoloji', 'Türkçe', 'Tarih', 'Coğrafya', 'Felsefe']);
+      expect(autoSelectedCategoryNames('yks', kept: const [], limit: 15), recommendedCategoryNames('yks'));
+      expect(autoSelectedCategoryNames('kpss', kept: const [], limit: 8), recommendedCategoryNames('kpss'));
+      expect(autoSelectedCategoryNames(null, kept: const [], limit: 8), kGeneralCategoryRecommendations);
+    });
+
+    test('elle seçilenler korunur, limite sayılır ve aynı kategori iki kez seçilmez', () {
+      // Elle seçilen 'Felsefe' + KPSS'nin 7 önerisi = 8.
+      expect(autoSelectedCategoryNames('kpss', kept: ['Felsefe'], limit: 8), recommendedCategoryNames('kpss'));
+      // İki elle seçim: KPSS'nin ilk 6'sı.
+      expect(autoSelectedCategoryNames('kpss', kept: ['Felsefe', 'Kendi'], limit: 8),
+          recommendedCategoryNames('kpss').take(6).toList());
+      // 'Mathematics' (İngilizce özel ad) = 'Matematik': yeniden seçilmez.
+      expect(autoSelectedCategoryNames('kpss', kept: ['Mathematics'], limit: 8),
+          ['Türkçe', 'Tarih', 'Coğrafya', 'Vatandaşlık', 'Güncel Bilgiler', 'Eğitim Bilimleri']);
+      expect(autoSelectedCategoryNames('language', kept: List.generate(8, (i) => 'K$i'), limit: 8), isEmpty);
     });
   });
 }
