@@ -53,6 +53,7 @@
 | `flutter test` | Her değişiklikten sonra | Hepsi yeşil (birim + widget testleri; raporlar için `reports_correctness_test`, `reports_findings_test`, kategoriler için `categories_findings_test`). Gün hesabına dokunduysan `TZ=America/New_York flutter test` ile de çalıştır |
 | `flutter run --profile` / `--release` | Gerçek seans ve puan testi | Debug build'de sayaç 5/10 sn'dir, sunucu bu seansları reddeder |
 | `supabase/tests/run_local.sh` | SQL değişikliği; **yalnızca yerel Postgres** | ASSERT'ler geçer. `live_audit_fixes` varsayılan olarak atlanır |
+| `supabase start --workdir tool/local_supabase` | Test hesabıyla deneme (canlının Docker'daki birebir kopyası; uygulama `--dart-define` / VS Code "PomoSprint (yerel Supabase)") | `tool/local_supabase/parity_check.sh` → hepsi `aynı`. Test hesapları yalnızca burada; ayrıntı `tool/local_supabase/README.md` |
 | `python3 landing/tools/sync_partials.py --check` | Site değişikliğinden sonra | Çıkış kodu 0 |
 | `cd scripts && npm test` | `landing/js`, `supabase/functions`, `scripts/send_newsletter.js` değişikliğinden sonra | Hepsi yeşil. Ağsız: Edge Function'lar sahte Supabase ile, site betikleri sahte DOM ile (`scripts/test/`); Node 22.18+ ya da 23.6+ (bayraksız TypeScript ayıklama ve `module.registerHooks`) |
 | `cd scripts && node security_regression_test.js` | **Yalnızca kullanıcı onayıyla.** Gerçek hesap açar ve siler | Bazı senaryolar canlıda olmayan `proposed/11` yüzünden bilinçli kırmızı |

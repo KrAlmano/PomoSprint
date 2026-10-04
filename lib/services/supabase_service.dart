@@ -18,6 +18,7 @@ import '../models/study_session.dart';
 import '../models/user_model.dart';
 import '../utils/name_filter.dart';
 import '../utils/study_day.dart';
+import 'backend_config.dart';
 import 'hidden_users.dart';
 import 'lock_screen_timer.dart';
 import 'notification_service.dart';
@@ -217,12 +218,16 @@ class SupabaseService {
 
     try {
       await dotenv.load(fileName: ".env");
-      if (dotenv.isInitialized) {
-        url = dotenv.env['SUPABASE_URL'] ?? '';
-        anonKey = dotenv.env['SUPABASE_ANON_KEY'] ?? '';
-      }
     } catch (e) {
       debugPrint('[INIT] .env okunamadı: $e');
+    }
+    // --dart-define SUPABASE_URL + SUPABASE_ANON_KEY (ör. yerel Supabase
+    // kopyası) verilmişse .env'in önüne geçer (BackendConfig).
+    final backend = BackendConfig.resolve(dotenv.isInitialized ? dotenv.env : const {});
+    url = backend.supabaseUrl;
+    anonKey = backend.supabaseAnonKey;
+    if (backend.source == BackendConfigSource.incompleteDartDefine) {
+      debugPrint('[INIT] SUPABASE_URL ve SUPABASE_ANON_KEY birlikte verilmeli; bulut kapalı.');
     }
 
     if (url.isEmpty ||

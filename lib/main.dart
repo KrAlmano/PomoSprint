@@ -9,6 +9,7 @@ import 'app/error_reporting.dart';
 import 'app/theme_controller.dart';
 import 'l10n/app_localizations.dart';
 import 'screens/splash_screen.dart';
+import 'services/backend_config.dart';
 import 'services/language_service.dart';
 import 'services/notification_service.dart';
 import 'theme.dart';
@@ -21,13 +22,16 @@ Future<void> main() async {
   // SupabaseService.initialize() aynı dosyayı kendi ihtiyacı için tekrar
   // yükler, bu zararsızdır. DSN boşsa Sentry SDK kendini otomatik devre
   // dışı bırakır — .env'de SENTRY_DSN olmaması uygulamayı bozmaz.
-  String sentryDsn = '';
+  // --dart-define ile Supabase verilmişse (ör. yerel kopya) DSN yalnızca
+  // --dart-define=SENTRY_DSN'den gelir; verilmezse Sentry kapalı (BackendConfig).
+  Map<String, String> env = const {};
   try {
     await dotenv.load(fileName: ".env");
-    sentryDsn = dotenv.env['SENTRY_DSN'] ?? '';
+    env = dotenv.env;
   } catch (_) {
     // .env okunamazsa (ör. asset eksik) Sentry'siz devam et.
   }
+  final sentryDsn = BackendConfig.resolve(env).sentryDsn;
 
   await SentryFlutter.init(
     (options) => configureSentry(options, dsn: sentryDsn),

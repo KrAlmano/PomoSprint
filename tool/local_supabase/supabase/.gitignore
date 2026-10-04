@@ -1,0 +1,10 @@
+# Supabase
+.branches
+.temp/*
+# Canlıyla aynı Postgres imajı (17.6.1.147): CLI bu dosyayı okur.
+!.temp/postgres-version
+
+# dotenvx
+.env.keys
+.env.local
+.env.*.local

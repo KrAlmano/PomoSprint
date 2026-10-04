@@ -1,0 +1,249 @@
+col	activity_feed.activity_date date notnull=true default= identity= generated= collation= acl= comment=
+col	activity_feed.activity_type text notnull=true default= identity= generated= collation= acl= comment=
+col	activity_feed.created_at timestamp with time zone notnull=true default=now() identity= generated= collation= acl= comment=
+col	activity_feed.id uuid notnull=true default=gen_random_uuid() identity= generated= collation= acl= comment=
+col	activity_feed.payload jsonb notnull=true default= identity= generated= collation= acl= comment=
+col	activity_feed.updated_at timestamp with time zone notnull=true default=now() identity= generated= collation= acl= comment=
+col	activity_feed.user_id uuid notnull=true default= identity= generated= collation= acl= comment=
+col	avatar_unlocks.avatar_id text notnull=true default= identity= generated= collation= acl= comment=
+col	avatar_unlocks.coins_spent integer notnull=true default=0 identity= generated= collation= acl= comment=
+col	avatar_unlocks.id uuid notnull=true default=gen_random_uuid() identity= generated= collation= acl= comment=
+col	avatar_unlocks.unlock_type text notnull=true default= identity= generated= collation= acl= comment=
+col	avatar_unlocks.unlocked_at timestamp with time zone notnull=true default=now() identity= generated= collation= acl= comment=
+col	avatar_unlocks.user_id uuid notnull=true default= identity= generated= collation= acl= comment=
+col	avatars.asset_key text notnull=true default= identity= generated= collation= acl= comment=
+col	avatars.cost_coins integer notnull=true default=0 identity= generated= collation= acl= comment=
+col	avatars.created_at timestamp with time zone notnull=true default=now() identity= generated= collation= acl= comment=
+col	avatars.id text notnull=true default= identity= generated= collation= acl= comment=
+col	avatars.is_active boolean notnull=true default=true identity= generated= collation= acl= comment=
+col	avatars.is_default boolean notnull=true default=false identity= generated= collation= acl= comment=
+col	avatars.is_league_award boolean notnull=true default=false identity= generated= collation= acl= comment=
+col	avatars.is_premium_only boolean notnull=true default=false identity= generated= collation= acl= comment=
+col	avatars.name_en text notnull=true default= identity= generated= collation= acl= comment=
+col	avatars.name_tr text notnull=true default= identity= generated= collation= acl= comment=
+col	avatars.sort_order integer notnull=true default=0 identity= generated= collation= acl= comment=
+col	categories.color_hex text notnull=true default= identity= generated= collation= acl= comment=
+col	categories.created_at timestamp with time zone notnull=true default=now() identity= generated= collation= acl= comment=
+col	categories.icon_name text notnull=false default= identity= generated= collation= acl= comment=
+col	categories.id uuid notnull=true default=gen_random_uuid() identity= generated= collation= acl= comment=
+col	categories.is_archived boolean notnull=true default=false identity= generated= collation= acl= comment=
+col	categories.name text notnull=true default= identity= generated= collation= acl= comment=
+col	categories.sort_order integer notnull=true default=0 identity= generated= collation= acl= comment=
+col	categories.user_id uuid notnull=true default= identity= generated= collation= acl= comment=
+col	friendships.created_at timestamp with time zone notnull=true default=now() identity= generated= collation= acl= comment=
+col	friendships.friend_id uuid notnull=true default= identity= generated= collation= acl= comment=
+col	friendships.status text notnull=true default='accepted'::text identity= generated= collation= acl= comment=
+col	friendships.user_id uuid notnull=true default= identity= generated= collation= acl= comment=
+col	league_memberships.id uuid notnull=true default=gen_random_uuid() identity= generated= collation= acl= comment=
+col	league_memberships.joined_at timestamp with time zone notnull=true default=now() identity= generated= collation= acl= comment=
+col	league_memberships.league_id uuid notnull=false default= identity= generated= collation= acl= comment=
+col	league_memberships.user_id uuid notnull=false default= identity= generated= collation= acl= comment=
+col	league_memberships.weekly_points integer notnull=true default=0 identity= generated= collation= acl= comment=
+col	leagues.end_date timestamp with time zone notnull=true default= identity= generated= collation= acl= comment=
+col	leagues.id uuid notnull=true default=gen_random_uuid() identity= generated= collation= acl= comment=
+col	leagues.is_active boolean notnull=true default=true identity= generated= collation= acl= comment=
+col	leagues.start_date timestamp with time zone notnull=true default=now() identity= generated= collation= acl= comment=
+col	leagues.tier integer notnull=true default=1 identity= generated= collation= acl= comment=
+col	marketing_subscribers.email text notnull=true default= identity= generated= collation= acl= comment=
+col	marketing_subscribers.id uuid notnull=true default=uuid_generate_v4() identity= generated= collation= acl= comment=
+col	marketing_subscribers.subscribed_at timestamp with time zone notnull=false default=now() identity= generated= collation= acl= comment=
+col	marketing_subscribers.unsubscribe_token uuid notnull=true default=gen_random_uuid() identity= generated= collation= acl= comment=
+col	marketing_subscribers.user_id uuid notnull=false default= identity= generated= collation= acl= comment=
+col	marketing_subscribers.welcome_sent_at timestamp with time zone notnull=false default= identity= generated= collation= acl= comment=
+col	profiles.active_session_category_name text notnull=false default= identity= generated= collation= acl=authenticated=r/postgres comment=
+col	profiles.active_session_ends_at timestamp with time zone notnull=false default= identity= generated= collation= acl=authenticated=r/postgres comment=
+col	profiles.avatar_id text notnull=false default='avatar_16_basic'::text identity= generated= collation= acl=authenticated=ar/postgres comment=
+col	profiles.birth_year integer notnull=false default= identity= generated= collation= acl=authenticated=rw/postgres comment=
+col	profiles.coins integer notnull=true default=0 identity= generated= collation= acl=authenticated=r/postgres comment=
+col	profiles.created_at timestamp with time zone notnull=false default=now() identity= generated= collation= acl=authenticated=r/postgres comment=
+col	profiles.current_streak integer notnull=false default=0 identity= generated= collation= acl=authenticated=r/postgres comment=
+col	profiles.daily_goal_minutes integer notnull=false default= identity= generated= collation= acl=authenticated=rw/postgres comment=
+col	profiles.email text notnull=true default= identity= generated= collation= acl=authenticated=a/postgres comment=
+col	profiles.friend_code character varying(8) notnull=false default=upper(substr(replace((gen_random_uuid())::text, '-'::text, ''::text), 1, 6)) identity= generated= collation= acl=authenticated=r/postgres comment=
+col	profiles.id uuid notnull=true default= identity= generated= collation= acl=authenticated=ar/postgres comment=
+col	profiles.is_premium boolean notnull=false default=false identity= generated= collation= acl=authenticated=r/postgres comment=
+col	profiles.last_study_date date notnull=false default= identity= generated= collation= acl=authenticated=r/postgres comment=
+col	profiles.league_tier integer notnull=true default=1 identity= generated= collation= acl=authenticated=r/postgres comment=
+col	profiles.lifetime_points integer notnull=true default=0 identity= generated= collation= acl=authenticated=r/postgres comment=
+col	profiles.longest_streak integer notnull=true default=0 identity= generated= collation= acl=authenticated=r/postgres comment=
+col	profiles.name text notnull=true default= identity= generated= collation= acl=authenticated=arw/postgres comment=
+col	profiles.onboarding_completed_at timestamp with time zone notnull=false default= identity= generated= collation= acl=authenticated=rw/postgres comment=
+col	profiles.show_in_social_feed boolean notnull=true default=true identity= generated= collation= acl=authenticated=rw/postgres comment=
+col	profiles.timezone text notnull=true default='Europe/Istanbul'::text identity= generated= collation= acl=authenticated=rw/postgres comment=
+col	profiles.total_minutes integer notnull=false default=0 identity= generated= collation= acl=authenticated=r/postgres comment=
+col	profiles.user_segment text notnull=false default= identity= generated= collation= acl=authenticated=rw/postgres comment=
+col	study_sessions.base_points integer notnull=true default=0 identity= generated= collation= acl= comment=
+col	study_sessions.bonus_points integer notnull=true default=0 identity= generated= collation= acl= comment=
+col	study_sessions.category text notnull=true default= identity= generated= collation= acl= comment=
+col	study_sessions.category_id uuid notnull=false default= identity= generated= collation= acl= comment=
+col	study_sessions.client_uuid uuid notnull=false default= identity= generated= collation= acl= comment=
+col	study_sessions.completed_at timestamp with time zone notnull=true default=now() identity= generated= collation= acl= comment=
+col	study_sessions.duration_minutes integer notnull=true default= identity= generated= collation= acl= comment=
+col	study_sessions.id uuid notnull=true default=gen_random_uuid() identity= generated= collation= acl= comment=
+col	study_sessions.is_verified integer notnull=true default=0 identity= generated= collation= acl= comment=
+col	study_sessions.started_at timestamp with time zone notnull=false default= identity= generated= collation= acl= comment=
+col	study_sessions.user_id uuid notnull=true default= identity= generated= collation= acl= comment=
+col	study_sessions.was_paused boolean notnull=true default=false identity= generated= collation= acl= comment=
+col	waitlist.created_at timestamp with time zone notnull=false default=now() identity= generated= collation= acl= comment=
+col	waitlist.email text notnull=true default= identity= generated= collation= acl= comment=
+col	waitlist.id uuid notnull=true default=gen_random_uuid() identity= generated= collation= acl= comment=
+con	activity_feed activity_feed_activity_type_check c CHECK ((activity_type = ANY (ARRAY['daily_summary'::text, 'streak_milestone'::text, 'league_promotion'::text, 'daily_4h_milestone'::text]))) deferrable=false validated=true
+con	activity_feed activity_feed_pkey p PRIMARY KEY (id) deferrable=false validated=true
+con	activity_feed activity_feed_user_id_activity_type_activity_date_key u UNIQUE (user_id, activity_type, activity_date) deferrable=false validated=true
+con	activity_feed activity_feed_user_id_fkey f FOREIGN KEY (user_id) REFERENCES profiles(id) ON DELETE CASCADE deferrable=false validated=true
+con	avatar_unlocks avatar_unlocks_avatar_id_fkey f FOREIGN KEY (avatar_id) REFERENCES avatars(id) deferrable=false validated=true
+con	avatar_unlocks avatar_unlocks_pkey p PRIMARY KEY (id) deferrable=false validated=true
+con	avatar_unlocks avatar_unlocks_unlock_type_check c CHECK ((unlock_type = ANY (ARRAY['coins'::text, 'premium'::text, 'default'::text, 'league_award'::text]))) deferrable=false validated=true
+con	avatar_unlocks avatar_unlocks_user_id_avatar_id_key u UNIQUE (user_id, avatar_id) deferrable=false validated=true
+con	avatar_unlocks avatar_unlocks_user_id_fkey f FOREIGN KEY (user_id) REFERENCES profiles(id) ON DELETE CASCADE deferrable=false validated=true
+con	avatars avatars_pkey p PRIMARY KEY (id) deferrable=false validated=true
+con	categories categories_pkey p PRIMARY KEY (id) deferrable=false validated=true
+con	categories categories_user_id_fkey f FOREIGN KEY (user_id) REFERENCES profiles(id) ON DELETE CASCADE deferrable=false validated=true
+con	friendships friendships_friend_id_fkey f FOREIGN KEY (friend_id) REFERENCES auth.users(id) ON DELETE CASCADE deferrable=false validated=true
+con	friendships friendships_pkey p PRIMARY KEY (user_id, friend_id) deferrable=false validated=true
+con	friendships friendships_status_check c CHECK ((status = ANY (ARRAY['pending'::text, 'accepted'::text]))) deferrable=false validated=true
+con	friendships friendships_user_id_fkey f FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE deferrable=false validated=true
+con	league_memberships league_memberships_league_id_fkey f FOREIGN KEY (league_id) REFERENCES leagues(id) ON DELETE CASCADE deferrable=false validated=true
+con	league_memberships league_memberships_league_id_user_id_key u UNIQUE (league_id, user_id) deferrable=false validated=true
+con	league_memberships league_memberships_pkey p PRIMARY KEY (id) deferrable=false validated=true
+con	league_memberships league_memberships_user_id_fkey f FOREIGN KEY (user_id) REFERENCES profiles(id) ON DELETE CASCADE deferrable=false validated=true
+con	leagues leagues_pkey p PRIMARY KEY (id) deferrable=false validated=true
+con	leagues leagues_tier_check c CHECK (((tier >= 1) AND (tier <= 5))) deferrable=false validated=true
+con	marketing_subscribers marketing_subscribers_pkey p PRIMARY KEY (id) deferrable=false validated=true
+con	marketing_subscribers marketing_subscribers_user_id_fkey f FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE deferrable=false validated=true
+con	profiles profiles_birth_year_range_check c CHECK (((birth_year IS NULL) OR ((birth_year >= 1900) AND (birth_year <= 2100)))) deferrable=false validated=true
+con	profiles profiles_daily_goal_range_check c CHECK (((daily_goal_minutes IS NULL) OR ((daily_goal_minutes >= 5) AND (daily_goal_minutes <= 1440)))) deferrable=false validated=true
+con	profiles profiles_id_fkey f FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE deferrable=false validated=true
+con	profiles profiles_league_tier_check c CHECK (((league_tier >= 1) AND (league_tier <= 5))) deferrable=false validated=true
+con	profiles profiles_name_length_check c CHECK (((char_length(btrim(name)) >= 1) AND (char_length(btrim(name)) <= 50))) deferrable=false validated=true
+con	profiles profiles_pkey p PRIMARY KEY (id) deferrable=false validated=true
+con	profiles profiles_user_segment_check c CHECK ((user_segment = ANY (ARRAY['lgs'::text, 'yks'::text, 'university'::text, 'work'::text]))) deferrable=false validated=true
+con	study_sessions study_sessions_category_id_fkey f FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL deferrable=false validated=true
+con	study_sessions study_sessions_pkey p PRIMARY KEY (id) deferrable=false validated=true
+con	study_sessions study_sessions_user_id_fkey f FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE deferrable=false validated=true
+con	waitlist waitlist_email_format_check c CHECK (((email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'::text) AND (length(email) <= 254))) deferrable=false validated=true
+con	waitlist waitlist_email_key u UNIQUE (email) deferrable=false validated=true
+con	waitlist waitlist_pkey p PRIMARY KEY (id) deferrable=false validated=true
+cron	cleanup_activity_feed_job 0 3 * * * cmd_md5=4f882db00628d8169a16e11ba7b3a583 active=true user=postgres db=postgres
+cron	weekly_leagues_job 1 21 * * 0 cmd_md5=0377a8dd0d765d384aff17462ae265d9 active=true user=postgres db=postgres
+defacl	postgres S anon=rwU/postgres,authenticated=rwU/postgres,postgres=rwU/postgres,service_role=rwU/postgres
+defacl	postgres f anon=X/postgres,authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres
+defacl	postgres r anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres
+defacl	supabase_admin S anon=rwU/supabase_admin,authenticated=rwU/supabase_admin,postgres=rwU/supabase_admin,service_role=rwU/supabase_admin
+defacl	supabase_admin f anon=X/supabase_admin,authenticated=X/supabase_admin,postgres=X/supabase_admin,service_role=X/supabase_admin
+defacl	supabase_admin r anon=arwdDxtm/supabase_admin,authenticated=arwdDxtm/supabase_admin,postgres=arwdDxtm/supabase_admin,service_role=arwdDxtm/supabase_admin
+ext	pg_cron schema=pg_catalog
+ext	pg_net schema=public
+ext	pg_stat_statements schema=extensions
+ext	pgcrypto schema=extensions
+ext	plpgsql schema=pg_catalog
+ext	supabase_vault schema=vault
+ext	uuid-ossp schema=extensions
+extver	pg_cron 1.6.4
+extver	pg_net 0.20.4
+extver	pg_stat_statements 1.11
+extver	pgcrypto 1.3
+extver	plpgsql 1.0
+extver	supabase_vault 0.3.1
+extver	uuid-ossp 1.1
+func	add_friend_by_code(p_code text) md5=d59affef7f113a3072d2de604bb9506f secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	cancel_study_session() md5=7c1adf25d21513e01f70ffe792957ba2 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	cleanup_unconfirmed_duplicate_identity(p_email text) md5=d700cfe622ef8f6904d26f0ccffe447a secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	complete_study_session(p_client_uuid uuid, p_category_id uuid, p_duration_minutes integer, p_was_paused boolean, p_is_verified integer, p_started_at timestamp with time zone) md5=592ede066173f30b64006f02b5141756 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	create_category(p_name text, p_color_hex text, p_icon_name text) md5=244a497256ecaa6bf03228187c5e53fc secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	delete_own_account() md5=f776ef3ebcd3f843cbe5c090cda2c002 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	enforce_category_limit() md5=15eec60b4e8bbb9b6d7b4542028af9d4 secdef=true owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
+func	ensure_user_in_league(p_user_id uuid, p_points integer) md5=e5674f687157135f7c5feaba2de56a7e secdef=true owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
+func	get_friends_feed(p_limit integer) md5=967aa64529d97c8730a8065f594a22b4 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	get_incoming_friend_requests() md5=de9f1fd811b87172bd7f59aff204bf66 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	get_league_ranking(p_user_id uuid) md5=81232005815cf301aa8ce29e882d5139 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	get_league_zones(p_member_count integer) md5=a6f397d1030391e2913e87ed681f2009 secdef=false owner=postgres acl=anon=X/postgres,authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	get_live_friends() md5=174841fa81aff71912908ebcfe0935ff secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	get_my_friends() md5=c914de18b0e6f080c7b3fe4f4fead8b2 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	get_my_league_ids() md5=550b3c8a63430f51da6302037319e33a secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	get_my_league_ranking() md5=cdcb245dd779a9eb7b651ec5a27426c5 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	get_points_config() md5=3c81d0f3e89a0e655cb62b472d7c91c9 secdef=false owner=postgres acl=anon=X/postgres,authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	get_public_alltime_leaderboard(p_limit integer) md5=60aac1f74b39ab6af9c5399cf285c607 secdef=true owner=postgres acl=anon=X/postgres,authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	get_public_monthly_leaderboard(p_limit integer) md5=801f6f83e6dbe4cf1394f7c1751a407d secdef=true owner=postgres acl=anon=X/postgres,authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	give_default_avatars() md5=bb36a4f2baa93af319c5f4e0ec3fe74f secdef=true owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
+func	handle_new_user() md5=ae6cedf2e0e0995ec759b69e20ada604 secdef=true owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
+func	handle_newsletter_subscription() md5=d909d0550cfd1894844757e2f0318609 secdef=true owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
+func	invoke_send_welcome_email() md5=cbe2d410b614849ea270e88e9f638c53 secdef=true owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
+func	league_award_avatar_id(p_tier integer, p_rank integer) md5=f6ed7f1c88a233f1a08bc67713b886e6 secdef=false owner=postgres acl=anon=X/postgres,authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	mask_public_name(p_name text) md5=124a0ddc389a4d352c65f4b554b12d7f secdef=false owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
+func	process_weekly_leagues() md5=3d547d20a94f32e3cf531a7c3888d536 secdef=true owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
+func	purchase_avatar(p_avatar_id text) md5=e328cbd5acfcc916141ce79ee7f684af secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	respond_friend_request(p_from_user_id uuid, p_accept boolean) md5=461b0959105c85cde71d50a25d1d5074 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	sanitize_profile_insert() md5=c1eab282e0d125d278be390a2a187ea9 secdef=false owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
+func	set_equipped_avatar(p_avatar_id text) md5=d93c0490a98f5a09235f7b0234287f6b secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	setup_onboarding_categories(p_categories jsonb) md5=5ae59bed03047d4c50e910749b586e36 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	start_study_session(p_duration_minutes integer, p_category_name text) md5=706f87a96d7b6d7d6c776aa64ecb3772 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	validate_profile_timezone() md5=c49c44be36ef5423e062985f8435ce62 secdef=false owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
+idx	CREATE INDEX categories_user_id_is_archived_idx ON public.categories USING btree (user_id, is_archived)
+idx	CREATE INDEX idx_activity_feed_user_created ON public.activity_feed USING btree (user_id, created_at DESC)
+idx	CREATE INDEX idx_avatar_unlocks_user_id ON public.avatar_unlocks USING btree (user_id)
+idx	CREATE INDEX idx_l_active ON public.leagues USING btree (is_active)
+idx	CREATE INDEX idx_lm_league ON public.league_memberships USING btree (league_id)
+idx	CREATE INDEX idx_lm_user_active ON public.league_memberships USING btree (user_id)
+idx	CREATE INDEX idx_study_sessions_completed_at ON public.study_sessions USING btree (completed_at)
+idx	CREATE INDEX idx_study_sessions_user_started ON public.study_sessions USING btree (user_id, started_at)
+idx	CREATE UNIQUE INDEX activity_feed_pkey ON public.activity_feed USING btree (id)
+idx	CREATE UNIQUE INDEX activity_feed_user_id_activity_type_activity_date_key ON public.activity_feed USING btree (user_id, activity_type, activity_date)
+idx	CREATE UNIQUE INDEX avatar_unlocks_pkey ON public.avatar_unlocks USING btree (id)
+idx	CREATE UNIQUE INDEX avatar_unlocks_user_id_avatar_id_key ON public.avatar_unlocks USING btree (user_id, avatar_id)
+idx	CREATE UNIQUE INDEX avatars_pkey ON public.avatars USING btree (id)
+idx	CREATE UNIQUE INDEX categories_pkey ON public.categories USING btree (id)
+idx	CREATE UNIQUE INDEX categories_user_id_name_key ON public.categories USING btree (user_id, name) WHERE (is_archived = false)
+idx	CREATE UNIQUE INDEX friendships_pkey ON public.friendships USING btree (user_id, friend_id)
+idx	CREATE UNIQUE INDEX league_memberships_league_id_user_id_key ON public.league_memberships USING btree (league_id, user_id)
+idx	CREATE UNIQUE INDEX league_memberships_pkey ON public.league_memberships USING btree (id)
+idx	CREATE UNIQUE INDEX leagues_pkey ON public.leagues USING btree (id)
+idx	CREATE UNIQUE INDEX marketing_subscribers_email_lower_key ON public.marketing_subscribers USING btree (lower(email))
+idx	CREATE UNIQUE INDEX marketing_subscribers_pkey ON public.marketing_subscribers USING btree (id)
+idx	CREATE UNIQUE INDEX marketing_subscribers_unsubscribe_token_key ON public.marketing_subscribers USING btree (unsubscribe_token)
+idx	CREATE UNIQUE INDEX profiles_friend_code_key ON public.profiles USING btree (friend_code)
+idx	CREATE UNIQUE INDEX profiles_pkey ON public.profiles USING btree (id)
+idx	CREATE UNIQUE INDEX study_sessions_pkey ON public.study_sessions USING btree (id)
+idx	CREATE UNIQUE INDEX study_sessions_user_client_uuid_key ON public.study_sessions USING btree (user_id, client_uuid) WHERE (client_uuid IS NOT NULL)
+idx	CREATE UNIQUE INDEX waitlist_email_key ON public.waitlist USING btree (email)
+idx	CREATE UNIQUE INDEX waitlist_pkey ON public.waitlist USING btree (id)
+pol	activity_feed "Service role full access on activity_feed" PERMISSIVE ALL roles={public} using=((CURRENT_USER = 'postgres'::name) OR (CURRENT_ROLE = 'service_role'::name)) check=
+pol	activity_feed "Users can see their own and friends activity feed" PERMISSIVE SELECT roles={public} using=((user_id = ( SELECT auth.uid() AS uid)) OR (user_id IN ( SELECT\n        CASE\n            WHEN (f.user_id = ( SELECT auth.uid() AS uid)) THEN f.friend_id\n            ELSE f.user_id\n        END AS user_id\n   FROM friendships f\n  WHERE ((f.status = 'accepted'::text) AND ((f.user_id = ( SELECT auth.uid() AS uid)) OR (f.friend_id = ( SELECT auth.uid() AS uid))))))) check=
+pol	avatar_unlocks "Users can view their own unlocked avatars" PERMISSIVE SELECT roles={public} using=(( SELECT auth.uid() AS uid) = user_id) check=
+pol	avatars "Avatars are viewable by everyone" PERMISSIVE SELECT roles={public} using=true check=
+pol	categories "Categories delete policy" PERMISSIVE DELETE roles={public} using=(( SELECT auth.uid() AS uid) = user_id) check=
+pol	categories "Categories insert policy" PERMISSIVE INSERT roles={public} using= check=(( SELECT auth.uid() AS uid) = user_id)
+pol	categories "Categories select policy" PERMISSIVE SELECT roles={public} using=(( SELECT auth.uid() AS uid) = user_id) check=
+pol	categories "Categories update policy" PERMISSIVE UPDATE roles={public} using=(( SELECT auth.uid() AS uid) = user_id) check=
+pol	friendships "Users can view own or incoming friendships" PERMISSIVE SELECT roles={public} using=((auth.uid() = user_id) OR (auth.uid() = friend_id)) check=
+pol	league_memberships "Memberships select policy" PERMISSIVE SELECT roles={public} using=(league_id IN ( SELECT get_my_league_ids() AS get_my_league_ids)) check=
+pol	leagues "Leagues select policy" PERMISSIVE SELECT roles={public} using=(( SELECT auth.uid() AS uid) IS NOT NULL) check=
+pol	marketing_subscribers "Users can manage their own subscription" PERMISSIVE ALL roles={public} using=(auth.uid() = user_id) check=
+pol	profiles "Profiles delete policy" PERMISSIVE DELETE roles={public} using=(( SELECT auth.uid() AS uid) = id) check=
+pol	profiles "Profiles insert policy" PERMISSIVE INSERT roles={public} using= check=(( SELECT auth.uid() AS uid) = id)
+pol	profiles "Profiles select policy" PERMISSIVE SELECT roles={public} using=(( SELECT auth.uid() AS uid) = id) check=
+pol	profiles "Profiles update policy" PERMISSIVE UPDATE roles={public} using=(( SELECT auth.uid() AS uid) = id) check=(( SELECT auth.uid() AS uid) = id)
+pol	study_sessions "Users can read own sessions" PERMISSIVE SELECT roles={authenticated} using=(auth.uid() = user_id) check=
+pol	waitlist "Allow public insert to waitlist" PERMISSIVE INSERT roles={anon} using= check=true
+pub	supabase_realtime all=false tables=
+pub	supabase_realtime_messages_publication all=false tables=realtime.messages
+rel	activity_feed kind=r rls=true force=false owner=postgres acl=authenticated=rm/postgres,postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres comment=
+rel	avatar_unlocks kind=r rls=true force=false owner=postgres acl=authenticated=rm/postgres,postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres comment=
+rel	avatars kind=r rls=true force=false owner=postgres acl=anon=rm/postgres,authenticated=rm/postgres,postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres comment=
+rel	categories kind=r rls=true force=false owner=postgres acl=authenticated=arwdm/postgres,postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres comment=
+rel	friendships kind=r rls=true force=false owner=postgres acl=authenticated=rm/postgres,postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres comment=
+rel	league_memberships kind=r rls=true force=false owner=postgres acl=authenticated=rm/postgres,postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres comment=
+rel	leagues kind=r rls=true force=false owner=postgres acl=authenticated=rm/postgres,postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres comment=
+rel	marketing_subscribers kind=r rls=true force=false owner=postgres acl=authenticated=rdm/postgres,postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres comment=
+rel	profiles kind=r rls=true force=false owner=postgres acl=authenticated=rm/postgres,postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres comment=
+rel	study_sessions kind=r rls=true force=false owner=postgres acl=authenticated=rm/postgres,postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres comment=
+rel	waitlist kind=r rls=true force=false owner=postgres acl=anon=a/postgres,postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres comment=
+schema	public owner=pg_database_owner acl==U/pg_database_owner,anon=U/pg_database_owner,authenticated=U/pg_database_owner,pg_database_owner=UC/pg_database_owner,postgres=U/pg_database_owner,service_role=U/pg_database_owner
+trg	auth.users on_auth_user_confirmed_newsletter enabled=O CREATE TRIGGER on_auth_user_confirmed_newsletter AFTER UPDATE OF email_confirmed_at ON auth.users FOR EACH ROW EXECUTE FUNCTION handle_newsletter_subscription()
+trg	auth.users on_auth_user_created enabled=O CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION handle_new_user()
+trg	public.categories enforce_category_limit_on_unarchive enabled=O CREATE TRIGGER enforce_category_limit_on_unarchive BEFORE UPDATE OF is_archived ON public.categories FOR EACH ROW WHEN ((old.is_archived AND (NOT new.is_archived))) EXECUTE FUNCTION enforce_category_limit()
+trg	public.categories enforce_category_limit_trigger enabled=O CREATE TRIGGER enforce_category_limit_trigger BEFORE INSERT ON public.categories FOR EACH ROW EXECUTE FUNCTION enforce_category_limit()
+trg	public.marketing_subscribers after_insert_marketing_subscribers enabled=O CREATE TRIGGER after_insert_marketing_subscribers AFTER INSERT ON public.marketing_subscribers FOR EACH ROW EXECUTE FUNCTION invoke_send_welcome_email()
+trg	public.profiles on_profile_created_give_avatars enabled=O CREATE TRIGGER on_profile_created_give_avatars AFTER INSERT ON public.profiles FOR EACH ROW EXECUTE FUNCTION give_default_avatars()
+trg	public.profiles sanitize_profile_insert enabled=O CREATE TRIGGER sanitize_profile_insert BEFORE INSERT ON public.profiles FOR EACH ROW EXECUTE FUNCTION sanitize_profile_insert()
+trg	public.profiles validate_profile_timezone enabled=O CREATE TRIGGER validate_profile_timezone BEFORE INSERT OR UPDATE OF timezone ON public.profiles FOR EACH ROW EXECUTE FUNCTION validate_profile_timezone()
