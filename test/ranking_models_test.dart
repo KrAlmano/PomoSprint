@@ -145,6 +145,41 @@ void main() {
     });
   });
 
+  group('nextMonthlyLeaderboardReset (çalışma ayı, proposed/15)', () {
+    const tr = 'Europe/Istanbul';
+    test('ayın ortasında: sonraki ayın 1i 04:00 (TR) = 01:00 UTC', () {
+      expect(
+        nextMonthlyLeaderboardReset(DateTime.utc(2026, 10, 15, 12), timeZone: tr).toUtc(),
+        DateTime.utc(2026, 11, 1, 1),
+      );
+    });
+
+    test('ayın 1i 04:00dan önce hâlâ önceki çalışma ayı: sıfırlanma bugün 04:00', () {
+      // 1 Kasım 00:30 UTC = 03:30 (TR).
+      expect(
+        nextMonthlyLeaderboardReset(DateTime.utc(2026, 11, 1, 0, 30), timeZone: tr).toUtc(),
+        DateTime.utc(2026, 11, 1, 1),
+      );
+      // 1 Kasım 01:00 UTC = 04:00 (TR): yeni ay başladı.
+      expect(
+        nextMonthlyLeaderboardReset(DateTime.utc(2026, 11, 1, 1), timeZone: tr).toUtc(),
+        DateTime.utc(2026, 12, 1, 1),
+      );
+    });
+
+    test('yıl dönümü ve profil saat dilimi', () {
+      expect(
+        nextMonthlyLeaderboardReset(DateTime.utc(2026, 12, 20), timeZone: tr).toUtc(),
+        DateTime.utc(2027, 1, 1, 1),
+      );
+      // New York (EST, UTC-5) profili: 1 Kasım 2026 04:00 yerel = 09:00 UTC (yaz saati 1 Kasım 02:00'de biter).
+      expect(
+        nextMonthlyLeaderboardReset(DateTime.utc(2026, 10, 20), timeZone: 'America/New_York').toUtc(),
+        DateTime.utc(2026, 11, 1, 9),
+      );
+    });
+  });
+
   group('assumedLeaguePeriodEnd', () {
     test('Pazar gecesi UTC iken TR saatinde Pazartesi: yeni haftadan sayılır', () {
       // 4 Ekim 22:30 UTC = 5 Ekim 01:30 (TR), Pazartesi.

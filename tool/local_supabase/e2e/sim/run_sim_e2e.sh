@@ -7,8 +7,12 @@
 #   tool/local_supabase/e2e/sim/run_sim_e2e.sh c d        # yalnızca seçilenler
 #
 # Ortam: SIM_UDID (vars. iPhone 16 Pro / iOS 18.6), DEVELOPER_DIR (vars.
-# /Applications/Xcode.app/Contents/Developer), E2E_HOST_PORT (vars. 54399).
-# Ekran görüntüleri analiz/ekranlar/e2e-*.png, psql günlüğü build/e2e_sim/.
+# /Applications/Xcode.app/Contents/Developer), E2E_HOST_PORT (vars. 54399),
+# E2E_SHOT_DIR (vars. analiz/ekranlar).
+# Ekran görüntüleri $E2E_SHOT_DIR/e2e-*.png, psql günlüğü build/e2e_sim/.
+# Simülatör görüntüyü kendi servisiyle yazar; macOS Masaüstü/Belgeler
+# klasörüne yazmayı engellerse (code=513, "Operation not permitted")
+# E2E_SHOT_DIR'i /tmp altında bir klasöre verin.
 set -u -o pipefail
 
 ROOT="$(cd "$(dirname "$0")/../../../.." && pwd)"
@@ -38,7 +42,8 @@ curl -fsS -o /dev/null "$API_URL/auth/v1/health" -H "apikey: $ANON_KEY" \
   || { echo "HATA: yerel Supabase ($API_URL) yanıt vermiyor: supabase start --workdir tool/local_supabase" >&2; exit 1; }
 xcrun simctl list devices | grep -q "$SIM_UDID) (Booted)" || xcrun simctl boot "$SIM_UDID"
 
-python3 tool/local_supabase/e2e/sim/e2e_host.py --port "$PORT" --udid "$SIM_UDID" 2>>"$LOG_DIR/host.log" &
+python3 tool/local_supabase/e2e/sim/e2e_host.py --port "$PORT" --udid "$SIM_UDID" \
+  ${E2E_SHOT_DIR:+--shot-dir "$E2E_SHOT_DIR"} 2>>"$LOG_DIR/host.log" &
 HOST_PID=$!
 trap 'kill $HOST_PID 2>/dev/null' EXIT
 for _ in $(seq 1 50); do curl -fsS -o /dev/null "http://127.0.0.1:$PORT/health" && break; sleep 0.1; done

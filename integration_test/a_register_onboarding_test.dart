@@ -4,9 +4,10 @@
 //    hedef YKS → kategori adımında YKS dersleri OTOMATİK seçili (Matematik,
 //    Fizik dahil) → görünürlük → kurallar → hedef → kabukta sayaç ve YKS
 //    çipleri. Sunucuda (psql) profil alanları ve kategoriler.
-// 2. KPSS hedefi: canlıda (ve eşit yerel kopyada) profiles_user_segment_check
-//    kpss'yi tanımaz (proposed/26 uygulanmadı) → istemci segmentsiz yazar;
-//    onboarding hatasız biter.
+// 2. KPSS hedefi: profiles_user_segment_check kpss'yi tanıyorsa
+//    (proposed/26, 5 Ekim 2026'dan beri canlıda) hedef saklanır; tanımıyorsa
+//    (eski sunucu) istemci segmentsiz yazar. İki durumda da onboarding
+//    hatasız biter.
 //
 // Çalıştırma: tool/local_supabase/e2e/sim/run_sim_e2e.sh a
 
@@ -169,7 +170,7 @@ void main() {
     expect(meta['marketing'], 'false');
   });
 
-  testWidgets('a2 · KPSS hedefi: sunucu segmenti tanımıyor, onboarding hatasız biter (segmentsiz)', (tester) async {
+  testWidgets('a2 · KPSS hedefi: onboarding hatasız biter (26 varsa kpss, yoksa segmentsiz)', (tester) async {
     await resetAppState(tester);
     final account = await signUpViaApi(e2eEmail('kpss'), 'Sim KPSS');
     await launchApp(tester);

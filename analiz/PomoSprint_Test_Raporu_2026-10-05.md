@@ -38,6 +38,8 @@ Ek olarak bulunup düzeltilenler:
 
 ## 2. Sizden gerekenler
 
+> **Güncelleme (5 Ekim, öğleden önce): 2.1 tamamlandı.** Onayınızla dosyaların hepsi canlıya uygulandı: 12, 15, 16, 19 (yalnızca A kısmı), 13, 14, 20–26. Her adımda önce deneme dosyası çalıştı (bütün maddeler `true`), sonra asıl dosya, sonra sağlama değerleri kontrol edildi. Uygulama sonrası canlı, yerel zincirle satır satır aynı. Kararlar: lig eşikleri bugünkü kural (1/1/1), geç seans kendi gününün serisiyle. Bekleyen tek sunucu adımı 19'un B kısmı: önce sitenin bekleme listesi formu onay bilgisini göndermeli.
+
 ### 2.1 Sunucu düzeltmeleri: Supabase SQL Editor, bu sırayla
 
 Her adım iki çalıştırmadır:

@@ -1,5 +1,6 @@
 import '../../models/league_rules.dart';
 import '../../models/user_model.dart';
+import '../../utils/study_day.dart';
 
 /// Sıralama ekranlarının ortak satır modeli. Her sekme kendi puan anahtarını
 /// açıkça eşler (lig: weekly_points, aylık: total_points, arkadaşlar:
@@ -222,13 +223,13 @@ DateTime assumedLeaguePeriodEnd(DateTime now) {
       .subtract(istanbulOffset);
 }
 
-/// Aylık sıralama ayın 1'inde Türkiye saatiyle (UTC+3, yaz saati yok)
-/// sıfırlanır (get_public_monthly_leaderboard). Cihazın saat diliminden
+/// Aylık sıralama çalışma ayıyla döner (get_public_monthly_leaderboard,
+/// proposed/15): ayın 1'i, profil saat diliminde 04:00. Raporlar > Aylık ile
+/// aynı kural ([studyDayOf], [studyDayStart]); cihazın saat diliminden
 /// bağımsız olarak bir sonraki sıfırlanma anını döndürür.
-DateTime nextMonthlyLeaderboardReset(DateTime now) {
-  const istanbulOffset = Duration(hours: 3);
-  final istanbul = now.toUtc().add(istanbulOffset);
-  return DateTime.utc(istanbul.year, istanbul.month + 1, 1).subtract(istanbulOffset);
+DateTime nextMonthlyLeaderboardReset(DateTime now, {String? timeZone}) {
+  final day = studyDayOf(now, timeZone: timeZone);
+  return studyDayStart(DateTime(day.year, day.month + 1, 1), timeZone: timeZone);
 }
 
 int _asInt(Object? value, {int fallback = 0}) {

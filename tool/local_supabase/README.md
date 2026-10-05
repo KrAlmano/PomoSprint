@@ -214,6 +214,13 @@ yerelde kapalı olduğu betikte ayrıca sınanır.
 
 ## Öneri zincirini kopyada sınama
 
+> **5 Ekim 2026'dan beri** zincir (12 → … → 26, 19 yalnızca A) canlıda ve bu
+> ana kopyada uygulanmış hâlde; `parity/` taban dosyaları canlının yeni
+> hâlinden alındı (`parity_check.sh` 13/13 aynı). Bu yüzden betiği bu
+> hâlden çalıştırmak artık anlamlı değil (md5 ön koşullu adımlar durur). Zinciri yeniden sınamak
+> için ana kopyayı önce `_down` dosyalarıyla ters sırada (26 → 12) eski hâle
+> döndürmek gerekir; yeni öneriler artık bu hâlin üstüne yazılır.
+
 `proposed_chain_check.sh`, bu kopyanın `public`, `auth` ve
 `supabase_migrations` şemalarını (şema + veri) aynı Postgres'te ayrı bir
 veritabanına (`CHAIN_DB`, vars. `pomosprint_chain`) alır; ana kopya

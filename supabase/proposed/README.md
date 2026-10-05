@@ -1,5 +1,19 @@
 # supabase/proposed — canlıya uygulanmamış öneriler
 
+> **Canlı durum (5 Ekim 2026):** 12 → 15 → 16 → 19 (yalnızca A) → 13 → 14 →
+> 20 → 21 → 22 → 23 → 24 → 25 → 26 bu sırayla **canlıya uygulandı**
+> (kullanıcı onayıyla `supabase db query --linked --project-ref`, `postgres`
+> rolü). Her adımda DRYRUN maddelerinin hepsi `true`, ardından aşağıdaki
+> tablodaki md5/katalog doğrulamaları tuttu. Uygulama sonrası canlı şema yerel
+> zincirle satır satır aynı (bilinçli farklar: 19 B yok, kopyaya özgü
+> eklentiler). Ürün düğmeleri varsayılanda (`unverified_session_daily_cap`
+> null, lig ödül/terfi 1/1/1). **Bekleyen:** 19 B (site onay alanlarını
+> gönderdikten sonra) ve 13'ün KVKK-20 2. aşaması. 01–11 uygulanmadı; 03, 05
+> ve 07'yi artık UYGULAMAYIN (14 ve 22 geçersiz kıldı). Geri alma: aşağıdaki
+> ters sıra. Yerel kopya (`tool/local_supabase`) aynı hâle getirildi ve
+> `parity/` taban dosyaları yenilendi; `proposed_chain_check.sh` bu
+> hâlden çalıştırılınca md5 ön koşullu adımlarda durur (zincir uygulanmış).
+
 Bu klasör Supabase CLI tarafından **uygulanmaz** (`supabase db push` yalnızca
 `supabase/migrations/` okur). Buradaki dosyalar, gövdesi canlıda repodakinden
 farklı olan ya da ürün kararı gerektiren düzeltmelerdir. Her `.sql` dosyası

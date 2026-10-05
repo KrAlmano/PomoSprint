@@ -333,6 +333,19 @@ void main() {
       expect(update(current: 'Pomo 9f3a', givenName: 'Ayşe'), 'Ayşe');
     });
 
+    // proposed/14: handle_new_user'ın nötr adı 'Pomo ' + rastgele 4 rakam.
+    // Apple adı yalnızca ilk yetkilendirmede verir; o an yazılmazsa kaybolur.
+    test("sunucunun nötr adı ('Pomo 1234') onboarding bitmeden ilk adla değişir", () {
+      expect(update(current: 'Pomo 0427', givenName: 'Ayşe'), 'Ayşe');
+      expect(update(current: 'Pomo 0427'), isNull, reason: 'ad yoksa nötr ad kalır');
+      expect(
+        update(current: 'Pomo 0427', givenName: 'Ayşe', onboardingCompleted: true),
+        isNull,
+        reason: 'onboarding sonrası (ör. moderasyonla sıfırlanmış ad) dokunulmaz',
+      );
+      expect(update(current: 'Pomo 04271', givenName: 'Ayşe'), isNull);
+    });
+
     test('ilk ad e-postanın yerel kısmıyla aynıysa gerçek addır, dokunulmaz', () {
       expect(
         update(

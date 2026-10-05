@@ -620,7 +620,11 @@ class SupabaseService {
     final fullName = (metadata['full_name'] ?? metadata['name'])?.toString().trim() ?? '';
     final neutral = neutralProfileName(userId);
     final isEmailDefault = emailLocal.isNotEmpty && current == clip(emailLocal);
-    final isNeutralDefault = userId != null && current == neutral;
+    // proposed/14: handle_new_user uygun ad bulamazsa 'Pomo 1234' (rastgele
+    // dört rakam) yazar. Onboarding bitmeden bu da varsayılandır; sonrasında
+    // (ör. ops.reset_display_name ile sıfırlanmış ad) dokunulmaz.
+    final isNeutralDefault = (userId != null && current == neutral) ||
+        (!onboardingCompleted && RegExp(r'^Pomo \d{4}$').hasMatch(current));
     final isFullNameDefault = !onboardingCompleted && fullName.contains(RegExp(r'\s')) && current == clip(fullName);
     if (!isEmailDefault && !isNeutralDefault && !isFullNameDefault) return null;
     final providerName = _providerGivenName(provider: provider, metadata: metadata, nameHint: givenName);
