@@ -103,9 +103,82 @@ anahtar karışmasın diye).
   ağda olmalı.
 - iOS: `Info.plist`'te `NSAppTransportSecurity` → `NSAllowsLocalNetworking`
   (yalnızca yerel ağa http; App Store'da kabul edilir).
-- Debug derlemesinde sayaç 5/10 sn olduğu için sunucu seansı
-  `session_not_finished` ile reddeder (canlıdaki gibi). Puan akışını
-  `smoke_test.py` ile ya da gerçek cihazda `--profile` ile dene.
+- Sayaç her derlemede (debug dahil) gerçek süreli (25/50 dk). Hızlı deneme
+  `--dart-define=QUICK_TIMER=true` ile 5/10 sn'dir ve bu seanslar sunucuya
+  gönderilmez. Puan akışını beklemeden denemek için aşağıdaki simülatör
+  senaryosu (c) ya da `smoke_test.py`.
+
+## Simülatörde uçtan uca test
+
+Uygulama **gerçek `main()`** ile iOS simülatöründe açılır ve bu yerel kopyaya
+bağlanır (`integration_test/`, Flutter `integration_test`). Arayüz Türkçe'ye
+sabitlenir (`LanguageService.deviceLocale`); her testin başında oturum
+kapanır ve SharedPreferences silinir. `SUPABASE_URL` yerel değilse testler
+başlamadan düşer.
+
+Ön koşullar: yerel kopya açık (`supabase start --workdir tool/local_supabase`),
+simülatör iPhone 16 Pro / iOS 18.6 (`7B8AF086-0864-42FD-B4D8-37A782C3F6B9`,
+kapalıysa betik açar), Xcode 27 (`DEVELOPER_DIR`; betik varsayılanı
+`/Applications/Xcode.app/Contents/Developer`).
+
+```sh
+tool/local_supabase/e2e/sim/run_sim_e2e.sh            # a b c d e
+tool/local_supabase/e2e/sim/run_sim_e2e.sh c          # yalnızca biri
+```
+
+Betik `e2e_host.py`'yi (yalnızca 127.0.0.1) başlatır: test ortasında ekran
+görüntüsü (`xcrun simctl io … screenshot` → `analiz/ekranlar/e2e-*.png`) ve
+yerel veritabanında **salt okuma** psql doğrulaması (`build/e2e_sim/psql.log`).
+Her dosyayı ayrı `flutter test integration_test/<dosya> -d <UDID>
+--dart-define=SUPABASE_URL=… --dart-define=SUPABASE_ANON_KEY=…
+--dart-define=E2E_HOST_PORT=… --dart-define=E2E_RUN_ID=…` ile koşturur, sonda
+`parity_check.sh` çalıştırır (testler yalnızca veri yazar). Günlükler
+`build/e2e_sim/<dosya>.log`. Hesaplar ve şifre: `e2e/ACCOUNTS.md`.
+
+| Dosya | Senaryo | Doğrulama |
+|---|---|---|
+| `a_register_onboarding_test.dart` | (a1) Kayıt ekranı (ad, e-posta, şifre, iki zorunlu onay) → onboarding: yaş, YKS → kategori adımında YKS dersleri otomatik seçili (Matematik, Fizik dahil 8) → görünürlük → kurallar → hedef → kabukta sayaç ve YKS çipleri. (a2) KPSS: sunucu `kpss`'i tanımıyor (`proposed/26` yok), onboarding hatasız, segmentsiz biter | psql: `profiles` (ad, doğum yılı, segment, hedef, görünürlük, onboarding), `categories` sırası, `auth.users` onay metadata'sı |
+| `b_timer_layout_test.dart` | Sayaç 402x874 (iPhone 16 Pro, güvenli alanlı) | BAŞLAT ekranda ve alt gezinmenin üstünde, kaydırmasız; 25/50 aynı satırda; kum saati görünür; taşma yok |
+| `c_session_points_test.dart` | (c) Uygulama kapalıyken biten seans: girişten sonra ağaç kapatılır, `TimerPersistence`'a (gerçek biçim, sahip = kullanıcı kimliği) 26 dk önce başlamış 25 dk'lık çalışan seans yazılır, uygulama yeniden açılır. (f) Lig | Diyalog 5 puan / 20 kum, kaydedilememe ve saat metni yok; üst çubuk PUAN 5 / KUM 20; psql `study_sessions` + profil toplamları (5 / 20 / 25 dk / seri 1); Raporlar'da bugün 25 dk; Sıralama > Lig'de "(Sen)" ve `get_my_league_ranking` sırası |
+| `d_friends_visibility_test.dart` | A API ile (onboarding tamam, görünür); uygulamada B, A'nın koduyla istek → A API ile kabul → B'nin listesinde A → A `start_study_session` → B'nin canlı akışında A → Sıralama > Arkadaşlar | psql `friendships` (pending → accepted), B olarak `get_live_friends`; ekranda "(Sen)" |
+| `e_settings_delete_test.dart` | Profil > Gizlilik ve yasal; Hesabımı Sil | Kullanım Şartları, Gizlilik, KVKK, Gizlenen kullanıcılar, Hesabımı Sil var; "Hesap silme hakkında", "Verilerimin kopyasını iste" yok. Silme sonrası giriş ekranı; psql'de `auth.users`, `profiles`, `categories` satırı yok |
+
+Süre (5 Ekim 2026, bu makine): ilk Xcode derlemesi ~2 dk, sonraki her
+dosya 45–90 sn (derleme ~20–40 sn + test); `a`–`e` birlikte ~6 dk.
+
+### Elle koşulan senaryolar (g, h, i)
+
+Normal debug derlemesi (`flutter build ios --simulator --debug
+--dart-define=SUPABASE_URL=http://127.0.0.1:54321
+--dart-define=SUPABASE_ANON_KEY=<yerel ANON_KEY>`) kurulur; hazır hesap:
+`python3 tool/local_supabase/e2e/sim/create_host_account.py <etiket>`
+(`e2e-sim-host-<etiket>@pomosprint.local`). Simülatör Claude Code'un
+simülatör aracıyla (ya da elle) sürülür; her adımda ekran görüntüsü.
+
+- **(g) Bildirim izni.** İzin durumunu sıfırlamak için yalnızca uygulamayı
+  kaldırıp kur (`xcrun simctl uninstall <UDID> com.pomosprint.app`). Profil >
+  "Bildirimler ve kilit ekranı sayacı" aç → iOS izin penceresi → *Allow* →
+  anahtar açık (`e2e-bildirim-izni.png`, `e2e-bildirim-acik.png`). Kaldır-kur,
+  *Don't Allow* → anahtar kapalı, kırmızı açıklama ve "Ayarları aç"
+  (`e2e-bildirim-reddedildi.png`).
+- **(h) Sunucu kesintisi.** Seans sürerken `docker stop
+  supabase_kong_pomosprint-local` (yalnızca API ağ geçidi) → seans biter →
+  diyalog "cihazına kaydedildi…", turuncu bekleyen seans bandı
+  (`e2e-kesinti-kuyruk.png`); uygulama kapatılıp açılır → kabuk önbellekten
+  açılır, bant sürer (`e2e-kesinti-acilis.png`); `docker start …` → kuyruk
+  yeniden deneme zamanlayıcısıyla (≤30 sn) gönderilir, PUAN 5 / KUM 20, bant
+  kalkar (`e2e-kesinti-toparlandi.png`, psql'de `study_sessions` satırı).
+  Çıkış yapmış kullanıcı kesintide giriş denerse "İnternet veya sunucu
+  bağlantısı kurulamadı" (`e2e-kesinti-giris.png`); ağ geçidi açılınca aynı
+  ekrandan giriş olur (`ensureCloud` giriş anında yeniden dener). Sonunda
+  `docker ps` ile kong'un çalıştığını doğrula.
+- **(i) Kilit ekranı.** Bildirimler açıkken BAŞLAT → simülatörü kilitle
+  (LOCK) → Canlı Etkinlik: kategori, "Odaklanıyorsun", geri sayım ve ilerleme
+  çubuğu (`e2e-kilit-ekrani.png`; ilk seferde iOS "Allow Live Activities"
+  sorar: `e2e-kilit-ekrani-izin.png`). Kilitli ekranda sistem saniyeleri
+  `--` gösteriyor (uygulama `Text(timerInterval:)` veriyor; dakika her
+  dakika azalıyor); kilit açıkken bildirim merkezinde tam `MM:SS`
+  görünür.
 
 ## Parite doğrulaması
 

@@ -615,17 +615,43 @@ class SessionQueue {
   /// Seansı önce diske yazar, sonra kuyruğu (bu seans dahil) gönderir ve bu
   /// seansın sonucunu döndürür.
   Future<SessionSubmitResult> submit(String userId, PendingSession session) async {
+    // Yalnızca bu yazımdan sonra çalışan turların sonucu geçerli.
+    _settledOutcomes.remove(session.clientUuid);
     await enqueue(userId, session);
     if (backend.signedInUserId != userId) {
       return SessionSubmitQueued(reasonCode: SessionReason.offline, pendingCount: await pendingCount(userId));
     }
     // Devam eden tur bu seansı görmemiş olabilir: her zaman yeni bir tur.
     final report = await _schedulePass(userId, foregroundUuid: session.clientUuid);
+    // Seansı bu turdan önce başka bir tur (ör. kabuğun açılış senkronu)
+    // göndermiş olabilir: bu turun anlık görüntüsünde yoktu, sonucu o turdan.
+    final settledElsewhere = _settledOutcomes.remove(session.clientUuid);
     return report.outcomes[session.clientUuid] ??
+        settledElsewhere ??
         SessionSubmitQueued(
           reasonCode: report.stopReason ?? SessionReason.network,
           pendingCount: report.remaining,
         );
+  }
+
+  // Son turlarda kuyruktan çıkan (kabul ya da kalıcı ret) seansların sonucu,
+  // client_uuid ile. Uygulama kapalıyken biten seans açılışta tamamlanınca
+  // kabuğun açılış senkronu ile sayacın submit'i yarışıyor; seansı açılış
+  // senkronu gönderince submit'in turunda seans yoktu ve sonuç diyaloğu,
+  // sunucu puanı yazmışken "bağlantı gelince gönderilecek" diyordu.
+  final Map<String, SessionSubmitResult> _settledOutcomes = {};
+  static const int _settledOutcomeLimit = 50;
+
+  void _rememberSettled(Map<String, SessionSubmitResult> outcomes) {
+    for (final entry in outcomes.entries) {
+      if (entry.value is SessionSubmitQueued) continue;
+      _settledOutcomes
+        ..remove(entry.key)
+        ..[entry.key] = entry.value;
+    }
+    while (_settledOutcomes.length > _settledOutcomeLimit) {
+      _settledOutcomes.remove(_settledOutcomes.keys.first);
+    }
   }
 
   /// Bildirilmemiş reddedilen seans sayısını döndürür ve sıfırlar.
@@ -856,6 +882,7 @@ class SessionQueue {
       },
       stopReason: stopReason,
     );
+    _rememberSettled(report.outcomes);
     if (remapRequested && allowRemapRetry && stopReason == null) {
       return report._merge(await _runPass(userId, foregroundUuid: foregroundUuid, allowRemapRetry: false));
     }

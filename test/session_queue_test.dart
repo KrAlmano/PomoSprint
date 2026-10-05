@@ -178,6 +178,34 @@ void main() {
     expect(await queue.pendingCount('u1'), 0);
   });
 
+  // Simülatör e2e (c): uygulama kapalıyken biten seans açılışta tamamlanınca
+  // kabuğun açılış senkronu (sync) ile sayacın submit'i yarışır. Seansı
+  // önceki tur gönderirse submit'in kendi turunda seans yoktu: diyalog
+  // "cihazda kayıtlı, bağlantı gelince gönderilecek" diyordu (sunucu 5 puanı
+  // yazmışken).
+  test('submit\'in seansını eşzamanlı başka tur gönderirse sonuç o turdan gelir (kuyrukta değil)', () async {
+    final submitFuture = queue.submit('u1', _session('b', startedAt: now.subtract(const Duration(minutes: 26))));
+    // Kabuğun açılış senkronu submit kendi turunu kurmadan önce başlıyor.
+    final syncFuture = queue.sync('u1');
+
+    final report = await syncFuture;
+    final result = await submitFuture;
+    expect(backend.sent.map((e) => e.uuid), ['b'], reason: 'tek gönderim');
+    expect(report.outcomes['b'], isA<SessionSubmitSuccess>(), reason: 'seansı açılış senkronu gönderdi');
+    expect(result, isA<SessionSubmitSuccess>(), reason: 'submit kuyrukta değil, kabul edildi demeli');
+    expect((result as SessionSubmitSuccess).totalPoints, 5);
+    expect(await queue.pendingCount('u1'), 0);
+  });
+
+  test('başka turun ret sonucu da submit\'e geçer', () async {
+    backend.handler = (s, c, t) async => throw const PostgrestException(message: 'invalid duration', code: 'P0001');
+    final submitFuture = queue.submit('u1', _session('b', startedAt: now.subtract(const Duration(minutes: 26))));
+    await queue.sync('u1');
+    final result = await submitFuture;
+    expect(backend.sent.length, 1);
+    expect(result, isA<SessionSubmitRejected>());
+  });
+
   test('eşzamanlı sync çağrıları tek turda birleşir (çift gönderim yok)', () async {
     await queue.enqueue('u1', _session('a', startedAt: now.subtract(const Duration(hours: 1))));
     final results = await Future.wait([queue.sync('u1'), queue.sync('u1'), queue.sync('u1')]);
