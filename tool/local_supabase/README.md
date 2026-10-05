@@ -117,9 +117,11 @@ kapanır ve SharedPreferences silinir. `SUPABASE_URL` yerel değilse testler
 başlamadan düşer.
 
 Ön koşullar: yerel kopya açık (`supabase start --workdir tool/local_supabase`),
-simülatör iPhone 16 Pro / iOS 18.6 (`7B8AF086-0864-42FD-B4D8-37A782C3F6B9`,
-kapalıysa betik açar), Xcode 27 (`DEVELOPER_DIR`; betik varsayılanı
-`/Applications/Xcode.app/Contents/Developer`).
+iOS 18.6 simülatörü ve Xcode 27 (`DEVELOPER_DIR`; betik varsayılanı
+`/Applications/Xcode.app/Contents/Developer`). Betiğin varsayılan cihazı iPhone
+16 Pro (`7B8AF086-0864-42FD-B4D8-37A782C3F6B9`); iPhone 16 Plus’ta çalıştırmak
+için `SIM_UDID=BEA55019-D5C3-420F-90F2-0B0CBD5690CF` ver. Android emülatörü
+senaryoları için `run_android_e2e.sh` kullanılır.
 
 ```sh
 tool/local_supabase/e2e/sim/run_sim_e2e.sh            # a b c d e
@@ -137,8 +139,8 @@ Her dosyayı ayrı `flutter test integration_test/<dosya> -d <UDID>
 
 | Dosya | Senaryo | Doğrulama |
 |---|---|---|
-| `a_register_onboarding_test.dart` | (a1) Kayıt ekranı (ad, e-posta, şifre, iki zorunlu onay) → onboarding: yaş, YKS → kategori adımında YKS dersleri otomatik seçili (Matematik, Fizik dahil 8) → görünürlük → kurallar → hedef → kabukta sayaç ve YKS çipleri. (a2) KPSS: sunucu `kpss`'i tanımıyor (`proposed/26` yok), onboarding hatasız, segmentsiz biter | psql: `profiles` (ad, doğum yılı, segment, hedef, görünürlük, onboarding), `categories` sırası, `auth.users` onay metadata'sı |
-| `b_timer_layout_test.dart` | Sayaç 402x874 (iPhone 16 Pro, güvenli alanlı) | BAŞLAT ekranda ve alt gezinmenin üstünde, kaydırmasız; 25/50 aynı satırda; kum saati görünür; taşma yok |
+| `a_register_onboarding_test.dart` | (a1) Kayıt → YKS onboarding ve otomatik seçili 8 kategori. (a2) KPSS: şema `user_segment=kpss` kısıtını içeriyorsa segment kaydedilir; eski kısıt zincirinde onboarding segmentsiz tamamlanır | psql: `profiles` (ad, doğum yılı, segment, hedef, görünürlük, onboarding), `categories` sırası, `auth.users` onay metadata'sı |
+| `b_timer_layout_test.dart` | Cihazın gerçek mantıksal ekran boyutu ve güvenli alanları | BAŞLAT ekranda ve alt gezinmenin üstünde, kaydırmasız; 25/50 aynı satırda; kum saati görünür; taşma yok |
 | `c_session_points_test.dart` | (c) Uygulama kapalıyken biten seans: girişten sonra ağaç kapatılır, `TimerPersistence`'a (gerçek biçim, sahip = kullanıcı kimliği) 26 dk önce başlamış 25 dk'lık çalışan seans yazılır, uygulama yeniden açılır. (f) Lig | Diyalog 5 puan / 20 kum, kaydedilememe ve saat metni yok; üst çubuk PUAN 5 / KUM 20; psql `study_sessions` + profil toplamları (5 / 20 / 25 dk / seri 1); Raporlar'da bugün 25 dk; Sıralama > Lig'de "(Sen)" ve `get_my_league_ranking` sırası |
 | `d_friends_visibility_test.dart` | A API ile (onboarding tamam, görünür); uygulamada B, A'nın koduyla istek → A API ile kabul → B'nin listesinde A → A `start_study_session` → B'nin canlı akışında A → Sıralama > Arkadaşlar | psql `friendships` (pending → accepted), B olarak `get_live_friends`; ekranda "(Sen)" |
 | `e_settings_delete_test.dart` | Profil > Gizlilik ve yasal; Hesabımı Sil | Kullanım Şartları, Gizlilik, KVKK, Gizlenen kullanıcılar, Hesabımı Sil var; "Hesap silme hakkında", "Verilerimin kopyasını iste" yok. Silme sonrası giriş ekranı; psql'de `auth.users`, `profiles`, `categories` satırı yok |
@@ -146,7 +148,32 @@ Her dosyayı ayrı `flutter test integration_test/<dosya> -d <UDID>
 Süre (5 Ekim 2026, bu makine): ilk Xcode derlemesi ~2 dk, sonraki her
 dosya 45–90 sn (derleme ~20–40 sn + test); `a`–`e` birlikte ~6 dk.
 
-### Elle koşulan senaryolar (g, h, i)
+### Ek uçtan uca senaryolar (f–l)
+
+Bu senaryolar `integration_test/` altında otomatikleştirilmiştir. `run_sim_e2e.sh`
+ve `run_android_e2e.sh` varsayılan olarak `a b c d e` çalıştırır; ek senaryoları
+senaryo harflerini argüman olarak ver (ör. `run_sim_e2e.sh f g` veya
+`run_android_e2e.sh j`). iOS betiği `SIM_UDID` ile cihaz seçer; Android betiği
+açık emülatörde `ANDROID_SERIAL` kullanır. Ayrıntılı ön koşullar test
+kaynaklarındadır.
+
+| Dosya | Kapsam |
+|---|---|
+| `f_quick_multi_account_test.dart` | Beş yerel hesapta hızlandırılmış seans kaydı, raporlar, arkadaşlık ve sosyal görünürlük |
+| `g_review_flows_test.dart` | Onboarding ve hesap akışları |
+| `h_offline_lifecycle_test.dart` | API kesintisi, çevrimdışı kuyruk, yeniden açılış ve senkronizasyon |
+| `i_pause_resume_test.dart` | Duraklat/devam ve etkin seansın yeniden açılışta korunması |
+| `j_android_notifications_test.dart` | Android izin, kalıcı sayaç, alarm teslimi ve iptali |
+| `k_ios_native_test.dart` | iOS sessiz bildirim ve ActivityKit kanalı |
+| `l_followup_management_test.dart` | Native saat dilimi, onay kaydı ve arkadaş yönetimi UI'sı |
+
+Testler yerel veritabanında hesap/seans oluşturabilir ve platform izinlerini
+değiştirebilir. Doğrulama kapsamı ilgili test kaynaklarında tanımlıdır.
+
+### Elle koşulan eski senaryolar (arşiv notu)
+
+Aşağıdakiler 5 Ekim tarihli otomasyon öncesi QA adımlarıdır; güncel regresyon
+koşusu için yukarıdaki `f`–`l` testlerini kullan.
 
 Normal debug derlemesi (`flutter build ios --simulator --debug
 --dart-define=SUPABASE_URL=http://127.0.0.1:54321

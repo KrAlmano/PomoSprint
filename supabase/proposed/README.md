@@ -1,4 +1,4 @@
-# supabase/proposed — canlıya uygulanmamış öneriler
+# supabase/proposed — SQL paketleri ve uygulama tarihçesi
 
 > **Canlı durum (5 Ekim 2026):** 12 → 15 → 16 → 19 (yalnızca A) → 13 → 14 →
 > 20 → 21 → 22 → 23 → 24 → 25 → 26 bu sırayla **canlıya uygulandı**
@@ -15,8 +15,13 @@
 > hâlden çalıştırılınca md5 ön koşullu adımlarda durur (zincir uygulanmış).
 
 Bu klasör Supabase CLI tarafından **uygulanmaz** (`supabase db push` yalnızca
-`supabase/migrations/` okur). Buradaki dosyalar, gövdesi canlıda repodakinden
-farklı olan ya da ürün kararı gerektiren düzeltmelerdir. Her `.sql` dosyası
+`supabase/migrations/` okur). Buradaki dosyaların çoğu 5 Ekim 2026 tarihinde
+canlıya uygulanan paketlerin kaynak ve denetim kayıtlarıdır; bunları yeniden
+uygulama. 19 B ve 13 paketinin ikinci aşaması hâlâ beklemededir. Yeni canlı
+değişikliği için bu tarihli kayıt yerine önce güncel canlı tanımı salt okunur
+doğrula. Bazı fonksiyonların canlı gövdesi repodaki tarihsel migration'lardan
+farklı olduğundan canlı gövdeyi bilmeden `CREATE OR REPLACE` yazmak sistemi
+geriletir. Her `.sql` dosyası
 `\quit` ile başlar: psql'de hiçbir şey çalıştırmadan çıkar, SQL editörde
 sözdizimi hatası verir. Yanlışlıkla çalıştırılamaz.
 
@@ -37,16 +42,21 @@ dağıtıyor). Canlı gövdeyi bilmeden repodaki eski sürümden
 3. Değişiklikleri canlı gövdeye uygulayıp `supabase/migrations/` altına
    **yeni zaman damgalı** bir dosya olarak ekleyin (`\echo`/`\quit`
    satırlarını kopyalamayın).
-4. Staging/branch projesinde uygulayın; `supabase/tests/run_local.sh` ve
-   staging'e karşı `node scripts/security_regression_test.js` çalıştırın.
-5. Canlıya uygulayın.
+4. Önce izole yerel zincir testini çalıştır. Hesap açıp/silen güvenlik regresyon
+   betiğini yalnızca kullanıcı açıkça onayladıysa kullan; staging canlı veriye
+   bağlı veya gerçek kullanıcı etkisi taşıyorsa çalıştırma.
+5. Canlıya yazan SQL'i kullanıcı onayıyla, SQL Editor'de uygula; ardından canlı
+   katalog ve sözleşmeleri salt okunur doğrula.
 
 ## Dosyalar ve uygulama sırası
 
-### Canlıya hazır paketler: TEK SIRA 12 → 15 → 16 → 19 → 13 → 14 (→ 20 → 21 → 22 → 23 → 24 → 25 → 26)
+### Paket sırası ve kayıtlı uygulama: 12 → 15 → 16 → 19 A → 13 → 14 → 20–26
 
-İlk altı paket canlı tanımlardan (3 Ekim 2026, `pg_get_functiondef`) yazıldı,
-`11`'e bağımlı değildir ve **yalnızca bu sırayla** uygulanır. 20–25 (5 Ekim
+Aşağıdaki sıra paketlerin uygulama/önkoşul sırasıdır. 5 Ekim tarihli proje
+kaydına göre tümü, 19'un yalnızca A bölümü dahil, canlıya uygulanıp
+doğrulanmıştır; tablo yeni uygulama talimatı değildir. İlk altı paket canlı
+tanımlardan (3 Ekim 2026, `pg_get_functiondef`) yazıldı, `11`'e bağımlı
+değildir ve tarihsel olarak **yalnızca bu sırayla** uygulandı. 20–25 (5 Ekim
 2026, test ajanı bulguları) zincir UYGULANMIŞ hâlin gövdelerinden yazıldı ve
 14'ten SONRA gelir; md5 ön koşulları zincirdeki gövdeleri bekler. 26 (segment
 genişletme) bağımsızdır: canlı hâlde de zincirden sonra da uygulanabilir;

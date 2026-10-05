@@ -3,7 +3,7 @@
 Uygulama içi hesap silme (App Store 5.1.1(v), Google Play). Sign in with Apple
 ile bağlı hesapta önce Apple token'ını iptal eder, sonra kullanıcıyı siler.
 
-**Durum (3 Ekim 2026): canlıda YOK.** İstemci önce bu fonksiyonu çağırır; 404
+**Durum (5 Ekim 2026 proje kaydı): canlıya deploy edilmedi.** Bu belge yenilenirken canlıya yeniden sorgu yapılmadı; deploy etmeden önce Dashboard/CLI ile doğrula. İstemci önce bu fonksiyonu çağırır; 404
 alırsa (deploy edilmemiş) canlıdaki `delete_own_account` RPC'sine düşer. Yani
 uygulama bugün de siler; Apple token iptali ve e-postaya bağlı kayıtların
 temizliği bu fonksiyon deploy edilince başlar.

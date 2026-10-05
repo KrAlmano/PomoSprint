@@ -487,80 +487,8 @@ Bir özellik/sözleşme/test değiştiğinde ilgili `AGENTS.md` bölümünü ve 
 Yeni sohbete verilebilecek kısa başlangıç talimatı: **“Önce kökteki PROJE_DEVIR.md ve AGENTS.md dosyalarını oku; git status ile commit edilmemiş işleri koru. Son kapsam QA_FOLLOWUP_2026-10-05'tir. Yalnızca yerel Supabase ile test et; fiziksel cihaz testleri ayrıca bekliyor.”**
 
 
-## 14. Git çalışma ağacı devri (5 Ekim anlık kayıt)
+## 14. Git / bilgisayarlar arası devir
 
-HEAD: `295838e`; branch: `main`. Aşağıdaki liste belge hazırlanırken alınmış durumdur; yeni oturumda tekrar `git status --short` oku. Listedeki tüm değişiklikler yalnızca bu konuşmaya ait kabul edilmemeli; başka oturumların işi de bulunabilir. `M` izlenen dosyada değişiklik, `??` henüz Git'e eklenmemiş dosya/klasör demektir. Yeni dosyalar commit edilmezse başka checkout/makinede görünmeyebilir.
+5 Ekim 2026'da mevcut `KrAlmano/PomoSprint` GitHub deposunun gizli olduğu doğrulandı. Yerel `main` dalı uzaktaki `origin/main`'e göre 57 commit ilerideydi; bu 57 commit ile o tarihteki 132 dosya/README/QA değişikliği, sır kalıbı taraması ve `.env` dışlama kontrolünden sonra `8a98dab` commit'iyle `origin/main`'e gönderildi. Push sonrasında yerel `main` ve özel GitHub `main` aynı commit'e geldi, çalışma ağacı temizdi.
 
-```text
- M .vscode/launch.json
- M AGENTS.md
- M android/app/src/debug/AndroidManifest.xml
- M android/app/src/main/kotlin/com/pomosprint/app/MainActivity.kt
- M assets/sand_timer.json
- M integration_test/b_timer_layout_test.dart
- M integration_test/support/e2e.dart
- M ios/Runner/AppDelegate.swift
- M lib/app/main_shell.dart
- M lib/l10n/app_en.arb
- M lib/l10n/app_localizations.dart
- M lib/l10n/app_localizations_en.dart
- M lib/l10n/app_localizations_tr.dart
- M lib/l10n/app_tr.arb
- M lib/screens/friends_sheet.dart
- M lib/screens/login_screen.dart
- M lib/screens/profile_screen.dart
- M lib/screens/social_screen.dart
- M lib/screens/timer_screen.dart
- M lib/services/session_queue.dart
- M lib/services/supabase_service.dart
- M lib/services/timer_persistence.dart
- M lib/widgets/social/ranking_models.dart
- M lib/widgets/social/user_safety.dart
- M test/accessibility_test.dart
- M test/support/fake_supabase_service.dart
- M test/timer_paused_expiry_test.dart
- M tool/local_supabase/README.md
- M tool/local_supabase/e2e/sim/e2e_host.py
- M tool/local_supabase/e2e/sim/run_sim_e2e.sh
- M tool/local_supabase/e2e/t1_seans_puan/t1_server_e2e.py
- M tool/local_supabase/e2e/t2_onboarding_categories/client_model.py
- M tool/local_supabase/e2e/t2_onboarding_categories/e2e_onboarding_categories.py
- M tool/local_supabase/e2e/t4_league_avatar/01_zones_ranking.sql
- M tool/local_supabase/e2e/t4_league_avatar/02_process_weekly_leagues.sql
- M tool/local_supabase/e2e/t4_league_avatar/03_league_placement_points.sql
- M tool/local_supabase/e2e/t4_league_avatar/05_client_contract.py
- M tool/local_supabase/e2e/t4_league_avatar/08_room_race.sh
- M tool/local_supabase/e2e/t4_league_avatar/league_fixture.json
- M tool/local_supabase/e2e/t4_league_avatar/t4_league_client_test.dart
-?? PROJE_DEVIR.md
-?? analiz/QA_2026-10-05.json
-?? analiz/QA_FOLLOWUP_2026-10-05.json
-?? analiz/QA_FOLLOWUP_2026-10-05.txt
-?? analiz/QA_FULL_2026-10-05.json
-?? analiz/QA_FULL_2026-10-05.txt
-?? analiz/ekranlar/20261005_followup/
-?? analiz/ekranlar/20261005_full_qa/
-?? analiz/ekranlar/20261005_qa/
-?? analiz/qa_evidence_20261005/
-?? android/app/src/debug/res/
-?? integration_test/f_quick_multi_account_test.dart
-?? integration_test/g_review_flows_test.dart
-?? integration_test/h_offline_lifecycle_test.dart
-?? integration_test/i_pause_resume_test.dart
-?? integration_test/j_android_notifications_test.dart
-?? integration_test/k_ios_native_test.dart
-?? integration_test/l_followup_management_test.dart
-?? lib/dev/local_qa_launcher.dart
-?? lib/dev/process_death_qa.dart
-?? lib/screens/forgot_password_screen.dart
-?? lib/services/device_time_zone.dart
-?? lib/services/local_test_mode.dart
-?? test/device_time_zone_test.dart
-?? test/forgot_password_test.dart
-?? test/friend_management_test.dart
-?? test/local_test_mode_test.dart
-?? tool/local_supabase/e2e/auth_mail_test.py
-?? tool/local_supabase/e2e/sim/run_android_e2e.sh
-?? tool/local_supabase/e2e/social_safety_test.py
-?? tool/local_supabase/quick_recording.py
-```
+Bu bölümün eski 5 Ekim çalışma ağacı listesini saklamıyorum; artık güncel gerçek değil. Sonraki oturumda yine `git status --short` ve `git log -5 --oneline` çalıştır. Yeni doküman değişiklikleri veya başka makinelerdeki commit'ler bu commit'ten sonra gelmiş olabilir. `.env`, `scripts/.env` ve `.claude/settings.local.json` ignore edilir; başka makineye taşıma için secrets olmayan kaynakları push etmek yeterli, yerel secret/settings dosyaları ayrıca güvenli şekilde kurulur. GitHub deposunu başka bilgisayarda clone et ve yeni sohbetten önce `PROJE_DEVIR.md` ile `AGENTS.md`'yi aç.

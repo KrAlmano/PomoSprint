@@ -1,114 +1,113 @@
 # PomoSprint
 
-Pomodoro tekniğini oyunlaştıran Flutter çalışma uygulaması: 25/50 dakikalık odak seansları, ders kategorileri, raporlar, seri bonusu, **14 günlük** ligler, avatarlar ve arkadaşlar. Backend Supabase (Postgres, Auth, RPC'ler, Edge Functions); site `pomosprint.app`.
+PomoSprint, oyunlaştırılmış bir çalışma sayacıdır. Android ve iOS'ta 25 veya 50 dakikalık odak seansı; ders kategorileri, raporlar, çalışma serisi, puan/kum, ligler, avatarlar ve arkadaş özellikleri sunar. Seansın otoritatif kaydı, puanı, kumu, serisi ve lig etkisi Supabase sunucusunda hesaplanır.
+
+## Proje belgeleri
 
 | Belge | İçerik |
 |---|---|
-| [AGENTS.md](AGENTS.md) | Ayrıntılı ve güncel geliştirici / AI rehberi (sözleşmeler, kurallar, açık konular) |
-| [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md) | Kısa ürün ve mimari özeti |
-| [supabase/README.md](supabase/README.md) | Canlı veritabanı durumu ve migration akışı |
-| [landing/README.md](landing/README.md) | Site kuralları |
+| [PROJE_DEVIR.md](PROJE_DEVIR.md) | Yapay zekâya ve geliştiriciye tam devir: mimari, yerel kurulum, modlar, QA sonuçları ve sonraki işler |
+| [AGENTS.md](AGENTS.md) | Günlük kodlama kuralları, dosya haritası ve istemci–Supabase RPC sözleşmeleri |
+| [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md) | Kısa ürün/mimari özeti |
+| [QA takip raporu](analiz/QA_FOLLOWUP_2026-10-05.txt) | En yeni saat dilimi, arkadaş ve yasal onay kontrolleri |
+| [Kapsamlı QA raporu](analiz/QA_FULL_2026-10-05.txt) | Önceki çok hesaplı iOS/Android simülatör/emülatör denetimi |
+| [Yerel Supabase](tool/local_supabase/README.md) | İzole backend, test hesapları, kısa seans kaydı ve E2E komutları |
+| [Supabase işlemleri](supabase/README.md) | Canlı veritabanı geçmişi ve güvenli SQL değişikliği akışı |
+| [Site rehberi](landing/README.md) | `pomosprint.app` geliştirme ve deploy kuralları |
 
-## Desteklenen platformlar
+## Platformlar ve teknoloji
 
 | Platform | Durum |
 |---|---|
-| Android | Destekleniyor (`com.pomosprint.app`) |
-| iOS | Destekleniyor (min. iOS 15.0, `com.pomosprint.app`) |
-| macOS, Linux, Windows, Web | `flutter create` şablonları; **çalışmıyor**, bakımı yapılmıyor |
+| Android | Ürün platformu, `com.pomosprint.app`; Android 16 ARM64 emülatörde UI E2E ve release APK derlendi. Fiziksel Android testi bekliyor |
+| iOS | Ürün platformu, minimum iOS 15.0, `com.pomosprint.app`; iPhone 16 Plus / iOS 18.6 simülatörü test edildi. Release derlemesi imzasızdı |
+| macOS, Linux, Windows, Web | `flutter create` kalıntısı; desteklenen ürün platformları değil |
 
-## Kurulum
+Flutter 3.44 / Dart `^3.12.2`. Backend, Supabase Auth + PostgreSQL + RLS + RPC + cron + Edge Functions. Site, Cloudflare Workers static assets. Gerçek paket sürümleri `pubspec.lock` içindedir.
 
-1. Flutter 3.44+ (Dart ^3.12) kurulu olmalı.
-2. Kök dizinde `.env` oluştur. Anahtarlar:
+## Kurulum ve çalıştırma
 
-   | Anahtar | Zorunlu | Not |
-   |---|---|---|
-   | `SUPABASE_URL` | Evet | Yoksa uygulama bulutsuz (yalnızca yerel) açılır |
-   | `SUPABASE_ANON_KEY` | Evet | Public anon key |
-   | `SENTRY_DSN` | Hayır | Boşsa Sentry kapalı |
+1. Flutter/Dart kur ve depo kökünde bağımlılıkları al:
 
-   Bu dosya APK/IPA içine düz metin gömülür. **Service role veya Resend anahtarı koyma.** Onlar yalnızca `scripts/.env`'de durur (şablon: `scripts/.env.example`; anahtarlar `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`).
-3. Komutlar:
-
-   ```bash
+   ```sh
    flutter pub get
-   flutter gen-l10n        # lib/l10n/*.arb değiştiyse
-   flutter run             # her derlemede gerçek süre (25/50 dk)
-   flutter run --dart-define=QUICK_TIMER=true   # hızlı test sayacı: 5/10 sn, TEST rozeti, kaydedilmez
-   flutter run --profile   # gerçek seans ve puan testi
    ```
 
-4. Android release AAB için `android/key.properties` ve upload keystore gerekir. Yoksa `bundleRelease` bilerek hata verir; release APK ise uyarıyla debug anahtarıyla imzalanır.
+2. Canlı backend ile normal geliştirme için `.env` oluştur. Yalnızca istemciye açık `SUPABASE_URL`, `SUPABASE_ANON_KEY` ve isteğe bağlı `SENTRY_DSN` koy. `.env` uygulama paketine düz metin asset olarak girer: **service role, Resend, Apple private key veya başka sır ekleme.** `scripts/.env` ve Supabase Edge secrets ayrı yönetilir.
+
+3. Normal uygulama 25/50 dakikalık seans kullanır:
+
+   ```sh
+   flutter run
+   ```
+
+4. Yerel Supabase'e bağlanmak için önce Docker ve `supabase start --workdir tool/local_supabase` çalıştır. Uygulamada URL ve anon key'i birlikte `--dart-define` ile ver; ayrıntılı hazır komutlar [yerel test rehberinde](tool/local_supabase/README.md).
+
+### Hızlı sayaç modları
+
+- `QUICK_TIMER=true`: 25/50 dakikayı 5/10 saniyeye indirir, TEST rozeti gösterir ve seansı **kaydetmez**.
+- Yerel rapor/puan akışını kısa sürede doğrulamak için ayrıca `QUICK_TIMER_SAVE=true`, debug derleme ve yalnızca yerel HTTP Supabase adresi gerekir. Bu özel mod 5/10 saniyeyi 25/50 dakika olarak yalnızca **yerel** `complete_qa_study_session` RPC'sine yazar.
+- Canlı `complete_study_session` davranışı değiştirilmedi. İzin koşulları ve yerel RPC kurulumu: [PROJE_DEVIR.md §7](PROJE_DEVIR.md#7-normal-ve-qa-çalışma-modları--karıştırma) ve [tool/local_supabase/README.md](tool/local_supabase/README.md).
+
+ARB çevirileri değişince `flutter gen-l10n` çalıştır; üretilen `app_localizations*.dart` dosyalarını elle düzenleme.
+
+## Testler
+
+```sh
+flutter analyze
+flutter test --concurrency=2
+```
+
+Rapor/çalışma günü değişikliklerinde New York DST doğrulaması:
+
+```sh
+TZ=America/New_York flutter test \
+  test/reports_correctness_test.dart test/reports_findings_test.dart \
+  test/stats_calculator_test.dart test/study_day_test.dart --concurrency=2
+```
+
+Gerçek backend ve uygulama UI'siyle testler yalnızca izole yerel Supabase'te çalışır. Simülatör/emülatör senaryoları, Android'e özel bildirim testi ve iOS native testi için [yerel E2E senaryolarına](tool/local_supabase/README.md#simülatörde-uçtan-uca-test) bak. Son kaydedilmiş sonuç (5 Ekim 2026): Flutter analizi temiz; tüm birim/widget paketinde 1068 test geçti, 5 isteğe bağlı screenshot testi atlandı; takip turunda iOS ve Android UI senaryoları ile iki release derlemesi geçti. Bu, fiziksel cihaz, gerçek Google/Apple girişi veya mağaza yayın onayı anlamına gelmez. Tam kapsam ve sınırlar raporlarda.
+
+Site JS/Edge testleri `cd scripts && npm test`. Ortak HTML parçası değişince `python3 landing/tools/sync_partials.py --check`. Canlı hesap açıp silebilen `scripts/security_regression_test.js`'i yerel Flutter testleriyle karıştırma; kapsamı [AGENTS.md](AGENTS.md)'de oku.
 
 ## Mağaza derlemesi
 
-```bash
-scripts/build_release.sh android   # AAB: build/app/outputs/bundle/release/
-scripts/build_release.sh ios       # IPA: build/ios/ipa/
+```sh
+scripts/build_release.sh android   # imzalı AAB: upload keystore gerekir
+scripts/build_release.sh ios       # IPA: Apple imzalama ayarları gerekir
 scripts/build_release.sh all
 ```
 
-- Betik `flutter clean` yapar, `--obfuscate --split-debug-info` ile derler. Dart sembolleri, obfuscation haritası ve Android R8 `mapping.txt` `release_symbols/<sürüm>/<platform>/` altına yazılır (git'e girmez). Her mağaza sürümü için saklayın.
-- Sentry'ye yükleme için `scripts/.env`'e `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN` ekleyin (şablon: `scripts/.env.example`). Betik bu dosyadan yalnızca `SENTRY_*` satırlarını okur. Token repoya ve `pubspec.yaml`'a yazılmaz. Eksikse derleme yapılır, yükleme atlanır.
-- Yüklenenler: Dart sembolleri ve obfuscation haritası (`sentry_dart_plugin`), iOS dSYM'leri, Android R8 mapping (`sentry-cli upload-proguard`; eşleşme UUID'si derleme sırasında `android/app/src/main/assets/sentry-debug-meta.properties`'e yazılır, sonra silinir). Native sembol tabloları AAB'ye girer (`ndk.debugSymbolLevel`), Play Console kullanır.
-- Release adı `com.pomosprint.app@<pubspec version>`, dist derleme numarası; `sentry_flutter`'ın varsayılanıyla aynı.
-- Sentry'siz çözümleme: `flutter symbolize -i <stack.txt> -d release_symbols/<sürüm>/android/app.android-arm64.symbols`.
-- Android derlemesi ve R8 mapping eşleşmesi bu makinede doğrulanmadı (Android SDK yok). İlk Android sürümünde Sentry'de bir Java yığınının çözüldüğünü kontrol edin.
+Bu betik obfuscation ve `--split-debug-info` kullanır; Sentry sembol upload ayarları `scripts/.env`'den alınır. QA sırasında alınan düz release build'leri mağaza paketi veya imzalı dağıtım değildir. Keystore/Sentry gereksinimleri: [`scripts/build_release.sh`](scripts/build_release.sh) üstbilgisi.
 
-## Kontrol ve testler
+## Supabase güvenliği
 
-```bash
-flutter analyze   # beklenen: No issues found!
-flutter test      # test/ altındaki 8 birim test dosyası
-```
+Canlı proje `Pomodoro App` (`eoosnyakvxmifmexpgxa`, `eu-north-1`). Canlı gövde ve katalog sözleşmesi gerçektir; kök `supabase/migrations/` canlı migration geçmişinin kopyası değildir. **Kökte `supabase db push` veya `db reset` çalıştırma.** SQL değişikliği için canlı tanımı okuyup migration + down + geri alınan DRYRUN hazırla; sırayı ve ayrıntıyı [supabase/README.md](supabase/README.md) ve [AGENTS.md](AGENTS.md) §2'den izle.
 
-- Yeni metinler `lib/l10n/app_tr.arb` ve `app_en.arb` dosyalarına eklenir, ardından `flutter gen-l10n`. `app_localizations*.dart` elle düzenlenmez.
-- SQL davranış testleri (yalnızca yerel, tek kullanımlık Postgres): `supabase/tests/run_local.sh`.
-- Canlı projeye karşı regresyon testi gerçek test hesapları açıp siler: `cd scripts && npm install && node security_regression_test.js`. Yalnızca bilerek çalıştır.
+5 Ekim 2026 tarihli proje kaydına göre 12, 15, 16, 19 A, 13, 14 ve 20–26 paketleri canlıya uygulanıp doğrulandı; 19 B uygulanmadı. Canlıya dair yeni bir işlemden önce tarihli repo bilgisini yeniden salt okunur doğrula. Bu belgede canlıya yeni bağlantı yapıldığı iddia edilmiyor.
 
-## Klasörler
+## Repo haritası
 
-| Klasör | İçerik |
+| Yol | Rol |
 |---|---|
-| `lib/app/` | Açılış sonrası kabuk: yönlendirme kapısı (`app_gate`), ana sekmeler (`main_shell`), tema, Sentry |
-| `lib/screens/` | Ekranlar |
-| `lib/services/` | Supabase veri katmanı, çevrimdışı seans kuyruğu, süren seans kaydı, bildirim, dil |
-| `lib/models/`, `lib/utils/`, `lib/widgets/` | Modeller, yardımcılar (çalışma günü, istatistik), ortak widget'lar |
-| `lib/l10n/` | ARB çevirileri ve üretilen yerelleştirme kodu |
-| `test/` | Birim testleri |
-| `supabase/migrations/` | İleri migration'lar (yalnızca `20261003150000_live_audit_fixes` canlıda) |
-| `supabase/rollbacks/`, `supabase/proposed/` | Geri alma betikleri; canlıya uygulanmamış öneriler |
-| `supabase/functions/` | Edge Functions: `unsubscribe`, `send-welcome-email` |
-| `supabase/tests/` | Yerel SQL testleri ve canlı DRYRUN betikleri |
-| `scripts/` | Güvenlik regresyon testi, bülten gönderimi (Node) |
-| `landing/` | Tanıtım sitesi (pomosprint.app) |
-| `android/`, `ios/` | Platform yapılandırması |
-| `analiz/` | Denetim raporları |
+| `lib/app/`, `lib/screens/`, `lib/widgets/` | Yönlendirme/kabuk, ürün ekranları ve UI parçaları |
+| `lib/services/`, `lib/models/`, `lib/utils/` | Veri servisi, kalıcı seans/outbox, domain modelleri ve hesaplamalar |
+| `lib/l10n/` | TR/EN ARB ve üretilen çeviri kodu |
+| `test/`, `integration_test/` | Birim/widget ve gerçek yerel backend E2E |
+| `android/`, `ios/` | Native bildirim, kanal ve platform ayarları |
+| `supabase/` | SQL tarihçesi, güncel paket notları, Edge Functions ve e-posta şablonları |
+| `tool/local_supabase/` | Canlıya bağlanmayan yerel Docker backend ve test araçları |
+| `scripts/` | JS testleri, e-posta aracı ve mağaza derleme betiği |
+| `landing/` | `pomosprint.app` kaynakları |
+| `analiz/` | Tarihli QA raporları, loglar ve simülatör ekranları |
 
-## Supabase akışı
+## Site
 
-Canlı veritabanı (`eoosnyakvxmifmexpgxa`) gerçeğin kaynağıdır ve repodaki eski migration'larla eşleşmez. **`supabase db push` / `db reset` çalıştırma.** Değişiklik akışı (canlı tanımı oku → migration + rollback + DRYRUN → önce DRYRUN, sonra migration, SQL Editor'de) ve baseline adımları: [supabase/README.md](supabase/README.md).
+Site build gerektirmez. Ortak `_partials/` kaynağını değiştirince sayfalara eşitle:
 
-Edge Function'lar JWT doğrulaması kapalı deploy edilir:
-
-```bash
-supabase functions deploy unsubscribe --no-verify-jwt
-supabase functions deploy send-welcome-email --no-verify-jwt
+```sh
+python3 landing/tools/sync_partials.py --check
+cd landing && wrangler deploy
 ```
 
-## Landing deploy
-
-```bash
-cd landing
-python3 tools/sync_partials.py --check   # fark varsa önce: python3 tools/sync_partials.py
-wrangler deploy
-```
-
-Statik site, derleme adımı yok. `worker.js` http → https ve www → apex yönlendirmesini yapar; güvenlik başlıkları `_headers`'ta. Kurallar: [landing/README.md](landing/README.md).
-
-## Lig
-
-- Dönem **14 gün**; Pazartesi 00:01 (TR) civarında çalışan cron dönemi biten ligleri işler.
-- 5 kademe (Bronz, Gümüş, Altın, Safir, Elmas), odada en fazla 30 kişi.
-- Dönem sonunda puanı olan üst sıralar terfi eder, alt sıralar düşer; ilk 3'e ödül avatarı verilir.
+Yayın öncesi KVKK veri sorumlusu gerçek bilgisi ve ileti/SMTP tercihlerini, [site rehberindeki](landing/README.md) kontrollerle doğrula. İmzalı uygulama veya site deploy'u bu README güncellemesinin parçası değildir.

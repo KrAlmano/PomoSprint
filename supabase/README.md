@@ -1,48 +1,65 @@
-# supabase/
+# Supabase çalışma rehberi
 
-| Klasör | İçerik | CLI uygular mı? |
+Bu klasör, PomoSprint'in Supabase SQL kaynaklarını, geri almalarını, dryrun'larını, Edge Functions'larını ve Auth e-posta şablonlarını içerir. **Git deposundaki migration sırası canlı Supabase migration geçmişinin aynısı değildir.** Yeni bir veritabanı kurmak veya canlıyı değiştirmek için bu klasörü körlemesine `db push` ile çalıştırma.
+
+Canlı proje: `Pomodoro App`, ref `eoosnyakvxmifmexpgxa`, `eu-north-1`. Kaynak önceliği ve canlı salt okuma sorguları için kök [AGENTS.md §2](../AGENTS.md); proje geneli ve tarihli QA için [PROJE_DEVIR.md](../PROJE_DEVIR.md).
+
+## Klasörler
+
+| Yol | Ne içerir | Güvenli kullanım |
 |---|---|---|
-| `migrations/` | Yalnızca İLERİ migration'lar, her sürüm için TEK dosya. | Evet (`supabase db push`) |
-| `rollbacks/` | Geri alma betikleri (`*_down.sql`). Her birinin başında risk notu var. | Hayır |
-| `proposed/` | Canlı gövdesi bilinmeyen fonksiyonlar için önerilen düzeltmeler. Bkz. `proposed/README.md`. | Hayır |
-| `tests/` | Yerel, tek kullanımlık Postgres'te migration zinciri + ASSERT'li davranış testleri (`tests/run_local.sh`; canlı şemaya göre yazılmış `20261003150000_live_audit_fixes` varsayılan olarak atlanır, onun için `tests/20261003_live_audit_fixes_dryrun.sql`). | Hayır |
-| `functions/` | Edge Functions. `unsubscribe` JWT doğrulaması KAPALI deploy edilmeli: bkz. `functions/unsubscribe/README.md`. | `supabase functions deploy` |
+| `migrations/` | İleri migration dosyaları; aralarında legacy/tarihsel ve güncel paketler var | Her dosyanın canlıya uygulandığını varsayma; aşağıdaki durum tablosuna bak |
+| `proposed/` | Ön koşul ve canlı gövde parmak izleriyle sıralanmış paketler | Çoğu 5 Ekim'de canlıya uygulandı; yeniden uygulamak için değil, tarihçe/DRYRUN için. `proposed/README.md` oku |
+| `rollbacks/`, `proposed/*_down.sql` | Ters işlemler | Yıkıcı olabilir; sırayla ve veri kaybı notlarıyla incele |
+| `tests/` | Yerel Postgres, geri alınan live dryrun, paket doğrulama | Live dryrun kullanıcı tarafından SQL Editor'de uygulanır; betiklerin bir kısmı bilerek hata ile rollback eder |
+| `functions/` | Deno Edge Functions | Deploy/JWT ayarı fonksiyonun kendi README'sine göre |
+| `auth-email-templates/` | Supabase panelindeki elle tutulan Auth şablon kopyaları | Paneldeki son durumla ayrıca karşılaştır |
 
-## Önemli uyarılar (3 Ekim 2026'da canlıya karşı doğrulandı)
+## Canlı migration durumu
 
-- **Gerçek kaynak canlı veritabanıdır.** Canlı projenin (`eoosnyakvxmifmexpgxa`)
-  migration geçmişinde, farklı isimlerle uygulanmış ~36 migration var
-  (`20260731130431_secure_rpcs_use_auth_uid` … `20260812234652_cleanup_league_cron_test_data`).
-  Bu repodaki `20260809021500` … `20260809033000` ve `20260928120000_security_hardening`
-  dosyaları canlı geçmişte **YOK** ve içerikleri canlıdan farklı. Bunlar tarihçe
-  olarak duruyor; yeni bir ortama uygulamayın.
-- **Canlıya uygulanan son migration:** `migrations/20261003150000_live_audit_fixes.sql`
-  (canlı fonksiyon gövdeleri esas alınarak yazıldı, 28 senaryoluk geri alınan test
-  `tests/20261003_live_audit_fixes_dryrun.sql` ile doğrulandı, geçmişe kaydedildi).
-  Acil geri alma: `rollbacks/20261003150000_live_audit_fixes_down.sql`.
-- `proposed/11_audit_fixes_unapplied.sql` canlıya UYGULANMADI (başındaki durum
-  notuna bakın). İçindeki `remove_friend`, `cancel_friend_request`,
-  `get_outgoing_friend_requests`, `reorder_categories`, `get_my_category_limit`
-  canlıda yok; istemci bunlar olmadan çalışacak şekilde yedek yola düşer.
-- **Canlıya yazma akışı:** canlı tanımı oku (`pg_get_functiondef`, `pg_policies`,
-  yetkiler) → migration + rollback + kendini geri alan DRYRUN test dosyası yaz →
-  Supabase SQL Editor'de önce DRYRUN (sonunda `DRYRUN_RESULT` hatası beklenir),
-  sonra migration. Repodaki eski sürümlerden `CREATE OR REPLACE` yazmayın.
-- **`supabase db push` ÇALIŞTIRMAYIN** (geçmiş eşitlenmeden eski dosyaları
-  yeniden uygular). Önce aşağıdaki baseline adımı yapılmalı.
-- `rollbacks/` içindeki betikler geri alınamaz veri silebilir; uygulamadan
-  önce başlıklarını okuyun.
-- Edge Functions: `unsubscribe` ve `send-welcome-email` JWT doğrulaması KAPALI
-  deploy edilir (ikisi de isteği kendisi doğrular). Repodaki sürümler canlıdan
-  yenidir; deploy adımları kök dizindeki rapordadır.
+Aşağıdaki durum `AGENTS.md` ve 5 Ekim tarihli doğrulama kaydından aktarılmıştır. **Bu README güncellenirken canlı DB'ye sorgu atılmadı.** Canlıda işlem yapmadan önce güncel fonksiyon, tablo, yetki, RLS, trigger, cron ve migration geçmişini salt okunur doğrula.
 
-## Baseline (BACKEND-17) — önerilen tek seferlik iş
+| Paket | Kayıtlı durum (5 Ekim 2026) |
+|---|---|
+| `migrations/20260809*`, `20260928120000_security_hardening_up` | Canlı migration geçmişinin kopyası değil; bazı fonksiyon gövdeleri canlıda farklı. Bunları yeni canlı/staging ortamına sıradan güncel migration gibi uygulama |
+| `migrations/20261003150000_live_audit_fixes.sql` | 3 Ekim'de canlıya uygulanmış, 28 dryrun kontrolü geçmiş |
+| `12 → 15 → 16 → 19 A → 13 → 14 → 20 → 21 → 22 → 23 → 24 → 25 → 26` | 5 Ekim'de sıralı uygulanmış; ilgili dryrun/md5/katalog kontrolleri o işlemde geçmiş |
+| `19 B` | Uygulanmadı. Site gerçek onay payload'ını gönderip doğrulayana kadar zorunlu kılma aşaması bekliyor |
+| `proposed/01–11` | Bu sıranın yerine kullanılamaz; bazıları sonraki paketlerle geçersiz/tekrar işlenmiş. Tek tek `proposed/README.md` durumuna bak |
 
-1. `supabase link --project-ref <proje>`
-2. `supabase db dump --schema public -f supabase/migrations/<tarih>_baseline.sql`
-   (auth trigger'ları için `--schema auth` çıktısındaki yalnızca
-   `on_auth_user_created` benzeri trigger/fonksiyon tanımlarını ekleyin).
-3. Mevcut migration sürümlerini canlıda uygulanmış olarak işaretleyin:
-   `supabase migration repair --status applied <sürüm> ...`
-4. Yeni ortam (staging) baseline + sonraki migration'larla kurulabilir hale
-   gelir; `tests/run_local.sh` stub yerine baseline ile çalıştırılabilir.
+5 Ekim'deki zincir DRYRUN sonuçları ve down testi `proposed/README.md`'de kayıtlıdır. Bu eski başarı kaydı yeni değişikliğin veya yeni canlı durumun doğrulaması yerine geçmez.
+
+## Canlı SQL değişiklik akışı
+
+1. `supabase/README.md` ve `proposed/README.md` ilgili bölümlerini, sonra canlı tanım ve yetkileri oku. `pg_get_functiondef`'i canlıdan al; eski migration gövdesini kaynak alma.
+2. Önce çözülmesi gereken ürün/KVKK kararı varsa uygulamayı durdurup kaydet.
+3. Yeni zaman damgalı ileri migration yaz. Canlı tanımın önceki hâlini içeren rollback ve `BEGIN`/kontroller/`ROLLBACK` yapan dryrun ekle.
+4. Önce staging veya izole zincir DB'sinde doğrula. Canlı DRYRUN kullanıcı SQL Editor'de çalıştırılır; bütün ASSERT sonuçları beklenen olmalı ve transaction geri alınmalı.
+5. Kullanıcı onayı ve bakım planı olmadan canlıya yazan SQL/CLI çalıştırma. Onaylı canlı değişiklikte dryrun, migration ve katalog/yetki doğrulamasını ayrı uygula.
+6. `AGENTS.md` sözleşme tablosu ve ilgili QA/devir belgelerini güncelle.
+
+**Kökte `supabase db push` / `db reset` kullanma.** Migration baseline işi tamamlanmadan CLI eski dosyaları yeniden uygulayabilir. `supabase link` ve `db push` yerel test talimatı değildir.
+
+## İzole yerel test
+
+Canlıya bağlanmayan Docker kopyası `tool/local_supabase/` altındadır:
+
+```sh
+open -a Docker
+supabase start --workdir tool/local_supabase
+python3 tool/local_supabase/smoke_test.py
+```
+
+URL/portun, hesapların, mail kutusunun, reset sınırlarının, kısa kayıt QA modunun ve E2E komutlarının ayrıntısı [tool/local_supabase/README.md](../tool/local_supabase/README.md). **Yerel test kullanıcıları ve `db reset` yalnızca o workdir içindir.** Kısa seans kaydı, ana Postgres'e QA-only RPC ekler; bitince README'deki `quick_recording.py --remove` ile kaldır.
+
+`tests/run_local.sh` tek kullanımlık yerel PostgreSQL testi içindir; canlı şema tarihçesini otomatik kurduğu anlamına gelmez. `tests/*_dryrun.sql` dosyalarının bir bölümü canlı SQL Editor'e yapıştırılmak üzere kendini rollback eder; `run_local.sh` ile aynı amaca sahip değildir.
+
+## Edge Functions
+
+JWT ayarı endpoint sözleşmesinin parçasıdır:
+
+- `unsubscribe`: kullanıcı tarayıcısından POST alır, **JWT doğrulaması kapalı** deploy gerekir; token'ı fonksiyon doğrular. Ayrıntı [`functions/unsubscribe/README.md`](functions/unsubscribe/README.md).
+- `delete-account`: **JWT doğrulaması açık** olmalı. Repo kodu Apple token iptali ve e-posta ilişkili kayıt temizliği içerir; 5 Ekim proje kaydında henüz canlıya deploy edilmedi. İstemci 404/5xx'te canlı `delete_own_account` RPC yedeğine düşer. Canlı deploy/secrets durumu yeni işlem öncesi yeniden doğrulanmalı. Ayrıntı [`functions/delete-account/README.md`](functions/delete-account/README.md).
+- `send-welcome-email`: Auth/waitlist tanıtım postasıdır; `functions/unsubscribe`'dan farklıdır. 5 Ekim kaydında repo sürüm v9 yayında, fakat `MAIL_SENDER_NAME` ve `MAIL_SENDER_ADDRESS` gönderici kimliği tanımlanmadığından tanıtım e-postası ve bülten bilinçli olarak kapalıdır. Auth kayıt/parola sıfırlama postası bundan ayrıdır. Kaynak [`auth-email-templates/README.md`](auth-email-templates/README.md).
+
+Deno birim testleri ve Edge testleri için `cd scripts && npm test`. Canlı deploy komutları verilmiş README'lerdeki JWT uyarılarını değiştirmeden kullan; bir `--no-verify-jwt` bayrağını tüm fonksiyonlara genelleme.
