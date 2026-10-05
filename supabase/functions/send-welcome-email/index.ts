@@ -105,15 +105,17 @@ Deno.serve(async (req) => {
     body: JSON.stringify({
       from: FROM_ADDRESS,
       to: [email],
-      subject: "PomoSprint Bültenine Hoş Geldin! 🚀",
+      subject: "PomoSprint'e hoş geldin! ⏳",
       headers: {
         "List-Unsubscribe": `<${oneClickUrl}>`,
         "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
       },
       text:
-        "Aramıza hoş geldin!\n\n" +
-        "PomoSprint'in gelişimine ortak olduğun ve yeni özelliklerden haberdar olmak istediğin için teşekkürler. " +
-        "Sana yalnızca önemli güncellemeleri, yeni özellikleri ve faydalı ipuçlarını göndereceğiz.\n\n" +
+        "PomoSprint'e hoş geldin!\n\n" +
+        "Seni aramızda görmekten çok mutluyuz. Hedefin ne olursa olsun, bugün atacağın küçük bir adım yarın büyük fark yaratır. " +
+        "Hiç zaman kaybetmeden ilk 25 dakikalık sprintini başlat!\n\n" +
+        "Bu bültende sana yalnızca önemli güncellemeleri, yeni özellikleri ve odaklanmana yardımcı olacak ipuçlarını göndereceğiz.\n\n" +
+        "Keyifli çalışmalar,\nPomoSprint Ekibi\n\n" +
         "Bu e-postayı PomoSprint kaydında bülten iznini işaretlediğin için alıyorsun.\n" +
         `Artık e-posta almak istemiyorsan: ${unsubscribePage}\n\n` +
         `Gönderen: ${senderName}, ${senderAddress}\n` +
@@ -122,10 +124,12 @@ Deno.serve(async (req) => {
         `KVKK Aydınlatma Metni: ${KVKK_URL}`,
       html: `
         <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto; color: #333;">
-          <h2 style="color: #C2462F;">Aramıza Hoş Geldin! ⏳</h2>
+          <h2 style="color: #C2462F;">PomoSprint'e hoş geldin! ⏳</h2>
           <p>Merhaba,</p>
-          <p>PomoSprint'in gelişimine ortak olduğun ve yeni özelliklerden haberdar olmak istediğin için teşekkürler!</p>
-          <p>Sana yalnızca önemli güncellemeleri, yeni özellikleri ve faydalı ipuçlarını göndereceğiz.</p>
+          <p>Seni aramızda görmekten çok mutluyuz! 🎉</p>
+          <p>Hedefin ne olursa olsun, bugün atacağın küçük bir adım yarın büyük fark yaratır. Hiç zaman kaybetmeden ilk 25 dakikalık sprintini başlat!</p>
+          <p>Bu bültende sana yalnızca önemli güncellemeleri, yeni özellikleri ve odaklanmana yardımcı olacak ipuçlarını göndereceğiz.</p>
+          <p>Keyifli çalışmalar,<br/>PomoSprint Ekibi</p>
           <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
           <p style="font-size: 12px; color: #777; text-align: center;">
             Bu e-postayı PomoSprint kaydında bülten iznini işaretlediğin için alıyorsun.<br/>
