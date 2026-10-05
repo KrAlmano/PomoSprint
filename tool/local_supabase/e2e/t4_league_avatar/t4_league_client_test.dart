@@ -76,7 +76,7 @@ void main() {
     final snap = LeagueSnapshot.fromRows([
       {'name': 'x', 'avatar_id': 'avatar_16_basic', 'weekly_points': 0, 'tier': 1,
        'end_date': '2026-10-18T20:59:59+00:00', 'is_me': true, 'promotion_zone_end': 1,
-       'demotion_zone_start': 999, 'member_count': 1},
+       'demotion_zone_start': 999, 'member_count': 0},
     ]);
     expect(snap.awaitingPlacement, isTrue);
     expect(snap.endDate, DateTime.utc(2026, 10, 18, 20, 59, 59));

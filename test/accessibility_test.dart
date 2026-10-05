@@ -118,17 +118,16 @@ void main() {
 
     // Tek TimerScreen testi: TimerPersistence tekilinin kilit zinciri onu
     // ilk kullanan testin fake async bölgesine bağlıdır (bkz. timer_screen_test).
-    testWidgets('sayaç: 25/50 seçimi, kalem ve kalan süre etiketli', (tester) async {
+    testWidgets('sayaç: 25/50 seçimi ve kalan süre etiketli, yalnızca kategori çipleri', (tester) async {
       final semantics = tester.ensureSemantics();
       // Dikey ekran (yatayda süre çipleri gizlenir).
       tester.view.physicalSize = const Size(1200, 2400);
       tester.view.devicePixelRatio = 2;
       addTearDown(tester.view.reset);
-      var settingsOpened = 0;
       await tester.pumpWidget(_app(TimerScreen(
         categories: CourseCategory.initialCategories(),
         sessionOwnerKey: 'a11y-owner',
-        onOpenSettings: () => settingsOpened++,
+        onOpenSettings: () {},
         onSessionCompleted: (_) async => null,
       )));
       await tester.pump();
@@ -154,20 +153,14 @@ void main() {
       // Çip en az 48 dp yüksekliğinde dokunma alanında.
       expect(tester.getSemantics(option50).rect.height, greaterThanOrEqualTo(kMinInteractiveDimension));
 
-      // Kategori düzenleme kalemi: etiketli ve 48x48.
-      final pencil = find.byTooltip(l10n.timerEditCategories);
-      expect(pencil, findsOneWidget);
-      final pencilSize = tester.getSize(find.ancestor(of: pencil, matching: find.byType(IconButton)));
-      expect(pencilSize.width, greaterThanOrEqualTo(kMinInteractiveDimension));
-      expect(pencilSize.height, greaterThanOrEqualTo(kMinInteractiveDimension));
-      await tester.tap(pencil);
-      expect(settingsOpened, 1);
+      expect(find.byTooltip(l10n.timerEditCategories), findsNothing);
+      expect(find.byType(FilterChip), findsWidgets);
 
       // Sayaç "X dakika Y saniye kaldı" diye okunur.
       expect(find.bySemanticsLabel(RegExp(r'^\d+ dakika \d+ saniye kaldı$')), findsOneWidget);
 
-      // UX-13: kategori başlığı ARB'den.
-      expect(find.text(l10n.selectSubject), findsOneWidget);
+      // Sayaçta yalnızca kategoriler var; başlık kaldırıldı.
+      expect(find.text(l10n.selectSubject), findsNothing);
 
       await tester.pumpWidget(const SizedBox.shrink());
       await tester.pump();

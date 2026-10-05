@@ -38,6 +38,7 @@ class RankingEntry {
     final id = row['id']?.toString();
     return RankingEntry(
       name: row['name']?.toString(),
+      hidden: row['is_blocked'] == true,
       avatarId: row['avatar_id']?.toString(),
       points: _asInt(row[pointsKey]),
       minutes: row['total_minutes'] == null ? null : _asInt(row['total_minutes']),

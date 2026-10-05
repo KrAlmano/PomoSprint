@@ -29,6 +29,11 @@ class FakeSupabaseService implements SupabaseService {
   @override
   Duration? serverClockOffset;
 
+  @override
+  Future<List<Map<String, dynamic>>> fetchOutgoingFriendRequests() async => const [];
+  @override
+  Future<List<Map<String, dynamic>>> fetchBlockedUsers() async => const [];
+
   // ---- İstatistik dinleyicileri ----
 
   final List<VoidCallback> _statsListeners = [];

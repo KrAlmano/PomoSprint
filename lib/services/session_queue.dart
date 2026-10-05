@@ -43,6 +43,7 @@ class PendingSession {
     this.clockOffsetMs,
     this.categoryRemaps = 0,
     this.lastError,
+    this.recordAccelerated = false,
   });
 
   final String clientUuid;
@@ -51,6 +52,7 @@ class PendingSession {
   final String? categoryId;
   final String categoryName;
   final int minutes;
+  final bool recordAccelerated;
   final bool wasPaused;
 
   /// Uygulamanın ön planda geçirdiği saniye (RPC'de p_is_verified).
@@ -87,6 +89,7 @@ class PendingSession {
       clockOffsetMs: clockOffsetMs,
       categoryRemaps: categoryRemaps ?? this.categoryRemaps,
       lastError: lastError ?? this.lastError,
+      recordAccelerated: recordAccelerated,
     );
   }
 
@@ -95,6 +98,7 @@ class PendingSession {
         'category_id': categoryId,
         'category_name': categoryName,
         'minutes': minutes,
+        if (recordAccelerated) 'record_accelerated': true,
         'was_paused': wasPaused,
         'is_verified': foregroundSeconds,
         'started_at': startedAt.toUtc().toIso8601String(),
@@ -129,6 +133,7 @@ class PendingSession {
       clockOffsetMs: _asInt(json['clock_offset_ms']),
       categoryRemaps: _asInt(json['category_remaps']) ?? 0,
       lastError: json['last_error']?.toString(),
+      recordAccelerated: json['record_accelerated'] == true,
     );
   }
 }

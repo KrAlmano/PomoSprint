@@ -276,3 +276,123 @@ CHAIN_DB=pomosprint_chain_client DROP_ONLY=1 tool/local_supabase/proposed_chain_
 | Veri: yalnızca `avatars` | Kullanıcı verisi (profil, seans, lig, arkadaşlık, abonelik, bekleme listesi, `auth.*`) kopyalanmaz. `leagues` satırları çalışma sırasında açılır |
 | Auth / PostgREST / Realtime servis sürümleri CLI'nin varsayılanları | Postgres imajı ve extension sürümleri canlıyla aynı; servis sürümleri farklı olabilir |
 | `pg_cron` işleri yerelde de çalışır | Yalnızca yerel veriye dokunur (`process_weekly_leagues`, `activity_feed` temizliği) |
+
+### Kayıtlı hızlı seans (geçici yerel QA, 5 Ekim 2026)
+
+Kullanıcı isteğiyle **5 saniye → 25 dakika, 10 saniye → 50 dakika** kayıt
+modu eklendi. Önce `python3 tool/local_supabase/quick_recording.py` çalıştırın,
+sonra VS Code'dan **PomoSprint (kayıtlı hızlı yerel test, iOS)** seçin.
+Android emülatör için aynı adlı Android yapılandırması `10.0.2.2` kullanır.
+5 Ekim QA: Android SDK ve JDK 17 kuruldu; ARM64 Android 16 emülatör UI ve release APK doğrulandı. Fiziksel cihaz testi sonraya bırakıldı.
+
+Bayraklar: `QUICK_TIMER=true`, `QUICK_TIMER_SAVE=true`, açıkça verilen yerel
+`SUPABASE_URL` ve demo `SUPABASE_ANON_KEY`. Kayıt modu debug derleme ve yalnızca
+HTTP localhost/127.0.0.1/::1/10.0.2.2 adreslerinde açılır. Normal hızlı mod
+(`QUICK_TIMER` tek başına) kaydetmez; release ve canlı URL kayıt modunu açamaz.
+
+Yerelde ek `complete_qa_study_session` RPC'si kurulur; **normal RPC değişmez**.
+Normal yerel gövdeden klonlanır: zaman denetimi ve seansın zaman aralığı 5/10
+saniye olur; `duration_minutes`, puan, kum, seri, lig, kategori sahipliği,
+çakışma ve mükerrer kayıt kontrolleri normal sunucu mantığıyla korunur.
+Art arda seanslar gerçek kısa aralıklarıyla kaydolur; raporlar dakika alanını
+kullanarak 25/50 dakika gösterir. QA işareti aktif seans ve outbox'ta saklanır.
+Bu test verileri gerçek 25/50 dakikalık zaman aralıkları değildir.
+
+Kaldırma: `python3 tool/local_supabase/quick_recording.py --remove` ve
+normal çalıştırma yapılandırmasına dönme. Ek QA RPC'si açıkken fonksiyon
+parite kontrolü beklenen ek fonksiyonu bildirir; kaldırınca normal parite
+kontrolü tekrar tam eşleşmelidir. Yerel konteyner adı betikte sabittir;
+canlı Supabase'e bu betik uygulanmaz.
+
+Beş hesaplı gerçek simülatör denemesi (seansları BAŞLAT ile çalıştırır):
+```sh
+QUICK_TIMER=true QUICK_TIMER_SAVE=true \
+SIM_UDID=BEA55019-D5C3-420F-90F2-0B0CBD5690CF \
+E2E_SHOT_DIR=/tmp/pomosprint-qa \
+tool/local_supabase/e2e/sim/run_sim_e2e.sh f
+```
+
+5 Ekim kontrolünde oluşturulan beş QA hesabı:
+`e2e-sim-qa1-1005qa@pomosprint.local` …
+`e2e-sim-qa5-1005qa@pomosprint.local`.
+Hepsinin **yalnızca yerel** şifresi `SimE2e-Yerel2026`.
+QA1'de 75 dk / 17 puan / 40 kum, diğerlerinde sırasıyla 25/50/25/50 dk;
+her birinin iki karşılıklı arkadaşı var. QA1'in arkadaşı QA2 ve QA5'tir.
+Canlı kullanıcı hesabıyla bu yerel kopyada giriş yapılamaz.
+Yerel sıfırlama e-postaları Mailpit'te (`http://127.0.0.1:54324`) tutulur.
+
+`lib/dev/local_qa_launcher.dart`, normal `main()` akışını açıp yalnızca bu
+korumalı yerel modda, `LOCAL_QA_EMAIL` ve `LOCAL_QA_PASSWORD` açıkça verilmişse
+hazır test hesabıyla giriş yapar. Normal uygulamadan import edilmez. İlk
+çalıştırmada bildirim tercihini kapatır; teslim testi için Profil'den açıp
+iOS sistem iznini vermek gerekir.
+
+Kayıtlı yerel QA modunda Sosyal görünürken sorgu aralığı 2 saniyedir;
+5/10 saniyelik odak denemeleri arada kaybolmasın. Normalde 30 saniye,
+sekmeden çıkınca ve uygulama arka plandayken sorgular durur. Dönüşte hemen
+yenilenir. Bu mekanizma gerçek zamanlı push yayını değil, periyodik okumadır.
+
+### 5 Ekim kapsamlı simülatör/emülatör denetimi
+
+Senaryo ve sonuç matrisi: `analiz/QA_FULL_2026-10-05.json`.
+`h` gerçek yerel API kesintisi, kalıcı outbox, ekranları yeniden kurma ve
+hesap izolasyonu; `i` duraklat/devam ve tek hak; `j` yalnızca Android'de
+native bildirim izni/zamanlama/teslim/iptal; `k` yalnızca iOS'ta sessiz
+provisional bildirim izni ve native ActivityKit kanalını sınar. Provisional
+izin, tam ses/banner izninin kullanıcı tarafından kabulü değildir.
+
+Android SDK + JDK 17 ve tek ARM64 emülatör hazırken:
+
+```bash
+E2E_RUN_ID=benzersiz-kosu E2E_SHOT_DIR=/tmp/pomosprint-android-qa \
+QUICK_TIMER=true QUICK_TIMER_SAVE=true E2E_ALLOW_OUTAGE=true \
+tool/local_supabase/e2e/sim/run_android_e2e.sh a b f h i j e
+```
+
+`E2E_ALLOW_OUTAGE` yalnızca yerel Kong konteynerini geçici durdurmaya izin
+verir. Her `h` koşusu API'yi `finally` içinde açar. Android yardımcı betiği
+çıkışta da açar. Host yalnızca loopback'e bağlanır; Android ekran görüntüsü
+ve bildirim izni işlemleri `emulator-*` cihaz kimliğiyle sınırlıdır.
+Android emülatörü hostu `10.0.2.2` üzerinden görür; `E2E_HOST_ADDRESS`
+bu yüzden Android betiğinde farklıdır. Gradle 2 işçi/2 GB ile sınırlandırılır.
+
+`lib/dev/process_death_qa.dart` yalnızca yerel kısa debug kayıt modunda bir
+50 dk/10 sn kalıcı seans hazırlar. Koşu başına bir kere hazırlanır; gerçek
+OS süreç kapatıp açma testinde tekrar başlangıç yaratmaz.
+`LOCAL_QA_EMAIL`, `LOCAL_QA_PASSWORD`, `LOCAL_QA_PROCESS_RUN` gerektirir.
+Normal giriş noktasından import edilmez.
+
+Yerel e-posta ve sosyal/RLS ek kontrolleri (kendi yeni hesaplarını siler):
+
+```bash
+python3 tool/local_supabase/e2e/auth_mail_test.py
+python3 tool/local_supabase/e2e/social_safety_test.py
+```
+
+Eski `t1`, `t2`, `t4` test beklentileri 5 Ekim sözleşmesine göre güncellendi:
+duplicate ilk puanı döndürür ama tekrar ödül vermez; geç seans kendi günüyle
+bonus alır; görünürlük açık seçim öncesi false; kategoriler JSON sayaçlarıyla
+uzlaştırılır; ligsiz kullanıcının `member_count` değeri 0'dır. `t2` artık
+başarısız kontrol varsa sıfır olmayan çıkış kodu verir. Son takip turunda cihaz IANA diliminin native kanaldan profile eşlenmesi
+eklendi ve iki platformda test edildi; fiziksel sistem dilimi değişimi bekliyor.
+
+
+## 5 Ekim takip kontrolleri
+
+Saat dilimi ve arkadaş yönetimi için gerçek uygulama UI senaryosu:
+
+```sh
+SIM_UDID=BEA55019-D5C3-420F-90F2-0B0CBD5690CF E2E_RUN_ID=followup_ios tool/local_supabase/e2e/sim/run_sim_e2e.sh l
+E2E_RUN_ID=followup_android tool/local_supabase/e2e/sim/run_android_e2e.sh l
+```
+
+`l`: native IANA dilimi / gerçek yerel profil güncellemesi, New York DST sınırı,
+geçersiz dilimden geri dönüş, yasal onay ledger idempotency, giden isteği iptal,
+arkadaş silme, engelleme / engeli kaldırma. Sağlayıcı girişi yapılmaz; onay
+metadata'sı olmayan yerel hesapla `accept_legal_documents` doğrulanır.
+Native IANA okuması gerçek; New York geçişinde sistem kanalı kontrollü taklit edilir.
+Sonuçlar: `analiz/QA_FOLLOWUP_2026-10-05.json`.
+
+Yerel QA başlatıcısında açıkça verilen `LOCAL_QA_EMAIL`, önceki yerel test
+oturumundan farklıysa yerel oturumu kapatıp istenen test hesabıyla giriş yapar.
+Bu giriş noktası normal uygulama tarafından import edilmez.

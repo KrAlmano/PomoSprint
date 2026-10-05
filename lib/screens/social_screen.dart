@@ -9,6 +9,7 @@ import '../widgets/social/load_error_view.dart';
 import '../widgets/social/user_safety.dart';
 import '../services/hidden_users.dart';
 import '../services/language_service.dart';
+import '../services/local_test_mode.dart';
 import '../services/supabase_service.dart';
 import '../theme.dart';
 import '../utils/responsive.dart';
@@ -41,13 +42,12 @@ class SocialScreen extends StatefulWidget {
 }
 
 class _SocialScreenState extends State<SocialScreen> with WidgetsBindingObserver {
-  static const Duration _pollInterval = Duration(seconds: 30);
+  static Duration get _pollInterval => Duration(seconds: recordLocalQuickSessions ? 2 : 30);
 
   List<Map<String, dynamic>> _activeUsers = const [];
   Timer? _pollingTimer;
   bool _loaded = false;
   Object? _error;
-  DateTime? _loadedAt;
   int _requestId = 0;
   bool _isVisible = false;
   bool _isResumed = true;
@@ -56,7 +56,12 @@ class _SocialScreenState extends State<SocialScreen> with WidgetsBindingObserver
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    SupabaseService.instance.addStatsChangedListener(_onStatsChanged);
     HiddenUsersStore.instance.hidden.addListener(_onHiddenUsersChanged);
+  }
+
+  void _onStatsChanged() {
+    if (_isVisible && _isResumed) unawaited(_fetchData());
   }
 
   void _onHiddenUsersChanged() {
@@ -83,13 +88,14 @@ class _SocialScreenState extends State<SocialScreen> with WidgetsBindingObserver
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    SupabaseService.instance.removeStatsChangedListener(_onStatsChanged);
     HiddenUsersStore.instance.hidden.removeListener(_onHiddenUsersChanged);
     _pollingTimer?.cancel();
     super.dispose();
   }
 
   // Canlı liste yalnızca sekme görünür ve uygulama ön plandayken yoklanır;
-  // geri dönüldüğünde veri bayatsa hemen yenilenir.
+  // geri dönüldüğünde hemen yenilenir (kısa seanslar da görünür).
   void _updatePolling() {
     if (!_isVisible || !_isResumed) {
       _pollingTimer?.cancel();
@@ -97,10 +103,7 @@ class _SocialScreenState extends State<SocialScreen> with WidgetsBindingObserver
       return;
     }
     if (_pollingTimer != null) return;
-    final loadedAt = _loadedAt;
-    if (loadedAt == null || DateTime.now().difference(loadedAt) > _pollInterval) {
-      unawaited(_fetchData());
-    }
+    unawaited(_fetchData());
     _pollingTimer = Timer.periodic(_pollInterval, (_) => _fetchData());
   }
 
@@ -115,7 +118,6 @@ class _SocialScreenState extends State<SocialScreen> with WidgetsBindingObserver
         _activeUsers = _dedupeById(live);
         _loaded = true;
         _error = null;
-        _loadedAt = DateTime.now();
       });
     } catch (e) {
       debugPrint('[SOCIAL] Canlı liste alınamadı: $e');
@@ -135,15 +137,17 @@ class _SocialScreenState extends State<SocialScreen> with WidgetsBindingObserver
   }
 
   void _openUserActions(Map<String, dynamic> user, AppLocalizations l10n) {
-    unawaited(showUserSafetySheet(
-      context,
-      target: UserSafetyTarget(
-        name: user['name']?.toString() ?? l10n.userDefault,
-        userId: user['id']?.toString(),
-        avatarId: user['avatar_id']?.toString(),
+    unawaited(
+      showUserSafetySheet(
+        context,
+        target: UserSafetyTarget(
+          name: user['name']?.toString() ?? l10n.userDefault,
+          userId: user['id']?.toString(),
+          avatarId: user['avatar_id']?.toString(),
+        ),
+        place: UserReportPlace.liveFeed,
       ),
-      place: UserReportPlace.liveFeed,
-    ));
+    );
   }
 
   @override

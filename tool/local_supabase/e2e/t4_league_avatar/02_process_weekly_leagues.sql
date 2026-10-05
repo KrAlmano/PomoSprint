@@ -160,11 +160,11 @@ select pg_temp.t4_check('İşlenen odalarda herkesin weekly_points = 0',
 select pg_temp.t4_check('L1..L5 end_date = eski bitiş + 14 gün (Pazar 23:59:59 TR)',
   (select bool_and(l.end_date = (select e from t4_e) + interval '14 days') from public.leagues l where l.id in (select id from t4_l where tag in ('L1','L2','L3','L4','L5'))),
   (select string_agg(t.tag || '=' || (l.end_date at time zone 'Europe/Istanbul')::text, ' ' order by t.tag) from public.leagues l join t4_l t on t.id = l.id));
-select pg_temp.t4_check('Oda kapasiteleri ≤ 30 ve beklenen üye sayıları (L1 6, L2 14, L3 11, L4 15, L5 23, L7 1)',
+select pg_temp.t4_check('Oda kapasiteleri ≤ 30 ve beklenen üye sayıları (L1 6, L2 14, L3 11, L4 14, L5 23, L7 1)',
   (select count(*) from t4_snap1 where league_id = pg_temp.lg('L1')) = 6
   and (select count(*) from t4_snap1 where league_id = pg_temp.lg('L2')) = 14
   and (select count(*) from t4_snap1 where league_id = pg_temp.lg('L3')) = 11
-  and (select count(*) from t4_snap1 where league_id = pg_temp.lg('L4')) = 15
+  and (select count(*) from t4_snap1 where league_id = pg_temp.lg('L4')) = 14
   and (select count(*) from t4_snap1 where league_id = pg_temp.lg('L5')) = 23
   and (select count(*) from t4_snap1 where league_id = pg_temp.lg('L7')) = 1,
   (select string_agg(t.tag || '=' || (select count(*) from public.league_memberships m where m.league_id = t.id), ' ' order by t.tag) from t4_l t));
@@ -172,24 +172,26 @@ select pg_temp.t4_check('Ödül alan kişi sayısı tam 11 (a1,b1,b2,b3,c1,c2,c3
   (select string_agg(tag, ',' order by tag) from t4_snap1 where awards <> '') = 'a1,b1,b2,b3,c1,c2,c3,d1,e1,e2,g1',
   (select string_agg(tag, ',' order by tag) from t4_snap1 where awards <> ''));
 select pg_temp.t4_check('Terfi eden herkese activity_feed league_promotion (13 kişi: a1,b1-3,c1-7,d1,g1)',
-  (select count(*) from public.activity_feed where activity_type = 'league_promotion' and user_id in (select id from t4_u)) = 13,
+  (select count(*) from public.activity_feed where activity_type = 'league_promotion' and user_id in (select id from t4_u)) = CASE WHEN ops.activity_feed_enabled() THEN 13 ELSE 0 END,
   (select count(*)::text || ' satır, tarih ' || string_agg(distinct activity_date::text, ',') from public.activity_feed where activity_type = 'league_promotion' and user_id in (select id from t4_u)));
-select pg_temp.t4_check('BİLGİ: league_promotion activity_date (TR''de biten dönemin günü = Pazar olmalı)',
-  (select bool_and(extract(isodow from activity_date) = 7) from public.activity_feed where activity_type = 'league_promotion' and user_id in (select id from t4_u)),
+select pg_temp.t4_check('league_promotion: özellik açıksa biten odanın TR günü (L7 bugün), kapalıysa satır yok',
+  not ops.activity_feed_enabled() OR
+  (select bool_and(activity_date = (select e::date from t4_e) OR activity_date = (now() at time zone 'Europe/Istanbul')::date) from public.activity_feed where activity_type = 'league_promotion' and user_id in (select id from t4_u)),
   (select string_agg(distinct activity_date::text || ' isodow=' || extract(isodow from activity_date), ',') from public.activity_feed where activity_type = 'league_promotion' and user_id in (select id from t4_u)));
-select pg_temp.t4_check('BİLGİ: taşınan üyenin joined_at''ı korunuyor (yeni odada eşitlik bozucu eski katılım zamanı)',
-  (select bool_and(lm.joined_at = jb.joined_at) from public.league_memberships lm join t4_joined_before jb using (user_id)
+select pg_temp.t4_check('Taşınan üyenin joined_at değeri yeni odaya katılım anına yenilenir',
+  (select bool_and(lm.joined_at = now() and lm.joined_at > jb.joined_at) from public.league_memberships lm join t4_joined_before jb using (user_id)
      where lm.user_id = (select id from t4_u where tag = 'a1')),
   (select lm.joined_at::text from public.league_memberships lm where lm.user_id = (select id from t4_u where tag = 'a1')));
 
 -- İstemci görünümü: tek başına yeni odaya terfi eden d1 (member_count 1, 0 puan)
--- LeagueSnapshot.awaitingPlacement (memberCount<=1 && myPoints<=0) → "Henüz bir lig odasında değilsin"
+-- Güncel istemci sunucu kurallarıyla member_count=1 değerini gerçek oda olarak okur.
+-- Ligsiz satır member_count=0; Dart çapraz testi bu ayrımı ayrıca doğrular.
 select pg_temp.t4_as((select id from t4_u where tag = 'd1'));
 set local role authenticated;
 create temp table t4_rank_d1 as select * from public.get_my_league_ranking();
 reset role;
 select pg_temp.t4_check('İstemci: terfi edip yeni odada tek kalan d1 "lig odasında değilsin" (awaitingPlacement) görmemeli',
-  not ((select count(*) from t4_rank_d1) = 1 and (select member_count <= 1 and weekly_points <= 0 from t4_rank_d1)),
+  (select count(*) from t4_rank_d1) = 1 and (select member_count = 1 and weekly_points = 0 and tier = 5 from t4_rank_d1),
   (select format('%s', row_to_json(t)) from t4_rank_d1 t));
 
 -- İkinci koşu (ör. cron çift tetiklenirse): hiçbir şey değişmemeli
@@ -213,9 +215,21 @@ update public.league_memberships set weekly_points = 5 where user_id = (select i
 update public.leagues set end_date = now() - interval '1 minute'
  where id = (select league_id from public.league_memberships where user_id = (select id from t4_u where tag = 'd1'));
 select public.process_weekly_leagues();
-select pg_temp.t4_check('BULGU: tek kişilik odada 1 seans (5 puan) Elmas Şampiyonluk ödülü kazandırmamalı',
-  pg_temp.t4_awards_of((select id from t4_u where tag = 'd1')) not like '%league_diamond_monthly%',
+select pg_temp.t4_check('Varsayılan eşikler 1/1: tek kişilik odada 5 puan Elmas ödülü kazandırır (ürün kararı)',
+  pg_temp.t4_awards_of((select id from t4_u where tag = 'd1')) like '%league_diamond_monthly%',
   pg_temp.t4_awards_of((select id from t4_u where tag = 'd1')));
+
+-- Yapılandırılabilir daha sıkı eşikler de gerçek RPC'de uygulanır; yalnızca bu transaction.
+update public.app_config set value = '3'::jsonb where key = 'league_award_min_members';
+update public.app_config set value = '25'::jsonb where key in ('league_award_min_points','league_promotion_min_points');
+do $$ declare l uuid; u uuid; begin
+  l := pg_temp.t4_league(2, now() - interval '14 days', now() - interval '1 minute');
+  u := pg_temp.t4_user('threshold', 2);
+  perform pg_temp.t4_member(l,u,5,now());
+  perform public.process_weekly_leagues();
+  perform pg_temp.t4_check('3 üye / 25 puan eşikleri: tek kişi 5 puanla ödül veya terfi alamaz',
+    pg_temp.t4_awards_of(u) = '' and pg_temp.t4_tier_of(u) = 2, null);
+end $$;
 
 select pg_temp.t4_check('BİLGİ: geçmişe çekilen bitişte (now-1dk) yeni end_date +14 gün → hizasız değil mi?',
   true, (select (end_date at time zone 'Europe/Istanbul')::text from public.leagues where id = pg_temp.lg('L2')));

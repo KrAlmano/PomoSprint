@@ -4,4 +4,6 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Yalnızca yerel geliştirme sunucusu; release manifestine taşınmaz. -->
+    <application android:networkSecurityConfig="@xml/local_network_security_config" />
 </manifest>

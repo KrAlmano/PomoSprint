@@ -1,0 +1,32 @@
+PomoSprint — 5 Ekim 2026 takip QA raporu
+
+SONUÇ
+İncelenen simülatör/emülatör senaryoları geçti. iOS ve Android release derlemeleri tamamlandı. Fiziksel cihaz ve gerçek Google/Apple girişi sonraki turda doğrulanacak; bu rapor tüm yayın koşullarının tamamlandığı anlamına gelmez.
+
+DÜZELTİLEN / TAMAMLANAN AKIŞLAR
+1. Cihazın IANA saat dilimi iOS/Android native kanaldan okunup profile ve raporların gün hesabına aktarılıyor. Geçersiz dilim/ağ hatası eski dilimi koruyor.
+2. Giden istek iptali, arkadaş silme, engelleme ve engeli kaldırma arayüzleri eklendi. Onay iptali, çift gönderim koruması ve ağ hatasında verinin korunması kontrol edildi. Engeli kaldırmak arkadaşlığı otomatik geri getirmiyor.
+3. Google/Apple girişinin ardından uygulama açılmadan mevcut yasal belge sürümleri sunucudaki consents defterine yazılıyor; hata halinde oturum kapatılıyor. Onaysız yerel hesapta iki kayıt ve tekrar çağrıda çoğalmama gerçek yerel RPC ile doğrulandı. Gerçek sağlayıcı girişi denenmedi.
+
+DOĞRULAMA
+- flutter analyze: temiz.
+- Tüm birim/widget paketi: 1068 geçti, 5 isteğe bağlı ekran görüntüsü testi atlandı.
+- New York saat diliminde rapor/gün sınırı: 93 geçti.
+- Yeni hedefli testler: 9 geçti. Eski arkadaş/güvenlik/uyumluluk kontrolleri: 66 geçti.
+- iPhone 16 Plus iOS 18.6 ve Android 16 API36 ARM64: yeni akışlar gerçek uygulama arayüzünden geçti.
+- Saat dilimi: iki platformda gerçek native okuma; New York yanıtı kontrollü kanal taklidi ile gerçek DB/cache/DST hesabına işlendi. Sistem saat dilimi ayarı fiziksel olarak değiştirilmedi.
+- iOS ek seans kontrolü: tek 25 dk kaydı, 5 puan, 20 kum; sonuç ekranı, DB, rapor ve lig doğrulandı. Bekleme yerine geçmişte başlayan seans fikstürü kullanıldı.
+- Android ARM64 release APK: başarılı, 29.5 MB. iOS imzasız release Runner.app: başarılı, 30.4 MB.
+- Ekranlar görsel olarak incelendi; arkadaş yönetimi altı ekran boyutunda taşma testinden geçti.
+
+ORTAM / KAPSAM
+Tüm yeni hesaplar ve işlemler yalnızca yerel Supabase üzerinde. Canlı SQL veya yayın yapılmadı. Önceki QA_FULL_2026-10-05 raporu tarihsel; saat dilimi ve eksik arkadaş yönetimi sınırlamaları bu takip raporuyla güncellendi. Önceki beşer hesaplı iOS/Android kapsamı ve 5/10 sn → 25/50 dk seans kontrollerinin kanıtları önceki raporda.
+
+SONRAKİ TUR
+Fiziksel iOS/Android bildirim sunumu, kilit ekranı/Canlı Etkinlik davranışı, gerçek Google/Apple sağlayıcı girişleri ve gerçek cihazda saat dilimi değişimi. Yayın öncesi AGENTS.md içindeki ayrı backend/yayın maddeleri de tamamlanmalı.
+
+KANITLAR
+QA_FOLLOWUP_2026-10-05.json, qa_followup_evidence_20261005/ ve ekranlar/20261005_followup/.
+
+ELLE TESTE HAZIR
+iPhone 16 Plus / iOS 18.6 açık. QA1 test hesabı: 17 puan, 40 kum. TEST rozeti görünüyor; 5/10 saniye tamamlanınca 25/50 dakika yerel kayıt oluşur. Android emülatörü kapalı, Gradle daemon durduruldu.

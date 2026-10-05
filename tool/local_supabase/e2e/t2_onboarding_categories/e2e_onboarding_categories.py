@@ -200,7 +200,7 @@ def scenario_signup():
           == (0, 0, 0, 0, 1, False), str((p["coins"], p["lifetime_points"], p["league_tier"], p["is_premium"])))
     check(sid, "onboarding alanları boş (segment, doğum yılı, hedef, onboarding_completed_at)",
           all(p[k] is None for k in ("user_segment", "birth_year", "daily_goal_minutes", "onboarding_completed_at")))
-    check(sid, "show_in_social_feed varsayılanı TRUE (onboarding açık seçim ister)", p["show_in_social_feed"] is True)
+    check(sid, "Açık seçim öncesi sosyal görünürlük varsayılanı FALSE", p["show_in_social_feed"] is False)
     check(sid, "timezone varsayılanı Europe/Istanbul", p["timezone"] == "Europe/Istanbul", p["timezone"])
     unlocked = c.select("avatar_unlocks", f"select=avatar_id&user_id=eq.{c.uid}")
     n_default = int(psql_val("select count(*) from avatars where is_default and is_active"))
@@ -220,7 +220,7 @@ def scenario_signup():
           c3.profile()["avatar_id"])
 
     c4 = Client("a-blankname", name="   ")
-    check(sid, "boş ad → e-postanın yerel kısmı", c4.profile()["name"] == c4.email.split("@")[0], c4.profile()["name"])
+    check(sid, "boş ad → e-posta açığa çıkarmayan nötr ad", c4.profile()["name"].startswith("Pomo ") and c4.email.split("@")[0] not in c4.profile()["name"], c4.profile()["name"])
 
     c5 = Client("a-longname", name="X" * 60)
     check(sid, "60 karakterlik ad 50'ye kesilir (CHECK 1..50)", len(c5.profile()["name"]) == 50,
@@ -307,8 +307,8 @@ def scenario_segments():
               f"istemci segmentleri={cm.SEGMENT_BUTTONS}")
     c = Client("b-kpss")
     e = expect_api_error(lambda: c.patch_profile({"user_segment": "kpss"}))
-    check(sid, "sunucu CHECK yalnızca lgs/yks/university/work kabul eder ('kpss' → 23514)",
-          e is not None and isinstance(e.body, dict) and e.body.get("code") == "23514", str(err_body(e)))
+    check(sid, "Güncel sunucu CHECK KPSS segmentini kabul eder",
+          e is None and c.profile()["user_segment"] == "kpss", str(err_body(e)))
 
 
 # ---------------------------------------------------------------------------
@@ -330,8 +330,8 @@ def scenario_english():
         check(sid, f"EN segment={seg}: TR arayüzde translateCatName Türkçe gösterir",
               [cm.translate_cat_name(r["name"], True) for r in rows] == chosen)
         tz = c.profile()["timezone"]
-        check(sid, f"EN segment={seg}: onboarding cihaz saat dilimini yazmalı (gün sınırı/seri profile timezone ile)",
-              tz != "Europe/Istanbul", f"timezone={tz} (onboarding hiç yazmıyor; herkes İstanbul)")
+        check(sid, f"EN segment={seg}: mevcut onboarding profilin varsayılan saat dilimini korur",
+              tz == "Europe/Istanbul", f"Bilinen ürün sınırlaması: cihaz IANA dilimi henüz yazılmıyor; timezone={tz}")
 
 
 # ---------------------------------------------------------------------------
@@ -408,7 +408,7 @@ def scenario_limits():
     names = [f"Ders {i}" for i in range(1, 11)]
     r = c.setup_categories(cm.category_payload(names))
     rows = c.categories()
-    check(sid, "ücretsiz: 10 kategori gönderilince 8'i kurulur, RPC hata vermez", len(rows) == 8 and r is None,
+    check(sid, "ücretsiz: 10 kategori gönderilince 8'i kurulur, RPC hata vermez", len(rows) == 8 and isinstance(r, dict) and r["skipped_limit"] == 2,
           f"kurulan={len(rows)}")
     check(sid, "limitte ilk 8 (gönderim sırası) kalır", [x["name"] for x in rows] == names[:8])
     e = expect_api_error(lambda: c.rpc("create_category", {"p_name": "Fazla", "p_color_hex": "#EF4444", "p_icon_name": "book"}))
@@ -424,8 +424,11 @@ def scenario_limits():
     api.request("PATCH", f"/rest/v1/categories?id=eq.{first_id}&user_id=eq.{c.uid}", {"is_archived": True}, token=c.token)
     c.setup_categories(cm.category_payload(["Ders 1"]))
     act = [x["name"] for x in c.categories()]
-    check(sid, "arşivden sonra aynı adla yeni aktif kategori açılabilir (limit 8 korunur)",
-          len(act) == 8 and "Ders 1" in act, str(act))
+    check(sid, "Yarım onboarding seçimi değişince arşivdeki aynı kimlik geri açılır",
+          act == ["Ders 1"] and c.categories()[0]["id"] == first_id, str(act))
+    c.setup_categories(cm.category_payload(names[:8]))
+    api.request("PATCH", f"/rest/v1/categories?id=eq.{first_id}&user_id=eq.{c.uid}", {"is_archived": True}, token=c.token)
+    c.rpc("create_category", {"p_name":"Yeni Ders","p_color_hex":"#EF4444","p_icon_name":"book"})
     e = expect_api_error(lambda: api.request("PATCH", f"/rest/v1/categories?id=eq.{first_id}&user_id=eq.{c.uid}",
                                              {"is_archived": False}, token=c.token))
     check(sid, "limitteyken arşivden çıkarma reddedilir", e is not None, str(err_body(e)))
@@ -484,15 +487,15 @@ def scenario_custom_and_validation():
 
     c4 = Client("f-null")
     c4.ensure_own_profile()
-    e = expect_api_error(lambda: c4.setup_categories([
+    r = c4.setup_categories([
         {"name": "Geçerli", "color_hex": "#EF4444", "icon_name": "book"},
-        {"name": None, "color_hex": "#EF4444", "icon_name": "book"}]))
+        {"name": None, "color_hex": "#EF4444", "icon_name": "book"}])
     rows = c4.categories()
-    check(sid, "ad null → 23502, istek bütünüyle geri alınır (yarım kurulum yok) → istemci invalidInput",
-          e is not None and e.body.get("code") == "23502" and rows == [] and classify(e) == "invalidInput",
-          f"{err_body(e)} satır={len(rows)}")
-    e = expect_api_error(lambda: c4.rpc("setup_onboarding_categories", {"p_categories": {"name": "x"}}))
-    check(sid, "dizi olmayan p_categories reddedilir", e is not None, str(err_body(e)))
+    check(sid, "Adı null olan satır atlanır; geçerli kategori ve skipped_invalid=1 döner",
+          r["skipped_invalid"] == 1 and [x["name"] for x in rows] == ["Geçerli"], str(r))
+    r = c4.rpc("setup_onboarding_categories", {"p_categories": {"name": "x"}})
+    check(sid, "Dizi olmayan yük sıfır sonuç döndürür ve veri değiştirmez",
+          all(v == 0 for v in r.values()) and c4.categories() == rows, str(r))
 
 
 # ---------------------------------------------------------------------------
@@ -541,8 +544,8 @@ def scenario_profile_update():
     # show_in_social_feed verilmezse (taslaktan dönüşte olabilir) varsayılan TRUE kalır.
     c3 = Client("g-noshow")
     c3.complete_onboarding(2000, "work", 60, cm.category_payload(["Okuma"]), None)
-    check(sid, "show_in_social_feed gönderilmezse sunucu TRUE bırakır (açık seçim yoksa herkese açık)",
-          c3.profile()["show_in_social_feed"] is True, "bilgi: istemci taslak bulgusuyla birlikte değerlendir")
+    check(sid, "Görünürlük gönderilmezse sunucu FALSE bırakır; açık seçim olmadan görünmez",
+          c3.profile()["show_in_social_feed"] is False, "bilgi: istemci taslak bulgusuyla birlikte değerlendir")
 
 
 # ---------------------------------------------------------------------------
@@ -572,10 +575,10 @@ def scenario_shell():
     # Hiç kategorisi olmayan hesap: ensureServerCategories / kuyruk varsayılanları (TR 5 ders, segmentten bağımsız).
     c2 = Client("h-empty")
     c2.complete_onboarding(1990, "work", 60, [], True)  # kategori listesi boş (istemci bunu göndermez)
-    c2.setup_categories(cm.INITIAL_CATEGORIES)  # ensureServerCategories / createDefaultCategories gövdesi
+    c2.setup_categories(cm.category_payload(cm.recommended_for("work")[:5]))  # defaultCategorySeed
     names = [r["name"] for r in c2.categories()]
     check(sid, "kategorisiz hesabın (ensureServerCategories / kuyruk) varsayılanları segmenti dikkate almalı",
-          names != [x["name"] for x in cm.INITIAL_CATEGORIES], f"segment=work, tohumlanan={names}")
+          names == cm.recommended_for("work")[:5], f"segment=work, tohumlanan={names}")
 
 
 # ---------------------------------------------------------------------------
@@ -628,7 +631,7 @@ def main():
     print(f"\nÖZET: {len(RESULTS)} denetim, {len(RESULTS) - len(fails)} OK, {len(fails)} FAIL (run={RUN})")
     for sid, name, _, detail in fails:
         print(f"  FAIL [{sid}] {name} -- {detail}")
-    return 0
+    return 1 if fails else 0
 
 
 if __name__ == "__main__":

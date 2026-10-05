@@ -11,6 +11,7 @@ import '../../services/supabase_service.dart';
 import '../../theme.dart';
 import '../../utils/responsive.dart';
 import '../../utils/user_report.dart';
+import 'social_error_text.dart';
 import '../avatar_widget.dart';
 
 /// Başka bir kullanıcının görünen adının geçtiği yer (bildirim e-postasında
@@ -50,18 +51,24 @@ Uri userReportUri(AppLocalizations l10n, UserSafetyTarget target, UserReportPlac
 }
 
 /// Başka kullanıcı satırının güvenlik menüsü: "Kullanıcıyı bildir" ve
-/// (izin verilirse) "Bu kullanıcıyı gizle". Kendi satırında açılmamalı.
+/// (izin verilirse) gizleme, kimlik varsa engelleme / arkadaşlıktan çıkarma.
+/// Kendi satırında açılmamalı.
 Future<void> showUserSafetySheet(
   BuildContext context, {
   required UserSafetyTarget target,
   required UserReportPlace place,
   bool allowHide = true,
+  bool allowRemoveFriend = false,
+  SupabaseService? service,
+  Future<void> Function()? onChanged,
 }) async {
+  final data = service ?? SupabaseService.instance;
   final action = await showModalBottomSheet<_SafetyAction>(
     context: context,
     showDragHandle: true,
     constraints: const BoxConstraints(maxWidth: ContentWidth.form),
-    builder: (sheetContext) => _UserSafetySheet(target: target, allowHide: allowHide),
+    builder: (sheetContext) =>
+        _UserSafetySheet(target: target, allowHide: allowHide, allowRemoveFriend: allowRemoveFriend, service: data),
   );
   if (action == null || !context.mounted) return;
   switch (action) {
@@ -69,10 +76,21 @@ Future<void> showUserSafetySheet(
       await _report(context, target, place);
     case _SafetyAction.hide:
       await _hide(context, target);
+    case _SafetyAction.block:
+    case _SafetyAction.remove:
+      final l10n = AppLocalizations.of(context)!;
+      final block = action == _SafetyAction.block;
+      await confirmFriendAction(
+        context,
+        title: block ? l10n.blockUserAction : l10n.friendsRemoveAction,
+        body: block ? l10n.blockUserConfirm : l10n.friendsRemoveConfirm,
+        operation: () => block ? data.blockUser(target.userId!) : data.removeFriend(target.userId!),
+      );
+      if (onChanged != null) await onChanged();
   }
 }
 
-enum _SafetyAction { report, hide }
+enum _SafetyAction { report, hide, block, remove }
 
 Future<void> _report(BuildContext context, UserSafetyTarget target, UserReportPlace place) async {
   final l10n = AppLocalizations.of(context)!;
@@ -86,15 +104,17 @@ Future<void> _report(BuildContext context, UserSafetyTarget target, UserReportPl
   }
   if (opened) return;
   // E-posta uygulaması yoksa adres gösterilir ve kopyalanabilir.
-  messenger.showSnackBar(SnackBar(
-    content: Text(l10n.reportMailFailed(kSupportEmail)),
-    behavior: SnackBarBehavior.floating,
-    duration: const Duration(seconds: 6),
-    action: SnackBarAction(
-      label: l10n.reportCopyAddress,
-      onPressed: () => unawaited(Clipboard.setData(const ClipboardData(text: kSupportEmail))),
+  messenger.showSnackBar(
+    SnackBar(
+      content: Text(l10n.reportMailFailed(kSupportEmail)),
+      behavior: SnackBarBehavior.floating,
+      duration: const Duration(seconds: 6),
+      action: SnackBarAction(
+        label: l10n.reportCopyAddress,
+        onPressed: () => unawaited(Clipboard.setData(const ClipboardData(text: kSupportEmail))),
+      ),
     ),
-  ));
+  );
 }
 
 Future<void> _hide(BuildContext context, UserSafetyTarget target) async {
@@ -111,27 +131,37 @@ Future<void> _hide(BuildContext context, UserSafetyTarget target) async {
     messenger.showSnackBar(SnackBar(content: Text(l10n.profileSettingSaveError), behavior: SnackBarBehavior.floating));
     return;
   }
-  messenger.showSnackBar(SnackBar(
-    content: Text(l10n.userHiddenMsg(target.name)),
-    behavior: SnackBarBehavior.floating,
-    action: SnackBarAction(
-      label: l10n.undoAction,
-      onPressed: () => unawaited(store.unhide(ownerId, user)),
+  messenger.showSnackBar(
+    SnackBar(
+      content: Text(l10n.userHiddenMsg(target.name)),
+      behavior: SnackBarBehavior.floating,
+      action: SnackBarAction(label: l10n.undoAction, onPressed: () => unawaited(store.unhide(ownerId, user))),
     ),
-  ));
+  );
 }
 
 class _UserSafetySheet extends StatelessWidget {
   final UserSafetyTarget target;
   final bool allowHide;
+  final bool allowRemoveFriend;
+  final SupabaseService service;
 
-  const _UserSafetySheet({required this.target, required this.allowHide});
+  const _UserSafetySheet({
+    required this.target,
+    required this.allowHide,
+    required this.allowRemoveFriend,
+    required this.service,
+  });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final muted = isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant;
+    final canBlock =
+        target.userId?.isNotEmpty == true &&
+        service.currentUser.value?.id != null &&
+        target.userId != service.currentUser.value?.id;
     final canHide = allowHide && (SupabaseService.instance.currentUser.value?.id?.isNotEmpty ?? false);
     return SafeArea(
       child: SingleChildScrollView(
@@ -164,6 +194,18 @@ class _UserSafetySheet extends StatelessWidget {
               subtitle: Text(l10n.reportUserActionSub, style: TextStyle(fontSize: 12, color: muted)),
               onTap: () => Navigator.pop(context, _SafetyAction.report),
             ),
+            if (canBlock)
+              ListTile(
+                leading: const Icon(Icons.block, color: Colors.red),
+                title: Text(l10n.blockUserAction),
+                onTap: () => Navigator.pop(context, _SafetyAction.block),
+              ),
+            if (canBlock && allowRemoveFriend)
+              ListTile(
+                leading: const Icon(Icons.person_remove_outlined),
+                title: Text(l10n.friendsRemoveAction),
+                onTap: () => Navigator.pop(context, _SafetyAction.remove),
+              ),
             if (canHide)
               ListTile(
                 leading: Icon(Icons.visibility_off_outlined, color: muted),
@@ -199,6 +241,94 @@ class UserActionsButton extends StatelessWidget {
         Icons.more_vert_rounded,
         size: 20,
         color: color ?? (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
+      ),
+    );
+  }
+}
+
+/// İşlem sunucu yanıtını beklerken ikinci dokunuş ve geri çıkış engellenir.
+Future<bool?> confirmFriendAction(
+  BuildContext context, {
+  required String title,
+  required String body,
+  required Future<Map<String, dynamic>> Function() operation,
+}) => showDialog<bool>(
+  context: context,
+  barrierDismissible: false,
+  builder: (_) => _FriendActionDialog(title: title, body: body, operation: operation),
+);
+
+class _FriendActionDialog extends StatefulWidget {
+  final String title;
+  final String body;
+  final Future<Map<String, dynamic>> Function() operation;
+  const _FriendActionDialog({required this.title, required this.body, required this.operation});
+  @override
+  State<_FriendActionDialog> createState() => _FriendActionDialogState();
+}
+
+class _FriendActionDialogState extends State<_FriendActionDialog> {
+  bool _busy = false;
+  String? _error;
+  Future<void> _confirm() async {
+    if (_busy) return;
+    final l10n = AppLocalizations.of(context)!;
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    try {
+      final response = await widget.operation();
+      if (!mounted) return;
+      if (response['success'] == true) {
+        Navigator.pop(context, true);
+        return;
+      }
+      setState(
+        () => _error = response['code'] == 'limit_reached' || response['code'] == 'rate_limited'
+            ? l10n.friendsErrRateLimited
+            : l10n.friendActionFailed,
+      );
+    } catch (e) {
+      if (mounted) setState(() => _error = socialErrorText(l10n, e));
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return PopScope(
+      canPop: !_busy,
+      child: AlertDialog(
+        scrollable: true,
+        constraints: const BoxConstraints(maxWidth: ContentWidth.form),
+        title: Text(widget.title),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(widget.body),
+            if (_error != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Text(_error!, style: const TextStyle(color: Colors.red)),
+              ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: _busy ? null : () => Navigator.pop(context, false),
+            child: Text(l10n.friendActionCancel),
+          ),
+          FilledButton(
+            onPressed: _busy ? null : _confirm,
+            child: _busy
+                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                : Text(l10n.friendActionConfirm),
+          ),
+        ],
       ),
     );
   }

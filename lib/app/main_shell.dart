@@ -17,6 +17,7 @@ import '../screens/reports_screen.dart';
 import '../screens/social_screen.dart';
 import '../screens/timer_screen.dart';
 import '../services/language_service.dart';
+import '../services/local_test_mode.dart';
 import '../services/lock_screen_timer.dart';
 import '../services/notification_service.dart';
 import '../services/supabase_service.dart';
@@ -126,6 +127,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
         _syncRetryAttempt = 0;
         if (_service.pendingSessionCount.value > 0 || !_service.isCloudActive) unawaited(_syncPendingSessions());
         unawaited(_service.verifyAppleCredential());
+        unawaited(_service.syncDeviceTimeZone());
       case AppLifecycleState.paused || AppLifecycleState.hidden || AppLifecycleState.detached:
         _cancelSyncRetry();
       case AppLifecycleState.inactive:
@@ -266,9 +268,9 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
 
   void _onTimerStateChanged(bool isRunning, String categoryName, int minutesLeft) {
     if (mounted && _isTimerRunning != isRunning) setState(() => _isTimerRunning = isRunning);
-    // Hızlı test sayacı (QUICK_TIMER) sunucuya hiçbir şey yazmaz: canlı
-    // çalışanlar listesine de girmez (seanslar zaten gönderilmez).
-    if (kQuickTimer) return;
+    // Kayıtsız hızlı sayaç canlı listeye girmez. Yerel kayıtlı QA modu
+    // normal sosyal başlat/bitir akışını da çalıştırır.
+    if (kQuickTimer && !recordLocalQuickSessions) return;
     if (isRunning) {
       unawaited(_service.startStudySession(durationMinutes: minutesLeft, categoryName: categoryName));
     } else {
@@ -289,6 +291,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
       wasPaused: session.wasPaused,
       foregroundSeconds: session.foregroundSeconds,
       startedAt: session.startedAt,
+      recordAccelerated: session.recordAccelerated,
     );
     if (!mounted) return result;
     // Ağ/sunucu yüzünden kuyrukta kaldıysa kendiliğinden yeniden denenir

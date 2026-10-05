@@ -1,0 +1,106 @@
+[
+  {
+    "name": "Başkasının profili RLS ile görünmez",
+    "passed": true
+  },
+  {
+    "name": "Başkasının kategorileri RLS ile görünmez",
+    "passed": true
+  },
+  {
+    "name": "Doğrudan coins değiştirilemez",
+    "passed": true
+  },
+  {
+    "name": "Doğrudan lifetime_points değiştirilemez",
+    "passed": true
+  },
+  {
+    "name": "Doğrudan current_streak değiştirilemez",
+    "passed": true
+  },
+  {
+    "name": "Kendi arkadaş kodu reddedilir",
+    "passed": true
+  },
+  {
+    "name": "Geçersiz arkadaş kodu reddedilir",
+    "passed": true
+  },
+  {
+    "name": "Arkadaş isteği gönderilir",
+    "passed": true
+  },
+  {
+    "name": "Giden istek yalnızca gönderende görünür",
+    "passed": true
+  },
+  {
+    "name": "Gelen istek yalnızca hedefte görünür",
+    "passed": true
+  },
+  {
+    "name": "Bekleyen istek arkadaş değildir",
+    "passed": true
+  },
+  {
+    "name": "Aynı istek ikinci kez kabul edilmez",
+    "passed": true
+  },
+  {
+    "name": "Üçüncü kişi isteği kabul edemez",
+    "passed": true
+  },
+  {
+    "name": "Giden istek iptal edilir",
+    "passed": true
+  },
+  {
+    "name": "Alıcı isteği reddedebilir",
+    "passed": true
+  },
+  {
+    "name": "Reddedilen istek bekleme süresinde tekrar gönderilemez",
+    "passed": true
+  },
+  {
+    "name": "Reddeden taraf ters yönde istek gönderebilir",
+    "passed": true
+  },
+  {
+    "name": "Alıcı isteği kabul eder",
+    "passed": true
+  },
+  {
+    "name": "Arkadaşlık iki yönlüdür",
+    "passed": true
+  },
+  {
+    "name": "Odak arkadaşta görünür, üçüncü kişide görünmez",
+    "passed": true
+  },
+  {
+    "name": "Engel arkadaşlığı iki yönlü kaldırır",
+    "passed": true
+  },
+  {
+    "name": "Engelleyen canlı odakta diğerini görmez",
+    "passed": true
+  },
+  {
+    "name": "Engellenen yeniden istek gönderemez",
+    "passed": true
+  },
+  {
+    "name": "Engel kaldırılır",
+    "passed": true
+  },
+  {
+    "name": "Engeli kaldırmak arkadaşlığı otomatik geri açmaz",
+    "passed": true
+  },
+  {
+    "name": "Arkadaş silme iki yönlüdür",
+    "passed": true
+  }
+]

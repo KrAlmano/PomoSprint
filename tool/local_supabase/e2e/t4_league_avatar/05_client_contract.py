@@ -86,13 +86,13 @@ def run(token, uid):
     # 1) Ligsiz kullanıcı: get_my_league_ranking (istemci: rpc('get_my_league_ranking'), parametresiz)
     rows = api.rpc("get_my_league_ranking", {}, token)
     keys = {"name", "avatar_id", "weekly_points", "tier", "end_date", "is_me",
-            "promotion_zone_end", "demotion_zone_start", "member_count"}
+            "promotion_zone_end", "demotion_zone_start", "member_count", "id", "is_blocked"}
     check("get_my_league_ranking: liste, tek satır, LeagueSnapshot alanlarının hepsi",
           isinstance(rows, list) and len(rows) == 1 and set(rows[0]) == keys, rows)
     r = rows[0]
     end = dt.datetime.fromisoformat(r["end_date"])
-    check("Ligsiz satır: is_me, 0 puan, member_count 1 → istemci awaitingPlacement (memberCount<=1 && myPoints<=0)",
-          r["is_me"] is True and r["weekly_points"] == 0 and r["member_count"] == 1
+    check("Ligsiz satır: is_me, 0 puan, member_count 0 → istemci awaitingPlacement",
+          r["is_me"] is True and r["weekly_points"] == 0 and r["member_count"] == 0
           and r["promotion_zone_end"] == 1 and r["demotion_zone_start"] == 999, r)
     # istemcinin assumedLeaguePeriodEnd() formülü ile sunucu aynı mı (DateTime.tryParse ISO)
     now = dt.datetime.now(dt.timezone.utc)

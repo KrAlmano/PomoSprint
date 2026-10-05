@@ -15,6 +15,17 @@ import UIKit
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+    let timezoneChannel = FlutterMethodChannel(
+      name: "com.pomosprint.app/device_timezone",
+      binaryMessenger: engineBridge.applicationRegistrar.messenger()
+    )
+    timezoneChannel.setMethodCallHandler { call, result in
+      if call.method == "getTimeZone" {
+        result(TimeZone.current.identifier)
+      } else {
+        result(FlutterMethodNotImplemented)
+      }
+    }
     // Kilit ekranı sayacı (Canlı Etkinlik) kanalı: lib/services/lock_screen_timer.dart
     LiveActivityChannel.register(with: engineBridge.applicationRegistrar.messenger())
   }

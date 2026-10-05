@@ -154,6 +154,7 @@ class _ProfileScreenState extends State<ProfileScreen> with WidgetsBindingObserv
   }
 
   Future<void> _openNotificationSettings() async {
+    if (!mounted) return;
     final l10n = AppLocalizations.of(context)!;
     final messenger = ScaffoldMessenger.of(context);
     final opened = await NotificationService.instance.openSystemSettings();

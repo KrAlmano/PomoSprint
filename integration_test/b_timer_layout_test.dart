@@ -1,4 +1,4 @@
-// (b) SAYAÇ DÜZENİ, gerçek iPhone 16 Pro simülatörü (402x874, güvenli alanlı):
+// (b) SAYAÇ DÜZENİ, gerçek simülatör/emülatör (cihazın boyutu ve güvenli alanı):
 // BAŞLAT ekranın içinde ve alt gezinmenin üstünde, 25 dk ile 50 dk aynı
 // satırda, kum saati görünür, taşma (RenderFlex overflow) yok.
 //
@@ -14,7 +14,7 @@ import 'support/e2e.dart';
 void main() {
   initE2e();
 
-  testWidgets('b · sayaç düzeni 402x874: BAŞLAT görünür, 25/50 tek satır, kum saati, taşma yok', (tester) async {
+  testWidgets('b · cihaz boyutunda BAŞLAT görünür, 25/50 tek satır, kum saati, taşma yok', (tester) async {
     await openShellWithNewAccount(tester, 'sayac');
     await pumpUntil(tester, find.byType(TimerScreen));
     await pumpUntilTrue(
@@ -26,8 +26,9 @@ void main() {
 
     final view = tester.view;
     final screen = view.physicalSize / view.devicePixelRatio;
-    expect(screen.width, closeTo(402, 0.5), reason: 'iPhone 16 Pro mantıksal genişlik');
-    expect(screen.height, closeTo(874, 0.5), reason: 'iPhone 16 Pro mantıksal yükseklik');
+    expect(screen.width, greaterThanOrEqualTo(320));
+    expect(screen.height, greaterThan(screen.width));
+    debugPrint('[E2E] Gerçek cihaz mantıksal boyutu: $screen');
     final screenRect = Offset.zero & screen;
     final safeBottom = screen.height - view.padding.bottom / view.devicePixelRatio;
 

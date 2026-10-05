@@ -2102,4 +2102,68 @@ class AppLocalizationsEn extends AppLocalizations {
   String rankingZoneNeedsMinPointsMe(int points) {
     return 'You\'re in the promotion zone, but you need at least $points points to move up. Keep completing sessions.';
   }
+
+  @override
+  String get forgotPasswordDescription =>
+      'Enter your email address. We will send a verification link to reset your password.';
+
+  @override
+  String get sendPasswordResetEmail => 'Send verification email';
+
+  @override
+  String get passwordResetSentTitle => 'Check your email';
+
+  @override
+  String get passwordResetSentDescription =>
+      'If an account is registered with this address, we sent a password reset link. Check your inbox and spam folder, then follow the link to set a new password.';
+
+  @override
+  String get timerQuickRecordedSemantics =>
+      'Local quick test timer: sessions are saved as 25 or 50 minutes';
+
+  @override
+  String get friendsOutgoingTitle => 'Sent requests';
+
+  @override
+  String get friendsCancelRequest => 'Cancel request';
+
+  @override
+  String get friendsRemoveAction => 'Remove friend';
+
+  @override
+  String get friendsRemoveConfirm =>
+      'Remove this friend? You will need to send a new request to become friends again.';
+
+  @override
+  String get friendsCancelConfirm => 'Cancel this friend request?';
+
+  @override
+  String get blockedUsersTitle => 'Blocked users';
+
+  @override
+  String get blockUserAction => 'Block user';
+
+  @override
+  String get blockUserConfirm =>
+      'Your friendship and requests will be removed. You cannot see each other in the live feed or send friend requests.';
+
+  @override
+  String get unblockUserAction => 'Unblock user';
+
+  @override
+  String get unblockUserConfirm =>
+      'The block will be removed. Your previous friendship will not be restored automatically.';
+
+  @override
+  String get friendActionCompleted => 'Done.';
+
+  @override
+  String get friendActionFailed =>
+      'Could not complete the action. Refresh the list and try again.';
+
+  @override
+  String get friendActionConfirm => 'Confirm';
+
+  @override
+  String get friendActionCancel => 'Cancel';
 }

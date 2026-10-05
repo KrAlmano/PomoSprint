@@ -3534,6 +3534,120 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Terfi bölgesindesin ama terfi için en az {points} puan gerekiyor. Seans tamamlamaya devam et.'**
   String rankingZoneNeedsMinPointsMe(int points);
+
+  /// No description provided for @forgotPasswordDescription.
+  ///
+  /// In tr, this message translates to:
+  /// **'E-posta adresini gir. Şifreni yenilemen için bir doğrulama bağlantısı göndereceğiz.'**
+  String get forgotPasswordDescription;
+
+  /// No description provided for @sendPasswordResetEmail.
+  ///
+  /// In tr, this message translates to:
+  /// **'Doğrulama maili gönder'**
+  String get sendPasswordResetEmail;
+
+  /// No description provided for @passwordResetSentTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mailinize gönderildi'**
+  String get passwordResetSentTitle;
+
+  /// No description provided for @passwordResetSentDescription.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu adresle kayıtlı bir hesap varsa şifre sıfırlama bağlantısını gönderdik. Gelen kutunu ve spam klasörünü kontrol et; e-postadaki bağlantıdan yeni şifreni belirleyebilirsin.'**
+  String get passwordResetSentDescription;
+
+  /// No description provided for @timerQuickRecordedSemantics.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yerel hızlı test sayacı: seanslar 25 veya 50 dakika olarak kaydedilir'**
+  String get timerQuickRecordedSemantics;
+
+  /// No description provided for @friendsOutgoingTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gönderilen istekler'**
+  String get friendsOutgoingTitle;
+
+  /// No description provided for @friendsCancelRequest.
+  ///
+  /// In tr, this message translates to:
+  /// **'İsteği iptal et'**
+  String get friendsCancelRequest;
+
+  /// No description provided for @friendsRemoveAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arkadaşlıktan çıkar'**
+  String get friendsRemoveAction;
+
+  /// No description provided for @friendsRemoveConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arkadaşlıktan çıkarmak istiyor musun? Yeniden arkadaş olmak için istek göndermen gerekir.'**
+  String get friendsRemoveConfirm;
+
+  /// No description provided for @friendsCancelConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu arkadaşlık isteğini iptal etmek istiyor musun?'**
+  String get friendsCancelConfirm;
+
+  /// No description provided for @blockedUsersTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Engellenen kullanıcılar'**
+  String get blockedUsersTitle;
+
+  /// No description provided for @blockUserAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kullanıcıyı engelle'**
+  String get blockUserAction;
+
+  /// No description provided for @blockUserConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arkadaşlık ve aranızdaki istekler kaldırılır. Birbirinizi canlı akışta göremez, arkadaşlık isteği gönderemezsiniz.'**
+  String get blockUserConfirm;
+
+  /// No description provided for @unblockUserAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Engeli kaldır'**
+  String get unblockUserAction;
+
+  /// No description provided for @unblockUserConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Engel kaldırılacak. Önceki arkadaşlığınız otomatik olarak geri gelmez.'**
+  String get unblockUserConfirm;
+
+  /// No description provided for @friendActionCompleted.
+  ///
+  /// In tr, this message translates to:
+  /// **'İşlem tamamlandı.'**
+  String get friendActionCompleted;
+
+  /// No description provided for @friendActionFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'İşlem tamamlanamadı. Listeyi yenileyip tekrar dene.'**
+  String get friendActionFailed;
+
+  /// No description provided for @friendActionConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Onayla'**
+  String get friendActionConfirm;
+
+  /// No description provided for @friendActionCancel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vazgeç'**
+  String get friendActionCancel;
 }
 
 class _AppLocalizationsDelegate

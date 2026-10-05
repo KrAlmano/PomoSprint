@@ -60,6 +60,8 @@ class _FriendsSheetState extends State<FriendsSheet> {
   String? _myCode;
   List<Map<String, dynamic>> _friends = const [];
   List<Map<String, dynamic>> _pendingRequests = const [];
+  List<Map<String, dynamic>> _outgoingRequests = const [];
+  List<Map<String, dynamic>> _blockedUsers = const [];
   bool _isLoading = true;
   bool _hasLoaded = false;
   bool _loadFailed = false;
@@ -87,10 +89,19 @@ class _FriendsSheetState extends State<FriendsSheet> {
     final codeFuture = service.getMyFriendCode();
     List<Map<String, dynamic>>? friends;
     List<Map<String, dynamic>>? pending;
+    List<Map<String, dynamic>>? outgoing;
+    List<Map<String, dynamic>>? blocked;
     try {
-      final results = await Future.wait([service.fetchFriends(), service.fetchPendingFriendRequests()]);
+      final results = await Future.wait([
+        service.fetchFriends(),
+        service.fetchPendingFriendRequests(),
+        service.fetchOutgoingFriendRequests(),
+        service.fetchBlockedUsers(),
+      ]);
       friends = results[0];
       pending = results[1];
+      outgoing = results[2];
+      blocked = results[3];
     } catch (e) {
       debugPrint('[SOCIAL] Arkadaş listesi alınamadı: $e');
     }
@@ -102,6 +113,8 @@ class _FriendsSheetState extends State<FriendsSheet> {
         _friends = [...friends]
           ..sort((a, b) => _asInt(b['lifetime_points']).compareTo(_asInt(a['lifetime_points'])));
         _pendingRequests = pending;
+        _outgoingRequests = outgoing!;
+        _blockedUsers = blocked!;
         _hasLoaded = true;
       }
       _loadFailed = friends == null;
@@ -337,6 +350,7 @@ class _FriendsSheetState extends State<FriendsSheet> {
           StaleDataNotice(onRetry: _loadData),
         ],
         ..._buildPendingRequests(l10n),
+        ..._buildManagedUsers(l10n, _outgoingRequests, outgoing: true),
         const SizedBox(height: 24),
         Text(
           l10n.friendsYourFriends(_friends.length),
@@ -347,6 +361,7 @@ class _FriendsSheetState extends State<FriendsSheet> {
           _buildEmptyFriends(l10n, isDark, muted)
         else
           for (final f in _friends) _buildFriendTile(f, l10n, isDark, muted),
+        ..._buildManagedUsers(l10n, _blockedUsers, outgoing: false),
       ],
     ];
   }
@@ -483,19 +498,59 @@ class _FriendsSheetState extends State<FriendsSheet> {
     ];
   }
 
-  // Arkadaş listesinde ve isteklerde yalnızca bildirme var (gizleme
-  // sıralama ve canlı akış içindir).
-  void _openReport(Map<String, dynamic> user, AppLocalizations l10n, UserReportPlace place) {
-    unawaited(showUserSafetySheet(
-      context,
-      target: UserSafetyTarget(
-        name: user['name']?.toString() ?? l10n.userDefault,
-        userId: user['id']?.toString(),
-        avatarId: user['avatar_id']?.toString(),
+  List<Widget> _buildManagedUsers(AppLocalizations l10n, List<Map<String, dynamic>> users, {required bool outgoing}) {
+    if (users.isEmpty) return const [];
+    return [
+      const SizedBox(height: 24),
+      Text(
+        outgoing ? l10n.friendsOutgoingTitle : l10n.blockedUsersTitle,
+        style: const TextStyle(fontWeight: FontWeight.bold),
       ),
-      place: place,
-      allowHide: false,
-    ));
+      for (final user in users)
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: AvatarWidget(avatar: AvatarCharacter.byId(user['avatar_id']?.toString()), size: 40),
+          title: Text(user['name']?.toString() ?? l10n.userDefault),
+          trailing: IconButton(
+            tooltip: outgoing ? l10n.friendsCancelRequest : l10n.unblockUserAction,
+            icon: Icon(outgoing ? Icons.cancel_outlined : Icons.lock_open),
+            onPressed: user['id'] == null
+                ? null
+                : () async {
+                    await confirmFriendAction(
+                      context,
+                      title: outgoing ? l10n.friendsCancelRequest : l10n.unblockUserAction,
+                      body: outgoing ? l10n.friendsCancelConfirm : l10n.unblockUserConfirm,
+                      operation: () => outgoing
+                          ? _service.cancelFriendRequest(user['id'].toString())
+                          : _service.unblockUser(user['id'].toString()),
+                    );
+                    if (mounted) await _loadData();
+                  },
+          ),
+        ),
+    ];
+  }
+
+  // Gizleme yereldir; engelleme ve arkadaşlıktan çıkarma sunucu işlemleridir.
+  void _openReport(Map<String, dynamic> user, AppLocalizations l10n, UserReportPlace place) {
+    unawaited(
+      showUserSafetySheet(
+        context,
+        target: UserSafetyTarget(
+          name: user['name']?.toString() ?? l10n.userDefault,
+          userId: user['id']?.toString(),
+          avatarId: user['avatar_id']?.toString(),
+        ),
+        place: place,
+        allowHide: false,
+        allowRemoveFriend: place == UserReportPlace.friendsList,
+        service: _service,
+        onChanged: () async {
+          if (mounted) await _loadData();
+        },
+      ),
+    );
   }
 
   Widget _buildRequestTile(Map<String, dynamic> r, AppLocalizations l10n) {

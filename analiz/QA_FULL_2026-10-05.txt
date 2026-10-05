@@ -1,0 +1,56 @@
+PomoSprint — kapsamlı yerel QA raporu
+5 Ekim 2026
+
+Sonuç
+Ana uygulama akışları iPhone 16 Plus / iOS 18.6 simülatöründe ve Pixel 7a / Android 16 ARM64 emülatöründe geçti. Android release APK (29,5 MB) ve imzasız iOS release Runner.app (30,3 MB) derlendi. Bu sonuç mağazaya yayın onayı değildir; aşağıdaki kapsam sınırları ve AGENTS.md §10 operasyon işleri ayrıca bekliyor.
+
+Ortam ve veri
+Canlıya hesap, seans veya SQL yazılmadı. Tüm hesaplar yerel Supabase ve posta kutusu Mailpit içinde oluşturuldu. Her platform için ayrı beş yeni QA hesabı kullanıldı; kayıt/onboarding ayrıca gerçek UI üzerinden YKS ve KPSS senaryolarıyla sınandı. Beşli hesap gruplarının her birinde 6 seans, toplam 225 dakika, 51 puan, 120 kum ve kişi başına 2 arkadaş doğrulandı.
+5 saniye tamamlanınca 25 dakika; 10 saniye tamamlanınca 50 dakika kaydı yalnızca açıkça etkinleştirilen yerel debug QA modunda yapılır. Normal uygulama/RPC ve release süreleri gerçek 25/50 dakikadır. Canlı sunucu kısa seans kabul edecek şekilde değiştirilmedi.
+Android emülatörü 2 çekirdek / 1536 MB, Gradle en fazla 2 işçi / 2048 MB heap ile çalıştırıldı. iOS ve Android emülatörleri sırayla kullanıldı. Android SDK/JDK kuruldu; Gradle daemon ve Android emülatörü iş sonunda kapatıldı. Yerel Supabase, manuel deneme için açık tutuldu.
+
+Çalıştırılan senaryolar
+1. Kayıt ve onboarding: zorunlu onaylar, yaş, segment, kategoriler, hedef, shell yönlendirmesi; iOS ve Android geçti.
+2. Sayaç düzeni: 16 Plus ve Pixel 7a gerçek ekran boyutunda BAŞLAT, 25/50 düğmeleri, kategoriler, kum saati ve gezinme görünür; geçti. Rapor ekranları görsel olarak da incelendi.
+3. Gerçek UI kısa seanslar: beş hesapla 25/50 kayıt, puan/kum, günlük/haftalık/aylık rapor, lig ve arkadaş sıralaması; iki platformda geçti.
+4. Duraklatma: aynı client_uuid/started_at korunması, diskte saklama, ekran yeniden kurulumu, devam ve ikinci duraklatmanın reddi; iki platformda geçti. Duraklatılmış 50 dakika doğru olarak 9 puan / 20 kum verdi.
+5. Çevrimdışı: yerel API ağ geçidi gerçekten durduruldu, seans bitirildi, kuyruk ve rapor korundu, ekranlar offline yeniden kuruldu, API geri gelince tek kayıt gönderildi. Tekrar senkronizasyon ikinci kez puan vermedi; iki platformda geçti.
+6. Hesap izolasyonu: A'dan çıkış / B'ye giriş / B raporu / A'ya dönüş; B'ye A'nın puan, kuyruk ve seansı taşınmadı; iki platformda geçti.
+7. Süreç kapanışı: iOS uygulaması gerçek simctl terminate ile kapatıldı; süre dolduktan sonra yeni OS sürecinde yeniden açıldı. Yalnızca bir yeni 50 dakika / 12 puan / 20 kum kaydı ve canlı odağın temizlenmesi doğrulandı. Android'de gerçek OS kill senaryosu ayrıca koşulmadı; Android pause/ekran yeniden kurma ve kalıcı kuyruk senaryoları koşuldu.
+8. Arkadaşlar ve sosyal: istek/kabul, çift yönlü listeler ve sıralama, canlı çalışan arkadaşın görünmesi, odak iptali/yeniden başlatma ve yerel gizleme; iki platformda geçti. Güncel uygulama push Realtime kullanmaz: görünürken normalde 30 sn, yerel QA modunda 2 sn poll; sekmeye ve ön plana dönüşte hemen okur.
+9. Güvenlik: 26 gerçek yerel API kontrolü geçti. Kendi/geçersiz kod, yinelenen istek, üçüncü kişinin kabulü, ret/cooldown, block/unblock/remove, arkadaş canlı görünürlüğü, çapraz profil/kategori RLS ve doğrudan puan/kum yazma reddi sınandı. Backend block/remove/cancel kabiliyeti mevcut; uygulama UI düğmeleri henüz yok, yerel gizle/bildir ayrı davranıştır.
+10. Şifremi unuttum: ayrı e-posta formu, gönderim ve gönderildi ekranı iOS/Android'de geçti. Yerel gerçek mail akışında 9 kontrol geçti: resend/onay, recovery bağlantısı doğrulama, şifre değişikliği, eski şifre reddi/yeni şifre kabulü, bağlantının yeniden kullanım reddi ve mevcut olmayan e-posta için nötr yanıt. Bağlantı/parola değişikliği API ile sınandı; site JS kontrolleri ayrı test paketinde.
+11. Profil/yasal/hesap silme: gerçek UI onayı, local delete-account Edge Function bulunmayınca delete_own_account yedeği, auth/profil/kategori temizliği ve girişe dönüş; iki platformda geçti. Gerçek Apple token iptali doğrulanmadı.
+12. Android bildirim: ADB ile emülatöre gerçek sistem izni verildi; izin okuma, kalıcı geri sayım bildirimi, AlarmManager bitiş teslimi, bekleyen bildirimin iptali ve tercih kapatma geçti. Kullanıcının sistem izin penceresine basması bu otomatik kontrolün parçası değildir.
+13. iOS bildirim: gerçek sessiz provisional izin, native bekleyen kayıt, teslim ve iptal geçti. ActivityKit gerçek kanalında başlatma, duraklatma ve devam true döndü; kaldırma çağrısı hatasız tamamlandı. Kilit ekranı görsel yerleşimi ve tam ses/banner kullanıcı izni doğrulanmadı.
+14. Seans sunucu sözleşmesi: 101 kontrol geçti. 25/50, duraklatma cezası, seri bonusları, 04:00 çalışma günü, farklı saat dilimleri, günlük tavan, yabancı/arşiv kategori, RLS, gelecekte/çok eski/erken seans, çakışma ve eşzamanlı idempotency sınandı.
+15. Onboarding/kategori sunucusu: 164 kontrol geçti. Segment önerileri, geçerli/geçersiz kategoriler, tekrar onboarding uzlaştırması, arşiv/geri açma ve kategori sınırları sınandı.
+16. Avatar ve lig: 26 HTTP sözleşme kontrolü + 98 geri alınan SQL kontrolü geçti. Bölge sınırları, eşitlik sırası, terfi/düşme, 0 puan, dolu oda, aynı koşuda çift terfi engeli, dönem carry, idempotency ve ödüller sınandı. 300 kumla iki eşzamanlı 200 kum alışında yalnızca biri gerçekleşti; 100 kum kaldı. Oda yerleşim yarışında ikinci işlem ilk rollback bitene kadar 3,08 sn kilitte bekledi.
+17. İstemci/sunucu lig çapraz kontrolü: güncel gerçek RPC çıktılarıyla 23 ek Dart kontrolü geçti.
+18. Regresyon: flutter analyze temiz. Son tam birim/widget koşusunda 1059 geçti; 5 yalnızca isteğe bağlı ekran görüntüsü fixture testi atlandı. DST için New York saat diliminde seçili 93 kontrol ve Node scripts paketinde 35 kontrol geçti. Eski migration zincirinin yerel SQL ASSERT'leri de geçti; bu zincir canlı şema eşitliği sayılmaz.
+19. Şema: yerel QA RPC geçici kaldırılarak repo içindeki kayıtlı canlı fingerprint ile karşılaştırıldı. 13 grubun tamamı ve 27 avatar eşleşti. Yerel welcome-email trigger bilerek kapalı. Karşılaştırma sonrası yalnızca yerel QA RPC yeniden kuruldu; canlıya yeni sorgu/yazma yapılmadı.
+
+Düzeltmeler ve bulgular
+Önceki kullanıcı değişiklikleri korunuyor: kum saati boşluğu, Ders seç başlığının kaldırılması, ayrı sıfırlama/gönderildi ekranları, yerel kayıtlı kısa sayaç ve sosyal sekmeye dönüşte tazeleme. Profil bildirim ayarı dönüşünde mounted kontrolü mevcut.
+Bu geniş QA koşusunda yeni doğrulanmış kritik uygulama hatası bulunmadı. Eski test beklentileri güncel sözleşmeyle uyumsuzdu: sabit Pro ekran boyutu, görünürlük varsayılanı, kategori uzlaştırması, duplicate yanıtı, ligsiz member_count, kapalı activity_feed, dönem carry ve ödül eşikleri güncellendi. Beklenti değişiklikleri mevcut sunucu gövdeleri/kurallarıyla kontrol edildi; canlı iş kuralları gevşetilmedi.
+Android Flutter test sürücüsü bazı koşularda VM keşfinde takıldı. Test başlamayan koşular başarılı sayılmadı; yeniden koşuldu. Native NotificationManager enqueue sonrası okuma için 500 ms bekleme eklendi. iOS provisional isteğinde eklentinin alert:true önkoşulu düzeltildi. İlgili senaryolar son koşularında geçti; ara başarısızlıklar kanıt günlüklerinde tutuldu.
+
+Açık kalanlar
+- Gerçek Google/Apple sağlayıcı girişleri ve fiziksel cihaz davranışı bu turda kapsam dışı.
+- iOS tam ses/banner izni, fiziksel cihaz sesi ve Canlı Etkinlik kilit ekranı görsel yerleşimi ayrıca denenmeli.
+- Otomatik cihaz IANA saat dilimi profile yazılmıyor; rapor ve sunucu profildeki Europe/Istanbul ile tutarlı. Türkiye dışı kullanım için mevcut P2 konu.
+- Lig eşikleri şu an 1 üye / 1 ödül puanı / 1 terfi puanı. Tek kişilik odada 5 puanla ödül almak bu kuralın sonucu. Yerel transaction içinde daha sıkı 3/25/25 de doğrulandı; canlı ayar değiştirilmedi.
+- Üretim SMTP/DNS ve Auth redirect/provider panel ayarları yerel mail testinden doğrulanamaz.
+- AGENTS.md §10'daki mağaza/operasyon hazırlıkları (veri sorumlusu kimliği, mail/DNS, Apple revoke Edge Function, yasal onay metadata ve eksik güvenlik UI'ları) bu test işi kapsamında tamamlanmadı.
+
+Kanıtlar ve tekrar kullanım
+Makine okunur senaryo matrisi: analiz/QA_FULL_2026-10-05.json
+Son koşu günlükleri/JSON sonuçları: analiz/qa_evidence_20261005/
+iOS ve Android görüntüleri: analiz/ekranlar/20261005_full_qa/
+Komutlar ve güvenlik sınırları: tool/local_supabase/README.md
+Geçici T1/T2 hesaplarından yalnızca bu turda oluşturulan 141 hesap silindi. Manuel QA için iki platformdaki toplam 10 hesap bırakıldı.
+iOS QA1: e2e-sim-qa1-1005qa@pomosprint.local
+Android QA1: e2e-sim-qa1-1005android@pomosprint.local
+Yalnızca yerel test şifresi: SimE2e-Yerel2026
+
+Son açılış: iPhone 16 Plus / iOS 18.6 QA1 hesabında 17 puan / 40 kum, 00:05 sayaç ve TEST rozetiyle açık bırakıldı. 25 dk seçimi 5 sn, 50 dk seçimi 10 sn sürer ve yerel kayıtlı QA modunda 25/50 dk sayılır.

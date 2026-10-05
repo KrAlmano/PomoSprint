@@ -1183,5 +1183,24 @@
         "type": "int"
       }
     }
-  }
+  },
+  "forgotPasswordDescription": "E-posta adresini gir. Şifreni yenilemen için bir doğrulama bağlantısı göndereceğiz.",
+  "sendPasswordResetEmail": "Doğrulama maili gönder",
+  "passwordResetSentTitle": "Mailinize gönderildi",
+  "passwordResetSentDescription": "Bu adresle kayıtlı bir hesap varsa şifre sıfırlama bağlantısını gönderdik. Gelen kutunu ve spam klasörünü kontrol et; e-postadaki bağlantıdan yeni şifreni belirleyebilirsin.",
+  "timerQuickRecordedSemantics": "Yerel hızlı test sayacı: seanslar 25 veya 50 dakika olarak kaydedilir",
+  "friendsOutgoingTitle": "Gönderilen istekler",
+  "friendsCancelRequest": "İsteği iptal et",
+  "friendsRemoveAction": "Arkadaşlıktan çıkar",
+  "friendsRemoveConfirm": "Arkadaşlıktan çıkarmak istiyor musun? Yeniden arkadaş olmak için istek göndermen gerekir.",
+  "friendsCancelConfirm": "Bu arkadaşlık isteğini iptal etmek istiyor musun?",
+  "blockedUsersTitle": "Engellenen kullanıcılar",
+  "blockUserAction": "Kullanıcıyı engelle",
+  "blockUserConfirm": "Arkadaşlık ve aranızdaki istekler kaldırılır. Birbirinizi canlı akışta göremez, arkadaşlık isteği gönderemezsiniz.",
+  "unblockUserAction": "Engeli kaldır",
+  "unblockUserConfirm": "Engel kaldırılacak. Önceki arkadaşlığınız otomatik olarak geri gelmez.",
+  "friendActionCompleted": "İşlem tamamlandı.",
+  "friendActionFailed": "İşlem tamamlanamadı. Listeyi yenileyip tekrar dene.",
+  "friendActionConfirm": "Onayla",
+  "friendActionCancel": "Vazgeç"
 }

@@ -21,9 +21,12 @@ import '../utils/friend_code.dart';
 import '../utils/name_filter.dart';
 import '../utils/study_day.dart';
 import 'avatar_equip.dart';
+import 'device_time_zone.dart';
+import '../widgets/auth/legal_links.dart' show kLegalDocumentsVersion;
 import 'backend_config.dart';
 import 'hidden_users.dart';
 import 'language_service.dart';
+import 'local_test_mode.dart';
 import 'lock_screen_timer.dart';
 import 'notification_service.dart';
 import 'onboarding_categories.dart';
@@ -514,6 +517,7 @@ class SupabaseService {
         ));
     if (response.user == null) throw const AuthFailure(AuthErrorCode.googleSignInFailed);
 
+    await _recordProviderLegalAcceptance();
     await _cleanupDuplicateIdentity();
     return _applyProviderFirstName(await _loadUserAfterSignIn());
   }
@@ -556,10 +560,35 @@ class SupabaseService {
     // bu kimlikle denetlenir (verifyAppleCredential).
     await _rememberAppleIdentity(response.user!.id, credential.userIdentifier);
 
+    await _recordProviderLegalAcceptance();
     await _cleanupDuplicateIdentity();
     // Apple adı yalnızca ilk girişte verir; profil oluşturulurken kullanılır.
     final user = await _loadUserAfterSignIn(nameHint: credential.givenName);
     return _applyProviderFirstName(user, givenName: credential.givenName);
+  }
+
+  /// Login ekranındaki bağlantılı sosyal giriş bildirimi sonrası çağrılır.
+  /// Başarısız kayıtla uygulamaya geçilmez; yeniden girişte güvenle tekrarlanır.
+  Future<void> _recordProviderLegalAcceptance() async {
+    try {
+      await acceptLegalDocuments();
+    } catch (_) {
+      await signOutFully();
+      rethrow;
+    }
+  }
+
+  Future<void> acceptLegalDocuments() async {
+    _requireUserId();
+    final result = await _guard(
+      () => _client.rpc(
+        'accept_legal_documents',
+        params: {'p_terms_version': kLegalDocumentsVersion, 'p_privacy_version': kLegalDocumentsVersion},
+      ),
+    );
+    if (result is! Map || result['success'] != true) {
+      throw const ServiceException(ServiceErrorCode.server);
+    }
   }
 
   /// Google/Apple girişinde profil adını sağlayıcının verdiği İLK ada çeker.
@@ -969,6 +998,8 @@ class SupabaseService {
     if (!_isCurrentSession(authUser.id, epoch)) return null;
     final profile = results[0] as Map<String, dynamic>;
     final unlocked = results[1] as List<String>;
+    await _syncProfileTimeZone(authUser.id, epoch, profile);
+    if (!_isCurrentSession(authUser.id, epoch)) return null;
 
     final user = UserModel.fromMap({
       ...profile,
@@ -982,6 +1013,34 @@ class SupabaseService {
     if (!_avatarCatalogFresh) unawaited(refreshAvatarCatalog());
     unawaited(_afterUserLoaded(user));
     return user;
+  }
+
+  Future<void> _syncProfileTimeZone(String uid, int epoch, Map<String, dynamic> profile) async {
+    final zone = await DeviceTimeZone.read();
+    if (zone == null || zone == profile['timezone'] || !_isCurrentSession(uid, epoch)) return;
+    try {
+      final rows = await _client
+          .from('profiles')
+          .update({'timezone': zone})
+          .eq('id', uid)
+          .select('timezone')
+          .timeout(const Duration(seconds: 3));
+      if (_isCurrentSession(uid, epoch) && rows.isNotEmpty) profile['timezone'] = rows.first['timezone'];
+    } catch (e) {
+      debugPrint('[DATA] Cihaz saat dilimi senkronize edilemedi; profil dilimi korundu: $e');
+    }
+  }
+
+  Future<void> syncDeviceTimeZone() async {
+    final user = currentUser.value;
+    if (!_isCloudActive || user?.id == null) return;
+    final epoch = _userEpoch;
+    final profile = <String, dynamic>{'timezone': user!.timezone};
+    await _syncProfileTimeZone(user.id!, epoch, profile);
+    if (profile['timezone'] != user.timezone) {
+      _updateUserIfCurrent(user.id!, epoch, (u) => u.copyWith(timezone: profile['timezone'] as String));
+      _notifyStatsChanged();
+    }
   }
 
   Future<void> _afterUserLoaded(UserModel user) async {
@@ -1391,9 +1450,11 @@ class SupabaseService {
     required bool wasPaused,
     required int foregroundSeconds,
     required DateTime startedAt,
+    bool recordAccelerated = false,
   }) async {
     final session = PendingSession(
       clientUuid: clientUuid,
+      recordAccelerated: recordAccelerated,
       categoryId: categoryId.isEmpty ? null : categoryId,
       categoryName: categoryName,
       minutes: durationMinutes,
@@ -1667,6 +1728,31 @@ class SupabaseService {
     if (response is Map) return Map<String, dynamic>.from(response);
     throw const ServiceException(ServiceErrorCode.server);
   }
+
+  Future<List<Map<String, dynamic>>> fetchOutgoingFriendRequests() async {
+    _requireUserId();
+    return _rows(await _guard(() => _client.rpc('get_outgoing_friend_requests')));
+  }
+
+  Future<List<Map<String, dynamic>>> fetchBlockedUsers() async {
+    _requireUserId();
+    return _rows(await _guard(() => _client.rpc('get_my_blocks')));
+  }
+
+  Future<Map<String, dynamic>> _friendMutation(String rpc, String param, String id) async {
+    _requireUserId();
+    final response = await _guard(() => _client.rpc(rpc, params: {param: id}));
+    if (response is! Map) throw const ServiceException(ServiceErrorCode.server);
+    final result = Map<String, dynamic>.from(response);
+    if (result['success'] == true) _notifyStatsChanged();
+    return result;
+  }
+
+  Future<Map<String, dynamic>> removeFriend(String id) => _friendMutation('remove_friend', 'p_friend_id', id);
+  Future<Map<String, dynamic>> cancelFriendRequest(String id) =>
+      _friendMutation('cancel_friend_request', 'p_to_user_id', id);
+  Future<Map<String, dynamic>> blockUser(String id) => _friendMutation('block_user', 'p_user_id', id);
+  Future<Map<String, dynamic>> unblockUser(String id) => _friendMutation('unblock_user', 'p_user_id', id);
 
   // ---- Sıralama ----
 
@@ -2003,14 +2089,20 @@ class _SupabaseQueueBackend implements SessionQueueBackend {
     required String categoryId,
     required DateTime startedAtForServer,
   }) {
-    return _service._client.rpc('complete_study_session', params: {
-      'p_client_uuid': session.clientUuid,
-      'p_category_id': categoryId,
-      'p_duration_minutes': session.minutes,
-      'p_was_paused': session.wasPaused,
-      'p_is_verified': session.foregroundSeconds,
-      'p_started_at': startedAtForServer.toUtc().toIso8601String(),
-    });
+    if (session.recordAccelerated && !recordLocalQuickSessions) {
+      throw StateError('local_only_accelerated_session');
+    }
+    return _service._client.rpc(
+      session.recordAccelerated ? 'complete_qa_study_session' : 'complete_study_session',
+      params: {
+        'p_client_uuid': session.clientUuid,
+        'p_category_id': categoryId,
+        'p_duration_minutes': session.minutes,
+        'p_was_paused': session.wasPaused,
+        'p_is_verified': session.foregroundSeconds,
+        'p_started_at': startedAtForServer.toUtc().toIso8601String(),
+      },
+    );
   }
 
   @override

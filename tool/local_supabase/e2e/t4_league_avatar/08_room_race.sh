@@ -34,8 +34,11 @@ OUT_A=$(mktemp)
 body A 4 | psql "$PG" -qAt >"$OUT_A" 2>&1 &
 PID_A=$!
 sleep 1
-body B 0 | psql "$PG" -qAt 2>&1 | grep -v '^$'
+OUT_B=$(body B 0 | psql "$PG" -qAt 2>&1)
+printf '%s\n' "$OUT_B" | grep -v '^$'
 wait $PID_A
 grep -v '^$' "$OUT_A"; rm -f "$OUT_A"
-echo "Beklenen (kilitli): B, A commit/rollback edene kadar bekler ve A'nın odasına girer."
-echo "Gerçek: B beklemeden AYRI bir oda açıyorsa seçim kilitsizdir (aynı yarış 29 üyeli odada 31 üyeye yol açar)."
+# A ROLLBACK yaptığı için açtığı oda yok olur; B'nin başka UUID açması doğrudur.
+DELAY=$(printf '%s\n' "$OUT_B" | sed -n 's/.*bekleme=\([0-9.]*\)sn.*/\1/p')
+awk -v delay="$DELAY" 'BEGIN { if (delay == "" || delay + 0 < 2) exit 1 }'
+echo "PASS: B oda seçimi A rollback yapana kadar kilitte bekledi; geçici odalar geri alındı."

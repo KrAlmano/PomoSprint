@@ -106,6 +106,11 @@ class User:
         cats = api.select("categories", "select=id,name&order=sort_order", self.tok)
         self.cat = {c["name"]: c["id"] for c in cats}
         self.m = self.cat["Matematik"]
+        # Güncel onboarding açık bir görünürlük seçimi gerektirir.
+        api.request("PATCH", f"/rest/v1/profiles?id=eq.{self.uid}", {
+            "show_in_social_feed": True, "birth_year": 2007,
+            "onboarding_completed_at": dt.datetime.now(UTC).isoformat(),
+        }, token=self.tok)
 
     def profile(self):
         raw = psql(f"""select json_build_object('lifetime_points', lifetime_points, 'coins', coins,
@@ -189,7 +194,7 @@ def s_config():
     body = psql("select pg_get_functiondef('public.complete_study_session(uuid,uuid,integer,boolean,integer,timestamptz)'::regprocedure);")
     for frag, label in [("v_base_points := 5", "25dk=5"), ("v_base_points := 12", "50dk=12"),
                         ("ceil(v_base_points * 0.20)", "duraklatma %20 ceil"), ("v_daily_sessions >= 16", "tavan 16"),
-                        ("v_coins_earned integer := 20", "kum 20"), ("v_current_streak >= 14", "seri 14"),
+                        ("v_coins_earned integer := 20", "kum 20"), ("v_bonus_streak >= 14", "seri 14"),
                         ("v_bonus_pct := 30", "%30"), ("interval '4 hours'", "gün 04:00")]:
         check(f"fonksiyon gövdesi config ile aynı: {label}", frag in body, frag)
     return cfg
@@ -221,8 +226,8 @@ def s_basic(now):
     cu, body, e = r_dup
     check("A2 duplicate: duplicate=true, kum 0", e is None and body.get("duplicate") is True and body.get("coins_earned") == 0, body or err_text(e))
     check("A2 duplicate profil/lig/satır değişmedi", a.profile() == p1 and a.league_points() == 5 and a.session_count() == 1, a.profile())
-    dup_points_zero = e is None and body.get("total_points") == 0 and body.get("base_points") == 0
-    check("A2 duplicate: AGENTS.md §5.2 'puan ve kum 0' (total_points 0)", dup_points_zero,
+    dup_original_points = e is None and body.get("total_points") == 5 and body.get("base_points") == 5
+    check("A2 duplicate: ilk kaydın puanı döner; profil/lig yukarıda değişmedi", dup_original_points,
           f"duplicate yanıtı ilk kaydın puanını döndürüyor: base={body.get('base_points') if body else None}, total={body.get('total_points') if body else None}")
     r_dup_bad = complete(a, 30, None, cu=r_a1[0])
     check("A2b duplicate doğrulamadan önce: geçersiz süre/null started_at ile aynı uuid → duplicate", r_dup_bad[2] is None and r_dup_bad[1].get("duplicate") is True, r_dup_bad[1] or err_text(r_dup_bad[2]))
@@ -258,7 +263,8 @@ def s_basic(now):
     check("A get_my_league_ranking is_me satırı weekly_points", len(me) == 1 and me[0]["weekly_points"] == total, rk)
     feed = psql(f"""select payload->>'session_count' from public.activity_feed
         where user_id = '{a.uid}' and activity_type = 'daily_summary' order by activity_date desc limit 1;""")
-    check("A activity_feed daily_summary yazıldı (show_in_social_feed=true)", feed != "", feed)
+    feed_enabled = psql("select ops.activity_feed_enabled()") == "t"
+    check("A activity_feed kaydı sunucu özellik anahtarına uyar", bool(feed) == feed_enabled, feed)
     return a
 
 
@@ -426,7 +432,7 @@ def s_streak_bonus(now):
         ok = got == exp and prof["lp"] == 1000 + exp[4] and prof["coins"] == 1020 and prof["cs"] == exp[0] \
             and prof["ls"] == max(prev, exp[0]) and (lg1 - lg0) == exp[4]
         check(f"S {name}", ok, f"yanıt {got} beklenen {exp}; profil {prof}; lig Δ {lg1 - lg0}")
-    # geç gelen seans + mevcut seri bonusu (dünkü seans bugünün serisiyle bonus alır)
+    # Geç seans kendi günündeki geçmiş seriyle değerlendirilir (proposed/13).
     cu = str(uuid.uuid4())
     floor = now - dt.timedelta(hours=23, minutes=50)
     t = boundary(now, 4, 0 * MIN) - 60 * MIN  # bir önceki çalışma günü 03:00 IST
@@ -438,7 +444,7 @@ def s_streak_bonus(now):
         out = psql(sql).splitlines()
         body = json.loads(out[1])
         check("S geç gelen (dünkü) seans: seri 3 korunur, last_study_date bugün kalır", out[2] == f"3|{today}" and body["streak"] == 3, out)
-        check("S geç gelen (dünkü) seans bugünkü seriyle %10 bonus alır (tasarım notu)", body["bonus_pct"] == 10 and body["total_points"] == 6, body)
+        check("S geç gelen seansın gününde geçmiş kayıt yoksa bugünkü seriyle bonus almaz", body["bonus_pct"] == 0 and body["total_points"] == 5, body)
 
 
 def s_timezone(now):
@@ -558,8 +564,8 @@ def s_concurrency(now):
     t3 = now - 200 * MIN
     blocked, r1, r2 = _race_psql(g.uid, g.m, cu3, t3, cu3, t3)
     cnt = psql(f"select count(*) from public.study_sessions where client_uuid = '{cu3}';")
-    check("R2 aynı client_uuid eşzamanlı: tek satır; ikinci çağrı 23505 (istemci geçici sayar, sonra duplicate)",
-          cnt == "1" and ("23505" in r2[1] or "duplicate key" in r2[1]), f"satır={cnt}, conn2={r2}")
+    check("R2 aynı client_uuid eşzamanlı: tek satır; ikinci çağrı duplicate=true",
+          cnt == "1" and not r2[1] and json.loads(r2[0].splitlines()[-1]).get("duplicate") is True, f"satır={cnt}, conn2={r2}")
     # Gerçek HTTP ile paralel istekler (iki cihaz)
     h = User("h")
     both = 0

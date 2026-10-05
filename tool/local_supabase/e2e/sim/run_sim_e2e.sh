@@ -43,7 +43,7 @@ curl -fsS -o /dev/null "$API_URL/auth/v1/health" -H "apikey: $ANON_KEY" \
 xcrun simctl list devices | grep -q "$SIM_UDID) (Booted)" || xcrun simctl boot "$SIM_UDID"
 
 python3 tool/local_supabase/e2e/sim/e2e_host.py --port "$PORT" --udid "$SIM_UDID" \
-  ${E2E_SHOT_DIR:+--shot-dir "$E2E_SHOT_DIR"} 2>>"$LOG_DIR/host.log" &
+  ${E2E_ALLOW_OUTAGE:+--allow-api-outage} ${E2E_SHOT_DIR:+--shot-dir "$E2E_SHOT_DIR"} 2>>"$LOG_DIR/host.log" &
 HOST_PID=$!
 trap 'kill $HOST_PID 2>/dev/null' EXIT
 for _ in $(seq 1 50); do curl -fsS -o /dev/null "http://127.0.0.1:$PORT/health" && break; sleep 0.1; done
@@ -58,7 +58,10 @@ for f in "${FILES[@]}"; do
     --dart-define=SUPABASE_URL="$API_URL" \
     --dart-define=SUPABASE_ANON_KEY="$ANON_KEY" \
     --dart-define=E2E_HOST_PORT="$PORT" \
-    --dart-define=E2E_RUN_ID="$RUN_ID" 2>&1 | tee "$LOG_DIR/$name.log"
+    --dart-define=E2E_RUN_ID="$RUN_ID" \
+    --dart-define=QUICK_TIMER="${QUICK_TIMER:-false}" \
+    --dart-define=E2E_REUSE="${E2E_REUSE:-false}" \
+    --dart-define=QUICK_TIMER_SAVE="${QUICK_TIMER_SAVE:-false}" 2>&1 | tee "$LOG_DIR/$name.log"
   rc=${PIPESTATUS[0]}
   echo "=== $f: $([ "$rc" = 0 ] && echo GEÇTİ || echo "KALDI ($rc)") ($(( $(date +%s) - start )) sn)"
   [ "$rc" = 0 ] || STATUS=1

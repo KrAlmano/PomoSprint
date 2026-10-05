@@ -23,6 +23,7 @@ def _read(rel):
 
 
 ONBOARDING_SRC = _read("lib/screens/post_auth_onboarding_screen.dart")
+CATEGORY_SEEDS_SRC = _read("lib/services/onboarding_categories.dart")
 NAMES_SRC = _read("lib/utils/category_names.dart")
 DIALOG_SRC = _read("lib/widgets/auth/category_name_dialog.dart")
 MODEL_SRC = _read("lib/models/category_model.dart")
@@ -34,7 +35,7 @@ def _strings(block):
 
 
 def _parse_recommended():
-    m = re.search(r"_recommendedBySegment\s*=\s*\{(.*?)\};", ONBOARDING_SRC, re.S)
+    m = re.search(r"kRecommendedCategoriesBySegment\s*=\s*\{(.*?)\};", CATEGORY_SEEDS_SRC, re.S)
     out = {}
     for seg, body in re.findall(r"'(\w+)'\s*:\s*\[(.*?)\]", m.group(1), re.S):
         out[seg] = _strings(body)
@@ -42,7 +43,7 @@ def _parse_recommended():
 
 
 def _parse_general():
-    m = re.search(r"_generalRecommendations\s*=\s*\[(.*?)\];", ONBOARDING_SRC, re.S)
+    m = re.search(r"kGeneralCategoryRecommendations\s*=\s*\[(.*?)\];", CATEGORY_SEEDS_SRC, re.S)
     return _strings(m.group(1))
 
 

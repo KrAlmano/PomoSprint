@@ -42,6 +42,7 @@ class ActiveTimerSession {
     this.pausedRemainingSeconds,
     this.pauseUsedCount = 0,
     this.foregroundSeconds = 0,
+    this.recordAccelerated = false,
   });
 
   /// Sunucu, başlangıcı bundan eski seansları reddeder (too_old).
@@ -72,6 +73,9 @@ class ActiveTimerSession {
   /// Uygulamanın ön planda geçirdiği saniye (sunucuda p_is_verified).
   final int foregroundSeconds;
 
+  /// Yalnızca yerel QA RPC'siyle 25/50 dk olarak kaydedilen kısa seans.
+  final bool recordAccelerated;
+
   bool get isRunning => endsAt != null;
   bool get wasPaused => pauseUsedCount > 0;
 
@@ -92,6 +96,7 @@ class ActiveTimerSession {
     required int durationMinutes,
     required int totalSeconds,
     required DateTime now,
+    bool recordAccelerated = false,
   }) {
     return ActiveTimerSession(
       clientUuid: clientUuid,
@@ -102,6 +107,7 @@ class ActiveTimerSession {
       totalSeconds: totalSeconds,
       startedAt: now,
       endsAt: now.add(Duration(seconds: totalSeconds)),
+      recordAccelerated: recordAccelerated,
     );
   }
 
@@ -166,6 +172,7 @@ class ActiveTimerSession {
       pausedRemainingSeconds: pausedRemainingSeconds,
       pauseUsedCount: pauseUsedCount ?? this.pauseUsedCount,
       foregroundSeconds: foregroundSeconds ?? this.foregroundSeconds,
+      recordAccelerated: recordAccelerated,
     );
   }
 
@@ -181,6 +188,7 @@ class ActiveTimerSession {
         'paused_remaining_seconds': pausedRemainingSeconds,
         'pause_used_count': pauseUsedCount,
         'foreground_seconds': foregroundSeconds,
+        if (recordAccelerated) 'record_accelerated': true,
       };
 
   /// Bozuk ya da eksik kayıtta null döner.
@@ -209,6 +217,7 @@ class ActiveTimerSession {
       pausedRemainingSeconds: endsAt == null ? paused as int : null,
       pauseUsedCount: json['pause_used_count'] is int ? json['pause_used_count'] as int : 0,
       foregroundSeconds: json['foreground_seconds'] is int ? json['foreground_seconds'] as int : 0,
+      recordAccelerated: json['record_accelerated'] == true,
     );
   }
 }

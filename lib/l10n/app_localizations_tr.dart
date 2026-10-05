@@ -2056,4 +2056,69 @@ class AppLocalizationsTr extends AppLocalizations {
   String rankingZoneNeedsMinPointsMe(int points) {
     return 'Terfi bölgesindesin ama terfi için en az $points puan gerekiyor. Seans tamamlamaya devam et.';
   }
+
+  @override
+  String get forgotPasswordDescription =>
+      'E-posta adresini gir. Şifreni yenilemen için bir doğrulama bağlantısı göndereceğiz.';
+
+  @override
+  String get sendPasswordResetEmail => 'Doğrulama maili gönder';
+
+  @override
+  String get passwordResetSentTitle => 'Mailinize gönderildi';
+
+  @override
+  String get passwordResetSentDescription =>
+      'Bu adresle kayıtlı bir hesap varsa şifre sıfırlama bağlantısını gönderdik. Gelen kutunu ve spam klasörünü kontrol et; e-postadaki bağlantıdan yeni şifreni belirleyebilirsin.';
+
+  @override
+  String get timerQuickRecordedSemantics =>
+      'Yerel hızlı test sayacı: seanslar 25 veya 50 dakika olarak kaydedilir';
+
+  @override
+  String get friendsOutgoingTitle => 'Gönderilen istekler';
+
+  @override
+  String get friendsCancelRequest => 'İsteği iptal et';
+
+  @override
+  String get friendsRemoveAction => 'Arkadaşlıktan çıkar';
+
+  @override
+  String get friendsRemoveConfirm =>
+      'Arkadaşlıktan çıkarmak istiyor musun? Yeniden arkadaş olmak için istek göndermen gerekir.';
+
+  @override
+  String get friendsCancelConfirm =>
+      'Bu arkadaşlık isteğini iptal etmek istiyor musun?';
+
+  @override
+  String get blockedUsersTitle => 'Engellenen kullanıcılar';
+
+  @override
+  String get blockUserAction => 'Kullanıcıyı engelle';
+
+  @override
+  String get blockUserConfirm =>
+      'Arkadaşlık ve aranızdaki istekler kaldırılır. Birbirinizi canlı akışta göremez, arkadaşlık isteği gönderemezsiniz.';
+
+  @override
+  String get unblockUserAction => 'Engeli kaldır';
+
+  @override
+  String get unblockUserConfirm =>
+      'Engel kaldırılacak. Önceki arkadaşlığınız otomatik olarak geri gelmez.';
+
+  @override
+  String get friendActionCompleted => 'İşlem tamamlandı.';
+
+  @override
+  String get friendActionFailed =>
+      'İşlem tamamlanamadı. Listeyi yenileyip tekrar dene.';
+
+  @override
+  String get friendActionConfirm => 'Onayla';
+
+  @override
+  String get friendActionCancel => 'Vazgeç';
 }

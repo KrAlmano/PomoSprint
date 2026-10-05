@@ -53,7 +53,7 @@ IntegrationTestWidgetsFlutterBinding initE2e() {
   if (kSupabaseUrl.isEmpty || kSupabaseAnonKey.isEmpty) {
     throw StateError('--dart-define=SUPABASE_URL ve SUPABASE_ANON_KEY (yerel kopya) verilmeli.');
   }
-  if (!{'127.0.0.1', 'localhost', '::1'}.contains(host) && !host.endsWith('.localhost')) {
+  if (!{'127.0.0.1', 'localhost', '::1', '10.0.2.2'}.contains(host) && !host.endsWith('.localhost')) {
     throw StateError('SUPABASE_URL yerel değil ($host): bu testler yalnızca yerel kopyaya bağlanır.');
   }
   return binding;
@@ -206,7 +206,7 @@ class E2eHost {
   static bool get available => kE2eHostPort > 0;
 
   static Uri _uri(String path, [Map<String, String>? query]) =>
-      Uri(scheme: 'http', host: '127.0.0.1', port: kE2eHostPort, path: path, queryParameters: query);
+      Uri(scheme: 'http', host: const String.fromEnvironment('E2E_HOST_ADDRESS', defaultValue: '127.0.0.1'), port: kE2eHostPort, path: path, queryParameters: query);
 
   static Future<String> _send(String method, Uri uri, {String? body}) async {
     final client = HttpClient()..connectionTimeout = const Duration(seconds: 5);
@@ -238,6 +238,16 @@ class E2eHost {
     final path = await _send('GET', _uri('/shot', {'name': name}));
     debugPrint('[E2E] ekran görüntüsü: $path');
     await tester.pump();
+  }
+
+  /// Yalnızca hostun seçili Android emülatöründe native bildirim izni verir.
+  static Future<void> grantAndroidNotifications() async {
+    await _send('POST', _uri('/android-notifications'));
+  }
+
+  /// Açıkça etkinleştirilmiş host yalnızca yerel API ağ geçidini durdurur.
+  static Future<void> setLocalApiAvailable(bool available) async {
+    await _send('POST', _uri('/local-api'), body: available ? 'start' : 'stop');
   }
 
   /// Yerel veritabanında salt okuma psql. [sql] tek satır döndürmeli.

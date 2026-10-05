@@ -62,10 +62,18 @@ class Handler(BaseHTTPRequestHandler):
                 return self._reply(400, "gecersiz ad")
             out = os.path.join(self.server.shot_dir, name + ".png")
             os.makedirs(self.server.shot_dir, exist_ok=True)
-            proc = subprocess.run(
-                ["xcrun", "simctl", "io", self.server.udid, "screenshot", out],
-                capture_output=True, text=True, timeout=60,
-            )
+            if self.server.android_serial:
+                proc = subprocess.run([os.path.expanduser("~/Library/Android/sdk/platform-tools/adb"),
+                    "-s", self.server.android_serial, "exec-out", "screencap", "-p"],
+                    capture_output=True, timeout=30)
+                if proc.returncode == 0:
+                    with open(out, "wb") as shot:
+                        shot.write(proc.stdout)
+            else:
+                proc = subprocess.run(
+                    ["xcrun", "simctl", "io", self.server.udid, "screenshot", out],
+                    capture_output=True, text=True, timeout=60,
+                )
             if proc.returncode != 0:
                 return self._reply(500, proc.stderr)
             # Depoda yer kaplamasın: yarı çözünürlük (iPhone 16 Pro → 603x1311).
@@ -75,6 +83,22 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):  # noqa: N802
         url = urllib.parse.urlparse(self.path)
+        if url.path == "/android-notifications":
+            if not self.server.android_serial:
+                return self._reply(403, "Android emulatore ozel")
+            proc = subprocess.run([os.path.expanduser("~/Library/Android/sdk/platform-tools/adb"),
+                "-s", self.server.android_serial, "shell", "pm", "grant", "com.pomosprint.app",
+                "android.permission.POST_NOTIFICATIONS"], capture_output=True, text=True, timeout=15)
+            return self._reply(200 if proc.returncode == 0 else 500, proc.stdout or proc.stderr)
+        if url.path == "/local-api":
+            if not self.server.allow_api_outage:
+                return self._reply(403, "yerel API kesintisi etkin degil")
+            action = self.rfile.read(int(self.headers.get("Content-Length") or 0)).decode()
+            if action not in {"stop", "start"}:
+                return self._reply(400, "gecersiz islem")
+            proc = subprocess.run(["docker", action, "supabase_kong_pomosprint-local"],
+                                  capture_output=True, text=True, timeout=30)
+            return self._reply(200 if proc.returncode == 0 else 500, proc.stdout or proc.stderr)
         if url.path != "/psql":
             return self._reply(404, "yok")
         length = int(self.headers.get("Content-Length") or 0)
@@ -93,12 +117,18 @@ class Handler(BaseHTTPRequestHandler):
 
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--allow-api-outage", action="store_true")
+    ap.add_argument("--android-serial")
     ap.add_argument("--port", type=int, default=54399)
     ap.add_argument("--udid", default=os.environ.get("SIM_UDID", DEFAULT_UDID))
     ap.add_argument("--shot-dir", default=os.path.join(ROOT, "analiz", "ekranlar"))
     ap.add_argument("--psql-log", default=os.path.join(ROOT, "build", "e2e_sim", "psql.log"))
     args = ap.parse_args()
+    if args.android_serial and not args.android_serial.startswith("emulator-"):
+        ap.error("Yalnizca Android emulatoru desteklenir")
     server = ThreadingHTTPServer(("127.0.0.1", args.port), Handler)
+    server.allow_api_outage = args.allow_api_outage
+    server.android_serial = args.android_serial
     server.udid = args.udid
     server.shot_dir = args.shot_dir
     server.psql_log = args.psql_log
@@ -107,6 +137,9 @@ def main():
         server.serve_forever()
     except KeyboardInterrupt:
         pass
+    finally:
+        if args.allow_api_outage:
+            subprocess.run(["docker", "start", "supabase_kong_pomosprint-local"], capture_output=True, timeout=30)
 
 
 if __name__ == "__main__":

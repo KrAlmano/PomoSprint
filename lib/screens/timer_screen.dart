@@ -9,10 +9,10 @@ import '../theme.dart';
 import '../utils/category_names.dart';
 import '../utils/color_hex.dart';
 import '../utils/responsive.dart';
-import '../utils/text_util.dart';
 import '../models/category_model.dart';
 import '../widgets/hourglass_widget.dart';
 import '../services/language_service.dart';
+import '../services/local_test_mode.dart';
 import '../services/lock_screen_timer.dart';
 import '../services/notification_service.dart';
 import '../services/session_queue.dart';
@@ -270,7 +270,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     widget.onTimerStateChanged?.call(false, completed.categoryName, 0);
 
     final owner = widget.sessionOwnerKey;
-    if (completed.isQuickTest) {
+    if (completed.isQuickTest && !completed.recordAccelerated) {
       // Hızlı test seansı sunucuya ve kuyruğa gönderilmez (sunucu kısa
       // seansı zaten reddeder); diyalog "kaydedilmez" der.
       _showSessionCompletedDialog(completed.durationMinutes, null, testSession: true);
@@ -539,6 +539,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
         categoryColorHex: category?.colorHex,
         durationMinutes: loggedMinutes,
         totalSeconds: totalSeconds,
+        recordAccelerated: widget.quickTimer && recordLocalQuickSessions,
         now: now,
       ),
       now,
@@ -727,40 +728,6 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                   for (final cat in activeCategories) categoryChip(cat),
                 ];
 
-                // Ders/kategori başlığı ve düzenleme kısayolu. [inline]: yatay
-                // kaydırılan çip satırının başında (genişlik sınırsız).
-                Widget categoryHeader({required bool inline}) {
-                  final label = Text(
-                    TextUtil.getCategorySelectionLabel(l10n, widget.userSegment),
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 1.5,
-                      color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
-                    ),
-                  );
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: inline ? MainAxisSize.min : MainAxisSize.max,
-                    children: [
-                      if (inline) label else Flexible(child: label),
-                      const SizedBox(width: 2),
-                      // Kategori düzenleme kısayolu: etiketli, 48 dp dokunma alanı.
-                      IconButton(
-                        onPressed: widget.onOpenSettings,
-                        tooltip: l10n.timerEditCategories,
-                        iconSize: 16,
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(
-                          minWidth: kMinInteractiveDimension,
-                          minHeight: kMinInteractiveDimension,
-                        ),
-                        icon: const Icon(Icons.edit_outlined, color: AppColors.primaryContainer),
-                      ),
-                    ],
-                  );
-                }
-
                 Widget durationOption(int mins) {
                   final isSel = loggedMinutes == mins;
                   final foreground = isSel
@@ -825,12 +792,6 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                 final controlsWidget = Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Subject Chips Section. Dikey alanı kıt ekranda ve dikey
-                    // telefonda başlık ayrı satır yerine çiplerin başında durur.
-                    // Kalem düğmesinin dokunma alanı başlıkla çipler arasındaki
-                    // boşluğu karşılar.
-                    if (!layout.inlineHeader) categoryHeader(inline: false),
-
                     // Active Category Pills: telefonda yatay kaydırılır,
                     // tablette ortalanmış satırlara sarılır.
                     if (large)
@@ -842,8 +803,6 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            if (layout.inlineHeader)
-                              Padding(padding: const EdgeInsets.only(left: 4, right: 6), child: categoryHeader(inline: true)),
                             ...categoryChips,
                           ],
                         ),
@@ -1004,12 +963,12 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                         ),
                       ),
                     ),
-                    // Hızlı test sayacı: bu seanslar kaydedilmez.
+                    // Hızlı test sayacı; kayıt davranışı yerel QA moduna bağlı.
                     if (_isQuickTest)
                       PositionedDirectional(
                         top: 8,
                         end: 8,
-                        child: IgnorePointer(child: _QuickTestBadge(label: l10n.timerQuickTestBadge, semanticsLabel: l10n.timerQuickTestSemantics)),
+                        child: IgnorePointer(child: _QuickTestBadge(label: l10n.timerQuickTestBadge, semanticsLabel: recordLocalQuickSessions ? l10n.timerQuickRecordedSemantics : l10n.timerQuickTestSemantics)),
                       ),
                   ],
                 );
@@ -1064,7 +1023,6 @@ class _TimerLayout {
     required this.dense,
     required this.large,
     required this.compact,
-    required this.inlineHeader,
     required this.hourglassSize,
     required this.hourglassHeight,
     required this.hourglassTop,
@@ -1130,7 +1088,6 @@ class _TimerLayout {
         dense: dense,
         large: large,
         compact: false,
-        inlineHeader: dense,
         hourglassSize: size,
         hourglassHeight: size * 1.05,
         hourglassTop: (h - size * 1.05) / 2,
@@ -1158,7 +1115,6 @@ class _TimerLayout {
         dense: dense,
         large: false,
         compact: true,
-        inlineHeader: true,
         hourglassSize: size,
         hourglassHeight: hourglassHeight,
         hourglassTop: top,
@@ -1179,7 +1135,6 @@ class _TimerLayout {
       dense: false,
       large: large,
       compact: false,
-      inlineHeader: false,
       hourglassSize: size,
       hourglassHeight: hourglassHeight,
       hourglassTop: top,
@@ -1200,9 +1155,6 @@ class _TimerLayout {
   /// Dikey telefon: aralıklar dense ile tablet arasında (BAŞLAT kaydırmadan
   /// görünsün, kum saati büyük kalsın).
   final bool compact;
-
-  /// Kategori başlığı ayrı satır yerine çip satırının başında.
-  final bool inlineHeader;
 
   final double hourglassSize;
   final double hourglassHeight;

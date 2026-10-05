@@ -92,7 +92,8 @@ begin
     insert into public.study_sessions(user_id, category, category_id, duration_minutes, base_points, bonus_points,
                                       was_paused, is_verified, client_uuid, started_at, completed_at)
     values (u, 't4-ders', c, 25, 5, 0, false, 0, gen_random_uuid(),
-            now() - make_interval(mins => 30 * i + 300), now() - make_interval(mins => 30 * i + 275));
+            ((now() at time zone 'Europe/Istanbul' - interval '4 hours')::date + time '04:00') at time zone 'Europe/Istanbul' + make_interval(mins => 26 * (i-1)),
+            ((now() at time zone 'Europe/Istanbul' - interval '4 hours')::date + time '04:00') at time zone 'Europe/Istanbul' + make_interval(mins => 26 * (i-1) + 25));
   end loop;
   r := pg_temp.t4_session('n3', 25, false, now() - interval '26 minutes');
   perform pg_temp.t4_check('E: 16 seans sonrası 17. seans: daily_limit_reached, 0 puan, lig üyeliği açılmaz',
@@ -117,16 +118,17 @@ end $$;
 -- completed_at = now()-1dk > end_date olacak şekilde)
 insert into t4_r select 'x-s1', pg_temp.t4_session('x', 25, false, now() - interval '25 minutes 10 seconds');
 insert into t4_r select 'z-s1', pg_temp.t4_session('z', 25, false, now() - interval '25 minutes 10 seconds');
-select pg_temp.t4_check('F: bitişi geçmiş (işlenmemiş) odaya puan yazılıyor; odasız z bitmiş odaya yerleşiyor',
-  pg_temp.t4_points_of((select id from t4_u where tag='x')) = 5
-  and pg_temp.t4_league_of((select id from t4_u where tag='z')) = (select id from t4_l where tag='RG'),
+select pg_temp.t4_check('F: bitmiş odanın eski dönem puanı artmaz; 5 puan carry olur; odasız z açık odaya yerleşir',
+  pg_temp.t4_points_of((select id from t4_u where tag='x')) = 0
+  and (select carry_points from public.league_memberships where user_id = (select id from t4_u where tag='x')) = 5
+  and pg_temp.t4_league_of((select id from t4_u where tag='z')) <> (select id from t4_l where tag='RG'),
   format('oda bitişi=%s, seans bitişi=%s', (select end_date from public.leagues where id=(select id from t4_l where tag='RG')),
          (select max(completed_at) from public.study_sessions where user_id = (select id from t4_u where tag='x'))));
 select public.process_weekly_leagues();
-select pg_temp.t4_check('F: dönem bitiminden SONRA biten seans eski döneme sayıldı: x terfi + sapphire_monthly, yeni dönemde 0 puan',
-  not (pg_temp.t4_tier_of((select id from t4_u where tag='x')) = 5
-       and pg_temp.t4_awards_of((select id from t4_u where tag='x')) = 'league_sapphire_monthly'
-       and pg_temp.t4_points_of((select id from t4_u where tag='x')) = 0),
+select pg_temp.t4_check('F: dönem devrinde x tier4 kalır, ödül yok; yeni dönem carry 5 puanla başlar',
+  pg_temp.t4_tier_of((select id from t4_u where tag='x')) = 4
+  and pg_temp.t4_awards_of((select id from t4_u where tag='x')) = ''
+  and pg_temp.t4_points_of((select id from t4_u where tag='x')) = 5,
   format('x tier=%s awards=%s weekly=%s; z tier=%s awards=%s weekly=%s',
     pg_temp.t4_tier_of((select id from t4_u where tag='x')), pg_temp.t4_awards_of((select id from t4_u where tag='x')),
     pg_temp.t4_points_of((select id from t4_u where tag='x')),

@@ -32,13 +32,14 @@ void main() {
     final l10n = await AppLocalizations.delegate.load(const Locale('tr'));
     final lang = LanguageService.instance;
 
+    var now = DateTime(2026, 10, 5, 12);
     final lockPlatform = FakeLockScreenPlatform();
     final lockScreen = LockScreenTimer(
       platform: lockPlatform,
       isEnabled: () async => true,
       categoryLabel: (name) => name,
+      clock: () => now,
     );
-    var now = DateTime(2026, 10, 5, 12);
     final submitted = <ActiveTimerSession>[];
 
     Future<void> mount(Key key) async {

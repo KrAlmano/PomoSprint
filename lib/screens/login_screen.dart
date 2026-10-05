@@ -16,6 +16,7 @@ import '../widgets/auth/google_logo.dart';
 import '../widgets/auth/language_switcher.dart';
 import '../widgets/auth/legal_links.dart';
 import 'register_screen.dart';
+import 'forgot_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   /// Giriş (e-posta, Google, Apple ya da kayıt) başarılı olunca çağrılır;
@@ -44,7 +45,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
-  bool _isSendingReset = false;
   bool _isResending = false;
   int _resendSecondsLeft = 0;
   Timer? _resendTimer;
@@ -278,27 +278,9 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Future<void> _handleForgotPassword() async {
-    if (_isSendingReset) return;
-    final l10n = AppLocalizations.of(context)!;
-    final email = _emailController.text.trim();
-    if (email.isEmpty) {
-      _showSnack(l10n.errEnterEmailForReset, isError: true);
-      return;
-    }
-    setState(() => _isSendingReset = true);
-    try {
-      // Bağlantı pomosprint.app/reset-password sayfasını açar (implicit akış).
-      await SupabaseService.instance.resetPassword(email);
-      if (mounted) _showSnack(l10n.passwordResetMsg);
-    } catch (e) {
-      if (mounted) {
-        _showSnack('⚠️ ${authErrorText(l10n, SupabaseService.instance.parseAuthError(e))}', isError: true);
-      }
-    } finally {
-      if (mounted) setState(() => _isSendingReset = false);
-    }
-  }
+  Future<void> _handleForgotPassword() => Navigator.of(context).push<void>(
+    MaterialPageRoute(builder: (_) => ForgotPasswordScreen(initialEmail: _emailController.text.trim())),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -465,21 +447,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
-                      onPressed: (_isLoading || _isSendingReset) ? null : _handleForgotPassword,
-                      child: _isSendingReset
-                          ? const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : Text(
-                              l10n.forgotPassword,
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: linkColor,
-                              ),
-                            ),
+                      onPressed: _isLoading ? null : _handleForgotPassword,
+                      child: Text(
+                        l10n.forgotPassword,
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: linkColor),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 8),

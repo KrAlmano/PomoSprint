@@ -88,16 +88,16 @@ select pg_temp.t4_check('ranking n=3: promo 2, düşme yok (999); 0 puanlılar �
   and (select avatar_id from t4_rank3 where pos = 3) = 'avatar_16_basic',
   (select string_agg(pos || ':' || avatar_id || '/' || weekly_points, ' ' order by pos) from t4_rank3));
 
--- 4) Ligi olmayan kullanıcı: tek satır, 0 puan, member_count 1, bölge 1/999,
+-- 4) Ligi olmayan kullanıcı: tek satır, 0 puan, member_count 0, bölge 1/999,
 --    end_date = bu haftanın Pazartesi'si (TR) + 13 gün 23:59:59 TR.
 do $$ declare u uuid; begin u := pg_temp.t4_user('nol', 3); insert into t4_u values ('nol', u); end $$;
 select pg_temp.t4_as((select id from t4_u where tag = 'nol'));
 set local role authenticated;
 create temp table t4_rank_none as select * from public.get_my_league_ranking();
 reset role;
-select pg_temp.t4_check('ligsiz kullanıcı: tek satır (is_me, 0, tier=profil, n=1, 1/999)',
+select pg_temp.t4_check('ligsiz kullanıcı: tek satır (is_me, 0, tier=profil, n=0, 1/999)',
   (select count(*) from t4_rank_none) = 1
-  and (select is_me and weekly_points = 0 and tier = 3 and member_count = 1
+  and (select is_me and weekly_points = 0 and tier = 3 and member_count = 0
               and promotion_zone_end = 1 and demotion_zone_start = 999 from t4_rank_none),
   (select format('%s', row_to_json(t)) from t4_rank_none t));
 select pg_temp.t4_check('ligsiz kullanıcı: end_date bir sonraki haftanın Pazar 23:59:59 TR',
