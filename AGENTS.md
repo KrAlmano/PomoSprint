@@ -362,7 +362,7 @@ MCP ile yıkıcı SQL çalıştırma. Canlıya yazan SQL'i **kullanıcı Supabas
 | `purchase_avatar` | `p_avatar_id text` | int (yeni bakiye) | Koleksiyon | Hayır |
 | `set_equipped_avatar` | `p_avatar_id text` | void | Koleksiyon | Hayır |
 | `delete_own_account` | — | void | Profil | Hayır |
-| `cleanup_unconfirmed_duplicate_identity` | `p_email text` | — | Google/Apple girişi sonrası (kendi e-postası) | Hayır |
+| `cleanup_unconfirmed_duplicate_identity` | `p_email text` | void. Canlı gövde `p_email`'i JWT'deki e-postayla karşılaştırır, değilse `not authorized` (5 Ekim'de okundu; `proposed/04` gereksiz) | Google/Apple girişi sonrası (kendi e-postası) | Hayır |
 | `get_friends_feed` | `int` | — | Kullanılmıyor | Hayır |
 | `process_weekly_leagues`, `ensure_user_in_league` | — | — | Yalnızca cron ve sunucu içi | Hayır |
 
@@ -560,7 +560,6 @@ curl -sI https://pomosprint.app/reset-password | grep -i cache-control   # no-st
 | P1 | `send-welcome-email` repodaki sürümü deploy edilmedi | 3 Ekim `list_edge_functions`: `unsubscribe` v9 ve `send-welcome-email` v7 canlıda, ikisi de JWT kapalı; `unsubscribe` v9 token-only isteği zaten kabul ediyor (repo farkı yalnızca yorum). Repodaki `send-welcome-email` (gönderen kimliği altbilgisi, yalnızca token'lı bağlantı) için sıra: site deploy → `supabase secrets set MAIL_SENDER_NAME=… MAIL_SENDER_ADDRESS=…` → `supabase functions deploy send-welcome-email --no-verify-jwt`. Secret'lar yoksa hoş geldin e-postası gönderilmez |
 | P1 | Veri sorumlusu kimliği sitede yer tutucu (KVKK-15) | `/privacy`, `/kvkk` (iki dil) §1'de `data-fill-in` işaretli; kullanıcı gerçek bilgiyle doldurur (`grep -rn 'data-fill-in' landing/`) |
 | P1 | `mail.pomosprint.app` Resend doğrulaması ve DNS kayıtları | Yapılmadan hoş geldin ve bülten gönderilemez |
-| P1 | `cleanup_unconfirmed_duplicate_identity(p_email)` parametredeki e-postaya güveniyor | `proposed/04` |
 | P1 | `delete-account` Edge Function deploy edilmedi | Deploy (`verify_jwt` açık) + `APPLE_*` secret'ları; o zamana kadar silme `delete_own_account` ile yapılır ve Apple token'ı iptal edilmez (kullanıcıya Ayarlar talimatı gösterilir). Apple Developer'da `pomosprint.app` / `mail.pomosprint.app` gönderici alan adları "Sign in with Apple for Email Communication"a kaydedilmeli (gizli röle adreslerine sıfırlama e-postası) |
 | P2 | E-posta değiştirme yok | Uygulama içi şifre değiştirme var; e-posta değişikliği eklenirse `handle_new_user` yalnızca INSERT'te çalıştığı için `profiles.email` ve `marketing_subscribers.email`'i güncelleyen bir trigger gerekir |
 | P2 | Başka cihazda silinen hesabın kuyruğu | Silinen uid'in `pending_/rejected_sessions_uid_<uid>` anahtarları diğer cihazda kalır (gönderilemez). "Seans sessizce silinmez" kuralı yüzünden otomatik temizlik yok |
