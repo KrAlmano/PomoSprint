@@ -26,6 +26,7 @@ Aşağıdaki durum `AGENTS.md` ve 5 Ekim tarihli doğrulama kaydından aktarılm
 | `12 → 15 → 16 → 19 A → 13 → 14 → 20 → 21 → 22 → 23 → 24 → 25 → 26` | 5 Ekim'de sıralı uygulanmış; ilgili dryrun/md5/katalog kontrolleri o işlemde geçmiş |
 | `19 B` | Uygulanmadı. Site gerçek onay payload'ını gönderip doğrulayana kadar zorunlu kılma aşaması bekliyor |
 | `proposed/01–11` | Bu sıranın yerine kullanılamaz; bazıları sonraki paketlerle geçersiz/tekrar işlenmiş. Tek tek `proposed/README.md` durumuna bak |
+| `migrations/20261007110000_report_submission_lock.sql` | 7 Ekim'de hazırlanıp izole yerelde doğrulandı; **canlıya uygulanmadı**. Eşzamanlı kullanıcı bildiriminde duplicate/günlük 10 sınırını korur. [23 maddelik DRYRUN ve HTTP testi](tests/20261007_report_submission_lock_README.md) |
 
 5 Ekim'deki zincir DRYRUN sonuçları ve down testi `proposed/README.md`'de kayıtlıdır. Bu eski başarı kaydı yeni değişikliğin veya yeni canlı durumun doğrulaması yerine geçmez.
 

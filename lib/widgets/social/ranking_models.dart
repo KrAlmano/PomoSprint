@@ -16,8 +16,8 @@ class RankingEntry {
   /// (arkadaşlar sekmesi) ile belirlenir; isimle eşleştirme yapılmaz.
   final bool isMe;
 
-  /// Genel kullanıcı kimliği. Yalnızca arkadaşlar sekmesi (get_my_friends)
-  /// döndürür; lig ve aylık sıralamada yoktur.
+  /// Oturumlu arkadaşlar, lig ve aylık RPC'lerinin döndürdüğü kimlik.
+  /// Oturumsuz aylık listede kimlik gönderilmez.
   final String? userId;
 
   /// Kullanıcının gizlediği biri: sıra ve puan korunur (lig bölgeleri

@@ -3,10 +3,12 @@
 Uygulama içi hesap silme (App Store 5.1.1(v), Google Play). Sign in with Apple
 ile bağlı hesapta önce Apple token'ını iptal eder, sonra kullanıcıyı siler.
 
-**Durum (5 Ekim 2026 proje kaydı): canlıya deploy edilmedi.** Bu belge yenilenirken canlıya yeniden sorgu yapılmadı; deploy etmeden önce Dashboard/CLI ile doğrula. İstemci önce bu fonksiyonu çağırır; 404
-alırsa (deploy edilmemiş) canlıdaki `delete_own_account` RPC'sine düşer. Yani
-uygulama bugün de siler; Apple token iptali ve e-postaya bağlı kayıtların
-temizliği bu fonksiyon deploy edilince başlar.
+**Durum (7 Ekim 2026 QA): canlıya deploy edilmedi.** Canlı Edge listesi ana QA
+oturumunda salt okunarak doğrulandı; bu kaynaktaki düzeltmeler yayınlanmadı.
+İstemci önce bu fonksiyonu çağırır; 404 (deploy edilmemiş) veya 5xx alırsa
+canlıdaki `delete_own_account` RPC'sine düşer. Uygulama bugün de hesabı ve
+doğrulanmış e-postaya bağlı kayıtları siler; Apple token iptali bu fonksiyon
+ve Apple yapılandırması hazır olduğunda devreye girer.
 
 ## Akış
 
@@ -20,7 +22,14 @@ temizliği bu fonksiyon deploy edilince başlar.
    uygulama kullanıcıya Ayarlar > Apple Hesabı > Apple ile Giriş > PomoSprint >
    Kullanmayı Durdur talimatını gösterir.
 3. E-postası doğrulanmış hesapta `waitlist` ve `user_id`'si boş
-   `marketing_subscribers` satırları silinir (`proposed/12` ile aynı kural).
+   `marketing_subscribers` satırları silinir (`proposed/12` ile aynı
+   `lower(btrim(email))` kuralı). Case farkları ve çevredeki ASCII boşluklar
+   kabul edilir; e-posta metakarakterleri kaçışlanmış, sabitlenmiş `imatch`
+   filtresiyle literal eşlenir. PostgREST `ILIKE` içindeki `*` alias'ı veya
+   SELECT'in 1000 satır sınırı başka kayıtları hedefleyemez/eşleşmeyi atlayamaz.
+   Temizlikte DB/ağ hatası olursa Auth kullanıcısı silinmeden
+   `500 {error: "delete_failed", apple}` döner. Kullanıcı aynı JWT ile veya
+   istemcinin mevcut SQL yedeğiyle işlemi yeniden deneyebilir.
 4. `admin.auth.admin.deleteUser(uid)`: geri kalan her şey cascade ile silinir
    (AGENTS.md §5.6).
 
@@ -36,8 +45,14 @@ Authorization: Bearer <kullanıcının access token'ı>
 {"apple_authorization_code": "..."}        // isteğe bağlı
 
 200 {"deleted": true, "apple": {"status": "revoked" | "skipped" | "not_applicable", "reason"?: "..."}}
-401 {"error": "not_authenticated"}   405 {"error": "method_not_allowed"}   500 {"error": "delete_failed"}
+400 {"error": "invalid_payload"}
+401 {"error": "not_authenticated"}   405 {"error": "method_not_allowed"}
+500 {"error": "delete_failed", "apple": {"status": "...", "reason"?: "..."}}
 ```
+
+Gövdesiz POST geçerlidir. Bozuk JSON, nesne olmayan gövde veya string olmayan
+`apple_authorization_code` 400 döndürür ve silme başlamaz. Gövdedeki kullanıcı
+kimliği/e-posta alanları silinecek hesabı değiştirmez; hedef yalnızca JWT'dir.
 
 Fonksiyon **404 döndürmez**; istemci 404'ü "deploy edilmemiş", 5xx'i "çalışamadı"
 sayıp `delete_own_account` RPC'sine düşer (5xx gövdesindeki `apple` durumu
@@ -70,7 +85,25 @@ supabase functions deploy delete-account
 kendi hesabını siler. CLI yoksa: Dashboard > Edge Functions > Deploy a new
 function > `delete-account`, `index.ts`'i yapıştırın; "Verify JWT" açık kalsın.
 
-## Doğrulama (silme yapmaz)
+## Ağsız kaynak doğrulaması
+
+```bash
+cd scripts
+node --test test/delete_account_function.test.mjs
+npm test
+```
+
+7 Ekim kaynak koşusu: **25/25**. Gerçek `index.ts`, sahte Supabase Auth/DB ve
+tamamen sahte Apple HTTP ile yürütülür. JWT/kimlik izolasyonu, malformed/boş
+istek, doğrulanmamış e-posta güvenliği, case/metakarakter ve 1000 satır sınırı,
+temizlik/silme hata-retry, Apple kimliği/kod/config ve token/revoke sonuçları
+denetlenir. ES256 client secret imzası yalnızca testte üretilen geçici anahtarla
+doğrulanır. Gerçek hesaba, Apple'a veya başka ağa istek gönderilmez.
+
+Bu test, fiziksel cihazda Apple girişini/izin iptalini, Edge gateway JWT
+doğrulamasını veya kaynak değişikliğinin canlıya deploy edildiğini doğrulamaz.
+
+## Dağıtım sonrası doğrulama (gerçek silme ayrı test hesabıyla)
 
 - Authorization başlığı olmadan POST → 401 (gateway)
 - `GET` (geçerli JWT ile) → 405

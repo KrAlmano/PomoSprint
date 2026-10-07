@@ -1,0 +1,85 @@
+{
+  "expect": "baseline",
+  "database": "pomosprint_report_qa_20261007",
+  "real_http": true,
+  "controlled_insert_barrier": "Temporary SHARE table lock in isolated QA only",
+  "checks": [
+    {
+      "name": "same-target concurrent duplicate",
+      "passed": true,
+      "observation": {
+        "rows": 2,
+        "unique_response_ids": 2,
+        "codes": [
+          "reported",
+          "reported"
+        ],
+        "wait_events": [
+          "relation",
+          "relation"
+        ]
+      }
+    },
+    {
+      "name": "nine reports plus two concurrent distinct targets",
+      "passed": true,
+      "observation": {
+        "rows": 11,
+        "codes": [
+          "reported",
+          "reported"
+        ],
+        "wait_events": [
+          "relation",
+          "relation"
+        ]
+      }
+    },
+    {
+      "name": "existing duplicate accepted even at daily cap",
+      "passed": true,
+      "observation": {
+        "code": "duplicate"
+      }
+    },
+    {
+      "name": "different reporters remain independent",
+      "passed": true,
+      "observation": {
+        "codes": [
+          "reported",
+          "reported"
+        ],
+        "wait_events": [
+          "relation",
+          "relation"
+        ]
+      }
+    },
+    {
+      "name": "self report unchanged",
+      "passed": true,
+      "observation": {
+        "code": "self"
+      }
+    },
+    {
+      "name": "anonymous execute forbidden",
+      "passed": true,
+      "observation": {
+        "status": 401,
+        "code": "42501"
+      }
+    },
+    {
+      "name": "authenticated role without uid still rejected",
+      "passed": true,
+      "observation": {
+        "status": 400,
+        "message": "not authenticated"
+      }
+    }
+  ],
+  "passed": 7,
+  "failed": 0
+}

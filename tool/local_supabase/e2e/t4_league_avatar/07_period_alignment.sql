@@ -13,8 +13,9 @@ create temp table t4_u(tag text primary key, id uuid, cat uuid) on commit drop;
 grant select on t4_u to authenticated;
 create temp table t4_l(tag text primary key, id uuid) on commit drop;
 create temp table t4_e as
-select (date_trunc('week', (now() at time zone 'Europe/Istanbul')::date::timestamp) - interval '1 second')
-         at time zone 'Europe/Istanbul' as e;
+-- Use a just-closed synthetic period so the late session remains inside
+-- complete_study_session's 24h acceptance window on every weekday.
+select now() - interval '1 minute' as e;
 
 do $$
 declare e timestamptz := (select e from t4_e); l uuid; u uuid; i int;
@@ -47,7 +48,7 @@ select pg_temp.t4_check('(a) Terfi eden p1 yeni (tier 2) odasında tam 14 günl�
      demotion_zone_start, case when pos >= demotion_zone_start then 'DÜŞME BÖLGESİ' else 'güvenli' end)
    from t4_rank where is_me));
 
--- (b) Sınırdan önce biten seans (Pazar 23:25-23:50 TR), cron'dan sonra gönderiliyor (çevrimdışı kuyruk)
+-- (b) Sınırdan önce biten seans, cron'dan sonra gönderiliyor (çevrimdışı kuyruk)
 do $$
 declare r jsonb; u record; before int; after int; e timestamptz := (select e from t4_e);
 begin

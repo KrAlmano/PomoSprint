@@ -1160,7 +1160,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get errFillEmailPassword => 'Lütfen e-posta ve şifrenizi girin.';
 
   @override
-  String get errShortPassword => 'Şifre en az 6 karakter olmalıdır.';
+  String get errShortPassword => 'Şifre en az 8 karakter olmalıdır.';
 
   @override
   String get errAcceptTerms =>
@@ -1661,10 +1661,10 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get registerPasswordHelper =>
-      'En az 6 karakter; büyük harf, küçük harf ve rakam içermeli.';
+      'En az 8 karakter; büyük harf, küçük harf ve rakam içermeli.';
 
   @override
-  String get passwordRuleLength => 'En az 6 karakter';
+  String get passwordRuleLength => 'En az 8 karakter';
 
   @override
   String get passwordRuleCase => 'Büyük ve küçük harf (A-Z, a-z)';
@@ -1790,7 +1790,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get reportUserActionSub =>
-      'Uygunsuz bir adı ya da davranışı destek ekibine e-postayla bildir.';
+      'Uygunsuz bir adı, içeriği ya da davranışı uygulama içinden bildir.';
 
   @override
   String get hideUserAction => 'Bu kullanıcıyı gizle';
@@ -2121,4 +2121,52 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get friendActionCancel => 'Vazgeç';
+
+  @override
+  String get reportReasonLabel => 'Bildirme nedeni';
+
+  @override
+  String get reportChooseReason => 'Lütfen bir bildirme nedeni seç.';
+
+  @override
+  String get reportReasonOffensiveName => 'Uygunsuz ad';
+
+  @override
+  String get reportReasonOffensiveContent => 'Uygunsuz içerik';
+
+  @override
+  String get reportReasonHarassment => 'Taciz veya zorbalık';
+
+  @override
+  String get reportReasonSpam => 'Spam';
+
+  @override
+  String get reportReasonImpersonation => 'Başkasını taklit etme';
+
+  @override
+  String get reportReasonOther => 'Diğer';
+
+  @override
+  String get reportDetailsLabel => 'Açıklama (isteğe bağlı)';
+
+  @override
+  String get reportSendButton => 'Bildirimi gönder';
+
+  @override
+  String get reportSent => 'Bildirimin alındı. Destek ekibi inceleyecek.';
+
+  @override
+  String get reportAlreadyReceived =>
+      'Bu kullanıcı hakkında bildirimin zaten alındı.';
+
+  @override
+  String get reportRateLimited =>
+      'Bugünkü bildirim sınırına ulaştın. Daha sonra tekrar dene.';
+
+  @override
+  String get reportUserUnavailable =>
+      'Bu kullanıcı artık bildirilemiyor. Listeyi yenile.';
+
+  @override
+  String get reportSendFailed => 'Bildirim gönderilemedi. Tekrar dene.';
 }

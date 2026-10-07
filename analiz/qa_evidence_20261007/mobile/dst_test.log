@@ -1,0 +1,104 @@
+00:00 +0: loading /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_correctness_test.dart
+00:00 +0: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_findings_test.dart: (setUpAll)
+00:00 +0: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_correctness_test.dart: (setUpAll)
+00:00 +0: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_findings_test.dart: Raporlar: veri birleştirme (ReportsScreen) REP-01/X1: uygulama çevrimdışı açılınca bekleyen seanslar gösterilir
+00:00 +1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_findings_test.dart: Raporlar: veri birleştirme (ReportsScreen) REP-01/X1: uygulama çevrimdışı açılınca bekleyen seanslar gösterilir
+00:00 +2: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_findings_test.dart: Raporlar: veri birleştirme (ReportsScreen) REP-01/X1: uygulama çevrimdışı açılınca bekleyen seanslar gösterilir
+00:00 +3: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_findings_test.dart: Raporlar: veri birleştirme (ReportsScreen) REP-01/X1: uygulama çevrimdışı açılınca bekleyen seanslar gösterilir
+İstatistikler yüklenemedi: ServiceException(network)
+00:00 +4: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_findings_test.dart: Raporlar: veri birleştirme (ReportsScreen) REP-01/X1: uygulama çevrimdışı açılınca bekleyen seanslar gösterilir
+00:00 +5: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_findings_test.dart: Raporlar: veri birleştirme (ReportsScreen) REP-01/X1: uygulama çevrimdışı açılınca bekleyen seanslar gösterilir
+00:00 +6: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_correctness_test.dart: Günlük ders kartları: sıra, süre, renk, ikon, bekleyen işareti
+00:00 +7: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_findings_test.dart: Raporlar: veri birleştirme (ReportsScreen) REP-01/X1: bir kez yüklendikten sonra çevrimdışı tamamlanan seans görünür
+İstatistikler yüklenemedi: ServiceException(network)
+00:00 +8: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_correctness_test.dart: Günlük dağılım: toplam ve süreler; yüzdeler 60/20/20
+00:00 +9: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_findings_test.dart: Raporlar: veri birleştirme (ReportsScreen) REP-02/MH-3/X6: sunucuya yazılmış ama kuyrukta kalan seans bir kez sayılır
+00:00 +10: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_correctness_test.dart: Haftalık (12-18 Ekim) trend: her gün doğru süre, bugün seçili
+00:00 +11: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_findings_test.dart: Raporlar: veri birleştirme (ReportsScreen) REP-03/MH-3: senkron anında toplam düşmez, yenileme başarısız olsa da kalır
+İstatistikler yüklenemedi: ServiceException(network)
+İstatistikler yüklenemedi: ServiceException(network)
+00:00 +12: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_findings_test.dart: Raporlar: veri birleştirme (ReportsScreen) REP-03/MH-3: senkron anında toplam düşmez, yenileme başarısız olsa da kalır
+00:00 +13: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_correctness_test.dart: Haftalık (12-18 Ekim) toplam odak 4sa 10dk, en verimli gün Çarşamba
+00:00 +14: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_findings_test.dart: Raporlar: veri birleştirme (ReportsScreen) REP-04/MH-4: overlap ile bekleyen seans toplama girmez
+00:00 +15: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_correctness_test.dart: Haftalık (12-18 Ekim) ders analizi: Fizik 2sa 5dk, Matematik 1sa 40dk (bekleyen), Kimya 25dk
+00:00 +16: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_findings_test.dart: Raporlar: veri birleştirme (ReportsScreen) REP-06/MH-4/X12: bekleyen seansın günü kuyruğun gönderdiği düzeltilmiş saatle
+00:00 +17: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_correctness_test.dart: Aylık (Ekim) ısı haritası günleri
+00:00 +18: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_correctness_test.dart: Aylık (Ekim) ısı haritası günleri
+00:00 +19: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_findings_test.dart: Raporlar: veri birleştirme (ReportsScreen) REP-05/MH-2: kategori görünmezken değişirse dönünce yenilenir (30 sn dolmadan)
+00:00 +20: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_correctness_test.dart: Aylık (Ekim) konu karşılaştırması: haftalık seriler
+00:00 +21: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_findings_test.dart: Raporlar: veri birleştirme (ReportsScreen) REP-05: arşivlenmiş kategorinin ikonu sunucudan gelir (kitaba dönmez)
+00:01 +22: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_correctness_test.dart: Aylık (Ekim) haftalık özet kartları ve rozetler
+00:01 +23: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_findings_test.dart: Raporlar: veri birleştirme (ReportsScreen) REP-05: yalnız bekleyen seansı olan arşivlenmiş kategori rengini korur
+00:01 +24: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_correctness_test.dart: Aylık (Ekim) hafta dökümü: yalnız bugüne kadarki günler, kategoriler ve bekleyen
+00:01 +25: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_correctness_test.dart: Aylık (Ekim) hafta dökümü: yalnız bugüne kadarki günler, kategoriler ve bekleyen
+00:01 +26: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_correctness_test.dart: Aylık (Ekim) hafta dökümü: yalnız bugüne kadarki günler, kategoriler ve bekleyen
+00:01 +27: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_correctness_test.dart: Aylık (Ekim) hafta dökümü: yalnız bugüne kadarki günler, kategoriler ve bekleyen
+00:01 +28: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_findings_test.dart: Günlük görünüm REP-08: ders kartlarının toplamı bugünün toplamını tutar (5 kategori)
+00:01 +29: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_findings_test.dart: Günlük görünüm REP-08: ders kartlarının toplamı bugünün toplamını tutar (5 kategori)
+00:01 +30: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_correctness_test.dart: Farklı saat dilimi New York profilinde günlük toplam o dilimin gününe göre
+00:01 +31: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_findings_test.dart: Günlük görünüm REP-09/X9: hedef tam tutturulunca "aştın" denmez; aşınca yüzde kırpılmaz
+00:01 +32: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_correctness_test.dart: Raporlar: üç sekme aynı birleşik veriyi gösterir
+00:01 +33: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_correctness_test.dart: Raporlar: üç sekme aynı birleşik veriyi gösterir
+00:02 +34: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_findings_test.dart: Haftalık görünüm REP-11/X13/MH-8: sıfır toplam "0dk" (0 sa değil)
+00:02 +35: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_findings_test.dart: Haftalık görünüm X10/MH-8: verimlilik etiketi geçen günlere göre; %0 "Normal" değil
+00:02 +36: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_findings_test.dart: Haftalık görünüm MH-5: haftalık ders analizinde bekleyen seans işaretlenir
+00:02 +37: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_findings_test.dart: Aylık görünüm MH-5: gün dökümünde bekleyen seans işaretlenir
+00:02 +38: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_findings_test.dart: Aylık görünüm MH-6: tek haftalık ayda "Hafta 1" etiketi noktanın altında (ortada)
+00:02 +39: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_findings_test.dart: Aylık görünüm MH-7: 0/0 haftada rozet yok, eşit haftada nötr rozet, "Yeni" yalnız ilk çalışmada
+00:02 +40: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_findings_test.dart: Aylık görünüm MH-9: kullanıcının "Diğer" kategorisi ile toplu seri ayrı adlarla
+00:02 +41: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_findings_test.dart: X7: hedef sayfası hedefe ulaşmak için gereken pomodoroyu söyler (yukarı yuvarlar)
+00:02 +42: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/reports_findings_test.dart: (tearDownAll)
+00:02 +42: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: takvim yardımcıları addDays ve mondayOf yaz saati geçişlerinde gün kaydırmaz
+00:02 +43: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: takvim yardımcıları dayKeyOf saat bilgisini yok sayar
+00:02 +44: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: weeksOfMonth Ekim 2026: ay dışına taşan ilk/son hafta kırpılır, gün kaybolmaz
+00:02 +45: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: weeksOfMonth Mart 2026: 30 Mart son haftaya düşer (Berlin DST senaryosu)
+00:02 +46: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: weeksOfMonth ayın her günü tam olarak bir haftaya düşer
+00:02 +47: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: weeksOfMonth yalnızca bugüne kadar başlamış haftalar listelenir
+00:02 +48: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: compareWithPreviousWeek kırpılmış ve devam eden hafta eşit pencereyle kıyaslanır
+00:02 +49: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: compareWithPreviousWeek devam eden ortadaki hafta da aynı günlerle kıyaslanır
+00:02 +50: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: compareWithPreviousWeek kıyas değeri yoksa yüzde yok
+00:02 +51: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: toplamlar dailyTotals her takvim günü için bir kayıt üretir
+00:02 +52: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: toplamlar totalsByCategory çoktan aza sıralar ve rengi korur
+00:02 +53: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: toplamlar goalPercent hedefe ulaşmadan %100 göstermez
+00:02 +54: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: toplamlar percentChangeOf
+00:02 +55: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: toplamlar effectiveDailyGoalMinutes
+00:02 +56: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: monthToDateComparison önceki ayın aynı dönemiyle kıyaslar
+00:02 +57: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: monthToDateComparison önceki ay kısaysa ay sonuna kırpılır
+00:02 +58: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: monthToDateComparison ocakta önceki yılın aralığına bakar
+00:02 +59: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: weeklyCategorySeries lejantsız seri kalmaz: fazlası "diğer"de toplanır
+00:02 +60: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: weeklyCategorySeries az kategoride hepsi ayrı seri
+00:02 +61: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: StatSession sunucu seansı 04:00 kuralıyla başlangıç gününe atanır
+00:02 +62: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: StatSession kuyruktaki seans bekleyen olarak işaretlenir
+00:02 +63: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: biçimler formatStudyMinutes tek biçim kullanır
+00:02 +64: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: biçimler formatPercent yerel ayara uyar
+00:02 +65: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: yüzdeler ve hedef roundedPercents toplamı her zaman 100 (en büyük kalan)
+00:02 +66: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: yüzdeler ve hedef goalProgressPercent kırpılmaz, goalPercent kırpılır
+00:02 +67: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: yüzdeler ve hedef elapsedWeekGoalPercent geçen günlerin hedefine göre
+00:02 +68: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: kuyruk ve birleştirme pendingStatSessions overlap seansını atar, saat farkını uygular
+00:02 +69: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: kuyruk ve birleştirme mergeStatSessions: kopya atılır, kategori kimlik/adla çözülür
+00:02 +70: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: kuyruk ve birleştirme mergeStatSessions: yalnız aktif listede olan kategori (dilden bağımsız ad)
+00:02 +71: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: kuyruk ve birleştirme totalsByCategory kimlikle gruplar; aynı adlı farklı kategoriler ayrı
+00:02 +72: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: kuyruk ve birleştirme StudySession.fromJson client_uuid ve ikon okur; ad yoksa boş
+00:02 +73: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: kategori adları categoryMatchKey dilden ve büyük/küçük harften bağımsız
+00:02 +74: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: kategori adları localizedKnownCategoryName
+00:02 +75: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: kategori adları firstUnusedPaletteColor
+00:02 +76: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/stats_calculator_test.dart: kategori adları categoryNameToSave: harf düzeltmesi kaydedilir, dokunulmamış çeviri korunur
+00:02 +77: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/study_day_test.dart: (setUpAll)
+00:02 +77: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/study_day_test.dart: studyDayOf (profil diliminde 04:00 sınırı) 04:00 öncesi bir önceki güne sayılır
+00:02 +78: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/study_day_test.dart: studyDayOf (profil diliminde 04:00 sınırı) 04:00 ve sonrası aynı gün
+00:02 +79: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/study_day_test.dart: studyDayOf (profil diliminde 04:00 sınırı) ay ve yıl sınırında takvim aritmetiği
+00:02 +80: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/study_day_test.dart: studyDayOf (profil diliminde 04:00 sınırı) yalnızca an önemlidir: yerel ve UTC aynı an aynı gün
+00:02 +81: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/study_day_test.dart: studyDayOf (profil diliminde 04:00 sınırı) yaz saati geçiş günlerinde gün kayması yok
+00:02 +82: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/study_day_test.dart: studyDayOf (profil diliminde 04:00 sınırı) gün cihazın değil profilin diliminde hesaplanır
+00:02 +83: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/study_day_test.dart: studyDayOf (profil diliminde 04:00 sınırı) etkin dilim profilden ayarlanır; boş/bilinmeyen değerde varsayılan
+00:02 +84: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/study_day_test.dart: studyDayStart çalışma gününün başladığı an profil diliminde 04:00
+00:02 +85: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/study_day_test.dart: studyDaysBetween saat bilgisinden ve yaz saatinden bağımsız gün farkı
+00:02 +86: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/study_day_test.dart: studyDayKey / parseStudyDayKey gidiş-dönüş
+00:02 +87: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/study_day_test.dart: effectiveStreak bugün ya da dün çalışıldıysa seri korunur
+00:02 +88: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/study_day_test.dart: effectiveStreak iki gün ve fazlası boşlukta seri 0
+00:02 +89: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/study_day_test.dart: effectiveStreak gece 04:00 öncesi hâlâ önceki çalışma günü sayılır
+00:02 +90: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/study_day_test.dart: effectiveStreak son çalışma günü yoksa ya da seri 0 ise 0
+00:02 +91: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/study_day_test.dart: effectiveStreak gelecekteki gün (saat dilimi farkı) seriyi bozmaz
+00:02 +92: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/study_day_test.dart: effectiveStreak seri sunucunun (profilin) gün sınırıyla kırılır, cihazınkiyle değil
+00:02 +93: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/study_day_test.dart: (tearDownAll)
+00:02 +93: All tests passed!

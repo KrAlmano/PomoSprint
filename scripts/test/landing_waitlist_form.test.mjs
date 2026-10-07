@@ -1,8 +1,7 @@
 // landing/js/main.js bekleme listesi formu (6563 / İYS): ticari elektronik
 // ileti onayı ayrı ve önceden işaretsiz bir kutuyla alınır; kutu işaretli
-// değilse waitlist'e istek gitmez. Canlı waitlist tablosunda onay kolonu
-// olmadığı için (3 Ekim, information_schema) istek gövdesi yalnızca e-posta
-// taşır; sunucu tarafı onay kaydı supabase/proposed/19'da.
+// değilse waitlist'e istek gitmez. proposed/19 A onay kolonlarını ekler;
+// onay ve sürüm istemciden, consented_at yalnızca sunucu trigger'ından gelir.
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
@@ -56,7 +55,7 @@ test("onay kutusu işaretli değilse kayıt gönderilmez, kutu hatalı işaretle
   assert.equal(ctx.els["notify-form"].hidden, false, "teşekkür gösterilmez");
 });
 
-test("onay verilince kayıt yalnızca e-postayla gönderilir (canlı tablo kolonları)", async () => {
+test("onay verilince e-posta, onay ve metin sürümü gönderilir; zaman sunucuya bırakılır", async () => {
   const ctx = setup();
   ctx.els["notify-consent"].checked = true;
   submit(ctx, "  Ayse@Example.com ");
@@ -64,7 +63,11 @@ test("onay verilince kayıt yalnızca e-postayla gönderilir (canlı tablo kolon
   await settle();
   assert.equal(ctx.calls.length, 1);
   assert.equal(ctx.calls[0].path, "/rest/v1/waitlist");
-  assert.deepEqual(plain(ctx.calls[0].opts.body), { email: "ayse@example.com" });
+  assert.deepEqual(plain(ctx.calls[0].opts.body), {
+    email: "ayse@example.com",
+    marketing_consent: true,
+    consent_text_version: "waitlist-2026-10-03",
+  });
   assert.equal(ctx.calls[0].opts.prefer, "return=minimal");
   assert.equal(ctx.els["notify-form"].hidden, true);
   assert.equal(ctx.els["notify-success"].hidden, false);

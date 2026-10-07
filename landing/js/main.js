@@ -68,8 +68,8 @@
      teşekkür gösterilir; form bir adresin listede olup olmadığını ele vermez.
      Ticari elektronik ileti onayı (6563 sayılı Kanun) ayrı ve önceden
      işaretsiz bir kutuyla alınır: kutu işaretlenmeden (ya da sayfada yoksa)
-     kayıt gönderilmez. waitlist tablosunda onay kolonu olmadığı için istekte
-     yalnızca e-posta gider; onay kaydı için bkz. supabase/proposed/19. */
+     kayıt gönderilmez. Onay ve metin sürümü kayıtla birlikte gönderilir;
+     onay zamanını waitlist_set_consent_time sunucu trigger'ı belirler. */
   var notifyForm = document.getElementById("notify-form");
   var notifyInput = document.getElementById("notify-email");
   if (notifyForm && notifyInput) {
@@ -81,6 +81,7 @@
     var consentBox = document.getElementById("notify-consent");
     var formReadyAt = Date.now();
     var MIN_FILL_MS = 2500;
+    var CONSENT_TEXT_VERSION = "waitlist-2026-10-03";
     var sending = false;
     var hadInteraction = false;
     var markInteraction = function (e) { if (e.isTrusted) hadInteraction = true; };
@@ -171,7 +172,11 @@
         return;
       }
       api.request("/rest/v1/waitlist", {
-        body: { email: email },
+        body: {
+          email: email,
+          marketing_consent: true,
+          consent_text_version: CONSENT_TEXT_VERSION
+        },
         prefer: "return=minimal"
       }).then(function (res) {
         var code = api.errorCode(res.data);
@@ -337,74 +342,6 @@
     });
   };
   loadLeaderboard();
-
-  /* ---------- Aylık sıfırlanma sayacı ----------
-     Ay sınırı Türkiye saatine (Europe/Istanbul) göre hesaplanır; ziyaretçinin
-     saat dilimi farklı olsa da herkes aynı anı görür. Sayaç sıfırlandığında
-     bir sonraki ay hedeflenir ve sıralama yeniden çekilir. */
-  var lbCountdownTime = document.getElementById("lb-countdown-time");
-  if (lbCountdownTime) {
-    var TZ = "Europe/Istanbul";
-    var tzFormatter = null;
-    try {
-      tzFormatter = new Intl.DateTimeFormat("en-US", {
-        timeZone: TZ, hourCycle: "h23",
-        year: "numeric", month: "numeric", day: "numeric",
-        hour: "numeric", minute: "numeric", second: "numeric"
-      });
-    } catch (e) {
-      tzFormatter = null;
-    }
-
-    // Verilen anın İstanbul'daki takvim parçaları (Intl yoksa sabit UTC+3)
-    var istanbulParts = function (ms) {
-      if (tzFormatter) {
-        var p = {};
-        tzFormatter.formatToParts(new Date(ms)).forEach(function (x) { p[x.type] = Number(x.value); });
-        return p;
-      }
-      var d = new Date(ms + 3 * 3600 * 1000);
-      return {
-        year: d.getUTCFullYear(), month: d.getUTCMonth() + 1, day: d.getUTCDate(),
-        hour: d.getUTCHours(), minute: d.getUTCMinutes(), second: d.getUTCSeconds()
-      };
-    };
-    var istanbulOffsetMs = function (ms) {
-      var p = istanbulParts(ms);
-      var asUtc = Date.UTC(p.year, p.month - 1, p.day, p.hour % 24, p.minute, p.second);
-      return asUtc - Math.floor(ms / 1000) * 1000;
-    };
-    var nextMonthlyReset = function () {
-      var now = Date.now();
-      var p = istanbulParts(now);
-      var localMidnightAsUtc = Date.UTC(p.year, p.month, 1, 0, 0, 0); // bir sonraki ayın 1'i
-      return localMidnightAsUtc - istanbulOffsetMs(localMidnightAsUtc);
-    };
-
-    var formatRemaining = function (diffMs) {
-      var totalSeconds = Math.floor(diffMs / 1000);
-      var days = Math.floor(totalSeconds / 86400);
-      var hours = Math.floor((totalSeconds % 86400) / 3600);
-      var minutes = Math.floor((totalSeconds % 3600) / 60);
-      var seconds = totalSeconds % 60;
-      if (days > 0) return days + " gün " + hours + " saat " + minutes + " dk";
-      return hours + " saat " + minutes + " dk " + seconds + " sn";
-    };
-
-    var target = nextMonthlyReset();
-    var tickCountdown = function () {
-      var diff = target - Date.now();
-      if (diff <= 0) {
-        lbCountdownTime.textContent = "Sıfırlanıyor…";
-        target = nextMonthlyReset();
-        if (target - Date.now() > 0) setTimeout(loadLeaderboard, 5000);
-        return;
-      }
-      lbCountdownTime.textContent = formatRemaining(diff);
-    };
-    tickCountdown();
-    setInterval(tickCountdown, 1000);
-  }
 
   /* ---------- SSS akordiyonu (tek açık) ---------- */
   var faqItems = Array.prototype.slice.call(document.querySelectorAll(".faq-item"));

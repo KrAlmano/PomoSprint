@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/Users/almano/Desktop/Courses/Projects/Pomodoro/analiz/qa_evidence_20261007/mobile/run_process_death.py", line 48, in <module>
+    values={n.attrib['name']:(n.text if n.tag=='string' else n.attrib.get('value')) for n in ET.fromstring(xml)}
+                                             ^^^^^^^^^^^^^^^^^^
+  File "/Users/almano/.brew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/xml/etree/ElementTree.py", line 1367, in XML
+    return parser.close()
+           ~~~~~~~~~~~~^^
+xml.etree.ElementTree.ParseError: no element found: line 1, column 0

@@ -25,6 +25,7 @@ python3 landing/tools/sync_partials.py --check  # fark varsa 1 ile çıkar
 - `_partials/`, `tools/` ve `*.md` `.assetsignore` ile yayından hariç tutulur; `_headers` tutulmaz (Workers okur, yayınlamaz).
 - Özellikler sayfasındaki telefon videoları `js/main.js` içindeki `SHOT_VIDEOS` listesinden gelir (540x1174, sessiz döngü). Her video için ilk kareden bir poster (`videos/<ad>.webp`) olmalı: `ffmpeg -i <ad>.mp4 -frames:v 1 kare.png && cwebp -q 72 kare.png -o videos/<ad>.webp`. Listede olmayan ekranlarda yer tutucu ya da "Örnek görünüm" kartı görünür. Eski arayüzü gösteren `leaderboard.mp4` ve `reports.mp4` güncel kayıt gelene kadar listeden çıkarıldı ve `.assetsignore` ile yayınlanmıyor.
 - Ana sayfadaki canlı aylık sıralama bölümü (`#siralama`) gizli başlar; en az 3 kişi puan topladığında görünür.
+- Aylık puanlar kullanıcının profil saat diliminde ayın 1'i 04:00 çalışma ayıyla hesaplanır. Site tüm kullanıcılar için tek bir sıfırlanma anı varsaymaz; eski İstanbul 00:00 geri sayımı kaldırıldı.
 
 ## Yasal sayfalar
 
@@ -43,7 +44,7 @@ python3 landing/tools/sync_partials.py --check  # fark varsa 1 ile çıkar
 
 ## Yardımcı sayfalar
 
-Üçü de Türkçe ve İngilizcedir: dil bağlantıdaki `?lang=tr|en` parametresinden, yoksa tarayıcı dilinden seçilir (`js/auth-i18n.js`). E-posta şablonları İngilizce kullanıcılar için bağlantıya `lang=en` eklemelidir.
+Üçü de Türkçe ve İngilizcedir: dil bağlantıdaki `?lang=tr|en` parametresinden, yoksa tarayıcı dilinden seçilir (`js/auth-i18n.js`). E-posta şablonları İngilizce kullanıcılar için bağlantıya `lang=en` eklemelidir. `config.js` zaman aşımı yanıt gövdesi tamamlanana kadar etkin kalır; başlıkların gelmesi ağ beklemesini sonlandırmaz.
 
 - `reset-password`: `#access_token=...&type=recovery` (implicit akış) ve `?token_hash=...&type=recovery` (e-posta şablonu) bağlantılarını kabul eder; token_hash form gönderilince doğrulanır.
 - `confirmed`: e-posta onayı dönüşü; parametresiz açılınca "onaylandı" demez.
@@ -51,4 +52,4 @@ python3 landing/tools/sync_partials.py --check  # fark varsa 1 ile çıkar
 
 ## Bekleme listesi formu
 
-Ana sayfadaki "Yayınlanınca haber ver" formunda ayrı, önceden işaretsiz ticari ileti onay kutusu (`#notify-consent`) vardır. `js/main.js` kutu işaretlenmeden POST göndermez; fakat istek gövdesi şu anda yalnızca `{ email }` olduğundan onay **sunucuya kaydedilmez**. Canlı waitlist tablosunda `proposed/19` A ile gelen `marketing_consent`, `consent_text_version`, `consented_at` ve `unsubscribe_token` kolonları bulunur; yeni satırlar onay metadatası olmadan kalır (`NULL`). Önce site bu alanları ve `waitlist-2026-10-03` sürümünü göndermeli, sonra `proposed/19` B uygulama planı yeniden incelenmeli; B onaylı kayıt dışında insert'i engeller. Bu yapılana kadar waitlist listesini pazarlama postası için onaylı sayma. Test: `scripts/test/landing_waitlist_form.test.mjs`.
+Ana sayfadaki "Yayınlanınca haber ver" formunda ayrı, önceden işaretsiz ticari ileti onay kutusu (`#notify-consent`) vardır. `js/main.js` kutu işaretlenmeden POST göndermez; 7 Ekim düzeltmesiyle `{ email, marketing_consent: true, consent_text_version: "waitlist-2026-10-03" }` gönderir. Onay zamanını istemci göndermez; `waitlist_set_consent_time` trigger'ı `consented_at` değerini sunucuda belirler. `proposed/19` A kolonları kayıtlı canlı şemada mevcut; bu QA'da yeni canlı sorgu veya deploy yapılmadı. Yeni kod deploy edildikten sonra `proposed/19` B uygulama planı yeniden incelenmeli; B onaylı kayıt dışında insert'i engeller. Önceki NULL onaylı kayıtları pazarlama postası için onaylı sayma. Test: `scripts/test/landing_waitlist_form.test.mjs`.

@@ -68,6 +68,7 @@ class _FriendsSheetState extends State<FriendsSheet> {
   bool _isAdding = false;
   String? _respondingId;
   String? _errorMessage;
+  int _requestId = 0;
 
   SupabaseService get _service => widget.service ?? SupabaseService.instance;
 
@@ -84,6 +85,8 @@ class _FriendsSheetState extends State<FriendsSheet> {
   }
 
   Future<void> _loadData() async {
+    if (!mounted) return;
+    final requestId = ++_requestId;
     setState(() => _isLoading = true);
     final service = _service;
     final codeFuture = service.getMyFriendCode();
@@ -106,7 +109,7 @@ class _FriendsSheetState extends State<FriendsSheet> {
       debugPrint('[SOCIAL] Arkadaş listesi alınamadı: $e');
     }
     final code = await codeFuture;
-    if (!mounted) return;
+    if (!mounted || requestId != _requestId) return;
     setState(() {
       _myCode = code ?? _myCode;
       if (friends != null && pending != null) {

@@ -12,11 +12,10 @@ import '../../theme.dart';
 import '../../utils/responsive.dart';
 import '../../utils/user_report.dart';
 import 'social_error_text.dart';
+import 'user_report_dialog.dart';
 import '../avatar_widget.dart';
 
-/// Başka bir kullanıcının görünen adının geçtiği yer (bildirim e-postasında
-/// yazılır).
-enum UserReportPlace { league, monthly, friendsRanking, liveFeed, friendsList, friendRequest }
+export 'user_report_dialog.dart' show UserReportPlace;
 
 /// Bildirilen / gizlenen kullanıcı.
 @immutable
@@ -73,7 +72,33 @@ Future<void> showUserSafetySheet(
   if (action == null || !context.mounted) return;
   switch (action) {
     case _SafetyAction.report:
-      await _report(context, target, place);
+      if (target.userId?.isNotEmpty == true) {
+        final ownerId = data.currentUser.value?.id;
+        final l10n = AppLocalizations.of(context)!;
+        final result = await showUserReportDialog(
+          context,
+          targetName: target.name,
+          submit: (reason, details) {
+            if (ownerId == null || data.currentUser.value?.id != ownerId) {
+              throw const ServiceException(ServiceErrorCode.notSignedIn);
+            }
+            return data.submitUserReport(
+              targetUserId: target.userId!,
+              place: userReportPlaceCode(place),
+              reason: reason,
+              details: details,
+            );
+          },
+        );
+        if (result != null && context.mounted && data.currentUser.value?.id == ownerId) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(result ? l10n.reportAlreadyReceived : l10n.reportSent),
+            behavior: SnackBarBehavior.floating,
+          ));
+        }
+      } else {
+        await _report(context, target, place);
+      }
     case _SafetyAction.hide:
       await _hide(context, target);
     case _SafetyAction.block:
@@ -102,7 +127,7 @@ Future<void> _report(BuildContext context, UserSafetyTarget target, UserReportPl
   } catch (e) {
     debugPrint('[SAFETY] E-posta uygulaması açılamadı: $e');
   }
-  if (opened) return;
+  if (opened || !context.mounted) return;
   // E-posta uygulaması yoksa adres gösterilir ve kopyalanabilir.
   messenger.showSnackBar(
     SnackBar(
@@ -128,9 +153,11 @@ Future<void> _hide(BuildContext context, UserSafetyTarget target) async {
     await store.hide(ownerId, user);
   } catch (e) {
     debugPrint('[SAFETY] Kullanıcı gizlenemedi: $e');
+    if (!context.mounted) return;
     messenger.showSnackBar(SnackBar(content: Text(l10n.profileSettingSaveError), behavior: SnackBarBehavior.floating));
     return;
   }
+  if (!context.mounted) return;
   messenger.showSnackBar(
     SnackBar(
       content: Text(l10n.userHiddenMsg(target.name)),

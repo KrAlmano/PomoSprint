@@ -1,0 +1,132 @@
+curl: (7) Failed to connect to 127.0.0.1 port 54399 after 0 ms: Couldn't connect to server
+koşu: 1007iosbase (hesaplar: e2e-sim-*-1007iosbase@pomosprint.local)
+=== integration_test/a_register_onboarding_test.dart
+00:00 +0: loading /Users/almano/Desktop/Courses/Projects/Pomodoro/integration_test/a_register_onboarding_test.dart
+Running Xcode build...                                          
+Xcode build done.                                           35.2s
+00:00 +0: a1 · kayıt + onboarding (YKS): otomatik ders seçimi, kabuk, sunucu kaydı
+supabase.supabase_flutter: INFO: ***** Supabase init completed ***** 
+[INIT] Supabase bağlandı.
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/base/e2e-kayit.png
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/base/e2e-onboarding-kategoriler.png
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/base/e2e-sayac-yks.png
+00:28 +1: a2 · KPSS hedefi: onboarding hatasız biter (26 varsa kpss, yoksa segmentsiz)
+00:29 +1: a1 · kayıt + onboarding (YKS): otomatik ders seçimi, kabuk, sunucu kaydı
+supabase.auth: INFO: Signing out user with scope: local 
+00:29 +1: a2 · KPSS hedefi: onboarding hatasız biter (26 varsa kpss, yoksa segmentsiz)
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/base/e2e-kpss-onboarding-kategoriler.png
+00:49 +2: (tearDownAll)
+00:49 +2: All tests passed!
+=== integration_test/a_register_onboarding_test.dart: GEÇTİ (116 sn)
+=== integration_test/b_timer_layout_test.dart
+00:00 +0: loading /Users/almano/Desktop/Courses/Projects/Pomodoro/integration_test/b_timer_layout_test.dart
+Running Xcode build...                                          
+Xcode build done.                                           37.0s
+00:00 +0: b · cihaz boyutunda BAŞLAT görünür, 25/50 tek satır, kum saati, taşma yok
+supabase.supabase_flutter: INFO: ***** Supabase init completed ***** 
+[INIT] Supabase bağlandı.
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+[E2E] Gerçek cihaz mantıksal boyutu: Size(430.0, 932.0)
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/base/e2e-sayac.png
+[E2E] sayaç: BAŞLAT Rect.fromLTRB(115.0, 700.9, 315.0, 748.9), nav üstü 830.0, 25 Rect.fromLTRB(119.8, 615.4, 166.2, 638.4), 50 Rect.fromLTRB(274.5, 615.4, 321.5, 638.4), kum saati Rect.fromLTRB(77.5, 170.1, 352.5, 458.9)
+00:10 +1: (tearDownAll)
+00:11 +1: All tests passed!
+=== integration_test/b_timer_layout_test.dart: GEÇTİ (71 sn)
+=== integration_test/c_session_points_test.dart
+00:00 +0: loading /Users/almano/Desktop/Courses/Projects/Pomodoro/integration_test/c_session_points_test.dart
+Running Xcode build...                                          
+Xcode build done.                                           26.0s
+00:00 +0: c+f · kapalıyken biten seans: diyalog 5 puan / 20 kum, üst çubuk, psql, Raporlar, Lig
+supabase.supabase_flutter: INFO: ***** Supabase init completed ***** 
+[INIT] Supabase bağlandı.
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+[AUTH] Splash: currentSession VAR (expiresAt=2026-10-07T11:10:37.000)
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/base/e2e-seans-sonucu.png
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/base/e2e-sayac-puan.png
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/base/e2e-raporlar.png
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/base/e2e-lig.png
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/base/e2e-lig-satir.png
+00:19 +1: (tearDownAll)
+00:20 +1: All tests passed!
+=== integration_test/c_session_points_test.dart: GEÇTİ (72 sn)
+=== integration_test/d_friends_visibility_test.dart
+00:00 +0: loading /Users/almano/Desktop/Courses/Projects/Pomodoro/integration_test/d_friends_visibility_test.dart
+Running Xcode build...                                          
+Xcode build done.                                           21.7s
+00:00 +0: d · arkadaş kodu → kabul → arkadaş listesi, canlı akış, sıralama (is_me)
+supabase.supabase_flutter: INFO: ***** Supabase init completed ***** 
+[INIT] Supabase bağlandı.
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/base/e2e-arkadaslar.png
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/base/e2e-canli-akis.png
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/base/e2e-siralama-arkadaslar.png
+00:18 +1: (tearDownAll)
+00:19 +1: All tests passed!
+=== integration_test/d_friends_visibility_test.dart: GEÇTİ (57 sn)
+=== integration_test/e_settings_delete_test.dart
+00:00 +0: loading /Users/almano/Desktop/Courses/Projects/Pomodoro/integration_test/e_settings_delete_test.dart
+Running Xcode build...                                          
+Xcode build done.                                           22.5s
+00:00 +0: e · Profil > Gizlilik ve yasal öğeleri; Hesabımı Sil yerel hesabı siler
+supabase.supabase_flutter: INFO: ***** Supabase init completed ***** 
+[INIT] Supabase bağlandı.
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/base/e2e-profil-ayarlar.png
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/base/e2e-hesap-silme-onay.png
+[AUTH] delete-account kullanılamadı (503); delete_own_account RPC.
+supabase.auth: INFO: Signing out user with scope: local 
+[PROFILE] Hesap silinemedi: Bad state: No element
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following assertion was thrown running a test:
+'package:flutter/src/widgets/navigator.dart': Failed assertion: line 5607 pos 12: '!_debugLocked':
+is not true.
+
+When the exception was thrown, this was the stack:
+#2      NavigatorState.pop (package:flutter/src/widgets/navigator.dart:5607:12)
+#3      _ProfileScreenState._deleteAccount (package:pomodoro/screens/profile_screen.dart:1138:17)
+<asynchronous suspension>
+#4      _ProfileScreenState._confirmDeleteAccount (package:pomodoro/screens/profile_screen.dart:1091:39)
+<asynchronous suspension>
+(elided 2 frames from class _AssertionError)
+
+The test description was:
+  e · Profil > Gizlilik ve yasal öğeleri; Hesabımı Sil yerel hesabı siler
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:13 +0 -1: e · Profil > Gizlilik ve yasal öğeleri; Hesabımı Sil yerel hesabı siler [E]
+  Test failed. See exception logs above.
+  The test description was: e · Profil > Gizlilik ve yasal öğeleri; Hesabımı Sil yerel hesabı siler
+  
+  'package:flutter_test/src/binding.dart': Failed assertion: line 3081 pos 12: '_pendingFrame == null': is not true.
+  dart:core                                                                                                              _AssertionError._throwNew
+  package:flutter_test/src/binding.dart 3081:12                                                                          LiveTestWidgetsFlutterBinding.postTest
+  ===== asynchronous gap ===========================
+  package:stream_channel                                                                                                 _GuaranteeSink.add
+  var/folders/sr/_y36s7p507v9lnwlx2n720n40000gn/T/flutter_tools.94lXuO/flutter_test_listener.nAbM0g/listener.dart 56:22  main.<fn>
+  
+00:13 +0 -1: (tearDownAll)
+00:13 +0 -1: e · Profil > Gizlilik ve yasal öğeleri; Hesabımı Sil yerel hesabı siler
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following assertion was thrown running a test (but after the test had completed):
+A FocusManager was used after being disposed.
+Once you have called dispose() on a FocusManager, it can no longer be used.
+
+When the exception was thrown, this was the stack:
+#0      ChangeNotifier.debugAssertNotDisposed.<anonymous closure> (package:flutter/src/foundation/change_notifier.dart:184:9)
+#1      ChangeNotifier.debugAssertNotDisposed (package:flutter/src/foundation/change_notifier.dart:191:6)
+#2      ChangeNotifier.notifyListeners (package:flutter/src/foundation/change_notifier.dart:414:27)
+#3      FocusManager.applyFocusChangesIfNeeded (package:flutter/src/widgets/focus_manager.dart:2000:7)
+(elided 14 frames from dart:async and package:stack_trace)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:13 +0 -1: e · Profil > Gizlilik ve yasal öğeleri; Hesabımı Sil yerel hesabı siler [E]
+  Test failed. See exception logs above.
+  The test description was: e · Profil > Gizlilik ve yasal öğeleri; Hesabımı Sil yerel hesabı siler
+  
+00:13 +0 -1: Some tests failed.
+
+Failing tests:
+  /Users/almano/Desktop/Courses/Projects/Pomodoro/integration_test/e_settings_delete_test.dart: e · Profil > Gizlilik ve yasal öğeleri; Hesabımı Sil yerel hesabı siler
+=== integration_test/e_settings_delete_test.dart: KALDI (1) (51 sn)
+SONUÇ: yerel kopya canlıdan FARKLI
+avatars: 27 satır, canlıyla aynı

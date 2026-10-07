@@ -1,0 +1,67 @@
+{
+  "date": "2026-10-07",
+  "status": "prepared_and_isolated_local_verified_not_live",
+  "fresh_live_source": {
+    "definition": "live_report_definition.json",
+    "md5": "547b73d8a9163466b19dafb4b89e9fe3",
+    "matched_local_clone": true,
+    "reads": "Catalog definition/ACL only, no production account/report data"
+  },
+  "baseline_real_http": {
+    "same_target_rows": 2,
+    "same_target_unique_ids": 2,
+    "daily9_plus2_total_rows": 11,
+    "evidence": "baseline_http.json"
+  },
+  "fixed_real_http": {
+    "checks_passed": 7,
+    "same_target_rows": 1,
+    "same_target_response_codes": [
+      "reported",
+      "duplicate"
+    ],
+    "daily9_plus2_total_rows": 10,
+    "daily_response_codes": [
+      "reported",
+      "rate_limited"
+    ],
+    "other_reporters_independent": true,
+    "self_and_auth_behavior_unchanged": true,
+    "evidence": "fixed_http.json"
+  },
+  "existing_contracts": {
+    "passed": 21,
+    "evidence": "fixed_contracts.log"
+  },
+  "dryrun": {
+    "passed": 23,
+    "migration_body_exact_match": true,
+    "full_transaction_restored": true,
+    "evidence": "dryrun_and_rollback.json"
+  },
+  "rollback": {
+    "original_function_hash_exact": true,
+    "original_acl_exact": true,
+    "migration_history_row_removed": true,
+    "data_unchanged": true
+  },
+  "prepared_files": {
+    "live_original_md5": "547b73d8a9163466b19dafb4b89e9fe3",
+    "expected_fixed_md5": "a7ee1b72778b92b59982e5bba8b86c7a",
+    "body_only_change": "Per-reporter transaction advisory lock before duplicate/count/INSERT",
+    "migration": "supabase/migrations/20261007110000_report_submission_lock.sql",
+    "rollback": "supabase/rollbacks/20261007110000_report_submission_lock_down.sql",
+    "dryrun": "supabase/tests/20261007_report_submission_lock_dryrun.sql"
+  },
+  "locking_choice": "One64bit transaction advisory key per reporter (namespaced hash of UUID); lock before duplicate/count/INSERT. No added profile/table row lock. Controlled SHARE barrier exists only in HTTP test harness.",
+  "main_local_schema_changed": false,
+  "production_writes": false,
+  "production_sql_application": "User SQL Editor only: DRYRUN then migration; not executed by agent",
+  "cleanup": "Isolated PostgREST container and database removed; main local/mobile environment untouched.",
+  "harness_setup_observations": [
+    "Generic clone helper omitted ops definitions; copied schema only to isolated clone because handle_new_user references ops.",
+    "Local PostgREST JWT secret is a JWK set; test signs with the local demo oct key, never prints token/key.",
+    "Initial generated SQL omitted pg_get_functiondef statement terminator; first isolated apply rolled back entirely; corrected before all successful tests. Initial failure log retained."
+  ],
+  "official_lock_reference": "https://www.postgresql.org/docs/current/explicit-locking.html#ADVISORY-LOCKS"
+}

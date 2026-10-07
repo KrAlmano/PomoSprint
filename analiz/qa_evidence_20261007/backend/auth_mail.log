@@ -1,0 +1,9 @@
+PASS Onaysız e-posta ile giriş engellenir
+PASS Gerçek yeniden gönderilen onay maili bağlantısı doğrulanır
+PASS Onaydan sonra normal parola ile giriş yapılır
+PASS Gerçek parola sıfırlama mailinin bağlantısı oturum açar
+PASS Eski parola artık giriş yapamaz
+PASS Yeni parola ile giriş yapılır
+PASS Sıfırlama bağlantısı ikinci kez kullanılamaz
+PASS Olmayan e-posta sıfırlamada hesap varlığını açığa çıkarmaz
+PASS Yerel test hesabı temizlendi

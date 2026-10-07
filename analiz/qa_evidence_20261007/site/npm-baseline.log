@@ -1,0 +1,50 @@
+
+> test
+> node --test "test/*.test.*"
+
+✔ yalnızca token'lı bağlantı: sayfa açılınca istek yok, butonla token-only POST (7.881709ms)
+✔ eski e-posta+token bağlantısı çalışır; e-posta URL'den silinir, yalnızca gövdede gider (2.033708ms)
+✔ token yoksa buton gösterilmez ve istek atılmaz (2.0335ms)
+✔ sunucu 403 (e-posta token sahibiyle uyuşmuyor) dönerse geçersiz bağlantı mesajı (1.578625ms)
+✔ onay kutusu işaretli değilse kayıt gönderilmez, kutu hatalı işaretlenir (7.507209ms)
+✔ onay verilince kayıt yalnızca e-postayla gönderilir (canlı tablo kolonları) (2.944375ms)
+✔ onay hatası kutu işaretlenince temizlenir ve ikinci deneme gönderilir (0.941167ms)
+✔ bekleme süresinde kutu kaldırılırsa istek gitmez (0.948708ms)
+✔ sayfada onay kutusu yoksa (eski önbellekli HTML) kayıt yapılmaz (0.873791ms)
+✔ e-posta hataları onaydan önce gösterilir (0.426584ms)
+✔ index.html: onay kutusu ayrı, önceden işaretsiz ve ticari ileti onayını açıkça söylüyor (0.543708ms)
+✔ abonelikten çıkma bağlantıları yalnızca token taşır (0.913375ms)
+✔ buildEmail: e-posta adresi hiçbir bağlantıda yok, tek tık başlıkları var (0.930917ms)
+✔ örnek şablon altbilgisi gönderen kimliği, iletişim ve gizlilik/KVKK bağlantılarını içerir (0.835916ms)
+✔ zorunlu yer tutucusu eksik şablon reddedilir (0.365875ms)
+✔ gönderen kimliği .env'den okunur, eksikse bildirilir (uydurulmaz) (0.191583ms)
+✔ değerler HTML kaçışlanır ve $& gibi diziler kalıp sayılmaz (0.344792ms)
+✔ tek tık (RFC 8058) yalnızca token ile aboneyi ve bekleme listesi kaydını siler (32.544541ms)
+✔ sayfa butonu: URL'de yalnızca token, gövdede token (0.477625ms)
+✔ token yalnızca gövdede de kabul edilir (0.295333ms)
+✔ eski e-posta+token bağlantısı çalışmaya devam eder (büyük/küçük harf duyarsız) (0.263917ms)
+✔ sayfa eski bağlantıdan gelince e-postayı gövdede gönderir; eşleşirse siler (0.362291ms)
+✔ e-posta token'ın sahibiyle uyuşmazsa 403 ve hiçbir şey silinmez (0.462667ms)
+✔ GET hiçbir şey silmez (405): e-posta tarayıcıları bağlantıyı açabilir (0.162291ms)
+✔ token yoksa ya da UUID değilse 400 (1.446167ms)
+✔ bilinmeyen token 200 döner ama hiçbir satırı silmez (adres listede mi, belli olmaz) (0.558292ms)
+✔ OPTIONS (CORS ön isteği) yalnızca site kökenine izin verir (0.24725ms)
+MAIL_SENDER_NAME / MAIL_SENDER_ADDRESS tanımlı değil; e-posta gönderilmedi
+MAIL_SENDER_NAME / MAIL_SENDER_ADDRESS tanımlı değil; e-posta gönderilmedi
+Resend hatası: 500 {"message":"fail"}
+✔ abonelikten çıkma bağlantıları yalnızca token taşır, e-posta adresi URL'de yok (30.645625ms)
+✔ altbilgide gönderen kimliği, iletişim, gizlilik/KVKK bağlantıları ve 'neden' cümlesi var (0.51075ms)
+✔ gönderen kimliği HTML'de kaçışlanır (0.636375ms)
+✔ MAIL_SENDER_NAME yoksa e-posta gönderilmez ve satır sahiplenilmez (1.120084ms)
+✔ MAIL_SENDER_ADDRESS yoksa e-posta gönderilmez ve satır sahiplenilmez (0.78025ms)
+✔ Resend hata verirse 502 ve welcome_sent_at geri alınır (0.944917ms)
+✔ daha önce gönderilmişse ya da e-posta uyuşmuyorsa gönderim yok (0.392ms)
+✔ bir saatten eski satıra gönderim yok (0.215167ms)
+ℹ tests 35
+ℹ suites 0
+ℹ pass 35
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 169.764833

@@ -1,0 +1,148 @@
+curl: (7) Failed to connect to 127.0.0.1 port 54399 after 0 ms: Couldn't connect to server
+koşu: 1007iosfull (hesaplar: e2e-sim-*-1007iosfull@pomosprint.local)
+=== integration_test/q_generated_release_test.dart
+00:00 +0: loading /Users/almano/Desktop/Courses/Projects/Pomodoro/integration_test/q_generated_release_test.dart
+Running Xcode build...                                          
+Xcode build done.                                           30.8s
+00:00 +0: beş hesap: 5/10 saniye → kayıt, rapor, arkadaş, sosyal
+supabase.supabase_flutter: INFO: ***** Supabase init completed ***** 
+[INIT] Supabase bağlandı.
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/full/e2e-qa1-rapor.png
+[QA] e2e-sim-qa1-1007iosfull@pomosprint.local: 75 dk, 17 puan, 40 kum; günlük/haftalık/aylık ekran açıldı
+supabase.auth: INFO: Signing out user with scope: local 
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/full/e2e-qa2-rapor.png
+[QA] e2e-sim-qa2-1007iosfull@pomosprint.local: 25 dk, 5 puan, 20 kum; günlük/haftalık/aylık ekran açıldı
+supabase.auth: INFO: Signing out user with scope: local 
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/full/e2e-qa3-rapor.png
+[QA] e2e-sim-qa3-1007iosfull@pomosprint.local: 50 dk, 12 puan, 20 kum; günlük/haftalık/aylık ekran açıldı
+supabase.auth: INFO: Signing out user with scope: local 
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/full/e2e-qa4-rapor.png
+[QA] e2e-sim-qa4-1007iosfull@pomosprint.local: 25 dk, 5 puan, 20 kum; günlük/haftalık/aylık ekran açıldı
+supabase.auth: INFO: Signing out user with scope: local 
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/full/e2e-qa5-rapor.png
+[QA] e2e-sim-qa5-1007iosfull@pomosprint.local: 50 dk, 12 puan, 20 kum; günlük/haftalık/aylık ekran açıldı
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/full/e2e-qa5-arkadaslar.png
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/full/e2e-qa5-canli.png
+[QA] Açık sosyal sekmede kısa odak başlat/iptal, 2 sn poll: PASS
+[QA] Native bildirim izni: NotificationPermissionStatus.notDetermined
+[QA] Native bekleyen bildirimler: []
+[QA] Native bildirim kaydı/teslimi DOĞRULANAMADI: sistem izni gerekli.
+[QA] BEŞ HESAP QA TAMAMLANDI: e2e-sim-qa1-1007iosfull@pomosprint.local, e2e-sim-qa2-1007iosfull@pomosprint.local, e2e-sim-qa3-1007iosfull@pomosprint.local, e2e-sim-qa4-1007iosfull@pomosprint.local, e2e-sim-qa5-1007iosfull@pomosprint.local
+02:24 +1: k · iOS gerçek sessiz bildirim ve ActivityKit kanalı
+02:24 +1: beş hesap: 5/10 saniye → kayıt, rapor, arkadaş, sosyal
+supabase.auth: INFO: Signing out user with scope: local 
+02:24 +1: k · iOS gerçek sessiz bildirim ve ActivityKit kanalı
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+[QA] iOS provisional native zamanlama/teslim/iptal: PASS
+[QA] ActivityKit native start: true
+[QA] ActivityKit native start/update pause/update resume: PASS
+02:32 +2: yerel parola e-postası, haftalık/aylık toplam ve native bildirim
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/full/e2e-parola-mail-gonderildi.png
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/full/e2e-qa1-haftalik.png
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/full/e2e-qa1-aylik.png
+[QA] Son native bildirim izni: NotificationPermissionStatus.granted
+[QA] Gerçek native bildirim teslimi: PASS
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/full/e2e-bildirim-teslim.png
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/full/e2e-son-acik-qa1.png
+02:56 +3: h · çevrimdışı seans korunur, tek kez gönderilir, diğer hesap temizdir
+02:56 +3: beş hesap: 5/10 saniye → kayıt, rapor, arkadaş, sosyal
+supabase.auth: INFO: Signing out user with scope: local 
+02:56 +3: h · çevrimdışı seans korunur, tek kez gönderilir, diğer hesap temizdir
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+03:09 +3: beş hesap: 5/10 saniye → kayıt, rapor, arkadaş, sosyal
+[SOCIAL] cancelStudySession hatası: ClientException with SocketException: Connection refused (OS Error: Connection refused, errno = 61), address = 127.0.0.1, port = 59117, uri=http://127.0.0.1:54321/rest/v1/rpc/cancel_study_session
+[QUEUE] Seans gönderilemedi (offline/network): ClientException with SocketException: Connection refused (OS Error: Connection refused, errno = 61), address = 127.0.0.1, port = 59118, uri=http://127.0.0.1:54321/rest/v1/rpc/complete_qa_study_session
+İstatistikler yüklenemedi: ServiceException(network: ClientException with SocketException: Connection refused (OS Error: Connection refused, errno = 61), address = 127.0.0.1, port = 59134, uri=http://127.0.0.1:54321/rest/v1/study_sessions?select=id%2Cuser_id%2Ccategory%2Ccategory_id%2Cduration_minutes%2Cstarted_at%2Ccompleted_at%2Cclient_uuid%2Ccategories%28name%2Ccolor_hex%2Cicon_name%29&user_id=eq.43adab44-1d24-45eb-83ef-38391f405e8c&started_at=gte.2026-09-01T01%3A00%3A00.000Z&order=started_at.desc.nullslast%2Cid.asc.nullslast&offset=0&limit=1000)
+03:19 +3: h · çevrimdışı seans korunur, tek kez gönderilir, diğer hesap temizdir
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/full/e2e-cevrimdisi-rapor.png
+[AUTH] Splash: currentSession VAR (expiresAt=2026-10-07T11:17:36.000)
+[SPLASH] profil alınamadı: TimeoutException after 0:00:05.000000: Future not completed
+[SPLASH] kategoriler alınamadı: TimeoutException after 0:00:05.000000: Future not completed
+03:24 +3: beş hesap: 5/10 saniye → kayıt, rapor, arkadaş, sosyal
+[RANKING] getPointsConfig hatası: ClientException with SocketException: Connection refused (OS Error: Connection refused, errno = 61), address = 127.0.0.1, port = 59165, uri=http://127.0.0.1:54321/rest/v1/rpc/get_points_config
+[QUEUE] Seans gönderilemedi (offline/network): ClientException with SocketException: Connection refused (OS Error: Connection refused, errno = 61), address = 127.0.0.1, port = 59166, uri=http://127.0.0.1:54321/rest/v1/rpc/complete_qa_study_session
+03:31 +3: h · çevrimdışı seans korunur, tek kez gönderilir, diğer hesap temizdir
+[AVATAR] Katalog çekilemedi: ClientException with SocketException: Connection refused (OS Error: Connection refused, errno = 61), address = 127.0.0.1, port = 59216, uri=http://127.0.0.1:54321/rest/v1/avatars?select=%2A&is_active=eq.true&order=sort_order.asc.nullslast
+03:31 +3: beş hesap: 5/10 saniye → kayıt, rapor, arkadaş, sosyal
+[SHELL] Profil tazelenemedi: ClientException with SocketException: Connection refused (OS Error: Connection refused, errno = 61), address = 127.0.0.1, port = 59218, uri=http://127.0.0.1:54321/rest/v1/profiles?select=id%2Cname%2Cavatar_id%2Ctotal_minutes%2Ccreated_at%2Cfriend_code%2Ccurrent_streak%2Clast_study_date%2Cis_premium%2Cleague_tier%2Clifetime_points%2Ccoins%2Clongest_streak%2Ctimezone%2Cactive_session_ends_at%2Cactive_session_category_name%2Cshow_in_social_feed%2Cuser_segment%2Cdaily_goal_minutes%2Cbirth_year%2Conboarding_completed_at&id=eq.43adab44-1d24-45eb-83ef-38391f405e8c
+İstatistikler yüklenemedi: ServiceException(network: ClientException with SocketException: Connection refused (OS Error: Connection refused, errno = 61), address = 127.0.0.1, port = 59221, uri=http://127.0.0.1:54321/rest/v1/study_sessions?select=id%2Cuser_id%2Ccategory%2Ccategory_id%2Cduration_minutes%2Cstarted_at%2Ccompleted_at%2Cclient_uuid%2Ccategories%28name%2Ccolor_hex%2Cicon_name%29&user_id=eq.43adab44-1d24-45eb-83ef-38391f405e8c&started_at=gte.2026-09-01T01%3A00%3A00.000Z&order=started_at.desc.nullslast%2Cid.asc.nullslast&offset=0&limit=1000)
+03:35 +3: h · çevrimdışı seans korunur, tek kez gönderilir, diğer hesap temizdir
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/full/e2e-cevrimdisi-sonrasi-tek-kayit.png
+03:35 +3: beş hesap: 5/10 saniye → kayıt, rapor, arkadaş, sosyal
+supabase.auth: INFO: Signing out user with scope: local 
+İstatistikler yüklenemedi: ServiceException(notSignedIn)
+03:40 +3: h · çevrimdışı seans korunur, tek kez gönderilir, diğer hesap temizdir
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/full/e2e-hesap-b-veri-izolasyonu.png
+03:40 +3: beş hesap: 5/10 saniye → kayıt, rapor, arkadaş, sosyal
+supabase.auth: INFO: Signing out user with scope: local 
+İstatistikler yüklenemedi: ServiceException(notSignedIn)
+03:44 +3: h · çevrimdışı seans korunur, tek kez gönderilir, diğer hesap temizdir
+[QA] Gerçek API kesintisi → kalıcı outbox → ekran yeniden kurulumu → tekrar gönderim → hesap izolasyonu: PASS
+03:44 +4: i · duraklat/devam ve yeniden kurulum aynı seansı korur
+03:44 +4: beş hesap: 5/10 saniye → kayıt, rapor, arkadaş, sosyal
+supabase.auth: INFO: Signing out user with scope: local 
+03:45 +4: i · duraklat/devam ve yeniden kurulum aynı seansı korur
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+[AUTH] Splash: currentSession VAR (expiresAt=2026-10-07T11:18:25.000)
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/full/e2e-duraklat-geri-yukle.png
+[QA] Duraklatma hakkı, aynı client_uuid/started_at, kalıcı devam, 50 dk ve duraklatma puanı: PASS
+04:14 +5: l · native saat dilimi, onay kaydı ve arkadaş yönetimi gerçek UI
+04:14 +5: beş hesap: 5/10 saniye → kayıt, rapor, arkadaş, sosyal
+supabase.auth: INFO: Signing out user with scope: local 
+04:15 +5: l · native saat dilimi, onay kaydı ve arkadaş yönetimi gerçek UI
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/full/e2e-giden-istek.png
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/full/e2e-engellenen-kullanicilar.png
+04:42 +5: beş hesap: 5/10 saniye → kayıt, rapor, arkadaş, sosyal
+supabase.auth: INFO: Signing out user with scope: local 
+04:43 +5: l · native saat dilimi, onay kaydı ve arkadaş yönetimi gerçek UI
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+[QA] ios: IANA native/profile/cache/DST, legal idempotency, cancel/remove/block/unblock gerçek UI: PASS
+04:48 +6: m · kategori, arşivli rapor, dil/tema, avatar ve açık route çıkışı
+04:48 +6: beş hesap: 5/10 saniye → kayıt, rapor, arkadaş, sosyal
+supabase.auth: INFO: Signing out user with scope: local 
+04:48 +6: m · kategori, arşivli rapor, dil/tema, avatar ve açık route çıkışı
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/full/e2e-release-kategoriler.png
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/full/e2e-release-arsivli-rapor.png
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/full/e2e-release-english-dark.png
+
+Warning: A call to tap() with finder "Found 1 widget with widget matching predicate (ignoring all but first): [
+  AvatarWidget(dependencies: [MediaQuery, _ScrollableScope]),
+]" derived an Offset (Offset(215.0, 222.0)) that would not hit test on the specified widget.
+Maybe the widget is actually off-screen, or another widget is obscuring it, or the widget cannot receive pointer events.
+The finder corresponds to this RenderBox: RenderConstrainedBox#8bd5e relayoutBoundary=up3
+The hit test result at that offset is: HitTestResult(HitTestEntry<HitTestTarget>#1ad98(TextSpan(inherit: false, color: Color(alpha: 1.0000, red: 1.0000, green: 1.0000, blue: 1.0000, colorSpace: ColorSpace.sRGB), family: MaterialIcons, size: 24.0, height: 1.0x, leadingDistribution: even, "")), RenderParagraph#123e7@Offset(12.0, 6.0), RenderPositionedBox#a0da4@Offset(12.0, 6.0), RenderConstrainedBox#8cdf3@Offset(12.0, 6.0), RenderExcludeSemantics#4994a@Offset(12.0, 6.0), RenderSemanticsAnnotations#bcbfb@Offset(12.0, 6.0), RenderFlex#3aecf@Offset(21.7, 53.8), RenderPositionedBox#6b744@Offset(57.7, 53.8), RenderPadding#20b0c@Offset(57.7, 53.8), RenderDecoratedBox#470a4@Offset(57.7, 53.8), RenderStack#0f2d3@Offset(57.7, 53.8), RenderPadding#c615d@Offset(59.7, 55.8), RenderDecoratedBox#3fd7f@Offset(59.7, 55.8), RenderPointerListener#a50d5@Offset(59.7, 55.8), RenderSemanticsGestureHandler#b030a@Offset(59.7, 55.8), RenderRepaintBoundary#689aa@Offset(59.7, 55.8), RenderIndexedSemantics#77417@Offset(59.7, 55.8), RenderSliverGrid@(mainAxis: 27.0, crossAxis: 190.99999999999997), RenderSliverPadding@(mainAxis: 27.0, crossAxis: 214.99999999999997), RenderViewport#b92e6@Offset(215.0, 27.0), RenderIgnorePointer#20aa7@Offset(215.0, 27.0), RenderSemanticsAnnotations#a53f0@Offset(215.0, 27.0), RenderPointerListener#1a35a@Offset(215.0, 27.0), RenderSemanticsGestureHandler#e94c4@Offset(215.0, 27.0), RenderPointerListener#07978@Offset(215.0, 27.0), _RenderScrollSemantics#9f2ad@Offset(215.0, 27.0), RenderFlex#b8f09@Offset(215.0, 107.0), _RenderLayoutBuilder#e0911@Offset(215.0, 107.0), RenderPadding#f0fc1@Offset(215.0, 107.0), RenderCustomMultiChildLayoutBox#1f192@Offset(215.0, 222.0), _RenderInkFeatures#b24fa@Offset(215.0, 222.0), RenderPhysicalModel#9b684@Offset(215.0, 222.0), RenderSemanticsAnnotations#df3fb@Offset(215.0, 222.0), RenderRepaintBoundary#cc1a0@Offset(215.0, 222.0), RenderIgnorePointer#3bef5@Offset(215.0, 222.0), RenderStack#9e69b@Offset(215.0, 222.0), RenderDecoratedBox#e796c@Offset(215.0, 222.0), RenderRepaintBoundary#d4a42@Offset(215.0, 222.0), RenderSemanticsAnnotations#5fb52@Offset(215.0, 222.0), RenderOffstage#bb8ea@Offset(215.0, 222.0), RenderSemanticsAnnotations#43fa8@Offset(215.0, 222.0), _RenderTheater#e5ddc@Offset(215.0, 222.0), RenderAbsorbPointer#b950b@Offset(215.0, 222.0), RenderPointerListener#db43d@Offset(215.0, 222.0), RenderSemanticsAnnotations#7e244@Offset(215.0, 222.0), RenderSemanticsAnnotations#e9122@Offset(215.0, 222.0), RenderSemanticsAnnotations#ecad2@Offset(215.0, 222.0), RenderSemanticsAnnotations#644af@Offset(215.0, 222.0), RenderTapRegionSurface#83e08@Offset(215.0, 222.0), RenderSemanticsAnnotations#b3200@Offset(215.0, 222.0), RenderSemanticsAnnotations#08278@Offset(215.0, 222.0), RenderSemanticsAnnotations#a8233@Offset(215.0, 222.0), HitTestEntry<HitTestTarget>#637e8(_ReusableRenderView#e1785), HitTestEntry<HitTestTarget>#04dcb(<IntegrationTestWidgetsFlutterBinding>))
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2165:25)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      tapOn (file:///Users/almano/Desktop/Courses/Projects/Pomodoro/integration_test/support/e2e.dart:164:16)
+<asynchronous suspension>
+#4      main.<anonymous closure> (file:///Users/almano/Desktop/Courses/Projects/Pomodoro/integration_test/m_release_journey_test.dart:211:5)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+#7      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+To silence this warning, pass "warnIfMissed: false" to "tap()".
+To make this warning fatal, set WidgetController.hitTestWarningShouldBeFatal to true.
+
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/full/e2e-release-avatar.png
+05:41 +6: beş hesap: 5/10 saniye → kayıt, rapor, arkadaş, sosyal
+supabase.auth: INFO: Signing out user with scope: local 
+05:43 +6: m · kategori, arşivli rapor, dil/tema, avatar ve açık route çıkışı
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/ios/full/e2e-release-overlay-cikis.png
+[QA] Kategori UI CRUD/limit, arşivli rapor, tema/dil, avatar bakiye ve eski route çıkışı: PASS
+05:43 +7: (tearDownAll)
+05:43 +7: All tests passed!
+=== integration_test/q_generated_release_test.dart: GEÇTİ (398 sn)
+SONUÇ: yerel kopya canlıdan FARKLI
+avatars: 27 satır, canlıyla aynı

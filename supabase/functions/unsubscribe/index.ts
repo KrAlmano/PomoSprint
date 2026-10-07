@@ -1,7 +1,8 @@
 // Bülten abonelikten çıkma uç noktası.
 //
-// Her abonenin marketing_subscribers.unsubscribe_token kolonunda tahmin
-// edilemez bir UUID'si var (20261003150000_live_audit_fixes). Linkler bu
+// Her abonenin marketing_subscribers.unsubscribe_token veya
+// waitlist.unsubscribe_token kolonunda tahmin edilemez bir UUID'si var
+// (live_audit_fixes ve proposed/19 A). Linkler bu
 // token'ı taşır; token olmadan kimse listeden çıkarılamaz (önceden e-posta
 // adresini bilen herkes başkasını çıkarabiliyordu).
 //
@@ -86,20 +87,43 @@ Deno.serve(async (req) => {
     .maybeSingle();
   if (readError) return new Response("Error", { status: 500, headers });
 
+  let tokenRow = row;
+  let tokenTable = "marketing_subscribers";
+  if (!tokenRow) {
+    const { data: waitlistRow, error: waitlistReadError } = await admin
+      .from("waitlist")
+      .select("id, email")
+      .eq("unsubscribe_token", token)
+      .maybeSingle();
+    if (waitlistReadError) return new Response("Error", { status: 500, headers });
+    tokenRow = waitlistRow;
+    tokenTable = "waitlist";
+  }
+
   // Adresin listede olup olmadığı açığa çıkmasın: bulunamayan ya da zaten
   // çıkmış token için de aynı başarılı yanıt.
-  if (!row) return new Response("OK", { status: 200, headers });
-  const rowEmail = String(row.email).trim().toLowerCase();
+  if (!tokenRow) return new Response("OK", { status: 200, headers });
+  const rowEmail = String(tokenRow.email).trim().toLowerCase();
   if (email && email !== rowEmail) {
     return new Response("Forbidden", { status: 403, headers });
   }
 
-  const { error: deleteError } = await admin.from("marketing_subscribers").delete().eq("id", row.id);
-  if (deleteError) return new Response("Error", { status: 500, headers });
+  // Önce diğer listeyi sil. Ağ/DB hatasında token'ın sahibi yerinde kalır:
+  // kullanıcı aynı bağlantıyla yeniden deneyebilir. Sabitlenmiş literal
+  // regex, PostgREST ILIKE'ın * joker takma adını da devre dışı bırakır.
+  const otherTable = tokenTable === "waitlist" ? "marketing_subscribers" : "waitlist";
+  const literalEmail = "^" + rowEmail.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "$";
+  const { error: otherDeleteError } = await admin.from(otherTable).delete().filter("email", "imatch", literalEmail);
+  if (otherDeleteError) return new Response("Error", { status: 500, headers });
 
-  // Lansman bekleme listesi de duyuru e-postası alır; oradan da çıkar.
-  const { error: waitlistError } = await admin.from("waitlist").delete().eq("email", rowEmail);
-  if (waitlistError) console.warn("waitlist silme hatası:", waitlistError.message);
+  // waitlist UNIQUE(email) büyük/küçük harfe duyarlıdır. Aynı adresin
+  // farklı yazımlarını da çıkar; retry token'ını taşıyan satır en son gider.
+  const { error: siblingDeleteError } = await admin.from(tokenTable).delete()
+    .filter("email", "imatch", literalEmail).neq("id", tokenRow.id);
+  if (siblingDeleteError) return new Response("Error", { status: 500, headers });
+
+  const { error: tokenDeleteError } = await admin.from(tokenTable).delete().eq("id", tokenRow.id);
+  if (tokenDeleteError) return new Response("Error", { status: 500, headers });
 
   return new Response("OK", { status: 200, headers });
 });

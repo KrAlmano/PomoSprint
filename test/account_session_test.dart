@@ -388,10 +388,12 @@ void main() {
     });
 
     test('şifre kuralı sunucuyla aynı', () {
-      expect(PasswordRules.isSatisfied('Abcde1'), isTrue);
-      expect(PasswordRules.isSatisfied('abcde1'), isFalse);
-      expect(PasswordRules.isSatisfied('ABCDE1'), isFalse);
-      expect(PasswordRules.isSatisfied('Abcdef'), isFalse);
+      expect(PasswordRules.isSatisfied('Abcdefg1'), isTrue);
+      expect(PasswordRules.isSatisfied('Abcde1'), isFalse);
+      expect(PasswordRules.isSatisfied('Abcdef1'), isFalse);
+      expect(PasswordRules.isSatisfied('abcdefg1'), isFalse);
+      expect(PasswordRules.isSatisfied('ABCDEFG1'), isFalse);
+      expect(PasswordRules.isSatisfied('Abcdefgh'), isFalse);
       expect(PasswordRules.isSatisfied('Abc1'), isFalse);
     });
 

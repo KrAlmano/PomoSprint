@@ -127,17 +127,19 @@ void main() {
       expect(registerEmailError(l10n, ' ayse@posta.com '), isNull);
     });
 
-    test('şifre sunucu kuralı: en az 6 karakter, küçük/büyük harf ve rakam', () {
+    test('şifre sunucu kuralı: en az 8 karakter, küçük/büyük harf ve rakam', () {
       expect(registerPasswordError(l10n, ''), l10n.registerErrPasswordRequired);
       expect(registerPasswordError(l10n, 'Ab1'), l10n.errShortPassword);
+      expect(registerPasswordError(l10n, 'Abcde1'), l10n.errShortPassword);
+      expect(registerPasswordError(l10n, 'Abcdef1'), l10n.errShortPassword);
       // Sunucu (lower_upper_letters_digits) bunları weak_password ile reddeder.
-      expect(registerPasswordError(l10n, '123456'), l10n.authErrWeakPassword);
-      expect(registerPasswordError(l10n, 'abcdef1'), l10n.authErrWeakPassword);
-      expect(registerPasswordError(l10n, 'ABCDEF1'), l10n.authErrWeakPassword);
-      expect(registerPasswordError(l10n, 'Abcdefg'), l10n.authErrWeakPassword);
+      expect(registerPasswordError(l10n, '12345678'), l10n.authErrWeakPassword);
+      expect(registerPasswordError(l10n, 'abcdefg1'), l10n.authErrWeakPassword);
+      expect(registerPasswordError(l10n, 'ABCDEFG1'), l10n.authErrWeakPassword);
+      expect(registerPasswordError(l10n, 'Abcdefgh'), l10n.authErrWeakPassword);
       // Türkçe harfler sunucuda harf sayılmaz.
-      expect(registerPasswordError(l10n, 'ŞĞÜşğü1'), l10n.authErrWeakPassword);
-      expect(registerPasswordError(l10n, 'Abcde1'), isNull);
+      expect(registerPasswordError(l10n, 'ŞĞÜşğü12'), l10n.authErrWeakPassword);
+      expect(registerPasswordError(l10n, 'Abcdefg1'), isNull);
     });
   });
 

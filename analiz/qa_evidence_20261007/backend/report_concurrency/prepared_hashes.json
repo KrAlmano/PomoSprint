@@ -1,0 +1,8 @@
+{
+  "live_original_md5": "547b73d8a9163466b19dafb4b89e9fe3",
+  "expected_fixed_md5": "a7ee1b72778b92b59982e5bba8b86c7a",
+  "body_only_change": "Per-reporter transaction advisory lock before duplicate/count/INSERT",
+  "migration": "supabase/migrations/20261007110000_report_submission_lock.sql",
+  "rollback": "supabase/rollbacks/20261007110000_report_submission_lock_down.sql",
+  "dryrun": "supabase/tests/20261007_report_submission_lock_dryrun.sql"
+}

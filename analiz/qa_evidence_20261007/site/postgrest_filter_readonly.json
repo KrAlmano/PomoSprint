@@ -1,0 +1,24 @@
+{
+  "all_rows": {
+    "status": 206,
+    "count": 4
+  },
+  "ilike_star_alias": {
+    "status": 206,
+    "count": 4
+  },
+  "imatch_literal_star": {
+    "status": 200,
+    "count": 0
+  },
+  "imatch_literal_metacharacters": {
+    "status": 200,
+    "count": 0
+  },
+  "imatch_existing_case_variant": {
+    "status": 206,
+    "count": 1
+  },
+  "method": "GET only; no mutations or mail",
+  "result": "pass"
+}

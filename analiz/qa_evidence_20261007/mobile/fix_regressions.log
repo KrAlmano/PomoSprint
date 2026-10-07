@@ -1,0 +1,119 @@
+00:00 +0: loading /Users/almano/Desktop/Courses/Projects/Pomodoro/test/auth_navigation_lifecycle_test.dart
+00:00 +0: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/auth_navigation_lifecycle_test.dart: uzaktan çıkış üstteki özel ekranı kapatır ve girişe döner
+00:00 +1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/profile_visibility_race_test.dart: ilk okuma ve kayıt sürerken görünürlük ikinci kez değiştirilemez
+00:01 +2: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/profile_visibility_race_test.dart: ilk okuma ve kayıt sürerken görünürlük ikinci kez değiştirilemez
+00:01 +3: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/auth_navigation_lifecycle_test.dart: hesap değişiminde onboarding durumu yeniden kurulur; son hesap korunur
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: ValueKey<String>:<[<'c'>]>
+  Actual: ValueKey<String?>:<[<c>]>
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure> (file:///Users/almano/Desktop/Courses/Projects/Pomodoro/test/auth_navigation_lifecycle_test.dart:93:7)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///Users/almano/Desktop/Courses/Projects/Pomodoro/test/auth_navigation_lifecycle_test.dart line 93
+The test description was:
+  hesap değişiminde onboarding durumu yeniden kurulur; son hesap korunur
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:01 +3 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/profile_visibility_race_test.dart: kayıt hatasında önceki görünürlük korunur ve tekrar denenebilir
+00:01 +3 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/auth_navigation_lifecycle_test.dart: hesap değişiminde onboarding durumu yeniden kurulur; son hesap korunur [E]
+  Test failed. See exception logs above.
+  The test description was: hesap değişiminde onboarding durumu yeniden kurulur; son hesap korunur
+  
+00:01 +3 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/profile_visibility_race_test.dart: kayıt hatasında önceki görünürlük korunur ve tekrar denenebilir
+[PROFILE] Sosyal görünürlük kaydedilemedi: ServiceException(network)
+00:01 +4 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/user_safety_test.dart: (setUpAll)
+00:01 +4 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/user_safety_test.dart: HiddenUserList eşleme kuralı kimlik iki tarafta da varsa yalnızca kimlikle eşlenir
+00:01 +5 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/user_safety_test.dart: HiddenUserList eşleme kuralı kimliksiz satır (Lig/Aylık) adla eşlenir
+00:01 +6 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/user_safety_test.dart: HiddenUserList eşleme kuralı kimliksiz gizlenen kayıt her satırda adla eşlenir (boşluk/büyük harf farkı yok)
+00:01 +7 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/user_safety_test.dart: HiddenUserList eşleme kuralı ekleme tekrar etmez, çıkarma yalnızca o kaydı siler, JSON gidiş-dönüş
+[HIDDEN] Gizlenen kullanıcı listesi okunamadı: FormatException: Unexpected character (at character 1)
+bozuk{
+^
+
+00:01 +8 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/user_safety_test.dart: HiddenUsersStore (hesaba bağlı, cihazda) çıkış sırasında bekleyen eski okuma gizli listeyi yeniden yayınlamaz
+00:01 +9 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/user_safety_test.dart: HiddenUsersStore (hesaba bağlı, cihazda) hesap silme bekleyen gizli liste okumasını da geçersiz kılar
+00:01 +10 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/user_safety_test.dart: HiddenUsersStore (hesaba bağlı, cihazda) eşzamanlı hesap okumalarında son seçilen hesabın listesi kalır
+00:01 +11 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/user_safety_test.dart: HiddenUsersStore (hesaba bağlı, cihazda) gizle, sıfırla ve hesaplar birbirinden ayrı
+00:01 +12 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/user_safety_test.dart: HiddenUsersStore (hesaba bağlı, cihazda) canlı akıştan gizlenenler çıkarılır
+00:01 +13 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/user_safety_test.dart: Sıralamada gizleme satırdan kimlik okunur; gizli hali sıra/puanı korur, adı ve avatarı atar
+00:01 +14 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/user_safety_test.dart: Sıralamada gizleme menü yalnızca başkalarının satırında; kendi ve gizli satırda yok
+00:02 +15 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/user_safety_test.dart: Sıralamada gizleme menü yalnızca başkalarının satırında; kendi ve gizli satırda yok
+00:02 +16 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/user_safety_test.dart: Sıralamada gizleme menü yalnızca başkalarının satırında; kendi ve gizli satırda yok
+00:02 +17 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/user_safety_test.dart: Sıralamada gizleme menü yalnızca başkalarının satırında; kendi ve gizli satırda yok
+00:02 +17 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/profile_settings_test.dart: UX-07 bildirim izni: kurallar izin okunamaz ya da istek hata verirse "soruldu" yazılmaz (görülmemiş pencere reddedildi sayılmaz)
+[NOTIF] Bildirim izni alınamadı: Bad state: izin isteği sürüyor
+00:02 +18 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/user_safety_test.dart: Sıralamada gizleme menü yalnızca başkalarının satırında; kendi ve gizli satırda yok
+00:02 +19 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/user_safety_test.dart: Sıralamada gizleme menü yalnızca başkalarının satırında; kendi ve gizli satırda yok
+00:02 +20 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/user_safety_test.dart: Sıralamada gizleme menü yalnızca başkalarının satırında; kendi ve gizli satırda yok
+00:02 +21 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/user_safety_test.dart: Sıralamada gizleme menü yalnızca başkalarının satırında; kendi ve gizli satırda yok
+00:02 +22 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/profile_settings_test.dart: UX-07 bildirim anahtarı (Profil) hiç sorulmamış izin: anahtar kapalı, uyarı yok; açınca sistem penceresi, izin verilince açık
+00:02 +23 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/profile_settings_test.dart: UX-07 bildirim anahtarı (Profil) hiç sorulmamış izin: anahtar kapalı, uyarı yok; açınca sistem penceresi, izin verilince açık
+00:03 +24 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/user_safety_test.dart: Güvenlik menüsü (sheet) dar ve kısa ekranda, büyük metinde taşmaz; arkadaş listesinde yalnızca bildir
+00:03 +25 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/profile_settings_test.dart: UX-07 bildirim anahtarı (Profil) pencerede reddedilirse kapalı + "Ayarları aç"; ayarlardan izin verip dönünce kendiliğinden açılır
+00:03 +26 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/profile_settings_test.dart: UX-07 bildirim anahtarı (Profil) pencerede reddedilirse kapalı + "Ayarları aç"; ayarlardan izin verip dönünce kendiliğinden açılır
+00:03 +27 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/user_safety_test.dart: Güvenlik menüsü (sheet) oturum yoksa gizleme seçeneği gösterilmez
+00:03 +28 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/profile_settings_test.dart: UX-07 bildirim anahtarı (Profil) daha önce reddedilmiş izin: pencere çıkmaz, "Ayarları aç" yolu gösterilir
+00:03 +29 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/profile_settings_test.dart: UX-07 bildirim anahtarı (Profil) daha önce reddedilmiş izin: pencere çıkmaz, "Ayarları aç" yolu gösterilir
+00:03 +30 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/profile_settings_test.dart: UX-07 bildirim anahtarı (Profil) açıkken kapatınca tercih kapanır; izin olsa da anahtar kapalı, uyarı yok
+00:03 +31 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/profile_settings_test.dart: UX-07 bildirim anahtarı (Profil) izin varsa anahtar açık, kapalı tercih kapalı görünür
+00:03 +32 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/profile_settings_test.dart: UX-07 bildirim anahtarı (Profil) KVKK-01: görünürlük metni kapsamı söyler; UX-17/21: yardım bölümü
+00:03 +33 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/profile_settings_test.dart: UX-17 destek e-postası sürüm metni
+00:03 +34 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/profile_settings_test.dart: UX-17 destek e-postası sürüm okunur
+00:03 +35 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/profile_settings_test.dart: UX-17 destek e-postası mailto destek@, gövdede sürüm ve cihaz; kişisel veri yok
+00:04 +36 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/friend_management_test.dart: silme onayı iptal edilince yazılmaz; bekleyen işlem ikinci kez gönderilmez
+00:04 +37 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/friend_management_test.dart: silme onayı iptal edilince yazılmaz; bekleyen işlem ikinci kez gönderilmez
+00:04 +38 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/friend_management_test.dart: silme onayı iptal edilince yazılmaz; bekleyen işlem ikinci kez gönderilmez
+00:04 +39 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/friend_management_test.dart: silme onayı iptal edilince yazılmaz; bekleyen işlem ikinci kez gönderilmez
+00:04 +40 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/friend_management_test.dart: silme onayı iptal edilince yazılmaz; bekleyen işlem ikinci kez gönderilmez
+00:04 +41 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/friend_management_test.dart: silme onayı iptal edilince yazılmaz; bekleyen işlem ikinci kez gönderilmez
+00:04 +42 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/friend_management_test.dart: silme onayı iptal edilince yazılmaz; bekleyen işlem ikinci kez gönderilmez
+00:04 +43 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/friend_management_test.dart: silme onayı iptal edilince yazılmaz; bekleyen işlem ikinci kez gönderilmez
+00:04 +44 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/friend_management_test.dart: silme onayı iptal edilince yazılmaz; bekleyen işlem ikinci kez gönderilmez
+00:04 +45 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/friend_management_test.dart: silme onayı iptal edilince yazılmaz; bekleyen işlem ikinci kez gönderilmez
+00:04 +46 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/friend_management_test.dart: silme onayı iptal edilince yazılmaz; bekleyen işlem ikinci kez gönderilmez
+00:04 +47 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/friend_management_test.dart: silme onayı iptal edilince yazılmaz; bekleyen işlem ikinci kez gönderilmez
+00:04 +48 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/friend_management_test.dart: silme onayı iptal edilince yazılmaz; bekleyen işlem ikinci kez gönderilmez
+00:04 +49 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/friend_management_test.dart: silme onayı iptal edilince yazılmaz; bekleyen işlem ikinci kez gönderilmez
+00:04 +50 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/account_session_test.dart: Çıkış onayı onay olmadan çıkılmaz; onayla çıkılır
+00:05 +51 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/account_session_test.dart: Çıkış onayı onay olmadan çıkılmaz; onayla çıkılır
+00:05 +52 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/account_session_test.dart: Çıkış onayı onay olmadan çıkılmaz; onayla çıkılır
+00:05 +53 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/account_session_test.dart: Çıkış onayı onay olmadan çıkılmaz; onayla çıkılır
+00:05 +54 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/account_session_test.dart: Çıkış onayı onay olmadan çıkılmaz; onayla çıkılır
+00:05 +55 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/account_session_test.dart: Çıkış onayı onay olmadan çıkılmaz; onayla çıkılır
+00:05 +56 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/account_session_test.dart: Çıkış onayı onay olmadan çıkılmaz; onayla çıkılır
+00:05 +57 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/account_session_test.dart: Çıkış onayı onay olmadan çıkılmaz; onayla çıkılır
+[APP] Sürüm okunamadı: MissingPluginException(No implementation found for method getAll on channel dev.fluttercommunity.plus/package_info)
+00:06 +58 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/account_session_test.dart: Çıkış onayı gönderilmemiş seans ve süren sayaç uyarısı; "Yine de çık"
+[APP] Sürüm okunamadı: MissingPluginException(No implementation found for method getAll on channel dev.fluttercommunity.plus/package_info)
+00:06 +59 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/account_session_test.dart: Profil: gizlilik kartı ve şifre "Gizlilik ve yasal" yalın: gizlenenler, üç yasal metin, Hesabımı Sil
+00:06 +60 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/account_session_test.dart: Profil: gizlilik kartı ve şifre şifre kuralı sunucuyla aynı
+00:06 +61 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/account_session_test.dart: Profil: gizlilik kartı ve şifre şifre değiştirme: doğrulama, yanlış mevcut şifre, başarı
+[PROFILE] Şifre değiştirilemedi: AuthException(message: Invalid login credentials, statusCode: 400, code: invalid_credentials)
+00:07 +62 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/account_session_test.dart: Giriş ekranı oturumun neden kapandığı bir kez gösterilir ve kapatılabilir
+00:07 +63 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/account_session_test.dart: Giriş ekranı kayıttan onay bekleyerek dönüş: e-posta dolu, yeniden gönder görünür
+00:07 +64 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/account_session_test.dart: Giriş ekranı e-posta boşken yeniden gönder sessiz kalmaz
+00:07 +65 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/account_session_test.dart: Giriş ekranı Android: Apple ile açılmış hesap için yol gösterilir
+00:07 +66 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/account_session_test.dart: Onboarding taslağı JSON gidiş-dönüş ve bozuk kayıt
+00:07 +67 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/account_session_test.dart: Onboarding taslağı süreç ölse de seçimler ve adım geri gelir; tamamlanmamış adım atlanmaz
+00:07 +68 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/account_session_test.dart: Onboarding taslağı "Diğer" segmentli taslak: genel önerilerden seçim ve adım korunur
+00:07 +69 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/account_session_test.dart: Onboarding taslağı segment seçilmemiş taslak: genel önerilerden seçim ve adım korunur
+00:07 +70 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/account_session_test.dart: Onboarding taslağı otomatik seçim taslakla geri gelir; segment değişince elle seçilen korunur
+00:08 +71 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/account_session_test.dart: Onboarding taslağı eski sürüm taslağı: segment seçili ama kategori yoksa öneriler seçili gelir
+00:08 +72 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/account_session_test.dart: Onboarding taslağı kullanıcının boşalttığı seçim (yeni sürüm taslağı) yeniden doldurulmaz
+00:08 +73 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/account_session_test.dart: Onboarding taslağı görünürlük yanıtı yoksa taslak görünürlük adımına döner
+00:08 +74 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/account_session_test.dart: Onboarding taslağı "Hayır" yanıtı taslakla geri gelir ve son adımdan bitirilebilir
+PostAuth onboarding error: ServiceException(cloudUnavailable)
+00:08 +75 -1: /Users/almano/Desktop/Courses/Projects/Pomodoro/test/account_session_test.dart: (tearDownAll)
+00:08 +75 -1: Some tests failed.
+
+Failing tests:
+  /Users/almano/Desktop/Courses/Projects/Pomodoro/test/auth_navigation_lifecycle_test.dart: hesap değişiminde onboarding durumu yeniden kurulur; son hesap korunur

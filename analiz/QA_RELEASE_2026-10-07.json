@@ -1,0 +1,153 @@
+{
+  "date": "2026-10-07",
+  "status": "local_QA_passed_release_blocked",
+  "production_writes_or_emails": false,
+  "production_deploy": false,
+  "physical_device_tested": false,
+  "tests": {
+    "flutter": {
+      "passed": 1091,
+      "skipped": 0,
+      "screenshots": true,
+      "analyze": "clean"
+    },
+    "new_york_dst": 93,
+    "backend": {
+      "suites": 9,
+      "passed": 466,
+      "isolated": true
+    },
+    "node": {
+      "passed": 99,
+      "skipped": 0,
+      "welcome_subset": 15,
+      "unsubscribe_subset": 24,
+      "delete_account_subset": 25
+    },
+    "report_lock_fix": {
+      "http": 7,
+      "contracts": 21,
+      "dryrun": 23,
+      "deployed": false
+    },
+    "ios": {
+      "runtime": "18.6",
+      "device": "iPhone16Plus",
+      "unique_real_ui_testcases": 14,
+      "os_process_death": "passed",
+      "five_accounts": "passed",
+      "account_deletion_regression_fixed": true
+    },
+    "android": {
+      "runtime": "Android16 API36 ARM64",
+      "base": 6,
+      "followup": 8,
+      "os_process_death": "passed",
+      "five_accounts": "passed",
+      "obfuscated_r8_release_runtime": "passed"
+    },
+    "live_readonly": {
+      "catalog_rows_matched": 409,
+      "ops_functions_matched": 14
+    },
+    "mail": {
+      "local_auth_mailpit": 9,
+      "resend_domain_spf_dkim": "Verified",
+      "historical_reset_delivered": 1,
+      "new_production_delivery_tested": false,
+      "smtp_fields_fully_verified": false
+    }
+  },
+  "artifacts": {
+    "android_aab": {
+      "version": "1.0.0+1",
+      "artifact": "release_artifacts/20261007/PomoSprint-1.0.0-1.aab",
+      "size_bytes": 64207477,
+      "sha256": "ccc1d7283f3446b2233d9ccade3ff937847ad6d594051344e002ee5bbd04a40c",
+      "jar_signature_verified": true,
+      "certificate_read": true,
+      "android_debug_certificate": false,
+      "has_native_debug_metadata": true,
+      "sentry_symbols_uploaded": false,
+      "quick_timer_defines_used": false,
+      "recipient_or_secrets_retained": false
+    },
+    "ios": {
+      "version": "1.0.0+1",
+      "unsigned_build_passed": true,
+      "signed_ipa_build_passed": false,
+      "signing_blocker": "Personal Team cannot provision Sign In with Apple and Time Sensitive Notifications",
+      "artifact": "release_artifacts/20261007/PomoSprint-1.0.0-1-ios-unsigned.app.tar.gz",
+      "compressed_bytes": 12363806,
+      "app_directory_bytes": 28362764,
+      "sha256": "0c2c9a3af5f0f1127ef7188847ec5063b96b577a5a9a834741cb91871fa43b31",
+      "obfuscated": true,
+      "quick_timer_defines_used": false,
+      "store_uploadable": false,
+      "sentry_symbols_uploaded": false
+    },
+    "android_local_qa_release": {
+      "passed": true,
+      "platform": "Android16/API36 ARM64 emulator",
+      "entrypoint": "lib/main.dart",
+      "mode": "release",
+      "obfuscated": true,
+      "r8_enabled": true,
+      "backend": "local http://10.0.2.2:54321",
+      "production_backend_used": false,
+      "quick_timer_enabled": false,
+      "apk_signature_verified": true,
+      "apk_bytes": 28009082,
+      "apk_sha256": "265624a9837ec9f29da6df1ce341f4b73a0f76279959d8a71163c1b97690b557",
+      "checks": {
+        "actual_login": true,
+        "daily_report_75_minutes_3_pomodoros": true,
+        "league_ranking": true,
+        "social_tab": true,
+        "normal_25_and_50_minute_selection": true,
+        "system_notification_permission_allow": true,
+        "timer_ticks": true,
+        "native_ongoing_notification_and_resource_icon": true,
+        "native_completion_alarm": true,
+        "pause_and_reset_cancel_active_alarm": true,
+        "reset_removes_ongoing_notification": true,
+        "cold_restart_preserves_login_and_idle_timer": true,
+        "no_package_crash_in_run": true,
+        "no_completed_session_saved_by_smoke": true
+      },
+      "db_after_smoke": {
+        "sessions": 2,
+        "minutes": 75
+      },
+      "limits": [
+        "25-minute native end delivery not waited; short-debug native delivery tested separately",
+        "local QA override APK is separate from production AAB",
+        "emulator evidence, physical device and native OAuth not verified"
+      ],
+      "harness_notes": [
+        "first-visit league information sheet dismissed",
+        "cancelled alarms remain in dumpsys history; active entries and cancellation history checked separately"
+      ]
+    }
+  },
+  "remaining": [
+    "User SQL Editor DRYRUN then report lock migration; live still old",
+    "Apple paid team/provisioning and enabled Supabase Apple provider",
+    "Deploy corrected site/welcome/unsubscribe and missing delete-account Edge",
+    "Developer/legal/sender identity user will supply last",
+    "User-owned recipient for fresh production delivery/inbox/spam verification",
+    "Physical devices/native OAuth/store privacy and review assets",
+    "Sentry symbol upload credentials absent; symbols preserved locally"
+  ],
+  "report": "analiz/QA_RELEASE_2026-10-07.md",
+  "independent_review": "No new product/security regression found in final readonly diff/SQL review",
+  "evidence_sha256": {
+    "analiz/qa_evidence_20261007/mobile/flutter_test_final.log": "265b19cde68416982aeed0256d37b535784d1d70ddfa3da2d4b490c08a9a5857",
+    "analiz/qa_evidence_20261007/mobile/flutter_analyze_final.log": "e67ed7b04a10edea0748612025468750650bfc1caf6a61c07eb874cd54113278",
+    "analiz/qa_evidence_20261007/node_final.log": "84acc77f2cf4c830dfa946a5d02d5bfd6a75b39bb20d907cc878356f0651f0b1",
+    "analiz/qa_evidence_20261007/mobile/android_release_smoke.json": "d56f1180bd636d3254fde4296089c03c78d89746d0716ac25b64ac063638572b",
+    "analiz/qa_evidence_20261007/mobile/release_android_aab.json": "8e5f05fdfd3899be3f0e84f0e7edc00c517200ad84505cf5f9d121ff708db3d8",
+    "analiz/qa_evidence_20261007/mobile/release_ios_build.json": "3426469ae6c751f68c0de94eefb7953a221e2144ba99e65f981bb3417ce24df8"
+  },
+  "counts_are_separate": "Subsets/reruns are not added to full suite totals; UI and catalog checks are not interchangeable"
+}

@@ -1,0 +1,85 @@
+
+> test
+> node --test "test/*.test.*"
+
+✔ landing API: response gövdesi beklenirken timeout etkin kalır (6.412667ms)
+✔ landing API: başarılı JSON/boş/metin yanıtları timeout'u temizler (1.91975ms)
+✔ landing API: POST metadatası body'de, token yalnızca Authorization'da (1.015833ms)
+✔ landing API: fetch ya da body hatasında timeout temizlenir ve hata üst katmana gider (3.968709ms)
+✔ reset: eksik ve eski PKCE bağlantıları geçersiz, istek yapılmaz (5.600875ms)
+✔ reset: token_hash açılışta tüketilmez; hassas parametreler URL'den silinir (1.944541ms)
+✔ reset: kısa, uzun veya farklı şifreler token doğrulaması başlatmaz (6.734458ms)
+✔ reset: yedi karakter reddedilir, sekiz karakter güncel Auth alt sınırını geçer (1.901458ms)
+✔ reset: implicit recovery şifreyi günceller, yalnızca kurtarma oturumunu kapatır (2.303625ms)
+✔ reset: zayıf şifreden sonraki denemede tek kullanımlık token tekrar doğrulanmaz (1.545916ms)
+✔ reset: süresi dolmuş token formu kapatır; sunucu hata açıklaması basılmaz (0.819333ms)
+✔ reset: ağ kesintisi formu korur ve yeniden denemeye izin verir (0.775333ms)
+✔ confirmed: parametresiz açılışta başarılı onay iddiası ve logout yok (1.103208ms)
+✔ confirmed: onay dönüşü URL'yi temizler ve yalnızca tarayıcıdaki oturumu kapatır (1.794292ms)
+✔ confirmed: URL'deki keyfi hata metni yerine sabit geçersiz bağlantı mesajı (0.875917ms)
+✔ auth dil seçimi: bağlantı tercihi tarayıcı dilinden önce gelir (0.98725ms)
+✔ yalnızca token'lı bağlantı: sayfa açılınca istek yok, butonla token-only POST (6.2965ms)
+✔ eski e-posta+token bağlantısı çalışır; e-posta URL'den silinir, yalnızca gövdede gider (1.278584ms)
+✔ token yoksa buton gösterilmez ve istek atılmaz (2.910042ms)
+✔ sunucu 403 (e-posta token sahibiyle uyuşmuyor) dönerse geçersiz bağlantı mesajı (1.657291ms)
+✔ onay kutusu işaretli değilse kayıt gönderilmez, kutu hatalı işaretlenir (9.317917ms)
+✔ onay verilince e-posta, onay ve metin sürümü gönderilir; zaman sunucuya bırakılır (4.062ms)
+✔ onay hatası kutu işaretlenince temizlenir ve ikinci deneme gönderilir (1.846166ms)
+✔ bekleme süresinde kutu kaldırılırsa istek gitmez (1.149583ms)
+✔ sayfada onay kutusu yoksa (eski önbellekli HTML) kayıt yapılmaz (1.076292ms)
+✔ e-posta hataları onaydan önce gösterilir (1.460708ms)
+✔ index.html: onay kutusu ayrı, önceden işaretsiz ve ticari ileti onayını açıkça söylüyor (0.712834ms)
+✔ site Worker: HTTP ve www yönlendirmesi yol/sorguyu korur (36.434584ms)
+✔ site Worker: HTTPS ana alan ve yerel test istekleri ASSETS'e aynen aktarılır (1.281666ms)
+✔ abonelikten çıkma bağlantıları yalnızca token taşır (1.736625ms)
+✔ buildEmail: e-posta adresi hiçbir bağlantıda yok, tek tık başlıkları var (1.1585ms)
+✔ örnek şablon altbilgisi gönderen kimliği, iletişim ve gizlilik/KVKK bağlantılarını içerir (1.996208ms)
+✔ zorunlu yer tutucusu eksik şablon reddedilir (0.236042ms)
+✔ gönderen kimliği .env'den okunur, eksikse bildirilir (uydurulmaz) (0.117583ms)
+✔ değerler HTML kaçışlanır ve $& gibi diziler kalıp sayılmaz (0.095ms)
+✔ tek tık (RFC 8058) yalnızca token ile aboneyi ve bekleme listesi kaydını siler (13.856833ms)
+✔ sayfa butonu: URL'de yalnızca token, gövdede token (0.433166ms)
+✔ token yalnızca gövdede de kabul edilir (0.309542ms)
+✔ eski e-posta+token bağlantısı çalışmaya devam eder (büyük/küçük harf duyarsız) (0.528709ms)
+✔ sayfa eski bağlantıdan gelince e-postayı gövdede gönderir; eşleşirse siler (0.687958ms)
+✔ e-posta token'ın sahibiyle uyuşmazsa 403 ve hiçbir şey silinmez (0.501958ms)
+✔ GET hiçbir şey silmez (405): e-posta tarayıcıları bağlantıyı açabilir (0.146666ms)
+✔ token yoksa ya da UUID değilse 400 (0.302584ms)
+✔ bilinmeyen token 200 döner ama hiçbir satırı silmez (adres listede mi, belli olmaz) (0.152042ms)
+✔ OPTIONS (CORS ön isteği) yalnızca site kökenine izin verir (0.189625ms)
+✔ waitlist-only token bekleme listesini gerçekten siler; başka adres korunur (0.199375ms)
+✔ waitlist token aynı adresin bülten aboneliğini de case farkına rağmen siler (0.125166ms)
+✔ waitlist token eski bağlantıda başka e-postayla gelirse hiçbir satır silinmez (0.109125ms)
+✔ bülten token: waitlist silme hatasında yanlış başarı yok, token korunur ve retry tamamlanır (0.57575ms)
+✔ waitlist token: bülten silme hatasında token korunur ve retry iki listeyi temizler (0.229208ms)
+✔ token sahibinin son silme adımı başarısızsa kısmi işlem aynı linkle tamamlanır (0.157667ms)
+✔ e-postadaki % ve _ karakterleri başka adresleri eşleyen joker olamaz (0.125792ms)
+✔ token lookup DB hataları 500 döner; bilinmeyen token gibi yanlış başarı verilmez (0.122ms)
+MAIL_SENDER_NAME / MAIL_SENDER_ADDRESS tanımlı değil; e-posta gönderilmedi
+MAIL_SENDER_NAME / MAIL_SENDER_ADDRESS tanımlı değil; e-posta gönderilmedi
+Resend hatası: 500
+Resend isteği tamamlanamadı
+abonelik satırı sahiplenilemedi
+hoş geldin e-postası sahiplenme işareti geri alınamadı
+✔ abonelikten çıkma bağlantıları yalnızca token taşır, e-posta adresi URL'de yok (14.427417ms)
+✔ altbilgide gönderen kimliği, iletişim, gizlilik/KVKK bağlantıları ve 'neden' cümlesi var (0.76025ms)
+✔ gönderen kimliği HTML'de kaçışlanır (0.865375ms)
+✔ MAIL_SENDER_NAME yoksa e-posta gönderilmez ve satır sahiplenilmez (0.829542ms)
+✔ MAIL_SENDER_ADDRESS yoksa e-posta gönderilmez ve satır sahiplenilmez (0.326084ms)
+✔ Resend hata verirse 502 ve welcome_sent_at geri alınır (0.450917ms)
+✔ daha önce gönderilmişse ya da e-posta uyuşmuyorsa gönderim yok (0.566208ms)
+✔ bir saatten eski satıra gönderim yok (0.20525ms)
+✔ ağ kesintisi 502 döner, işaret geri alınır ve aynı anahtarla tekrar denenir (0.942417ms)
+✔ adres karşılaştırması büyük harfi kabul eder, LIKE jokerlerini literal eşler (0.387625ms)
+✔ yanlış payload, yöntem ve olmayan kayıt gönderim başlatmaz (0.207833ms)
+✔ DB sahiplenme hatasında gönderim yapılmaz (0.157666ms)
+✔ iki eşzamanlı webhook yalnızca bir provider gönderimi başlatır (0.224ms)
+✔ provider hatasında geri alma da bozulursa DB hatası açıkça döner (0.1985ms)
+ℹ tests 67
+ℹ suites 0
+ℹ pass 67
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 156.280542

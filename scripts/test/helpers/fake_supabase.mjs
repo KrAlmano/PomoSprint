@@ -37,6 +37,35 @@ class Query {
     return this;
   }
 
+  neq(column, value) {
+    this.filters.push({ op: "neq", column, value, test: (row) => row[column] != null && row[column] !== value });
+    return this;
+  }
+
+  filter(column, operator, value) {
+    if (operator !== "imatch") throw new Error(`unsupported raw filter: ${operator}`);
+    const match = new RegExp(value, "i");
+    this.filters.push({ op: operator, column, value, test: (row) => row[column] != null && match.test(String(row[column])) });
+    return this;
+  }
+
+  ilike(column, value) {
+    // PostgREST treats * as a % alias before PostgreSQL evaluates ILIKE.
+    const restPattern = value.replace(/\*/g, "%");
+    let pattern = "";
+    for (let i = 0; i < restPattern.length; i++) {
+      const char = restPattern[i];
+      if (char === "\\" && i + 1 < restPattern.length) {
+        pattern += restPattern[++i].replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      } else if (char === "%") pattern += ".*";
+      else if (char === "_") pattern += ".";
+      else pattern += char.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    }
+    const match = new RegExp(`^${pattern}$`, "i");
+    this.filters.push({ op: "ilike", column, value, test: (row) => match.test(String(row[column] ?? "")) });
+    return this;
+  }
+
   is(column, value) {
     this.filters.push({ op: "is", column, value, test: (row) => (row[column] ?? null) === value });
     return this;
@@ -63,7 +92,8 @@ class Query {
       filters: this.filters.map(({ op, column, value }) => [op, column, value]),
     };
     this.db.calls.push(call);
-    const failure = this.db.failures?.[`${this.table}.${this.action}`];
+    const configuredFailure = this.db.failures?.[`${this.table}.${this.action}`];
+    const failure = typeof configuredFailure === "function" ? configuredFailure(call) : configuredFailure;
     if (failure) return { data: null, error: { message: failure } };
 
     const rows = (this.db.tables[this.table] ??= []);

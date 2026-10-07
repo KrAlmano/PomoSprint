@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0+1",
+  "unsigned_build_passed": true,
+  "signed_ipa_build_passed": false,
+  "signing_blocker": "Personal Team cannot provision Sign In with Apple and Time Sensitive Notifications",
+  "artifact": "release_artifacts/20261007/PomoSprint-1.0.0-1-ios-unsigned.app.tar.gz",
+  "compressed_bytes": 12363806,
+  "app_directory_bytes": 28362764,
+  "sha256": "0c2c9a3af5f0f1127ef7188847ec5063b96b577a5a9a834741cb91871fa43b31",
+  "obfuscated": true,
+  "quick_timer_defines_used": false,
+  "store_uploadable": false,
+  "sentry_symbols_uploaded": false
+}

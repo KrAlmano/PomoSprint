@@ -2003,7 +2003,7 @@ abstract class AppLocalizations {
   /// No description provided for @errShortPassword.
   ///
   /// In tr, this message translates to:
-  /// **'Şifre en az 6 karakter olmalıdır.'**
+  /// **'Şifre en az 8 karakter olmalıdır.'**
   String get errShortPassword;
 
   /// No description provided for @errAcceptTerms.
@@ -2897,13 +2897,13 @@ abstract class AppLocalizations {
   /// No description provided for @registerPasswordHelper.
   ///
   /// In tr, this message translates to:
-  /// **'En az 6 karakter; büyük harf, küçük harf ve rakam içermeli.'**
+  /// **'En az 8 karakter; büyük harf, küçük harf ve rakam içermeli.'**
   String get registerPasswordHelper;
 
   /// No description provided for @passwordRuleLength.
   ///
   /// In tr, this message translates to:
-  /// **'En az 6 karakter'**
+  /// **'En az 8 karakter'**
   String get passwordRuleLength;
 
   /// No description provided for @passwordRuleCase.
@@ -3125,7 +3125,7 @@ abstract class AppLocalizations {
   /// No description provided for @reportUserActionSub.
   ///
   /// In tr, this message translates to:
-  /// **'Uygunsuz bir adı ya da davranışı destek ekibine e-postayla bildir.'**
+  /// **'Uygunsuz bir adı, içeriği ya da davranışı uygulama içinden bildir.'**
   String get reportUserActionSub;
 
   /// No description provided for @hideUserAction.
@@ -3648,6 +3648,96 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Vazgeç'**
   String get friendActionCancel;
+
+  /// No description provided for @reportReasonLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bildirme nedeni'**
+  String get reportReasonLabel;
+
+  /// No description provided for @reportChooseReason.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lütfen bir bildirme nedeni seç.'**
+  String get reportChooseReason;
+
+  /// No description provided for @reportReasonOffensiveName.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uygunsuz ad'**
+  String get reportReasonOffensiveName;
+
+  /// No description provided for @reportReasonOffensiveContent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uygunsuz içerik'**
+  String get reportReasonOffensiveContent;
+
+  /// No description provided for @reportReasonHarassment.
+  ///
+  /// In tr, this message translates to:
+  /// **'Taciz veya zorbalık'**
+  String get reportReasonHarassment;
+
+  /// No description provided for @reportReasonSpam.
+  ///
+  /// In tr, this message translates to:
+  /// **'Spam'**
+  String get reportReasonSpam;
+
+  /// No description provided for @reportReasonImpersonation.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başkasını taklit etme'**
+  String get reportReasonImpersonation;
+
+  /// No description provided for @reportReasonOther.
+  ///
+  /// In tr, this message translates to:
+  /// **'Diğer'**
+  String get reportReasonOther;
+
+  /// No description provided for @reportDetailsLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Açıklama (isteğe bağlı)'**
+  String get reportDetailsLabel;
+
+  /// No description provided for @reportSendButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bildirimi gönder'**
+  String get reportSendButton;
+
+  /// No description provided for @reportSent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bildirimin alındı. Destek ekibi inceleyecek.'**
+  String get reportSent;
+
+  /// No description provided for @reportAlreadyReceived.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu kullanıcı hakkında bildirimin zaten alındı.'**
+  String get reportAlreadyReceived;
+
+  /// No description provided for @reportRateLimited.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugünkü bildirim sınırına ulaştın. Daha sonra tekrar dene.'**
+  String get reportRateLimited;
+
+  /// No description provided for @reportUserUnavailable.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu kullanıcı artık bildirilemiyor. Listeyi yenile.'**
+  String get reportUserUnavailable;
+
+  /// No description provided for @reportSendFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bildirim gönderilemedi. Tekrar dene.'**
+  String get reportSendFailed;
 }
 
 class _AppLocalizationsDelegate

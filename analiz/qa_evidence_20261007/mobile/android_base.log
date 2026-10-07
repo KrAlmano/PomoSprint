@@ -1,0 +1,65 @@
+device
+curl: (7) Failed to connect to 127.0.0.1 port 54399 after 0 ms: Couldn't connect to server
+=== integration_test/o_generated_base_test.dart / Android / 1007androidbase
+00:00 +0: loading /Users/almano/Desktop/Courses/Projects/Pomodoro/integration_test/o_generated_base_test.dart
+Running Gradle task 'assembleDebug'...                          
+Warning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.
+Running Gradle task 'assembleDebug'...                             36.9s
+✓ Built build/app/outputs/flutter-apk/app-debug.apk
+Installing build/app/outputs/flutter-apk/app-debug.apk...          621ms
+00:00 +0: a1 · kayıt + onboarding (YKS): otomatik ders seçimi, kabuk, sunucu kaydı
+supabase.supabase_flutter: INFO: ***** Supabase init completed ***** 
+[INIT] Supabase bağlandı.
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/android/base/e2e-kayit.png
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/android/base/e2e-onboarding-kategoriler.png
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/android/base/e2e-sayac-yks.png
+00:27 +1: a2 · KPSS hedefi: onboarding hatasız biter (26 varsa kpss, yoksa segmentsiz)
+00:27 +1: a1 · kayıt + onboarding (YKS): otomatik ders seçimi, kabuk, sunucu kaydı
+supabase.auth: INFO: Signing out user with scope: local 
+00:28 +1: a2 · KPSS hedefi: onboarding hatasız biter (26 varsa kpss, yoksa segmentsiz)
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/android/base/e2e-kpss-onboarding-kategoriler.png
+00:50 +2: b · cihaz boyutunda BAŞLAT görünür, 25/50 tek satır, kum saati, taşma yok
+00:51 +2: a1 · kayıt + onboarding (YKS): otomatik ders seçimi, kabuk, sunucu kaydı
+supabase.auth: INFO: Signing out user with scope: local 
+00:53 +2: b · cihaz boyutunda BAŞLAT görünür, 25/50 tek satır, kum saati, taşma yok
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+[E2E] Gerçek cihaz mantıksal boyutu: Size(411.4, 914.3)
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/android/base/e2e-sayac.png
+[E2E] sayaç: BAŞLAT Rect.fromLTRB(105.7, 690.0, 305.7, 738.0), nav üstü 822.2857142857143, 25 Rect.fromLTRB(113.1, 604.5, 154.3, 627.5), 50 Rect.fromLTRB(268.1, 604.5, 309.3, 627.5), kum saati Rect.fromLTRB(68.2, 159.2, 343.2, 448.0)
+01:00 +3: c+f · kapalıyken biten seans: diyalog 5 puan / 20 kum, üst çubuk, psql, Raporlar, Lig
+01:00 +3: a1 · kayıt + onboarding (YKS): otomatik ders seçimi, kabuk, sunucu kaydı
+supabase.auth: INFO: Signing out user with scope: local 
+01:02 +3: c+f · kapalıyken biten seans: diyalog 5 puan / 20 kum, üst çubuk, psql, Raporlar, Lig
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+[AUTH] Splash: currentSession VAR (expiresAt=2026-10-07T11:37:07.000)
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/android/base/e2e-seans-sonucu.png
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/android/base/e2e-sayac-puan.png
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/android/base/e2e-raporlar.png
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/android/base/e2e-lig.png
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/android/base/e2e-lig-satir.png
+01:25 +4: d · arkadaş kodu → kabul → arkadaş listesi, canlı akış, sıralama (is_me)
+01:25 +4: a1 · kayıt + onboarding (YKS): otomatik ders seçimi, kabuk, sunucu kaydı
+supabase.auth: INFO: Signing out user with scope: local 
+01:27 +4: d · arkadaş kodu → kabul → arkadaş listesi, canlı akış, sıralama (is_me)
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/android/base/e2e-arkadaslar.png
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/android/base/e2e-canli-akis.png
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/android/base/e2e-siralama-arkadaslar.png
+01:50 +5: e · Profil > Gizlilik ve yasal öğeleri; Hesabımı Sil yerel hesabı siler
+01:51 +5: a1 · kayıt + onboarding (YKS): otomatik ders seçimi, kabuk, sunucu kaydı
+supabase.auth: INFO: Signing out user with scope: local 
+01:53 +5: e · Profil > Gizlilik ve yasal öğeleri; Hesabımı Sil yerel hesabı siler
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/android/base/e2e-profil-ayarlar.png
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/android/base/e2e-hesap-silme-onay.png
+[AUTH] delete-account kullanılamadı (503); delete_own_account RPC.
+02:06 +5: a1 · kayıt + onboarding (YKS): otomatik ders seçimi, kabuk, sunucu kaydı
+supabase.auth: INFO: Signing out user with scope: local 
+02:07 +5: e · Profil > Gizlilik ve yasal öğeleri; Hesabımı Sil yerel hesabı siler
+[E2E] ekran görüntüsü: ../../../../../../tmp/pomosprint-20261007/android/base/e2e-hesap-silindi.png
+02:08 +6: (tearDownAll)
+02:09 +6: All tests passed!
+=== integration_test/o_generated_base_test.dart: GEÇTİ
+tool/local_supabase/e2e/sim/run_android_e2e.sh: line 41: 61839 Terminated: 15          python3 tool/local_supabase/e2e/sim/e2e_host.py --port "$PORT" --android-serial "$DEVICE" ${E2E_ALLOW_OUTAGE:+--allow-api-outage} ${E2E_SHOT_DIR:+--shot-dir "$E2E_SHOT_DIR"} 2> "$LOG_DIR/host.log"

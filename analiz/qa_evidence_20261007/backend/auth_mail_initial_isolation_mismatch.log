@@ -1,0 +1,10 @@
+PASS Onaysız e-posta ile giriş engellenir
+Traceback (most recent call last):
+  File "/Users/almano/Desktop/Courses/Projects/Pomodoro/analiz/qa_evidence_20261007/backend/run_isolated.py", line 94, in <module>
+    exec(compile(code, str(source), "exec"), {"__name__": "isolated_qa_suite", "__file__": str(source)})
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/almano/Desktop/Courses/Projects/Pomodoro/tool/local_supabase/e2e/auth_mail_test.py", line 61, in <module>
+    token = token_for(email, 'signup', before)
+  File "/Users/almano/Desktop/Courses/Projects/Pomodoro/tool/local_supabase/e2e/auth_mail_test.py", line 42, in token_for
+    raise AssertionError('Yerel posta kutusunda bağlantı yok: ' + kind)
+AssertionError: Yerel posta kutusunda bağlantı yok: signup

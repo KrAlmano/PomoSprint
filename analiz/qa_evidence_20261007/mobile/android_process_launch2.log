@@ -1,0 +1,15 @@
+--------- beginning of main
+I/flutter ( 5839): [IMPORTANT:flutter/shell/platform/android/android_context_gl_impeller.cc(104)] Using the Impeller rendering backend (OpenGLES).
+I/flutter ( 5839): The Dart VM service is listening on http://127.0.0.1:43709/H0CARSi37K8=/
+I/flutter ( 5839): supabase.supabase_flutter: INFO: ***** Supabase init completed ***** 
+I/flutter ( 5839): [INIT] Supabase bağlandı.
+I/flutter ( 5839): [QA_OS] RELAUNCH existing state
+I/flutter ( 5839): [AUTH] Splash: currentSession VAR (expiresAt=2026-10-07T11:52:40.000)
+I/flutter ( 5839): [QA_OS] APP_READY
+I/flutter ( 5906): [IMPORTANT:flutter/shell/platform/android/android_context_gl_impeller.cc(104)] Using the Impeller rendering backend (OpenGLES).
+I/flutter ( 5906): The Dart VM service is listening on http://127.0.0.1:35217/i3LYB5jaItA=/
+I/flutter ( 5906): supabase.supabase_flutter: INFO: ***** Supabase init completed ***** 
+I/flutter ( 5906): [INIT] Supabase bağlandı.
+I/flutter ( 5906): [QA_OS] RELAUNCH existing state
+I/flutter ( 5906): [AUTH] Splash: currentSession VAR (expiresAt=2026-10-07T11:52:47.000)
+I/flutter ( 5906): [QA_OS] APP_READY

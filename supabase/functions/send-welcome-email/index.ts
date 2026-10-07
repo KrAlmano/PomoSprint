@@ -31,6 +31,10 @@ const UNSUBSCRIBE_PAGE = "https://pomosprint.app/unsubscribe";
 const PRIVACY_URL = "https://pomosprint.app/privacy";
 const KVKK_URL = "https://pomosprint.app/kvkk";
 const MAX_AGE_MS = 60 * 60 * 1000;
+const SEND_TIMEOUT_MS = 10_000;
+
+const literalEmailPattern = (value: string) =>
+  `^${value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`;
 
 const escapeHtml = (value: string) =>
   value
@@ -66,7 +70,10 @@ Deno.serve(async (req) => {
   } catch (_) {
     return json({ error: "Invalid payload" }, 400);
   }
-  if (!record?.id || !record?.email) return json({ error: "Invalid payload" }, 400);
+  if (typeof record?.id !== "string" || !record.id.trim() ||
+      typeof record.email !== "string" || !record.email.trim()) {
+    return json({ error: "Invalid payload" }, 400);
+  }
 
   const admin = createClient(
     Deno.env.get("SUPABASE_URL")!,
@@ -77,19 +84,25 @@ Deno.serve(async (req) => {
   // Satırı "gönderiliyor" diye işaretleyerek sahiplen; aynı satıra ikinci
   // çağrı (yeniden deneme ya da kötüye kullanım) hiçbir şey yapmaz.
   const since = new Date(Date.now() - MAX_AGE_MS).toISOString();
+  const claimTime = new Date().toISOString();
   const { data: claimed, error: claimError } = await admin
     .from("marketing_subscribers")
-    .update({ welcome_sent_at: new Date().toISOString() })
+    .update({ welcome_sent_at: claimTime })
     .eq("id", record.id)
+    // E-posta eşleşmesi de atomik UPDATE içinde olmalı. Yanlış payload önce
+    // sahiplenilip sonra elenirse gerçek abonenin maili kalıcı olarak atlanır.
+    // PostgREST ILIKE '*' değerini '%' jokerine çevirir. İki ucu sabit,
+    // regex karakterleri kaçışlı imatch ise adresi literal/case-insensitive eşler.
+    .filter("email", "imatch", literalEmailPattern(record.email.trim()))
     .is("welcome_sent_at", null)
     .gte("subscribed_at", since)
     .select("id, email, unsubscribe_token")
     .maybeSingle();
   if (claimError) {
-    console.error("abonelik satırı okunamadı:", claimError.message);
+    console.error("abonelik satırı sahiplenilemedi");
     return json({ error: "Database error" }, 500);
   }
-  if (!claimed || String(claimed.email).toLowerCase() !== String(record.email).toLowerCase()) {
+  if (!claimed) {
     return json({ skipped: true }, 200);
   }
 
@@ -99,9 +112,30 @@ Deno.serve(async (req) => {
   const unsubscribePage = `${UNSUBSCRIBE_PAGE}?${query}`;
   const oneClickUrl = `${String(Deno.env.get("SUPABASE_URL")).replace(/\/+$/, "")}/functions/v1/unsubscribe?${query}`;
 
-  const res = await fetch("https://api.resend.com/emails", {
+  const releaseClaim = async () => {
+    try {
+      const { error } = await admin.from("marketing_subscribers")
+        .update({ welcome_sent_at: null })
+        .eq("id", claimed.id)
+        .eq("welcome_sent_at", claimTime);
+      if (!error) return true;
+    } catch (_) {
+      // SDK/ağ hataları da aynı açık DB hata sonucunu verir.
+    }
+    console.error("hoş geldin e-postası sahiplenme işareti geri alınamadı");
+    return false;
+  };
+
+  const sendRequest = {
     method: "POST",
-    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${resendKey}` },
+    signal: AbortSignal.timeout(SEND_TIMEOUT_MS),
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${resendKey}`,
+      // Provider yanıtı kaybolsa bile aynı kayıt için yeniden gönderim tek
+      // e-posta üretir. Resend anahtarı 24 saat korur; kabul penceremiz 1 saat.
+      "Idempotency-Key": `welcome-subscriber/${claimed.id}`,
+    },
     body: JSON.stringify({
       from: FROM_ADDRESS,
       to: [email],
@@ -144,13 +178,20 @@ Deno.serve(async (req) => {
         </div>
       `,
     }),
-  });
+  };
+  let res: Response;
+  try {
+    res = await fetch("https://api.resend.com/emails", sendRequest);
+  } catch (_) {
+    console.error("Resend isteği tamamlanamadı");
+    if (!await releaseClaim()) return json({ error: "Database error" }, 500);
+    return json({ error: "Email provider error" }, 502);
+  }
 
   if (!res.ok) {
     // Gönderilemediyse işareti geri al; bir sonraki denemede tekrar gidebilsin.
-    await admin.from("marketing_subscribers").update({ welcome_sent_at: null }).eq("id", claimed.id);
-    const detail = await res.text();
-    console.error("Resend hatası:", res.status, detail);
+    if (!await releaseClaim()) return json({ error: "Database error" }, 500);
+    console.error("Resend hatası:", res.status);
     return json({ error: "Email provider error" }, 502);
   }
 

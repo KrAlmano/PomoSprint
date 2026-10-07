@@ -1,8 +1,10 @@
 # unsubscribe Edge Function
 
 Bülten e-postalarındaki "Abonelikten çık" bağlantısını işler. Her abonenin
-`marketing_subscribers.unsubscribe_token` kolonunda tahmin edilemez bir UUID'si
-var; token olmadan kimse listeden çıkarılamaz. Ek secret gerekmez.
+`marketing_subscribers.unsubscribe_token` ya da `waitlist.unsubscribe_token`
+kolonunda tahmin edilemez bir UUID'si var; token olmadan kimse listeden
+çıkarılamaz. Ek secret gerekmez. Waitlist token yolu için `proposed/19` A
+kolonları gerekir (5 Ekim kaydında canlıda).
 
 ## Link biçimi
 
@@ -26,7 +28,22 @@ adresi okuduktan sonra adres çubuğundan siler.
 - Token yoksa ya da UUID değilse 400. `email` verilirse token'ın sahibiyle
   eşleşmezse 403. Bulunamayan token için de 200 döner (adresin listede olup
   olmadığı açığa çıkmasın).
-- Abone `waitlist`'ten de çıkarılır.
+- Her iki token türü de aynı e-posta adresinin bütün yazımlarını iki listeden
+  çıkarır. `waitlist` ham `UNIQUE(email)` nedeniyle case farkıyla birden çok
+  kayıt içerebilir; hepsi kaldırılır. Büyük/küçük harf farkı dikkate alınmaz.
+- Eşleme sabitlenmiş ve metakarakterleri kaçışlanmış `imatch` regex ile yapılır;
+  `%`, `_`, `*` veya regex metakarakterleri başka adresleri eşlemez. `ilike`
+  kullanılmaz: PostgREST `*` karakterini `%` jokerinin takma adı olarak işler.
+- Önce diğer liste, sonra token sahibinin listesindeki aynı adresin diğer
+  kayıtları, en son token sahibi silinir. Her silme hatası 500 döner ve token
+  sahibi korunur. Aynı linkle yeniden denenebilir; yanlış başarı gösterilmez.
+
+7 Ekim 2026 QA'da repoya bu düzeltmeler eklendi; bu çalışma canlı deploy
+yapmadı. Ağsız testlerde waitlist-only token, iki yönde hata ve yeniden
+deneme, eski bağlantı biçimi, case-variant kayıtlar, üç silme aşaması ve joker
+karakterli e-posta sınandı. GET/OPTIONS e-posta tarayıcısı istekleri silmez.
+Gerçek yerel PostgREST GET sorgularında `*` takma adı ve `imatch` doğrulandı;
+kanıt `analiz/qa_evidence_20261007/site/postgrest_filter_readonly.json`.
 
 ## Deploy (JWT doğrulaması KAPALI olmalı)
 

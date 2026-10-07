@@ -1,0 +1,93 @@
+{
+  "date": "2026-10-07",
+  "environment": "Local HTTP server 127.0.0.1:8187 with original static files; config.js Supabase URL/public key were replaced only in served QA response. All API calls went to localhost fixtures. No production account/email/mutation.",
+  "chrome_checks_before_user_safari_preference": [
+    {
+      "case": "index normal desktop width1512",
+      "result": "pass",
+      "console_error_warn": 0
+    },
+    {
+      "case": "leaderboard three-row fixture",
+      "result": "pass",
+      "visible_names": [
+        "QA Ada",
+        "QA Ece",
+        "QA Can"
+      ],
+      "points": [
+        25,
+        12,
+        5
+      ]
+    },
+    {
+      "case": "waitlist without consent",
+      "result": "pass",
+      "form_hidden": false,
+      "consent_invalid": "true",
+      "status": "Sana haber verebilmemiz için onay kutusunu işaretlemen gerekiyor."
+    },
+    {
+      "case": "waitlist with consent",
+      "result": "pass",
+      "form_hidden": true,
+      "success_visible": true,
+      "success_text": "Listedesin! Yayın günü haber vereceğiz.",
+      "http_status": 201
+    },
+    {
+      "case": "mobile390x844 home",
+      "result": "pass",
+      "viewport_width": 390,
+      "page_width": 390
+    },
+    {
+      "case": "mobile menu open/SSS navigation",
+      "result": "pass",
+      "aria_expanded_after_navigation": "false"
+    },
+    {
+      "case": "SSS single open accordion",
+      "result": "pass",
+      "open_questions": [
+        "Hangi platformlarda olacak?"
+      ],
+      "page_width": 390
+    },
+    {
+      "case": "English privacy footer link/mobile table",
+      "result": "pass",
+      "language": "en",
+      "title": "Privacy Policy — PomoSprint",
+      "page_width": 390,
+      "console_error_warn": 0
+    }
+  ],
+  "safari_smoke_after_user_preference": [
+    {
+      "case": "reset-password?lang=en no recovery parameters",
+      "result": "pass",
+      "heading": "Invalid Link",
+      "form_visible": false
+    },
+    {
+      "case": "confirmed?lang=tr no confirmation parameters",
+      "result": "pass",
+      "heading": "E-posta Onayı",
+      "success_claim": false
+    },
+    {
+      "case": "unsubscribe?lang=en no token",
+      "result": "pass",
+      "heading": "Incomplete Link",
+      "confirm_button_visible": false
+    }
+  ],
+  "cleanup": "Chrome viewport reset and only created QA tab closed. Safari created QA tab closed, original two user tabs left intact. Local mock server terminated after smoke checks.",
+  "limitations": [
+    "Chrome captureScreenshot had one transient 5-second tool timeout; DOM/console checks continued and subsequent supported screenshot succeeded. This is a tooling event, not evidence of an app crash.",
+    "No browser password entry, real reset email, production unsubscribe, live SMTP delivery or production site deploy.",
+    "Responsive browser checks cover390x844 and existing desktop1512 width; other mobile/tablet sizes are primarily covered by main Flutter QA."
+  ]
+}

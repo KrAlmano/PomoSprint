@@ -14,7 +14,8 @@
 //                "reason"?: "no_authorization_code" | "not_configured" |
 //                           "token_exchange_failed" | "no_token" |
 //                           "revoke_failed" | "apple_error" } }
-// Hata: 401 not_authenticated, 405, 500 delete_failed (+ apple). Bu fonksiyon
+// Hata: 400 invalid_payload, 401 not_authenticated, 405,
+// 500 delete_failed (+ apple). Bu fonksiyon
 // 404 DÖNDÜRMEZ: istemci 404'ü "fonksiyon deploy edilmemiş", 5xx'i
 // "çalışamadı" sayıp delete_own_account RPC'sine düşer.
 //
@@ -149,33 +150,27 @@ function hasAppleIdentity(user: User): boolean {
 }
 
 // E-postaya bağlı, yabancı anahtarı olmayan kayıtlar (proposed/12 ile aynı
-// kural: lower(btrim(email)) eşleşmesi). ilike adayları daraltır ('_' ve '%'
-// LIKE joker karakteri olduğu için fazladan satır gelebilir); kesin eşleşme
-// burada yapılır, yalnızca o satırlar id ile silinir.
-async function deleteEmailLinkedRows(admin: SupabaseClient, email: string): Promise<void> {
-  const exact = (value: unknown) => String(value ?? "").trim().toLowerCase() === email;
-
-  const waitlist = await admin.from("waitlist").select("id, email").ilike("email", email);
-  if (waitlist.error) {
-    console.warn("waitlist okunamadı:", waitlist.error.message);
-  } else {
-    const ids = (waitlist.data ?? []).filter((r) => exact(r.email)).map((r) => r.id);
-    if (ids.length) {
-      const { error } = await admin.from("waitlist").delete().in("id", ids);
-      if (error) console.warn("waitlist silinemedi:", error.message);
+// kural: lower(btrim(email)) eşleşmesi). PostgREST ILIKE'da '*' da jokerdir;
+// literal ve baştan/sondan sabitlenmiş regex doğrudan DELETE'te kullanılır.
+// Adayları SELECT ile almak PostgREST satır sınırında eşleşmeyi atlayabilirdi.
+async function deleteEmailLinkedRows(admin: SupabaseClient, email: string): Promise<boolean> {
+  const literal = email.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const pattern = `^ *${literal} *$`;
+  for (const table of ["waitlist", "marketing_subscribers"]) {
+    try {
+      let query = admin.from(table).delete().filter("email", "imatch", pattern);
+      if (table === "marketing_subscribers") query = query.is("user_id", null);
+      const { error } = await query;
+      if (!error) continue;
+      console.warn(`${table} silinemedi:`, error.message);
+    } catch (_) {
+      console.warn(`${table} silme isteği tamamlanamadı`);
     }
+    // Auth satırı korunur: kullanıcı veya istemcinin SQL yedeği yeniden
+    // deneyebilir. Kısmi temizliği tamamlanmış silme diye göstermeyiz.
+    return false;
   }
-
-  const subs = await admin.from("marketing_subscribers").select("id, email").is("user_id", null).ilike("email", email);
-  if (subs.error) {
-    console.warn("marketing_subscribers okunamadı:", subs.error.message);
-  } else {
-    const ids = (subs.data ?? []).filter((r) => exact(r.email)).map((r) => r.id);
-    if (ids.length) {
-      const { error } = await admin.from("marketing_subscribers").delete().in("id", ids);
-      if (error) console.warn("marketing_subscribers silinemedi:", error.message);
-    }
-  }
+  return true;
 }
 
 Deno.serve(async (req) => {
@@ -197,11 +192,16 @@ Deno.serve(async (req) => {
 
   let body: Record<string, unknown> = {};
   try {
-    body = await req.json();
+    const rawBody = await req.text();
+    if (rawBody.trim()) body = JSON.parse(rawBody);
   } catch (_) {
-    // Gövdesiz istek geçerli (Apple kimliği olmayan hesap).
+    return json({ error: "invalid_payload" }, 400);
   }
+  // Gövdesiz POST geçerli; bozuk JSON veya yanlış türde Apple kodu hesabı
+  // silmeye başlamamalı. Gövdedeki kullanıcı kimlikleri yine kullanılmaz.
+  if (!body || typeof body !== "object" || Array.isArray(body)) return json({ error: "invalid_payload" }, 400);
   const rawCode = body?.apple_authorization_code;
+  if (rawCode !== undefined && typeof rawCode !== "string") return json({ error: "invalid_payload" }, 400);
   const code = typeof rawCode === "string" ? rawCode.trim() : "";
 
   let apple: AppleResult = { status: "not_applicable" };
@@ -222,7 +222,7 @@ Deno.serve(async (req) => {
   }
 
   const email = user.email_confirmed_at && user.email ? user.email.trim().toLowerCase() : "";
-  if (email) await deleteEmailLinkedRows(admin, email);
+  if (email && !await deleteEmailLinkedRows(admin, email)) return json({ error: "delete_failed", apple }, 500);
 
   const { error: deleteError } = await admin.auth.admin.deleteUser(user.id);
   if (deleteError) {

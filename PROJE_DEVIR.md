@@ -1,8 +1,8 @@
 # PomoSprint — proje ve AI oturum devir belgesi
 
-**Güncelleme:** 5 Ekim 2026. **Proje kökü:** `/Users/almano/Desktop/Courses/Projects/Pomodoro`.
+**Güncelleme:** 7 Ekim 2026. **Son kapsamlı QA:** [QA_RELEASE_2026-10-07.md](analiz/QA_RELEASE_2026-10-07.md). **Proje kökü:** `/Users/almano/Desktop/Courses/Projects/Pomodoro`.
 
-Bu dosya yeni bir konuşmaya başlayan yapay zekâ için proje haritası ve çalışma geçmişidir. Kod, mevcut `AGENTS.md`, Git geçmişi ve yerel QA raporları okunarak hazırlanmıştır. Bu belgeyi hazırlarken uygulama kodu değiştirilmedi, canlıya SQL veya yayın yapılmadı. Geçmiş test sonuçları aşağıda kanıt dosyalarıyla verilmiştir; bu belgeyi yazmak için testler yeniden çalıştırılmadı.
+Bu dosya yeni bir konuşmaya başlayan yapay zekâ için proje haritası ve çalışma geçmişidir. 7 Ekim sürüm hazırlığı turunda uygulama gerçekten çalıştırıldı, yeni hatalar giderildi ve testler yeniden koşuldu. Canlı DB/Auth/Edge/Resend/DNS durumu salt okunarak doğrulandı; canlı hesap açılmadı, posta gönderilmedi, SQL/deploy/yayın yapılmadı. Yerel test sonuçları, canlı salt-okuma bulguları ve geçmiş 5 Ekim sonuçları aşağıda ayrı belirtilir. Android/iOS gerçek UI ve süreç sonlandırma/restore testleri geçti; son artifact/runtime durumu ana QA raporunda esas alınır.
 
 ## 1. Yeni oturumda önce bunu bil
 
@@ -11,7 +11,7 @@ Bu dosya yeni bir konuşmaya başlayan yapay zekâ için proje haritası ve çal
 3. Şu an fiziksel cihaz kullanılmıyor. Kullanıcı fiziksel cihaz doğrulamasını sonraya bıraktı. iOS simülatörü ve Android emülatörü üzerinde çalış.
 4. Test hesapları ve test seansları **yerel Supabase** içindir. Kök `.env` normal uygulamayı canlıya bağlayabilir. Test için URL ve anon anahtarı birlikte `--dart-define` ile ver; normal `flutter run` komutunu düşünmeden çalıştırma.
 5. İstenen geçici davranış: **5 saniye bitince 25 dakika, 10 saniye bitince 50 dakika gibi kayıt, puan, kum, rapor ve lig işlemleri**. Bu yalnızca açıkça seçilen yerel debug QA modunda kuruludur. Normal uygulama 25/50 dakika kullanır. Canlı sunucunun süre doğrulaması gevşetilmedi.
-6. Son simülatör görüntüsünde QA1 hesabı açık bırakıldı: 17 puan, 40 kum, `00:05`, TEST rozeti. Android emülatörü ve Gradle daemon kapatıldı. Bunlar oturum sonu durumudur; yeni oturumda süreçlerin hâlâ açık olduğunu varsayma.
+6. Cihaz/süreç ve açık hesap durumu oturuma özgüdür. 5 Ekim sonunda QA1 açık bırakılmıştı; 7 Ekim yeni koşuları kendi run ID hesaplarını kullanır. Eski ekran görüntüsünü bugünkü DB sonucu sayma; yeni oturumda emulator/simulator/Docker süreçlerini ve giriş hesabını kontrol et.
 7. “Testler geçti” mağazaya hazır demek değildir. Fiziksel bildirim/kilit ekranı, gerçek Google/Apple girişi ve ayrı operasyon/yayın işleri bekliyor.
 
 ### Kaynaklar ve çelişkileri çözme
@@ -19,7 +19,8 @@ Bu dosya yeni bir konuşmaya başlayan yapay zekâ için proje haritası ve çal
 - Canlı DB sözleşmesi için gerçeğin kaynağı canlı tanımdır; bu belgedeki geçmiş sonuç canlıya yeni bir doğrulama değildir.
 - `AGENTS.md`: çalışma kuralları, detaylı RPC/kolon/hata sözleşmeleri, SQL değişiklik akışı.
 - Bu belge: son oturumun devri, bağımlılıklar, çalıştırma ve sonuçların özeti.
-- [QA_FOLLOWUP raporu](analiz/QA_FOLLOWUP_2026-10-05.json): en yeni saat dilimi/arkadaş yönetimi/yasal onay test sonuçları.
+- [7 Ekim ana QA raporu](analiz/QA_RELEASE_2026-10-07.md): güncel test, düzeltme ve yayın engellerinin kaynağı. Kanıtlar `analiz/qa_evidence_20261007/` içinde.
+- [QA_FOLLOWUP raporu](analiz/QA_FOLLOWUP_2026-10-05.json): tarihsel saat dilimi/arkadaş yönetimi/yasal onay test sonuçları.
 - [QA_FULL raporu](analiz/QA_FULL_2026-10-05.json): önceki geniş kapsamlı testler. Burada “saat dilimi eşleme yok” ve “silme/engelleme düğmeleri yok” ifadeleri tarihsel bulgulardır; takip turunda tamamlandı.
 - `PROJECT_CONTEXT.md`, `analiz/` içindeki eski raporlar ve kod yorumları eski olabilir. Daha eski bir metne dayanarak düzeltilmiş özelliği geri alma.
 - `supabase/proposed/` adı “hepsi uygulanmamış” anlamına gelmez: bazı paketler 5 Ekim'de canlıya uygulandı (§8).
@@ -86,7 +87,7 @@ flowchart TD
 - `onboardingCompletedAt` null → PostAuthOnboarding.
 - Tamamlanmış profil → MainNavigationShell.
 
-Ekranlar kendi kopya kullanıcı durumunu tutup ayrı Login/Shell geçişi yapmamalı. Servis auth/async işlemlerde kullanıcı epoch/id kontrolüyle eski hesabın yanıtının yeni hesaba yazılmasını önler. Çıkış, Apple yetki iptali ve oturum düşmesi tam çıkış kancalarından geçer.
+Ekranlar kendi kopya kullanıcı durumunu tutup ayrı Login/Shell geçişi yapmamalı. Servis auth/async işlemlerde kullanıcı epoch/id kontrolüyle eski hesabın yanıtının yeni hesaba yazılmasını önler. 7 Ekim düzeltmesiyle sahip değişiminde kökün üzerindeki eski Profil/Koleksiyon/dialog/sheet route’ları frame sonunda AppGate tarafından kapatılır; aynı sahibin profil yenilemesi route kapatmaz. Onboarding/Shell UID ile anahtarlanır. Hesap silme başarısı ayrıca pop/onLogout yapmaz; servis → AppGate yönlendirmesi tek merkezdir. Çıkış, Apple yetki iptali ve oturum düşmesi tam çıkış kancalarından geçer.
 
 ### Kabuk ve yenileme
 
@@ -114,7 +115,7 @@ Sosyal veri normalde görünürken 30 saniyede bir okunur. Kayıtlı yerel kısa
 | `history_screen.dart`, `monthly_tracking_screen.dart` | Haftalık ve aylık detay; history dosya adı yanıltıcıdır |
 | `lib/utils/stats_calculator.dart`, `study_day.dart`, `category_names.dart` | Metrikler, 04:00/DST takvimi, TR/EN kategori eşlemesi |
 | `ranking_screen.dart`, `lib/widgets/social/ranking_models.dart` | Lig/Aylık/Arkadaşlar sıralaması ve satır modelleri |
-| `social_screen.dart`, `friends_sheet.dart`, `user_safety.dart` | Canlı arkadaş, gelen/giden istek, silme/engelleme/gizleme/bildirme |
+| `social_screen.dart`, `friends_sheet.dart`, `user_safety.dart`, `user_report_dialog.dart` | Canlı arkadaş, gelen/giden istek, silme/engelleme/gizleme ve uygulama içi neden/not ile bildirme |
 | `profile_screen.dart`, `character_collection_screen.dart` | Ayarlar, şifre/hesap silme, avatar mağazası/kuşanma |
 | `login_screen.dart`, `register_screen.dart`, `forgot_password_screen.dart` | Giriş, kayıt, ayrı reset formu ve gönderildi ekranı |
 | `post_auth_onboarding_screen.dart`, `services/onboarding_categories.dart` | Altı adım ve mevcut kategorilerle uzlaştırma |
@@ -168,16 +169,18 @@ Takip turunda UI'ya bağlananlar: `remove_friend(p_friend_id)`, `cancel_friend_r
 
 Yerel **Gizle** (`hidden_users_uid_<uid>`) ve sunucudaki **Engelle** ayrı işlevlerdir. Ranking model sunucunun `is_blocked` işaretini de okur; sıra/puan satırı bozulmadan maskelenir. Kendi satırında güvenlik menüsü olmaz. “Ben” eşlemesi isimle değil `is_me` ile yapılır.
 
-Mevcut bildirme `mailto:destek@pomosprint.app`; sunucu `submit_user_report` RPC'si hazır fakat uygulamada rapor formu henüz bağlanmadı. Sunucuda ops operatör araçları mevcut; otomatik test için operatör/üretim değişikliği yapma.
+7 Ekim'de kimliği bilinen satırlar için uygulama içi neden/not formu `submit_user_report(p_target_user_id, p_place, p_reason, p_details)` RPC'sine bağlandı. Lig/aylık/arkadaş sıralaması, canlı liste ve arkadaş isteklerinden çalışır. Neden zorunlu, not isteğe bağlı/en çok 500 karakter; mükerrer, hız sınırı, ağ hatası ve hesap değişimi korunur. Kimliksiz eski sunucu satırında destek e-postası yedeği vardır. RPC açık raporu 24 saat içinde çoğaltmaz, 24 saatte en çok 10 yeni bildirim kabul eder; detaylar `AGENTS.md` sözleşmesindedir. Sunucuda 14 ops operatör fonksiyonu canlı/yerel eşleşti; otomatik test için operatör/üretim değişikliği yapma.
+
+Arkadaş listesindeki eski paralel yanıt yalnız en güncel isteğin sonucuysa uygulanır. Profil sosyal görünürlük anahtarı ilk okuma/kaydetme boyunca kapalıdır; tek işlem ve gerçek önceki değere hata geri dönüşü vardır. Gizlenen kullanıcı cache’i yüklenirken sahip değişimi/logout/silme eski sonucu yeniden yayınlayamaz.
 
 ### 5.4 Auth, reset ve yasal onay
 
 - Kayıt zorunlu Kullanım Şartları kabulü ve KVKK/Gizlilik okuma teyidi ister. Pazarlama onayı isteğe bağlı, önceden işaretli değil. `RegistrationConsent` metadata üretir.
 - “Şifremi Unuttum” artık ayrı e-posta formunu açar. Kullanıcı adresi girip doğrulama/sıfırlama maili gönderir; başarı ayrı “mailinize gönderildi” ekranına gider. Parola değiştirme linki web reset sayfasında tamamlanır; uygulamada kod girme akışı eklenmedi.
 - Supabase auth implicit; özel eski uygulama URL şeması kaldırılmıştır. Web `/reset-password` `access_token`/recovery veya `token_hash` akışını işler; `/confirmed` onay dönüşüdür.
-- Google/Apple: native idToken → Supabase auth → **`accept_legal_documents`** → duplicate identity temizliği/profil → AppGate. İki belge sürümü tek `kLegalDocumentsVersion` sabitinden (şu an `2026-10-03`) gider.
+- Google/Apple kod akışı: native idToken → Supabase auth → **`accept_legal_documents`** → duplicate identity temizliği/profil → AppGate. İki belge sürümü tek `kLegalDocumentsVersion` sabitinden (`2026-10-07`) gider. 7 Ekim canlı salt-okuma: Google provider açık; Apple provider kapalı ve client ID boş. Apple düğmesinin bulunması çalışan Apple girişi kanıtı değildir; provider/capability ve signed cihaz doğrulaması yayın engelidir.
 - Onay `consents` ledger'ına `terms`/`privacy_notice`, `source=app_legal_acceptance` olarak yazılır; tekrar çağrı çoğaltmaz. Kayıt başarısızsa sosyal girişten sonra tam çıkış yapılır. Restored eski oturumlara kullanıcı eylemi olmadan geriye dönük onay yazılmaz. Bu metadata yazımı veya pazarlama aboneliği değildir.
-- Auth istekleri 25 saniye zaman aşımlı. Şifre en az 6 karakter, küçük/büyük harf ve rakam; uygulama, web ve Auth paneli uyumlu olmalı.
+- Auth istekleri 25 saniye zaman aşımlı. Canlı Auth şifre kuralı 7 Ekim’de salt okunarak doğrulandı: en az 8 karakter, ASCII küçük/büyük harf ve rakam. Mobil ortak helper/ARB/kayıt/şifre değiştirme ve web reset JS/HTML/TR/EN doğrulaması 8’e; yerel Auth minimumu 8’e hizalandı; sunucu kuralı değiştirilmedi. Yerel karakter politikası mevcut QA fikstürleri için boş kalır; config değişikliği sırasında çalışan ana yerel Auth restart edilmedi. Yeni şifre doğrulaması mevcut hesaba girişte eski parolayı istemciden reddetmez. Kayıt/şifre değiştirme isteği sürerken geri çıkış engellenir.
 - Onboarding: yaş (13+), hedef/segment, kategoriler, sosyal görünürlük açık seçimi, oyun kuralları, günlük hedef. Segmentler `lgs/yks/kpss/language/university/work`; Diğer null. Kategori önerileri hedefe göre seçilir; kullanıcı seçimi ve taslak korunur.
 
 ### 5.5 Kategoriler, avatar ve lig
@@ -197,9 +200,9 @@ Android sistem kronometresi / `timeoutAfter`, iOS `Text(timerInterval:)` / `stal
 
 Simülatör native kayıt/teslim/iptal ve ActivityKit çağrıları geçti. Bu, fiziksel kilit ekranının yerleşimini veya gerçek cihazda tam ses/banner izin akışını doğruladığımız anlamına gelmez.
 
-## 6. Bu çalışma sürecinde neler yapıldı?
+## 6. Çalışma geçmişi — 5 ve 7 Ekim turları
 
-### Kullanıcı arayüzü ve kısa seans isteği
+### 5 Ekim ve önceki kullanıcı arayüzü/kısa seans işleri
 
 - Kum saati animasyonunun boyun/bitiş kısmındaki boşluk için `assets/sand_timer.json` düzeltildi.
 - Timer'daki “DERS SEÇ” başlığı ve kalem kaldırıldı; kategoriler ve seçim çipleri korundu.
@@ -208,7 +211,7 @@ Simülatör native kayıt/teslim/iptal ve ActivityKit çağrıları geçti. Bu, 
 - `record_accelerated` aktif seans ve outbox'ta opsiyonel işaret olarak taşındı. Eski JSON'da false.
 - Profil bildirim ayarındaki mounted koruması ve sosyal dönüşte taze veri davranışı düzeltildi.
 
-### Test altyapısı ve iki platform
+### 5 Ekim test altyapısı ve iki platform (tarihsel)
 
 - iPhone 16 Plus / iOS 18.6 test hedefi kullanıldı. Eski destination/SDK sorununda istenen platform Xcode sürümüyle simulator runtime arasındaki fark ayrıştırıldı; iOS 26 runtime indirilerek ürün test hedefi değiştirilmedi.
 - Android SDK, JDK 17 ve tek ARM64 API36 emülatör ile Android debug, UI ve release doğrulandı. Eski “bu makinede Android SDK yok” bilgisi artık geçersiz.
@@ -220,14 +223,23 @@ Simülatör native kayıt/teslim/iptal ve ActivityKit çağrıları geçti. Bu, 
 - Auth mail, RLS/sosyal güvenlik, kategori/onboarding, avatar satın alma/kuşanma, lig/cron/sıra/dönem/yariş senaryoları yerelde çalıştırıldı. Eski test beklentileri yeni canlı sözleşmeyle uyumlu hâle getirildi; doğru ürün davranışı sırf eski test yeşil olsun diye geri alınmadı.
 - Flutter analiz ve regression, JS/Edge ağsız testleri, Android ARM64 ve iOS imzasız release derlemeleri geçti.
 
-### Son takip turu
+### 5 Ekim takip turu (tarihsel)
 
 - Native IANA okuma ve profil saat dilimi sync'i eklendi; New York DST/gün hesabı ve geçersiz ad fallback'i sınandı.
 - Giden istek iptali, arkadaş silme, block/unblock ve engellenen kullanıcı UI bağlandı; beklerken tek işlem, hata ve altı ekran boyutu test edildi.
 - Google/Apple girişine yasal ledger kayıt adımı bağlandı. Gerçek sağlayıcı girişi denenmeden, onay metadata'sız yerel hesaplarla ledger yazımı/idempotency doğrulandı.
 - Tüm paket 1068 başarılı teste çıktı; son ek iOS seans sonucu/rapor/lig kontrolü de geçti.
 
-Bu değişikliklerin büyük kısmı çalışma ağacında henüz commit edilmemiştir. Dokümanı okuyan ajan yalnızca HEAD'e bakarsa son işi kaçırır.
+5 Ekim çalışması `8a98dab`, doküman takibi `1ab8160` commit’lerinde kayıtlıdır. 7 Ekim turunun düzeltme/test/dokümanları bu yazım sırasında commit edilmedi; `git status` ile koru.
+
+### 7 Ekim sürüm hazırlığı turu
+
+- Flutter analiz temiz; screenshot senaryoları dahil tüm birim/widget 1091/1091, 0 atlama; New York DST alt kümesi 93/93.
+- Gerçek iOS `a,b,c,d` normal koşu ve düzeltme sonrası `e,m,n` 3/3 geçti. İlk `e` silme koşusu gerçek Navigator hatası gösterdi; AppGate tek yönlendirme düzeltmesiyle tekrar yeşil oldu. Hızlandırılmış `f,k,g,h,i,l,m` 7/7 geçti; `q` yalnızca geçici toplu import dosyasıydı.
+- Yeni uygulama içi bildirim, 8 karakter şifre kuralı ve async/navigation/account isolation düzeltmeleri yapıldı. iOS privacy manifest özel kategori/bildirim notu için hesaba bağlı `OtherUserContent` içerir; tracking yok, amaç AppFunctionality; plist lint geçti. Mobil inceleme ve resmi platform koşulları [mobil raporda](analiz/qa_evidence_20261007/mobile_audit/mobile_review.md).
+- Güncel canlı katalog 409 kayıt, 14 ops fonksiyonu ve izole backend 9 paket 466/466 doğrulandı. Üretim yazımı/posta gönderimi yok.
+- Site/Edge ilk düzeltme sonrası 61/61; son tüm Node paketi 99/99 (welcome 15/15, unsubscribe 24/24, delete-account 25/25 alt kümeleri); waitlist onayı, gövde timeout, unsubscribe hata/yeniden deneme ve 8 karakter reset sınırı düzeltildi. TR/EN yasal kaynaklar 7 Ekim’e güncellendi; deploy yapılmadı.
+- Android gerçek UI temel koşusu 6/6, tam koşusu 8/8 geçti. İki platformda gerçek OS süreç sonlandırma/restore tek UUID'yi tek seans olarak kaydetti. Gerçek Android mağaza pipeline 64,2 MB AAB üretti ve imza doğrulaması geçti; mağazaya yüklenmedi. Yerel QA release APK'sı 28,0 MB derlendi; normal main ile emülatörde release giriş/rapor/sekme/sayaç/native bildirim, duraklat/sıfırla ve soğuk açılış kontrolleri geçti; bu koşuda çökme yok. iOS obfuscated imzasız release geçti (28,4 MB uygulama); imzalı IPA kişisel takım/provisioning engelinde kaldı. Son durum [ana QA raporunda](analiz/QA_RELEASE_2026-10-07.md). Önceki 5 Ekim derlemesi bugünkü artifact kanıtı değildir.
 
 ## 7. Normal ve QA çalışma modları — karıştırma
 
@@ -262,9 +274,9 @@ Kök `supabase/migrations/` canlı şemanın tam/birebir migration geçmişi de�
 - Eski `20260928120000_security_hardening_up` uygulanmadı; `session_not_elapsed` canlı kuralı diye kabul etme.
 - `reorder_categories`, `set_my_timezone`, `get_my_category_limit` canlıda yok. Son timezone işi doğrudan izinli kendi `profiles.timezone` UPDATE ile çalışıyor.
 
-Bu belge/son QA sırasında yeniden canlı DB sorgusu yapılmadı; yerel parity mevcut kaydedilmiş canlı fingerprint ile karşılaştırmadır. Yeni DB işi için canlı `pg_get_functiondef`, kolon/yetki/RLS/trigger/cron/migration geçmişini **yeniden** salt okunarak doğrula.
+7 Ekim’de canlı DB/Auth/Edge kataloğu yeniden **salt okunarak** doğrulandı: 409 katalog kaydı 5 Ekim baseline ile aynı; 14 ops fonksiyonu yerel/canlı eşleşiyor ve beklenmedik API EXECUTE grant yok. Kanıtlar `analiz/qa_evidence_20261007/backend/` içinde. İzole test veritabanında 9 paket 466/466 kontrol geçti; ana yerel şema ve üretim değişmedi. Gerçek cron zamanlaması yerine gerçek `process_weekly_leagues` gövdesi kontrollü çağrıyla test edildi. Yeni DB işi için o andaki `pg_get_functiondef`, kolon/yetki/RLS/trigger/cron/migration geçmişini yine salt okunarak doğrula.
 
-SQL işi: `supabase/README.md` ve `AGENTS.md` §2.4 akışını izle; canlı gövdeye göre ileri migration, eski canlı gövdeli rollback, transaction içinde geri alınan DRYRUN üret. Belgede kullanıcı SQL Editor uygulama akışı var; geçmişteki izinli migration uygulamasını yeni canlı yazma izni sayma. Bu oturumdaki yetki yerel test/dokümantasyon içindir.
+SQL işi: `supabase/README.md` ve `AGENTS.md` §2.4 akışını izle; canlı gövdeye göre ileri migration, eski canlı gövdeli rollback, transaction içinde geri alınan DRYRUN üret. Belgede kullanıcı SQL Editor uygulama akışı var; geçmişteki izinli migration uygulamasını yeni canlı yazma izni sayma. 7 Ekim turunda üretim SQL/ayar/deploy değişikliği yapılmadı; kullanıcı erişim yetkisi verse de uygulama/doküman test sonuçları otomatik üretim yazımı değildir.
 
 Korunan para/puan/seri kolonlarına istemciden yazılmaz. Başkasının `profiles` satırı doğrudan okunmaz; yetkili RPC kullanılır. `study_sessions` istemciden INSERT/UPDATE değil RPC ile yazılır. RLS ve SECURITY DEFINER yetkileri korunur; yeni kolon/RPC'de GRANT/REVOKE unutma.
 
@@ -347,32 +359,33 @@ Bu şifre yalnızca disposable **yerel** fikstür şifresidir; canlı kullanıc�
 
 ## 10. Test senaryoları, komutlar ve son sonuçlar
 
-### En son kanıtlanmış sonuç
+### 7 Ekim 2026 güncel sonuçlar
 
 | Kontrol | Sonuç / kapsam |
 |---|---|
 | `flutter analyze` | No issues found |
-| Tüm birim/widget | **1068 geçti**, 5 isteğe bağlı screenshot testi atlandı |
-| New York DST rapor/gün | **93 geçti** |
-| Yeni timezone/arkadaş widget | 9 geçti; iptal, ağ hatası, çift işlem, 6 boyut |
-| Odaklı eski arkadaş/güvenlik/uyumluluk | 66 geçti |
-| iOS ve Android `l` UI | İkisi geçti; native IANA, gerçek yerel DB/cache, arkadaş yönetimi, onay ledger |
-| Son iOS `c` | Tek 25 dk, 5 puan, 20 kum; DB/sonuç/rapor/lig geçti |
-| Android ARM64 release | `app-release.apk` 29.5 MB derlendi |
-| iOS release | İmzasız `Runner.app` 30.4 MB derlendi; cihaza yükleme/archive değil |
-| Önceki JS/Edge ağsız | 35 geçti |
-| Önceki server seans / kategori | 101 / 164 geçti |
-| Önceki avatar / sosyal güvenlik / gerçek yerel mail | 26 / 26 / 9 geçti |
-| Önceki lig SQL / istemci çapraz | 98 / 23 geçti; oda ve satın alma yarışları da sınandı |
-| Parite | QA helper kaldırılınca kayıtlı baseline ile 13/13 ve 27 avatar; helper açıkken beklenen ek fonksiyon |
+| Tüm birim/widget, `SCREENSHOTS=true` | **1091/1091 geçti**, 0 atlama; yeni mobil düzeltmeler dahil |
+| New York DST rapor/gün alt kümesi | **93/93 geçti** |
+| Report/silme/race odaklı küme | 86/86 geçti; tam kümenin alt kümesidir |
+| Gerçek iOS normal UI | `a,b,c,d` geçti; ilk `e` gerçek route yarışını gösterdi, düzeltme sonrası `e,m,n` 3/3 geçti |
+| iOS kayıtlı hızlı toplu koşu | `f,k,g,h,i,l,m` 7/7 geçti; geçici `q` import dosyasıyla çalıştırıldı, seans için 25/50 dakika beklenmedi |
+| İzole backend | 9 paket, **466/466**: seans 101, kategori 164, lig/avatar SQL 98, avatar HTTP 26, sosyal 26, Auth/mail 9, yarış 7, ay/gizlilik/onay/silme 14, report 21 |
+| Güncel canlı salt-okuma | 409 katalog kaydı baseline ile aynı; 14 ops fonksiyonu canlı/yerel eşleşiyor |
+| Site/Edge/e-posta ağsız | **99/99** son tüm Node paketi; site ilk turu 61/61; son welcome 15/15, unsubscribe 24/24, delete-account 25/25; partial sync/statik varlık denetimi temiz |
+| Android gerçek UI | Temel koşu **6/6**, tam koşu **8/8** geçti; beş hesap, kesinti, native bildirim ve uygulama içi report formu dahil |
+| iOS/Android gerçek OS süreç sonlandırma | İki platformda aynı UUID ile tek 50 dk seans/12 puan/20 kum; ikinci açılışta kayıt yine tek |
+| Android mağaza AAB | **64,2 MB**, gerçek pipeline ve mağaza imza doğrulaması geçti; mağazaya yüklenmedi |
+| iOS release / imzalı IPA | Obfuscated imzasız release **28,4 MB** uygulama olarak derlendi; imzalı IPA kişisel takımın Sign In with Apple / Time Sensitive Notifications ve provisioning kısıtında kaldı |
+| Android yerel QA release APK / çalışma kontrolü | **28,0 MB** derlendi; normal main ile emülatörde release giriş/rapor/sekme/sayaç/native bildirim, duraklat/sıfırla ve soğuk açılış kontrolleri geçti; bu koşuda çökme yok. Son artifact/runtime için [ana raporu](analiz/QA_RELEASE_2026-10-07.md) oku |
+| Fiziksel cihaz / gerçek provider login | Doğrulanmadı; Apple provider ayrıca canlıda kapalı |
 
-9, 66 ve 93 sayıları 1068'in üstüne eklenip bağımsız toplam gibi sunulmamalı; bazı testler ayrıca tekrar çalıştırılmış alt kümelerdir. Eski tüm paket 1059'dan yeni 1068'e çıktı.
+Alt küme/tekrar koşular 1091’e eklenip bağımsız toplam yapılmamalı. Backend 466 ve Node 99 ayrı araçların farklı kontrolleridir; tek “uygulama testi” toplamına dönüştürme. 5 Ekim’deki 1068+5 atlama, Android APK 29.5 MB/iOS unsigned 30.4 MB ve önceki OS kill sonuçları tarihsel kanıttır; 7 Ekim derleme sonuçlarının yerine geçmez.
 
 ### Tekrar çalıştırma
 
 ```sh
 flutter analyze
-flutter test --concurrency=2
+flutter test --concurrency=2 --dart-define=SCREENSHOTS=true
 TZ=America/New_York flutter test \
   test/reports_correctness_test.dart test/reports_findings_test.dart \
   test/stats_calculator_test.dart test/study_day_test.dart --concurrency=2
@@ -407,6 +420,10 @@ tool/local_supabase/e2e/sim/run_android_e2e.sh f l
 | `j_android_notifications` | Android gerçek sistem izni/bildirim/alarm teslimi/iptal |
 | `k_ios_native` | iOS provisional bildirim ve gerçek ActivityKit kanal çağrıları |
 | `l_followup_management` | Saat dilimi, DST/cache/DB, cancel/remove/block/unblock UI, onay idempotency |
+| `m_release_journey` | Kategori ekle/ad/arşiv/limit, arşivli rapor geçmişi, tema/dil, avatar bakiye hatası, overlay açıkken çıkış |
+| `n_user_report` | Gerçek UI→yerel RPC bildirim, payload/tek kayıt/mükerrer ve hesap izolasyonu |
+
+`o/q/r` toplu import dosyaları PC yükünü azaltmak için bu turda oluşturulan geçici koşu yardımcılarıydı ve kaldırıldı. Kalıcı testler yukarıdaki `a`–`n` dosyalarıdır; tekrar koşarken geçici dosya adlarına dayanma.
 
 `h` için `E2E_ALLOW_OUTAGE=true` gerekir; sadece yerel API geçici durdurulur ve finally açılır. Native `j` yalnızca Android, `k` yalnızca iOS'ta çalıştır. Cihaz screenshot'ı macOS proje klasörüne yazamıyorsa `/tmp` E2E_SHOT_DIR kullanıp sonradan proje içine kopyala. Test hostu `e2e_host.py` loopback'tedir; Android erişimi ayrı host define ile ayarlanır.
 
@@ -421,11 +438,13 @@ python3 tool/local_supabase/e2e/social_safety_test.py
 
 ### Kanıt dosyaları
 
-- [En yeni okunabilir rapor](analiz/QA_FOLLOWUP_2026-10-05.txt) / [JSON](analiz/QA_FOLLOWUP_2026-10-05.json).
+- [Güncel ana QA raporu](analiz/QA_RELEASE_2026-10-07.md); kanıt kökü `analiz/qa_evidence_20261007/`.
+- [Backend özeti](analiz/qa_evidence_20261007/backend/summary.json), [mobil kod incelemesi](analiz/qa_evidence_20261007/mobile_audit/mobile_review.md), [site raporu](analiz/qa_evidence_20261007/site/report.md), [e-posta özeti](analiz/qa_evidence_20261007/backend/email/summary.json).
+- [5 Ekim takip raporu](analiz/QA_FOLLOWUP_2026-10-05.txt) / [JSON](analiz/QA_FOLLOWUP_2026-10-05.json), tarihsel.
 - [Önceki kapsamlı okunabilir rapor](analiz/QA_FULL_2026-10-05.txt) / [JSON](analiz/QA_FULL_2026-10-05.json).
-- Son loglar `analiz/qa_followup_evidence_20261005/`; önceki `analiz/qa_evidence_20261005/`.
-- Son ekranlar `analiz/ekranlar/20261005_followup/ios`, `android`, `session`; önceki `20261005_full_qa/`.
-- Son elle test görüntüsü `analiz/ekranlar/20261005_followup/ios/elle-test-hazir.png`.
+- 7 Ekim logları `analiz/qa_evidence_20261007/`; 5 Ekim logları `analiz/qa_followup_evidence_20261005/` ve `analiz/qa_evidence_20261005/`.
+- Tarihsel 5 Ekim ekranları `analiz/ekranlar/20261005_followup/ios`, `android`, `session`; önceki `20261005_full_qa/`. 7 Ekim platform görüntüleri ana rapordaki kanıt yollarındadır.
+- 5 Ekim elle test görüntüsü `analiz/ekranlar/20261005_followup/ios/elle-test-hazir.png`.
 - `build/e2e_sim/` ve `/tmp` geçici, silinebilir/üstüne yazılabilir; kalıcı rapor linki için `analiz/` kanıtlarını tercih et.
 
 ### Doğrulanmayanı doğrulanmış sayma
@@ -433,9 +452,9 @@ python3 tool/local_supabase/e2e/social_safety_test.py
 - Gerçek Google/Apple login yerel provider kapalı olduğundan denenmedi. Ledger'ın gerçek yerel RPC'yle yazılması provider auth'un testi değildir.
 - New York IANA yanıtı testte kontrollü MethodChannel taklidi; iki platformun gerçek native kanalı Istanbul döndürdü. Sistem ayarından fiziksel seyahat/saat dilimi değişimi yapılmadı.
 - iOS provisional bildirim teslimi, tam banner/ses/kilit ekranı kullanıcı onayıyla eşdeğer değildir.
-- `c` restore fikstürü gerçek OS kill değildir; ayrı iOS süreç ölümü testi bunu tamamlıyor. Android için aynı OS kill kanıtı yok.
-- Unsigned iOS release / APK derlemesi, mağaza imzası/dağıtım/gerçek cihaz başarısı değildir. Test APK'sı keystore yoksa debug imzalı olabilir; mağaza pipeline ayrı.
-- Yerel Mailpit başarıları üretim SMTP, DNS, deliverability veya Auth panel redirect ayarlarının testi değildir.
+- `c` restore fikstürü gerçek OS kill değildir. 7 Ekim’de ayrıca iOS terminate ve Android force-stop sonrası gerçek restore/tek kayıt iki platformda doğrulandı; güncel kanıt ana QA raporunda. 5 Ekim iOS OS kill ve eski 'Android kill yapılmadı' kayıtları tarihsel kalır.
+- 7 Ekim mağaza AAB imzası doğrulandı; mağazaya yükleme ve fiziksel cihaz testi yapılmadı. İmzasız iOS uygulaması mağazaya yüklenebilir IPA değildir; imzalı IPA kişisel takım/provisioning engelinde kaldı.
+- Yerel Mailpit başarıları tek başına üretim teslimi değildir. 7 Ekim’de Resend domain/DNS ve geçmiş tek Delivered mail salt okunarak görüldü; yeni reset/kayıt/bülten postası gönderilmedi. SMTP alanları Auth config çıktısında redakte/eksik olduğu için güncel SMTP ayarı doğrulanmış sayılmaz.
 
 ## 11. Site, e-posta ve mağaza bağlantıları
 
@@ -445,9 +464,13 @@ Dokunulmaz URL'ler: `/terms`, `/privacy`, `/kvkk`, `/hesap-silme`, `/destek`, `/
 
 Auth mail şablonları `supabase/auth-email-templates/`; reset token_hash ve TR/EN bağlantıları burada belgeli. Bunların repo kopyası Auth paneline uygulanmış sayılmaz.
 
-E-posta: Auth mail ve pazarlama hoş geldin/bülteni ayrı akışlar. `send-welcome-email`, `marketing_subscribers` insert trigger'ı, Resend ve gönderici kimliğine bağlı. `unsubscribe` token-only POST; bülten `send_newsletter.js`, önce dry-run. 5 Ekim `supabase/auth-email-templates/README.md` kaydı: Resend doğrulandı, Auth maili Delivered, DMARC `p=none` mevcut; welcome repo sürümü v9 yayında. `MAIL_SENDER_NAME` / `MAIL_SENDER_ADDRESS` kullanıcı tercihiyle tanımlı değil, bu yüzden welcome 500 döner/satır sahiplenmez ve bülten gönderilmez. Auth kayıt/reset maili bu kimlik şartından etkilenmez. Kullanıcı kimlik bilgisi verince secret tanımı yeterli; yeniden deploy gerekmez. Bunlar kayıtlı durumdur; yeni e-posta işinde gerçek panel/secret/deploy durumu ayrıca kontrol edilmeli, bu devir turunda canlı kontrol edilmedi.
+E-posta: Auth mail ve pazarlama hoş geldin/bülteni ayrı akışlar. `send-welcome-email`, `marketing_subscribers` insert trigger’ı, Resend ve gönderici kimliğine bağlı. `unsubscribe` token-only POST; bülten `send_newsletter.js`, önce dry-run.
 
-Mağaza pipeline `scripts/build_release.sh android|ios|all`: obfuscation, split-debug-info, Sentry sembolleri, keystore/provisioning. QA'daki sade release derlemeleri bu yayın pipeline'ını tamamlamadı; deploy/publish otomatik yapılmadı.
+7 Ekim salt-okuma doğrulaması: Resend `mail.pomosprint.app` verified; DKIM/SPF kayıtları verified, sending açık, receiving kapalı, Ireland/eu-west-1. Son 15 günlük panelde 1 geçmiş parola sıfırlama maili Delivered, 0 bounce/complaint görüldü; yeni posta gönderilmedi. `RESEND_API_KEY` var, `MAIL_SENDER_NAME`/`MAIL_SENDER_ADDRESS` yok. Welcome bu nedenle satırı sahiplenmeden başarısız olur, bülten gönderici kimliği olmadan gönderilmez; Auth kayıt/reset ayrı akıştır. Auth CLI yapılandırması SMTP alanlarını redakte/eksik verdi; geçmiş teslim güncel SMTP alanlarını doğrulamaz. Kanıtlar `analiz/qa_evidence_20261007/backend/email/` içinde.
+
+Canlı welcome v9 ve unsubscribe v10, 7 Ekim yerel düzeltmelerinden eskidir. Welcome identity/network/idempotent-retry 15/15; unsubscribe iki liste/hata-retry düzeltmeleriyle tüm Node paketi 99/99 kaynakta test edildi fakat deploy edilmedi. Gönderici/geliştirici kimliği kullanıcı tarafından verilmeli; AI uydurmaz. Yeni deploy veya posta testi bu belge güncellemesinin parçası değildir.
+
+Mağaza pipeline `scripts/build_release.sh android|ios|all`: obfuscation, split-debug-info, Sentry sembolleri, keystore/provisioning. 7 Ekim Android pipeline ile 64,2 MB AAB üretildi ve mağaza imzası doğrulandı. iOS obfuscated imzasız release geçti (28,4 MB uygulama); imzalı IPA kişisel takımın Sign In with Apple / Time Sensitive Notifications ve provisioning kısıtında kaldı. Android yerel QA release APK'sı 28,0 MB derlendi; gerçek release çalışma kontrolü emülatörde geçti. Son artifact/runtime ve sembol yükleme durumu ana QA raporunda. Deploy/publish yapılmadı.
 
 ## 12. Kalan işler ve sonraki oturum için önerilen sıra
 
@@ -463,10 +486,10 @@ Mağaza pipeline `scripts/build_release.sh android|ios|all`: obfuscation, split-
 
 - Canlı migration geçmişi/baseline düzeni; kök CLI push güvenli hâle getirilmeden kullanılmamalı.
 - Veri sorumlusu ve gönderici kimlik bilgileri gerçek kullanıcı/kurum bilgisiyle doldurulmalı; AI uydurmaz.
-- Welcome sender kimliği hâlâ bekliyor; repo kaydına göre v9 deploy, Resend/Auth SMTP ve DMARC tamamlandı. Yeni operasyon işinde panel/secret/DNS ve redirect durumunu yeniden doğrula; eski rapordaki “Resend/DMARC yok” ifadesini güncel açık iş sayma.
-- `delete-account` Edge Function deploy + Apple token revoke secrets/capability; SQL fallback çalışıyor fakat Apple revoke farklı adım.
-- Waitlist consent payload, site deploy ve sonra `proposed/19` B; sıralama bozulursa yeni kayıtlar durabilir.
-- Gerçek report formunu `submit_user_report`'a bağlama; şu an mailto.
+- Welcome sender kimliği 7 Ekim salt-okuma secret adlarında hâlâ yok; Resend domain verified ve geçmiş Auth Delivered kanıtı mevcut. Kaynak welcome/unsubscribe düzeltmeleri deploy edilmedi. SMTP alanları güncel çıktıda doğrulanamadı; eski “Resend/DMARC yok” ifadesini güncel açık iş sayma.
+- Canlı Apple provider kapalı/client ID boş; `delete-account` Edge Function yok. Provider/capability/secrets, Apple token revoke ve gerçek signed cihaz login/delete doğrulaması yayın engelidir; SQL fallback hesabı siler fakat revoke yapmaz.
+- Waitlist consent payload 7 Ekim kaynakta düzeltildi/test edildi; site deploy ve sonra `proposed/19` B bekliyor. Sıralama bozulursa yeni kayıtlar durabilir. TR/EN yasal kaynaklar 7 Ekim’e güncel, developer kimliği placeholder ve deploy bekliyor.
+- Uygulama içi report formu tamamlandı ve yerel UI/RPC testleri geçti. Bildirimlerin ops tarafından ele alınması, Store Data Safety/App Privacy etiketleri, exact-alarm beyanı ve signed dağıtım operasyonları ayrıca tamamlanmalı.
 - Lig eşikleri 1/1/1 mi 3/25/25 mi, ilk oda 7–14 gün, 24 saat pencere ve unverified cap ürün kararları; test bulgusu diye otomatik değiştirilmez.
 - Google plugin 7.x göçü, güvenli token depolama, servis katmanını bölme, eski çeviri yollarını ARB'ye taşıma ayrı teknik işler.
 - Git çalışma ağacının gözden geçirilip commit edilmesi ve repo hijyeni; mevcut işi silerek “temiz” hâle getirme.
@@ -484,11 +507,11 @@ Bir özellik/sözleşme/test değiştiğinde ilgili `AGENTS.md` bölümünü ve 
 - Hangi önceki bulgu tamamlandı; eski raporu silmek yerine takip kaydıyla ilişkilendir.
 - Elle test için kalan hesap/cihaz/helper ve normal moda geri dönüş komutu.
 
-Yeni sohbete verilebilecek kısa başlangıç talimatı: **“Önce kökteki PROJE_DEVIR.md ve AGENTS.md dosyalarını oku; git status ile commit edilmemiş işleri koru. Son kapsam QA_FOLLOWUP_2026-10-05'tir. Yalnızca yerel Supabase ile test et; fiziksel cihaz testleri ayrıca bekliyor.”**
+Yeni sohbete verilebilecek kısa başlangıç talimatı: **“Önce kökteki PROJE_DEVIR.md ve AGENTS.md dosyalarını oku; git status ile commit edilmemiş işleri koru. Son kapsam QA_RELEASE_2026-10-07’dir. Yalnızca yerel Supabase ile test et; fiziksel cihaz testleri ayrıca bekliyor.”**
 
 
 ## 14. Git / bilgisayarlar arası devir
 
-5 Ekim 2026'da mevcut `KrAlmano/PomoSprint` GitHub deposunun gizli olduğu doğrulandı. Yerel `main` dalı uzaktaki `origin/main`'e göre 57 commit ilerideydi; bu 57 commit ile o tarihteki 132 dosya/README/QA değişikliği, sır kalıbı taraması ve `.env` dışlama kontrolünden sonra `8a98dab` commit'iyle `origin/main`'e gönderildi. Push sonrasında yerel `main` ve özel GitHub `main` aynı commit'e geldi, çalışma ağacı temizdi.
+5 Ekim 2026'da mevcut `KrAlmano/PomoSprint` GitHub deposunun gizli olduğu doğrulandı. Yerel `main` dalı uzaktaki `origin/main`'e göre 57 commit ilerideydi; bu 57 commit ile o tarihteki 132 dosya/README/QA değişikliği, sır kalıbı taraması ve `.env` dışlama kontrolünden sonra `8a98dab` commit'iyle `origin/main`'e gönderildi. Push sonrasında yerel `main` ve özel GitHub `main` aynı commit’e geldi, çalışma ağacı temizdi. Ardından `1ab8160` doküman takibi eklendi. 7 Ekim QA paketi `fix: resolve release QA findings and record end-to-end evidence` commit başlığı altında kaynak, test, seçilmiş ekran ve kanıt/devir güncellemelerini içerir. Depo erişimi 7 Ekim yeniden kontrol edildi: authenticated Git erişimi var, anonim GitHub API 404; özel repo durumunun kanıtı `analiz/qa_evidence_20261007/github_access_check.json`. Commit kimliği ve güncel remote senkronu için `git status`/`git log`/uzak branch kontrolü yap. İkili release paketleri ve semboller ignore edilen yerel dizinlerde; Git ile taşınmaz.
 
 Bu bölümün eski 5 Ekim çalışma ağacı listesini saklamıyorum; artık güncel gerçek değil. Sonraki oturumda yine `git status --short` ve `git log -5 --oneline` çalıştır. Yeni doküman değişiklikleri veya başka makinelerdeki commit'ler bu commit'ten sonra gelmiş olabilir. `.env`, `scripts/.env` ve `.claude/settings.local.json` ignore edilir; başka makineye taşıma için secrets olmayan kaynakları push etmek yeterli, yerel secret/settings dosyaları ayrıca güvenli şekilde kurulur. GitHub deposunu başka bilgisayarda clone et ve yeni sohbetten önce `PROJE_DEVIR.md` ile `AGENTS.md`'yi aç.

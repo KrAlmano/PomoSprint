@@ -1,0 +1,10 @@
+{
+  "client_env_present": true,
+  "key_names": [
+    "SUPABASE_URL",
+    "SUPABASE_ANON_KEY",
+    "SENTRY_DSN"
+  ],
+  "unexpected_keys": [],
+  "values_retained": false
+}

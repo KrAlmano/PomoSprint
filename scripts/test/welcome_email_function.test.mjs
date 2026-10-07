@@ -21,11 +21,13 @@ const ENV = {
 let fn;
 let sent;
 let resendStatus;
+let resendThrow;
 
 before(async () => {
   fn = await loadEdgeFunction("supabase/functions/send-welcome-email/index.ts", ENV);
   globalThis.fetch = async (url, init) => {
     sent.push({ url: String(url), init, body: JSON.parse(init.body) });
+    if (resendThrow) throw new TypeError("Network failed");
     return new Response(resendStatus === 200 ? '{"id":"email_1"}' : '{"message":"fail"}', { status: resendStatus });
   };
 });
@@ -34,6 +36,7 @@ beforeEach(() => {
   Object.assign(fn.env, ENV);
   sent = [];
   resendStatus = 200;
+  resendThrow = false;
   globalThis.__fakeDb = {
     tables: {
       marketing_subscribers: [{
@@ -126,6 +129,9 @@ test("daha önce gönderilmişse ya da e-posta uyuşmuyorsa gönderim yok", asyn
   const mismatch = await invoke({ id: "s1", email: "mallory@example.com" });
   assert.deepEqual(await mismatch.json(), { skipped: true });
   assert.equal(sent.length, 0);
+  assert.equal(row().welcome_sent_at, null, "yanlış adres geçerli abonenin hoş geldin mailini engellememeli");
+  const correct = await invoke();
+  assert.deepEqual(await correct.json(), { sent: true });
 });
 
 test("bir saatten eski satıra gönderim yok", async () => {
@@ -133,4 +139,92 @@ test("bir saatten eski satıra gönderim yok", async () => {
   const res = await invoke();
   assert.deepEqual(await res.json(), { skipped: true });
   assert.equal(sent.length, 0);
+});
+
+test("ağ kesintisi 502 döner, işaret geri alınır ve aynı anahtarla tekrar denenir", async () => {
+  resendThrow = true;
+  const failed = await invoke();
+  assert.equal(failed.status, 502);
+  assert.deepEqual(await failed.json(), { error: "Email provider error" });
+  assert.equal(row().welcome_sent_at, null);
+  assert.ok(sent[0].init.signal instanceof AbortSignal, "Resend isteğinin sınırlı bekleme süresi olmalı");
+  const key = sent[0].init.headers["Idempotency-Key"];
+  assert.equal(key, "welcome-subscriber/s1");
+  resendThrow = false;
+  const retry = await invoke();
+  assert.deepEqual(await retry.json(), { sent: true });
+  assert.equal(sent[1].init.headers["Idempotency-Key"], key);
+  const repeated = await invoke();
+  assert.deepEqual(await repeated.json(), { skipped: true });
+  assert.equal(sent.length, 2, "başarılı kayda üçüncü provider isteği gitmemeli");
+});
+
+test("adres karşılaştırması büyük harfi kabul eder, LIKE jokerlerini literal eşler", async () => {
+  row().email = "a_b%tag@example.com";
+  const mismatch = await invoke({ id: "s1", email: "axbZZtag@example.com" });
+  assert.deepEqual(await mismatch.json(), { skipped: true });
+  assert.equal(row().welcome_sent_at, null);
+  const match = await invoke({ id: "s1", email: "A_B%TAG@EXAMPLE.COM" });
+  assert.deepEqual(await match.json(), { sent: true });
+  assert.deepEqual(sent[0].body.to, ["a_b%tag@example.com"]);
+});
+
+test("PostgREST yıldız/regex jokeri gerçek abonenin e-postası yerine geçmez", async () => {
+  for (const email of ["*", "*@example.com", ".*@example.com", "ayse.yilmaz@.*"]) {
+    const mismatch = await invoke({ id: "s1", email });
+    assert.deepEqual(await mismatch.json(), { skipped: true });
+    assert.equal(row().welcome_sent_at, null);
+  }
+  assert.equal(sent.length, 0);
+  row().email = "a*b+tag@example.com";
+  const match = await invoke({ id: "s1", email: "A*B+TAG@EXAMPLE.COM" });
+  assert.deepEqual(await match.json(), { sent: true });
+  assert.deepEqual(sent[0].body.to, ["a*b+tag@example.com"]);
+});
+
+test("yanlış payload, yöntem ve olmayan kayıt gönderim başlatmaz", async () => {
+  const malformed = await invoke({ id: { invalid: true }, email: EMAIL });
+  assert.equal(malformed.status, 400);
+  const method = await fn.handler(new Request(URL_, { method: "GET" }));
+  assert.equal(method.status, 405);
+  const missing = await invoke({ id: "absent", email: EMAIL });
+  assert.deepEqual(await missing.json(), { skipped: true });
+  assert.equal(sent.length, 0);
+  assert.equal(row().welcome_sent_at, null);
+});
+
+test("DB sahiplenme hatasında gönderim yapılmaz", async () => {
+  globalThis.__fakeDb.failures["marketing_subscribers.update"] = "DB unavailable";
+  const res = await invoke();
+  assert.equal(res.status, 500);
+  assert.deepEqual(await res.json(), { error: "Database error" });
+  assert.equal(sent.length, 0);
+});
+
+test("iki eşzamanlı webhook yalnızca bir provider gönderimi başlatır", async () => {
+  const responses = await Promise.all([invoke(), invoke()]);
+  const bodies = await Promise.all(responses.map((res) => res.json()));
+  assert.deepEqual(bodies.filter((body) => body.sent), [{ sent: true }]);
+  assert.deepEqual(bodies.filter((body) => body.skipped), [{ skipped: true }]);
+  assert.equal(sent.length, 1);
+});
+
+test("provider hatasında geri alma da bozulursa DB hatası açıkça döner", async () => {
+  globalThis.fetch = async (_url, init) => {
+    sent.push({ init });
+    globalThis.__fakeDb.failures["marketing_subscribers.update"] = "DB unavailable";
+    return new Response('{"message":"fail"}', { status: 500 });
+  };
+  try {
+    const res = await invoke();
+    assert.equal(res.status, 500);
+    assert.deepEqual(await res.json(), { error: "Database error" });
+    assert.ok(row().welcome_sent_at, "geri alma başarısızlığı gizlenmemeli");
+  } finally {
+    globalThis.fetch = async (url, init) => {
+      sent.push({ url: String(url), init, body: JSON.parse(init.body) });
+      if (resendThrow) throw new TypeError("Network failed");
+      return new Response(resendStatus === 200 ? '{"id":"email_1"}' : '{"message":"fail"}', { status: resendStatus });
+    };
+  }
 });

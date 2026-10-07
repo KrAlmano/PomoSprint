@@ -67,6 +67,54 @@ void main() {
   });
 
   group('HiddenUsersStore (hesaba bağlı, cihazda)', () {
+    test(
+      'çıkış sırasında bekleyen eski okuma gizli listeyi yeniden yayınlamaz',
+      () async {
+        SharedPreferences.setMockInitialValues({
+          HiddenUsersStore.keyFor('old'): '[{"id":"x","name":"Eski"}]',
+        });
+        final store = HiddenUsersStore.instance;
+        final loading = store.load('old');
+        await store.load(null);
+        await loading;
+        expect(store.hidden.value.isEmpty, isTrue);
+      },
+    );
+
+    test(
+      'hesap silme bekleyen gizli liste okumasını da geçersiz kılar',
+      () async {
+        SharedPreferences.setMockInitialValues({
+          HiddenUsersStore.keyFor('deleted'): '[{"id":"x","name":"Silinen"}]',
+        });
+        final store = HiddenUsersStore.instance;
+        final loading = store.load('deleted');
+        await store.forget('deleted');
+        await loading;
+        expect(store.hidden.value.isEmpty, isTrue);
+        final prefs = await SharedPreferences.getInstance();
+        expect(prefs.containsKey(HiddenUsersStore.keyFor('deleted')), isFalse);
+      },
+    );
+
+    test(
+      'eşzamanlı hesap okumalarında son seçilen hesabın listesi kalır',
+      () async {
+        SharedPreferences.setMockInitialValues({
+          HiddenUsersStore.keyFor('a'): '[{"id":"a-hidden","name":"A"}]',
+          HiddenUsersStore.keyFor('b'): '[{"id":"b-hidden","name":"B"}]',
+        });
+        final store = HiddenUsersStore.instance;
+        await store.load('a');
+        final first = store.load('b');
+        final last = store.load('a');
+        await Future.wait([first, last]);
+        expect(store.hidden.value.isHidden(id: 'a-hidden'), isTrue);
+        expect(store.hidden.value.isHidden(id: 'b-hidden'), isFalse);
+      },
+    );
+
+
     test('gizle, sıfırla ve hesaplar birbirinden ayrı', () async {
       final store = HiddenUsersStore.instance;
       await store.hide('me-1', const HiddenUser(id: 'x', name: 'X'));

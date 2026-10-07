@@ -42,6 +42,7 @@ app.*.map.json
 # scripts/build_release.sh: sürüm başına semboller, R8 mapping ve derleme
 # sırasında yazılan geçici Sentry ProGuard UUID dosyası
 /release_symbols/
+/release_artifacts/
 android/app/src/main/assets/sentry-debug-meta.properties
 
 # Android Studio will place build artifacts here

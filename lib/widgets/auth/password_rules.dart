@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import '../../l10n/app_localizations.dart';
 import '../../theme.dart';
 
-/// Supabase Auth şifre kuralı (panel: en az 6 karakter; küçük harf, büyük
+/// Supabase Auth şifre kuralı (panel: en az 8 karakter; küçük harf, büyük
 /// harf ve rakam). Sitedeki sıfırlama sayfası (landing/js/reset-password.js)
 /// ve `authErrWeakPassword` metni aynı kuralı söyler; panel ayarı değişirse
 /// üçü birlikte değişmeli. Sunucu ASCII harf/rakam arar (ş, ğ sayılmaz).
 class PasswordRules {
   PasswordRules._();
 
-  static const int minLength = 6;
+  static const int minLength = 8;
 
   static bool hasMinLength(String value) => value.length >= minLength;
   static bool hasMixedCase(String value) => value.contains(RegExp('[a-z]')) && value.contains(RegExp('[A-Z]'));

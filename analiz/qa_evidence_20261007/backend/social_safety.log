@@ -1,0 +1,26 @@
+PASS Başkasının profili RLS ile görünmez
+PASS Başkasının kategorileri RLS ile görünmez
+PASS Doğrudan coins değiştirilemez
+PASS Doğrudan lifetime_points değiştirilemez
+PASS Doğrudan current_streak değiştirilemez
+PASS Kendi arkadaş kodu reddedilir
+PASS Geçersiz arkadaş kodu reddedilir
+PASS Arkadaş isteği gönderilir
+PASS Giden istek yalnızca gönderende görünür
+PASS Gelen istek yalnızca hedefte görünür
+PASS Bekleyen istek arkadaş değildir
+PASS Aynı istek ikinci kez kabul edilmez
+PASS Üçüncü kişi isteği kabul edemez
+PASS Giden istek iptal edilir
+PASS Alıcı isteği reddedebilir
+PASS Reddedilen istek bekleme süresinde tekrar gönderilemez
+PASS Reddeden taraf ters yönde istek gönderebilir
+PASS Alıcı isteği kabul eder
+PASS Arkadaşlık iki yönlüdür
+PASS Odak arkadaşta görünür, üçüncü kişide görünmez
+PASS Engel arkadaşlığı iki yönlü kaldırır
+PASS Engelleyen canlı odakta diğerini görmez
+PASS Engellenen yeniden istek gönderemez
+PASS Engel kaldırılır
+PASS Engeli kaldırmak arkadaşlığı otomatik geri açmaz
+PASS Arkadaş silme iki yönlüdür

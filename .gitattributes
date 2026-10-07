@@ -1,0 +1,2 @@
+# Preserve generated QA stdout, including aligned psql and CLI progress output.
+analiz/qa_evidence_20261007/**/*.log -whitespace

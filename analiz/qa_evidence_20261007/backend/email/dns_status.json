@@ -1,0 +1,62 @@
+{
+  "resend._domainkey.mail.pomosprint.app TXT": {
+    "answer_present": true,
+    "exit_code": 0,
+    "sha256": "5a1eda1e5cbf9671449a6672b1ee85414c77b09af6aaa6b3550b95069ab8f3f1",
+    "public_key_present": true
+  },
+  "send.mail.pomosprint.app CNAME": {
+    "answer_present": true,
+    "exit_code": 0,
+    "records": [
+      "send.forge.rmta.net."
+    ]
+  },
+  "rsend.mail.pomosprint.app CNAME": {
+    "answer_present": true,
+    "exit_code": 0,
+    "records": [
+      "rsend-euw1.forge.rmta.net."
+    ]
+  },
+  "_dmarc.pomosprint.app TXT": {
+    "answer_present": true,
+    "exit_code": 0,
+    "policy": "p=none",
+    "report_destination_host": "dmarc-reports.cloudflare.net"
+  },
+  "_dmarc.mail.pomosprint.app TXT": {
+    "answer_present": false,
+    "exit_code": 0,
+    "policy": null,
+    "record": ""
+  },
+  "send.forge.rmta.net TXT": {
+    "answer_present": true,
+    "exit_code": 0,
+    "records": [
+      "\"v=spf1 ip4:52.3.252.119 ip4:44.222.39.36 ip4:199.249.231.0/24 ~all\""
+    ]
+  },
+  "rsend-euw1.forge.rmta.net TXT": {
+    "answer_present": true,
+    "exit_code": 0,
+    "records": [
+      "\"v=spf1 include:amazonses.com ~all\""
+    ]
+  },
+  "send.forge.rmta.net MX": {
+    "answer_present": true,
+    "exit_code": 0,
+    "records": [
+      "10 feedback.forge.rmta.net."
+    ]
+  },
+  "rsend-euw1.forge.rmta.net MX": {
+    "answer_present": true,
+    "exit_code": 0,
+    "records": [
+      "10 feedback-smtp.eu-west-1.amazonses.com."
+    ]
+  }
+}

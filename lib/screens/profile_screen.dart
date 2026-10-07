@@ -30,6 +30,7 @@ import 'character_collection_screen.dart';
 /// (SupabaseService.currentUser) okunur; isim, avatar ve satın alma
 /// değişiklikleri servis tarafından oraya yazılır ve shell'e de yansır.
 class ProfileScreen extends StatefulWidget {
+  final SupabaseService? service;
   final ValueChanged<bool> onDarkModeChanged;
   final VoidCallback onLogout;
 
@@ -43,6 +44,7 @@ class ProfileScreen extends StatefulWidget {
     required this.onDarkModeChanged,
     required this.onLogout,
     this.activeTimerSessionCheck,
+    this.service,
   });
 
   @override
@@ -53,7 +55,7 @@ class _ProfileScreenState extends State<ProfileScreen> with WidgetsBindingObserv
   static const int _nameMinLength = 2;
   static const int _nameMaxLength = 30;
 
-  final SupabaseService _service = SupabaseService.instance;
+  SupabaseService get _service => widget.service ?? SupabaseService.instance;
   UserModel? _user;
   // Anahtar "tercih açık VE sistem izni var" durumunu gösterir.
   bool _notificationsEnabled = true;
@@ -62,6 +64,8 @@ class _ProfileScreenState extends State<ProfileScreen> with WidgetsBindingObserv
   bool _isUpdatingNotifications = false;
   String? _appVersion;
   bool _socialVisibilityEnabled = true;
+  bool _isLoadingSocialVisibility = true;
+  bool _isUpdatingSocialVisibility = false;
   late final TextEditingController _nameController;
   late final TextEditingController _emailController;
   bool _isSavingName = false;
@@ -132,8 +136,13 @@ class _ProfileScreenState extends State<ProfileScreen> with WidgetsBindingObserv
   }
 
   Future<void> _loadSocialVisibility() async {
+    final ownerId = _user?.id;
     final value = await _service.getSocialVisibility();
-    if (mounted) setState(() => _socialVisibilityEnabled = value);
+    if (!mounted || _service.currentUser.value?.id != ownerId) return;
+    setState(() {
+      _socialVisibilityEnabled = value;
+      _isLoadingSocialVisibility = false;
+    });
   }
 
   // Yalnızca kayıtlı tercihe değil sistem iznine de bakılır: izin
@@ -270,15 +279,21 @@ class _ProfileScreenState extends State<ProfileScreen> with WidgetsBindingObserv
   }
 
   Future<void> _setSocialVisibility(bool value) async {
+    if (_isLoadingSocialVisibility || _isUpdatingSocialVisibility) return;
+    final previous = _socialVisibilityEnabled;
+    final ownerId = _user?.id;
     final l10n = AppLocalizations.of(context)!;
     final messenger = ScaffoldMessenger.of(context);
-    setState(() => _socialVisibilityEnabled = value);
+    setState(() {
+      _socialVisibilityEnabled = value;
+      _isUpdatingSocialVisibility = true;
+    });
     try {
       await _service.setSocialVisibility(value);
     } catch (e) {
       debugPrint('[PROFILE] Sosyal görünürlük kaydedilemedi: $e');
-      if (!mounted) return;
-      setState(() => _socialVisibilityEnabled = !value);
+      if (!mounted || _service.currentUser.value?.id != ownerId) return;
+      setState(() => _socialVisibilityEnabled = previous);
       messenger.showSnackBar(
         SnackBar(
           content: Text(socialErrorText(l10n, e)),
@@ -286,6 +301,10 @@ class _ProfileScreenState extends State<ProfileScreen> with WidgetsBindingObserv
           behavior: SnackBarBehavior.floating,
         ),
       );
+    } finally {
+      if (mounted && _service.currentUser.value?.id == ownerId) {
+        setState(() => _isUpdatingSocialVisibility = false);
+      }
     }
   }
 
@@ -722,7 +741,7 @@ class _ProfileScreenState extends State<ProfileScreen> with WidgetsBindingObserv
             // ve arkadaşların canlı listesi (lig grubu ve arkadaş listesi değil).
             SwitchListTile(
               value: _socialVisibilityEnabled,
-              onChanged: _setSocialVisibility,
+              onChanged: (_isLoadingSocialVisibility || _isUpdatingSocialVisibility) ? null : _setSocialVisibility,
               title: Text(l10n.profileSocialVisibilityTitle, style: titleStyle),
               subtitle: Text(
                 l10n.profileSocialVisibilitySub,
@@ -901,7 +920,7 @@ class _ProfileScreenState extends State<ProfileScreen> with WidgetsBindingObserv
     } catch (e) {
       debugPrint('[PROFILE] E-posta uygulaması açılamadı: $e');
     }
-    if (opened) return;
+    if (opened || !mounted) return;
     // E-posta uygulaması yoksa adres gösterilir ve kopyalanabilir.
     messenger.showSnackBar(SnackBar(
       content: Text(l10n.supportMailFailed(kSupportEmail)),
@@ -924,9 +943,11 @@ class _ProfileScreenState extends State<ProfileScreen> with WidgetsBindingObserv
       await HiddenUsersStore.instance.clear(uid);
     } catch (e) {
       debugPrint('[PROFILE] Gizlenen kullanıcılar sıfırlanamadı: $e');
+      if (!mounted) return;
       messenger.showSnackBar(SnackBar(content: Text(l10n.profileSettingSaveError), behavior: SnackBarBehavior.floating));
       return;
     }
+    if (!mounted) return;
     messenger.showSnackBar(SnackBar(content: Text(l10n.hiddenUsersCleared), behavior: SnackBarBehavior.floating));
   }
 
@@ -1084,7 +1105,7 @@ class _ProfileScreenState extends State<ProfileScreen> with WidgetsBindingObserv
     setState(() => _isDeleting = true);
     final appleCode = _service.canReauthorizeWithApple ? await _service.requestAppleAuthorizationCode() : null;
     if (!mounted) return;
-    unawaited(showDialog<void>(
+    final progressRoute = DialogRoute<void>(
       context: context,
       barrierDismissible: false,
       builder: (_) => PopScope(
@@ -1103,18 +1124,17 @@ class _ProfileScreenState extends State<ProfileScreen> with WidgetsBindingObserv
           ),
         ),
       ),
-    ));
+    );
+    unawaited(navigator.push(progressRoute));
 
     try {
       await _service.deleteUserAccount(appleAuthorizationCode: appleCode);
-      if (!mounted) return;
-      navigator.pop(); // ilerleme diyaloğu
-      navigator.pop(); // profil ekranı
-      widget.onLogout();
+      // Servis oturumu kapatır; AppGate tüm hesap route'larını kapatır.
+      // Buradan pop yapmak aynı diyaloğu/profili ikinci kez kapatıyordu.
     } catch (e) {
       debugPrint('[PROFILE] Hesap silinemedi: $e');
       if (!mounted) return;
-      navigator.pop(); // ilerleme diyaloğu
+      if (progressRoute.isActive) navigator.removeRoute(progressRoute);
       setState(() => _isDeleting = false);
       messenger.showSnackBar(
         SnackBar(

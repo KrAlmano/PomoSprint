@@ -25,12 +25,18 @@ class _AppGateState extends State<AppGate> {
   final SupabaseService _service = SupabaseService.instance;
   late List<CourseCategory> _bootCategories;
   late final String? _bootUserEmail;
+  String? _lastOwnerKey;
+  int _ownerRevision = 0;
+  bool _closeAccountRoutesPending = false;
+
+  String? _ownerKey(UserModel? user) => user == null ? null : user.id ?? user.email.toLowerCase();
 
   @override
   void initState() {
     super.initState();
     _bootCategories = widget.initialCategories;
     _bootUserEmail = _service.currentUser.value?.email;
+    _lastOwnerKey = _ownerKey(_service.currentUser.value);
     _service.currentUser.addListener(_onUserChanged);
   }
 
@@ -43,7 +49,22 @@ class _AppGateState extends State<AppGate> {
   // Çıkıştan sonra açılıştaki kategoriler artık kullanılmaz; yeni kabuk
   // kategorileri kendisi yükler.
   void _onUserChanged() {
-    if (_service.currentUser.value == null) _bootCategories = const [];
+    final ownerKey = _ownerKey(_service.currentUser.value);
+    final previousOwnerKey = _lastOwnerKey;
+    _lastOwnerKey = ownerKey;
+    if (previousOwnerKey != ownerKey) _ownerRevision++;
+    if (ownerKey == null) _bootCategories = const [];
+    if (previousOwnerKey != ownerKey && (previousOwnerKey != null || _closeAccountRoutesPending)) {
+      _closeAccountRoutesPending = true;
+      final revision = _ownerRevision;
+      // Profil, koleksiyon ve sheet'ler kökün üstünde ayrı route'lardır.
+      // Eski hesabın ekranları çıkışta/yeni hesaba geçişte açık kalmamalı.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || revision != _ownerRevision) return;
+        _closeAccountRoutesPending = false;
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      });
+    }
   }
 
   Future<void> _onSignedIn(UserModel user) async {
@@ -68,10 +89,13 @@ class _AppGateState extends State<AppGate> {
           return LoginScreen(onLoginSuccess: _onSignedIn);
         }
         if (user.onboardingCompletedAt == null) {
-          return PostAuthOnboardingScreen(onCompleted: _onOnboardingCompleted);
+          return PostAuthOnboardingScreen(
+            key: ValueKey(_ownerKey(user)),
+            onCompleted: _onOnboardingCompleted,
+          );
         }
         return MainNavigationShell(
-          key: ValueKey(user.email.toLowerCase()),
+          key: ValueKey(_ownerKey(user)),
           user: user,
           initialCategories: user.email == _bootUserEmail ? _bootCategories : const [],
         );

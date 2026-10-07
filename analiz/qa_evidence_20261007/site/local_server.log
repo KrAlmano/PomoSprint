@@ -1,0 +1,74 @@
+QA mock HTTP server on http://127.0.0.1:8187; production requests disabled
+127.0.0.1 - - [07/Oct/2026 10:06:57] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:06:57] "GET /css/fonts.css?v=20261003 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:06:57] "GET /css/style.css?v=20261003d HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:06:57] "GET /js/boot.js?v=20261003b HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:06:57] "GET /avatars/avatar_2_glasses.webp HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:06:57] "GET /avatars/avatar_5_flower.webp HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:06:57] "GET /avatars/avatar_7_scholar.webp HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:06:57] "GET /avatars/avatar_3_gentleman.webp HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:06:57] "GET /avatars/avatar_1_gamer.webp HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:06:57] "GET /avatars/avatar_4_bowtie.webp HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:06:57] "GET /avatars/avatar_6_cool.webp HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:06:57] "GET /avatars/avatar_9_viking.webp HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:06:57] "GET /avatars/avatar_10_dentist.webp HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:06:57] "GET /avatars/avatar_8_striped.webp HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:06:57] "GET /avatars/avatar_12_builder.webp HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:06:57] "GET /avatars/avatar_11_doctor.webp HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:06:57] "GET /avatars/avatar_13_pilot.webp HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:06:57] "GET /avatars/avatar_14_teacher.webp HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:06:57] "GET /avatars/avatar_15_athlete.webp HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:06:57] "GET /avatars/avatar_16_basic.webp HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:06:57] "GET /vendor/gsap-3.13.0/gsap.min.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:06:57] "GET /js/main.js?v=20261007a HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:06:57] "GET /js/config.js?v=20261003 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:06:57] "GET /vendor/gsap-3.13.0/ScrollTrigger.min.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:06:58] "GET /fonts/nunito-v32-latin.woff2 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:06:58] "GET /fonts/nunito-v32-latin-ext.woff2 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:06:58] "GET /fonts/baloo2-v23-latin-ext.woff2 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:06:58] "GET /fonts/baloo2-v23-latin.woff2 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:06:58] "POST /rest/v1/rpc/get_public_monthly_leaderboard HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:06:58] "GET /favicon.svg HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:07:45] "GET /favicon.ico HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:09:51] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:09:51] "GET /css/style.css?v=20261007a HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:09:51] "GET /js/config.js?v=20261003 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:09:51] "GET /js/main.js?v=20261007a HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:09:51] "POST /rest/v1/rpc/get_public_monthly_leaderboard HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:11:26] "POST /rest/v1/waitlist HTTP/1.1" 201 -
+127.0.0.1 - - [07/Oct/2026 10:12:07] "GET / HTTP/1.1" 304 -
+127.0.0.1 - - [07/Oct/2026 10:12:07] "GET /css/style.css?v=20261007a HTTP/1.1" 304 -
+127.0.0.1 - - [07/Oct/2026 10:12:07] "GET /js/config.js?v=20261003 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:12:07] "GET /js/main.js?v=20261007a HTTP/1.1" 304 -
+127.0.0.1 - - [07/Oct/2026 10:12:07] "POST /rest/v1/rpc/get_public_monthly_leaderboard HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:12:19] "GET /faq HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:12:31] "GET /en/privacy HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:12:31] "GET /js/main.js?v=20261007a HTTP/1.1" 304 -
+127.0.0.1 - - [07/Oct/2026 10:12:31] "GET /css/style.css?v=20261007a HTTP/1.1" 304 -
+127.0.0.1 - - [07/Oct/2026 10:16:22] "GET /reset-password?lang=en HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:16:22] "GET /css/fonts.css?v=20261003 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:16:22] "GET /css/style.css?v=20261007a HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:16:22] "GET /css/auth.css?v=20261003b HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:16:22] "GET /js/config.js?v=20261007a HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:16:22] "GET /js/auth-i18n.js?v=20261003b HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:16:22] "GET /js/reset-password.js?v=20261003b HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:16:22] "GET /fonts/nunito-v32-latin.woff2 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:16:22] "GET /fonts/baloo2-v23-latin.woff2 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:16:23] "GET /favicon.ico HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:16:23] "GET /favicon.svg HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:16:32] "GET /confirmed?lang=tr HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:16:32] "GET /js/config.js?v=20261007a HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:16:32] "GET /js/confirmed.js?v=20261003b HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:16:32] "GET /fonts/nunito-v32-latin-ext.woff2 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:16:38] "GET /unsubscribe?lang=en HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:16:38] "GET /js/config.js?v=20261007a HTTP/1.1" 200 -
+127.0.0.1 - - [07/Oct/2026 10:16:38] "GET /js/unsubscribe.js?v=20261003c HTTP/1.1" 200 -
+Traceback (most recent call last):
+  File "/Users/almano/Desktop/Courses/Projects/Pomodoro/analiz/qa_evidence_20261007/site/local_server.py", line 63, in <module>
+    ThreadingHTTPServer(('127.0.0.1', 8187), Handler).serve_forever()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/almano/.brew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/socketserver.py", line 235, in serve_forever
+    ready = selector.select(poll_interval)
+  File "/Users/almano/.brew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/selectors.py", line 398, in select
+    fd_event_list = self._selector.poll(timeout)
+KeyboardInterrupt

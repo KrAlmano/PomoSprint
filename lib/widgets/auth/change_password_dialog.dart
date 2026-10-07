@@ -27,7 +27,7 @@ Future<bool> showChangePasswordDialog(
     barrierDismissible: false,
     builder: (_) => _ChangePasswordDialog(changePassword: changePassword ?? SupabaseService.instance.changePassword),
   );
-  if (changed == true) {
+  if (changed == true && context.mounted) {
     messenger.showSnackBar(SnackBar(content: Text(l10n.changePasswordSuccess), behavior: SnackBarBehavior.floating));
   }
   return changed == true;
@@ -96,7 +96,9 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
           ),
         );
 
-    return AlertDialog(
+    return PopScope(
+      canPop: !_busy,
+      child: AlertDialog(
       scrollable: true,
       constraints: const BoxConstraints(minWidth: 280, maxWidth: ContentWidth.form),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -168,6 +170,7 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
               : Text(l10n.changePasswordSave),
         ),
       ],
+      ),
     );
   }
 }

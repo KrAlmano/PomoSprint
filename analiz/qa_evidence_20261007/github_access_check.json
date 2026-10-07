@@ -1,0 +1,8 @@
+{
+  "repository": "KrAlmano/PomoSprint",
+  "origin_matches_expected": true,
+  "anonymous_api_status": 404,
+  "authenticated_git_access": true,
+  "is_private": true,
+  "privacy_evidence": "Repository exists via authenticated Git; public GitHub API returns 404"
+}

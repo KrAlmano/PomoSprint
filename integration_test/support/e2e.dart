@@ -39,7 +39,7 @@ final String e2eRunId =
     _runIdDefine.isNotEmpty ? _runIdDefine : DateTime.now().millisecondsSinceEpoch.toRadixString(36);
 
 /// YALNIZCA yerel kopyadaki e2e-sim hesaplarının şifresi; uygulamanın şifre
-/// kuralına uyar (en az 6 karakter, küçük/büyük harf, rakam). Belge:
+/// kuralına uyar (en az 8 karakter, küçük/büyük harf, rakam). Belge:
 /// tool/local_supabase/e2e/ACCOUNTS.md.
 const String kE2ePassword = 'SimE2e-Yerel2026';
 

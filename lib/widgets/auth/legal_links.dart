@@ -9,7 +9,7 @@ import '../../theme.dart';
 /// Aydınlatma Metni sürümü. Metinlerden biri değişince güncellenir; kayıt
 /// sırasında kullanıcının auth metadata'sına terms_version ve
 /// privacy_version olarak yazılır.
-const String kLegalDocumentsVersion = '2026-10-03';
+const String kLegalDocumentsVersion = '2026-10-07';
 
 enum LegalPage { terms, privacy, kvkk }
 
@@ -38,7 +38,7 @@ Future<void> openLegalPage(BuildContext context, LegalPage page) async {
   } catch (e) {
     debugPrint('[LEGAL] $uri açılamadı: $e');
   }
-  if (!opened && l10n != null) {
+  if (!opened && context.mounted && l10n != null) {
     messenger?.showSnackBar(SnackBar(
       content: Text(l10n.legalOpenFailed(uri.toString())),
       behavior: SnackBarBehavior.floating,

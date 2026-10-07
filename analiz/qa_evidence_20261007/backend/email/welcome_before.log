@@ -1,0 +1,109 @@
+MAIL_SENDER_NAME / MAIL_SENDER_ADDRESS tanımlı değil; e-posta gönderilmedi
+MAIL_SENDER_NAME / MAIL_SENDER_ADDRESS tanımlı değil; e-posta gönderilmedi
+Resend hatası: 500 {"message":"fail"}
+abonelik satırı okunamadı: DB unavailable
+Resend hatası: 500 {"message":"fail"}
+✔ abonelikten çıkma bağlantıları yalnızca token taşır, e-posta adresi URL'de yok (17.576708ms)
+✔ altbilgide gönderen kimliği, iletişim, gizlilik/KVKK bağlantıları ve 'neden' cümlesi var (0.456292ms)
+✔ gönderen kimliği HTML'de kaçışlanır (0.398542ms)
+✔ MAIL_SENDER_NAME yoksa e-posta gönderilmez ve satır sahiplenilmez (0.639166ms)
+✔ MAIL_SENDER_ADDRESS yoksa e-posta gönderilmez ve satır sahiplenilmez (0.259ms)
+✔ Resend hata verirse 502 ve welcome_sent_at geri alınır (0.448167ms)
+✖ daha önce gönderilmişse ya da e-posta uyuşmuyorsa gönderim yok (0.803375ms)
+✔ bir saatten eski satıra gönderim yok (0.211333ms)
+✖ ağ kesintisi 502 döner, işaret geri alınır ve aynı anahtarla tekrar denenir (0.266ms)
+✖ adres karşılaştırması büyük harfi kabul eder, LIKE jokerlerini literal eşler (0.277875ms)
+✖ yanlış payload, yöntem ve olmayan kayıt gönderim başlatmaz (0.294959ms)
+✔ DB sahiplenme hatasında gönderim yapılmaz (0.189708ms)
+✖ provider hatasında geri alma da bozulursa DB hatası açıkça döner (0.3495ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 8
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 114.319666
+
+✖ failing tests:
+
+test at scripts/test/welcome_email_function.test.mjs:123:1
+✖ daha önce gönderilmişse ya da e-posta uyuşmuyorsa gönderim yok (0.803375ms)
+  AssertionError [ERR_ASSERTION]: yanlış adres geçerli abonenin hoş geldin mailini engellememeli
+  + actual - expected
+  
+  + '2026-10-07T07:27:54.287Z'
+  - null
+  
+      at TestContext.<anonymous> (file:///Users/almano/Desktop/Courses/Projects/Pomodoro/scripts/test/welcome_email_function.test.mjs:132:10)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: '2026-10-07T07:27:54.287Z',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at scripts/test/welcome_email_function.test.mjs:144:1
+✖ ağ kesintisi 502 döner, işaret geri alınır ve aynı anahtarla tekrar denenir (0.266ms)
+  TypeError: Network failed
+      at globalThis.fetch (file:///Users/almano/Desktop/Courses/Projects/Pomodoro/scripts/test/welcome_email_function.test.mjs:30:28)
+      at Object.handler (file:///Users/almano/Desktop/Courses/Projects/Pomodoro/supabase/functions/send-welcome-email/index.ts:102:21)
+      at async TestContext.<anonymous> (file:///Users/almano/Desktop/Courses/Projects/Pomodoro/scripts/test/welcome_email_function.test.mjs:146:18)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at scripts/test/welcome_email_function.test.mjs:162:1
+✖ adres karşılaştırması büyük harfi kabul eder, LIKE jokerlerini literal eşler (0.277875ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + '2026-10-07T07:27:54.288Z'
+  - null
+  
+      at TestContext.<anonymous> (file:///Users/almano/Desktop/Courses/Projects/Pomodoro/scripts/test/welcome_email_function.test.mjs:166:10)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '2026-10-07T07:27:54.288Z',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at scripts/test/welcome_email_function.test.mjs:172:1
+✖ yanlış payload, yöntem ve olmayan kayıt gönderim başlatmaz (0.294959ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  200 !== 400
+  
+      at TestContext.<anonymous> (file:///Users/almano/Desktop/Courses/Projects/Pomodoro/scripts/test/welcome_email_function.test.mjs:174:10)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 200,
+    expected: 400,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at scripts/test/welcome_email_function.test.mjs:191:1
+✖ provider hatasında geri alma da bozulursa DB hatası açıkça döner (0.3495ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  502 !== 500
+  
+      at TestContext.<anonymous> (file:///Users/almano/Desktop/Courses/Projects/Pomodoro/scripts/test/welcome_email_function.test.mjs:199:12)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 502,
+    expected: 500,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

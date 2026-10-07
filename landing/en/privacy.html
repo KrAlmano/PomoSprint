@@ -30,7 +30,7 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="stylesheet" href="/css/fonts.css?v=20261003">
-  <link rel="stylesheet" href="/css/style.css?v=20261003d">
+  <link rel="stylesheet" href="/css/style.css?v=20261007a">
   <script src="/js/boot.js?v=20261003b"></script>
   <!-- /partial:head -->
 </head>
@@ -69,7 +69,7 @@
 
     <section class="section section-legal">
       <div class="container prose">
-        <p class="updated">Last updated: October 3, 2026</p>
+        <p class="updated">Last updated: October 7, 2026</p>
 
         <p class="notice">
           This is an English translation of the Turkish Privacy Policy
@@ -85,7 +85,7 @@
               <li><a href="#data-we-collect">2. Data We Collect</a></li>
               <li><a href="#how-we-use">3. How We Use Your Data</a></li>
               <li><a href="#rankings">4. Rankings and Social Visibility</a></li>
-              <li><a href="#report-hide">5. Reporting and Hiding Users</a></li>
+              <li><a href="#report-hide">5. Reporting, Hiding and Blocking Users</a></li>
               <li><a href="#consents">6. Sign-Up Consents and Commercial Messages</a></li>
               <li><a href="#waitlist">7. Waitlist</a></li>
               <li><a href="#third-parties">8. Third-Party Services</a></li>
@@ -142,11 +142,11 @@
           <li><strong>Profile information:</strong> Your display name, the hourglass character (avatar) you choose, and your friend code.</li>
           <li><strong>Onboarding information:</strong> Your birth year (only to enforce the minimum age of 13), your study situation (LGS, YKS, university, or work and personal growth; to suggest suitable study categories), the study categories you choose, and your daily study goal.</li>
           <li><strong>Study data:</strong> The sessions you complete (start time, duration, category, whether it was paused and how long the App stayed open), your streak, your points, your sand grain balance, the characters you unlock, and your league and ranking information.</li>
-          <li><strong>Social data:</strong> Your friend connections and requests; while the "Show in Social List" setting is on, your live study status ("focusing right now" and the subject you are studying) shown to your friends and the daily study summary your friends can see (total time, number of sessions, the subject you studied most), as well as milestones such as streaks and 4 hours in a day. Your league promotions may also be shown to your friends as milestones.</li>
-          <li><strong>User reports:</strong> When you report a user, the email that reaches us: your email address, information identifying the user you reported (e.g. their display name) and any description you add (see Section 5).</li>
+          <li><strong>Social data:</strong> Your friend connections, requests and the block list stored on our servers; while the "Show in Social List" setting is on, your live study status ("focusing right now" and the subject you are studying) shown to your friends and the daily study summary your friends can see (total time, number of sessions, the subject you studied most), as well as milestones such as streaks and 4 hours in a day. Your league promotions may also be shown to your friends as milestones.</li>
+          <li><strong>User reports:</strong> An in-app report stores the reporter and target account IDs, the screen it was sent from, reason, optional details, the target's display name and relevant live-feed subject at the time of the report, and its submission time on our servers. An email report shares your email address, information identifying the user you reported and your description (see Section 5).</li>
           <li><strong>Data kept on your device:</strong> Your notification, language and theme preferences and the list of users you hid are stored only on your device and are not sent to our servers. Notifications, the lock screen countdown and the Live Activity are generated entirely on your device (see Section 13).</li>
           <li><strong>Technical and error data:</strong> App version, device model, operating system and version; when the App hits an error or crashes, the error report (error message, related code lines, technical events leading up to the error) and sampled performance measurements. When the App connects to our servers, our infrastructure provider keeps access logs (such as IP address and request time) for security and debugging.</li>
-          <li><strong>Waitlist (Site):</strong> The email address you enter in the "Notify me at launch" form on the Site.</li>
+          <li><strong>Waitlist (Site):</strong> The email address you enter in the "Notify me at launch" form on the Site, your consent to commercial electronic messages, the consent text version and the time of consent.</li>
           <li><strong>Newsletter:</strong> If you consented to commercial electronic messages at sign-up or subscribed to our newsletter, your email address; you can unsubscribe using the link in every newsletter.</li>
         </ul>
         <p>
@@ -195,7 +195,7 @@
           <li>By turning off the <strong>"Show in Social List"</strong> setting on your Profile, you stop appearing in your friends' "Focusing Right Now" list, in the App's monthly ranking and in the public ranking on the Site. Users in your league room can still see your name and character in the league ranking, and your friends can still see your name, character and total points in their friend list and under Ranking → Friends.</li>
         </ul>
 
-        <h2 id="report-hide">5. Reporting and Hiding Users</h2>
+        <h2 id="report-hide">5. Reporting, Hiding and Blocking Users</h2>
         <p>
           If a user bothers you or uses an inappropriate display name, you can
           report them to us with the <strong>Report user</strong> option in the
@@ -203,8 +203,9 @@
           <strong>Hide user</strong> option.
         </p>
         <ul>
-          <li><strong>Reporting:</strong> An email addressed to <a href="mailto:destek@pomosprint.app">destek@pomosprint.app</a> is prepared in the email app on your device; you send it yourself. We receive your email address, information identifying the user you reported and any description you add. We use this only to review the report and enforce the Terms of Use; we do not reveal your identity to the user you reported.</li>
+          <li><strong>Reporting:</strong> You can select a reason and add optional details in the in-app form; the report is saved on our servers and linked to your account. In a view where a user ID is unavailable, an email addressed to <a href="mailto:destek@pomosprint.app">destek@pomosprint.app</a> is prepared in the email app on your device; you send that email yourself. We use this information only to review the report and enforce the Terms of Use; we do not reveal your identity to the user you reported.</li>
           <li><strong>Hiding:</strong> The list of users you hid is stored only on your device; it is not sent to our servers and the hidden user is not notified.</li>
+          <li><strong>Blocking:</strong> Your block list is stored on our servers and linked to your account. Blocking a user removes your friendship and any pending friend requests between you; new friend requests and access to each other's live study status are blocked. Unblocking does not automatically restore the previous friendship.</li>
           <li><strong>Display name filter:</strong> Display names pass through an automatic filter; names containing inappropriate words are not accepted.</li>
         </ul>
 
@@ -282,15 +283,20 @@
           kept, see the <a href="/en/delete-account">Delete Your Account</a> page.
         </p>
         <p>
-          When you delete your account, all of your personal data — including your
-          email address, profile, friend connections, study data, consent records
-          and newsletter subscription — is permanently deleted from our systems
+          When you delete your account, your email address, profile, friend
+          connections, study data, consent records and newsletter subscription
+          are permanently deleted from our systems
           within a reasonable period (no later than 30 days). Error reports and
           server access logs are deleted automatically when the provider's
           retention period ends. Waitlist and newsletter entries are deleted when
-          you request it or unsubscribe; because the waitlist entry on the Site
-          is not linked to your account, it is not deleted together with your
-          account and is deleted separately on request.
+          you request it or unsubscribe. A waitlist entry matching your verified
+          account email address is also removed when you delete your account.
+          For an entry created with a different address, you can request
+          deletion separately from that address. Account references in in-app user
+          reports are removed when the account is deleted; the report details,
+          the target's name and relevant content at the time of the report, and
+          the handling outcome may be kept to review and resolve the report.
+          You can contact support to request deletion of these records.
         </p>
 
         <h2 id="security">11. Data Security</h2>
@@ -412,7 +418,7 @@
   <!-- partial:scripts -->
   <script src="/vendor/gsap-3.13.0/gsap.min.js" integrity="sha384-HOvlOYPIs/zjoIkWUGXkVmXsjr8GuZLV+Q+rcPwmJOVZVpvTSXQChiN4t9Euv9Vc" defer></script>
   <script src="/vendor/gsap-3.13.0/ScrollTrigger.min.js" integrity="sha384-P8VzCVnT9NBUkMrpcIZrJbA7EBjJvh/fJS6PmP+4nLIM284DtsImIv8D0fFjIkeh" defer></script>
-  <script src="/js/main.js?v=20261003c" defer></script>
+  <script src="/js/main.js?v=20261007a" defer></script>
   <!-- /partial:scripts -->
 </body>
 </html>

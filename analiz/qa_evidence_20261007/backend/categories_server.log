@@ -1,0 +1,186 @@
+
+=== scenario_signup ===
+OK   [A] metadata 'name' auth.users.raw_user_meta_data'ya yazıldı  -- 'Ayşe Yılmaz'
+OK   [A] metadata 'avatar_id' auth.users.raw_user_meta_data'ya yazıldı  -- 'avatar_16_basic'
+OK   [A] metadata 'newsletter' auth.users.raw_user_meta_data'ya yazıldı  -- True
+OK   [A] metadata 'marketing_consent' auth.users.raw_user_meta_data'ya yazıldı  -- True
+OK   [A] metadata 'terms_version' auth.users.raw_user_meta_data'ya yazıldı  -- '2026-10-03'
+OK   [A] metadata 'privacy_version' auth.users.raw_user_meta_data'ya yazıldı  -- '2026-10-03'
+OK   [A] metadata 'terms_accepted_at' auth.users.raw_user_meta_data'ya yazıldı  -- '2026-10-07T07:08:27.510945+00:00'
+OK   [A] handle_new_user profili açtı ve istemci ownProfileColumns ile okuyabiliyor
+OK   [A] ad metadata'dan  -- Ayşe Yılmaz
+OK   [A] avatar varsayılan avatar_16_basic  -- avatar_16_basic
+OK   [A] friend_code 6 karakter büyük harf/rakam  -- M9F47N
+OK   [A] sayaçlar sıfır, lig kademesi 1, premium değil  -- (0, 0, 1, False)
+OK   [A] onboarding alanları boş (segment, doğum yılı, hedef, onboarding_completed_at)
+OK   [A] Açık seçim öncesi sosyal görünürlük varsayılanı FALSE
+OK   [A] timezone varsayılanı Europe/Istanbul  -- Europe/Istanbul
+OK   [A] give_default_avatars varsayılan avatarları açtı  -- 7/7
+OK   [A] kayıtta sunucu hiç kategori AÇMAZ (kategori onboarding'de kurulur)  -- 0
+OK   [A] newsletter=true → marketing_subscribers satırı (yerel otomatik onay)  -- 1
+OK   [A] newsletter=false → abonelik satırı yok  -- 0
+OK   [A] ücretli avatar istenirse avatar_16_basic'e zorlanır  -- avatar_16_basic
+OK   [A] boş ad → e-posta açığa çıkarmayan nötr ad  -- Pomo 3987
+OK   [A] 60 karakterlik ad 50'ye kesilir (CHECK 1..50)  -- 50
+OK   [A] mevcut profilde ignore-duplicates upsert hata vermez ve ad/avatarı ezmez  -- Ayşe Yılmaz/avatar_16_basic
+OK   [A] profil yoksa istemci upsert'i (id,email,name,avatar_id) satırı açar
+OK   [A] yedek akışta ücretli avatar sanitize_profile_insert ile varsayılana çekilir  -- avatar_16_basic
+OK   [A] yedek akışta da varsayılan avatarlar açılır  -- 7
+
+=== scenario_segments ===
+OK   [B] segment=lgs: adlar ve sıra istemcinin seçim sırasıyla aynı  -- sunucu=['Din Kültürü', 'İngilizce', 'T.C. İnkılap Tarihi', 'Türkçe', 'Fen Bilimleri', 'Matematik'] beklenen=['Din Kültürü', 'İngilizce', 'T.C. İnkılap Tarihi', 'Türkçe', 'Fen Bilimleri', 'Matematik']
+OK   [B] segment=lgs: renkler paletten sırayla  -- ['#EF4444', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899']
+OK   [B] segment=lgs: sort_order 0..n-1  -- [0, 1, 2, 3, 4, 5]
+OK   [B] segment=lgs: icon_name 'book', arşivsiz
+OK   [B] segment=lgs: user_segment='lgs'  -- 'lgs'
+OK   [B] segment=lgs: birth_year/daily_goal/show_in_social_feed yazıldı  -- (2012, 60, True)
+OK   [B] segment=lgs: onboarding_completed_at dolu → AppGate kabuğa geçer  -- 2026-10-07T07:08:28.767947+00:00
+OK   [B] segment=yks: adlar ve sıra istemcinin seçim sırasıyla aynı  -- sunucu=['İngilizce', 'Felsefe', 'Coğrafya', 'Tarih', 'Türkçe', 'Biyoloji', 'Kimya', 'Fizik'] beklenen=['İngilizce', 'Felsefe', 'Coğrafya', 'Tarih', 'Türkçe', 'Biyoloji', 'Kimya', 'Fizik']
+OK   [B] segment=yks: renkler paletten sırayla  -- ['#EF4444', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316']
+OK   [B] segment=yks: sort_order 0..n-1  -- [0, 1, 2, 3, 4, 5, 6, 7]
+OK   [B] segment=yks: icon_name 'book', arşivsiz
+OK   [B] segment=yks: user_segment='yks'  -- 'yks'
+OK   [B] segment=yks: birth_year/daily_goal/show_in_social_feed yazıldı  -- (2008, 120, True)
+OK   [B] segment=yks: onboarding_completed_at dolu → AppGate kabuğa geçer  -- 2026-10-07T07:08:28.927139+00:00
+OK   [B] yks: 9 öneriden en çok 8'i seçilebilir (ücretsiz limit)  -- öneri=9 kurulan=8
+OK   [B] segment=university: adlar ve sıra istemcinin seçim sırasıyla aynı  -- sunucu=['Sınav Hazırlık', 'Proje', 'Ödev', 'Ders Çalışma'] beklenen=['Sınav Hazırlık', 'Proje', 'Ödev', 'Ders Çalışma']
+OK   [B] segment=university: renkler paletten sırayla  -- ['#EF4444', '#3B82F6', '#10B981', '#F59E0B']
+OK   [B] segment=university: sort_order 0..n-1  -- [0, 1, 2, 3]
+OK   [B] segment=university: icon_name 'book', arşivsiz
+OK   [B] segment=university: user_segment='university'  -- 'university'
+OK   [B] segment=university: birth_year/daily_goal/show_in_social_feed yazıldı  -- (2004, 180, False)
+OK   [B] segment=university: onboarding_completed_at dolu → AppGate kabuğa geçer  -- 2026-10-07T07:08:29.092859+00:00
+OK   [B] segment=work: adlar ve sıra istemcinin seçim sırasıyla aynı  -- sunucu=['Proje', 'Öğrenme', 'Okuma', 'Derin Çalışma'] beklenen=['Proje', 'Öğrenme', 'Okuma', 'Derin Çalışma']
+OK   [B] segment=work: renkler paletten sırayla  -- ['#EF4444', '#3B82F6', '#10B981', '#F59E0B']
+OK   [B] segment=work: sort_order 0..n-1  -- [0, 1, 2, 3]
+OK   [B] segment=work: icon_name 'book', arşivsiz
+OK   [B] segment=work: user_segment='work'  -- 'work'
+OK   [B] segment=work: birth_year/daily_goal/show_in_social_feed yazıldı  -- (1990, 240, True)
+OK   [B] segment=work: onboarding_completed_at dolu → AppGate kabuğa geçer  -- 2026-10-07T07:08:29.282071+00:00
+OK   [B] segment=other: adlar ve sıra istemcinin seçim sırasıyla aynı  -- sunucu=['Proje', 'Öğrenme', 'Okuma', 'Ders Çalışma'] beklenen=['Proje', 'Öğrenme', 'Okuma', 'Ders Çalışma']
+OK   [B] segment=other: renkler paletten sırayla  -- ['#EF4444', '#3B82F6', '#10B981', '#F59E0B']
+OK   [B] segment=other: sort_order 0..n-1  -- [0, 1, 2, 3]
+OK   [B] segment=other: icon_name 'book', arşivsiz
+OK   [B] segment=other: user_segment=None  -- None
+OK   [B] segment=other: birth_year/daily_goal/show_in_social_feed yazıldı  -- (1985, 60, False)
+OK   [B] segment=other: onboarding_completed_at dolu → AppGate kabuğa geçer  -- 2026-10-07T07:08:29.432226+00:00
+OK   [B] segment=other: genel öneriler (Ders Çalışma, Okuma, Öğrenme, Proje) kuruldu
+OK   [B] segment=None: adlar ve sıra istemcinin seçim sırasıyla aynı  -- sunucu=['Proje', 'Öğrenme', 'Okuma', 'Ders Çalışma'] beklenen=['Proje', 'Öğrenme', 'Okuma', 'Ders Çalışma']
+OK   [B] segment=None: renkler paletten sırayla  -- ['#EF4444', '#3B82F6', '#10B981', '#F59E0B']
+OK   [B] segment=None: sort_order 0..n-1  -- [0, 1, 2, 3]
+OK   [B] segment=None: icon_name 'book', arşivsiz
+OK   [B] segment=None: user_segment=None  -- None
+OK   [B] segment=None: birth_year/daily_goal/show_in_social_feed yazıldı  -- (2000, 120, True)
+OK   [B] segment=None: onboarding_completed_at dolu → AppGate kabuğa geçer  -- 2026-10-07T07:08:29.571193+00:00
+OK   [B] segment=None: genel öneriler (Ders Çalışma, Okuma, Öğrenme, Proje) kuruldu
+OK   [B] ilgi alanı seçeneği 'KPSS' onboarding'de var  -- istemci segmentleri=['lgs', 'yks', 'kpss', 'language', 'university', 'work', 'other']
+OK   [B] ilgi alanı seçeneği 'dil (yabancı dil / YDS)' onboarding'de var  -- istemci segmentleri=['lgs', 'yks', 'kpss', 'language', 'university', 'work', 'other']
+OK   [B] Güncel sunucu CHECK KPSS segmentini kabul eder  -- None
+
+=== scenario_english ===
+OK   [C] EN segment=lgs: tüm öneriler category_names.dart'ta İngilizce karşılığa sahip  -- []
+OK   [C] EN segment=lgs: adlar ve sıra istemcinin seçim sırasıyla aynı  -- sunucu=['Mathematics', 'Science', 'Turkish', 'Turkish Revolution History', 'English', 'Religious Culture'] beklenen=['Mathematics', 'Science', 'Turkish', 'Turkish Revolution History', 'English', 'Religious Culture']
+OK   [C] EN segment=lgs: renkler paletten sırayla  -- ['#EF4444', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899']
+OK   [C] EN segment=lgs: sort_order 0..n-1  -- [0, 1, 2, 3, 4, 5]
+OK   [C] EN segment=lgs: icon_name 'book', arşivsiz
+OK   [C] EN segment=lgs: categoryMatchKey İngilizce adı Türkçe anahtara eşler (kuyruk/rapor)
+OK   [C] EN segment=lgs: TR arayüzde translateCatName Türkçe gösterir
+OK   [C] EN segment=lgs: mevcut onboarding profilin varsayılan saat dilimini korur  -- Bilinen ürün sınırlaması: cihaz IANA dilimi henüz yazılmıyor; timezone=Europe/Istanbul
+OK   [C] EN segment=yks: tüm öneriler category_names.dart'ta İngilizce karşılığa sahip  -- []
+OK   [C] EN segment=yks: adlar ve sıra istemcinin seçim sırasıyla aynı  -- sunucu=['Mathematics', 'Physics', 'Chemistry', 'Biology', 'Turkish', 'History', 'Geography', 'Philosophy'] beklenen=['Mathematics', 'Physics', 'Chemistry', 'Biology', 'Turkish', 'History', 'Geography', 'Philosophy']
+OK   [C] EN segment=yks: renkler paletten sırayla  -- ['#EF4444', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316']
+OK   [C] EN segment=yks: sort_order 0..n-1  -- [0, 1, 2, 3, 4, 5, 6, 7]
+OK   [C] EN segment=yks: icon_name 'book', arşivsiz
+OK   [C] EN segment=yks: categoryMatchKey İngilizce adı Türkçe anahtara eşler (kuyruk/rapor)
+OK   [C] EN segment=yks: TR arayüzde translateCatName Türkçe gösterir
+OK   [C] EN segment=yks: mevcut onboarding profilin varsayılan saat dilimini korur  -- Bilinen ürün sınırlaması: cihaz IANA dilimi henüz yazılmıyor; timezone=Europe/Istanbul
+OK   [C] EN segment=university: tüm öneriler category_names.dart'ta İngilizce karşılığa sahip  -- []
+OK   [C] EN segment=university: adlar ve sıra istemcinin seçim sırasıyla aynı  -- sunucu=['Studying', 'Homework', 'Project', 'Exam Prep'] beklenen=['Studying', 'Homework', 'Project', 'Exam Prep']
+OK   [C] EN segment=university: renkler paletten sırayla  -- ['#EF4444', '#3B82F6', '#10B981', '#F59E0B']
+OK   [C] EN segment=university: sort_order 0..n-1  -- [0, 1, 2, 3]
+OK   [C] EN segment=university: icon_name 'book', arşivsiz
+OK   [C] EN segment=university: categoryMatchKey İngilizce adı Türkçe anahtara eşler (kuyruk/rapor)
+OK   [C] EN segment=university: TR arayüzde translateCatName Türkçe gösterir
+OK   [C] EN segment=university: mevcut onboarding profilin varsayılan saat dilimini korur  -- Bilinen ürün sınırlaması: cihaz IANA dilimi henüz yazılmıyor; timezone=Europe/Istanbul
+OK   [C] EN segment=work: tüm öneriler category_names.dart'ta İngilizce karşılığa sahip  -- []
+OK   [C] EN segment=work: adlar ve sıra istemcinin seçim sırasıyla aynı  -- sunucu=['Deep Work', 'Reading', 'Learning', 'Project'] beklenen=['Deep Work', 'Reading', 'Learning', 'Project']
+OK   [C] EN segment=work: renkler paletten sırayla  -- ['#EF4444', '#3B82F6', '#10B981', '#F59E0B']
+OK   [C] EN segment=work: sort_order 0..n-1  -- [0, 1, 2, 3]
+OK   [C] EN segment=work: icon_name 'book', arşivsiz
+OK   [C] EN segment=work: categoryMatchKey İngilizce adı Türkçe anahtara eşler (kuyruk/rapor)
+OK   [C] EN segment=work: TR arayüzde translateCatName Türkçe gösterir
+OK   [C] EN segment=work: mevcut onboarding profilin varsayılan saat dilimini korur  -- Bilinen ürün sınırlaması: cihaz IANA dilimi henüz yazılmıyor; timezone=Europe/Istanbul
+OK   [C] EN segment=None: tüm öneriler category_names.dart'ta İngilizce karşılığa sahip  -- []
+OK   [C] EN segment=None: adlar ve sıra istemcinin seçim sırasıyla aynı  -- sunucu=['Studying', 'Reading', 'Learning', 'Project'] beklenen=['Studying', 'Reading', 'Learning', 'Project']
+OK   [C] EN segment=None: renkler paletten sırayla  -- ['#EF4444', '#3B82F6', '#10B981', '#F59E0B']
+OK   [C] EN segment=None: sort_order 0..n-1  -- [0, 1, 2, 3]
+OK   [C] EN segment=None: icon_name 'book', arşivsiz
+OK   [C] EN segment=None: categoryMatchKey İngilizce adı Türkçe anahtara eşler (kuyruk/rapor)
+OK   [C] EN segment=None: TR arayüzde translateCatName Türkçe gösterir
+OK   [C] EN segment=None: mevcut onboarding profilin varsayılan saat dilimini korur  -- Bilinen ürün sınırlaması: cihaz IANA dilimi henüz yazılmıyor; timezone=Europe/Istanbul
+
+=== scenario_idempotency ===
+OK   [D] aynı onboarding iki kez → kategori çoğalmaz, kimlik/sıra aynı  -- 3 → 3
+OK   [D] ikinci tamamlama onboarding_completed_at'i yeniler (zararsız)
+OK   [D] yarıda kalan onboarding: onboarding_completed_at NULL kalır → AppGate onboarding'i yeniden gösterir
+OK   [D] ikinci deneme hata vermeden biter (RPC limitte sessizce durur)
+OK   [D] ikinci denemede seçilen kategoriler kullanıcıya ulaşmalı (work: Derin Çalışma, Okuma, Öğrenme, Proje)  -- sunucudaki aktif=['Derin Çalışma', 'Okuma', 'Öğrenme', 'Proje']; yeni seçimden eksik=[]
+OK   [D] segment 'work' ama kategoriler hâlâ YKS dersleri olmamalı  -- ['Derin Çalışma', 'Okuma', 'Öğrenme', 'Proje']
+OK   [D] TR yarım kurulum + EN tekrar → aynı ders iki kez oluşmamalı (dilden bağımsız eşleme)  -- aktif=['Mathematics', 'Science', 'Turkish', 'Turkish Revolution History', 'English', 'Religious Culture'] çift anahtarlar=[]
+OK   [D] aynı istekte aynı ad iki kez → tek kategori, hata yok  -- ['Okuma']
+
+=== scenario_limits ===
+OK   [E] ücretsiz: 10 kategori gönderilince 8'i kurulur, RPC hata vermez  -- kurulan=8
+OK   [E] limitte ilk 8 (gönderim sırası) kalır
+OK   [E] create_category 9. kategoride reddedilir → istemci categoryLimitReached  -- {'code': 'P0001', 'details': None, 'hint': None, 'message': "Ücretsiz planda en fazla 8 kategori ekleyebilirsin. Premium ile 15'e çıkar."} → categoryLimitReached
+OK   [E] doğrudan INSERT de limit trigger'ına takılır  -- {'code': 'P0001', 'details': None, 'hint': None, 'message': "Ücretsiz planda en fazla 8 kategori ekleyebilirsin. Premium ile 15'e çıkar."}
+OK   [E] Yarım onboarding seçimi değişince arşivdeki aynı kimlik geri açılır  -- ['Ders 1']
+OK   [E] limitteyken arşivden çıkarma reddedilir  -- {'code': 'P0001', 'details': None, 'hint': None, 'message': "Ücretsiz planda en fazla 8 kategori ekleyebilirsin. Premium ile 15'e çıkar."}
+OK   [E] premium: 16 gönderilince 15 kurulur (geri alındı)  -- t
+{"created": 15, "archived": 0, "restored": 0, "skipped_limit": 1, "skipped_invalid": 0, "skipped_existing": 0}
+N=15
+
+=== scenario_custom_and_validation ===
+OK   [F] özel kategori karışık: adlar ve sıra istemcinin seçim sırasıyla aynı  -- sunucu=['Matematik', 'Kendi Kategorim', 'Fen Bilimleri'] beklenen=['Matematik', 'Kendi Kategorim', 'Fen Bilimleri']
+OK   [F] özel kategori karışık: renkler paletten sırayla  -- ['#EF4444', '#3B82F6', '#10B981']
+OK   [F] özel kategori karışık: sort_order 0..n-1  -- [0, 1, 2]
+OK   [F] özel kategori karışık: icon_name 'book', arşivsiz
+OK   [F] sunucu boş/boşluk ad, 40'tan uzun ad ve geçersiz renk kabul etmemeli (istemci 1..40 ve palet)  -- kabul edilen=[]
+OK   [F] büyük/küçük harf ve sondaki boşluk farkı aynı kategori sayılmalı  -- aktif=['Matematik']
+OK   [F] Adı null olan satır atlanır; geçerli kategori ve skipped_invalid=1 döner  -- {'created': 1, 'archived': 0, 'restored': 0, 'skipped_limit': 0, 'skipped_invalid': 1, 'skipped_existing': 0}
+OK   [F] Dizi olmayan yük sıfır sonuç döndürür ve veri değiştirmez  -- {'created': 0, 'archived': 0, 'restored': 0, 'skipped_limit': 0, 'skipped_invalid': 0, 'skipped_existing': 0}
+
+=== scenario_profile_update ===
+OK   [G] istemci 'coins' kolonunu yazamaz (42501)  -- {'code': '42501', 'details': None, 'hint': 'Grant the required privileges to the current role with: GRANT UPDATE ON publ
+OK   [G] istemci 'is_premium' kolonunu yazamaz (42501)  -- {'code': '42501', 'details': None, 'hint': 'Grant the required privileges to the current role with: GRANT UPDATE ON publ
+OK   [G] istemci 'league_tier' kolonunu yazamaz (42501)  -- {'code': '42501', 'details': None, 'hint': 'Grant the required privileges to the current role with: GRANT UPDATE ON publ
+OK   [G] istemci 'lifetime_points' kolonunu yazamaz (42501)  -- {'code': '42501', 'details': None, 'hint': 'Grant the required privileges to the current role with: GRANT UPDATE ON publ
+OK   [G] istemci 'avatar_id' kolonunu yazamaz (42501)  -- {'code': '42501', 'details': None, 'hint': 'Grant the required privileges to the current role with: GRANT UPDATE ON publ
+OK   [G] istemci 'friend_code' kolonunu yazamaz (42501)  -- {'code': '42501', 'details': None, 'hint': 'Grant the required privileges to the current role with: GRANT UPDATE ON publ
+OK   [G] istemci 'user_segment' kolonunu yazabilir ve select=id satırı döner
+OK   [G] istemci 'birth_year' kolonunu yazabilir ve select=id satırı döner
+OK   [G] istemci 'daily_goal_minutes' kolonunu yazabilir ve select=id satırı döner
+OK   [G] istemci 'show_in_social_feed' kolonunu yazabilir ve select=id satırı döner
+OK   [G] istemci 'onboarding_completed_at' kolonunu yazabilir ve select=id satırı döner
+OK   [G] istemci 'timezone' kolonunu yazabilir ve select=id satırı döner
+OK   [G] istemci 'name' kolonunu yazabilir ve select=id satırı döner
+OK   [G] segment 'other' CHECK ile reddedilir → istemci invalidInput  -- {'code': '23514', 'details': None, 'hint': None, 'message': 'new row for relation "profiles" violate
+OK   [G] doğum yılı 1899 CHECK ile reddedilir → istemci invalidInput  -- {'code': '23514', 'details': None, 'hint': None, 'message': 'new row for relation "profiles" violate
+OK   [G] hedef 4 dk CHECK ile reddedilir → istemci invalidInput  -- {'code': '23514', 'details': None, 'hint': None, 'message': 'new row for relation "profiles" violate
+OK   [G] hedef 1441 dk CHECK ile reddedilir → istemci invalidInput  -- {'code': '23514', 'details': None, 'hint': None, 'message': 'new row for relation "profiles" violate
+OK   [G] başkasının profiline PATCH 0 satır (RLS) → istemci notFound  -- []
+OK   [G] 13 yaş altı doğum yılıyla onboarding sunucuda tamamlanamamalı (Şartlar: en az 13)  -- birth_year=2021 kabul edildi; onboarding_completed_at=None
+OK   [G] Görünürlük gönderilmezse sunucu FALSE bırakır; açık seçim olmadan görünmez  -- bilgi: istemci taslak bulgusuyla birlikte değerlendir
+
+=== scenario_shell ===
+OK   [H] onboarding sonrası profil: onboarding_completed_at dolu, segment work, hedef 120
+OK   [H] kabuk aktif kategorileri okur (yalnızca seçilenler, varsayılan 5 ders eklenmez)  -- ['Derin Çalışma', 'Okuma']
+OK   [H] onboarding kategorisiyle ilk seans kaydedilir  -- {'streak': 1, 'bonus_pct': 0, 'duplicate': False, 'base_points': 5, 'bonus_points': 0, 'coins_earned': 20, 'total_points': 5, 'league_points': 5, 'start_verified': False, 'daily_limit_reached': False, 'league_period_closed': False, 'unverified_limit_reached': False, 'league_points_next_period': False}
+OK   [H] kategorisiz hesabın (ensureServerCategories / kuyruk) varsayılanları segmenti dikkate almalı  -- segment=work, tohumlanan=['Derin Çalışma', 'Okuma', 'Öğrenme', 'Proje']
+
+=== scenario_auth_and_race ===
+OK   [I] anon setup_onboarding_categories çağıramaz  -- 401 {'code': '42501', 'details': None, 'hint': None, 'message': 'permission denied for function setup_onboarding_categories'}
+OK   [I] bozuk JWT → PostgREST kodu istemcinin notSignedIn saydığı kod olmalı  -- HTTP 401 code=PGRST301 → notSignedIn
+OK   [I] eşzamanlı iki setup_onboarding_categories ücretsiz limiti (8) aşmamalı  -- aktif kategori=8; a_rc=0 b_rc=0
+
+ÖZET: 164 denetim, 164 OK, 0 FAIL (run=1007100827)

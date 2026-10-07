@@ -1754,6 +1754,27 @@ class SupabaseService {
   Future<Map<String, dynamic>> blockUser(String id) => _friendMutation('block_user', 'p_user_id', id);
   Future<Map<String, dynamic>> unblockUser(String id) => _friendMutation('unblock_user', 'p_user_id', id);
 
+  /// Uygulama içi bildirim: sunucu hedefi, sebebi, hız sınırını ve mükerrer
+  /// kaydı doğrular. Başka oturumun geç yanıtı mevcut hesaba gösterilmez.
+  Future<Map<String, dynamic>> submitUserReport({
+    required String targetUserId,
+    required String place,
+    required String reason,
+    String? details,
+  }) async {
+    final uid = _requireUserId();
+    final epoch = _userEpoch;
+    final response = await _guard(() => _client.rpc('submit_user_report', params: {
+          'p_target_user_id': targetUserId,
+          'p_place': place,
+          'p_reason': reason,
+          'p_details': details,
+        }));
+    if (!_isCurrentSession(uid, epoch)) throw const ServiceException(ServiceErrorCode.notSignedIn);
+    if (response is! Map) throw const ServiceException(ServiceErrorCode.server);
+    return Map<String, dynamic>.from(response);
+  }
+
   // ---- Sıralama ----
 
   // Herkese açık sıralama RPC'lerinin sunucu tarafı üst sınırı.

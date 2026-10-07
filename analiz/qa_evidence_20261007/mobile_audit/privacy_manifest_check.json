@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-07",
+  "source": "ios/Runner/PrivacyInfo.xcprivacy",
+  "plist_lint": "passed",
+  "other_user_content": {
+    "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypeOtherUserContent",
+    "NSPrivacyCollectedDataTypeLinked": true,
+    "NSPrivacyCollectedDataTypeTracking": false,
+    "NSPrivacyCollectedDataTypePurposes": [
+      "NSPrivacyCollectedDataTypePurposeAppFunctionality"
+    ]
+  },
+  "scope": "Stored custom categories and user report notes; account linked, app functionality, no tracking. App Store Connect labels must be updated separately.",
+  "sources": [
+    "https://developer.apple.com/app-store/app-privacy-details/",
+    "https://developer.apple.com/documentation/bundleresources/app-privacy-configuration/nsprivacycollecteddatatypes/nsprivacycollecteddatatype"
+  ]
+}

@@ -9,7 +9,8 @@ PomoSprint, oyunlaştırılmış bir çalışma sayacıdır. Android ve iOS'ta 2
 | [PROJE_DEVIR.md](PROJE_DEVIR.md) | Yapay zekâya ve geliştiriciye tam devir: mimari, yerel kurulum, modlar, QA sonuçları ve sonraki işler |
 | [AGENTS.md](AGENTS.md) | Günlük kodlama kuralları, dosya haritası ve istemci–Supabase RPC sözleşmeleri |
 | [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md) | Kısa ürün/mimari özeti |
-| [QA takip raporu](analiz/QA_FOLLOWUP_2026-10-05.txt) | En yeni saat dilimi, arkadaş ve yasal onay kontrolleri |
+| [Yayın QA raporu](analiz/QA_RELEASE_2026-10-07.md) | Son baştan sona mobil/backend/site/e-posta denetimi, düzeltmeler ve yayın engelleri |
+| [QA takip raporu](analiz/QA_FOLLOWUP_2026-10-05.txt) | 5 Ekim saat dilimi, arkadaş ve yasal onay geçmişi |
 | [Kapsamlı QA raporu](analiz/QA_FULL_2026-10-05.txt) | Önceki çok hesaplı iOS/Android simülatör/emülatör denetimi |
 | [Yerel Supabase](tool/local_supabase/README.md) | İzole backend, test hesapları, kısa seans kaydı ve E2E komutları |
 | [Supabase işlemleri](supabase/README.md) | Canlı veritabanı geçmişi ve güvenli SQL değişikliği akışı |
@@ -19,8 +20,8 @@ PomoSprint, oyunlaştırılmış bir çalışma sayacıdır. Android ve iOS'ta 2
 
 | Platform | Durum |
 |---|---|
-| Android | Ürün platformu, `com.pomosprint.app`; Android 16 ARM64 emülatörde UI E2E ve release APK derlendi. Fiziksel Android testi bekliyor |
-| iOS | Ürün platformu, minimum iOS 15.0, `com.pomosprint.app`; iPhone 16 Plus / iOS 18.6 simülatörü test edildi. Release derlemesi imzasızdı |
+| Android | Ürün platformu, `com.pomosprint.app`; 7 Ekim Android 16 ARM64 emülatör UI koşuları 6/6 + 8/8 geçti. 64,2 MB mağaza AAB imzası doğrulandı; release sürümünde giriş/rapor/sekme/sayaç/native bildirim kontrolü geçti; fiziksel cihaz testi bekliyor |
+| iOS | Ürün platformu, minimum iOS 15.0, `com.pomosprint.app`; 7 Ekim iPhone 16 Plus / iOS 18.6 simülatör UI ve gerçek süreç sonlandırma/restore geçti. Obfuscated imzasız release 28,4 MB; imzalı IPA kişisel takım/provisioning engelinde |
 | macOS, Linux, Windows, Web | `flutter create` kalıntısı; desteklenen ürün platformları değil |
 
 Flutter 3.44 / Dart `^3.12.2`. Backend, Supabase Auth + PostgreSQL + RLS + RPC + cron + Edge Functions. Site, Cloudflare Workers static assets. Gerçek paket sürümleri `pubspec.lock` içindedir.
@@ -55,7 +56,7 @@ ARB çevirileri değişince `flutter gen-l10n` çalıştır; üretilen `app_loca
 
 ```sh
 flutter analyze
-flutter test --concurrency=2
+flutter test --concurrency=2 --dart-define=SCREENSHOTS=true
 ```
 
 Rapor/çalışma günü değişikliklerinde New York DST doğrulaması:
@@ -66,7 +67,7 @@ TZ=America/New_York flutter test \
   test/stats_calculator_test.dart test/study_day_test.dart --concurrency=2
 ```
 
-Gerçek backend ve uygulama UI'siyle testler yalnızca izole yerel Supabase'te çalışır. Simülatör/emülatör senaryoları, Android'e özel bildirim testi ve iOS native testi için [yerel E2E senaryolarına](tool/local_supabase/README.md#simülatörde-uçtan-uca-test) bak. Son kaydedilmiş sonuç (5 Ekim 2026): Flutter analizi temiz; tüm birim/widget paketinde 1068 test geçti, 5 isteğe bağlı screenshot testi atlandı; takip turunda iOS ve Android UI senaryoları ile iki release derlemesi geçti. Bu, fiziksel cihaz, gerçek Google/Apple girişi veya mağaza yayın onayı anlamına gelmez. Tam kapsam ve sınırlar raporlarda.
+Gerçek backend ve uygulama UI'siyle testler yalnızca izole yerel Supabase'te çalışır. Simülatör/emülatör senaryoları, Android'e özel bildirim testi ve iOS native testi için [yerel E2E senaryolarına](tool/local_supabase/README.md#simülatörde-uçtan-uca-test) bak. Son paket (7 Ekim 2026): Flutter analizi temiz; 1091 birim/widget testi geçti, ekran görüntüsü testleri de çalıştırıldı, atlanan test yok. New York DST seçili kümesi 93/93, izole sunucu dokuz süitte 466/466, tüm Node paketi 99/99 geçti (welcome 15, unsubscribe 24, delete-account 25 bu toplamın alt kümeleridir). Gerçek iOS/Android UI koşuları ve iki platformda OS süreç sonlandırma/restore geçti. Tam kanıt, derleme durumu ve sınırlar [yayın QA raporunda](analiz/QA_RELEASE_2026-10-07.md). Fiziksel cihaz, gerçek Google/Apple girişi ve mağaza yayın onayı henüz doğrulanmadı.
 
 Site JS/Edge testleri `cd scripts && npm test`. Ortak HTML parçası değişince `python3 landing/tools/sync_partials.py --check`. Canlı hesap açıp silebilen `scripts/security_regression_test.js`'i yerel Flutter testleriyle karıştırma; kapsamı [AGENTS.md](AGENTS.md)'de oku.
 
@@ -78,13 +79,13 @@ scripts/build_release.sh ios       # IPA: Apple imzalama ayarları gerekir
 scripts/build_release.sh all
 ```
 
-Bu betik obfuscation ve `--split-debug-info` kullanır; Sentry sembol upload ayarları `scripts/.env`'den alınır. QA sırasında alınan düz release build'leri mağaza paketi veya imzalı dağıtım değildir. Keystore/Sentry gereksinimleri: [`scripts/build_release.sh`](scripts/build_release.sh) üstbilgisi.
+Bu betik obfuscation ve `--split-debug-info` kullanır; Sentry sembol upload ayarları `scripts/.env`'den alınır. 7 Ekim gerçek Android pipeline ile 64,2 MB AAB üretildi ve mağaza imzası doğrulandı; mağazaya yüklenmedi. Yerel QA release APK'sı 28,0 MB derlendi; normal main ile emülatörde release giriş/rapor/sekme/sayaç/native bildirim, duraklat/sıfırla ve soğuk açılış kontrolleri geçti; bu koşuda çökme yok. iOS obfuscated imzasız release derlemesi geçti (28,4 MB uygulama); imzalı IPA kişisel takımın Sign In with Apple / Time Sensitive Notifications ve provisioning kısıtında kaldı. Son artifact/runtime ve sembol yükleme durumu [yayın QA raporunda](analiz/QA_RELEASE_2026-10-07.md). Keystore/Sentry gereksinimleri: [`scripts/build_release.sh`](scripts/build_release.sh) üstbilgisi.
 
 ## Supabase güvenliği
 
 Canlı proje `Pomodoro App` (`eoosnyakvxmifmexpgxa`, `eu-north-1`). Canlı gövde ve katalog sözleşmesi gerçektir; kök `supabase/migrations/` canlı migration geçmişinin kopyası değildir. **Kökte `supabase db push` veya `db reset` çalıştırma.** SQL değişikliği için canlı tanımı okuyup migration + down + geri alınan DRYRUN hazırla; sırayı ve ayrıntıyı [supabase/README.md](supabase/README.md) ve [AGENTS.md](AGENTS.md) §2'den izle.
 
-5 Ekim 2026 tarihli proje kaydına göre 12, 15, 16, 19 A, 13, 14 ve 20–26 paketleri canlıya uygulanıp doğrulandı; 19 B uygulanmadı. Canlıya dair yeni bir işlemden önce tarihli repo bilgisini yeniden salt okunur doğrula. Bu belgede canlıya yeni bağlantı yapıldığı iddia edilmiyor.
+5 Ekim 2026 tarihli proje kaydına göre 12, 15, 16, 19 A, 13, 14 ve 20–26 paketleri canlıya uygulanıp doğrulandı; 19 B uygulanmadı. Canlıya dair yeni bir işlemden önce tarihli repo bilgisini yeniden salt okunur doğrula. 7 Ekim salt okuma ile 409 katalog satırı 5 Ekim kaydıyla eşit doğrulandı; 14 ops fonksiyonu/yetkisi de yerelle eşit. Yeni ortam migration baseline işi ayrıca açık. Canlıya yazma yapılmadı.
 
 ## Repo haritası
 
@@ -110,4 +111,4 @@ python3 landing/tools/sync_partials.py --check
 cd landing && wrangler deploy
 ```
 
-Yayın öncesi KVKK veri sorumlusu gerçek bilgisi ve ileti/SMTP tercihlerini, [site rehberindeki](landing/README.md) kontrollerle doğrula. İmzalı uygulama veya site deploy'u bu README güncellemesinin parçası değildir.
+Yayın öncesi KVKK veri sorumlusu gerçek bilgisi ve ileti/SMTP tercihlerini, [site rehberindeki](landing/README.md) kontrollerle doğrula. Mağazaya yükleme veya site deploy'u bu README güncellemesinin parçası değildir.

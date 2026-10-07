@@ -1,0 +1,29 @@
+MAIL_SENDER_NAME / MAIL_SENDER_ADDRESS tanımlı değil; e-posta gönderilmedi
+MAIL_SENDER_NAME / MAIL_SENDER_ADDRESS tanımlı değil; e-posta gönderilmedi
+Resend hatası: 500
+Resend isteği tamamlanamadı
+abonelik satırı sahiplenilemedi
+hoş geldin e-postası sahiplenme işareti geri alınamadı
+✔ abonelikten çıkma bağlantıları yalnızca token taşır, e-posta adresi URL'de yok (45.766042ms)
+✔ altbilgide gönderen kimliği, iletişim, gizlilik/KVKK bağlantıları ve 'neden' cümlesi var (0.502333ms)
+✔ gönderen kimliği HTML'de kaçışlanır (0.354459ms)
+✔ MAIL_SENDER_NAME yoksa e-posta gönderilmez ve satır sahiplenilmez (1.025042ms)
+✔ MAIL_SENDER_ADDRESS yoksa e-posta gönderilmez ve satır sahiplenilmez (0.456084ms)
+✔ Resend hata verirse 502 ve welcome_sent_at geri alınır (0.7495ms)
+✔ daha önce gönderilmişse ya da e-posta uyuşmuyorsa gönderim yok (0.615709ms)
+✔ bir saatten eski satıra gönderim yok (0.204042ms)
+✔ ağ kesintisi 502 döner, işaret geri alınır ve aynı anahtarla tekrar denenir (0.827958ms)
+✔ adres karşılaştırması büyük harfi kabul eder, LIKE jokerlerini literal eşler (0.425583ms)
+✔ PostgREST yıldız/regex jokeri gerçek abonenin e-postası yerine geçmez (0.410458ms)
+✔ yanlış payload, yöntem ve olmayan kayıt gönderim başlatmaz (0.202125ms)
+✔ DB sahiplenme hatasında gönderim yapılmaz (0.15225ms)
+✔ iki eşzamanlı webhook yalnızca bir provider gönderimi başlatır (0.220042ms)
+✔ provider hatasında geri alma da bozulursa DB hatası açıkça döner (0.176959ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 166.301125

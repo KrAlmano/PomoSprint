@@ -41,7 +41,7 @@ String? registerEmailError(AppLocalizations l10n, String value) {
   return null;
 }
 
-/// Sunucunun şifre kuralı (bkz. [PasswordRules]): en az 6 karakter, küçük
+/// Sunucunun şifre kuralı (bkz. [PasswordRules]): en az 8 karakter, küçük
 /// harf, büyük harf ve rakam. Kural yazarken alanın altında canlı gösterilir.
 @visibleForTesting
 String? registerPasswordError(AppLocalizations l10n, String value) => passwordRuleError(l10n, value);
@@ -233,6 +233,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   // Onay bekleniyorsa ekran her yoldan (geri, buton) adresle kapanır.
   void _leave() {
+    if (_isLoading) return;
     if (_isVerificationSent) {
       Navigator.pop<RegisterResult>(context, RegisterAwaitingConfirmation(_emailController.text.trim()));
     } else {
@@ -251,7 +252,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final background = isDark ? AppColors.darkSurface : AppColors.surface;
 
     return PopScope(
-      canPop: !_isVerificationSent,
+      canPop: !_isLoading && !_isVerificationSent,
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop) _leave();
       },
@@ -265,7 +266,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: isDark ? AppColors.darkOnSurface : AppColors.onSurface),
             tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-            onPressed: _leave,
+            onPressed: _isLoading ? null : _leave,
           ),
         ),
         body: SafeArea(
@@ -687,7 +688,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               width: double.infinity,
               height: 52,
               child: ElevatedButton(
-                onPressed: _leave,
+                onPressed: _isLoading ? null : _leave,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,

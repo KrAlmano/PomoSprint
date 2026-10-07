@@ -104,24 +104,38 @@ class HiddenUsersStore {
   String? _ownerId;
   Future<void>? _loading;
   String? _loadingFor;
+  int _loadEpoch = 0;
 
   /// [userId] hesabının listesini yükler; zaten yüklüyse bir şey yapmaz.
   /// Null (oturum yok) listeyi boşaltır.
   Future<void> load(String? userId) {
     if (userId == null || userId.isEmpty) {
+      _loadEpoch++;
+      _loading = null;
+      _loadingFor = null;
       _ownerId = null;
       hidden.value = HiddenUserList.empty;
       return Future.value();
     }
-    if (_ownerId == userId) return Future.value();
+    if (_ownerId == userId) {
+      if (_loadingFor != null && _loadingFor != userId) {
+        _loadEpoch++;
+        _loading = null;
+        _loadingFor = null;
+      }
+      return Future.value();
+    }
     if (_loadingFor == userId && _loading != null) return _loading!;
     _loadingFor = userId;
+    final epoch = ++_loadEpoch;
+    _ownerId = null;
+    hidden.value = HiddenUserList.empty;
     final future = _read(userId).then((list) {
-      if (_loadingFor != userId) return;
+      if (_loadEpoch != epoch) return;
       _ownerId = userId;
       hidden.value = list;
     }).whenComplete(() {
-      if (_loadingFor == userId) {
+      if (_loadEpoch == epoch) {
         _loading = null;
         _loadingFor = null;
       }
@@ -152,23 +166,29 @@ class HiddenUsersStore {
 
   Future<void> hide(String userId, HiddenUser user) async {
     await load(userId);
+    if (_ownerId != userId) return;
     await _write(userId, hidden.value.adding(user));
   }
 
   Future<void> unhide(String userId, HiddenUser user) async {
     await load(userId);
+    if (_ownerId != userId) return;
     await _write(userId, hidden.value.removing(user));
   }
 
   /// "Gizlenen kullanıcıları göster": listeyi sıfırlar.
   Future<void> clear(String userId) async {
     await load(userId);
+    if (_ownerId != userId) return;
     await _write(userId, HiddenUserList.empty);
   }
 
   /// Hesap silinince: cihazdaki kaydı siler.
   Future<void> forget(String userId) async {
-    if (_ownerId == userId) {
+    if (_ownerId == userId || _loadingFor == userId) {
+      _loadEpoch++;
+      _loading = null;
+      _loadingFor = null;
       _ownerId = null;
       hidden.value = HiddenUserList.empty;
     }
@@ -178,6 +198,7 @@ class HiddenUsersStore {
 
   @visibleForTesting
   void resetForTest() {
+    _loadEpoch++;
     _ownerId = null;
     _loading = null;
     _loadingFor = null;

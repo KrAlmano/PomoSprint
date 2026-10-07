@@ -1,0 +1,23 @@
+{
+  "dryrun_checks": 23,
+  "all_true": true,
+  "intentional_error_exit_code": 3,
+  "migration_body_exact_match": true,
+  "before": {
+    "function_md5": "547b73d8a9163466b19dafb4b89e9fe3",
+    "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+    "auth_users": 298,
+    "profiles": 298,
+    "reports": 29,
+    "migration_records": 0
+  },
+  "after": {
+    "function_md5": "547b73d8a9163466b19dafb4b89e9fe3",
+    "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+    "auth_users": 298,
+    "profiles": 298,
+    "reports": 29,
+    "migration_records": 0
+  },
+  "transaction_restored_exact_metadata_counts": true
+}

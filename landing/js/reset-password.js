@@ -22,7 +22,7 @@
       checking: "Bağlantın kontrol ediliyor…",
       pw1: "Yeni şifre",
       pw2: "Yeni şifre (tekrar)",
-      hint: "En az 6 karakter; en az bir küçük harf, bir büyük harf ve bir rakam.",
+      hint: "En az 8 karakter; en az bir küçük harf, bir büyük harf ve bir rakam.",
       submit: "Şifreyi Güncelle",
       busy: "Güncelleniyor…",
       foot: "Sorun mu yaşıyorsun?",
@@ -39,7 +39,7 @@
       weakPassword: "Bu şifre çok zayıf. En az 1 küçük harf (a-z), 1 büyük harf (A-Z) ve 1 rakam (0-9) içermeli.",
       pwnedPassword: "Bu şifre daha önce bir veri sızıntısında görülmüş. Farklı bir şifre seç.",
       rateLimit: "Kısa sürede çok fazla deneme yapıldı. Birkaç dakika bekleyip tekrar dene.",
-      tooShort: "Şifre en az 6 karakter olmalı.",
+      tooShort: "Şifre en az 8 karakter olmalı.",
       tooLong: "Şifre en fazla 72 karakter olabilir.",
       mismatch: "Girdiğin şifreler eşleşmiyor.",
       network: "Bağlantı hatası. İnternet bağlantını kontrol edip tekrar dene.",
@@ -52,7 +52,7 @@
       checking: "Checking your link…",
       pw1: "New password",
       pw2: "New password (again)",
-      hint: "At least 6 characters, including a lowercase letter, an uppercase letter and a number.",
+      hint: "At least 8 characters, including a lowercase letter, an uppercase letter and a number.",
       submit: "Update Password",
       busy: "Updating…",
       foot: "Having trouble?",
@@ -69,7 +69,7 @@
       weakPassword: "This password is too weak. It must contain at least 1 lowercase letter (a-z), 1 uppercase letter (A-Z) and 1 number (0-9).",
       pwnedPassword: "This password has appeared in a data breach. Choose a different password.",
       rateLimit: "Too many attempts in a short time. Wait a few minutes and try again.",
-      tooShort: "Your password must be at least 6 characters.",
+      tooShort: "Your password must be at least 8 characters.",
       tooLong: "Your password can be at most 72 characters.",
       mismatch: "The passwords you entered don't match.",
       network: "Connection error. Check your internet connection and try again.",
@@ -248,7 +248,7 @@
     errorEl.textContent = "";
     var p1 = pw1.value;
     var p2 = pw2.value;
-    if (p1.length < 6) { errorEl.textContent = MSG.tooShort; pw1.focus(); return; }
+    if (p1.length < 8) { errorEl.textContent = MSG.tooShort; pw1.focus(); return; }
     if (p1.length > 72) { errorEl.textContent = MSG.tooLong; pw1.focus(); return; }
     if (p1 !== p2) { errorEl.textContent = MSG.mismatch; pw2.focus(); return; }
 

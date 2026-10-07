@@ -19,6 +19,16 @@ Future<void> main() async {
   const email = String.fromEnvironment('LOCAL_QA_EMAIL');
   const password = String.fromEnvironment('LOCAL_QA_PASSWORD');
   const run = String.fromEnvironment('LOCAL_QA_PROCESS_RUN');
+  // Native sürücü kalıcı tercihlerdeki kaydı görüp süreç öldürür. iOS'un
+  // dosyaya yazma gecikmesine pay vermek için bu fikstür 30 sn seçebilir;
+  // ürünün QUICK_TIMER 5/10 saniye davranışını değiştirmez.
+  const seconds = int.fromEnvironment(
+    'LOCAL_QA_PROCESS_SECONDS',
+    defaultValue: 10,
+  );
+  if (seconds < 10 || seconds > 60) {
+    throw StateError('Yerel süreç fikstürü 10–60 saniye olmalı.');
+  }
   if (email.isEmpty || password.isEmpty || run.isEmpty) {
     throw StateError('Yerel süreç testi hesabı/koşu gerekli.');
   }
@@ -42,7 +52,7 @@ Future<void> main() async {
       categoryId: category.id,
       categoryName: category.name,
       durationMinutes: 50,
-      totalSeconds: 10,
+      totalSeconds: seconds,
       now: DateTime.now(),
       recordAccelerated: true,
     );

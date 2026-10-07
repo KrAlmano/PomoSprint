@@ -1,5 +1,5 @@
 // landing/js/*.js dosyalarını tarayıcı olmadan çalıştırmak için küçük sahte DOM.
-// Yalnızca bekleme listesi formunun ve abonelikten çıkma sayfasının kullandığı
+// Bekleme listesi, auth yardımcıları ve abonelikten çıkma sayfasının kullandığı
 // API'ler var; sayfa betiği node:vm içinde, testin verdiği `window` ile çalışır.
 // Ağ yok: window.PomoSupabase.request testte sahtelenir, setTimeout elle ilerletilir.
 import fs from "node:fs";
@@ -65,13 +65,13 @@ export class FakeElement {
 
 /**
  * @param {Record<string, FakeElement>} elements id → öğe
- * @param {{ search?: string, pathname?: string, api?: object }} opts
+ * @param {{ search?: string, hash?: string, pathname?: string, language?: string, api?: object }} opts
  */
-export function createPage(elements, { search = "", pathname = "/", api = null } = {}) {
+export function createPage(elements, { search = "", hash = "", pathname = "/", language = "tr", api = null } = {}) {
   const docListeners = {};
   const timers = [];
   const replaced = [];
-  const location = { search, pathname, hash: "" };
+  const location = { search, pathname, hash };
   const document = {
     title: "",
     documentElement: new FakeElement("html"),
@@ -92,6 +92,7 @@ export function createPage(elements, { search = "", pathname = "/", api = null }
         const u = new URL(url, "https://pomosprint.app");
         location.search = u.search;
         location.pathname = u.pathname;
+        location.hash = u.hash;
       },
     },
     // Hareket azaltma açık: main.js animasyon kurmadan erken döner.
@@ -104,8 +105,10 @@ export function createPage(elements, { search = "", pathname = "/", api = null }
   const context = vm.createContext({
     window,
     document,
+    navigator: { language, languages: [language] },
     URL,
     URLSearchParams,
+    TextDecoder,
     Intl,
     console,
     Image: class { set src(_v) {} },

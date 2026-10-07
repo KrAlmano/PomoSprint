@@ -86,20 +86,29 @@ end $$;
 
 -- E) Günlük tavan: 16 seans dolu kullanıcı (odasız) → 17. seans 0 puan, odaya da yerleşmez
 do $$
-declare u uuid := (select id from t4_u where tag='n3'); c uuid := (select cat from t4_u where tag='n3'); i int; r jsonb;
+declare u uuid := (select id from t4_u where tag='n3'); c uuid := (select cat from t4_u where tag='n3');
+        i int; r jsonb; v_start timestamptz := now() - interval '26 minutes'; v_day_start timestamptz;
 begin
+  -- Keep all 17 intervals in one study day without overlap at any run hour.
+  -- Early in a study day there is not yet room for 16 real intervals;
+  -- use the previous day's last completed interval (still inside 24h).
+  v_day_start := (((v_start at time zone 'Europe/Istanbul') - interval '4 hours')::date
+                  + time '04:00') at time zone 'Europe/Istanbul';
+  if v_start - v_day_start < interval '416 minutes' then
+    v_start := v_day_start - interval '30 minutes';
+  end if;
   for i in 1..16 loop
     insert into public.study_sessions(user_id, category, category_id, duration_minutes, base_points, bonus_points,
                                       was_paused, is_verified, client_uuid, started_at, completed_at)
     values (u, 't4-ders', c, 25, 5, 0, false, 0, gen_random_uuid(),
-            ((now() at time zone 'Europe/Istanbul' - interval '4 hours')::date + time '04:00') at time zone 'Europe/Istanbul' + make_interval(mins => 26 * (i-1)),
-            ((now() at time zone 'Europe/Istanbul' - interval '4 hours')::date + time '04:00') at time zone 'Europe/Istanbul' + make_interval(mins => 26 * (i-1) + 25));
+            v_start - make_interval(mins => 26 * (17-i)),
+            v_start - make_interval(mins => 26 * (17-i)) + interval '25 minutes');
   end loop;
-  r := pg_temp.t4_session('n3', 25, false, now() - interval '26 minutes');
+  r := pg_temp.t4_session('n3', 25, false, v_start);
   perform pg_temp.t4_check('E: 16 seans sonrası 17. seans: daily_limit_reached, 0 puan, lig üyeliği açılmaz',
     (r->>'daily_limit_reached')::boolean and (r->>'total_points')::int = 0 and pg_temp.t4_league_of(u) is null,
     format('r=%s league=%s (16 seansın ilki %s TR)', r, pg_temp.t4_league_of(u),
-           ((now() - interval '785 minutes') at time zone 'Europe/Istanbul')::text));
+           ((v_start - interval '416 minutes') at time zone 'Europe/Istanbul')::text));
 end $$;
 
 -- F) Dönem sınırı: bitişi 30 sn önce geçmiş, cron'un henüz işlemediği oda

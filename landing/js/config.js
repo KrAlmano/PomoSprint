@@ -32,7 +32,6 @@
       credentials: "omit",
       cache: "no-store"
     }).then(function (res) {
-      if (timer) clearTimeout(timer);
       return res.text().then(function (txt) {
         var data = null;
         if (txt) {
@@ -40,6 +39,10 @@
         }
         return { ok: res.ok, status: res.status, data: data };
       });
+    }).then(function (result) {
+      // Yanıt başlıkları gelmiş olsa da gövde beklenirken zaman aşımı sürer.
+      if (timer) clearTimeout(timer);
+      return result;
     }, function (err) {
       if (timer) clearTimeout(timer);
       throw err;

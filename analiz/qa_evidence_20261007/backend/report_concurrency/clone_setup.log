@@ -1,0 +1,3 @@
+-> kopya: postgres (public, auth, supabase_migrations) → pomosprint_report_qa_20261007
+SONUÇ: tüm adımlar beklendiği gibi (kopya: postgresql://postgres:postgres@127.0.0.1:54322/pomosprint_report_qa_20261007)
+REST: http://127.0.0.1:54351 (pomosprint_report_qa_20261007_rest → pomosprint_report_qa_20261007). Kaldırmak: CHAIN_DB=pomosprint_report_qa_20261007 DROP_ONLY=1 tool/local_supabase/proposed_chain_check.sh

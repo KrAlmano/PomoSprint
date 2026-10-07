@@ -1199,7 +1199,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errFillEmailPassword => 'Please enter your email and password.';
 
   @override
-  String get errShortPassword => 'Password must be at least 6 characters.';
+  String get errShortPassword => 'Password must be at least 8 characters.';
 
   @override
   String get errAcceptTerms =>
@@ -1702,10 +1702,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get registerPasswordHelper =>
-      'At least 6 characters, with an uppercase letter, a lowercase letter and a number.';
+      'At least 8 characters, with an uppercase letter, a lowercase letter and a number.';
 
   @override
-  String get passwordRuleLength => 'At least 6 characters';
+  String get passwordRuleLength => 'At least 8 characters';
 
   @override
   String get passwordRuleCase => 'Upper and lower case (A-Z, a-z)';
@@ -1834,7 +1834,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportUserActionSub =>
-      'Email our support team about an inappropriate name or behavior.';
+      'Report an inappropriate name, content or behavior in the app.';
 
   @override
   String get hideUserAction => 'Hide this user';
@@ -2166,4 +2166,53 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get friendActionCancel => 'Cancel';
+
+  @override
+  String get reportReasonLabel => 'Reason for reporting';
+
+  @override
+  String get reportChooseReason => 'Choose a reason for reporting.';
+
+  @override
+  String get reportReasonOffensiveName => 'Inappropriate name';
+
+  @override
+  String get reportReasonOffensiveContent => 'Inappropriate content';
+
+  @override
+  String get reportReasonHarassment => 'Harassment or bullying';
+
+  @override
+  String get reportReasonSpam => 'Spam';
+
+  @override
+  String get reportReasonImpersonation => 'Impersonation';
+
+  @override
+  String get reportReasonOther => 'Other';
+
+  @override
+  String get reportDetailsLabel => 'Details (optional)';
+
+  @override
+  String get reportSendButton => 'Send report';
+
+  @override
+  String get reportSent =>
+      'Your report was received. Our support team will review it.';
+
+  @override
+  String get reportAlreadyReceived =>
+      'We already received your report about this user.';
+
+  @override
+  String get reportRateLimited =>
+      'You reached the daily report limit. Please try again later.';
+
+  @override
+  String get reportUserUnavailable =>
+      'This user is no longer available to report. Refresh the list.';
+
+  @override
+  String get reportSendFailed => 'Could not send the report. Please try again.';
 }

@@ -1,0 +1,42 @@
+{
+  "ios/Runner/Info.plist": {
+    "parse": "passed",
+    "key_count": 25
+  },
+  "ios/Runner/PrivacyInfo.xcprivacy": {
+    "parse": "passed",
+    "key_count": 4
+  },
+  "ios/Runner/Runner.entitlements": {
+    "parse": "passed",
+    "key_count": 2
+  },
+  "ios/Runner/RunnerDebug.entitlements": {
+    "parse": "passed",
+    "key_count": 0
+  },
+  "ios/PomoSprintTimerWidget/Info.plist": {
+    "parse": "passed",
+    "key_count": 10
+  },
+  "android/app/src/main/AndroidManifest.xml": {
+    "parse": "passed"
+  },
+  "android/app/src/debug/AndroidManifest.xml": {
+    "parse": "passed"
+  },
+  "android/app/src/profile/AndroidManifest.xml": {
+    "parse": "passed"
+  },
+  "android/app/src/main/res/xml/data_extraction_rules.xml": {
+    "parse": "passed"
+  },
+  "android/app/src/debug/res/xml/local_network_security_config.xml": {
+    "parse": "passed"
+  },
+  "signing_material_presence": {
+    "android/key.properties": true,
+    "ios/ExportOptions.plist": false
+  },
+  "scope": "Static parse and file-presence only; no key or .env content read; no native build executed by this reviewer."
+}
