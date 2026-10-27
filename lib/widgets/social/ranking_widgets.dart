@@ -20,6 +20,8 @@ class RankingCountdownBanner extends StatelessWidget {
   final DateTime? target;
   final String? message;
   final VoidCallback? onHelp;
+  final VoidCallback? onElapsed;
+  final DateTime Function()? now;
 
   const RankingCountdownBanner({
     super.key,
@@ -27,6 +29,8 @@ class RankingCountdownBanner extends StatelessWidget {
     this.target,
     this.message,
     this.onHelp,
+    this.onElapsed,
+    this.now,
   });
 
   @override
@@ -94,6 +98,8 @@ class RankingCountdownBanner extends StatelessWidget {
                   const SizedBox(height: 2),
                   CountdownText(
                     target: target!,
+                    onElapsed: onElapsed,
+                    now: now,
                     prefix: '⏱️ ',
                     style: TextStyle(
                       fontSize: 15,

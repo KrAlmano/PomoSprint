@@ -37,10 +37,14 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
   List<StudySession> _studies = [];
   String? _owner;
   String? _previousActiveUuid;
+  int _leagueRefreshRevision = 0;
+  bool _foreground = true;
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    final lifecycle = WidgetsBinding.instance.lifecycleState;
+    _foreground = lifecycle == null || lifecycle == AppLifecycleState.resumed;
     _owner = _service.backend.ownerId;
     _service.addListener(_changed);
     unawaited(_load());
@@ -58,6 +62,7 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
     if (_owner != _service.backend.ownerId) {
       _owner = _service.backend.ownerId;
       _studies = [];
+      _leagueRefreshRevision++;
     }
     final previous = _previousActiveUuid;
     _previousActiveUuid = _service.activeRecord?.clientUuid;
@@ -76,6 +81,12 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     _service.setForeground(state == AppLifecycleState.resumed);
+    if (mounted) {
+      setState(() {
+        _foreground = state == AppLifecycleState.resumed;
+        if (_foreground) _leagueRefreshRevision++;
+      });
+    }
     if (state == AppLifecycleState.resumed) unawaited(_loadStudies());
   }
 
@@ -99,8 +110,12 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
   }
 
   Future<void> _refresh() async {
+    final owner = _service.backend.ownerId;
     await _service.refresh();
     await _loadStudies();
+    if (mounted && owner == _service.backend.ownerId) {
+      setState(() => _leagueRefreshRevision++);
+    }
   }
 
   void _message(String text) =>
@@ -252,6 +267,8 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
                   _ExamLeagueView(
                     service: _service,
                     available: _service.catalog.available,
+                    refreshRevision: _leagueRefreshRevision,
+                    foreground: _foreground,
                   ),
               ],
             ),
@@ -604,35 +621,135 @@ class _ExamCountdownState extends State<_ExamCountdown> {
 }
 
 class _ExamLeagueView extends StatefulWidget {
-  const _ExamLeagueView({required this.service, required this.available});
+  const _ExamLeagueView({
+    required this.service,
+    required this.available,
+    required this.refreshRevision,
+    required this.foreground,
+  });
   final ExamService service;
   final bool available;
+  final int refreshRevision;
+  final bool foreground;
   @override
   State<_ExamLeagueView> createState() => _ExamLeagueViewState();
 }
 
-class _ExamLeagueViewState extends State<_ExamLeagueView> {
+class _ExamLeagueViewState extends State<_ExamLeagueView>
+    with WidgetsBindingObserver {
   String _scope = 'segment';
   ExamLeagueSnapshot? _league;
   bool _loading = false;
   bool _failed = false;
   int _revision = 0;
+  bool _visible = false;
+  Timer? _periodTimer;
+  DateTime? _lastRefreshedPeriod;
+  String? _loadedOwner;
+  bool _foreground = true;
   @override
   void initState() {
     super.initState();
-    unawaited(_load());
+    WidgetsBinding.instance.addObserver(this);
+    final state = WidgetsBinding.instance.lifecycleState;
+    _foreground = state == null || state == AppLifecycleState.resumed;
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _foreground = state == AppLifecycleState.resumed;
+    // Paused apps need not rebuild immediately, so stop the timer directly.
+    // The parent's explicit revision performs one refresh on foreground return.
+    if (!_foreground) _periodTimer?.cancel();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final visible = TickerMode.valuesOf(context).enabled;
+    if (visible == _visible) return;
+    _visible = visible;
+    if (visible) {
+      unawaited(_load());
+    } else {
+      _periodTimer?.cancel();
+    }
+  }
+
+  @override
+  void dispose() {
+    _revision++;
+    WidgetsBinding.instance.removeObserver(this);
+    _periodTimer?.cancel();
+    super.dispose();
   }
 
   @override
   void didUpdateWidget(_ExamLeagueView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.available != widget.available) unawaited(_load());
+    if (!widget.foreground || !widget.available) _periodTimer?.cancel();
+    if (oldWidget.available != widget.available ||
+        oldWidget.refreshRevision != widget.refreshRevision ||
+        oldWidget.foreground != widget.foreground) {
+      unawaited(_load());
+    }
+  }
+
+  void _reloadExpiredPeriod() {
+    final target = _league?.periodEnd;
+    if (!mounted ||
+        !_visible ||
+        !_foreground ||
+        !widget.foreground ||
+        !widget.available ||
+        target == null ||
+        target.isAfter(widget.service.now()) ||
+        target == _lastRefreshedPeriod) {
+      return;
+    }
+    _lastRefreshedPeriod = target;
+    unawaited(_load());
+  }
+
+  void _schedulePeriodRefresh() {
+    _periodTimer?.cancel();
+    final target = _league?.periodEnd;
+    if (!_visible ||
+        !_foreground ||
+        !widget.foreground ||
+        !widget.available ||
+        target == null) {
+      return;
+    }
+    final delay = target.difference(widget.service.now());
+    if (delay <= Duration.zero) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _reloadExpiredPeriod(),
+      );
+    } else {
+      _periodTimer = Timer(delay, _reloadExpiredPeriod);
+    }
   }
 
   Future<void> _load() async {
     final revision = ++_revision;
     final owner = widget.service.backend.ownerId;
-    if (!widget.available) return;
+    if (owner != _loadedOwner) {
+      _loadedOwner = owner;
+      _league = null;
+      _lastRefreshedPeriod = null;
+    }
+    if (!widget.available) {
+      _periodTimer?.cancel();
+      _league = null;
+      _loading = false;
+      _failed = false;
+      return;
+    }
+    if (!_visible || !_foreground || !widget.foreground) {
+      _loading = false;
+      return;
+    }
     setState(() {
       _loading = true;
       _failed = false;
@@ -643,6 +760,7 @@ class _ExamLeagueViewState extends State<_ExamLeagueView> {
           revision == _revision &&
           owner == widget.service.backend.ownerId) {
         setState(() => _league = league);
+        _schedulePeriodRefresh();
       }
     } catch (_) {
       if (mounted && revision == _revision) setState(() => _failed = true);

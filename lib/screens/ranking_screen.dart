@@ -44,13 +44,17 @@ class RankingScreen extends StatefulWidget {
   final UserModel? currentUser;
   final SupabaseService? service;
 
-  const RankingScreen({super.key, this.currentUser, this.service});
+  /// Optional clock for deterministic rollover tests; production uses DateTime.now.
+  final DateTime Function()? now;
+
+  const RankingScreen({super.key, this.currentUser, this.service, this.now});
 
   @override
   State<RankingScreen> createState() => _RankingScreenState();
 }
 
-class _RankingScreenState extends State<RankingScreen> {
+class _RankingScreenState extends State<RankingScreen>
+    with WidgetsBindingObserver {
   static const Duration _staleAfter = Duration(seconds: 30);
 
   _RankingTab _tab = _RankingTab.league;
@@ -64,11 +68,17 @@ class _RankingScreenState extends State<RankingScreen> {
   bool _editingTarget = false;
   bool _isVisible = false;
   bool _leagueInfoChecked = false;
+  bool _foreground = true;
+  final Set<DateTime> _refreshedPeriods = {};
   SupabaseService get _service => widget.service ?? SupabaseService.instance;
+  DateTime get _now => widget.now?.call() ?? DateTime.now();
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    final lifecycle = WidgetsBinding.instance.lifecycleState;
+    _foreground = lifecycle == null || lifecycle == AppLifecycleState.resumed;
     _service.addStatsChangedListener(_onStatsChanged);
     HiddenUsersStore.instance.hidden.addListener(_onHiddenUsersChanged);
     unawaited(HiddenUsersStore.instance.load(widget.currentUser?.id));
@@ -90,8 +100,9 @@ class _RankingScreenState extends State<RankingScreen> {
       _target = null;
       _globalPeriodEnd = null;
       _leagueInfoChecked = false;
+      _refreshedPeriods.clear();
       unawaited(HiddenUsersStore.instance.load(widget.currentUser?.id));
-      if (_isVisible) unawaited(_load(_tab));
+      if (_isVisible && _foreground) unawaited(_load(_tab));
     }
   }
 
@@ -108,7 +119,7 @@ class _RankingScreenState extends State<RankingScreen> {
     if (visible == _isVisible) return;
     _isVisible = visible;
     if (visible) {
-      _loadIfStale(_tab);
+      if (!_refreshExpiredPeriod()) _loadIfStale(_tab);
       unawaited(_maybeAutoShowLeagueInfo());
     }
   }
@@ -118,6 +129,7 @@ class _RankingScreenState extends State<RankingScreen> {
     _service.removeStatsChangedListener(_onStatsChanged);
     HiddenUsersStore.instance.hidden.removeListener(_onHiddenUsersChanged);
     super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
   }
 
   // Yalnızca bu cihazda seans tamamlanınca/senkron olunca tetiklenir.
@@ -125,15 +137,64 @@ class _RankingScreenState extends State<RankingScreen> {
     for (final d in _data.values) {
       d.loadedAt = null;
     }
-    if (_isVisible) unawaited(_load(_tab));
+    if (_isVisible && _foreground) unawaited(_load(_tab));
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _foreground = state == AppLifecycleState.resumed;
+    if (_foreground && _isVisible && !_refreshExpiredPeriod()) {
+      _loadIfStale(_tab);
+    }
+  }
+
+  DateTime? _resetTarget() {
+    switch (_tab) {
+      case _RankingTab.league:
+        final league = _league;
+        if (league == null) return null;
+        return league.rules.isCalendarMonthly
+            ? league.rules.periodEnd ?? league.endDate
+            : league.rules.isCompetitionActive
+            ? league.endDate
+            : league.rules.competitionPhase == 'scheduled'
+            ? league.rules.competitionStartsAt
+            : null;
+      case _RankingTab.monthly:
+        return _rules.isCalendarMonthly
+            ? _globalPeriodEnd ?? _rules.periodEnd
+            : nextMonthlyLeaderboardReset(_now);
+      case _RankingTab.friends:
+        return null;
+    }
+  }
+
+  bool _refreshExpiredPeriod() {
+    final target = _resetTarget();
+    if (!_isVisible ||
+        !_foreground ||
+        target == null ||
+        target.isAfter(_now) ||
+        !_refreshedPeriods.add(target)) {
+      return false;
+    }
+    // Other tabs must not keep the previous month's cached rows either. This
+    // one boundary reload bypasses normal freshness checks, without polling.
+    for (final data in _data.values) {
+      data.loadedAt = null;
+    }
+    unawaited(_load(_tab));
+    return true;
   }
 
   void _loadIfStale(_RankingTab tab) {
+    if (!_isVisible || !_foreground) return;
     final data = _data[tab]!;
     if (data.isStale && !data.loading) unawaited(_load(tab));
   }
 
   Future<void> _load(_RankingTab tab) async {
+    if (!mounted || !_isVisible || !_foreground) return;
     final data = _data[tab]!;
     final requestId = ++data.requestId;
     final owner = widget.currentUser?.id;
@@ -248,7 +309,10 @@ class _RankingScreenState extends State<RankingScreen> {
     final user = widget.currentUser;
     final uid = user?.id;
     if (_leagueInfoChecked || !_isVisible || _tab != _RankingTab.league) return;
-    if (league == null || league.memberCount < 2 || uid == null || uid.isEmpty) {
+    if (league == null ||
+        league.memberCount < 2 ||
+        uid == null ||
+        uid.isEmpty) {
       return;
     }
     _leagueInfoChecked = true;
@@ -458,13 +522,9 @@ class _RankingScreenState extends State<RankingScreen> {
         if (league == null) return const [];
         banner = RankingCountdownBanner(
           title: leagueTitle(l10n, league.tier),
-          target: league.rules.isCalendarMonthly
-              ? league.rules.periodEnd ?? league.endDate
-              : league.rules.isCompetitionActive
-              ? league.endDate
-              : league.rules.competitionPhase == 'scheduled'
-              ? league.rules.competitionStartsAt
-              : null,
+          target: _resetTarget(),
+          onElapsed: _refreshExpiredPeriod,
+          now: widget.now,
           message: league.rules.isCompetitionActive
               ? null
               : league.rules.competitionPhase == 'scheduled'
@@ -480,8 +540,10 @@ class _RankingScreenState extends State<RankingScreen> {
           target: _rules.isCalendarMonthly
               ? _globalPeriodEnd ??
                     _rules.periodEnd ??
-                    nextCalendarMonthReset(DateTime.now())
-              : nextMonthlyLeaderboardReset(DateTime.now()),
+                    nextCalendarMonthReset(_now)
+              : nextMonthlyLeaderboardReset(_now),
+          onElapsed: _refreshExpiredPeriod,
+          now: widget.now,
         );
       case _RankingTab.friends:
         return const [];
