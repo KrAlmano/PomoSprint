@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
-/// Donmayı Önleyen, 60 FPS Donanım İvmeli (RenderMode.HARDWARE) ve
-/// Süreyle Uyumlu Akan Lottie Kum Saati Bileşeni.
+/// Kompozisyonun kare hızını kullanan, duraklatılabilir Lottie kum saati.
 class HourglassWidget extends StatefulWidget {
   final bool isRunning;
   final double size;
@@ -61,8 +60,9 @@ class _HourglassWidgetState extends State<HourglassWidget>
     super.didChangeDependencies();
     // Ayar uygulama açıkken açıldıysa süren animasyon durdurulur; kapatıldıysa
     // (animasyon yüklendikten sonra) sayaç çalışıyorsa kum yeniden akar.
-    if (_reduceMotion && _lottieController.isAnimating) {
+    if (_reduceMotion) {
       _lottieController.stop();
+      _shakeController.reset();
     } else if (!_reduceMotion &&
         widget.isRunning &&
         !_lottieController.isAnimating &&
@@ -81,8 +81,10 @@ class _HourglassWidgetState extends State<HourglassWidget>
     }
 
     if (widget.isRunning && !_reduceMotion) {
-      if (!_lottieController.isAnimating) {
-        _lottieController.repeat(); // Sayaç çalışırken sürekli 60 FPS canlı kum akış animasyonu
+      if (!_lottieController.isAnimating &&
+          _lottieController.duration != null) {
+        // Asset henüz yüklenmediyse onLoaded güvenli biçimde başlatır.
+        _lottieController.repeat();
       }
     } else {
       if (_lottieController.isAnimating) {
