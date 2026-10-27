@@ -9,6 +9,7 @@
 | 1 | `27_tus_segment_dryrun.sql` | `27_tus_segment.sql` | `27_tus_segment_down.sql` |
 | 2 | `28_exam_core_dryrun.sql` | `28_exam_core.sql` | `28_exam_core_down.sql` |
 | 3 | `29_monthly_competitions_dryrun.sql` | `29_monthly_competitions.sql` | `29_monthly_competitions_down.sql` |
+| Ek güvenlik | `30_session_start_atomic_dryrun.sql` | `30_session_start_atomic.sql` | `30_session_start_atomic_down.sql` |
 
 Dosyalar bu klasördedir. İleri/down başındaki `\echo` ve `\quit` satırları yanlışlıkla CLI uygulamasını önler. Sabah kullanıcı incelemesinde SQL Editor için yalnız bu iki satır kaldırılır. DRYRUN olduğu gibi çalıştırılır; sondaki **`DRYRUN_RESULT` hatası bilinçli rollback** sonucudur. Her Txx sonucu `true` olmalıdır. Her DRYRUN, kendi önceki paketleri kurulmuş durumda çalıştırılır. Bir adım başarısızsa devam edilmez. **Toplu `db push/reset` yoktur.**
 
@@ -23,9 +24,10 @@ Tam API: [EXAM_API_CONTRACT.md](EXAM_API_CONTRACT.md). Katalog: [exam_catalog_v1
 - Ödül varsayımı: tam süreli her **5 dakika için 1 deneme puanı**, her **25 dakika için 1 deneme kumu**, aşağı yuvarlama. Bunlar katalog snapshot'ındadır. Normal puan/kum cüzdanına eklenmez; netler sonucu değiştirmez.
 - Vazgeçme `abandoned` ve sunucunun ölçtüğü `elapsed_seconds` ile geçmişte saklanır. Sayı, toplam çalışma süresi, seri veya ekonomi kazandırmaz. Tam süre dolmuşsa vazgeçme isteği güvenli/idempotent tamamlamaya döner.
 - Kapanma ve arka plan süreyi durdurmaz; uygulama açıldığında aynı sunucu zamanlarıyla devam edilir. Bu, kullanıcının fiziksel dikkatini ölçen bir cihaz tasdiki değildir.
+- D-05: Yeni başlangıç aynı sahibin süresi dolmuş aktif denemesini önce normal tamamlama yoluyla bir kez kapatır. Süresi dolmuş aynı UUID tekrarında da yeni kayıt açmadan tamamlanmış makbuz döner. Orijinal süre/bitiş/ödül snapshot'ı korunur; henüz dolmamış deneme yine çakışma hatası verir.
 - Tamamlanan deneme toplam çalışma dakikası ve 04:00 çalışma günü serisine katkı verir; Pomodoro/Maraton ekonomisiyle karışmaz. Süre derslere paylaştırılmaz. Raporlar ayrıca tamamlanmış denemeleri birleştirir.
 - Net satırı dersin tam soru toplamını karşılar, boşlar açıkça kaydedilir. Eksik ders sonucu “0 net” diye uydurulmaz; gönderilmeyen ders korunur. Negatif net geçerlidir. Sahip dışındaki istemci deneme/net okuyamaz veya yazamaz.
-- TUS'ta yedi temel ve dört klinik resmî test grubu vardır. “Küçük Stajlar” için uydurma soru kotası yoktur. Fizyoloji/Histoloji/Embriyoloji birleşik çalışma kategorisi, aynı süreyi iki farklı dersin kanıtı yapmaz.
+- TUS'ta yedi temel ve dört klinik resmî test grubu vardır. TUS Fizyoloji ile Histoloji/Embriyoloji, `Fizyoloji, Histoloji ve Embriyoloji` çalışma kategorisine; AYT edebiyatı `Edebiyat` ve `Türkçe` kategorilerine bağlanır. Birleşik kategorinin aynı dakika toplamı her ilgili net karşılaştırmasına bağlam olur; derslere paylaştırılmaz ve toplam çalışma süresini artırmaz. Arayüz bu yüzden “İlişkili çalışma kategorilerinde …” der. “Küçük Stajlar” için resmî ayrı soru kotası veya uydurma ders eşlemesi yoktur; yetersiz sonuç içgörü oluşturmaz.
 
 ## Tek aylık lig geçişi
 
@@ -37,6 +39,7 @@ Tam API: [EXAM_API_CONTRACT.md](EXAM_API_CONTRACT.md). Katalog: [exam_catalog_v1
 - Normal avatar ödülü en az10 aktif kişi, ilk3 ve aynı kişisel yeterlilikle verilir. Deneme ödül slotları15 adet `NULL` yer tutucudur; gerçek görseller/katalog gelmeden hayalî avatar açılmaz veya kuşanılmaz.
 - Kurulum ayının aylık kayıtları yeniden hesaplanır; resmi yeni aylık rekabet sonraki ayın başında etkinleşir. Geçişe kadar eski dönem bakım motoru sürer. Geçiş anında son eski dönemin geçerli aktivitesi aynı yeterlilikle bir kez karara bağlanır; sonuçlar ve son üyelikler arşivlenir. Önceden kazanılmış avatar silinmez.
 - İlk00:00–00:01 aralığında gelmiş yeni seans eski kademeye yerleşmişse bakım, yeni kademeye geçirir; puanı ve katılım zamanı korunur. Gecikmiş cron da kapalı ayları sırayla/idempotent işler. Eski TABLE/V2 RPC'ler korunmuş alanlarla yeni aylık veriyi döndürür.
+- D-03: Günlük bakım önce kilitsiz olarak gerçekten kapanacak dönem/legacy geçişi var mı bakar. İş yoksa profil kilidi almadan döner. İş varsa eski kilit sırası korunur; kilit altında tekrar kontrol edilerek iki worker'ın aynı işi tekrarlaması engellenir.
 - Ay ortasında hedef değişimi sonraki ay için tutulur. Mevcut ay hedefi/odası/puanı değişmez; global/segment sekmesine basmak hedefi değiştirmez. İlk çalışmadan önceki onboarding seçimi hemen uygulanır. İlk normal seansın aktif sunucu rezervasyonu veya ilk deneme kaydı bulunduğunda da hedef değişikliği sonraki ayı bekler; iki mod bu konuda aynı davranır. Süresi dolmuş, hiç tamamlanmamış normal rezervasyon tek başına ilk seçimi kilitlemez.
 - **Kapanmış ayın çevrimdışı kayıt politikası:** Kabul edilen geç seansın gerçek bitiş tarihi korunur; çalışma geçmişi, toplamları ve o eski aya ait event kaydı eklenir. Kesinleşmiş aylık sıralama, kademe kararı ve avatar ödülü yeniden hesaplanmaz. Aynı olayı tekrar göndermek ek ödül üretmez. Bu nedenle ay kapandıktan sonra gönderilen eski seansa geriye dönük terfi veya ödül vaat edilmez.
 
@@ -59,8 +62,11 @@ python3 tool/local_supabase/e2e/overnight_competition_backend.py
 python3 tool/local_supabase/e2e/overnight_transition_metadata.py
 python3 tool/local_supabase/e2e/overnight_privacy_retention.py
 python3 tool/local_supabase/e2e/overnight_target_reservation.py
+python3 tool/local_supabase/e2e/overnight_d03_d05.py
 # Yeni yerel şema için açıkça incelenmiş referansı seçer; varsayılan canlı referansı değişmez:
 bash tool/local_supabase/parity_check.sh --reviewed-night-20261028
+# Yerel QA'ya ek30 kurulduysa açıkça farklı referans seçilir:
+bash tool/local_supabase/parity_check.sh --reviewed-night-20261028-with-start-atomic
 ```
 
 Bu testlerin review DB hazırlama adımları gece raporunda bulunur. Şema testi kendi başına native test değildir. Gerçek60sn yerel sınav kataloğu deneyi tam75/135dk native denemesinin yerine sayılmaz; kontrollü tarihli kayıtlar da gerçek ayın geçmesini beklemiş sayılmaz.

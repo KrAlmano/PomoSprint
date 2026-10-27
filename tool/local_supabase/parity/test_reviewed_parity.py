@@ -53,6 +53,20 @@ class ReviewedParityTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     parity.local_url()
 
+    def test_atomic_reference_requires_explicit_mode(self):
+        self.assertEqual(parity.reference_for([])[0], parity.REFERENCE)
+        self.assertEqual(parity.reference_for(["--with-session-start-atomic"])[0], parity.ATOMIC_REFERENCE)
+        for arguments in (["--auto"], ["--with-session-start-atomic", "--extra"]):
+            with self.assertRaises(ValueError):
+                parity.reference_for(arguments)
+
+    def test_atomic_reference_changes_only_reviewed_function_and_migration(self):
+        atomic = json.loads(parity.ATOMIC_REFERENCE.read_text())
+        self.assertEqual(parity.verify_sources(atomic), [])
+        self.assertEqual(parity.differences(self.reference["expected"], atomic["expected"]), ["migrations", "schema"])
+        self.assertEqual(parity.differences(self.reference["expected"]["schema"], atomic["expected"]["schema"]), ["func"])
+        self.assertEqual(set(atomic["expected"]["migrations"]) - set(self.reference["expected"]["migrations"]), {"20261028040000|session_start_atomic"})
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

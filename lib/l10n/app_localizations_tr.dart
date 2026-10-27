@@ -2731,7 +2731,7 @@ class AppLocalizationsTr extends AppLocalizations {
     String before,
     String after,
   ) {
-    return '$subject: $minutes dk çalışma. Netin $before → $after.';
+    return 'İlişkili çalışma kategorilerinde $minutes dk; $subject neti: $before → $after.';
   }
 
   @override

@@ -1,17 +1,17 @@
 {
   "reference_id": "reviewed-local-night-20261028",
-  "review_basis": "Local 27/28/29: exam52, competition21, transition20, privacy26, migration16 PASS. Review does not claim production parity. Target reservation follow-up15 and migration16 PASS.",
+  "review_basis": "Local 27/28/29: exam52, competition21, transition20, privacy26, migration16 PASS. Review does not claim production parity. Target reservation follow-up15 and migration16 PASS. D03/D05 isolated25 and migration16 PASS; D04 reviewed category mappings; fixed-local repair preserved all user/probe hashes.",
   "sources_sha256": {
     "supabase/proposed/27_tus_segment.sql": "5836949553fc20a72348bdb2370b44e8c8d4dd51d014f64474291b8acb818fa1",
     "supabase/proposed/27_tus_segment_down.sql": "9292ec74679b5f9cb0d620f555ec9a7b9e0160b2a6557934f4b54967bda7c4ef",
     "supabase/proposed/27_tus_segment_dryrun.sql": "068d383f2d0b712cf5426332b92616b49743d4740cd619e046cd8b0ee5bc0c1a",
-    "supabase/proposed/28_exam_core.sql": "bbceb45cc4cfac4c73b6606116f6afdea3e741ca3eeba0f7408c95748f5bdb95",
+    "supabase/proposed/28_exam_core.sql": "420810cbc2d9d72c2c9695da09402a01429561b296088be5139c9dbc587d7c9c",
     "supabase/proposed/28_exam_core_down.sql": "4989b31fa55f45a6f30a9e84b7b8a9b8b4028d642c3c19ce27ee40a891e68fe8",
-    "supabase/proposed/28_exam_core_dryrun.sql": "da93727b94411e39c77dd351ce9f6759d04471cb0cdec35842e0953f85a5017f",
-    "supabase/proposed/29_monthly_competitions.sql": "daa3ec297012c6ed9b0e51988a7af84e58dbbcbb68300e4f8e5b39424726ffef",
+    "supabase/proposed/28_exam_core_dryrun.sql": "286ca4c8b1f4a2de30631ebebd78a5383bacce7dd66f9bc99f84e73135d4da52",
+    "supabase/proposed/29_monthly_competitions.sql": "6276e13aa1846302ac3f103aff1b84b5f45f67ace401b4cc0e33220e72e6cfd5",
     "supabase/proposed/29_monthly_competitions_down.sql": "f529dc4a33bb4971525230e764737342b82e2b8ab2bde54ff33f81d124bee109",
-    "supabase/proposed/29_monthly_competitions_dryrun.sql": "eaf4eb849633f59577fafdb27caa45220f730b893bb5633daeef32f8b8a0afa4",
-    "supabase/proposed/exam_catalog_v1.json": "7eece1aa36e0ba43fa5a29df348e91565b81d88b7368b45c5a86270be7ea6303",
+    "supabase/proposed/29_monthly_competitions_dryrun.sql": "c1d4daaf3c97758be7b0f2458bf78f6c1605ad601a5d61f26b814d3f8137d40f",
+    "supabase/proposed/exam_catalog_v1.json": "ccebb3e7a52dad5901245413aa2241bde098cb119e08e658d4bb557dc701f18c",
     "tool/local_supabase/parity/fingerprint_lines.sql": "625593a088175b2a30e6ac48fc134834451206100f582977b1a5ebcc5cb1c4ca"
   },
   "expected": {
@@ -42,7 +42,7 @@
       ],
       "func": [
         "113",
-        "4f205ec6b91213353b49a0c2cf259f3c"
+        "2d81fc1fe30146af32d5c4fd014690b4"
       ],
       "idx": [
         "75",
@@ -94,7 +94,7 @@
     ],
     "catalog": {
       "avatars": "48|3e88f75541a31ec3c8a9f83816ec40bd",
-      "exam_catalog": "7|70e0d40f43c4c98599338712cc8d92de",
+      "exam_catalog": "7|72a254ae54ebb8871def4f1f3bbefba2",
       "competition_avatar_rewards": "30|ca20b98cdfd6c50d8c441d7334aa7472"
     },
     "mail_trigger": "D"

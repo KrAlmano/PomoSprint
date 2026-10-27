@@ -4659,7 +4659,7 @@ abstract class AppLocalizations {
   /// No description provided for @examInsightsChange.
   ///
   /// In tr, this message translates to:
-  /// **'{subject}: {minutes} dk çalışma. Netin {before} → {after}.'**
+  /// **'İlişkili çalışma kategorilerinde {minutes} dk; {subject} neti: {before} → {after}.'**
   String examInsightsChange(
     String subject,
     int minutes,

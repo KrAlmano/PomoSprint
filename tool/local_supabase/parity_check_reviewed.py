@@ -14,6 +14,7 @@ import sys
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 REFERENCE = HERE / "parity/reviewed_night_20261028.json"
+ATOMIC_REFERENCE = HERE / "parity/reviewed_night_20261028_start_atomic.json"
 LOCAL_URL = "postgresql://postgres:postgres@127.0.0.1:54322/postgres"
 
 
@@ -37,6 +38,14 @@ def sql(body):
 
 def differences(reference, observed):
     return [name for name in sorted(set(reference) | set(observed)) if reference.get(name) != observed.get(name)]
+
+
+def reference_for(arguments):
+    if arguments == []:
+        return REFERENCE, "reviewed-local-night-20261028", "27/28/29"
+    if arguments == ["--with-session-start-atomic"]:
+        return ATOMIC_REFERENCE, "reviewed-local-night-20261028-start-atomic", "27/28/29 + 30"
+    raise ValueError("unknown reviewed parity mode")
 
 
 def verify_sources(reference):
@@ -64,8 +73,9 @@ def observe():
 
 def main():
     local_url()  # Validate before any subprocess or database request.
-    reference = json.loads(REFERENCE.read_text())
-    if reference.get("reference_id") != "reviewed-local-night-20261028":
+    path, reference_id, packages = reference_for(sys.argv[1:])
+    reference = json.loads(path.read_text())
+    if reference.get("reference_id") != reference_id:
         raise ValueError("unrecognized reviewed reference")
     changed = verify_sources(reference)
     if changed:
@@ -80,9 +90,9 @@ def main():
         if name == "schema" and name in changed:
             print("Changed schema categories:", ", ".join(differences(reference["expected"]["schema"], observed["schema"])))
     if changed:
-        print("FAIL: local candidate differs from reviewed 27/28/29 reference")
+        print("FAIL: local candidate differs from reviewed " + packages + " reference")
         return 1
-    print("PASS: reviewed local 27/28/29 candidate; this is NOT live parity")
+    print("PASS: reviewed local " + packages + " candidate; this is NOT live parity")
     return 0
 
 

@@ -116,7 +116,8 @@
           "name_en": "Turkish Language and Literature",
           "question_count": 24,
           "category_keys": [
-            "Edebiyat"
+            "Edebiyat",
+            "Türkçe"
           ]
         },
         {
@@ -346,14 +347,18 @@
           "name_tr": "Histoloji ve Embriyoloji",
           "name_en": "Histology and Embryology",
           "question_count": 7,
-          "category_keys": []
+          "category_keys": [
+            "Fizyoloji, Histoloji ve Embriyoloji"
+          ]
         },
         {
           "id": "physiology",
           "name_tr": "Fizyoloji",
           "name_en": "Physiology",
           "question_count": 8,
-          "category_keys": []
+          "category_keys": [
+            "Fizyoloji, Histoloji ve Embriyoloji"
+          ]
         },
         {
           "id": "biochemistry",

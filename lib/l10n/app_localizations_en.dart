@@ -2780,7 +2780,7 @@ class AppLocalizationsEn extends AppLocalizations {
     String before,
     String after,
   ) {
-    return '$subject: $minutes min of study. Your net score: $before → $after.';
+    return 'In related study categories: $minutes min; $subject net score: $before → $after.';
   }
 
   @override

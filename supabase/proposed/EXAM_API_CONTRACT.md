@@ -33,6 +33,10 @@ Normal lig puanı yalnız Pomodoro/Maraton; deneme ligi puanı yalnız tam süre
 
 Tamamlanan denemeler profil toplam dakikasına ve04:00 serisine eklenir; normal puan/kum değişmez. Raporlar ayrı deneme listesini okur ve yalnız `completed` kayıtların tam süresini `Deneme` satırında birleştirir. Derslere süre paylaştırılmaz; netler yalnız kişisel rapor/içgörü girdisidir.
 
+## Ders–çalışma kategorisi eşlemesi
+
+TUS Fizyoloji ile Histoloji/Embriyoloji, `Fizyoloji, Histoloji ve Embriyoloji` çalışma kategorisine; AYT edebiyatı `Edebiyat` ve `Türkçe` kategorilerine bağlanır. Birleşik kategorinin aynı dakika toplamı her ilgili net karşılaştırmasına bağlam olur; derslere paylaştırılmaz ve toplam çalışma süresini artırmaz. Arayüz bu yüzden “İlişkili çalışma kategorilerinde …” der. “Küçük Stajlar” için resmî ayrı soru kotası veya uydurma ders eşlemesi yoktur; yetersiz sonuç içgörü oluşturmaz. İstemci `category_keys` değerlerini TR/EN adlar için `categoryMatchKey` ile normalize eder; kategori oturumunun UUID'si aynı karşılaştırmada bir kez sayılır. Eşleşen çalışma yokken geçerli iki net sonucu varsa gösterilen 0 dakika yalnız kayıtlı eşleşen süreyi ifade eder, çalışma yapılmadığı iddiası değildir.
+
 ## Ortak rapor için çalışma metaverisi
 
 `get_my_study_sessions_v2(p_since timestamptz DEFAULT NULL,p_limit integer DEFAULT 1000,p_offset integer DEFAULT 0)` → kendi `study_sessions` satırlarından JSON dizi. Ek alanlar: `session_kind:normal|marathon`, `marathon_uuid`, `marathon_target_sessions`, `marathon_session_index`, `marathon_completed_at`. Tam ve geçerli planda son alan bütün odaklarda aynı son tamamlama zamanıdır; plan adedi distinct UUID ile sayılır. Yarım/geçersiz plan odağı süreye katılır ama plan tamamlanması NULL kalır.

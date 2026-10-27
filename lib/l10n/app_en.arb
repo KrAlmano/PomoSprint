@@ -1027,7 +1027,7 @@
       }
     }
   },
-  "examInsightsChange": "{subject}: {minutes} min of study. Your net score: {before} → {after}.",
+  "examInsightsChange": "In related study categories: {minutes} min; {subject} net score: {before} → {after}.",
   "@examInsightsChange": {
     "placeholders": {
       "subject": {

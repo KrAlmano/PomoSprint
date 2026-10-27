@@ -2,6 +2,8 @@
 
 > **28 Ekim gece hazırlığı:** 27 TUS → 28 Deneme → 29 birleşik aylık lig paketleri yalnız yerelde hazırlanıyor; **canlıya uygulanmadı**. [Yeni paket rehberi](NIGHT_20261028_README.md) ve [API sözleşmesi](EXAM_API_CONTRACT.md) geçerlidir. Aşağıdaki 5 Ekim kayıtları tarihçedir.
 
+> **Ek güvenlik adayı30:** [Başlangıç kotası/UUID atomikliği](30_session_start_atomic_README.md) ayrı ileri/down/DRYRUN paketidir;27–29'a veya offline ödül politikasına dokunmaz. İzole31/31 kontrol geçti; canlıya uygulanmadı.
+
 > **Canlı durum (5 Ekim 2026):** 12 → 15 → 16 → 19 (yalnızca A) → 13 → 14 →
 > 20 → 21 → 22 → 23 → 24 → 25 → 26 bu sırayla **canlıya uygulandı**
 > (kullanıcı onayıyla `supabase db query --linked --project-ref`, `postgres`

@@ -186,9 +186,26 @@ END $$;
 CREATE FUNCTION public.process_monthly_competitions() RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path=public,pg_temp AS $$
 DECLARE pol public.competition_policy%ROWTYPE;v_month date;v_end timestamptz;room record;r record;v_tier integer;v_award text;
 BEGIN
+ -- D-03: ordinary daily runs need no profile locks. Check immutable month
+ -- boundaries and completed-period records before entering the global lock.
+ SELECT * INTO pol FROM public.competition_policy WHERE singleton;
+ IF NOT FOUND THEN RETURN; END IF;
+ IF (pol.legacy_finalized OR now()<pol.activates_at) AND NOT EXISTS(
+  SELECT 1 FROM generate_series(public._competition_month(pol.activates_at)::timestamp,
+   (public._competition_month(now())-interval '1 month')::timestamp,interval '1 month') due(month)
+  WHERE NOT EXISTS(SELECT 1 FROM public.competition_periods done WHERE done.period_month=due.month::date)
+ ) THEN RETURN; END IF;
  -- Same lock order as normal completion: profiles first, then competition locks.
  PERFORM 1 FROM public.profiles ORDER BY id FOR UPDATE;
  PERFORM pg_advisory_xact_lock(71028003);
+ -- Another worker may have finished while this one waited: recheck under lock.
+ SELECT * INTO pol FROM public.competition_policy WHERE singleton;
+ IF NOT FOUND THEN RETURN; END IF;
+ IF (pol.legacy_finalized OR now()<pol.activates_at) AND NOT EXISTS(
+  SELECT 1 FROM generate_series(public._competition_month(pol.activates_at)::timestamp,
+   (public._competition_month(now())-interval '1 month')::timestamp,interval '1 month') due(month)
+  WHERE NOT EXISTS(SELECT 1 FROM public.competition_periods done WHERE done.period_month=due.month::date)
+ ) THEN RETURN; END IF;
  PERFORM public._competition_finalize_legacy();
  SELECT * INTO pol FROM public.competition_policy WHERE singleton;
  v_month:=public._competition_month(pol.activates_at);

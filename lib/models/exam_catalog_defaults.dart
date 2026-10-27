@@ -93,7 +93,7 @@ const offlineExamCatalog = ExamCatalog(
           nameTr: 'Türk Dili ve Edebiyatı',
           nameEn: 'Turkish Language and Literature',
           questionCount: 24,
-          categoryKeys: ['Edebiyat'],
+          categoryKeys: ['Edebiyat', 'Türkçe'],
         ),
         ExamSubject(
           id: 'history_1',
@@ -270,12 +270,14 @@ const offlineExamCatalog = ExamCatalog(
           nameTr: 'Histoloji ve Embriyoloji',
           nameEn: 'Histology and Embryology',
           questionCount: 7,
+          categoryKeys: ['Fizyoloji, Histoloji ve Embriyoloji'],
         ),
         ExamSubject(
           id: 'physiology',
           nameTr: 'Fizyoloji',
           nameEn: 'Physiology',
           questionCount: 8,
+          categoryKeys: ['Fizyoloji, Histoloji ve Embriyoloji'],
         ),
         ExamSubject(
           id: 'biochemistry',

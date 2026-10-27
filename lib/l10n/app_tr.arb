@@ -1582,7 +1582,7 @@
       }
     }
   },
-  "examInsightsChange": "{subject}: {minutes} dk çalışma. Netin {before} → {after}.",
+  "examInsightsChange": "İlişkili çalışma kategorilerinde {minutes} dk; {subject} neti: {before} → {after}.",
   "@examInsightsChange": {
     "placeholders": {
       "subject": {

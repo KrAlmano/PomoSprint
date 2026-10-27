@@ -50,7 +50,9 @@ List<ExamTimeInsight> buildExamTimeInsights({
     final exam = definitionFor(attempt);
     if (exam == null) continue;
     for (final subject in exam.subjects) {
-      // Combined or ambiguous categories do not become imaginary subject time.
+      // Only catalog-declared category mappings may contribute study time.
+      // A shared category total can contextualize multiple subject results;
+      // it is neither split into subject time nor added to study totals here.
       if (subject.categoryKeys.isEmpty) continue;
       final result = attempt.subjectResults
           .where((r) => r.isValidFor(subject))
