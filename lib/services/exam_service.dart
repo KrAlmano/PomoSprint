@@ -323,43 +323,50 @@ class ExamService extends ChangeNotifier {
           throw const ExamFailure('invalid_response');
         }
       } while (cursor != null);
-      _remote = fetched.map((incoming) {
-        final local = _records
-            .where((r) => r.clientUuid == incoming.clientUuid)
-            .firstOrNull;
-        final saved = local?.attempt;
-        if (saved != null &&
-            (local != localAtRequest[incoming.clientUuid] ||
-                (saved.status != ExamAttemptStatus.active &&
-                    incoming.status != saved.status))) {
-          return saved;
+      // A terminal/net mutation may be committing to native storage while
+      // the history request returns. Merge only after that operation commits,
+      // then keep the same lock through our own journal write. The network
+      // read remains outside the lock so it cannot block an offline action.
+      await _lock.synchronized(() async {
+        if (!_current(owner, epoch)) return;
+        _remote = fetched.map((incoming) {
+          final local = _records
+              .where((r) => r.clientUuid == incoming.clientUuid)
+              .firstOrNull;
+          final saved = local?.attempt;
+          if (saved != null &&
+              (local != localAtRequest[incoming.clientUuid] ||
+                  (saved.status != ExamAttemptStatus.active &&
+                      incoming.status != saved.status))) {
+            return saved;
+          }
+          return incoming;
+        }).toList();
+        var rows = List<ExamLocalRecord>.of(_records);
+        for (final a in _remote) {
+          final i = rows.indexWhere((r) => r.clientUuid == a.clientUuid);
+          final definition = definitionFor(a);
+          if (definition == null) continue;
+          if (i < 0) {
+            rows.add(
+              ExamLocalRecord(
+                clientUuid: a.clientUuid,
+                definition: definition,
+                createdAt: a.startedAt,
+                attempt: a.withDefinition(definition),
+              ),
+            );
+          } else if (i >= 0 && rows[i].pendingAction == null) {
+            rows[i] = rows[i].copy(attempt: a.withDefinition(definition));
+          }
         }
-        return incoming;
-      }).toList();
-      var rows = List<ExamLocalRecord>.of(_records);
-      for (final a in _remote) {
-        final i = rows.indexWhere((r) => r.clientUuid == a.clientUuid);
-        final definition = definitionFor(a);
-        if (definition == null) continue;
-        if (i < 0) {
-          rows.add(
-            ExamLocalRecord(
-              clientUuid: a.clientUuid,
-              definition: definition,
-              createdAt: a.startedAt,
-              attempt: a.withDefinition(definition),
-            ),
-          );
-        } else if (i >= 0 && rows[i].pendingAction == null) {
-          rows[i] = rows[i].copy(attempt: a.withDefinition(definition));
+        await _save(owner, epoch, rows);
+        if (_current(owner, epoch)) {
+          _historyLoaded = true;
+          _historyRefreshFailed = false;
+          if (errorCode != 'journal_invalid') errorCode = null;
         }
-      }
-      await _save(owner, epoch, rows);
-      if (_current(owner, epoch)) {
-        _historyLoaded = true;
-        _historyRefreshFailed = false;
-        if (errorCode != 'journal_invalid') errorCode = null;
-      }
+      });
     } catch (error) {
       if (_current(owner, epoch)) {
         if (error is PostgrestException && error.code == 'PGRST202') {
@@ -559,11 +566,22 @@ class ExamService extends ChangeNotifier {
           (action == ExamPendingAction.results && !attempt.isCompleted)) {
         throw const ExamFailure('invalid_response');
       }
-      await _replace(
+      final committed = await _replace(
         owner,
         epoch,
         row.copy(attempt: attempt.withDefinition(row.definition)),
       );
+      if (committed && _current(owner, epoch)) {
+        // The history cache may contain an older completed row. Publishing a
+        // successful result edit must not keep showing that stale snapshot
+        // until the next network refresh.
+        _remote = [
+          for (final cached in _remote)
+            cached.clientUuid == attempt.clientUuid
+                ? attempt.withDefinition(row.definition)
+                : cached,
+        ];
+      }
       if (attempt.isCompleted &&
           action != ExamPendingAction.results &&
           _current(owner, epoch)) {

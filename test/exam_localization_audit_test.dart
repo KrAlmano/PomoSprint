@@ -163,4 +163,54 @@ void main() {
     expect(staleTurkishError, 0);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('editing three result fields keeps their net through rotation', (
+    tester,
+  ) async {
+    final backend = FakeExamBackend();
+    final attempt = _completed(backend);
+    backend.rows[attempt.clientUuid] = attempt;
+    final service = ExamService(backend: backend);
+    final locale = ValueNotifier(const Locale('en'));
+    addTearDown(service.dispose);
+    addTearDown(backend.owner.dispose);
+    addTearDown(locale.dispose);
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(390, 844);
+    addTearDown(tester.view.reset);
+    await service.initialize();
+    await tester.pumpWidget(_app(locale, service, attempt));
+    await tester.tap(find.byKey(const ValueKey('open-results')));
+    await tester.pumpAndSettle();
+    final en = await AppLocalizations.delegate.load(const Locale('en'));
+    final correct = find.byKey(const ValueKey('exam-result-turkish-0'));
+    final wrong = find.byKey(const ValueKey('exam-result-turkish-1'));
+    final blank = find.byKey(const ValueKey('exam-result-turkish-2'));
+    await tester.enterText(correct, '41');
+    FocusManager.instance.primaryFocus?.unfocus();
+    await tester.tap(find.widgetWithText(FilledButton, en.examSaveResults));
+    await tester.pumpAndSettle();
+    expect(find.text(en.examResultsInvalid), findsOneWidget);
+    await tester.enterText(correct, '30');
+    await tester.enterText(wrong, '4');
+    await tester.enterText(blank, '6');
+    FocusManager.instance.primaryFocus?.unfocus();
+    tester.view.physicalSize = const Size(844, 390);
+    await tester.pumpAndSettle();
+    expect(tester.widget<TextField>(correct).controller!.text, '30');
+    expect(tester.widget<TextField>(wrong).controller!.text, '4');
+    expect(tester.widget<TextField>(blank).controller!.text, '6');
+    expect(find.text('${en.examNet}: 29.00'), findsOneWidget);
+    expect(service.attempts.single.subjectResults, isEmpty);
+    await tester.tap(find.widgetWithText(FilledButton, en.examSaveResults));
+    await tester.pumpAndSettle();
+    expect(service.records.single.errorCode, isNull);
+    expect(service.records.single.pendingAction, isNull);
+    expect(find.byType(AlertDialog), findsNothing);
+    final saved = service.attempts.single.subjectResults.firstWhere(
+      (r) => r.subjectId == 'turkish',
+    );
+    expect(saved.net(4), 29);
+    expect(tester.takeException(), isNull);
+  });
 }
