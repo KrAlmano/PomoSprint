@@ -131,27 +131,30 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
     setState(() => _starting = true);
     try {
       if (!await _canStartNow(owner)) {
-        if (mounted) _message(l10n.examConflict);
+        if (mounted) _message(AppLocalizations.of(context)!.examConflict);
         return;
       }
       if (!mounted) return;
       final accepted = await showDialog<bool>(
         context: context,
-        builder: (context) => AlertDialog(
-          scrollable: true,
-          title: Text(l10n.examRulesTitle),
-          content: Text(l10n.examRulesBody),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: Text(l10n.cancel),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: Text(l10n.examReady),
-            ),
-          ],
-        ),
+        builder: (context) {
+          final l10n = AppLocalizations.of(context)!;
+          return AlertDialog(
+            scrollable: true,
+            title: Text(l10n.examRulesTitle),
+            content: Text(l10n.examRulesBody),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text(l10n.cancel),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text(l10n.examReady),
+              ),
+            ],
+          );
+        },
       );
       if (!mounted || accepted != true || owner != _service.backend.ownerId) {
         return;
@@ -162,12 +165,12 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
         builder: (_) => const _ExamCountdown(),
       );
       if (!await _canStartNow(owner)) {
-        if (mounted) _message(l10n.examConflict);
+        if (mounted) _message(AppLocalizations.of(context)!.examConflict);
         return;
       }
       await _service.start(exam);
     } catch (_) {
-      if (mounted) _message(l10n.examError);
+      if (mounted) _message(AppLocalizations.of(context)!.examError);
     } finally {
       if (mounted) setState(() => _starting = false);
     }
@@ -189,24 +192,26 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
   }
 
   Future<void> _abandon(ExamLocalRecord record) async {
-    final l10n = AppLocalizations.of(context)!;
     final accepted = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        scrollable: true,
-        title: Text(l10n.examAbandonTitle),
-        content: Text(l10n.examAbandonBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(l10n.cancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(l10n.examAbandon),
-          ),
-        ],
-      ),
+      builder: (context) {
+        final l10n = AppLocalizations.of(context)!;
+        return AlertDialog(
+          scrollable: true,
+          title: Text(l10n.examAbandonTitle),
+          content: Text(l10n.examAbandonBody),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(l10n.cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(l10n.examAbandon),
+            ),
+          ],
+        );
+      },
     );
     if (accepted == true) await _service.abandon(record.clientUuid);
   }

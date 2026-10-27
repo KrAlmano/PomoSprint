@@ -130,11 +130,13 @@ class _CategoriesManagementScreenState extends State<CategoriesManagementScreen>
 
     // Diyalogda ad arayüz dilinde gösterilir (ör. 'Matematik' → 'Mathematics').
     final shownName = cat == null ? null : LanguageService.instance.translateCatName(cat.name);
-    final result = await CategoryNameDialog.show(
+    final result = await CategoryNameDialog.showLocalized(
       context,
-      title: cat == null ? l10n.newCategoryDialogTitle : l10n.editCategoryDialogTitle,
-      confirmLabel: cat == null ? l10n.addBtn : l10n.save,
-      hintText: l10n.categoryNameHint,
+      labels: (current) => (
+        title: cat == null ? current.newCategoryDialogTitle : current.editCategoryDialogTitle,
+        confirmLabel: cat == null ? current.addBtn : current.save,
+        hintText: current.categoryNameHint,
+      ),
       initialName: shownName,
       // Yeni kategori, aktiflerde kullanılmayan ilk palet rengiyle açılır.
       initialColorHex: cat?.colorHex ?? firstUnusedPaletteColor(_activeCategories.map((c) => c.colorHex)),

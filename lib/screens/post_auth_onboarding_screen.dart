@@ -420,45 +420,49 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
   /// bitirmeden hesabını silebilir; Profil ekranına buradan ulaşılamıyor.
   Future<void> _confirmDeleteAccount() async {
     if (_isSaving) return;
-    final l10n = AppLocalizations.of(context)!;
     final service = _service;
-    final confirmText = deleteAccountConfirmText(
-      l10n,
-      pendingCount: service.pendingSessionCount.value,
-      appleReauthorization: service.canReauthorizeWithApple,
-    );
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        scrollable: true,
-        constraints: const BoxConstraints(minWidth: 280, maxWidth: 440),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(
-          l10n.deleteAccount,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        content: Text(
-          confirmText,
-          style: const TextStyle(fontSize: 14, height: 1.4),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(l10n.cancel),
+      builder: (ctx) {
+        final l10n = AppLocalizations.of(ctx)!;
+        final confirmText = deleteAccountConfirmText(
+          l10n,
+          pendingCount: service.pendingSessionCount.value,
+          appleReauthorization: service.canReauthorizeWithApple,
+        );
+        return AlertDialog(
+          scrollable: true,
+          constraints: const BoxConstraints(minWidth: 280, maxWidth: 440),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
           ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-            ),
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(
-              l10n.deleteAccount,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
+          title: Text(
+            l10n.deleteAccount,
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
-        ],
-      ),
+          content: Text(
+            confirmText,
+            style: const TextStyle(fontSize: 14, height: 1.4),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text(l10n.cancel),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text(
+                l10n.deleteAccount,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        );
+      },
     );
     if (confirmed != true || !mounted) return;
     setState(() => _isSaving = true);
@@ -478,7 +482,10 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
       _draftClosed = false;
       if (!mounted) return;
       setState(() => _isSaving = false);
-      _showSnack(l10n.profileDeleteError, isError: true);
+      _showSnack(
+        AppLocalizations.of(context)!.profileDeleteError,
+        isError: true,
+      );
     }
   }
 
@@ -547,11 +554,13 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
       _showSnack(l10n.categoryLimitReachedMsg(_categoryLimit));
       return;
     }
-    final result = await CategoryNameDialog.show(
+    final result = await CategoryNameDialog.showLocalized(
       context,
-      title: l10n.onboardingAddCategoryTitle,
-      hintText: l10n.onboardingCategoryHint,
-      confirmLabel: l10n.addBtn,
+      labels: (current) => (
+        title: current.onboardingAddCategoryTitle,
+        hintText: current.onboardingCategoryHint,
+        confirmLabel: current.addBtn,
+      ),
       showColorPicker: false,
       takenNames: _categoryChipNames,
     );

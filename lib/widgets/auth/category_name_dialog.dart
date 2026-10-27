@@ -6,9 +6,18 @@ import '../../utils/color_hex.dart';
 
 /// Kategori renk paleti; onboarding ve Kategorilerim aynı listeyi kullanır.
 const List<String> kCategoryPalette = [
-  '#EF4444', '#3B82F6', '#10B981', '#F59E0B',
-  '#8B5CF6', '#EC4899', '#14B8A6', '#F97316',
-  '#64FFDA', '#69F0AE', '#7C4DFF', '#FFAB40',
+  '#EF4444',
+  '#3B82F6',
+  '#10B981',
+  '#F59E0B',
+  '#8B5CF6',
+  '#EC4899',
+  '#14B8A6',
+  '#F97316',
+  '#64FFDA',
+  '#69F0AE',
+  '#7C4DFF',
+  '#FFAB40',
 ];
 
 const int kCategoryNameMaxLength = 40;
@@ -40,10 +49,18 @@ String firstUnusedPaletteColor(Iterable<String> usedHexes) {
 /// dilinde gösterir ([shownName]); kullanıcı ona dokunmadıysa sunucudaki ad
 /// ([storedName], ör. 'Matematik') korunur. Büyük/küçük harf düzeltmesi dahil
 /// her değişiklik kaydedilir.
-String categoryNameToSave({required String storedName, required String shownName, required String editedName}) =>
-    editedName.trim() == shownName.trim() ? storedName : editedName.trim();
+String categoryNameToSave({
+  required String storedName,
+  required String shownName,
+  required String editedName,
+}) => editedName.trim() == shownName.trim() ? storedName : editedName.trim();
 
 typedef CategoryDialogResult = ({String name, String colorHex});
+typedef CategoryDialogLabels = ({
+  String title,
+  String confirmLabel,
+  String? hintText,
+});
 
 /// Kategori adı (ve isteğe bağlı renk) soran diyalog. Ad 1..40 karakter
 /// olmalı ve [takenNames] içinde (büyük-küçük harf duyarsız) bulunmamalı.
@@ -77,18 +94,41 @@ class CategoryNameDialog extends StatefulWidget {
     String? initialColorHex,
     bool showColorPicker = true,
     Iterable<String> takenNames = const [],
+  }) => showLocalized(
+    context,
+    labels: (_) =>
+        (title: title, confirmLabel: confirmLabel, hintText: hintText),
+    initialName: initialName,
+    initialColorHex: initialColorHex,
+    showColorPicker: showColorPicker,
+    takenNames: takenNames,
+  );
+
+  /// Rebuilds application labels when the locale changes without replacing
+  /// the dialog state or the user's in-progress text/color selection.
+  /// [show] remains available for caller-owned literal labels.
+  static Future<CategoryDialogResult?> showLocalized(
+    BuildContext context, {
+    required CategoryDialogLabels Function(AppLocalizations) labels,
+    String? initialName,
+    String? initialColorHex,
+    bool showColorPicker = true,
+    Iterable<String> takenNames = const [],
   }) {
     return showDialog<CategoryDialogResult>(
       context: context,
-      builder: (_) => CategoryNameDialog(
-        title: title,
-        confirmLabel: confirmLabel,
-        hintText: hintText,
-        initialName: initialName,
-        initialColorHex: initialColorHex,
-        showColorPicker: showColorPicker,
-        takenNames: takenNames,
-      ),
+      builder: (context) {
+        final current = labels(AppLocalizations.of(context)!);
+        return CategoryNameDialog(
+          title: current.title,
+          confirmLabel: current.confirmLabel,
+          hintText: current.hintText,
+          initialName: initialName,
+          initialColorHex: initialColorHex,
+          showColorPicker: showColorPicker,
+          takenNames: takenNames,
+        );
+      },
     );
   }
 
@@ -97,8 +137,12 @@ class CategoryNameDialog extends StatefulWidget {
 }
 
 class _CategoryNameDialogState extends State<CategoryNameDialog> {
-  late final TextEditingController _nameCtrl = TextEditingController(text: widget.initialName);
-  late String _colorHex = _normalizeHex(widget.initialColorHex ?? kCategoryPalette.first);
+  late final TextEditingController _nameCtrl = TextEditingController(
+    text: widget.initialName,
+  );
+  late String _colorHex = _normalizeHex(
+    widget.initialColorHex ?? kCategoryPalette.first,
+  );
   String Function(AppLocalizations)? _error;
 
   static String _normalizeHex(String hex) => colorToHex(colorFromHex(hex));
@@ -122,7 +166,10 @@ class _CategoryNameDialogState extends State<CategoryNameDialog> {
       setState(() => _error = (current) => current.categoryNameExistsMsg);
       return;
     }
-    Navigator.pop<CategoryDialogResult>(context, (name: name, colorHex: _colorHex));
+    Navigator.pop<CategoryDialogResult>(context, (
+      name: name,
+      colorHex: _colorHex,
+    ));
   }
 
   @override
@@ -149,11 +196,17 @@ class _CategoryNameDialogState extends State<CategoryNameDialog> {
               if (_error != null) setState(() => _error = null);
             },
             onSubmitted: (_) => _submit(),
-            decoration: InputDecoration(hintText: widget.hintText, errorText: _error?.call(l10n)),
+            decoration: InputDecoration(
+              hintText: widget.hintText,
+              errorText: _error?.call(l10n),
+            ),
           ),
           if (widget.showColorPicker) ...[
             const SizedBox(height: 12),
-            Text(l10n.chooseColor, style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              l10n.chooseColor,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 10),
             Wrap(
               spacing: 8,
@@ -169,13 +222,18 @@ class _CategoryNameDialogState extends State<CategoryNameDialog> {
                     decoration: BoxDecoration(
                       color: color,
                       shape: BoxShape.circle,
-                      border: Border.all(color: isSelected ? onSurface : Colors.transparent, width: 2),
+                      border: Border.all(
+                        color: isSelected ? onSurface : Colors.transparent,
+                        width: 2,
+                      ),
                     ),
                     child: isSelected
                         ? Icon(
                             Icons.check,
                             size: 16,
-                            color: color.computeLuminance() > 0.5 ? Colors.black : Colors.white,
+                            color: color.computeLuminance() > 0.5
+                                ? Colors.black
+                                : Colors.white,
                           )
                         : null,
                   ),
@@ -186,7 +244,10 @@ class _CategoryNameDialogState extends State<CategoryNameDialog> {
         ],
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n.cancel),
+        ),
         ValueListenableBuilder<TextEditingValue>(
           valueListenable: _nameCtrl,
           builder: (context, value, _) => ElevatedButton(
