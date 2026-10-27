@@ -5,7 +5,7 @@ set -u -o pipefail
 ROOT="$(cd "$(dirname "$0")/../../../.." && pwd)"
 cd "$ROOT" || exit 1
 if [[ "${1:-}" == "--help" ]]; then
-  echo "Senaryolar: a b c d e g i j k l m n o p q r s t u v w x y z; varsayılan: a b c d e"
+  echo "Senaryolar: a b c d e g h i j k l m n o p q r s t u v w x y z; varsayılan: a b c d e"
   echo "Yerel Supabase açık olmalı; sayaçlar gerçek 25/50 dakikadır."
   echo "Cihazı açıkça seçin: SIM_UDID (iOS) veya ANDROID_SERIAL (Android emülatörü)."
   exit 0
@@ -15,7 +15,7 @@ declare -a FILES=()
 shopt -s nullglob
 for part in "$@"; do
   case "$part" in
-    a|b|c|d|e|g|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z) ;;
+    a|b|c|d|e|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z) ;;
     *) echo "HATA: desteklenmeyen senaryo '$part'; --help ile listeye bakın." >&2; exit 2 ;;
   esac
   matches=(integration_test/"${part}"_*_test.dart)
@@ -37,7 +37,7 @@ if [[ -n "${E2E_PLAIN_NAME:-}" ]]; then
 fi
 case "${E2E_MARATHON_MINUTES:-25}" in 25|50) ;; *) echo "HATA: Maraton yalnız25/50 dakika olabilir." >&2; exit 2 ;; esac
 EXTRA_DEFINES+=("--dart-define=E2E_MARATHON_MINUTES=${E2E_MARATHON_MINUTES:-25}")
-for flag in E2E_REAL_MARATHON E2E_HTTP_PROXY E2E_NORMAL_HTTP_REAL25 E2E_NORMAL_HTTP_PRESEEDED E2E_MEDIA_CAPTURE E2E_EXTRA_JOURNEYS; do
+for flag in E2E_REAL_MARATHON E2E_HTTP_PROXY E2E_NORMAL_HTTP_REAL25 E2E_NORMAL_HTTP_PRESEEDED E2E_MEDIA_CAPTURE E2E_EXTRA_JOURNEYS E2E_FIRST_USE_REAL25; do
   case "${!flag:-false}" in
     true) EXTRA_DEFINES+=("--dart-define=$flag=true") ;;
     false) ;;
@@ -71,8 +71,16 @@ if [[ -n "${E2E_EXAM_FIXTURE_EMAIL:-}" ]]; then
   esac
 fi
 LOG_DIR="$ROOT/build/e2e_sim"
-curl -fsS -o /dev/null "$API_URL/auth/v1/health" -H "apikey: $ANON_KEY" \
+# A two-process HTTP503 test intentionally leaves the app proxy unavailable.
+# Check the real local service without reopening transport before the next
+# process has inspected its durable outbox. This never changes the app URL.
+HEALTH_URL="http://127.0.0.1:54321"
+curl -fsS -o /dev/null "$HEALTH_URL/auth/v1/health" -H "apikey: $ANON_KEY" \
   || { echo "HATA: yerel Supabase yanıt vermiyor; supabase start --workdir tool/local_supabase" >&2; exit 1; }
+if [[ "${E2E_API_PORT:-54321}" == "54325" ]]; then
+  curl -fsS -o /dev/null http://127.0.0.1:54326/health \
+    || { echo "HATA: yerel QA HTTP proxy admin yanıt vermiyor." >&2; exit 1; }
+fi
 if ! xcrun simctl list devices booted | grep -Fq "$SIM_UDID"; then
   xcrun simctl boot "$SIM_UDID" || exit 1
 fi
