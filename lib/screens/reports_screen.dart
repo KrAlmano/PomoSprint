@@ -6,6 +6,7 @@ import 'package:intl/date_symbol_data_local.dart';
 
 import '../l10n/app_localizations.dart';
 import '../models/category_model.dart';
+import '../models/exam_model.dart';
 import '../services/language_service.dart';
 import '../services/server_clock.dart';
 import '../services/supabase_service.dart';
@@ -20,6 +21,7 @@ import '../widgets/stats/stats_empty_card.dart';
 import '../widgets/stats/stats_layout.dart';
 import '../widgets/stats/stats_load_state.dart';
 import '../widgets/stats/stats_text.dart';
+import '../widgets/stats/session_type_summary.dart';
 import 'history_screen.dart';
 import 'monthly_tracking_screen.dart';
 import 'rejected_sessions_screen.dart';
@@ -29,6 +31,9 @@ import 'rejected_sessions_screen.dart';
 class ReportsScreen extends StatefulWidget {
   final List<CourseCategory> categories;
   final VoidCallback? onStartTimer;
+  final VoidCallback? onOpenExams;
+  final Future<List<ExamAttempt>> Function()? loadExamAttempts;
+  final bool Function()? isExamHistoryStale;
 
   /// Testte sahte servis verilir; uygulamada [SupabaseService.instance].
   @visibleForTesting
@@ -38,6 +43,9 @@ class ReportsScreen extends StatefulWidget {
     super.key,
     required this.categories,
     this.onStartTimer,
+    this.onOpenExams,
+    this.loadExamAttempts,
+    this.isExamHistoryStale,
     this.service,
   });
 
@@ -45,7 +53,8 @@ class ReportsScreen extends StatefulWidget {
   State<ReportsScreen> createState() => _ReportsScreenState();
 }
 
-class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserver {
+class _ReportsScreenState extends State<ReportsScreen>
+    with WidgetsBindingObserver {
   // Sekme yeniden görünür olduğunda veriler bu süreden eskiyse yenilenir.
   static const Duration _staleAfter = Duration(seconds: 30);
   // Tarih biçimleri bir kez yüklenir. (Önbelleğe alınmış tek bir Future
@@ -65,6 +74,8 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
   bool _showDistributionPercent = false;
 
   List<StatSession> _remoteSessions = const [];
+  List<ExamAttempt> _examAttempts = const [];
+  int _ownerEpoch = 0;
 
   /// Cihazdaki bekleyen seans kuyruğu (ham). İstatistiğe girenler build'de
   /// [pendingStatSessions] ile seçilir.
@@ -95,7 +106,8 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
 
   // 'Bugün' sunucu saatiyle: bekleyen seansın günü de kuyruğun gönderdiği
   // düzeltilmiş saatle hesaplanıyor; ikisi aynı saate bakmalı.
-  DateTime _now() => DateTime.now().add(ServerClock.correctionFor(_service.serverClockOffset));
+  DateTime _now() =>
+      DateTime.now().add(ServerClock.correctionFor(_service.serverClockOffset));
 
   @override
   void initState() {
@@ -152,7 +164,8 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
     _syncToday();
     _scheduleDayRollover();
     final loadedAt = _loadedAt;
-    final stale = loadedAt == null || DateTime.now().difference(loadedAt) > _staleAfter;
+    final stale =
+        loadedAt == null || DateTime.now().difference(loadedAt) > _staleAfter;
     if (_dirty || stale || _loadError != null) unawaited(_refresh());
   }
 
@@ -208,7 +221,9 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
     if (userId != _userId) {
       // Hesap değişti: önceki kullanıcının verisi gösterilmez.
       _userId = userId;
+      _ownerEpoch++;
       _remoteSessions = const [];
+      _examAttempts = const [];
       _pendingQueue = const [];
       _rejectedCount = 0;
       _hasLoaded = false;
@@ -251,6 +266,7 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
   Future<void> _load() async {
     _dirty = false;
     final userId = _userId;
+    final epoch = _ownerEpoch;
     final today = studyDayOf(_now());
     // Kuyruk uzak okumadan ÖNCE ve ondan bağımsız okunur: (1) çevrimdışıyken
     // de bekleyen seanslar görünür; (2) bu arada gönderilen seans iki listede
@@ -258,6 +274,20 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
     // oluşmaz.
     final queue = await _readQueue();
     final rejectedCount = await _readRejectedCount();
+    List<ExamAttempt>? nextExams;
+    ServiceErrorCode? examError;
+    final loadExams = widget.loadExamAttempts;
+    if (loadExams != null) {
+      try {
+        nextExams = await loadExams();
+        if (widget.isExamHistoryStale?.call() == true) {
+          examError = ServiceErrorCode.network;
+        }
+      } catch (error) {
+        examError = serviceErrorCodeOf(error);
+      }
+    }
+    if (!mounted || epoch != _ownerEpoch || userId != _userId) return;
     try {
       await _ensureDateFormatting();
       // Aylık sekme önceki ayın aynı dönemini ve ayın ilk haftasının
@@ -265,33 +295,40 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
       final since = studyDayStart(DateTime(today.year, today.month - 1, 1));
       final remote = await _service.fetchStudySessions(since: since);
       if (!mounted) return;
-      if (userId != _userId) {
+      if (userId != _userId || epoch != _ownerEpoch) {
         _reloadQueued = true;
         return;
       }
       setState(() {
-        _remoteSessions = remote.map(StatSession.fromStudySession).toList(growable: false);
+        _remoteSessions = remote
+            .map(StatSession.fromStudySession)
+            .toList(growable: false);
+        if (nextExams != null) _examAttempts = nextExams;
         _pendingQueue = queue;
         _rejectedCount = rejectedCount;
         _hasLoaded = true;
         _remoteLoaded = true;
-        _loadError = null;
+        _loadError = examError;
         _loadedAt = DateTime.now();
         _today = today;
       });
     } catch (e) {
       // Mevcut veriler silinmez; hata durumu ve 'Tekrar Dene' gösterilir.
       debugPrint('İstatistikler yüklenemedi: $e');
-      if (!mounted || userId != _userId) return;
+      if (!mounted || userId != _userId || epoch != _ownerEpoch) return;
       final delivered = await _deliveredSince(queue);
-      if (!mounted || userId != _userId) return;
+      if (!mounted || userId != _userId || epoch != _ownerEpoch) return;
       setState(() {
+        if (nextExams != null) _examAttempts = nextExams;
         _loadError = serviceErrorCodeOf(e);
         _pendingQueue = queue;
         _rejectedCount = rejectedCount;
-        if (delivered.isNotEmpty) _remoteSessions = [..._remoteSessions, ...delivered];
+        if (delivered.isNotEmpty) {
+          _remoteSessions = [..._remoteSessions, ...delivered];
+        }
         // Sunucu verisi hiç alınamadıysa bekleyenler yine de gösterilir.
-        if (!_hasLoaded && queue.isNotEmpty) {
+        if (!_hasLoaded &&
+            (queue.isNotEmpty || _examAttempts.any((a) => a.isCompleted))) {
           _hasLoaded = true;
           _today = today;
         }
@@ -321,13 +358,19 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
   /// sunucuya ulaşmıştır (kalıcı reddedilenler hariç). Uzak liste
   /// yenilenemediğinde toplam düşmesin diye bunlar sunucu seansı olarak
   /// tutulur; bir sonraki başarılı yükleme listeyi baştan kurar.
-  Future<List<StatSession>> _deliveredSince(List<PendingSession> queueNow) async {
+  Future<List<StatSession>> _deliveredSince(
+    List<PendingSession> queueNow,
+  ) async {
     final stillQueued = {for (final p in queueNow) p.clientUuid};
-    final gone = _pendingQueue.where((p) => !stillQueued.contains(p.clientUuid)).toList();
+    final gone = _pendingQueue
+        .where((p) => !stillQueued.contains(p.clientUuid))
+        .toList();
     if (gone.isEmpty) return const [];
     final Set<String> rejected;
     try {
-      rejected = {for (final r in await _service.getRejectedSessions()) r.clientUuid};
+      rejected = {
+        for (final r in await _service.getRejectedSessions()) r.clientUuid,
+      };
     } catch (e) {
       debugPrint('Reddedilen seanslar okunamadı: $e');
       return const [];
@@ -337,8 +380,13 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
         if (s.clientUuid != null) s.clientUuid!.toLowerCase(),
     };
     return [
-      for (final s in pendingStatSessions(gone, clockOffset: _service.serverClockOffset))
-        if (!rejected.contains(s.clientUuid) && !known.contains(s.clientUuid!.toLowerCase())) s.copyWith(pending: false),
+      for (final s in pendingStatSessions(
+        gone,
+        clockOffset: _service.serverClockOffset,
+      ))
+        if (!rejected.contains(s.clientUuid) &&
+            !known.contains(s.clientUuid!.toLowerCase()))
+          s.copyWith(pending: false),
     ];
   }
 
@@ -375,7 +423,10 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
               children: [
                 // Sekme çubuğu, yükleme çizgisi ve uyarı geniş ekranda pano
                 // genişliğinde ortalanır.
-                ContentWidth(maxWidth: ContentWidth.dashboard, child: _buildTabBar(lang)),
+                ContentWidth(
+                  maxWidth: ContentWidth.dashboard,
+                  child: _buildTabBar(lang),
+                ),
                 ContentWidth(
                   maxWidth: ContentWidth.dashboard,
                   child: SizedBox(
@@ -385,7 +436,9 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
                             padding: const EdgeInsets.symmetric(horizontal: 24),
                             child: LinearProgressIndicator(
                               minHeight: 2,
-                              color: isDark ? AppColors.darkPrimary : AppColors.primary,
+                              color: isDark
+                                  ? AppColors.darkPrimary
+                                  : AppColors.primary,
                               backgroundColor: Colors.transparent,
                             ),
                           )
@@ -397,7 +450,11 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
                     maxWidth: ContentWidth.dashboard,
                     child: StatsStaleBanner(
                       onRetry: _refresh,
-                      message: _remoteLoaded ? null : AppLocalizations.of(context)!.statsOfflinePendingOnly,
+                      message: _remoteLoaded
+                          ? null
+                          : AppLocalizations.of(
+                              context,
+                            )!.statsOfflinePendingOnly,
                     ),
                   ),
                 Expanded(child: _buildTabContent(lang)),
@@ -413,46 +470,65 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
     final isDark = Theme.of(context).brightness == Brightness.dark;
     if (!_hasLoaded) {
       final error = _loadError;
-      if (error != null && !_isLoading) return StatsErrorView(code: error, onRetry: _refresh);
-      return Center(child: CircularProgressIndicator(color: isDark ? AppColors.darkPrimary : AppColors.primary));
+      if (error != null && !_isLoading) {
+        return StatsErrorView(code: error, onRetry: _refresh);
+      }
+      return Center(
+        child: CircularProgressIndicator(
+          color: isDark ? AppColors.darkPrimary : AppColors.primary,
+        ),
+      );
     }
 
-    final sessions = mergeStatSessions(
+    final study = mergeStatSessions(
       remote: _remoteSessions,
-      pending: pendingStatSessions(_pendingQueue, clockOffset: _service.serverClockOffset),
+      pending: pendingStatSessions(
+        _pendingQueue,
+        clockOffset: _service.serverClockOffset,
+      ),
       categories: widget.categories,
+    );
+    final sessions = combineStudyAndExamSessions(
+      study: study,
+      exams: _examAttempts,
     );
     final goalMinutes = _dailyGoalMinutes;
     return switch (_activeTab) {
       0 => DailyReportView(
-          sessions: sessions,
-          today: _today,
-          dailyGoalMinutes: goalMinutes,
-          // Tam boş durum yalnızca hiç çalışmamış kullanıcıya gösterilir.
-          hasHistory: sessions.isNotEmpty || (_service.currentUser.value?.totalMinutes ?? 0) > 0,
-          categories: widget.categories,
-          onRefresh: _refresh,
-          showDistributionPercent: _showDistributionPercent,
-          onDistributionModeChanged: (percent) => setState(() => _showDistributionPercent = percent),
-          onShowDetails: () => setState(() => _activeTab = 1),
-          onStartTimer: widget.onStartTimer,
-        ),
+        sessions: sessions,
+        today: _today,
+        dailyGoalMinutes: goalMinutes,
+        // Tam boş durum yalnızca hiç çalışmamış kullanıcıya gösterilir.
+        hasHistory:
+            sessions.isNotEmpty ||
+            (_service.currentUser.value?.totalMinutes ?? 0) > 0,
+        categories: widget.categories,
+        onRefresh: _refresh,
+        showDistributionPercent: _showDistributionPercent,
+        onDistributionModeChanged: (percent) =>
+            setState(() => _showDistributionPercent = percent),
+        onShowDetails: () => setState(() => _activeTab = 1),
+        onStartTimer: widget.onStartTimer,
+        onOpenExams: widget.onOpenExams,
+      ),
       1 => HistoryScreen(
-          sessions: sessions,
-          today: _today,
-          dailyGoalMinutes: goalMinutes,
-          categories: widget.categories,
-          onRefresh: _refresh,
-          onStartTimer: widget.onStartTimer,
-          rejectedSessionCount: _rejectedCount,
-          onShowRejectedSessions: () => openRejectedSessions(context),
-        ),
+        sessions: sessions,
+        today: _today,
+        dailyGoalMinutes: goalMinutes,
+        categories: widget.categories,
+        onRefresh: _refresh,
+        onStartTimer: widget.onStartTimer,
+        onOpenExams: widget.onOpenExams,
+        rejectedSessionCount: _rejectedCount,
+        onShowRejectedSessions: () => openRejectedSessions(context),
+      ),
       _ => MonthlyTrackingScreen(
-          sessions: sessions,
-          today: _today,
-          categories: widget.categories,
-          onRefresh: _refresh,
-        ),
+        sessions: sessions,
+        today: _today,
+        categories: widget.categories,
+        onRefresh: _refresh,
+        onOpenExams: widget.onOpenExams,
+      ),
     };
   }
 
@@ -465,7 +541,11 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: (isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant).withValues(alpha: 0.3),
+            color:
+                (isDark
+                        ? AppColors.darkOutlineVariant
+                        : AppColors.outlineVariant)
+                    .withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -538,7 +618,9 @@ class _ReportsScreenState extends State<ReportsScreen> with WidgetsBindingObserv
               fontWeight: FontWeight.w600,
               color: isActive
                   ? accent
-                  : (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
+                  : (isDark
+                        ? AppColors.darkOnSurfaceVariant
+                        : AppColors.onSurfaceVariant),
             ),
           ),
         ),
@@ -566,6 +648,7 @@ class DailyReportView extends StatelessWidget {
     required this.onDistributionModeChanged,
     this.onShowDetails,
     this.onStartTimer,
+    this.onOpenExams,
   });
 
   final List<StatSession> sessions;
@@ -584,6 +667,7 @@ class DailyReportView extends StatelessWidget {
   final ValueChanged<bool> onDistributionModeChanged;
   final VoidCallback? onShowDetails;
   final VoidCallback? onStartTimer;
+  final VoidCallback? onOpenExams;
 
   @override
   Widget build(BuildContext context) {
@@ -593,7 +677,10 @@ class DailyReportView extends StatelessWidget {
     final todaySessions = sessionsBetween(sessions, today, today).toList();
     final categoryStats = totalsByCategory(todaySessions);
     final todayMinutes = sumMinutes(todaySessions);
-    final todayPomodoros = todaySessions.fold<int>(0, (sum, s) => sum + s.pomodoros);
+    final todayPomodoros = todaySessions.fold<int>(
+      0,
+      (sum, s) => sum + s.pomodoros,
+    );
     final pendingToday = todaySessions.where((s) => s.pending).length;
     final l10n = AppLocalizations.of(context)!;
 
@@ -604,11 +691,17 @@ class DailyReportView extends StatelessWidget {
           final layout = StatsLayout.of(context, constraints.maxWidth);
 
           // 0. Günlük Hedef  1. Verimlilik Skoru  4. Verimlilik İpucu
-          final goalCard = _buildDailyGoalCard(context, todayMinutes, todayPomodoros, pendingToday);
+          final goalCard = _buildDailyGoalCard(
+            context,
+            todayMinutes,
+            todayPomodoros,
+            pendingToday,
+          );
           final efficiencyCard = _buildEfficiencyCard(context, todayMinutes);
           final tip = _buildEfficiencyTip(context);
           // Geniş ekranda ipucu da özet satırına katılır (3 sütun).
           final tipInSummary = layout.isExpanded;
+          final counts = sessionTypeCounts(sessions, today, today);
 
           // 2-3. Bugünkü çalışmalar ve dağılım
           final Widget todayContent;
@@ -669,11 +762,10 @@ class DailyReportView extends StatelessWidget {
               const SizedBox(height: 24),
               _buildTodayHeader(context, lang),
               const SizedBox(height: 12),
+              SessionTypeSummary(counts: counts, onOpenExams: onOpenExams),
+              const SizedBox(height: 24),
               todayContent,
-              if (!tipInSummary) ...[
-                const SizedBox(height: 24),
-                tip,
-              ],
+              if (!tipInSummary) ...[const SizedBox(height: 24), tip],
               const SizedBox(height: 24),
             ],
           );
@@ -683,26 +775,40 @@ class DailyReportView extends StatelessWidget {
   }
 
   // ─── 0. GÜNLÜK HEDEF KARTI ───
-  Widget _buildDailyGoalCard(BuildContext context, int todayMinutes, int todayPomodoros, int pendingToday) {
+  Widget _buildDailyGoalCard(
+    BuildContext context,
+    int todayMinutes,
+    int todayPomodoros,
+    int pendingToday,
+  ) {
     final lang = LanguageService.instance;
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final variant = isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant;
+    final variant = isDark
+        ? AppColors.darkOnSurfaceVariant
+        : AppColors.onSurfaceVariant;
     final goalMinutes = dailyGoalMinutes;
 
     return MergeSemantics(
       child: Semantics(
         button: true,
         child: GestureDetector(
-          onTap: () => showDailyGoalSheet(context, initialGoalMinutes: goalMinutes),
+          onTap: () =>
+              showDailyGoalSheet(context, initialGoalMinutes: goalMinutes),
           child: Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: isDark ? AppColors.darkSurfaceContainerLowest : AppColors.surfaceContainerLowest,
+              color: isDark
+                  ? AppColors.darkSurfaceContainerLowest
+                  : AppColors.surfaceContainerLowest,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: (isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant).withValues(alpha: 0.4),
+                color:
+                    (isDark
+                            ? AppColors.darkOutlineVariant
+                            : AppColors.outlineVariant)
+                        .withValues(alpha: 0.4),
               ),
               boxShadow: [
                 BoxShadow(
@@ -726,8 +832,14 @@ class DailyReportView extends StatelessWidget {
                         CircularProgressIndicator(
                           value: (todayMinutes / goalMinutes).clamp(0.0, 1.0),
                           strokeWidth: 4,
-                          backgroundColor: (isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant).withValues(alpha: 0.3),
-                          valueColor: AlwaysStoppedAnimation<Color>(isDark ? AppColors.darkPrimary : AppColors.primary),
+                          backgroundColor:
+                              (isDark
+                                      ? AppColors.darkOutlineVariant
+                                      : AppColors.outlineVariant)
+                                  .withValues(alpha: 0.3),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            isDark ? AppColors.darkPrimary : AppColors.primary,
+                          ),
                         ),
                         Padding(
                           padding: const EdgeInsets.all(6),
@@ -738,7 +850,9 @@ class DailyReportView extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
-                                color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                                color: isDark
+                                    ? AppColors.darkOnSurface
+                                    : AppColors.onSurface,
                               ),
                             ),
                           ),
@@ -758,24 +872,38 @@ class DailyReportView extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                          color: isDark
+                              ? AppColors.darkOnSurface
+                              : AppColors.onSurface,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         '${StatsText.duration(todayMinutes)} / ${StatsText.duration(goalMinutes)}',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: variant),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: variant,
+                        ),
                       ),
                       if (pendingToday > 0) ...[
                         const SizedBox(height: 4),
                         Row(
                           children: [
-                            Icon(Icons.cloud_upload_outlined, size: 14, color: variant),
+                            Icon(
+                              Icons.cloud_upload_outlined,
+                              size: 14,
+                              color: variant,
+                            ),
                             const SizedBox(width: 4),
                             Flexible(
                               child: Text(
                                 l10n.statsPendingSessions(pendingToday),
-                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: variant),
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                  color: variant,
+                                ),
                               ),
                             ),
                           ],
@@ -817,10 +945,10 @@ class DailyReportView extends StatelessWidget {
     final message = todayMinutes > dailyGoalMinutes
         ? lang.translate('efficiency_msg_exceeded')
         : reached
-            ? l10n.statsGoalReached
-            : score >= 50
-                ? lang.translate('efficiency_msg_close')
-                : lang.translate('efficiency_msg_low');
+        ? l10n.statsGoalReached
+        : score >= 50
+        ? lang.translate('efficiency_msg_close')
+        : lang.translate('efficiency_msg_low');
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -873,7 +1001,11 @@ class DailyReportView extends StatelessWidget {
                         const SizedBox(width: 6),
                         const Padding(
                           padding: EdgeInsets.only(bottom: 6),
-                          child: Icon(Icons.check_circle_rounded, color: Colors.white, size: 22),
+                          child: Icon(
+                            Icons.check_circle_rounded,
+                            color: Colors.white,
+                            size: 22,
+                          ),
                         ),
                       ],
                     ],
@@ -954,12 +1086,12 @@ class DailyReportView extends StatelessWidget {
   }
 
   CategoryStyle _styleOf(CategoryStat cat) => categoryStyleFor(
-        name: cat.name,
-        categoryId: cat.categoryId,
-        colorHex: cat.colorHex,
-        iconName: cat.iconName,
-        categories: categories,
-      );
+    name: cat.name,
+    categoryId: cat.categoryId,
+    colorHex: cat.colorHex,
+    iconName: cat.iconName,
+    categories: categories,
+  );
 
   // En fazla 4 kart: 4'ten fazla ders varsa ilk 3'ü ve kalanların toplamı
   // ("+N kategori daha"); kartların toplamı her zaman bugünün toplamıdır.
@@ -977,23 +1109,31 @@ class DailyReportView extends StatelessWidget {
     required bool keepAspect,
   }) {
     const spacing = 12.0;
-    final overflow = categoryStats.length > _maxSubjectCards;
-    final displayCats = categoryStats.take(overflow ? _maxSubjectCards - 1 : _maxSubjectCards).toList();
-    final rest = overflow ? categoryStats.skip(_maxSubjectCards - 1).toList() : const <CategoryStat>[];
+    final partition = categoryCardPartition(
+      categoryStats,
+      maximum: _maxSubjectCards,
+    );
+    final displayCats = partition.visible;
+    final rest = partition.remaining;
     final cellWidth = statsCellWidth(width, columns, spacing);
-    final minHeight = keepAspect ? cellWidth / 1.5 : min(cellWidth / 1.5, 110.0);
+    final minHeight = keepAspect
+        ? cellWidth / 1.5
+        : min(cellWidth / 1.5, 110.0);
 
     return StatsGrid(
       columns: columns,
       spacing: spacing,
       runSpacing: spacing,
       children: [
-        for (final cat in displayCats) _buildSubjectCard(context, cat, minHeight),
+        for (final cat in displayCats)
+          _buildSubjectCard(context, cat, minHeight),
         if (rest.isNotEmpty)
           _buildSubjectCard(
             context,
             CategoryStat(
-              name: AppLocalizations.of(context)!.statsMoreCategories(rest.length),
+              name: AppLocalizations.of(
+                context,
+              )!.statsMoreCategories(rest.length),
               minutes: _sumOf(rest, (c) => c.minutes),
               sessions: _sumOf(rest, (c) => c.sessions),
               pomodoros: _sumOf(rest, (c) => c.pomodoros),
@@ -1006,12 +1146,21 @@ class DailyReportView extends StatelessWidget {
     );
   }
 
-  static int _sumOf(List<CategoryStat> list, int Function(CategoryStat c) f) => list.fold(0, (a, c) => a + f(c));
+  static int _sumOf(List<CategoryStat> list, int Function(CategoryStat c) f) =>
+      list.fold(0, (a, c) => a + f(c));
 
-  Widget _buildSubjectCard(BuildContext context, CategoryStat cat, double minHeight, {bool aggregate = false}) {
+  Widget _buildSubjectCard(
+    BuildContext context,
+    CategoryStat cat,
+    double minHeight, {
+    bool aggregate = false,
+  }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final style = aggregate
-        ? const CategoryStyle(color: kStatsNeutralColor, icon: Icons.more_horiz_rounded)
+        ? const CategoryStyle(
+            color: kStatsNeutralColor,
+            icon: Icons.more_horiz_rounded,
+          )
         : _styleOf(cat);
 
     return MergeSemantics(
@@ -1019,7 +1168,9 @@ class DailyReportView extends StatelessWidget {
         constraints: BoxConstraints(minHeight: minHeight),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow,
+          color: isDark
+              ? AppColors.darkSurfaceContainerLow
+              : AppColors.surfaceContainerLow,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -1040,13 +1191,21 @@ class DailyReportView extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    aggregate ? cat.name : StatsText.categoryName(context, cat.name),
+                    aggregate
+                        ? cat.name
+                        : StatsText.categoryName(
+                            context,
+                            cat.name,
+                            categoryId: cat.categoryId,
+                          ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                      color: isDark
+                          ? AppColors.darkOnSurface
+                          : AppColors.onSurface,
                     ),
                   ),
                 ),
@@ -1054,8 +1213,12 @@ class DailyReportView extends StatelessWidget {
                   Icon(
                     Icons.cloud_upload_outlined,
                     size: 16,
-                    color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
-                    semanticLabel: AppLocalizations.of(context)!.statsPendingSessions(cat.pendingSessions),
+                    color: isDark
+                        ? AppColors.darkOnSurfaceVariant
+                        : AppColors.onSurfaceVariant,
+                    semanticLabel: AppLocalizations.of(
+                      context,
+                    )!.statsPendingSessions(cat.pendingSessions),
                   ),
               ],
             ),
@@ -1076,18 +1239,30 @@ class DailyReportView extends StatelessWidget {
   }
 
   // ─── 3. BUGÜNÜN DAĞILIMI (DONUT) ───
-  Widget _buildTodayDistribution(BuildContext context, List<CategoryStat> categoryStats, int totalMinutes) {
+  Widget _buildTodayDistribution(
+    BuildContext context,
+    List<CategoryStat> categoryStats,
+    int totalMinutes,
+  ) {
     final lang = LanguageService.instance;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Lejant yüzdeleri tek tek yuvarlanmaz; toplamları tam 100 olur.
-    final percents = roundedPercents([for (final cat in categoryStats) cat.minutes]);
+    final percents = roundedPercents([
+      for (final cat in categoryStats) cat.minutes,
+    ]);
     final segments = [
       for (var i = 0; i < categoryStats.length; i++)
         _DonutSegment(
-          label: StatsText.categoryName(context, categoryStats[i].name),
+          label: StatsText.categoryName(
+            context,
+            categoryStats[i].name,
+            categoryId: categoryStats[i].categoryId,
+          ),
           minutes: categoryStats[i].minutes,
-          percentage: totalMinutes > 0 ? categoryStats[i].minutes / totalMinutes : 0.0,
+          percentage: totalMinutes > 0
+              ? categoryStats[i].minutes / totalMinutes
+              : 0.0,
           roundedPercent: percents[i],
           color: _styleOf(categoryStats[i]).color,
         ),
@@ -1096,7 +1271,8 @@ class DailyReportView extends StatelessWidget {
         ? StatsText.percent(context, seg.roundedPercent)
         : StatsText.duration(seg.minutes);
     final title = lang.translate('weekly_dist_title');
-    final summary = '$title, ${lang.translate('total_label')} ${StatsText.duration(totalMinutes)}: '
+    final summary =
+        '$title, ${lang.translate('total_label')} ${StatsText.duration(totalMinutes)}: '
         '${segments.map((s) => '${s.label} ${StatsText.duration(s.minutes)} '
             '${StatsText.percent(context, s.roundedPercent)}').join(', ')}';
     // Çok dar ekranda (320 pt telefon, iPad Slide Over) lejant halkanın yanına
@@ -1107,7 +1283,9 @@ class DailyReportView extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurfaceContainerLowest : AppColors.surfaceContainerLowest,
+        color: isDark
+            ? AppColors.darkSurfaceContainerLowest
+            : AppColors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -1132,7 +1310,9 @@ class DailyReportView extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                        color: isDark
+                            ? AppColors.darkOnSurface
+                            : AppColors.onSurface,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -1141,7 +1321,9 @@ class DailyReportView extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
-                        color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                        color: isDark
+                            ? AppColors.darkOnSurfaceVariant
+                            : AppColors.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -1164,7 +1346,9 @@ class DailyReportView extends StatelessWidget {
                   child: CustomPaint(
                     painter: _DonutChartPainter(
                       segments: segments,
-                      emptyColor: isDark ? AppColors.darkSurfaceContainerHighest : AppColors.surfaceContainerHighest,
+                      emptyColor: isDark
+                          ? AppColors.darkSurfaceContainerHighest
+                          : AppColors.surfaceContainerHighest,
                     ),
                     // Halkanın içine sığmazsa (büyük yazı boyutu) küçülür.
                     child: Padding(
@@ -1180,7 +1364,9 @@ class DailyReportView extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
-                                  color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                                  color: isDark
+                                      ? AppColors.darkOnSurface
+                                      : AppColors.onSurface,
                                 ),
                               ),
                               Text(
@@ -1188,7 +1374,9 @@ class DailyReportView extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w500,
-                                  color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                                  color: isDark
+                                      ? AppColors.darkOnSurfaceVariant
+                                      : AppColors.onSurfaceVariant,
                                 ),
                               ),
                             ],
@@ -1212,7 +1400,10 @@ class DailyReportView extends StatelessWidget {
                             Container(
                               width: 8,
                               height: 8,
-                              decoration: BoxDecoration(color: seg.color, shape: BoxShape.circle),
+                              decoration: BoxDecoration(
+                                color: seg.color,
+                                shape: BoxShape.circle,
+                              ),
                             ),
                             const SizedBox(width: 8),
                             Expanded(
@@ -1223,7 +1414,9 @@ class DailyReportView extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w500,
-                                  color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                                  color: isDark
+                                      ? AppColors.darkOnSurfaceVariant
+                                      : AppColors.onSurfaceVariant,
                                 ),
                               ),
                             ),
@@ -1239,7 +1432,9 @@ class DailyReportView extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
-                                    color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                                    color: isDark
+                                        ? AppColors.darkOnSurface
+                                        : AppColors.onSurface,
                                   ),
                                 ),
                               ),
@@ -1264,7 +1459,11 @@ class DailyReportView extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    Widget option({required String text, required String semanticLabel, required bool percent}) {
+    Widget option({
+      required String text,
+      required String semanticLabel,
+      required bool percent,
+    }) {
       final selected = showDistributionPercent == percent;
       return Semantics(
         button: true,
@@ -1277,9 +1476,16 @@ class DailyReportView extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: selected
                 ? BoxDecoration(
-                    color: isDark ? AppColors.darkSurfaceContainerLowest : Colors.white,
+                    color: isDark
+                        ? AppColors.darkSurfaceContainerLowest
+                        : Colors.white,
                     borderRadius: BorderRadius.circular(6),
-                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 4)],
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.06),
+                        blurRadius: 4,
+                      ),
+                    ],
                   )
                 : null,
             child: Text(
@@ -1289,7 +1495,9 @@ class DailyReportView extends StatelessWidget {
                 fontWeight: FontWeight.w500,
                 color: selected
                     ? (isDark ? AppColors.darkOnSurface : AppColors.onSurface)
-                    : (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
+                    : (isDark
+                          ? AppColors.darkOnSurfaceVariant
+                          : AppColors.onSurfaceVariant),
               ),
             ),
           ),
@@ -1300,14 +1508,24 @@ class DailyReportView extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurfaceContainer : AppColors.surfaceContainer,
+        color: isDark
+            ? AppColors.darkSurfaceContainer
+            : AppColors.surfaceContainer,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          option(text: lang.translate('hour_toggle'), semanticLabel: l10n.statsShowAsDuration, percent: false),
-          option(text: '%', semanticLabel: l10n.statsShowAsPercent, percent: true),
+          option(
+            text: lang.translate('hour_toggle'),
+            semanticLabel: l10n.statsShowAsDuration,
+            percent: false,
+          ),
+          option(
+            text: '%',
+            semanticLabel: l10n.statsShowAsPercent,
+            percent: true,
+          ),
         ],
       ),
     );
@@ -1330,7 +1548,9 @@ class DailyReportView extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         border: Border.all(
-          color: (isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant).withValues(alpha: 0.3),
+          color:
+              (isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant)
+                  .withValues(alpha: 0.3),
           width: 2,
           strokeAlign: BorderSide.strokeAlignInside,
         ),
@@ -1362,7 +1582,9 @@ class DailyReportView extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                    color: isDark
+                        ? AppColors.darkOnSurface
+                        : AppColors.onSurface,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -1371,7 +1593,9 @@ class DailyReportView extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
-                    color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                    color: isDark
+                        ? AppColors.darkOnSurfaceVariant
+                        : AppColors.onSurfaceVariant,
                     height: 1.4,
                   ),
                 ),
@@ -1405,7 +1629,9 @@ class DailyReportView extends StatelessWidget {
                 child: Icon(
                   Icons.analytics_outlined,
                   size: 48,
-                  color: isDark ? AppColors.darkPrimary : AppColors.primaryContainer,
+                  color: isDark
+                      ? AppColors.darkPrimary
+                      : AppColors.primaryContainer,
                 ),
               ),
               const SizedBox(height: 20),
@@ -1424,7 +1650,9 @@ class DailyReportView extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14,
-                  color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                  color: isDark
+                      ? AppColors.darkOnSurfaceVariant
+                      : AppColors.onSurfaceVariant,
                   height: 1.5,
                 ),
               ),
@@ -1437,7 +1665,10 @@ class DailyReportView extends StatelessWidget {
                   icon: const Icon(Icons.play_arrow_rounded, size: 22),
                   label: Text(
                     lang.translate('start_studying_now'),
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFF5C4D),

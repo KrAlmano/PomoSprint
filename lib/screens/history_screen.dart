@@ -16,6 +16,7 @@ import '../widgets/stats/progress_ring.dart';
 import '../widgets/stats/stats_empty_card.dart';
 import '../widgets/stats/stats_layout.dart';
 import '../widgets/stats/stats_text.dart';
+import '../widgets/stats/session_type_summary.dart';
 
 /// Raporlar > Haftalık Çalışma: içinde bulunulan Pazartesi-Pazar haftası.
 /// Veriler ReportsScreen'den gelir (tek yükleme, ortak 'bugün').
@@ -31,6 +32,7 @@ class HistoryScreen extends StatefulWidget {
   final List<CourseCategory> categories;
   final Future<void> Function() onRefresh;
   final VoidCallback? onStartTimer;
+  final VoidCallback? onOpenExams;
 
   /// Sunucunun reddettiği seans sayısı; 0'dan büyükse listenin sonunda
   /// "Kaydedilemeyen seanslar" bağlantısı görünür.
@@ -45,6 +47,7 @@ class HistoryScreen extends StatefulWidget {
     required this.categories,
     required this.onRefresh,
     this.onStartTimer,
+    this.onOpenExams,
     this.rejectedSessionCount = 0,
     this.onShowRejectedSessions,
   });
@@ -61,7 +64,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
   void didUpdateWidget(covariant HistoryScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     // Hafta değişince seçim bugüne döner.
-    if (!isSameDay(mondayOf(oldWidget.today), mondayOf(widget.today))) _selectedDayIndex = null;
+    if (!isSameDay(mondayOf(oldWidget.today), mondayOf(widget.today))) {
+      _selectedDayIndex = null;
+    }
   }
 
   @override
@@ -69,16 +74,28 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final monday = mondayOf(widget.today);
     final sunday = addDays(monday, 6);
     final days = dailyTotals(widget.sessions, monday, sunday);
-    final weekSessions = sessionsBetween(widget.sessions, monday, sunday).toList();
+    final weekSessions = sessionsBetween(
+      widget.sessions,
+      monday,
+      sunday,
+    ).toList();
     final weekMinutes = sumMinutes(weekSessions);
     final subjects = totalsByCategory(weekSessions);
-    final selectedIndex = (_selectedDayIndex ?? studyDaysBetween(monday, widget.today)).clamp(0, 6);
+    final selectedIndex =
+        (_selectedDayIndex ?? studyDaysBetween(monday, widget.today)).clamp(
+          0,
+          6,
+        );
 
     return RefreshIndicator(
       onRefresh: widget.onRefresh,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final layout = StatsLayout.of(context, constraints.maxWidth, maxContentWidth: ContentWidth.reading);
+          final layout = StatsLayout.of(
+            context,
+            constraints.maxWidth,
+            maxContentWidth: ContentWidth.reading,
+          );
           // 2. Haftalık verimlilik  2.5 Haftalık hedef (günlük hedef × 7)
           final efficiency = _buildEfficiencyCard(weekMinutes);
           final weeklyGoal = _buildWeeklyGoalSetting();
@@ -102,19 +119,29 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
               // 3. Toplam süre ve en verimli gün
               _buildStatsBento(weekMinutes, busiestDay(days)),
+              const SizedBox(height: 16),
+              SessionTypeSummary(
+                counts: sessionTypeCounts(widget.sessions, monday, sunday),
+                onOpenExams: widget.onOpenExams,
+              ),
               const SizedBox(height: 24),
 
               // 4. Ders bazında haftalık analiz
               _buildWeeklyAnalysis(subjects),
 
               // 5. Kaydedilemeyen (sunucunun reddettiği) seanslar
-              if (widget.rejectedSessionCount > 0 && widget.onShowRejectedSessions != null) ...[
+              if (widget.rejectedSessionCount > 0 &&
+                  widget.onShowRejectedSessions != null) ...[
                 const SizedBox(height: 16),
                 Center(
                   child: TextButton.icon(
                     onPressed: widget.onShowRejectedSessions,
                     icon: const Icon(Icons.cloud_off_rounded, size: 18),
-                    label: Text(AppLocalizations.of(context)!.rejectedSessionsLink(widget.rejectedSessionCount)),
+                    label: Text(
+                      AppLocalizations.of(
+                        context,
+                      )!.rejectedSessionsLink(widget.rejectedSessionCount),
+                    ),
                   ),
                 ),
               ],
@@ -127,7 +154,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   // --- 1. HAFTALIK TREND ---
-  Widget _buildWeeklyTrendChart(List<DayStat> days, int selectedIndex, StatsLayout layout) {
+  Widget _buildWeeklyTrendChart(
+    List<DayStat> days,
+    int selectedIndex,
+    StatsLayout layout,
+  ) {
     final lang = LanguageService.instance;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final locale = StatsText.dateLocale;
@@ -138,7 +169,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final maxBarHeight = chartHeight * 0.75;
     final barWidth = layout.isWide ? 40.0 : 32.0;
 
-    final maxMins = max(60, days.map((d) => d.minutes).reduce(max)); // en az 1 saatlik ölçek
+    final maxMins = max(
+      60,
+      days.map((d) => d.minutes).reduce(max),
+    ); // en az 1 saatlik ölçek
     final selected = days[selectedIndex];
 
     return Container(
@@ -148,7 +182,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: (isDark ? Colors.black : const Color(0xFFD9DADC)).withValues(alpha: 0.2),
+            color: (isDark ? Colors.black : const Color(0xFFD9DADC)).withValues(
+              alpha: 0.2,
+            ),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -170,7 +206,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
-                        color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                        color: isDark
+                            ? AppColors.darkOnSurfaceVariant
+                            : AppColors.onSurfaceVariant,
                         letterSpacing: 1.2,
                       ),
                     ),
@@ -180,7 +218,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
-                        color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                        color: isDark
+                            ? AppColors.darkOnSurface
+                            : AppColors.onSurface,
                       ),
                     ),
                   ],
@@ -189,7 +229,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
               // 320 pt ekranda büyük yazıyla süre küçülür, başlığı itmez.
               Flexible(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.primaryContainer.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(20),
@@ -227,7 +270,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 final day = days[index];
                 final heightFactor = (day.minutes / maxMins).clamp(0.0, 1.0);
                 final isSelected = index == selectedIndex;
-                final semanticsLabel = '${DateFormat('EEEE, d MMMM', locale).format(day.day)}: '
+                final semanticsLabel =
+                    '${DateFormat('EEEE, d MMMM', locale).format(day.day)}: '
                     '${day.minutes > 0 ? StatsText.duration(day.minutes) : lang.translate('no_study_this_day')}';
 
                 return Expanded(
@@ -249,20 +293,33 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           Expanded(
                             child: LayoutBuilder(
                               builder: (context, box) {
-                                final barArea = min(maxBarHeight, max(0.0, box.maxHeight - 4));
+                                final barArea = min(
+                                  maxBarHeight,
+                                  max(0.0, box.maxHeight - 4),
+                                );
                                 return Align(
                                   alignment: Alignment.bottomCenter,
                                   child: Container(
                                     width: barWidth,
-                                    height: barArea * heightFactor + 4, // en az 4 px
-                                    margin: const EdgeInsets.symmetric(horizontal: 2),
+                                    height:
+                                        barArea * heightFactor +
+                                        4, // en az 4 px
+                                    margin: const EdgeInsets.symmetric(
+                                      horizontal: 2,
+                                    ),
                                     decoration: BoxDecoration(
-                                      color: isSelected ? accent : accent.withValues(alpha: 0.2),
-                                      borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+                                      color: isSelected
+                                          ? accent
+                                          : accent.withValues(alpha: 0.2),
+                                      borderRadius: const BorderRadius.vertical(
+                                        top: Radius.circular(8),
+                                      ),
                                       boxShadow: isSelected
                                           ? [
                                               BoxShadow(
-                                                color: accent.withValues(alpha: 0.3),
+                                                color: accent.withValues(
+                                                  alpha: 0.3,
+                                                ),
                                                 blurRadius: 8,
                                                 offset: const Offset(0, 4),
                                               ),
@@ -281,10 +338,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               DateFormat('E', locale).format(day.day),
                               style: TextStyle(
                                 fontSize: 12,
-                                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.w500,
                                 color: isSelected
                                     ? accent
-                                    : (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
+                                    : (isDark
+                                          ? AppColors.darkOnSurfaceVariant
+                                          : AppColors.onSurfaceVariant),
                               ),
                             ),
                           ),
@@ -309,7 +370,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final efficiency = goalPercent(weekMinutes, widget.dailyGoalMinutes * 7);
     // Etiket: haftanın GEÇEN günlerinin hedefine göre; Pazartesi hedefini
     // tutturan kullanıcı 'Normal' değil 'Çok Yüksek' görür.
-    final pace = elapsedWeekGoalPercent(weekMinutes, widget.dailyGoalMinutes, mondayOf(widget.today), widget.today);
+    final pace = elapsedWeekGoalPercent(
+      weekMinutes,
+      widget.dailyGoalMinutes,
+      mondayOf(widget.today),
+      widget.today,
+    );
 
     final String label;
     if (weekMinutes <= 0) {
@@ -329,7 +395,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: (isDark ? Colors.black : const Color(0xFFD9DADC)).withValues(alpha: 0.2),
+            color: (isDark ? Colors.black : const Color(0xFFD9DADC)).withValues(
+              alpha: 0.2,
+            ),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -348,7 +416,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                    color: isDark
+                        ? AppColors.darkOnSurfaceVariant
+                        : AppColors.onSurfaceVariant,
                     letterSpacing: 1.2,
                   ),
                 ),
@@ -358,7 +428,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.w700,
-                    color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                    color: isDark
+                        ? AppColors.darkOnSurface
+                        : AppColors.onSurface,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -380,12 +452,20 @@ class _HistoryScreenState extends State<HistoryScreen> {
               child: CustomPaint(
                 painter: ProgressRingPainter(
                   progress: efficiency / 100,
-                  trackColor: isDark ? AppColors.darkSurfaceContainerHighest : AppColors.surfaceContainerHighest,
-                  progressColor: isDark ? AppColors.darkPrimary : AppColors.primary,
+                  trackColor: isDark
+                      ? AppColors.darkSurfaceContainerHighest
+                      : AppColors.surfaceContainerHighest,
+                  progressColor: isDark
+                      ? AppColors.darkPrimary
+                      : AppColors.primary,
                   strokeWidth: 6,
                 ),
                 child: Center(
-                  child: Icon(Icons.bolt_rounded, size: 28, color: isDark ? AppColors.darkPrimary : AppColors.primary),
+                  child: Icon(
+                    Icons.bolt_rounded,
+                    size: 28,
+                    color: isDark ? AppColors.darkPrimary : AppColors.primary,
+                  ),
                 ),
               ),
             ),
@@ -403,10 +483,21 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final minAbbr = lang.translate('min_abbr');
     final hours = weekMinutes ~/ 60;
     final mins = weekMinutes % 60;
-    const bigNumber = TextStyle(fontSize: 36, fontWeight: FontWeight.w700, color: Colors.white, height: 1);
-    const unit = TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white);
+    const bigNumber = TextStyle(
+      fontSize: 36,
+      fontWeight: FontWeight.w700,
+      color: Colors.white,
+      height: 1,
+    );
+    const unit = TextStyle(
+      fontSize: 16,
+      fontWeight: FontWeight.w600,
+      color: Colors.white,
+    );
     // En verimli günün çubuğu, o günün günlük hedefe oranıdır.
-    final bestFactor = best == null ? 0.0 : (best.minutes / max(1, widget.dailyGoalMinutes)).clamp(0.0, 1.0);
+    final bestFactor = best == null
+        ? 0.0
+        : (best.minutes / max(1, widget.dailyGoalMinutes)).clamp(0.0, 1.0);
 
     // Uzun metin ya da büyük yazı boyutunda kartlar birlikte uzar. 320 pt
     // ekranda (iPhone SE, iPad Slide Over) yan yana sığmıyor; alt alta dizilir.
@@ -420,7 +511,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
           Expanded(
             flex: stacked ? 0 : 1,
             child: Semantics(
-              label: '${lang.translate('total_focus_label').replaceAll('\n', ' ')}: ${StatsText.duration(weekMinutes)}',
+              label:
+                  '${lang.translate('total_focus_label').replaceAll('\n', ' ')}: ${StatsText.duration(weekMinutes)}',
               excludeSemantics: true,
               child: Container(
                 constraints: const BoxConstraints(minHeight: 120),
@@ -469,14 +561,21 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               if (hours > 0) ...[
                                 Text('$hours', style: bigNumber),
                                 Padding(
-                                  padding: const EdgeInsets.only(bottom: 4, left: 2, right: 4),
+                                  padding: const EdgeInsets.only(
+                                    bottom: 4,
+                                    left: 2,
+                                    right: 4,
+                                  ),
                                   child: Text(hourAbbr, style: unit),
                                 ),
                               ],
                               if (mins > 0 || hours == 0) ...[
                                 Text('$mins', style: bigNumber),
                                 Padding(
-                                  padding: const EdgeInsets.only(bottom: 4, left: 2),
+                                  padding: const EdgeInsets.only(
+                                    bottom: 4,
+                                    left: 2,
+                                  ),
                                   child: Text(minAbbr, style: unit),
                                 ),
                               ],
@@ -498,7 +597,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 constraints: const BoxConstraints(minHeight: 120),
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: isDark ? AppColors.darkSurfaceContainerHigh : AppColors.surfaceContainerHigh,
+                  color: isDark
+                      ? AppColors.darkSurfaceContainerHigh
+                      : AppColors.surfaceContainerHigh,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Column(
@@ -510,17 +611,26 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                        color: isDark
+                            ? AppColors.darkOnSurfaceVariant
+                            : AppColors.onSurfaceVariant,
                       ),
                     ),
                     Text(
-                      best == null ? '-' : DateFormat('EEEE', StatsText.dateLocale).format(best.day),
+                      best == null
+                          ? '-'
+                          : DateFormat(
+                              'EEEE',
+                              StatsText.dateLocale,
+                            ).format(best.day),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w700,
-                        color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                        color: isDark
+                            ? AppColors.darkOnSurface
+                            : AppColors.onSurface,
                         height: 1.1,
                       ),
                     ),
@@ -531,7 +641,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             child: Container(
                               height: 6,
                               decoration: BoxDecoration(
-                                color: isDark ? AppColors.darkSurfaceContainerHighest : const Color(0xFFD9DADC),
+                                color: isDark
+                                    ? AppColors.darkSurfaceContainerHighest
+                                    : const Color(0xFFD9DADC),
                                 borderRadius: BorderRadius.circular(3),
                               ),
                               child: FractionallySizedBox(
@@ -602,7 +714,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: (isDark ? Colors.black : const Color(0xFFD9DADC)).withValues(alpha: 0.2),
+            color: (isDark ? Colors.black : const Color(0xFFD9DADC)).withValues(
+              alpha: 0.2,
+            ),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -623,7 +737,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
-                        color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                        color: isDark
+                            ? AppColors.darkOnSurfaceVariant
+                            : AppColors.onSurfaceVariant,
                         letterSpacing: 1.2,
                       ),
                     ),
@@ -633,7 +749,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                        color: isDark
+                            ? AppColors.darkOnSurface
+                            : AppColors.onSurface,
                       ),
                     ),
                   ],
@@ -647,7 +765,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     color: AppColors.primaryContainer.withValues(alpha: 0.15),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.bar_chart_rounded, color: isDark ? AppColors.darkPrimary : AppColors.primary),
+                  child: Icon(
+                    Icons.bar_chart_rounded,
+                    color: isDark ? AppColors.darkPrimary : AppColors.primary,
+                  ),
                 ),
               ),
             ],
@@ -661,7 +782,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
               iconName: sub.iconName,
               categories: widget.categories,
             );
-            final variant = isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant;
+            final variant = isDark
+                ? AppColors.darkOnSurfaceVariant
+                : AppColors.onSurfaceVariant;
             final factor = (sub.minutes / maxSubjectMins).clamp(0.0, 1.0);
 
             return MergeSemantics(
@@ -674,13 +797,19 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       children: [
                         Expanded(
                           child: Text(
-                            StatsText.categoryName(context, sub.name),
+                            StatsText.categoryName(
+                              context,
+                              sub.name,
+                              categoryId: sub.categoryId,
+                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                              color: isDark
+                                  ? AppColors.darkOnSurface
+                                  : AppColors.onSurface,
                             ),
                           ),
                         ),
@@ -691,7 +820,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             Icons.cloud_upload_outlined,
                             size: 14,
                             color: variant,
-                            semanticLabel: l10n.statsPendingSessions(sub.pendingSessions),
+                            semanticLabel: l10n.statsPendingSessions(
+                              sub.pendingSessions,
+                            ),
                           ),
                           const SizedBox(width: 4),
                         ],
@@ -718,7 +849,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       height: 8,
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: isDark ? AppColors.darkSurfaceContainerHighest : AppColors.surfaceContainerHighest,
+                        color: isDark
+                            ? AppColors.darkSurfaceContainerHighest
+                            : AppColors.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: FractionallySizedBox(
@@ -752,15 +885,21 @@ class _HistoryScreenState extends State<HistoryScreen> {
       child: Semantics(
         button: true,
         child: GestureDetector(
-          onTap: () => showDailyGoalSheet(context, initialGoalMinutes: widget.dailyGoalMinutes),
+          onTap: () => showDailyGoalSheet(
+            context,
+            initialGoalMinutes: widget.dailyGoalMinutes,
+          ),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             decoration: BoxDecoration(
-              color: isDark ? AppColors.darkSurfaceContainerLowest : Colors.white,
+              color: isDark
+                  ? AppColors.darkSurfaceContainerLowest
+                  : Colors.white,
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: (isDark ? Colors.black : const Color(0xFFD9DADC)).withValues(alpha: 0.2),
+                  color: (isDark ? Colors.black : const Color(0xFFD9DADC))
+                      .withValues(alpha: 0.2),
                   blurRadius: 16,
                   offset: const Offset(0, 4),
                 ),
@@ -792,16 +931,22 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                          color: isDark
+                              ? AppColors.darkOnSurface
+                              : AppColors.onSurface,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        l10n.statsWeeklyGoalSubtitle(StatsText.duration(weeklyGoal)),
+                        l10n.statsWeeklyGoalSubtitle(
+                          StatsText.duration(weeklyGoal),
+                        ),
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
-                          color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                          color: isDark
+                              ? AppColors.darkOnSurfaceVariant
+                              : AppColors.onSurfaceVariant,
                         ),
                       ),
                     ],

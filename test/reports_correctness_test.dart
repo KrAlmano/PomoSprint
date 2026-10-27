@@ -353,7 +353,9 @@ void main() {
 
     testWidgets('hafta dökümü: yalnız bugüne kadarki günler, kategoriler ve bekleyen', (tester) async {
       await _pump(tester, monthly());
-      await tester.tap(find.byType(InkWell).first); // en yeni hafta (12-14 Ekim)
+      final weekCard = find.byKey(ValueKey('monthly-week-${dayKeyOf(mondayOf(_today))}'));
+      await tester.ensureVisible(weekCard);
+      await tester.tap(weekCard); // en yeni hafta (12-14 Ekim)
       await tester.pumpAndSettle();
       expect(find.text('12 Ekim, Pazartesi'), findsOneWidget);
       expect(find.text('14 Ekim, Çarşamba'), findsOneWidget);

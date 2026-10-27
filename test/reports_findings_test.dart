@@ -427,7 +427,9 @@ void main() {
     testWidgets('MH-5: gün dökümünde bekleyen seans işaretlenir', (tester) async {
       final day = DateTime(2026, 10, 15);
       await _pumpView(tester, _monthly([_s(day, 25, 'A', pending: true)], day));
-      await tester.tap(find.byType(InkWell).first);
+      final weekCard = find.byKey(ValueKey('monthly-week-${dayKeyOf(mondayOf(day))}'));
+      await tester.ensureVisible(weekCard);
+      await tester.tap(weekCard);
       await tester.pumpAndSettle();
       expect(find.byIcon(Icons.cloud_upload_outlined), findsWidgets);
     });

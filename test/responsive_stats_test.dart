@@ -255,7 +255,9 @@ void main() {
     for (final size in _sizes.entries) {
       testWidgets('${size.key}: taşmaz, en çok 640 px', (tester) async {
         await _pumpAt(tester, size.value, _monthly());
-        final card = find.byType(InkWell).first;
+        final card = find.byKey(ValueKey('monthly-week-${dayKeyOf(mondayOf(_today))}'));
+        await tester.ensureVisible(card);
+        await tester.pumpAndSettle();
         await tester.ensureVisible(card);
         await tester.pumpAndSettle();
         await tester.tap(card);

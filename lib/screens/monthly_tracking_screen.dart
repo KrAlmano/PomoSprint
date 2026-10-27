@@ -10,6 +10,7 @@ import '../utils/stats_calculator.dart';
 import '../widgets/stats/category_style.dart';
 import '../widgets/stats/stats_layout.dart';
 import '../widgets/stats/stats_text.dart';
+import '../widgets/stats/session_type_summary.dart';
 
 /// Raporlar > Aylık Takip. Veriler ReportsScreen'den gelir; tüm gün ve hafta
 /// hesapları stats_calculator ile (04:00 kuralı, takvim aritmetiği) yapılır.
@@ -24,6 +25,7 @@ class MonthlyTrackingScreen extends StatelessWidget {
   final DateTime today;
   final List<CourseCategory> categories;
   final Future<void> Function() onRefresh;
+  final VoidCallback? onOpenExams;
 
   const MonthlyTrackingScreen({
     super.key,
@@ -31,6 +33,7 @@ class MonthlyTrackingScreen extends StatelessWidget {
     required this.today,
     required this.categories,
     required this.onRefresh,
+    this.onOpenExams,
   });
 
   @override
@@ -39,8 +42,9 @@ class MonthlyTrackingScreen extends StatelessWidget {
     final monthStart = monthStartOf(today);
     final monthEnd = monthEndOf(today);
     final monthMinutes = sumMinutesBetween(sessions, monthStart, monthEnd);
+    final counts = sessionTypeCounts(sessions, monthStart, monthEnd);
 
-    if (monthMinutes <= 0) {
+    if (monthMinutes <= 0 && counts.completedMarathons == 0) {
       return RefreshIndicator(
         onRefresh: onRefresh,
         child: LayoutBuilder(
@@ -75,6 +79,8 @@ class MonthlyTrackingScreen extends StatelessWidget {
             layout: layout,
             maxWidth: ContentWidth.dashboard,
             children: [
+              SessionTypeSummary(counts: counts, onOpenExams: onOpenExams),
+              const SizedBox(height: 16),
               if (split)
                 IntrinsicHeight(
                   child: Row(
@@ -87,18 +93,41 @@ class MonthlyTrackingScreen extends StatelessWidget {
                       const SizedBox(width: 16),
                       Expanded(
                         flex: layout.isExpanded ? 3 : 1,
-                        child: _buildTopicComparison(context, isDark, weeks, series, chartHeight: chartHeight, fill: true),
+                        child: _buildTopicComparison(
+                          context,
+                          isDark,
+                          weeks,
+                          series,
+                          chartHeight: chartHeight,
+                          fill: true,
+                        ),
                       ),
                     ],
                   ),
                 )
               else ...[
-                _buildHeatmap(context, isDark, days, maxGridWidth: layout.isShortHeight ? 360 : null),
+                _buildHeatmap(
+                  context,
+                  isDark,
+                  days,
+                  maxGridWidth: layout.isShortHeight ? 360 : null,
+                ),
                 const SizedBox(height: 24),
-                _buildTopicComparison(context, isDark, weeks, series, chartHeight: chartHeight),
+                _buildTopicComparison(
+                  context,
+                  isDark,
+                  weeks,
+                  series,
+                  chartHeight: chartHeight,
+                ),
               ],
               const SizedBox(height: 24),
-              _buildWeeklySummary(context, isDark, weeks, columns: layout.columns(compact: 1, medium: 2, expanded: 3)),
+              _buildWeeklySummary(
+                context,
+                isDark,
+                weeks,
+                columns: layout.columns(compact: 1, medium: 2, expanded: 3),
+              ),
               if (growth != null && growth > 0) ...[
                 const SizedBox(height: 16),
                 _buildMotivation(context, isDark, growth),
@@ -111,7 +140,8 @@ class MonthlyTrackingScreen extends StatelessWidget {
     );
   }
 
-  Color _colorFor(String name, String? categoryId, String? colorHex) => categoryStyleFor(
+  Color _colorFor(String name, String? categoryId, String? colorHex) =>
+      categoryStyleFor(
         name: name,
         categoryId: categoryId,
         colorHex: colorHex,
@@ -121,7 +151,13 @@ class MonthlyTrackingScreen extends StatelessWidget {
   // ─── ISI HARİTASI ───
   // [fill]: yan yana düzende kart, satırın kalan yüksekliğini doldurur.
   // [maxGridWidth]: kısa ekranda hücrelerin aşırı büyümesini önler.
-  Widget _buildHeatmap(BuildContext context, bool isDark, List<DayStat> days, {bool fill = false, double? maxGridWidth}) {
+  Widget _buildHeatmap(
+    BuildContext context,
+    bool isDark,
+    List<DayStat> days, {
+    bool fill = false,
+    double? maxGridWidth,
+  }) {
     final lang = LanguageService.instance;
     final locale = StatsText.dateLocale;
     final monthStart = monthStartOf(today);
@@ -132,8 +168,13 @@ class MonthlyTrackingScreen extends StatelessWidget {
     final base = isDark ? AppColors.darkPrimary : AppColors.primary;
 
     Color cellColor(int minutes) {
-      if (minutes <= 0) return isDark ? AppColors.darkSurfaceContainerHigh : AppColors.surfaceContainerHighest;
-      final intensity = (minutes / kPomodoroMinutes) / 15.0; // En koyu ton: 15 pomodoro
+      if (minutes <= 0) {
+        return isDark
+            ? AppColors.darkSurfaceContainerHigh
+            : AppColors.surfaceContainerHighest;
+      }
+      final intensity =
+          (minutes / kPomodoroMinutes) / 15.0; // En koyu ton: 15 pomodoro
       if (intensity <= 0.25) return base.withValues(alpha: 0.2);
       if (intensity <= 0.5) return base.withValues(alpha: 0.4);
       if (intensity <= 0.75) return base.withValues(alpha: 0.7);
@@ -144,30 +185,42 @@ class MonthlyTrackingScreen extends StatelessWidget {
     // hücreler, sonra günler. Satırlar Row ile kurulur (GridView değil);
     // böylece kart yan yana düzende eşit yükseklik ölçümüne katılabilir.
     final cells = <Widget>[
-      ...List.generate(7, (i) => ExcludeSemantics(
-            child: Center(
-              child: Text(
-                weekdayFormat.format(addDays(firstMonday, i)),
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant).withValues(alpha: 0.6),
-                ),
+      ...List.generate(
+        7,
+        (i) => ExcludeSemantics(
+          child: Center(
+            child: Text(
+              weekdayFormat.format(addDays(firstMonday, i)),
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color:
+                    (isDark
+                            ? AppColors.darkOnSurfaceVariant
+                            : AppColors.onSurfaceVariant)
+                        .withValues(alpha: 0.6),
               ),
             ),
-          )),
+          ),
+        ),
+      ),
       ...List.generate(monthStart.weekday - 1, (_) => const SizedBox.shrink()),
-      ...days.map((day) => Semantics(
-            label: '${cellFormat.format(day.day)}: '
-                '${day.minutes > 0 ? StatsText.duration(day.minutes) : lang.translate('no_study_this_day')}',
-            child: Container(
-              decoration: BoxDecoration(
-                color: cellColor(day.minutes),
-                borderRadius: BorderRadius.circular(4),
-                border: isSameDay(day.day, today) ? Border.all(color: base, width: 1.5) : null,
-              ),
+      ...days.map(
+        (day) => Semantics(
+          label:
+              '${cellFormat.format(day.day)}: '
+              '${day.minutes > 0 ? StatsText.duration(day.minutes) : lang.translate('no_study_this_day')}',
+          child: Container(
+            decoration: BoxDecoration(
+              color: cellColor(day.minutes),
+              borderRadius: BorderRadius.circular(4),
+              border: isSameDay(day.day, today)
+                  ? Border.all(color: base, width: 1.5)
+                  : null,
             ),
-          )),
+          ),
+        ),
+      ),
     ];
     const gap = 6.0;
     Widget grid = Column(
@@ -181,7 +234,9 @@ class MonthlyTrackingScreen extends StatelessWidget {
                 Expanded(
                   child: AspectRatio(
                     aspectRatio: 1,
-                    child: start + i < cells.length ? cells[start + i] : const SizedBox.shrink(),
+                    child: start + i < cells.length
+                        ? cells[start + i]
+                        : const SizedBox.shrink(),
                   ),
                 ),
               ],
@@ -192,14 +247,19 @@ class MonthlyTrackingScreen extends StatelessWidget {
     );
     if (maxGridWidth != null) {
       grid = Center(
-        child: ConstrainedBox(constraints: BoxConstraints(maxWidth: maxGridWidth), child: grid),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: maxGridWidth),
+          child: grid,
+        ),
       );
     }
 
     final card = Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow,
+        color: isDark
+            ? AppColors.darkSurfaceContainerLow
+            : AppColors.surfaceContainerLow,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -218,22 +278,34 @@ class MonthlyTrackingScreen extends StatelessWidget {
                   children: [
                     Text(
                       lang.translate('heatmap_less'),
-                      style: TextStyle(fontSize: 11, color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: isDark
+                            ? AppColors.darkOnSurfaceVariant
+                            : AppColors.onSurfaceVariant,
+                      ),
                     ),
                     const SizedBox(width: 6),
-                    ...[0.2, 0.4, 0.7, 1.0].map((alpha) => Container(
-                          width: 12,
-                          height: 12,
-                          margin: const EdgeInsets.symmetric(horizontal: 1),
-                          decoration: BoxDecoration(
-                            color: base.withValues(alpha: alpha),
-                            borderRadius: BorderRadius.circular(3),
-                          ),
-                        )),
+                    ...[0.2, 0.4, 0.7, 1.0].map(
+                      (alpha) => Container(
+                        width: 12,
+                        height: 12,
+                        margin: const EdgeInsets.symmetric(horizontal: 1),
+                        decoration: BoxDecoration(
+                          color: base.withValues(alpha: alpha),
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                      ),
+                    ),
                     const SizedBox(width: 6),
                     Text(
                       lang.translate('heatmap_more'),
-                      style: TextStyle(fontSize: 11, color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: isDark
+                            ? AppColors.darkOnSurfaceVariant
+                            : AppColors.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ),
@@ -262,14 +334,22 @@ class MonthlyTrackingScreen extends StatelessWidget {
             ),
             Row(
               children: [
-                Icon(Icons.calendar_today, size: 16, color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
+                Icon(
+                  Icons.calendar_today,
+                  size: 16,
+                  color: isDark
+                      ? AppColors.darkOnSurfaceVariant
+                      : AppColors.onSurfaceVariant,
+                ),
                 const SizedBox(width: 4),
                 Text(
                   '${monthStart.year}',
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                    color: isDark
+                        ? AppColors.darkOnSurfaceVariant
+                        : AppColors.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -297,24 +377,32 @@ class MonthlyTrackingScreen extends StatelessWidget {
     // Toplu seri 'Diğer kategoriler': kullanıcının 'Diğer' adlı kendi
     // kategorisiyle aynı ada düşmez.
     final names = [
-      for (final s in series) s.isOther ? l10n.statsOtherCategories : StatsText.categoryName(context, s.name),
+      for (final s in series)
+        s.isOther
+            ? l10n.statsOtherCategories
+            : StatsText.categoryName(context, s.name, categoryId: s.categoryId),
     ];
     final colors = [
-      for (final s in series) s.isOther ? kStatsNeutralColor : _colorFor(s.name, s.categoryId, s.colorHex),
+      for (final s in series)
+        s.isOther
+            ? kStatsNeutralColor
+            : _colorFor(s.name, s.categoryId, s.colorHex),
     ];
-    final weekLabels = [for (var i = 0; i < weeks.length; i++) l10n.statsWeekLabel(i + 1)];
+    final weekLabels = [
+      for (var i = 0; i < weeks.length; i++) l10n.statsWeekLabel(i + 1),
+    ];
     final summary = [
       for (var i = 0; i < series.length; i++)
-        '${names[i]}: ${[
-          for (var w = 0; w < weekLabels.length; w++) '${weekLabels[w]} ${StatsText.duration(series[i].weeklyMinutes[w])}',
-        ].join(', ')}',
+        '${names[i]}: ${[for (var w = 0; w < weekLabels.length; w++) '${weekLabels[w]} ${StatsText.duration(series[i].weeklyMinutes[w])}'].join(', ')}',
     ].join('; ');
 
     final chart = CustomPaint(
       painter: _MultiLineChartPainter(
         series: [for (final s in series) s.weeklyMinutes],
         colors: colors,
-        gridColor: (isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant).withValues(alpha: 0.3),
+        gridColor:
+            (isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant)
+                .withValues(alpha: 0.3),
       ),
     );
 
@@ -324,7 +412,9 @@ class MonthlyTrackingScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow,
+          color: isDark
+              ? AppColors.darkSurfaceContainerLow
+              : AppColors.surfaceContainerLow,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -341,7 +431,10 @@ class MonthlyTrackingScreen extends StatelessWidget {
                       Container(
                         width: 10,
                         height: 10,
-                        decoration: BoxDecoration(color: colors[i], shape: BoxShape.circle),
+                        decoration: BoxDecoration(
+                          color: colors[i],
+                          shape: BoxShape.circle,
+                        ),
                       ),
                       const SizedBox(width: 6),
                       Flexible(
@@ -351,7 +444,9 @@ class MonthlyTrackingScreen extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 12,
-                            color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                            color: isDark
+                                ? AppColors.darkOnSurface
+                                : AppColors.onSurface,
                           ),
                         ),
                       ),
@@ -368,22 +463,35 @@ class MonthlyTrackingScreen extends StatelessWidget {
                 ),
               )
             else
-              SizedBox(height: chartHeight, width: double.infinity, child: chart),
+              SizedBox(
+                height: chartHeight,
+                width: double.infinity,
+                child: chart,
+              ),
             const SizedBox(height: 8),
             // Etiketler noktaların altında: grafik tek haftada noktayı ortaya,
             // birden çok haftada kenardan kenara çizer.
             Row(
-              mainAxisAlignment: weekLabels.length == 1 ? MainAxisAlignment.center : MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: weekLabels.length == 1
+                  ? MainAxisAlignment.center
+                  : MainAxisAlignment.spaceBetween,
               children: weekLabels
-                  .map((l) => Flexible(
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            l,
-                            style: TextStyle(fontSize: 11, color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
+                  .map(
+                    (l) => Flexible(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          l,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: isDark
+                                ? AppColors.darkOnSurfaceVariant
+                                : AppColors.onSurfaceVariant,
                           ),
                         ),
-                      ))
+                      ),
+                    ),
+                  )
                   .toList(),
             ),
           ],
@@ -410,7 +518,12 @@ class MonthlyTrackingScreen extends StatelessWidget {
 
   // ─── HAFTALIK ÖZET KARTLARI ───
   // Dikey telefonda alt alta; geniş ekranda [columns] sütunlu ızgara.
-  Widget _buildWeeklySummary(BuildContext context, bool isDark, List<MonthWeek> weeks, {int columns = 1}) {
+  Widget _buildWeeklySummary(
+    BuildContext context,
+    bool isDark,
+    List<MonthWeek> weeks, {
+    int columns = 1,
+  }) {
     final l10n = AppLocalizations.of(context)!;
     final lang = LanguageService.instance;
     final dateFmt = DateFormat('d MMM', StatsText.dateLocale);
@@ -425,20 +538,31 @@ class MonthlyTrackingScreen extends StatelessWidget {
       final showNew = pct == null && comparison.minutes > 0;
       final isFlat = pct == 0;
       final isUp = (pct ?? 0) > 0;
-      final neutral = isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant;
-      final trendColor = isFlat ? neutral : (isUp ? (isDark ? AppColors.darkPrimary : AppColors.primary) : Colors.red);
+      final neutral = isDark
+          ? AppColors.darkOnSurfaceVariant
+          : AppColors.onSurfaceVariant;
+      final trendColor = isFlat
+          ? neutral
+          : (isUp
+                ? (isDark ? AppColors.darkPrimary : AppColors.primary)
+                : Colors.red);
       final pctText = pct == null ? '' : StatsText.percent(context, pct.abs());
       final trendLabel = isFlat
           ? l10n.statsWeekChangeSame
-          : (isUp ? l10n.statsWeekChangeUp(pctText) : l10n.statsWeekChangeDown(pctText));
+          : (isUp
+                ? l10n.statsWeekChangeUp(pctText)
+                : l10n.statsWeekChangeDown(pctText));
 
       return InkWell(
+        key: ValueKey('monthly-week-${dayKeyOf(week.start)}'),
         borderRadius: BorderRadius.circular(16),
         onTap: () => _showWeekDetailModal(context, week, comparison.to, isDark),
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: isDark ? AppColors.darkSurfaceContainerHigh.withValues(alpha: 0.5) : AppColors.surfaceContainerHighest.withValues(alpha: 0.4),
+            color: isDark
+                ? AppColors.darkSurfaceContainerHigh.withValues(alpha: 0.5)
+                : AppColors.surfaceContainerHighest.withValues(alpha: 0.4),
             borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
@@ -452,16 +576,22 @@ class MonthlyTrackingScreen extends StatelessWidget {
                       '${dateFmt.format(week.rangeStart)} - ${dateFmt.format(week.rangeEnd)}',
                       style: TextStyle(
                         fontSize: 12,
-                        color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                        color: isDark
+                            ? AppColors.darkOnSurfaceVariant
+                            : AppColors.onSurfaceVariant,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      l10n.statsWeekStudyTotal(StatsText.duration(comparison.minutes)),
+                      l10n.statsWeekStudyTotal(
+                        StatsText.duration(comparison.minutes),
+                      ),
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w500,
-                        color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                        color: isDark
+                            ? AppColors.darkOnSurface
+                            : AppColors.onSurface,
                       ),
                     ),
                   ],
@@ -473,9 +603,16 @@ class MonthlyTrackingScreen extends StatelessWidget {
                   label: trendLabel,
                   excludeSemantics: true,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
                     decoration: BoxDecoration(
-                      color: (isFlat ? neutral : (isUp ? AppColors.primary : Colors.red)).withValues(alpha: 0.1),
+                      color:
+                          (isFlat
+                                  ? neutral
+                                  : (isUp ? AppColors.primary : Colors.red))
+                              .withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
@@ -484,14 +621,20 @@ class MonthlyTrackingScreen extends StatelessWidget {
                         Icon(
                           isFlat
                               ? Icons.trending_flat_rounded
-                              : (isUp ? Icons.trending_up_rounded : Icons.trending_down_rounded),
+                              : (isUp
+                                    ? Icons.trending_up_rounded
+                                    : Icons.trending_down_rounded),
                           size: 18,
                           color: trendColor,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           pctText,
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: trendColor),
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: trendColor,
+                          ),
                         ),
                       ],
                     ),
@@ -499,9 +642,16 @@ class MonthlyTrackingScreen extends StatelessWidget {
                 )
               else if (showNew)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
                   decoration: BoxDecoration(
-                    color: (isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant).withValues(alpha: 0.3),
+                    color:
+                        (isDark
+                                ? AppColors.darkOutlineVariant
+                                : AppColors.outlineVariant)
+                            .withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -509,7 +659,9 @@ class MonthlyTrackingScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                      color: isDark
+                          ? AppColors.darkOnSurfaceVariant
+                          : AppColors.onSurfaceVariant,
                     ),
                   ),
                 ),
@@ -532,16 +684,31 @@ class MonthlyTrackingScreen extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         if (columns <= 1)
-          ...cards.map((card) => Padding(padding: const EdgeInsets.only(bottom: 10), child: card))
+          ...cards.map(
+            (card) => Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: card,
+            ),
+          )
         else ...[
-          StatsGrid(columns: columns, spacing: 12, runSpacing: 10, children: cards),
+          StatsGrid(
+            columns: columns,
+            spacing: 12,
+            runSpacing: 10,
+            children: cards,
+          ),
           const SizedBox(height: 10),
         ],
       ],
     );
   }
 
-  void _showWeekDetailModal(BuildContext context, MonthWeek week, DateTime lastDay, bool isDark) {
+  void _showWeekDetailModal(
+    BuildContext context,
+    MonthWeek week,
+    DateTime lastDay,
+    bool isDark,
+  ) {
     final lang = LanguageService.instance;
     final dateFmt = DateFormat('d MMMM, EEEE', StatsText.dateLocale);
     final rangeFmt = DateFormat('d MMM', StatsText.dateLocale);
@@ -565,8 +732,12 @@ class MonthlyTrackingScreen extends StatelessWidget {
           builder: (context, scrollController) {
             return Container(
               decoration: BoxDecoration(
-                color: isDark ? AppColors.darkSurfaceContainerLowest : Colors.white,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                color: isDark
+                    ? AppColors.darkSurfaceContainerLowest
+                    : Colors.white,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(24),
+                ),
               ),
               child: Column(
                 children: [
@@ -575,7 +746,9 @@ class MonthlyTrackingScreen extends StatelessWidget {
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: isDark ? AppColors.darkOutlineVariant : AppColors.outlineVariant,
+                      color: isDark
+                          ? AppColors.darkOutlineVariant
+                          : AppColors.outlineVariant,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -593,14 +766,18 @@ class MonthlyTrackingScreen extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
-                                  color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                                  color: isDark
+                                      ? AppColors.darkOnSurface
+                                      : AppColors.onSurface,
                                 ),
                               ),
                               Text(
                                 '${rangeFmt.format(week.rangeStart)} - ${rangeFmt.format(week.rangeEnd)}',
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                                  color: isDark
+                                      ? AppColors.darkOnSurfaceVariant
+                                      : AppColors.onSurfaceVariant,
                                 ),
                               ),
                             ],
@@ -608,7 +785,9 @@ class MonthlyTrackingScreen extends StatelessWidget {
                         ),
                         IconButton(
                           icon: const Icon(Icons.close),
-                          tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+                          tooltip: MaterialLocalizations.of(
+                            context,
+                          ).closeButtonTooltip,
                           onPressed: () => Navigator.pop(ctx),
                         ),
                       ],
@@ -623,19 +802,24 @@ class MonthlyTrackingScreen extends StatelessWidget {
                       separatorBuilder: (_, _) => const SizedBox(height: 10),
                       itemBuilder: (context, index) {
                         final day = days[index];
-                        final dayCategories = totalsByCategory(sessionsBetween(sessions, day.day, day.day));
+                        final dayCategories = totalsByCategory(
+                          sessionsBetween(sessions, day.day, day.day),
+                        );
 
                         return Container(
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow,
+                            color: isDark
+                                ? AppColors.darkSurfaceContainerLow
+                                : AppColors.surfaceContainerLow,
                             borderRadius: BorderRadius.circular(14),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Expanded(
                                     child: Text(
@@ -643,7 +827,9 @@ class MonthlyTrackingScreen extends StatelessWidget {
                                       style: TextStyle(
                                         fontSize: 13,
                                         fontWeight: FontWeight.w600,
-                                        color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                                        color: isDark
+                                            ? AppColors.darkOnSurface
+                                            : AppColors.onSurface,
                                       ),
                                     ),
                                   ),
@@ -652,8 +838,15 @@ class MonthlyTrackingScreen extends StatelessWidget {
                                     Icon(
                                       Icons.cloud_upload_outlined,
                                       size: 14,
-                                      color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
-                                      semanticLabel: AppLocalizations.of(context)!.statsPendingSessions(day.pendingSessions),
+                                      color: isDark
+                                          ? AppColors.darkOnSurfaceVariant
+                                          : AppColors.onSurfaceVariant,
+                                      semanticLabel:
+                                          AppLocalizations.of(
+                                            context,
+                                          )!.statsPendingSessions(
+                                            day.pendingSessions,
+                                          ),
                                     ),
                                     const SizedBox(width: 4),
                                   ],
@@ -663,7 +856,9 @@ class MonthlyTrackingScreen extends StatelessWidget {
                                       style: TextStyle(
                                         fontSize: 13,
                                         fontWeight: FontWeight.bold,
-                                        color: isDark ? AppColors.darkPrimary : AppColors.primary,
+                                        color: isDark
+                                            ? AppColors.darkPrimary
+                                            : AppColors.primary,
                                       ),
                                     ),
                                 ],
@@ -675,7 +870,9 @@ class MonthlyTrackingScreen extends StatelessWidget {
                                     lang.translate('no_study_this_day'),
                                     style: TextStyle(
                                       fontSize: 12,
-                                      color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                                      color: isDark
+                                          ? AppColors.darkOnSurfaceVariant
+                                          : AppColors.onSurfaceVariant,
                                     ),
                                   ),
                                 )
@@ -686,16 +883,29 @@ class MonthlyTrackingScreen extends StatelessWidget {
                                     spacing: 8,
                                     runSpacing: 6,
                                     children: dayCategories.map((c) {
-                                      final color = _colorFor(c.name, c.categoryId, c.colorHex);
+                                      final color = _colorFor(
+                                        c.name,
+                                        c.categoryId,
+                                        c.colorHex,
+                                      );
                                       return Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 4,
+                                        ),
                                         decoration: BoxDecoration(
                                           color: color.withValues(alpha: 0.12),
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
                                         ),
                                         child: Text(
-                                          '${StatsText.categoryName(context, c.name)} • ${StatsText.duration(c.minutes)}',
-                                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: color),
+                                          '${StatsText.categoryName(context, c.name, categoryId: c.categoryId)} • ${StatsText.duration(c.minutes)}',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w600,
+                                            color: color,
+                                          ),
                                         ),
                                       );
                                     }).toList(),
@@ -717,7 +927,11 @@ class MonthlyTrackingScreen extends StatelessWidget {
   }
 
   // ─── AY MOTİVASYON MESAJI ───
-  Widget _buildMotivation(BuildContext context, bool isDark, int growthPercent) {
+  Widget _buildMotivation(
+    BuildContext context,
+    bool isDark,
+    int growthPercent,
+  ) {
     return Center(
       child: Column(
         children: [
@@ -725,19 +939,30 @@ class MonthlyTrackingScreen extends StatelessWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              color: isDark ? AppColors.darkSurfaceContainer : AppColors.surfaceContainer,
+              color: isDark
+                  ? AppColors.darkSurfaceContainer
+                  : AppColors.surfaceContainer,
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.auto_awesome, color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
+            child: Icon(
+              Icons.auto_awesome,
+              color: isDark
+                  ? AppColors.darkOnSurfaceVariant
+                  : AppColors.onSurfaceVariant,
+            ),
           ),
           const SizedBox(height: 12),
           Text(
-            AppLocalizations.of(context)!.statsMonthMotivation(StatsText.percent(context, growthPercent)),
+            AppLocalizations.of(
+              context,
+            )!.statsMonthMotivation(StatsText.percent(context, growthPercent)),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+              color: isDark
+                  ? AppColors.darkOnSurfaceVariant
+                  : AppColors.onSurfaceVariant,
             ),
           ),
         ],
@@ -766,7 +991,9 @@ class MonthlyTrackingScreen extends StatelessWidget {
                 child: Icon(
                   Icons.calendar_month_outlined,
                   size: 48,
-                  color: isDark ? AppColors.darkPrimary : AppColors.primaryContainer,
+                  color: isDark
+                      ? AppColors.darkPrimary
+                      : AppColors.primaryContainer,
                 ),
               ),
               const SizedBox(height: 20),
@@ -785,7 +1012,9 @@ class MonthlyTrackingScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14,
-                  color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                  color: isDark
+                      ? AppColors.darkOnSurfaceVariant
+                      : AppColors.onSurfaceVariant,
                   height: 1.5,
                 ),
               ),
@@ -803,7 +1032,11 @@ class _MultiLineChartPainter extends CustomPainter {
   final List<Color> colors;
   final Color gridColor;
 
-  _MultiLineChartPainter({required this.series, required this.colors, required this.gridColor});
+  _MultiLineChartPainter({
+    required this.series,
+    required this.colors,
+    required this.gridColor,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -832,7 +1065,11 @@ class _MultiLineChartPainter extends CustomPainter {
       final dotPaint = Paint()..color = color;
 
       if (weekCount == 1) {
-        canvas.drawCircle(Offset(size.width / 2, size.height * (1 - values[0] / maxVal)), 4, dotPaint);
+        canvas.drawCircle(
+          Offset(size.width / 2, size.height * (1 - values[0] / maxVal)),
+          4,
+          dotPaint,
+        );
         continue;
       }
 
@@ -843,7 +1080,10 @@ class _MultiLineChartPainter extends CustomPainter {
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round;
 
-      Offset point(int i) => Offset(size.width * i / (weekCount - 1), size.height * (1 - values[i] / maxVal));
+      Offset point(int i) => Offset(
+        size.width * i / (weekCount - 1),
+        size.height * (1 - values[i] / maxVal),
+      );
 
       final path = Path()..moveTo(point(0).dx, point(0).dy);
       for (var i = 1; i < values.length; i++) {
@@ -858,5 +1098,7 @@ class _MultiLineChartPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _MultiLineChartPainter oldDelegate) =>
-      oldDelegate.series != series || oldDelegate.colors != colors || oldDelegate.gridColor != gridColor;
+      oldDelegate.series != series ||
+      oldDelegate.colors != colors ||
+      oldDelegate.gridColor != gridColor;
 }

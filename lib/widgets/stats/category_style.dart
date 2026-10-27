@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../models/category_model.dart';
 import '../../utils/color_hex.dart';
+import '../../utils/stats_calculator.dart' show kExamStatsCategoryId;
 
 /// İstatistiklerde kategorisi bulunamayan (ör. silinmiş) seanslar için nötr renk.
 const Color kStatsNeutralColor = Color(0xFF9E9E9E);
@@ -25,12 +26,22 @@ CategoryStyle categoryStyleFor({
   String? iconName,
   required List<CourseCategory> categories,
 }) {
+  if (categoryId == kExamStatsCategoryId) {
+    return const CategoryStyle(
+      color: Color(0xFF0055D4),
+      icon: Icons.assignment_outlined,
+    );
+  }
   CourseCategory? match;
-  if (categoryId != null) match = categories.where((c) => c.id == categoryId).firstOrNull;
+  if (categoryId != null) {
+    match = categories.where((c) => c.id == categoryId).firstOrNull;
+  }
   match ??= categories.where((c) => c.name == name).firstOrNull;
   final fallback = match?.color ?? kStatsNeutralColor;
   return CategoryStyle(
-    color: colorHex == null ? fallback : colorFromHex(colorHex, fallback: fallback),
+    color: colorHex == null
+        ? fallback
+        : colorFromHex(colorHex, fallback: fallback),
     icon: colorHex != null && iconName != null
         ? CourseCategory.iconForName(iconName)
         : (match?.icon ?? CourseCategory.iconForName(iconName)),
