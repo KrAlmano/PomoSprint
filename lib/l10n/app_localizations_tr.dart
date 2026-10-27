@@ -702,7 +702,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String statsTodayPomodoros(int count) {
-    return 'Bugün $count Pomodoro tamamlandı';
+    return 'Bugünkü 25 dakikalık odak eşdeğeri: $count';
   }
 
   @override

@@ -260,7 +260,7 @@
   "statsGoalSheetSubtitle": "How long do you want to focus each day?",
   "statsGoalPomodoroApprox": "{count, plural, =1{≈ 1 Pomodoro} other{≈ {count} Pomodoros}}",
   "statsGoalSaveFailed": "Couldn't save your goal. Check your connection and try again.",
-  "statsTodayPomodoros": "{count, plural, =1{1 Pomodoro completed today} other{{count} Pomodoros completed today}}",
+  "statsTodayPomodoros": "Today's 25-minute focus equivalents: {count}",
   "statsWeeklyGoalTitle": "Weekly Goal",
   "statsWeeklyGoalSubtitle": "{weekly} · your daily goal × 7",
   "statsWeekLabel": "Week {index}",

@@ -528,7 +528,7 @@
     }
   },
   "statsGoalSaveFailed": "Hedef kaydedilemedi. Bağlantını kontrol edip tekrar dene.",
-  "statsTodayPomodoros": "Bugün {count} Pomodoro tamamlandı",
+  "statsTodayPomodoros": "Bugünkü 25 dakikalık odak eşdeğeri: {count}",
   "@statsTodayPomodoros": {
     "placeholders": {
       "count": {

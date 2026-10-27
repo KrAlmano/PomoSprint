@@ -1187,7 +1187,7 @@ abstract class AppLocalizations {
   /// No description provided for @statsTodayPomodoros.
   ///
   /// In tr, this message translates to:
-  /// **'Bugün {count} Pomodoro tamamlandı'**
+  /// **'Bugünkü 25 dakikalık odak eşdeğeri: {count}'**
   String statsTodayPomodoros(int count);
 
   /// No description provided for @statsWeeklyGoalTitle.

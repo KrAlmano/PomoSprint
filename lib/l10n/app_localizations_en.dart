@@ -725,13 +725,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String statsTodayPomodoros(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count Pomodoros completed today',
-      one: '1 Pomodoro completed today',
-    );
-    return '$_temp0';
+    return 'Today\'s 25-minute focus equivalents: $count';
   }
 
   @override
