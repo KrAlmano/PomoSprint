@@ -24,15 +24,114 @@ import datetime
 import json
 import os
 import re
+import struct
 import subprocess
 import sys
+import tempfile
 import urllib.parse
+import zlib
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from local_mailpit import ConfirmationError, confirm_local_email
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
 DB_URL = "postgresql://postgres:postgres@127.0.0.1:54322/postgres"
 SHOT_NAME = re.compile(r"^e2e-[a-z0-9-]{1,60}$")
+PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
+
+
+class ScreenshotError(Exception):
+    """A fixed public error code, never subprocess output or device details."""
+
+
+def png_dimensions(path):
+    """Validate a complete PNG container before counting it as evidence."""
+    try:
+        with open(path, "rb") as source:
+            data = source.read(64 * 1024 * 1024 + 1)
+    except FileNotFoundError:
+        raise ScreenshotError("screenshot_invalid_png") from None
+    if len(data) > 64 * 1024 * 1024 or not data.startswith(PNG_SIGNATURE):
+        raise ScreenshotError("screenshot_invalid_png")
+    offset = len(PNG_SIGNATURE)
+    dimensions = None
+    saw_image_data = False
+    while offset + 12 <= len(data):
+        size = struct.unpack_from(">I", data, offset)[0]
+        kind = data[offset + 4:offset + 8]
+        end = offset + 12 + size
+        if end > len(data):
+            break
+        payload = data[offset + 8:offset + 8 + size]
+        checksum = struct.unpack_from(">I", data, offset + 8 + size)[0]
+        if zlib.crc32(kind + payload) & 0xffffffff != checksum:
+            break
+        if dimensions is None:
+            if kind != b"IHDR" or size != 13:
+                break
+            width, height = struct.unpack_from(">II", payload)
+            if not (0 < width <= 16384 and 0 < height <= 16384
+                    and width * height <= 64 * 1024 * 1024):
+                break
+            dimensions = (width, height)
+        elif kind == b"IHDR":
+            break
+        if kind == b"IDAT" and size:
+            saw_image_data = True
+        if kind == b"IEND":
+            if size == 0 and end == len(data) and saw_image_data:
+                return dimensions
+            break
+        offset = end
+    raise ScreenshotError("screenshot_invalid_png")
+
+
+def capture_screenshot(server, name):
+    """Publish only a new, validated capture; retain previous good evidence."""
+    temporary = None
+    try:
+        os.makedirs(server.shot_dir, exist_ok=True)
+        # A fresh name prevents an rc=0 capture that wrote nothing from reusing
+        # an older successful image. Atomic replacement happens only at the end.
+        fd, temporary = tempfile.mkstemp(prefix=".capture-", suffix=".png", dir=server.shot_dir)
+        os.close(fd)
+        os.unlink(temporary)
+        try:
+            if server.android_serial:
+                proc = subprocess.run([os.path.expanduser("~/Library/Android/sdk/platform-tools/adb"),
+                    "-s", server.android_serial, "exec-out", "screencap", "-p"],
+                    capture_output=True, timeout=30)
+                if proc.returncode == 0:
+                    with open(temporary, "wb") as output:
+                        output.write(proc.stdout)
+            else:
+                proc = subprocess.run(
+                    ["xcrun", "simctl", "io", server.udid, "screenshot", temporary],
+                    capture_output=True, timeout=60,
+                )
+        except subprocess.TimeoutExpired:
+            raise ScreenshotError("screenshot_capture_timeout") from None
+        if proc.returncode != 0:
+            raise ScreenshotError("screenshot_capture_failed")
+        png_dimensions(temporary)
+        try:
+            resize = subprocess.run(["sips", "-Z", "1311", temporary],
+                                    capture_output=True, timeout=60)
+        except subprocess.TimeoutExpired:
+            raise ScreenshotError("screenshot_resize_timeout") from None
+        if resize.returncode != 0:
+            raise ScreenshotError("screenshot_resize_failed")
+        png_dimensions(temporary)
+        out = os.path.join(server.shot_dir, name + ".png")
+        os.replace(temporary, out)
+        return os.path.relpath(out, ROOT)
+    except OSError:
+        raise ScreenshotError("screenshot_io_error") from None
+    finally:
+        if temporary is not None:
+            try:
+                os.unlink(temporary)
+            except OSError:
+                pass
 
 
 def _log(path, text):
@@ -63,27 +162,12 @@ class Handler(BaseHTTPRequestHandler):
             return self._reply(200, "ok")
         if url.path == "/shot":
             name = (urllib.parse.parse_qs(url.query).get("name") or [""])[0]
-            if not SHOT_NAME.match(name):
+            if not SHOT_NAME.fullmatch(name):
                 return self._reply(400, "gecersiz ad")
-            out = os.path.join(self.server.shot_dir, name + ".png")
-            os.makedirs(self.server.shot_dir, exist_ok=True)
-            if self.server.android_serial:
-                proc = subprocess.run([os.path.expanduser("~/Library/Android/sdk/platform-tools/adb"),
-                    "-s", self.server.android_serial, "exec-out", "screencap", "-p"],
-                    capture_output=True, timeout=30)
-                if proc.returncode == 0:
-                    with open(out, "wb") as shot:
-                        shot.write(proc.stdout)
-            else:
-                proc = subprocess.run(
-                    ["xcrun", "simctl", "io", self.server.udid, "screenshot", out],
-                    capture_output=True, text=True, timeout=60,
-                )
-            if proc.returncode != 0:
-                return self._reply(500, proc.stderr)
-            # Depoda yer kaplamasın: yarı çözünürlük (iPhone 16 Pro → 603x1311).
-            subprocess.run(["sips", "-Z", "1311", out], capture_output=True, timeout=60)
-            return self._reply(200, os.path.relpath(out, ROOT))
+            try:
+                return self._reply(200, capture_screenshot(self.server, name))
+            except ScreenshotError as failure:
+                return self._reply(500, str(failure))
         return self._reply(404, "yok")
 
     def do_POST(self):  # noqa: N802
