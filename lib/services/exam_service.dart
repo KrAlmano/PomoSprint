@@ -80,6 +80,9 @@ class ExamService extends ChangeNotifier {
   int _epoch = 0;
   bool _disposed = false;
   bool _initialized = false;
+  Future<void>? _initialization;
+  String? _initializationOwner;
+  bool _restoringJournal = false;
   bool _foreground = true;
   bool _refreshing = false;
   bool _historyLoaded = false;
@@ -141,14 +144,42 @@ class ExamService extends ChangeNotifier {
       _catalog.byId(attempt.examId) ??
       offlineExamCatalog.byId(attempt.examId);
 
-  Future<void> initialize() async {
-    if (_initialized && _owner == backend.ownerId) return;
+  Future<void> initialize() {
+    final owner = backend.ownerId;
+    final pending = _initialization;
+    if (pending != null && _initializationOwner == owner) return pending;
+    if (_initialized && _owner == owner) return Future<void>.value();
     _initialized = true;
-    await _switchOwner();
+    // Publish the shared future before _switchOwner emits: listeners may
+    // re-enter initialize while the owner's journal is still being read.
+    final completion = Completer<void>();
+    final future = completion.future;
+    _initialization = future;
+    _initializationOwner = owner;
+    void settled() {
+      if (identical(_initialization, future)) {
+        _initialization = null;
+        _initializationOwner = null;
+      }
+    }
+
+    unawaited(
+      _switchOwner().then<void>(
+        (_) {
+          settled();
+          completion.complete();
+        },
+        onError: (Object error, StackTrace stack) {
+          settled();
+          completion.completeError(error, stack);
+        },
+      ),
+    );
+    return future;
   }
 
   void _onOwnerChanged() {
-    if (_owner != backend.ownerId) unawaited(_switchOwner());
+    if (_owner != backend.ownerId) unawaited(initialize());
   }
 
   Future<void> _switchOwner() async {
@@ -165,6 +196,7 @@ class ExamService extends ChangeNotifier {
     _historyLoaded = false;
     _historyKnownUnavailable = false;
     _historyRefreshFailed = false;
+    _restoringJournal = _owner != null;
     _emit();
     final owner = _owner;
     if (owner == null) return;
@@ -176,6 +208,7 @@ class ExamService extends ChangeNotifier {
       if (_current(owner, epoch)) errorCode = 'journal_invalid';
     }
     if (!_current(owner, epoch)) return;
+    _restoringJournal = false;
     _emit();
     _scheduleTimer();
     await refresh();
@@ -237,6 +270,7 @@ class ExamService extends ChangeNotifier {
     if (_disposed) return;
     final active = activeRecord;
     final blocks =
+        _restoringJournal ||
         errorCode == 'journal_invalid' ||
         active != null &&
             (active.pendingAction == ExamPendingAction.start ||
@@ -267,7 +301,10 @@ class ExamService extends ChangeNotifier {
   }
 
   Future<void> refresh() async {
-    if (!_initialized) {
+    if (!_initialized || _restoringJournal) {
+      // _switchOwner calls refresh only after local restoration has finished.
+      // External refresh/lifecycle calls must not merge an empty snapshot
+      // while the durable journal is still being read.
       await initialize();
       return;
     }
@@ -387,106 +424,121 @@ class ExamService extends ChangeNotifier {
     }
   }
 
-  Future<void> start(ExamDefinition exam) => _lock.synchronized(() async {
+  Future<void> start(ExamDefinition exam) async {
+    // Bind the user's intent before waiting for an outbox/network operation.
+    // A later owner switch cannot turn account A's queued action into B's.
     final owner = _owner, epoch = _epoch;
-    if (owner == null ||
-        !_catalog.available ||
-        !backend.isAvailable ||
-        activeRecord != null ||
-        busy) {
-      throw const ExamFailure('exam_overlap');
-    }
-    final definition = _catalog.byId(exam.id);
-    if (definition == null) throw const ExamFailure('invalid_catalog');
-    final row = ExamLocalRecord(
-      clientUuid: _createUuid(),
-      definition: definition,
-      createdAt: now(),
-      pendingAction: ExamPendingAction.start,
-    );
-    if (!await _save(owner, epoch, [..._records, row])) {
-      throw const ExamFailure('storage');
-    }
-    await _send(owner, epoch, row);
-  });
+    if (_restoringJournal) await initialize();
+    return _lock.synchronized(() async {
+      if (owner == null ||
+          !_current(owner, epoch) ||
+          !_catalog.available ||
+          !backend.isAvailable ||
+          activeRecord != null ||
+          busy) {
+        throw const ExamFailure('exam_overlap');
+      }
+      final definition = _catalog.byId(exam.id);
+      if (definition == null) throw const ExamFailure('invalid_catalog');
+      final row = ExamLocalRecord(
+        clientUuid: _createUuid(),
+        definition: definition,
+        createdAt: now(),
+        pendingAction: ExamPendingAction.start,
+      );
+      if (!await _save(owner, epoch, [..._records, row])) {
+        throw const ExamFailure('storage');
+      }
+      await _send(owner, epoch, row);
+    });
+  }
+
   Future<void> complete(String uuid) =>
       _transition(uuid, ExamPendingAction.complete);
   Future<void> abandon(String uuid) =>
       _transition(uuid, ExamPendingAction.abandon);
-  Future<void> _transition(
-    String uuid,
-    ExamPendingAction action,
-  ) => _lock.synchronized(() async {
+  Future<void> _transition(String uuid, ExamPendingAction action) async {
     final owner = _owner, epoch = _epoch;
-    if (owner == null) return;
-    final row = _records.where((r) => r.clientUuid == uuid).firstOrNull;
-    if (row == null ||
-        row.attempt == null ||
-        row.attempt!.status != ExamAttemptStatus.active) {
-      return;
-    }
-    // A requested abandon is never replaced by a later automatic completion.
-    if (row.pendingAction == ExamPendingAction.abandon &&
-        action != ExamPendingAction.abandon) {
-      return;
-    }
-    if (action == ExamPendingAction.complete &&
-        row.attempt!.remainingSecondsAt(now()) > 0) {
-      return;
-    }
-    final next = row.copy(action: action);
-    if (await _replace(owner, epoch, next)) await _send(owner, epoch, next);
-  });
+    if (_restoringJournal) await initialize();
+    return _lock.synchronized(() async {
+      if (owner == null || !_current(owner, epoch)) return;
+      final row = _records.where((r) => r.clientUuid == uuid).firstOrNull;
+      if (row == null ||
+          row.attempt == null ||
+          row.attempt!.status != ExamAttemptStatus.active) {
+        return;
+      }
+      // A requested abandon is never replaced by a later automatic completion.
+      if (row.pendingAction == ExamPendingAction.abandon &&
+          action != ExamPendingAction.abandon) {
+        return;
+      }
+      if (action == ExamPendingAction.complete &&
+          row.attempt!.remainingSecondsAt(now()) > 0) {
+        return;
+      }
+      final next = row.copy(action: action);
+      if (await _replace(owner, epoch, next)) await _send(owner, epoch, next);
+    });
+  }
+
   Future<void> saveResults(
     ExamAttempt attempt,
     List<ExamSubjectResult> results,
-  ) => _lock.synchronized(() async {
+  ) async {
     final owner = _owner, epoch = _epoch;
-    // A DTO retained by a route from a previous account is not authority to
-    // create a new journal row. Resolve only from this owner's current cache.
-    final owned = attempts
-        .where(
-          (a) =>
-              a.id == attempt.id &&
-              a.clientUuid == attempt.clientUuid &&
-              a.examId == attempt.examId &&
-              a.catalogVersion == attempt.catalogVersion,
-        )
-        .firstOrNull;
-    final definition = owned == null ? null : definitionFor(owned);
-    if (owner == null ||
-        !_current(owner, epoch) ||
-        owned == null ||
-        !owned.isCompleted ||
-        definition == null ||
-        results.length != definition.subjects.length ||
-        results.map((r) => r.subjectId).toSet().length != results.length ||
-        !definition.subjects.every(
-          (s) => results.any((r) => r.isValidFor(s)),
-        )) {
-      throw const ExamFailure('exam_result_invalid');
-    }
-    final prior =
-        _records
-            .where(
-              (r) =>
-                  r.clientUuid == owned.clientUuid && r.attempt?.id == owned.id,
-            )
-            .firstOrNull ??
-        ExamLocalRecord(
-          clientUuid: owned.clientUuid,
-          definition: definition,
-          createdAt: owned.startedAt,
-          attempt: owned,
-        );
-    final next = prior.copy(
-      attempt: owned,
-      action: ExamPendingAction.results,
-      results: results,
-    );
-    if (!await _replace(owner, epoch, next)) throw const ExamFailure('storage');
-    await _send(owner, epoch, next);
-  });
+    if (_restoringJournal) await initialize();
+    return _lock.synchronized(() async {
+      // A DTO retained by a route from a previous account is not authority to
+      // create a new journal row. Resolve only from this owner's current cache.
+      final owned = attempts
+          .where(
+            (a) =>
+                a.id == attempt.id &&
+                a.clientUuid == attempt.clientUuid &&
+                a.examId == attempt.examId &&
+                a.catalogVersion == attempt.catalogVersion,
+          )
+          .firstOrNull;
+      final definition = owned == null ? null : definitionFor(owned);
+      if (owner == null ||
+          !_current(owner, epoch) ||
+          owned == null ||
+          !owned.isCompleted ||
+          definition == null ||
+          results.length != definition.subjects.length ||
+          results.map((r) => r.subjectId).toSet().length != results.length ||
+          !definition.subjects.every(
+            (s) => results.any((r) => r.isValidFor(s)),
+          )) {
+        throw const ExamFailure('exam_result_invalid');
+      }
+      final prior =
+          _records
+              .where(
+                (r) =>
+                    r.clientUuid == owned.clientUuid &&
+                    r.attempt?.id == owned.id,
+              )
+              .firstOrNull ??
+          ExamLocalRecord(
+            clientUuid: owned.clientUuid,
+            definition: definition,
+            createdAt: owned.startedAt,
+            attempt: owned,
+          );
+      final next = prior.copy(
+        attempt: owned,
+        action: ExamPendingAction.results,
+        results: results,
+      );
+      if (!await _replace(owner, epoch, next)) {
+        throw const ExamFailure('storage');
+      }
+      await _send(owner, epoch, next);
+    });
+  }
+
   Future<bool> _replace(String owner, int epoch, ExamLocalRecord row) {
     final rows = List<ExamLocalRecord>.of(_records);
     final i = rows.indexWhere((r) => r.clientUuid == row.clientUuid);
@@ -498,25 +550,35 @@ class ExamService extends ChangeNotifier {
     return _save(owner, epoch, rows);
   }
 
-  Future<void> sync() => _lock.synchronized(() async {
+  Future<void> sync() async {
     final owner = _owner, epoch = _epoch;
-    if (owner == null ||
-        !backend.isAvailable ||
-        errorCode == 'journal_invalid') {
-      return;
-    }
-    for (final row in List<ExamLocalRecord>.of(_records)) {
-      if (!_current(owner, epoch)) return;
-      if (row.pendingAction != null) await _send(owner, epoch, row);
-    }
-  });
-  Future<void> retry(String uuid) => _lock.synchronized(() async {
+    if (_restoringJournal) await initialize();
+    return _lock.synchronized(() async {
+      if (owner == null ||
+          !_current(owner, epoch) ||
+          !backend.isAvailable ||
+          errorCode == 'journal_invalid') {
+        return;
+      }
+      for (final row in List<ExamLocalRecord>.of(_records)) {
+        if (!_current(owner, epoch)) return;
+        if (row.pendingAction != null) await _send(owner, epoch, row);
+      }
+    });
+  }
+
+  Future<void> retry(String uuid) async {
     final owner = _owner, epoch = _epoch;
-    final row = _records.where((r) => r.clientUuid == uuid).firstOrNull;
-    if (owner != null && row != null && row.pendingAction != null) {
-      await _send(owner, epoch, row);
-    }
-  });
+    if (_restoringJournal) await initialize();
+    return _lock.synchronized(() async {
+      if (owner == null || !_current(owner, epoch)) return;
+      final row = _records.where((r) => r.clientUuid == uuid).firstOrNull;
+      if (row != null && row.pendingAction != null) {
+        await _send(owner, epoch, row);
+      }
+    });
+  }
+
   Future<void> _send(String owner, int epoch, ExamLocalRecord row) async {
     if (!_current(owner, epoch) ||
         !backend.isAvailable ||
