@@ -3,20 +3,24 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../l10n/app_localizations.dart';
+import '../models/competition_target.dart';
+import '../models/league_rules.dart';
 import '../models/user_model.dart';
 import '../services/hidden_users.dart';
 import '../services/supabase_service.dart';
 import '../theme.dart';
 import '../utils/responsive.dart';
 import '../widgets/league_info_sheet.dart';
+import '../widgets/competition_target_dialog.dart';
 import '../widgets/social/league_tiers.dart';
 import '../widgets/social/load_error_view.dart';
 import '../widgets/social/ranking_models.dart';
 import '../widgets/social/ranking_widgets.dart';
 import '../widgets/social/user_safety.dart';
 
-// Sekmeler: Lig (14 günlük dönemlik oda), Aylık (herkese açık, ayın 1'inde
-// sıfırlanır), Arkadaşlar. Ayrı bir "Tüm Zamanlar" sekmesi yok: hiç sıfırlanmayan bir
+// Version 2: monthly target room, global monthly view, friends.
+// Older servers retain their existing league/monthly behavior.
+// Ayrı bir "Tüm Zamanlar" sekmesi yok: hiç sıfırlanmayan bir
 // liste eski kullanıcılarda donup kalıyordu; kişinin toplam puanı Profil'de
 // ve Arkadaşlar sekmesinde zaten görünüyor.
 enum _RankingTab { league, monthly, friends }
@@ -32,16 +36,15 @@ class _TabData {
   int requestId = 0;
 
   bool get isStale =>
-      loadedAt == null || DateTime.now().difference(loadedAt!) > _RankingScreenState._staleAfter;
+      loadedAt == null ||
+      DateTime.now().difference(loadedAt!) > _RankingScreenState._staleAfter;
 }
 
 class RankingScreen extends StatefulWidget {
   final UserModel? currentUser;
+  final SupabaseService? service;
 
-  const RankingScreen({
-    super.key,
-    this.currentUser,
-  });
+  const RankingScreen({super.key, this.currentUser, this.service});
 
   @override
   State<RankingScreen> createState() => _RankingScreenState();
@@ -51,15 +54,22 @@ class _RankingScreenState extends State<RankingScreen> {
   static const Duration _staleAfter = Duration(seconds: 30);
 
   _RankingTab _tab = _RankingTab.league;
-  final Map<_RankingTab, _TabData> _data = {for (final t in _RankingTab.values) t: _TabData()};
+  final Map<_RankingTab, _TabData> _data = {
+    for (final t in _RankingTab.values) t: _TabData(),
+  };
   LeagueSnapshot? _league;
+  LeagueRules _rules = LeagueRules.standard;
+  CompetitionTarget? _target;
+  DateTime? _globalPeriodEnd;
+  bool _editingTarget = false;
   bool _isVisible = false;
   bool _leagueInfoChecked = false;
+  SupabaseService get _service => widget.service ?? SupabaseService.instance;
 
   @override
   void initState() {
     super.initState();
-    SupabaseService.instance.addStatsChangedListener(_onStatsChanged);
+    _service.addStatsChangedListener(_onStatsChanged);
     HiddenUsersStore.instance.hidden.addListener(_onHiddenUsersChanged);
     unawaited(HiddenUsersStore.instance.load(widget.currentUser?.id));
   }
@@ -68,7 +78,20 @@ class _RankingScreenState extends State<RankingScreen> {
   void didUpdateWidget(RankingScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.currentUser?.id != widget.currentUser?.id) {
+      for (final data in _data.values) {
+        data.requestId++;
+        data.entries = const [];
+        data.loaded = false;
+        data.loading = false;
+        data.error = null;
+        data.loadedAt = null;
+      }
+      _league = null;
+      _target = null;
+      _globalPeriodEnd = null;
+      _leagueInfoChecked = false;
       unawaited(HiddenUsersStore.instance.load(widget.currentUser?.id));
+      if (_isVisible) unawaited(_load(_tab));
     }
   }
 
@@ -92,7 +115,7 @@ class _RankingScreenState extends State<RankingScreen> {
 
   @override
   void dispose() {
-    SupabaseService.instance.removeStatsChangedListener(_onStatsChanged);
+    _service.removeStatsChangedListener(_onStatsChanged);
     HiddenUsersStore.instance.hidden.removeListener(_onHiddenUsersChanged);
     super.dispose();
   }
@@ -113,34 +136,60 @@ class _RankingScreenState extends State<RankingScreen> {
   Future<void> _load(_RankingTab tab) async {
     final data = _data[tab]!;
     final requestId = ++data.requestId;
+    final owner = widget.currentUser?.id;
     setState(() => data.loading = true);
     try {
-      final service = SupabaseService.instance;
+      final service = _service;
+      final rules = await service.getLeagueRules();
       LeagueSnapshot? league;
+      CompetitionTarget? target = _target;
+      DateTime? globalEnd;
       final List<RankingEntry> entries;
       switch (tab) {
         case _RankingTab.league:
           // Son başarılı kurallar korunur; yeni satır kendi güncel yapılandırmasını taşır.
-          final rulesFuture = service.getLeagueRules();
           final rows = await service.getLeagueRanking();
           league = rows.isEmpty
               ? null
               : LeagueSnapshot.fromRows(
                   rows,
-                  rules: await rulesFuture,
-                  hasLeagueHistory: hasLeagueHistory(service.currentUser.value ?? widget.currentUser),
+                  rules: rules,
+                  hasLeagueHistory: hasLeagueHistory(
+                    service.currentUser.value ?? widget.currentUser,
+                  ),
                 );
-          entries = [for (final r in rows) RankingEntry.fromRow(r, pointsKey: 'weekly_points')];
+          entries = [
+            for (final r in rows)
+              RankingEntry.fromRow(r, pointsKey: 'weekly_points'),
+          ];
+          if (rules.isCalendarMonthly ||
+              league?.rules.isCalendarMonthly == true) {
+            target = await service.getCompetitionTarget();
+          }
         case _RankingTab.monthly:
           final rows = await service.getMonthlyRanking();
-          entries = [for (final r in rows) RankingEntry.fromRow(r, pointsKey: 'total_points')];
+          globalEnd = rows.isEmpty
+              ? null
+              : DateTime.tryParse(rows.first['period_end']?.toString() ?? '');
+          entries = [
+            for (final r in rows)
+              RankingEntry.fromRow(r, pointsKey: 'total_points'),
+          ];
         case _RankingTab.friends:
           final rows = await service.fetchFriends();
-          entries = [for (final r in rows) RankingEntry.fromRow(r, pointsKey: 'lifetime_points')]
-            ..sort(RankingEntry.compare);
+          entries = [
+            for (final r in rows)
+              RankingEntry.fromRow(r, pointsKey: 'lifetime_points'),
+          ]..sort(RankingEntry.compare);
       }
-      if (!mounted || requestId != data.requestId) return;
+      if (!mounted ||
+          requestId != data.requestId ||
+          owner != widget.currentUser?.id) {
+        return;
+      }
       setState(() {
+        _rules = league?.rules ?? rules;
+        _target = target;
         data
           ..entries = entries
           ..loaded = true
@@ -148,16 +197,40 @@ class _RankingScreenState extends State<RankingScreen> {
           ..error = null
           ..loadedAt = DateTime.now();
         if (tab == _RankingTab.league) _league = league;
+        if (tab == _RankingTab.monthly) _globalPeriodEnd = globalEnd;
       });
       if (tab == _RankingTab.league) unawaited(_maybeAutoShowLeagueInfo());
     } catch (e) {
       debugPrint('[RANKING] ${tab.name} yüklenemedi: $e');
-      if (!mounted || requestId != data.requestId) return;
+      if (!mounted ||
+          requestId != data.requestId ||
+          owner != widget.currentUser?.id) {
+        return;
+      }
       setState(() {
         data
           ..loading = false
           ..error = e;
       });
+    }
+  }
+
+  Future<void> _editTarget() async {
+    final target = _target;
+    if (target == null || _editingTarget) return;
+    final owner = widget.currentUser?.id;
+    setState(() => _editingTarget = true);
+    try {
+      final result = await showCompetitionTargetDialog(
+        context,
+        target: target,
+        save: _service.setCompetitionTarget,
+      );
+      if (!mounted || owner != widget.currentUser?.id || result == null) return;
+      setState(() => _target = result);
+      await _load(_RankingTab.league);
+    } finally {
+      if (mounted) setState(() => _editingTarget = false);
     }
   }
 
@@ -175,14 +248,18 @@ class _RankingScreenState extends State<RankingScreen> {
     final user = widget.currentUser;
     final uid = user?.id;
     if (_leagueInfoChecked || !_isVisible || _tab != _RankingTab.league) return;
-    if (league == null || league.memberCount < 2 || uid == null || uid.isEmpty) return;
+    if (league == null || league.memberCount < 2 || uid == null || uid.isEmpty) {
+      return;
+    }
     _leagueInfoChecked = true;
 
     final prefs = await SharedPreferences.getInstance();
     final key = 'league_info_shown_$uid';
     // Eski sürüm anahtarı e-postaya bağlıydı; onu görmüş kullanıcıya tekrar açılmaz.
     final legacyKey = 'league_info_shown_${user!.email}';
-    if ((prefs.getBool(key) ?? false) || (prefs.getBool(legacyKey) ?? false)) return;
+    if ((prefs.getBool(key) ?? false) || (prefs.getBool(legacyKey) ?? false)) {
+      return;
+    }
     if (!mounted || !_isVisible || _tab != _RankingTab.league) {
       _leagueInfoChecked = false;
       return;
@@ -201,7 +278,9 @@ class _RankingScreenState extends State<RankingScreen> {
     final hidden = HiddenUsersStore.instance.hidden.value;
     final entries = [
       for (final e in _data[_tab]!.entries)
-        (!e.isMe && hidden.isHidden(id: e.userId, name: e.name)) ? e.asHidden() : e,
+        (!e.isMe && hidden.isHidden(id: e.userId, name: e.name))
+            ? e.asHidden()
+            : e,
     ];
     final me = widget.currentUser;
     if (_tab != _RankingTab.friends || me == null) return entries;
@@ -220,15 +299,21 @@ class _RankingScreenState extends State<RankingScreen> {
   // Başka kullanıcının satırı: bildir / gizle.
   void _openEntryActions(RankingEntry entry) {
     final l10n = AppLocalizations.of(context)!;
-    unawaited(showUserSafetySheet(
-      context,
-      target: UserSafetyTarget(name: entry.name ?? l10n.userDefault, userId: entry.userId, avatarId: entry.avatarId),
-      place: switch (_tab) {
-        _RankingTab.league => UserReportPlace.league,
-        _RankingTab.monthly => UserReportPlace.monthly,
-        _RankingTab.friends => UserReportPlace.friendsRanking,
-      },
-    ));
+    unawaited(
+      showUserSafetySheet(
+        context,
+        target: UserSafetyTarget(
+          name: entry.name ?? l10n.userDefault,
+          userId: entry.userId,
+          avatarId: entry.avatarId,
+        ),
+        place: switch (_tab) {
+          _RankingTab.league => UserReportPlace.league,
+          _RankingTab.monthly => UserReportPlace.monthly,
+          _RankingTab.friends => UserReportPlace.friendsRanking,
+        },
+      ),
+    );
   }
 
   // Düzen: sekme çubuğu, geri sayım ve durum mesajları okunabilir genişlikte
@@ -248,8 +333,13 @@ class _RankingScreenState extends State<RankingScreen> {
           onRefresh: () => _load(_tab),
           color: AppColors.primary,
           child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: compact ? 12 : 20),
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
+            padding: EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: compact ? 12 : 20,
+            ),
             child: ContentWidth(
               maxWidth: ContentWidth.dashboard,
               child: Column(
@@ -264,11 +354,16 @@ class _RankingScreenState extends State<RankingScreen> {
                         ..._buildBanner(l10n),
                         if (!data.loaded)
                           data.error != null
-                              ? LoadErrorView(message: l10n.rankingLoadError, onRetry: () => _load(_tab))
+                              ? LoadErrorView(
+                                  message: l10n.rankingLoadError,
+                                  onRetry: () => _load(_tab),
+                                )
                               : const Center(
                                   child: Padding(
                                     padding: EdgeInsets.all(40.0),
-                                    child: CircularProgressIndicator(color: AppColors.primary),
+                                    child: CircularProgressIndicator(
+                                      color: AppColors.primary,
+                                    ),
                                   ),
                                 )
                         else if (data.error != null)
@@ -297,7 +392,9 @@ class _RankingScreenState extends State<RankingScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final labels = {
       _RankingTab.league: l10n.rankingTabLeague,
-      _RankingTab.monthly: l10n.rankingTabMonthly,
+      _RankingTab.monthly: _rules.isCalendarMonthly
+          ? l10n.rankingTabGlobal
+          : l10n.rankingTabMonthly,
       _RankingTab.friends: l10n.rankingTabFriends,
     };
     return Container(
@@ -305,7 +402,9 @@ class _RankingScreenState extends State<RankingScreen> {
       height: 48,
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurfaceContainerHigh : AppColors.surfaceContainerHigh,
+        color: isDark
+            ? AppColors.darkSurfaceContainerHigh
+            : AppColors.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(24),
       ),
       child: Row(
@@ -317,7 +416,9 @@ class _RankingScreenState extends State<RankingScreen> {
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   decoration: BoxDecoration(
-                    color: _tab == entry.key ? AppColors.primaryContainer : Colors.transparent,
+                    color: _tab == entry.key
+                        ? AppColors.primaryContainer
+                        : Colors.transparent,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   alignment: Alignment.center,
@@ -334,7 +435,9 @@ class _RankingScreenState extends State<RankingScreen> {
                         fontWeight: FontWeight.bold,
                         color: _tab == entry.key
                             ? Colors.white
-                            : (isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant),
+                            : (isDark
+                                  ? AppColors.darkOnSurfaceVariant
+                                  : AppColors.onSurfaceVariant),
                       ),
                     ),
                   ),
@@ -355,7 +458,9 @@ class _RankingScreenState extends State<RankingScreen> {
         if (league == null) return const [];
         banner = RankingCountdownBanner(
           title: leagueTitle(l10n, league.tier),
-          target: league.rules.isCompetitionActive
+          target: league.rules.isCalendarMonthly
+              ? league.rules.periodEnd ?? league.endDate
+              : league.rules.isCompetitionActive
               ? league.endDate
               : league.rules.competitionPhase == 'scheduled'
               ? league.rules.competitionStartsAt
@@ -369,12 +474,66 @@ class _RankingScreenState extends State<RankingScreen> {
         );
       case _RankingTab.monthly:
         banner = RankingCountdownBanner(
-          title: l10n.rankingMonthlyResetIn,
-          target: nextMonthlyLeaderboardReset(DateTime.now()),
+          title: _rules.isCalendarMonthly
+              ? l10n.rankingGlobalResetIn
+              : l10n.rankingMonthlyResetIn,
+          target: _rules.isCalendarMonthly
+              ? _globalPeriodEnd ??
+                    _rules.periodEnd ??
+                    nextCalendarMonthReset(DateTime.now())
+              : nextMonthlyLeaderboardReset(DateTime.now()),
         );
       case _RankingTab.friends:
         return const [];
     }
-    return [banner, const SizedBox(height: 12)];
+    return [
+      banner,
+      const SizedBox(height: 12),
+      if (_rules.isCalendarMonthly && _tab == _RankingTab.monthly) ...[
+        Text(l10n.leagueGlobalScopeBody),
+        const SizedBox(height: 12),
+      ],
+      if (_rules.isCalendarMonthly &&
+          _tab == _RankingTab.league &&
+          _target != null) ...[
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.leagueTargetTitle,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  l10n.leagueTargetCurrent(
+                    competitionTargetLabel(l10n, _target!.currentSegment),
+                  ),
+                ),
+                if (_target!.pendingSegment != null &&
+                    _target!.effectiveAt != null) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    l10n.leagueTargetPending(
+                      competitionTargetLabel(l10n, _target!.pendingSegment!),
+                      competitionDate(l10n, _target!.effectiveAt!),
+                    ),
+                  ),
+                ],
+                TextButton.icon(
+                  key: const ValueKey('league-change-target'),
+                  onPressed: _editingTarget ? null : _editTarget,
+                  icon: const Icon(Icons.edit_outlined),
+                  label: Text(l10n.leagueTargetChange),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+      ],
+    ];
   }
 }

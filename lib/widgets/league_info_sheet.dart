@@ -7,6 +7,7 @@ import '../models/league_rules.dart';
 import '../theme.dart';
 import '../services/supabase_service.dart';
 import '../utils/responsive.dart';
+import 'competition_target_dialog.dart' show competitionDate;
 import 'social/league_rule_texts.dart';
 import 'social/league_tiers.dart';
 import 'social/ranking_models.dart';
@@ -171,15 +172,31 @@ class _LeagueInfoSheetState extends State<LeagueInfoSheet> {
                     _sectionTitle(l10n.leagueInfoWhatTitle, onSurface),
                     _card(
                       cardBg,
-                      Text(
-                        l10n.leagueInfoWhatBodyWithCapacity(
-                          _rules.roomCapacity,
-                        ),
-                        style: TextStyle(
-                          fontSize: 14,
-                          height: 1.5,
-                          color: onSurfaceVariant,
-                        ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.leagueInfoWhatBodyWithCapacity(
+                              _rules.roomCapacity,
+                            ),
+                            style: TextStyle(
+                              fontSize: 14,
+                              height: 1.5,
+                              color: onSurfaceVariant,
+                            ),
+                          ),
+                          if (_rules.isCalendarMonthly) ...[
+                            const SizedBox(height: 10),
+                            Text(
+                              l10n.leagueTargetPolicy,
+                              style: TextStyle(
+                                fontSize: 14,
+                                height: 1.5,
+                                color: onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -425,8 +442,13 @@ class _LeagueInfoSheetState extends State<LeagueInfoSheet> {
     if (_rules.hasLaunchPolicy && !_rules.isCompetitionActive) {
       return leaguePreparationText(l10n, _rules);
     }
-    final end = _league?.endDate;
+    final end = _rules.isCalendarMonthly
+        ? _rules.periodEnd ?? _league?.endDate
+        : _league?.endDate;
     if (end == null) return l10n.leagueInfoPeriodGeneric;
+    if (_rules.isCalendarMonthly) {
+      return '${l10n.leagueCalendarMonthBody}\n${l10n.leagueInfoPeriodEnds(competitionDate(l10n, end))}';
+    }
     final formatted = DateFormat.MMMMEEEEd(
       l10n.localeName,
     ).add_Hm().format(end.toLocal());
@@ -575,6 +597,12 @@ String promotionDemotionText(AppLocalizations l10n, LeagueSnapshot league) {
 /// sunucunun verdiği ilk resmi başlangıç tarihi açıklanır.
 String leaguePreparationText(AppLocalizations l10n, LeagueRules rules) {
   final start = rules.competitionStartsAt;
+  if (rules.isCalendarMonthly) {
+    if (start != null && start.isAfter(DateTime.now())) {
+      return l10n.leagueCalendarPreparingBody(competitionDate(l10n, start));
+    }
+    return l10n.leagueCalendarPreparingGeneric;
+  }
   if (rules.competitionPhase == 'scheduled' && start != null) {
     final formatted = DateFormat.MMMMEEEEd(
       l10n.localeName,

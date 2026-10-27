@@ -166,7 +166,10 @@ class LeagueSnapshot {
       tier: _asInt(me['tier'], fallback: 1).clamp(1, kLeagueTierCount),
       endDate:
           DateTime.tryParse(me['end_date']?.toString() ?? '') ??
-          assumedLeaguePeriodEnd(now ?? DateTime.now()),
+          currentRules.periodEnd ??
+          (currentRules.isCalendarMonthly
+              ? nextCalendarMonthReset(now ?? DateTime.now())
+              : assumedLeaguePeriodEnd(now ?? DateTime.now())),
       promotionZoneEnd: _asInt(me['promotion_zone_end'], fallback: 0),
       demotionZoneStart: _asInt(me['demotion_zone_start'], fallback: 999),
       memberCount: memberCount,
@@ -324,6 +327,17 @@ DateTime nextMonthlyLeaderboardReset(DateTime now, {String? timeZone}) {
     DateTime(day.year, day.month + 1, 1),
     timeZone: timeZone,
   );
+}
+
+/// Competition months always change at 00:00 Europe/Istanbul, independently
+/// of the profile's 04:00 study day and the device's display time zone.
+DateTime nextCalendarMonthReset(DateTime now) {
+  final istanbul = now.toUtc().add(const Duration(hours: 3));
+  return DateTime.utc(
+    istanbul.year,
+    istanbul.month + 1,
+    1,
+  ).subtract(const Duration(hours: 3));
 }
 
 int _asInt(Object? value, {int fallback = 0}) {
