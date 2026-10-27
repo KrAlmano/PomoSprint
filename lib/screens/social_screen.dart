@@ -20,6 +20,9 @@ class SocialScreen extends StatefulWidget {
   @visibleForTesting
   static bool isOnBreak(Map<String, dynamic> user) => user['status'] == 'break';
 
+  static bool isTakingExam(Map<String, dynamic> user) =>
+      user['status'] == 'exam';
+
   /// Eski focus-only RPC'de status yoktur. Odak ve mola aynı listede
   /// görünür; bilinmeyen durumlar görünür bir çalışma gibi yorumlanmaz.
   @visibleForTesting
@@ -27,7 +30,10 @@ class SocialScreen extends StatefulWidget {
     List<Map<String, dynamic>> rows,
   ) => [
     for (final row in rows)
-      if (row['status'] == null || row['status'] == 'focus' || isOnBreak(row))
+      if (row['status'] == null ||
+          row['status'] == 'focus' ||
+          isOnBreak(row) ||
+          isTakingExam(row))
         row,
   ];
 
@@ -54,7 +60,11 @@ class SocialScreen extends StatefulWidget {
   static String liveStatusText(
     Map<String, dynamic> user,
     AppLocalizations l10n,
-  ) => isOnBreak(user) ? l10n.socialOnBreak : l10n.socialFocusing;
+  ) => isOnBreak(user)
+      ? l10n.socialOnBreak
+      : isTakingExam(user)
+      ? l10n.socialTakingExam
+      : l10n.socialFocusing;
 
   @override
   State<SocialScreen> createState() => _SocialScreenState();

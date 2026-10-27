@@ -16,6 +16,8 @@ import '../screens/ranking_screen.dart';
 import '../screens/reports_screen.dart';
 import '../screens/social_screen.dart';
 import '../screens/timer_screen.dart';
+import '../screens/exam_screen.dart';
+import '../services/exam_service.dart';
 import '../services/language_service.dart';
 import '../services/lock_screen_timer.dart';
 import '../services/marathon_presence.dart';
@@ -67,11 +69,13 @@ class _MainNavigationShellState extends State<MainNavigationShell>
   ];
 
   final SupabaseService _service = SupabaseService.instance;
+  final ExamService _exams = ExamService.instance;
   int _currentIndex = 0;
   late List<CourseCategory> _categories;
   bool _isTimerRunning = false;
   bool _isMarathonBreak = false;
   bool _isLoggingOut = false;
+  bool _focusWasReserved = false;
   final AsyncLock _presenceLock = AsyncLock();
   int _presenceRevision = 0;
   bool _marathonAvailable = false;
@@ -102,6 +106,8 @@ class _MainNavigationShellState extends State<MainNavigationShell>
     _categories = List.of(widget.initialCategories);
     _cloudSeen = _service.isCloudActive;
     WidgetsBinding.instance.addObserver(this);
+    _exams.blocksOtherSessions.addListener(_onExamStateChanged);
+    unawaited(_exams.initialize());
     // Kategori ekleme/düzenleme/arşiv/sıralama sonrası liste yeniden yüklenir.
     _service.categoriesRevision.addListener(_loadCategories);
     _listenAuthChanges();
@@ -119,6 +125,7 @@ class _MainNavigationShellState extends State<MainNavigationShell>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _exams.blocksOtherSessions.removeListener(_onExamStateChanged);
     _service.categoriesRevision.removeListener(_loadCategories);
     _authSubscription?.cancel();
     unawaited(_connection.dispose());
@@ -131,6 +138,13 @@ class _MainNavigationShellState extends State<MainNavigationShell>
     return state == null ||
         state == AppLifecycleState.resumed ||
         state == AppLifecycleState.inactive;
+  }
+
+  // A new timer needs an interactive foreground. `inactive` is retained for
+  // existing-session sync but cannot authorize a new focus or exam.
+  static bool get _canStartInForeground {
+    final state = WidgetsBinding.instance.lifecycleState;
+    return state == null || state == AppLifecycleState.resumed;
   }
 
   @override
@@ -146,6 +160,7 @@ class _MainNavigationShellState extends State<MainNavigationShell>
         unawaited(_service.verifyAppleCredential());
         unawaited(_service.syncDeviceTimeZone());
         unawaited(_loadMarathonConfig());
+        unawaited(_exams.refresh());
       case AppLifecycleState.paused ||
           AppLifecycleState.hidden ||
           AppLifecycleState.detached:
@@ -194,6 +209,7 @@ class _MainNavigationShellState extends State<MainNavigationShell>
     if (_needsCategoryReload) unawaited(_loadCategories());
     if (cameOnline) _syncRetryAttempt = 0;
     unawaited(_syncPendingSessions());
+    unawaited(_exams.refresh());
     if (cameOnline) {
       unawaited(_loadMarathonConfig());
       unawaited(_refreshUser());
@@ -345,6 +361,10 @@ class _MainNavigationShellState extends State<MainNavigationShell>
     if (mounted && _isTimerRunning != isRunning) {
       setState(() => _isTimerRunning = isRunning);
     }
+    if (isRunning && _focusWasReserved) {
+      _focusWasReserved = false;
+      return;
+    }
     _queuePresence(
       () => isRunning
           ? _service.startStudySession(
@@ -359,6 +379,67 @@ class _MainNavigationShellState extends State<MainNavigationShell>
       !_isLoggingOut &&
       !_service.isDeviceSessionEnding &&
       _service.currentUser.value?.id == _user.id;
+
+  void _onExamStateChanged() {
+    if (mounted) setState(() {});
+  }
+
+  Future<bool> _canStartExam() async {
+    if (!_ownsCurrentSession || _isTimerRunning || _isMarathonBreak) {
+      return false;
+    }
+    final owner = _user.id ?? _user.email.toLowerCase();
+    final record = await TimerPersistence.instance.load(owner);
+    return mounted &&
+        _ownsCurrentSession &&
+        record == null &&
+        !_isTimerRunning &&
+        !_isMarathonBreak &&
+        _canStartInForeground;
+  }
+
+  Future<bool> _authorizeTimerStart(
+    String categoryName,
+    int minutesLeft,
+  ) async {
+    await _exams.initialize();
+    if (!_ownsCurrentSession ||
+        !_canStartInForeground ||
+        _exams.blocksOtherSessions.value) {
+      return false;
+    }
+    final owner = _user.id;
+    final revision = ++_presenceRevision;
+    return _presenceLock.synchronized(() async {
+      if (!mounted ||
+          !_ownsCurrentSession ||
+          _user.id != owner ||
+          revision != _presenceRevision ||
+          !_canStartInForeground ||
+          _exams.blocksOtherSessions.value) {
+        return false;
+      }
+      final result = await _service.authorizeStudySessionStart(
+        durationMinutes: minutesLeft,
+        categoryName: categoryName,
+      );
+      if (!mounted || !_ownsCurrentSession || _user.id != owner) return false;
+      if (!_canStartInForeground ||
+          revision != _presenceRevision ||
+          _exams.blocksOtherSessions.value) {
+        if (result.reserved) await _service.cancelStudySession();
+        return false;
+      }
+      _focusWasReserved = result.reserved;
+      return result.allowed;
+    });
+  }
+
+  void _onTimerStartAborted() {
+    if (!_focusWasReserved) return;
+    _focusWasReserved = false;
+    _queuePresence(_service.cancelStudySession);
+  }
 
   /// Odak/mola/iptal istekleri sırayla gider. Geç kalan bir iptal, yeni
   /// molayı ya da Pomodoro'yu sunucuda silemez; eski hesap da yeni hesaba
@@ -387,6 +468,7 @@ class _MainNavigationShellState extends State<MainNavigationShell>
     if (mounted && _isMarathonBreak != isOnBreak) {
       setState(() => _isMarathonBreak = isOnBreak);
     }
+    if (!isOnBreak && _focusWasReserved) return;
     final endsAt = DateTime.now().add(Duration(seconds: secondsLeft));
     _queuePresence(() async {
       if (isOnBreak && secondsLeft > 0) {
@@ -439,13 +521,21 @@ class _MainNavigationShellState extends State<MainNavigationShell>
     final plan = previous.marathon;
     if (!_ownsCurrentSession || plan == null || !_isInForeground) return false;
     final owner = _user.id;
+    if (_exams.blocksOtherSessions.value) return false;
     final confirmed = await _service.confirmMarathonPresence(
       marathonUuid: plan.marathonUuid,
       completedSessionIndex: plan.completedSessions,
       previousClientUuid: previous.clientUuid,
       nextClientUuid: nextUuid,
     );
-    return confirmed &&
+    if (!confirmed || !mounted || !_ownsCurrentSession || !_isInForeground) {
+      return false;
+    }
+    final authorized = await _authorizeTimerStart(
+      previous.categoryName,
+      previous.durationMinutes,
+    );
+    return authorized &&
         mounted &&
         _ownsCurrentSession &&
         _user.id == owner &&
@@ -489,7 +579,11 @@ class _MainNavigationShellState extends State<MainNavigationShell>
       setState(() => _currentIndex = 0);
       return;
     }
-    if (!_isTimerRunning && !_isMarathonBreak) return;
+    if (!_isTimerRunning &&
+        !_isMarathonBreak &&
+        !_exams.blocksOtherSessions.value) {
+      return;
+    }
     final l10n = AppLocalizations.of(context)!;
     final leave = await showDialog<bool>(
       context: context,
@@ -529,6 +623,8 @@ class _MainNavigationShellState extends State<MainNavigationShell>
         sessionOwnerKey: user.id ?? ownerEmail,
         legacySessionOwnerKey: ownerEmail,
         isSessionActive: () => _ownsCurrentSession,
+        authorizeStart: _authorizeTimerStart,
+        onStartAborted: _onTimerStartAborted,
         onOpenSettings: _openProfile,
         onTimerStateChanged: _onTimerStateChanged,
         onMarathonBreakChanged: _onMarathonBreakChanged,
@@ -541,9 +637,22 @@ class _MainNavigationShellState extends State<MainNavigationShell>
       ReportsScreen(
         categories: _categories,
         onStartTimer: () => setState(() => _currentIndex = 0),
+        loadExamAttempts: () async {
+          await _exams.refresh();
+          return _exams.attempts;
+        },
+        isExamHistoryStale: () => _exams.historyIsStale,
+        onOpenExams: () => setState(() => _currentIndex = 4),
       ),
       RankingScreen(currentUser: user),
       const SocialScreen(),
+      ExamScreen(
+        service: _exams,
+        canStart: () =>
+            !_isTimerRunning && !_isMarathonBreak && _ownsCurrentSession,
+        canStartAsync: _canStartExam,
+        loadStudySessions: _service.fetchStudySessions,
+      ),
     ];
 
     return ListenableBuilder(
@@ -552,7 +661,11 @@ class _MainNavigationShellState extends State<MainNavigationShell>
         final lang = LanguageService.instance;
 
         return PopScope(
-          canPop: _currentIndex == 0 && !_isTimerRunning && !_isMarathonBreak,
+          canPop:
+              _currentIndex == 0 &&
+              !_isTimerRunning &&
+              !_isMarathonBreak &&
+              !_exams.blocksOtherSessions.value,
           onPopInvokedWithResult: (didPop, _) {
             if (!didPop) unawaited(_onBackPressed());
           },
@@ -582,6 +695,11 @@ class _MainNavigationShellState extends State<MainNavigationShell>
                 icon: Icons.groups_outlined,
                 selectedIcon: Icons.groups,
                 label: lang.translate('nav_social'),
+              ),
+              ShellDestination(
+                icon: Icons.assignment_outlined,
+                selectedIcon: Icons.assignment,
+                label: AppLocalizations.of(context)!.examTab,
               ),
             ],
             appBar: hideUI

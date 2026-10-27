@@ -92,18 +92,20 @@ void main() {
   tearDown(() => HiddenUsersStore.instance.resetForTest());
 
   test(
-    'One list includes legacy focus, focus and break; unknown status stays hidden',
+    'One list includes legacy focus, focus, break and exam; unknown stays hidden',
     () {
       final rows = [
         _friend('legacy', 'Legacy'),
         _friend('focus', 'Focus', status: 'focus'),
         _friend('break', 'Break', status: 'break'),
+        _friend('exam', 'Exam', status: 'exam'),
         _friend('unknown', 'Unknown', status: 'future'),
       ];
       expect(SocialScreen.visibleFriends(rows).map((r) => r['id']), [
         'legacy',
         'focus',
         'break',
+        'exam',
       ]);
     },
   );
@@ -135,6 +137,13 @@ void main() {
           l10n.socialOnBreak,
         );
         expect(
+          SocialScreen.liveStatusText(
+            _friend('e', 'Exam', status: 'exam'),
+            l10n,
+          ),
+          l10n.socialTakingExam,
+        );
+        expect(
           SocialScreen.liveStatusText(_friend('l', 'Legacy'), l10n),
           l10n.socialFocusing,
         );
@@ -151,14 +160,22 @@ void main() {
           _friend('b', 'Resting Bob', status: 'break'),
           _friend('b', 'Resting Bob', status: 'break'),
           _friend('c', 'Legacy Carol'),
+          _friend('d', 'Exam Dani', status: 'exam'),
         ];
       final l10n = await _mount(tester, service);
       expect(find.text('Focused Alice'), findsOneWidget);
       expect(find.text('Legacy Carol'), findsOneWidget);
       expect(find.text('Resting Bob'), findsOneWidget);
+      expect(find.text('Exam Dani'), findsOneWidget);
       expect(find.byType(ChoiceChip), findsNothing);
       expect(find.text(l10n.socialFocusing), findsNWidgets(2));
       expect(find.text(l10n.socialOnBreak), findsOneWidget);
+      expect(find.text(l10n.socialTakingExam), findsOneWidget);
+      final examDot = find.descendant(
+        of: find.byKey(const ValueKey('social-friend-d')),
+        matching: find.byType(SocialPresenceDot),
+      );
+      expect(tester.widget<SocialPresenceDot>(examDot).onBreak, isFalse);
       final bobCard = find.byKey(const ValueKey('social-friend-b'));
       final bobDot = find.descendant(
         of: bobCard,
@@ -189,6 +206,7 @@ void main() {
       expect(find.text('Resting Bob'), findsOneWidget);
       expect(find.text(l10n.socialFocusing), findsOneWidget);
       expect(find.text(l10n.socialOnBreak), findsNothing);
+      expect(find.text(l10n.socialTakingExam), findsNothing);
       expect(tester.widget<SocialPresenceDot>(bobDot).onBreak, isFalse);
       expect(
         (tester

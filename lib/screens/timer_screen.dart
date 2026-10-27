@@ -68,6 +68,12 @@ class TimerScreen extends StatefulWidget {
   /// Oturum kapanışı başlamış olabilir; native çıkış sürerken ekran henüz
   /// mounted olsa da yeni sayaç, alarm veya RPC başlatılmaz.
   final bool Function()? isSessionActive;
+
+  /// Geri sayımdan sonra, diske/sayaca başlamadan önce sunucuda diğer
+  /// çalışma moduyla çakışmayı denetler. Çevrimdışı normal seans korunur.
+  final Future<bool> Function(String categoryName, int minutesLeft)?
+  authorizeStart;
+  final VoidCallback? onStartAborted;
   final String? userSegment;
 
   /// Kilit ekranı sayacı (varsayılan: [LockScreenTimer.instance]; testte sahtesi).
@@ -95,6 +101,8 @@ class TimerScreen extends StatefulWidget {
     this.marathonAvailable = true,
     this.marathonBonuses,
     this.isSessionActive,
+    this.authorizeStart,
+    this.onStartAborted,
     this.userSegment,
     this.lockScreenTimer,
     this.quickTimer = false,
@@ -1034,6 +1042,9 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
       }
     }
     if (!canStartNext()) {
+      if (_sameOwner(owner)) {
+        widget.onStartAborted?.call();
+      }
       if (_sameOwner(owner) &&
           _session?.clientUuid == previous.clientUuid &&
           _isResting) {
@@ -1043,6 +1054,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
       return;
     }
     if (!accepted) {
+      widget.onStartAborted?.call();
       setState(() {
         _isStarting = false;
         _presenceRequestFailed = true;
@@ -1083,6 +1095,9 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
       canCommit: canCommitStartedFocus,
     );
     if (storedNext == null) {
+      if (_sameOwner(owner)) {
+        widget.onStartAborted?.call();
+      }
       if (_sameOwner(owner) &&
           _session?.clientUuid == previous.clientUuid &&
           _isResting) {
@@ -1101,12 +1116,16 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     }
     if (storedNext.marathon!.stopRequested) {
       if (_sameOwner(owner)) {
+        widget.onStartAborted?.call();
         _isStarting = false;
         await _restoreSavedSession(storedNext, owner);
       }
       return;
     }
     if (!canCommitStartedFocus()) {
+      if (_sameOwner(owner)) {
+        widget.onStartAborted?.call();
+      }
       // ACK/disk yazısının ardından lifecycle/deadline değiştiyse henüz
       // çalıştırılmamış odak restore edilip tamamlanamaz.
       await _store.compareAndUpdateMarathon(
@@ -1532,6 +1551,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     final notificationsAllowed = await NotificationService.instance
         .ensurePermission();
     if (!mounted || !_sameOwner(owner)) return;
+    var countdownCompleted = false;
     await showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -1539,16 +1559,39 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
       builder: (ctx) {
         return TimerCountdownDialog(
           onComplete: () {
+            countdownCompleted = true;
             if (ctx.mounted && Navigator.of(ctx).canPop()) {
               Navigator.of(ctx).pop();
             }
-            if (_sameOwner(owner) && _isStarting) _startOrResume();
           },
         );
       },
     );
+    if (countdownCompleted &&
+        _sameOwner(owner) &&
+        _isStarting &&
+        _isInForeground) {
+      var allowed = true;
+      try {
+        allowed =
+            await widget.authorizeStart?.call(
+              _session?.categoryName ?? selectedCategoryName,
+              (remaining / 60).ceil().clamp(1, 50),
+            ) ??
+            true;
+      } catch (_) {
+        allowed = false;
+      }
+      if (!_sameOwner(owner)) return;
+      if (allowed && _isStarting && _isInForeground) {
+        _startOrResume();
+      } else if (mounted) {
+        _showMarathonFeedback(AppLocalizations.of(context)!.examConflict);
+      }
+    }
     // Geri tuşuyla kapatılan geri sayım BAŞLAT'ı kilitli bırakmaz.
     if (_sameOwner(owner) && !isRunning && !_persistingMarathonStart) {
+      widget.onStartAborted?.call();
       setState(() {
         _isStarting = false;
         if (!_hasSession) _marathonCount = 0;
@@ -1619,6 +1662,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     if (!_sameOwner(owner)) return;
     _persistingMarathonStart = false;
     if (!saved) {
+      widget.onStartAborted?.call();
       setState(() {
         _isStarting = false;
         _marathonCount = 0;
