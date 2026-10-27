@@ -1,5 +1,5 @@
 // Operational audit only: synthetic values, in-memory transport, no live DSN.
-// These probes document the current implementation; they do not change it.
+// Acceptance regressions for the scrubbed SDK transport; no live delivery.
 import 'dart:convert';
 import 'dart:io';
 
@@ -51,7 +51,7 @@ void main() {
   tearDownAll(() async {
     await Sentry.close();
     final output = File(
-      'analiz/qa_evidence_20261008/operational_controls/error_tracking/findings.json',
+      'analiz/qa_evidence_20261028/operational_controls/error_tracking/findings.json',
     );
     output.parent.createSync(recursive: true);
     output.writeAsStringSync(
@@ -70,6 +70,7 @@ void main() {
     expect(options.tracesSampleRate, .2);
     expect(options.beforeSend, isNotNull);
     expect(options.beforeBreadcrumb, isNotNull);
+    expect(options.beforeSendTransaction, isNotNull);
     _findings['privacy_defaults'] = 'pass';
   });
 
@@ -109,12 +110,10 @@ void main() {
     );
     final processed = await options.beforeSend!(event, Hint());
     final encoded = jsonEncode(processed!.toJson());
-    // These are explicit reproducibility assertions, not acceptance criteria.
-    // A future fix changes this probe and its report, not the current product.
-    expect(encoded, contains(_email));
-    expect(encoded, contains(_secret));
+    expect(encoded, isNot(contains(_email)));
+    expect(encoded, isNot(contains(_secret)));
     _findings['nested_and_request_scrub'] = {
-      'acceptance': 'gap reproduced',
+      'acceptance': 'pass: nested and request payload scrubbed',
       'synthetic_email_survived': encoded.contains(_email),
       'synthetic_token_survived': encoded.contains(_secret),
       'real_user_data_observed': false,
@@ -170,8 +169,9 @@ void main() {
         'native_crash_or_dashboard_alert_tested': false,
       };
       final saved = File(
-        'analiz/qa_evidence_20261008/operational_controls/error_tracking/synthetic_event.json',
+        'analiz/qa_evidence_20261028/operational_controls/error_tracking/synthetic_event.json',
       );
+      saved.parent.createSync(recursive: true);
       saved.writeAsStringSync(
         '${const JsonEncoder.withIndent('  ').convert(event)}\n',
       );
