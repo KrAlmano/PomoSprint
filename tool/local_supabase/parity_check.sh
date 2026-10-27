@@ -10,6 +10,8 @@
 #   tool/local_supabase/parity_check.sh --print-summary-sql canlıda çalıştırılacak özet SQL'i
 #   tool/local_supabase/parity_check.sh --print-lines-sql   canlıda çalıştırılacak ayrıntı SQL'i
 #   tool/local_supabase/parity_check.sh --local-lines       yerelin normalize satırları
+#   tool/local_supabase/parity_check.sh --reviewed-night-20261028
+#     yalnız yerel 27/28/29 adayını ayrı incelenmiş referansla karşılaştırır
 #
 # Canlı özeti tazelemek: --print-summary-sql çıktısını Supabase SQL Editor'de
 # (ya da MCP execute_sql ile) çalıştır, (k, n, h) satırlarını sekmeyle ayırıp
@@ -21,6 +23,12 @@ LINES_SQL="$HERE/parity/fingerprint_lines.sql"
 LIVE_SUMMARY="$HERE/parity/live_summary.tsv"
 LIVE_LINES="$HERE/parity/live_lines.tsv"
 DB_URL="${LOCAL_DB_URL:-postgresql://postgres:postgres@127.0.0.1:54322/postgres}"
+
+# Explicit opt-in only: the default historical live reference below is unchanged.
+if [[ "${1:-}" == "--reviewed-night-20261028" ]]; then
+  [[ $# -eq 1 ]] || { echo "HATA: reviewed parity ek seçenek kabul etmez." >&2; exit 2; }
+  exec python3 "$HERE/parity_check_reviewed.py"
+fi
 
 case "$DB_URL" in
   *@127.0.0.1:*|*@localhost:*|*@\[::1\]:*) ;;

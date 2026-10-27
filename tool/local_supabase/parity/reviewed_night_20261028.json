@@ -1,0 +1,102 @@
+{
+  "reference_id": "reviewed-local-night-20261028",
+  "review_basis": "Local 27/28/29: exam52, competition21, transition20, privacy26, migration16 PASS. Review does not claim production parity. Target reservation follow-up15 and migration16 PASS.",
+  "sources_sha256": {
+    "supabase/proposed/27_tus_segment.sql": "5836949553fc20a72348bdb2370b44e8c8d4dd51d014f64474291b8acb818fa1",
+    "supabase/proposed/27_tus_segment_down.sql": "9292ec74679b5f9cb0d620f555ec9a7b9e0160b2a6557934f4b54967bda7c4ef",
+    "supabase/proposed/27_tus_segment_dryrun.sql": "068d383f2d0b712cf5426332b92616b49743d4740cd619e046cd8b0ee5bc0c1a",
+    "supabase/proposed/28_exam_core.sql": "bbceb45cc4cfac4c73b6606116f6afdea3e741ca3eeba0f7408c95748f5bdb95",
+    "supabase/proposed/28_exam_core_down.sql": "4989b31fa55f45a6f30a9e84b7b8a9b8b4028d642c3c19ce27ee40a891e68fe8",
+    "supabase/proposed/28_exam_core_dryrun.sql": "da93727b94411e39c77dd351ce9f6759d04471cb0cdec35842e0953f85a5017f",
+    "supabase/proposed/29_monthly_competitions.sql": "daa3ec297012c6ed9b0e51988a7af84e58dbbcbb68300e4f8e5b39424726ffef",
+    "supabase/proposed/29_monthly_competitions_down.sql": "f529dc4a33bb4971525230e764737342b82e2b8ab2bde54ff33f81d124bee109",
+    "supabase/proposed/29_monthly_competitions_dryrun.sql": "eaf4eb849633f59577fafdb27caa45220f730b893bb5633daeef32f8b8a0afa4",
+    "supabase/proposed/exam_catalog_v1.json": "7eece1aa36e0ba43fa5a29df348e91565b81d88b7368b45c5a86270be7ea6303",
+    "tool/local_supabase/parity/fingerprint_lines.sql": "625593a088175b2a30e6ac48fc134834451206100f582977b1a5ebcc5cb1c4ca"
+  },
+  "expected": {
+    "schema": {
+      "col": [
+        "247",
+        "7f249d38da4ffc74284b095ab34f8f7b"
+      ],
+      "con": [
+        "152",
+        "471d6f280b6133dc1fffd50141a87307"
+      ],
+      "cron": [
+        "3",
+        "fefadd57a7e0f9a7fba62d26214e6050"
+      ],
+      "defacl": [
+        "6",
+        "d257813ad5c72bd659fec221c1ed34f8"
+      ],
+      "ext": [
+        "7",
+        "9c1750b5ef9ce6d29533861ee1456808"
+      ],
+      "extver": [
+        "7",
+        "802c38cc8da32f090b6089c3fe1d4aa8"
+      ],
+      "func": [
+        "113",
+        "4f205ec6b91213353b49a0c2cf259f3c"
+      ],
+      "idx": [
+        "75",
+        "9bdeee593f3a8edc25375e8580311bfa"
+      ],
+      "pol": [
+        "20",
+        "98957ac20d10a35e355ac8ea4cb2f83a"
+      ],
+      "pub": [
+        "2",
+        "58ebe974541353e989c25a535aa9cb28"
+      ],
+      "rel": [
+        "41",
+        "81b3d3e58192e7e2e8878bf5f88a2487"
+      ],
+      "schema": [
+        "1",
+        "6ae3d56d282d7fbcf093eae1da2f4491"
+      ],
+      "trg": [
+        "27",
+        "23e72fcf0b37305d3f80fa22fd882547"
+      ]
+    },
+    "migrations": [
+      "20261003180000|monthly_leaderboard_study_month",
+      "20261003181000|categories_order_and_privileges",
+      "20261003194000|privacy_social",
+      "20261004120000|live_snapshot",
+      "20261005120000|lig_donemi",
+      "20261005121000|seans_kilit_gec_bonus",
+      "20261005122000|avatar_satin_alma",
+      "20261005123000|kategori_butunluk",
+      "20261005124000|onboarding_profil",
+      "20261005125000|sosyal_erisim",
+      "20261005126000|segment_genisletme",
+      "20261007110000|report_submission_lock",
+      "20261007150000|marathon_break_presence",
+      "20261007160000|marathon_rewards",
+      "20261007170000|marathon_presence_confirmation",
+      "20261008190000|league_launch_policy",
+      "20261009190000|special_avatar_catalog",
+      "20261009233000|remove_unowned_ronin",
+      "20261028010000|tus_segment",
+      "20261028020000|exam_core",
+      "20261028030000|monthly_competitions"
+    ],
+    "catalog": {
+      "avatars": "48|3e88f75541a31ec3c8a9f83816ec40bd",
+      "exam_catalog": "7|70e0d40f43c4c98599338712cc8d92de",
+      "competition_avatar_rewards": "30|ca20b98cdfd6c50d8c441d7334aa7472"
+    },
+    "mail_trigger": "D"
+  }
+}

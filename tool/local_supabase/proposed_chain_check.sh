@@ -85,7 +85,7 @@ export PGOPTIONS="${PGOPTIONS:-} -c client_min_messages=warning"
 # 1. Kopya
 # ---------------------------------------------------------------------------
 echo "-> kopya: postgres (public, auth, supabase_migrations) → $DB"
-docker exec "$CONTAINER" pg_dump -U supabase_admin -d postgres -n public -n auth -n supabase_migrations \
+docker exec "$CONTAINER" pg_dump -U supabase_admin -d postgres -n public -n auth -n ops -n supabase_migrations \
   -Fc -f "/tmp/${DB}_base.dump"
 docker exec "$CONTAINER" sh -c "pg_restore -l /tmp/${DB}_base.dump | grep -v ' SCHEMA - public ' > /tmp/${DB}_base.list"
 admin -d postgres -c "SET client_min_messages = warning" -c "DROP DATABASE IF EXISTS \"$DB\" WITH (FORCE)" >/dev/null

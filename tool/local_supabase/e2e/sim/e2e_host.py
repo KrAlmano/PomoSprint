@@ -5,6 +5,8 @@ Uygulama (iOS simülatörü bilgisayarın ağını paylaşır) testin ortasında
 sunucuya 127.0.0.1 üzerinden istek atar:
 
 - ``GET /health`` → ``ok``
+- ``POST /confirm-email`` (JSON: yalnız ``email``) → yerel Mailpit'teki
+  kayıt doğrulama bağlantısını yönlendirmeyi takip etmeden açar.
 - ``GET /shot?name=e2e-kayit`` → ``xcrun simctl io <UDID> screenshot
   analiz/ekranlar/e2e-kayit.png`` (eşzamanlı; yanıt dosya yazılınca döner).
   Ad yalnızca ``e2e-[a-z0-9-]+`` olabilir.
@@ -14,20 +16,21 @@ sunucuya 127.0.0.1 üzerinden istek atar:
   durumunu doğrular. Her sorgu ve sonucu ``build/e2e_sim/psql.log``'a yazılır.
 
 Yalnızca 127.0.0.1'e bağlanır. Çalıştırma: ``run_sim_e2e.sh`` başlatır;
-elle: ``python3 tool/local_supabase/e2e/sim/e2e_host.py --port 54399``.
+elle: ``python3 tool/local_supabase/e2e/sim/e2e_host.py --udid <UDID> --port 54399``.
 """
 
 import argparse
 import datetime
+import json
 import os
 import re
 import subprocess
 import sys
 import urllib.parse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from local_mailpit import ConfirmationError, confirm_local_email
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
-DEFAULT_UDID = "7B8AF086-0864-42FD-B4D8-37A782C3F6B9"
 DB_URL = "postgresql://postgres:postgres@127.0.0.1:54322/postgres"
 SHOT_NAME = re.compile(r"^e2e-[a-z0-9-]{1,60}$")
 
@@ -50,7 +53,9 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(data)
 
     def log_message(self, fmt, *args):  # noqa: N802 (BaseHTTPRequestHandler API)
-        sys.stderr.write("[e2e_host] " + (fmt % args) + "\n")
+        # A malformed caller must not be able to put a token in the access log.
+        safe_args = tuple(re.sub(r"\?[^\s\"]*", "?[redacted]", arg) if isinstance(arg, str) else arg for arg in args)
+        sys.stderr.write("[e2e_host] " + (fmt % safe_args) + "\n")
 
     def do_GET(self):  # noqa: N802
         url = urllib.parse.urlparse(self.path)
@@ -83,6 +88,26 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):  # noqa: N802
         url = urllib.parse.urlparse(self.path)
+        if url.path == "/confirm-email":
+            try:
+                self.connection.settimeout(5)
+                length = int(self.headers.get("Content-Length", "0"))
+                if (url.query or not 0 < length <= 512
+                        or self.headers.get_content_type() != "application/json"):
+                    raise ConfirmationError("invalid_confirmation_request")
+                body = json.loads(self.rfile.read(length))
+                if not isinstance(body, dict) or set(body) != {"email"}:
+                    raise ConfirmationError("invalid_confirmation_request")
+                confirmed = confirm_local_email(body["email"])
+                return self._reply(200, json.dumps({"confirmed": confirmed}), "application/json")
+            except (ValueError, UnicodeDecodeError):
+                error = "invalid_confirmation_request"
+            except ConfirmationError as failure:
+                error = str(failure)
+            except OSError:
+                error = "confirmation_request_timeout"
+            status = 400 if error.startswith(("invalid_", "recipient_")) else 503
+            return self._reply(status, json.dumps({"confirmed": False, "error": error}), "application/json")
         if url.path == "/android-notifications":
             if not self.server.android_serial:
                 return self._reply(403, "Android emulatore ozel")
@@ -118,21 +143,24 @@ class Handler(BaseHTTPRequestHandler):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--allow-api-outage", action="store_true")
-    ap.add_argument("--android-serial")
+    device = ap.add_mutually_exclusive_group(required=True)
+    device.add_argument("--android-serial")
     ap.add_argument("--port", type=int, default=54399)
-    ap.add_argument("--udid", default=os.environ.get("SIM_UDID", DEFAULT_UDID))
+    device.add_argument("--udid")
     ap.add_argument("--shot-dir", default=os.path.join(ROOT, "analiz", "ekranlar"))
     ap.add_argument("--psql-log", default=os.path.join(ROOT, "build", "e2e_sim", "psql.log"))
     args = ap.parse_args()
-    if args.android_serial and not args.android_serial.startswith("emulator-"):
+    if args.android_serial and not re.fullmatch(r"emulator-[0-9]+", args.android_serial):
         ap.error("Yalnizca Android emulatoru desteklenir")
+    if args.udid and not re.fullmatch(r"[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}", args.udid):
+        ap.error("Gecerli bir iOS simulator UDID gerekli")
     server = ThreadingHTTPServer(("127.0.0.1", args.port), Handler)
     server.allow_api_outage = args.allow_api_outage
     server.android_serial = args.android_serial
     server.udid = args.udid
     server.shot_dir = args.shot_dir
     server.psql_log = args.psql_log
-    sys.stderr.write(f"[e2e_host] 127.0.0.1:{args.port} (sim {args.udid})\n")
+    sys.stderr.write(f"[e2e_host] 127.0.0.1:{args.port} (device {args.udid or args.android_serial})\n")
     try:
         server.serve_forever()
     except KeyboardInterrupt:

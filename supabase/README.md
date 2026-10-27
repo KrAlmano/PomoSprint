@@ -1,5 +1,7 @@
 # Supabase çalışma rehberi
 
+> **28 Ekim 2026:** Yeni TUS/Deneme/aylık kategori ligleri [27→28→29 rehberi](proposed/NIGHT_20261028_README.md) altında proposed olarak hazırlanmıştır. Canlıya uygulama yok; aşağıdaki canlı14gün bilgisi sunucu değişikliği onaylanana kadar tarihsel mevcut davranıştır.
+
 Bu klasör, PomoSprint'in Supabase SQL kaynaklarını, geri almalarını, dryrun'larını, Edge Functions'larını ve Auth e-posta şablonlarını içerir. **Git deposundaki migration sırası canlı Supabase migration geçmişinin aynısı değildir.** Yeni bir veritabanı kurmak veya canlıyı değiştirmek için bu klasörü körlemesine `db push` ile çalıştırma.
 
 Canlı proje: `Pomodoro App`, ref `eoosnyakvxmifmexpgxa`, `eu-north-1`. Kaynak önceliği ve canlı salt okuma sorguları için kök [AGENTS.md §2](../AGENTS.md); proje geneli ve tarihli QA için [PROJE_DEVIR.md](../PROJE_DEVIR.md).

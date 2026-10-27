@@ -1,5 +1,7 @@
 # supabase/proposed — SQL paketleri ve uygulama tarihçesi
 
+> **28 Ekim gece hazırlığı:** 27 TUS → 28 Deneme → 29 birleşik aylık lig paketleri yalnız yerelde hazırlanıyor; **canlıya uygulanmadı**. [Yeni paket rehberi](NIGHT_20261028_README.md) ve [API sözleşmesi](EXAM_API_CONTRACT.md) geçerlidir. Aşağıdaki 5 Ekim kayıtları tarihçedir.
+
 > **Canlı durum (5 Ekim 2026):** 12 → 15 → 16 → 19 (yalnızca A) → 13 → 14 →
 > 20 → 21 → 22 → 23 → 24 → 25 → 26 bu sırayla **canlıya uygulandı**
 > (kullanıcı onayıyla `supabase db query --linked --project-ref`, `postgres`
