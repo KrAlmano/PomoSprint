@@ -35,6 +35,9 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
   String? _group;
   bool _starting = false;
   List<StudySession> _studies = [];
+  bool _studiesLoaded = false;
+  bool _studiesStale = false;
+  int _studyLoadRevision = 0;
   String? _owner;
   String? _previousActiveUuid;
   int _leagueRefreshRevision = 0;
@@ -62,6 +65,9 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
     if (_owner != _service.backend.ownerId) {
       _owner = _service.backend.ownerId;
       _studies = [];
+      _studiesLoaded = false;
+      _studiesStale = false;
+      _studyLoadRevision++;
       _leagueRefreshRevision++;
     }
     final previous = _previousActiveUuid;
@@ -98,14 +104,23 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
   Future<void> _loadStudies() async {
     final owner = _service.backend.ownerId;
     final load = widget.loadStudySessions;
-    if (load == null) return;
+    if (load == null || owner == null) return;
+    final revision = ++_studyLoadRevision;
+    bool current() =>
+        mounted &&
+        owner == _service.backend.ownerId &&
+        revision == _studyLoadRevision;
     try {
       final rows = await load();
-      if (mounted && owner == _service.backend.ownerId) {
-        setState(() => _studies = rows);
+      if (current()) {
+        setState(() {
+          _studies = rows;
+          _studiesLoaded = true;
+          _studiesStale = false;
+        });
       }
     } catch (_) {
-      /* retain previous owner-scoped successful data */
+      if (current()) setState(() => _studiesStale = true);
     }
   }
 
@@ -431,12 +446,14 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
 
   List<Widget> _history(AppLocalizations l10n) {
     final attempts = _service.attempts;
-    final insights = buildExamTimeInsights(
-      attempts: attempts,
-      studySessions: _studies,
-      definitionFor: _service.definitionFor,
-      now: _service.now(),
-    );
+    final insights = _studiesLoaded
+        ? buildExamTimeInsights(
+            attempts: attempts,
+            studySessions: _studies,
+            definitionFor: _service.definitionFor,
+            now: _service.now(),
+          )
+        : const <ExamTimeInsight>[];
     return [
       if (attempts.isEmpty)
         Card(
@@ -467,7 +484,13 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
       const SizedBox(height: 20),
       Text(l10n.examInsights, style: Theme.of(context).textTheme.titleLarge),
       const SizedBox(height: 8),
-      if (insights.isEmpty) Text(l10n.examInsightsEmpty),
+      if (_studiesStale) ...[
+        Text(
+          _studiesLoaded ? l10n.statsStaleNotice : l10n.statsLoadErrorGeneric,
+        ),
+        TextButton(onPressed: _loadStudies, child: Text(l10n.examRetry)),
+      ],
+      if (_studiesLoaded && insights.isEmpty) Text(l10n.examInsightsEmpty),
       for (final insight in insights)
         Card(
           child: Padding(
