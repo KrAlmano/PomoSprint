@@ -15,6 +15,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro/app/main_shell.dart';
+import 'package:pomodoro/l10n/app_localizations.dart';
+import 'package:pomodoro/services/language_service.dart';
+import 'package:pomodoro/utils/category_names.dart';
+import 'package:pomodoro/widgets/auth/onboarding_welcome_gate.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pomodoro/screens/post_auth_onboarding_screen.dart';
 import 'package:pomodoro/screens/register_screen.dart';
 import 'package:pomodoro/screens/timer_screen.dart';
@@ -26,6 +31,9 @@ import 'support/e2e.dart';
 void main() {
   initE2e();
   final l10n = trL10n;
+  void checkpoint(String target, String step) {
+    debugPrint('[ONBOARD_QA][$target] $step');
+  }
 
   /// Onboarding'i ekranda yürütür; seçilen doğum yılını döndürür.
   Future<int> runOnboarding(
@@ -33,7 +41,21 @@ void main() {
     required String segmentLabel,
     required String shotPrefix,
     required void Function() verifyCategoryStep,
+    Locale locale = const Locale('tr'),
   }) async {
+    final pageL10n = lookupAppLocalizations(locale);
+    await pumpUntil(
+      tester,
+      find.byKey(ValueKey('onboarding-language-${locale.languageCode}')),
+    );
+    await tapOn(
+      tester,
+      find.byKey(ValueKey('onboarding-language-${locale.languageCode}')),
+    );
+    await tapOn(
+      tester,
+      find.byKey(const ValueKey('onboarding-language-continue')),
+    );
     await pumpUntil(
       tester,
       find.byType(PostAuthOnboardingScreen),
@@ -60,70 +82,81 @@ void main() {
       greaterThan(13),
       reason: 'en az 13 yaş: seçili yıl $birthYear',
     );
-    await tapOn(tester, find.text(l10n.continueBtn));
+    await tapOn(tester, find.text(pageL10n.continueBtn));
 
     // 2/7 hedef
-    await pumpUntil(tester, find.text(l10n.onboardingSegmentTitle));
+    await pumpUntil(tester, find.text(pageL10n.onboardingSegmentTitle));
     await tapOn(tester, find.text(segmentLabel));
-    await tapOn(tester, find.text(l10n.continueBtn));
+    await tapOn(tester, find.text(pageL10n.continueBtn));
 
     // 3/7 kategoriler: hedefe göre hazır
     await pumpUntil(
       tester,
-      find.text(l10n.onboardingCategoryStepPreparedTitle),
+      find.text(pageL10n.onboardingCategoryStepPreparedTitle),
     );
     verifyCategoryStep();
     await E2eHost.screenshot(tester, '$shotPrefix-onboarding-kategoriler');
-    await tapOn(tester, find.text(l10n.continueBtn));
+    await tapOn(tester, find.text(pageL10n.continueBtn));
 
     // 4/7 görünürlük
-    await pumpUntil(tester, find.text(l10n.onboardingVisibilityYes));
-    await tapOn(tester, find.text(l10n.onboardingVisibilityYes));
-    await tapOn(tester, find.text(l10n.continueBtn));
+    await pumpUntil(tester, find.text(pageL10n.onboardingVisibilityYes));
+    await tapOn(tester, find.text(pageL10n.onboardingVisibilityYes));
+    await tapOn(tester, find.text(pageL10n.continueBtn));
 
     // 5/7 kurallar
-    await pumpUntil(tester, find.text(l10n.gameRulesTitle));
-    await tapOn(tester, find.text(l10n.continueBtn));
+    await pumpUntil(tester, find.text(pageL10n.gameRulesTitle));
+    await tapOn(tester, find.text(pageL10n.continueBtn));
 
     // 6/7 hedef: 2 saat
-    await pumpUntil(tester, find.text(l10n.onboardingGoal2h));
-    await tapOn(tester, find.text(l10n.onboardingGoal2h));
-    await tapOn(tester, find.text(l10n.continueBtn));
+    await pumpUntil(tester, find.text(pageL10n.onboardingGoal2h));
+    await tapOn(tester, find.text(pageL10n.onboardingGoal2h));
+    await tapOn(tester, find.text(pageL10n.continueBtn));
 
     // 7/7: bütün ana ekranların rehberi; kaydetme yalnız Bitir'de.
-    await pumpUntil(tester, find.text(l10n.onboardingGuideTitle));
+    await pumpUntil(tester, find.text(pageL10n.onboardingGuideTitle));
     for (final body in [
-      l10n.onboardingGuidePomoBody,
-      l10n.onboardingGuideMarathonBody,
-      l10n.onboardingGuideReportsBody,
-      l10n.onboardingGuideRankingBody,
-      l10n.onboardingGuideSocialBody,
-      l10n.onboardingGuideProfileBody,
+      pageL10n.onboardingGuidePomoBody,
+      pageL10n.onboardingGuideMarathonBody,
+      pageL10n.onboardingGuideExamBody,
+      pageL10n.onboardingGuideInsightsBody,
+      pageL10n.onboardingGuideReportsBody,
+      pageL10n.onboardingGuideRankingBody,
+      pageL10n.onboardingGuideSocialBody,
+      pageL10n.onboardingGuideProfileBody,
     ]) {
       expect(find.text(body), findsOneWidget);
     }
-    await tester.ensureVisible(find.text(l10n.onboardingGuideProfileBody));
+    await tester.ensureVisible(find.text(pageL10n.onboardingGuideProfileBody));
     await pumpFor(tester, const Duration(milliseconds: 300));
     await E2eHost.screenshot(tester, '$shotPrefix-onboarding-ekran-rehberi');
+    checkpoint(shotPrefix, 'finish tap begin');
     await tapOn(
       tester,
-      find.widgetWithText(ElevatedButton, l10n.onboardingFinishBtn),
+      find.widgetWithText(ElevatedButton, pageL10n.onboardingFinishBtn),
       settle: const Duration(milliseconds: 200),
     );
+    checkpoint(shotPrefix, 'finish tap returned');
     return birthYear;
   }
 
   /// Onboarding sonrası: kabuk, sayaç; hata metni yok.
-  Future<void> expectShell(WidgetTester tester) async {
+  Future<void> expectShell(
+    WidgetTester tester, {
+    Locale locale = const Locale('tr'),
+  }) async {
+    final pageL10n = lookupAppLocalizations(locale);
+    checkpoint(locale.languageCode, 'shell wait begin');
     await pumpUntil(
       tester,
       find.byType(MainNavigationShell),
       timeout: const Duration(seconds: 40),
       reason: 'kabuk',
     );
-    expect(find.text(l10n.onboardingSaveError), findsNothing);
-    expect(find.text(l10n.onboardingTimeoutError), findsNothing);
+    checkpoint(locale.languageCode, 'shell found; timer wait begin');
+    expect(find.text(pageL10n.onboardingSaveError), findsNothing);
+    expect(find.text(pageL10n.onboardingTimeoutError), findsNothing);
     await pumpUntil(tester, find.byType(TimerScreen), reason: 'sayaç sekmesi');
+    checkpoint(locale.languageCode, 'timer found');
   }
 
   List<String> timerChipLabels(WidgetTester tester) => [
@@ -175,6 +208,15 @@ void main() {
         find.widgetWithText(ElevatedButton, l10n.registerBtn),
         settle: const Duration(milliseconds: 200),
       );
+
+      // Gerçek kayıt, gerçek yerel SMTP/Mailpit onayı ve sonra UI girişi.
+      await pumpUntil(tester, find.text(l10n.verificationSentTitle));
+      await E2eHost.confirmEmail(email);
+      await tapOn(
+        tester,
+        find.widgetWithText(ElevatedButton, l10n.backToLoginBtn),
+      );
+      await loginViaUi(tester, email);
 
       late List<String> autoNames;
       final birthYear = await runOnboarding(
@@ -313,4 +355,160 @@ void main() {
       expect([for (final c in categories) c['name']], kpssNames);
     },
   );
+
+  // Mevcut YKS/KPSS senaryolarına ek beş hedef. Her biri yeni, Mailpit ile
+  // doğrulanmış hesapta gerçek onboarding UI'ını ve sunucu kaydını denetler.
+  for (final scenario
+      in <({String segment, Locale locale, List<String> names})>[
+        (
+          segment: 'lgs',
+          locale: const Locale('tr'),
+          names: [
+            'Matematik',
+            'Fen Bilimleri',
+            'Türkçe',
+            'T.C. İnkılap Tarihi',
+            'İngilizce',
+            'Din Kültürü',
+          ],
+        ),
+        (
+          segment: 'tus',
+          locale: const Locale('en'),
+          names: [
+            'Anatomi',
+            'Fizyoloji, Histoloji ve Embriyoloji',
+            'Biyokimya',
+            'Mikrobiyoloji',
+            'Patoloji',
+            'Farmakoloji',
+            'Dahiliye',
+            'Pediatri',
+          ],
+        ),
+        (
+          segment: 'language',
+          locale: const Locale('tr'),
+          names: [
+            'Kelime',
+            'Okuma',
+            'Dilbilgisi',
+            'Dinleme',
+            'Yazma',
+            'Konuşma',
+          ],
+        ),
+        (
+          segment: 'university',
+          locale: const Locale('tr'),
+          names: ['Ders Çalışma', 'Ödev', 'Proje', 'Sınav Hazırlık'],
+        ),
+        (
+          segment: 'work',
+          locale: const Locale('tr'),
+          names: ['Derin Çalışma', 'Okuma', 'Öğrenme', 'Proje'],
+        ),
+      ]) {
+    testWidgets(
+      'a · ${scenario.segment} gerçek onboarding, ${scenario.locale.languageCode} dil ve sunucu kategorileri',
+      (tester) async {
+        checkpoint(scenario.segment, 'reset begin');
+        await resetAppState(tester);
+        checkpoint(scenario.segment, 'reset returned; signup begin');
+        final account = await signUpViaApi(
+          e2eEmail(
+            'goal-${scenario.segment}-${DateTime.now().microsecondsSinceEpoch}',
+          ),
+          'QA ${scenario.segment.toUpperCase()}',
+        );
+        checkpoint(scenario.segment, 'signup returned; launch begin');
+        await launchApp(tester);
+        await waitPastSplash(tester);
+        await loginViaUi(tester, account.email);
+        checkpoint(scenario.segment, 'login returned; onboarding begin');
+        final labels = lookupAppLocalizations(scenario.locale);
+        final segmentLabel = switch (scenario.segment) {
+          'lgs' => labels.onboardingSegmentLgs,
+          'tus' => labels.onboardingSegmentTus,
+          'language' => labels.onboardingSegmentLanguage,
+          'university' => labels.onboardingSegmentUniversity,
+          'work' => labels.onboardingSegmentWork,
+          _ => throw StateError('unknown onboarding scenario'),
+        };
+        final expectedNames = [
+          for (final name in scenario.names)
+            localizedKnownCategoryName(
+              name,
+              turkish: scenario.locale.languageCode == 'tr',
+            ),
+        ];
+        final birthYear = await runOnboarding(
+          tester,
+          segmentLabel: segmentLabel,
+          shotPrefix: 'e2e-goal-${scenario.segment}',
+          locale: scenario.locale,
+          verifyCategoryStep: () {
+            final selected = [
+              for (final chip in tester.widgetList<ChoiceChip>(
+                find.byType(ChoiceChip),
+              ))
+                if (chip.selected) ((chip.label as Text).data ?? ''),
+            ];
+            expect(selected, expectedNames);
+            expect(find.text('${expectedNames.length} / 8'), findsOneWidget);
+          },
+        );
+        checkpoint(scenario.segment, 'onboarding returned; shell begin');
+        await expectShell(tester, locale: scenario.locale);
+        checkpoint(scenario.segment, 'shell returned; prefs begin');
+        expect(LanguageService.instance.currentLocale, scenario.locale);
+        final preferences = await SharedPreferences.getInstance();
+        checkpoint(scenario.segment, 'prefs returned');
+        expect(
+          preferences.getString('app_language_code'),
+          scenario.locale.languageCode == 'tr' ? null : 'en',
+        );
+        expect(
+          preferences.getBool(OnboardingWelcomeGate.keyFor(account.id)),
+          isTrue,
+        );
+        checkpoint(scenario.segment, 'language init begin');
+        await LanguageService.instance.init();
+        checkpoint(scenario.segment, 'language init returned; pump begin');
+        await pumpFor(tester, const Duration(milliseconds: 200));
+        checkpoint(scenario.segment, 'language pump returned; labels begin');
+        expect(LanguageService.instance.currentLocale, scenario.locale);
+        await pumpUntilTrue(
+          tester,
+          () => timerChipLabels(tester).length == expectedNames.length,
+          reason: '${scenario.segment} seçili ders çipleri',
+        );
+        expect(timerChipLabels(tester), expectedNames);
+        checkpoint(scenario.segment, 'labels verified; profile SQL begin');
+        final profile = (await E2eHost.row(
+          'select user_segment,birth_year,daily_goal_minutes,show_in_social_feed,'
+          'onboarding_completed_at is not null as onboarded from public.profiles '
+          'where id=${sqlText(account.id)}',
+        ))!;
+        checkpoint(scenario.segment, 'profile SQL returned');
+        expect(profile, {
+          'user_segment': scenario.segment,
+          'birth_year': birthYear,
+          'daily_goal_minutes': 120,
+          'show_in_social_feed': true,
+          'onboarded': true,
+        });
+        checkpoint(scenario.segment, 'profile verified; categories SQL begin');
+        final stored = await E2eHost.rows(
+          'select name from public.categories where user_id=${sqlText(account.id)} and not is_archived '
+          'order by sort_order,created_at,id',
+        );
+        checkpoint(scenario.segment, 'categories SQL returned');
+        expect([for (final row in stored) row['name']], expectedNames);
+        expect(tester.takeException(), isNull);
+        checkpoint(scenario.segment, 'all checks complete');
+      },
+      timeout: const Timeout(Duration(minutes: 3)),
+    );
+  }
 }

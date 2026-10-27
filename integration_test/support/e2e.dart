@@ -35,8 +35,9 @@ const int kE2eHostPort = int.fromEnvironment('E2E_HOST_PORT');
 const String _runIdDefine = String.fromEnvironment('E2E_RUN_ID');
 
 /// Koşu kimliği: hesap e-postalarını koşular arasında ayırır.
-final String e2eRunId =
-    _runIdDefine.isNotEmpty ? _runIdDefine : DateTime.now().millisecondsSinceEpoch.toRadixString(36);
+final String e2eRunId = _runIdDefine.isNotEmpty
+    ? _runIdDefine
+    : DateTime.now().millisecondsSinceEpoch.toRadixString(36);
 
 /// YALNIZCA yerel kopyadaki e2e-sim hesaplarının şifresi; uygulamanın şifre
 /// kuralına uyar (en az 8 karakter, küçük/büyük harf, rakam). Belge:
@@ -51,10 +52,15 @@ IntegrationTestWidgetsFlutterBinding initE2e() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   final host = Uri.tryParse(kSupabaseUrl)?.host ?? '';
   if (kSupabaseUrl.isEmpty || kSupabaseAnonKey.isEmpty) {
-    throw StateError('--dart-define=SUPABASE_URL ve SUPABASE_ANON_KEY (yerel kopya) verilmeli.');
+    throw StateError(
+      '--dart-define=SUPABASE_URL ve SUPABASE_ANON_KEY (yerel kopya) verilmeli.',
+    );
   }
-  if (!{'127.0.0.1', 'localhost', '::1', '10.0.2.2'}.contains(host) && !host.endsWith('.localhost')) {
-    throw StateError('SUPABASE_URL yerel değil ($host): bu testler yalnızca yerel kopyaya bağlanır.');
+  if (!{'127.0.0.1', 'localhost', '::1', '10.0.2.2'}.contains(host) &&
+      !host.endsWith('.localhost')) {
+    throw StateError(
+      'SUPABASE_URL yerel değil ($host): bu testler yalnızca yerel kopyaya bağlanır.',
+    );
   }
   return binding;
 }
@@ -75,7 +81,8 @@ Future<void> resetAppState(WidgetTester tester) async {
     await tester.pump(const Duration(milliseconds: 200));
   }
   final service = SupabaseService.instance;
-  if (service.isCloudActive && Supabase.instance.client.auth.currentSession != null) {
+  if (service.isCloudActive &&
+      Supabase.instance.client.auth.currentSession != null) {
     await service.signOutFully();
   }
   service.currentUser.value = null;
@@ -115,7 +122,9 @@ Future<void> pumpUntil(
     await tester.pump(const Duration(milliseconds: 100));
     if (finder.evaluate().isNotEmpty) return;
   }
-  fail('Bulunamadı (${timeout.inSeconds} sn): ${reason ?? finder.describeMatch(Plurality.zero)}');
+  fail(
+    'Bulunamadı (${timeout.inSeconds} sn): ${reason ?? finder.describeMatch(Plurality.zero)}',
+  );
 }
 
 /// [finder] kaybolana kadar kare çizer.
@@ -156,22 +165,34 @@ Future<void> pumpFor(WidgetTester tester, Duration duration) async {
   }
 }
 
-/// Görünür hedefi kaydırmadan dokunur; ekran dışındaki hedefi önce görünür yapar.
-Future<void> tapOn(WidgetTester tester, Finder finder, {Duration settle = const Duration(milliseconds: 600)}) async {
+/// Hedefi görünür yapar; geçiş katmanı kalkıp gerçekten dokunulana kadar bekler.
+Future<void> tapOn(
+  WidgetTester tester,
+  Finder finder, {
+  Duration settle = const Duration(milliseconds: 600),
+}) async {
   expect(finder, findsWidgets, reason: 'dokunulacak öğe yok: $finder');
   if (finder.first.hitTestable().evaluate().isEmpty) {
     await tester.ensureVisible(finder.first);
   }
-  await pumpFor(tester, const Duration(milliseconds: 300));
+  await pumpUntilTrue(
+    tester,
+    () =>
+        finder.evaluate().isNotEmpty &&
+        finder.first.hitTestable().evaluate().isNotEmpty,
+    timeout: const Duration(seconds: 15),
+    reason: 'dokunulacak öğe görünür ve hit-test hedefi olmalı: $finder',
+  );
   await tester.tap(finder.first);
   await pumpFor(tester, settle);
 }
 
 /// [scope] altındaki tüm Text / RichText metinleri (hata açıklamaları için).
 List<String> visibleTexts(Finder scope) => [
-      for (final element in find.descendant(of: scope, matching: find.byType(RichText)).evaluate())
-        (element.widget as RichText).text.toPlainText(),
-    ];
+  for (final element
+      in find.descendant(of: scope, matching: find.byType(RichText)).evaluate())
+    (element.widget as RichText).text.toPlainText(),
+];
 
 /// Türkçe metinler (testler arayüzü Türkçe'ye sabitler).
 final AppLocalizations trL10n = lookupAppLocalizations(const Locale('tr'));
@@ -182,22 +203,60 @@ String tr(String key) => LanguageService.instance.translate(key);
 Future<void> waitPastSplash(WidgetTester tester) async {
   await pumpUntil(
     tester,
-    find.byWidgetPredicate((w) => w is LoginScreen || w is MainNavigationShell || w.runtimeType.toString() == 'PostAuthOnboardingScreen'),
+    find.byWidgetPredicate(
+      (w) =>
+          w is LoginScreen ||
+          w is MainNavigationShell ||
+          w.runtimeType.toString() == 'PostAuthOnboardingScreen',
+    ),
     timeout: const Duration(seconds: 40),
     reason: 'açılış ekranından sonra giriş/onboarding/kabuk',
   );
 }
 
 /// Giriş ekranında e-posta + şifre ile girer.
-Future<void> loginViaUi(WidgetTester tester, String email, {String password = kE2ePassword}) async {
+Future<void> loginViaUi(
+  WidgetTester tester,
+  String email, {
+  String password = kE2ePassword,
+}) async {
   await pumpUntil(tester, find.byType(LoginScreen), reason: 'giriş ekranı');
-  final fields = find.descendant(of: find.byType(LoginScreen), matching: find.byType(TextField));
-  await tester.enterText(fields.at(0), email);
-  await tester.enterText(fields.at(1), password);
+  final fields = find.descendant(
+    of: find.byType(LoginScreen),
+    matching: find.byType(TextField),
+  );
+  expect(fields, findsNWidgets(2), reason: 'giriş formunun iki alanı');
+  await _enterLoginField(tester, fields.at(0), email, 'e-posta');
+  await _enterLoginField(tester, fields.at(1), password, 'şifre');
+  await tapOn(tester, find.widgetWithText(ElevatedButton, trL10n.loginBtn));
+}
+
+Future<void> _enterLoginField(
+  WidgetTester tester,
+  Finder field,
+  String value,
+  String label,
+) async {
+  await tapOn(tester, field, settle: const Duration(milliseconds: 300));
+  final editable = find.descendant(
+    of: field,
+    matching: find.byType(EditableText),
+  );
+  expect(
+    tester.widget<EditableText>(editable).focusNode.hasFocus,
+    isTrue,
+    reason: '$label alanı girişten önce odaklanmalı',
+  );
+  await tester.enterText(field, value);
   await pumpFor(tester, const Duration(milliseconds: 300));
   FocusManager.instance.primaryFocus?.unfocus();
-  await pumpFor(tester, const Duration(milliseconds: 400));
-  await tapOn(tester, find.widgetWithText(ElevatedButton, trL10n.loginBtn));
+  await pumpFor(tester, const Duration(milliseconds: 300));
+  // Do not include the supplied email/password in diagnostics on failure.
+  expect(
+    tester.widget<TextField>(field).controller!.text == value,
+    isTrue,
+    reason: '$label alanı girilen değeri korumalı',
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -207,25 +266,83 @@ Future<void> loginViaUi(WidgetTester tester, String email, {String password = kE
 class E2eHost {
   static bool get available => kE2eHostPort > 0;
 
-  static Uri _uri(String path, [Map<String, String>? query]) =>
-      Uri(scheme: 'http', host: const String.fromEnvironment('E2E_HOST_ADDRESS', defaultValue: '127.0.0.1'), port: kE2eHostPort, path: path, queryParameters: query);
+  static Uri _uri(String path, [Map<String, String>? query]) => Uri(
+    scheme: 'http',
+    host: const String.fromEnvironment(
+      'E2E_HOST_ADDRESS',
+      defaultValue: '127.0.0.1',
+    ),
+    port: kE2eHostPort,
+    path: path,
+    queryParameters: query,
+  );
 
-  static Future<String> _send(String method, Uri uri, {String? body}) async {
+  static Future<String> _send(
+    String method,
+    Uri uri, {
+    String? body,
+    ContentType? contentType,
+  }) async {
     final client = HttpClient()..connectionTimeout = const Duration(seconds: 5);
     try {
       final req = await client.openUrl(method, uri);
       if (body != null) {
         final bytes = utf8.encode(body);
-        req.headers.contentType = ContentType('text', 'plain', charset: 'utf-8');
+        req.headers.contentType =
+            contentType ?? ContentType('text', 'plain', charset: 'utf-8');
         req.contentLength = bytes.length;
         req.add(bytes);
       }
       final res = await req.close().timeout(const Duration(seconds: 90));
       final text = await utf8.decodeStream(res);
-      if (res.statusCode != 200) throw HttpException('e2e_host ${res.statusCode}: $text', uri: uri);
+      if (res.statusCode != 200) {
+        throw HttpException('e2e_host ${res.statusCode}: $text', uri: uri);
+      }
       return text;
     } finally {
       client.close(force: true);
+    }
+  }
+
+  /// Yalnız yerel Mailpit'ten gerçek onay bağlantısını işler. Host üretim
+  /// alan adlarını ve yönlendirme takibini reddeder; token çıktıya yazılmaz.
+  static Future<void> confirmEmail(String email) async {
+    if (!available) {
+      throw StateError('Mailpit confirmation requires the local E2E host');
+    }
+    final response = jsonDecode(
+      await _send(
+        'POST',
+        _uri('/confirm-email'),
+        body: jsonEncode({'email': email}),
+        contentType: ContentType.json,
+      ),
+    );
+    if (response is! Map || response['confirmed'] != true) {
+      throw StateError('Local Mailpit confirmation did not succeed');
+    }
+  }
+
+  /// Exact new QA account only. Recovery token stays in the loopback host;
+  /// this tests Mailpit/Auth, not the website's password form UI.
+  static Future<void> recoverLocalPassword(
+    String email,
+    String password,
+  ) async {
+    final response = jsonDecode(
+      await _send(
+        'POST',
+        _uri('/recover-password'),
+        body: jsonEncode({
+          'email': email,
+          'password': password,
+          'anon_key': kSupabaseAnonKey,
+        }),
+        contentType: ContentType.json,
+      ),
+    );
+    if (response is! Map || response['changed'] != true) {
+      throw StateError('Local recovery did not change the exact QA account');
     }
   }
 
@@ -255,26 +372,39 @@ class E2eHost {
   /// Yerel veritabanında salt okuma psql. [sql] tek satır döndürmeli.
   static Future<String> psql(String sql) {
     if (!available) {
-      throw StateError('psql doğrulaması için E2E_HOST_PORT gerekir (tool/local_supabase/e2e/sim/run_sim_e2e.sh).');
+      throw StateError(
+        'psql doğrulaması için E2E_HOST_PORT gerekir (tool/local_supabase/e2e/sim/run_sim_e2e.sh).',
+      );
     }
     return _send('POST', _uri('/psql'), body: sql);
   }
 
   /// [select] sorgusunun satırları (json_agg ile).
   static Future<List<Map<String, dynamic>>> rows(String select) async {
-    final out = await psql("select coalesce(json_agg(t), '[]'::json) from ($select) t");
-    return [for (final row in jsonDecode(out) as List) Map<String, dynamic>.from(row as Map)];
+    final out = await psql(
+      "select coalesce(json_agg(t), '[]'::json) from ($select) t",
+    );
+    return [
+      for (final row in jsonDecode(out) as List)
+        Map<String, dynamic>.from(row as Map),
+    ];
   }
 
   /// [select]'i oturumu [userId] olan kullanıcı gibi çalıştırır
   /// (`auth.uid()` = [userId]; SECURITY DEFINER RPC'ler için).
-  static Future<List<Map<String, dynamic>>> rowsAsUser(String userId, String select) async {
+  static Future<List<Map<String, dynamic>>> rowsAsUser(
+    String userId,
+    String select,
+  ) async {
     final out = await psql(
       "select set_config('request.jwt.claims', json_build_object('sub', ${sqlText(userId)}, 'role', 'authenticated')::text, true); "
       "select coalesce(json_agg(t), '[]'::json) from ($select) t",
     );
     final json = out.substring(out.indexOf('\n') + 1);
-    return [for (final row in jsonDecode(json) as List) Map<String, dynamic>.from(row as Map)];
+    return [
+      for (final row in jsonDecode(json) as List)
+        Map<String, dynamic>.from(row as Map),
+    ];
   }
 
   static Future<Map<String, dynamic>?> row(String select) async {
@@ -306,7 +436,8 @@ class LocalApi {
     String? token,
     Map<String, String> headers = const {},
   }) async {
-    final client = HttpClient()..connectionTimeout = const Duration(seconds: 10);
+    final client = HttpClient()
+      ..connectionTimeout = const Duration(seconds: 10);
     try {
       final req = await client.openUrl(method, Uri.parse('$kSupabaseUrl$path'));
       req.headers.set('apikey', kSupabaseAnonKey);
@@ -327,8 +458,11 @@ class LocalApi {
     }
   }
 
-  static Future<Object?> rpc(String name, ApiAccount account, [Map<String, Object?> args = const {}]) =>
-      request('POST', '/rest/v1/rpc/$name', body: args, token: account.token);
+  static Future<Object?> rpc(
+    String name,
+    ApiAccount account, [
+    Map<String, Object?> args = const {},
+  ]) => request('POST', '/rest/v1/rpc/$name', body: args, token: account.token);
 }
 
 /// API ile açılmış hesap.
@@ -339,25 +473,44 @@ class ApiAccount {
   final String token;
 }
 
-/// Uygulamadaki kayıtla aynı metadata ile hesap açar (yerelde e-posta onayı
-/// kapalı: oturum hemen açılır).
+/// Uygulamadaki metadata ile yerel hesap açar. E-posta onayı etkinse
+/// Mailpit bağlantısı doğrulanır, ardından parola oturumu açılır.
 Future<ApiAccount> signUpViaApi(String email, String name) async {
-  final res = await LocalApi.request('POST', '/auth/v1/signup', body: {
-    'email': email,
-    'password': kE2ePassword,
-    'data': {
-      'name': name,
-      'avatar_id': 'avatar_16_basic',
-      'newsletter': false,
-      'marketing_consent': false,
-      'terms_version': kLegalDocumentsVersion,
-      'privacy_version': kLegalDocumentsVersion,
-      'terms_accepted_at': DateTime.now().toUtc().toIso8601String(),
-    },
-  }) as Map;
-  final token = res['access_token'] as String?;
+  final res =
+      await LocalApi.request(
+            'POST',
+            '/auth/v1/signup',
+            body: {
+              'email': email,
+              'password': kE2ePassword,
+              'data': {
+                'name': name,
+                'avatar_id': 'avatar_16_basic',
+                'newsletter': false,
+                'marketing_consent': false,
+                'terms_version': kLegalDocumentsVersion,
+                'privacy_version': kLegalDocumentsVersion,
+                'terms_accepted_at': DateTime.now().toUtc().toIso8601String(),
+              },
+            },
+          )
+          as Map;
+  var token = res['access_token'] as String?;
   final user = (res['user'] ?? res) as Map;
-  if (token == null) throw StateError('yerelde e-posta onayı kapalı olmalı (oturum dönmedi)');
+  if (token == null) {
+    await E2eHost.confirmEmail(email);
+    final signedIn =
+        await LocalApi.request(
+              'POST',
+              '/auth/v1/token?grant_type=password',
+              body: {'email': email, 'password': kE2ePassword},
+            )
+            as Map;
+    token = signedIn['access_token'] as String?;
+  }
+  if (token == null) {
+    throw StateError('Local confirmed account could not sign in');
+  }
   return ApiAccount(user['id'] as String, email, token);
 }
 
@@ -374,13 +527,18 @@ Future<void> completeOnboardingViaApi(
   await LocalApi.rpc('setup_onboarding_categories', account, {
     'p_categories': categorySeedPayload(names, turkish: true),
   });
-  await LocalApi.request('PATCH', '/rest/v1/profiles?id=eq.${account.id}', token: account.token, body: {
-    'birth_year': birthYear,
-    'user_segment': segment,
-    'daily_goal_minutes': dailyGoalMinutes,
-    'show_in_social_feed': showInSocialFeed,
-    'onboarding_completed_at': DateTime.now().toUtc().toIso8601String(),
-  });
+  await LocalApi.request(
+    'PATCH',
+    '/rest/v1/profiles?id=eq.${account.id}',
+    token: account.token,
+    body: {
+      'birth_year': birthYear,
+      'user_segment': segment,
+      'daily_goal_minutes': dailyGoalMinutes,
+      'show_in_social_feed': showInSocialFeed,
+      'onboarding_completed_at': DateTime.now().toUtc().toIso8601String(),
+    },
+  );
 }
 
 /// Hesabın aktif kategorileri (id, name), sıralı.
@@ -404,23 +562,44 @@ Future<ApiAccount> openShellWithNewAccount(
 }) async {
   await resetAppState(tester);
   final account = await signUpViaApi(e2eEmail(tag), name);
-  await completeOnboardingViaApi(account, segment: segment, showInSocialFeed: showInSocialFeed);
+  await completeOnboardingViaApi(
+    account,
+    segment: segment,
+    showInSocialFeed: showInSocialFeed,
+  );
   await launchApp(tester);
   await waitPastSplash(tester);
   await loginViaUi(tester, account.email);
-  await pumpUntil(tester, find.byType(MainNavigationShell), timeout: const Duration(seconds: 40), reason: 'kabuk');
+  await pumpUntil(
+    tester,
+    find.byType(MainNavigationShell),
+    timeout: const Duration(seconds: 40),
+    reason: 'kabuk',
+  );
   return account;
 }
 
 /// Üst çubuktaki PUAN / KUM rozetlerinin değerleri.
 ({int points, int coins}) shellStats(WidgetTester tester) {
-  final pills = tester.widgetList<ShellStatPill>(find.byType(ShellStatPill)).toList();
+  final pills = tester
+      .widgetList<ShellStatPill>(find.byType(ShellStatPill))
+      .toList();
   int valueOf(String label) => pills.firstWhere((p) => p.label == label).value;
-  return (points: valueOf(trL10n.pointsCaption), coins: valueOf(trL10n.coinsCaption));
+  return (
+    points: valueOf(trL10n.pointsCaption),
+    coins: valueOf(trL10n.coinsCaption),
+  );
 }
 
 /// Alt gezinme çubuğundaki sekmeye geçer (0 Pomo, 1 Raporlar, 2 Sıralama, 3 Sosyal).
 Future<void> openTab(WidgetTester tester, int index) async {
-  final destinations = find.descendant(of: find.byType(NavigationBar), matching: find.byType(NavigationDestination));
-  await tapOn(tester, destinations.at(index), settle: const Duration(milliseconds: 800));
+  final destinations = find.descendant(
+    of: find.byType(NavigationBar),
+    matching: find.byType(NavigationDestination),
+  );
+  await tapOn(
+    tester,
+    destinations.at(index),
+    settle: const Duration(milliseconds: 800),
+  );
 }

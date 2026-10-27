@@ -200,11 +200,30 @@ void main() {
               },
             )
             as Map;
-    final c = ApiAccount(
-      (raw['user'] as Map)['id'] as String,
-      e2eEmail('provider-consent'),
-      raw['access_token'] as String,
+    final providerEmail = e2eEmail('provider-consent');
+    final providerId = ((raw['user'] ?? raw) as Map)['id'] as String;
+    var token = raw['access_token'] as String?;
+    if (token == null) {
+      // Confirmation-required local Auth returns no session at signup. Keep
+      // this account's intentionally absent legal metadata, confirm its real
+      // Mailpit message, and authenticate with the ordinary password grant.
+      await E2eHost.confirmEmail(providerEmail);
+      final confirmed =
+          await LocalApi.request(
+                'POST',
+                '/auth/v1/token?grant_type=password',
+                body: {'email': providerEmail, 'password': kE2ePassword},
+              )
+              as Map;
+      expect((confirmed['user'] as Map)['id'], providerId);
+      token = confirmed['access_token'] as String?;
+    }
+    expect(
+      token,
+      isNotNull,
+      reason: 'Confirmed local account must have a session',
     );
+    final c = ApiAccount(providerId, providerEmail, token!);
     await completeOnboardingViaApi(c);
     await launchApp(tester);
     await waitPastSplash(tester);

@@ -32,6 +32,7 @@ import urllib.parse
 import zlib
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from local_mailpit import ConfirmationError, confirm_local_email
+from local_recovery import RecoveryError, reset_local_password
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
 DB_URL = "postgresql://postgres:postgres@127.0.0.1:54322/postgres"
@@ -172,6 +173,27 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):  # noqa: N802
         url = urllib.parse.urlparse(self.path)
+        if url.path == '/recover-password':
+            try:
+                self.connection.settimeout(5)
+                length = int(self.headers.get('Content-Length', '0'))
+                if (url.query or self.headers.get('Origin') is not None
+                        or not 0 < length <= 8192
+                        or self.headers.get_content_type() != 'application/json'):
+                    raise RecoveryError('invalid_recovery_request')
+                body = json.loads(self.rfile.read(length))
+                if not isinstance(body, dict) or set(body) != {'email', 'password', 'anon_key'}:
+                    raise RecoveryError('invalid_recovery_request')
+                changed = reset_local_password(body['email'], body['password'], body['anon_key'])
+                return self._reply(200, json.dumps({'changed': changed}), 'application/json')
+            except (ValueError, UnicodeDecodeError):
+                error = 'invalid_recovery_request'
+            except (RecoveryError, ConfirmationError) as failure:
+                error = str(failure)
+            except OSError:
+                error = 'recovery_unavailable'
+            return self._reply(400 if error.startswith(('invalid_', 'recipient_')) else 503,
+                               json.dumps({'changed': False, 'error': error}), 'application/json')
         if url.path == "/confirm-email":
             try:
                 self.connection.settimeout(5)
