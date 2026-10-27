@@ -1,5 +1,0 @@
-Traceback (most recent call last):
-  File "/tmp/pomosprint-20261007/os_process_qa.py", line 51, in <module>
-    seeded=active['client_uuid']; assert time.time()<datetime.datetime.fromisoformat(active['ends_at'].replace('Z','+00:00')).timestamp(), 'Already elapsed before termination'; stop(); (base/f'{platform}_process_checkpoint.json').write_text(json.dumps({'client_uuid':seeded,'active':active,'terminated_at':datetime.datetime.now(datetime.timezone.utc).isoformat()},indent=2)+'\n'); break
-                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-AssertionError: Already elapsed before termination

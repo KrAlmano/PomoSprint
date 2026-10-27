@@ -146,9 +146,9 @@ Uygulama iPhone'da yatay modu ve iPad'i destekliyordu, ama düzen yalnızca dike
 
 6 ekran boyutunda (390×844, 844×390, 568×320, 820×1180, 1180×820, 1366×1024) ve büyük metin ölçeğinde **taşma olmadığını doğrulayan** testler eklendi. Gerçek fontla çizilmiş örnekler: `analiz/ekranlar/uygulama-*.png`
 
-![Yatay telefonda sayaç](ekranlar/uygulama-sayac-yatay-telefon.png)
+!Yatay telefonda sayaç (ham çıktı §37 temizliğinde kaldırıldı)
 
-![Tablette sayaç](ekranlar/uygulama-sayac-tablet-yatay.png)
+!Tablette sayaç (ham çıktı §37 temizliğinde kaldırıldı)
 
 ---
 

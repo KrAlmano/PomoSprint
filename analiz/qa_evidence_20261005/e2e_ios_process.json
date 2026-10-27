@@ -1,9 +1,0 @@
-{
-  "sessions": 2,
-  "minutes": 100,
-  "points": 24,
-  "coins": 40,
-  "live_cleared": true,
-  "previous_session_count": 1,
-  "new_sessions_after_process_death": 1
-}

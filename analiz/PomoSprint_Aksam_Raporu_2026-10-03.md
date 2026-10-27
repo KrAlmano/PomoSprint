@@ -17,11 +17,11 @@ Bu rapor, sabahki uçtan uca raporun ([PomoSprint_Analiz_Raporu_2026-10-03.md](P
 
 - Ekran kapalıyken geçen süre puanı düşürmüyor (yalnızca kayıt amaçlı tutuluyor).
 - Uygulama açıkken seans bitince titreşim ve bildirim sesi çalıyor.
-- Doğrulama: iPhone 17 Pro simülatöründe Dynamic Island görüntülendi ([ekran](ekranlar/ios-dynamic-island-sayac.png)). Android tarafı bu Mac'te SDK olmadığı için derlenemedi; kod eklentinin kaynağına karşı satır satır doğrulandı. **Gerçek Android cihaz testi gerekli.**
+- Doğrulama: iPhone 17 Pro simülatöründe Dynamic Island görüntülendi (ekran (ham çıktı §37 temizliğinde kaldırıldı)). Android tarafı bu Mac'te SDK olmadığı için derlenemedi; kod eklentinin kaynağına karşı satır satır doğrulandı. **Gerçek Android cihaz testi gerekli.**
 
 ## 2. KVKK, kayıt ekranı ve mağaza uyumu (uygulama)
 
-- **Kayıt ekranı yeniden tasarlandı** ([telefon](ekranlar/kayit-telefon-acik.png), [koyu](ekranlar/kayit-telefon-koyu.png), [tablet](ekranlar/kayit-tablet.png)). Alan içi doğrulama ve yazdıkça işaretlenen şifre kuralları var. Ayrı bir "Onaylar" kartı var:
+- **Kayıt ekranı yeniden tasarlandı** (telefon (ham çıktı §37 temizliğinde kaldırıldı), koyu (ham çıktı §37 temizliğinde kaldırıldı), tablet (ham çıktı §37 temizliğinde kaldırıldı)). Alan içi doğrulama ve yazdıkça işaretlenen şifre kuralları var. Ayrı bir "Onaylar" kartı var:
   - [Zorunlu] Kullanım Şartları'nı kabul.
   - [Zorunlu] KVKK Aydınlatma Metni ve Gizlilik Politikası'nı okudum (bilgilendirme teyidi, rıza değil).
   - [İsteğe bağlı, işaretsiz] e-posta bülteni (ticari elektronik ileti onayı).

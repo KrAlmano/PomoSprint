@@ -19,32 +19,44 @@ import '../utils/responsive.dart';
 /// profile ve ana ekrana yansır.
 class CharacterCollectionScreen extends StatefulWidget {
   final UserModel user;
+  final SupabaseService? service;
 
-  const CharacterCollectionScreen({super.key, required this.user});
+  const CharacterCollectionScreen({super.key, required this.user, this.service});
 
   @override
   State<CharacterCollectionScreen> createState() => _CharacterCollectionScreenState();
 }
 
 class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
+  late final SupabaseService _service = widget.service ?? SupabaseService.instance;
   late final String _equippedId = widget.user.avatarId;
-  late String _selection = widget.user.avatarId;
+  late String _selection = AvatarCharacter.isRetiredAvatarId(widget.user.avatarId)
+      ? kDefaultAvatarId
+      : widget.user.avatarId;
   late int _coins = widget.user.coins;
   // Üst bileşenin listesi değiştirilemez; satın alınanlar yerel kopyaya eklenir.
   late final List<String> _unlocked = List.of(widget.user.unlockedAvatars);
   late List<AvatarCharacter> _shopAvatars;
-  late final List<AvatarCharacter> _leagueAwards =
-      AvatarCharacter.allAvatars().where((a) => a.isLeagueAward).toList();
+  late List<AvatarCharacter> _specialAvatars;
+  late List<AvatarCharacter> _leagueAwards;
+  // Hesap değişirse eski ekrandaki bekleyen katalog/satın alma sonuçları
+  // yeni oturuma veya koleksiyon görünümüne uygulanmaz.
+  int _ownerEpoch = 0;
   bool _isSaving = false;
   String? _purchasingId;
   // Lig ödülü kuralı (proposed/20; okunamazsa bugünkü kural).
-  LeagueRules _leagueRules = SupabaseService.instance.leagueRules;
+  late LeagueRules _leagueRules = _service.leagueRules;
 
   // Izgara ~120 px hücrelerle kurulur: dikey telefonda bugünkü gibi 3 sütun,
   // yatay telefonda ve tablette genişliğe göre daha fazla sütun.
   static const double _maxTileExtent = 120;
   static const double _tileSpacing = 12;
   static const double _tileAspectRatio = 0.82;
+
+  // Kilit ve fiyat yalnız avatar alanını kaplar; karakter adı bu alandan
+  // sonra ayrı yer kaplar. Büyük yazıda fiyatın satır yüksekliği korunur.
+  double _avatarExtent(TextScaler textScaler) =>
+      math.max(54, 24 + 4 + textScaler.scale(12) * 1.2 + 2 * 4);
 
   // Diyaloglar tablette ekran boyunca genişlemez (Material 3 en dar 280).
   static const BoxConstraints _dialogConstraints = BoxConstraints(minWidth: 280, maxWidth: ContentWidth.form);
@@ -53,22 +65,45 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
   void initState() {
     super.initState();
     _sortShop();
-    SupabaseService.instance.currentUser.addListener(_onUserChanged);
-    unawaited(SupabaseService.instance.getLeagueRules().then((rules) {
-      if (mounted && rules != _leagueRules) setState(() => _leagueRules = rules);
+    _service.currentUser.addListener(_onUserChanged);
+    final current = _service.currentUser.value;
+    if (current != null && !_isOwner(current)) _ownerEpoch++;
+    final epoch = _ownerEpoch;
+    unawaited(_refreshCatalog(epoch));
+    unawaited(_service.getLeagueRules().then((rules) {
+      if (mounted && epoch == _ownerEpoch && rules != _leagueRules) setState(() => _leagueRules = rules);
     }));
   }
 
   @override
   void dispose() {
-    SupabaseService.instance.currentUser.removeListener(_onUserChanged);
+    _service.currentUser.removeListener(_onUserChanged);
     super.dispose();
   }
 
+  Future<void> _refreshCatalog(int epoch) async {
+    try {
+      await _service.refreshAvatarCatalog();
+      if (mounted && epoch == _ownerEpoch && _ownerEpoch == 0) setState(_sortShop);
+    } catch (e) {
+      // Mevcut katalog korunur; başarısız tazeleme açık ekranı bozmaz.
+      debugPrint('[AVATAR] Koleksiyon kataloğu tazelenemedi: $e');
+    }
+  }
+
+  bool _isOwner(UserModel user) => widget.user.id != null
+      ? user.id == widget.user.id
+      : widget.user.email.isNotEmpty && user.email.toLowerCase() == widget.user.email.toLowerCase();
+
   // Ekran açıkken biten bir seans bakiyeyi değiştirebilir.
   void _onUserChanged() {
-    final user = SupabaseService.instance.currentUser.value;
-    if (user == null || !mounted) return;
+    final user = _service.currentUser.value;
+    if (!mounted) return;
+    if (user == null || !_isOwner(user)) {
+      setState(() => _ownerEpoch++);
+      return;
+    }
+    if (_ownerEpoch != 0) return;
     setState(() {
       _coins = user.coins;
       for (final id in user.unlockedAvatars) {
@@ -84,10 +119,13 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
     final shop = AvatarCharacter.allAvatars()
         .where((a) => a.isListedInShop(unlockedAvatars: _unlocked, isPremium: widget.user.isPremium))
         .toList();
-    _shopAvatars = [
-      ...shop.where((a) => a.isOwned(_unlocked)),
-      ...shop.where((a) => !a.isOwned(_unlocked)),
-    ];
+    List<AvatarCharacter> ownedFirst(Iterable<AvatarCharacter> avatars) => [
+          ...avatars.where((a) => a.isOwned(_unlocked)),
+          ...avatars.where((a) => !a.isOwned(_unlocked)),
+        ];
+    _shopAvatars = ownedFirst(shop.where((a) => !a.isSpecial));
+    _specialAvatars = ownedFirst(shop.where((a) => a.isSpecial));
+    _leagueAwards = AvatarCharacter.allAvatars().where((a) => a.isLeagueAward).toList();
   }
 
   bool get _isTurkish => AppLocalizations.of(context)!.localeName == 'tr';
@@ -101,7 +139,7 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
   }
 
   void _onAvatarTap(AvatarCharacter avatar) {
-    if (_purchasingId != null || _isSaving) return;
+    if (_ownerEpoch != 0 || _purchasingId != null || _isSaving) return;
     if (avatar.isOwned(_unlocked)) {
       setState(() => _selection = avatar.id);
     } else if (avatar.isLeagueAward) {
@@ -117,6 +155,7 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
   }
 
   Future<void> _confirmPurchase(AvatarCharacter avatar) async {
+    final epoch = _ownerEpoch;
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final name = avatar.getName(_isTurkish);
@@ -183,17 +222,18 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
         ],
       ),
     );
-    if (confirmed == true && mounted) await _purchase(avatar);
+    if (confirmed == true && mounted && epoch == _ownerEpoch) await _purchase(avatar);
   }
 
   Future<void> _purchase(AvatarCharacter avatar) async {
-    if (_purchasingId != null) return;
+    if (_ownerEpoch != 0 || _purchasingId != null) return;
+    final epoch = _ownerEpoch;
     final l10n = AppLocalizations.of(context)!;
     final name = avatar.getName(_isTurkish);
     setState(() => _purchasingId = avatar.id);
     try {
-      final newCoins = await SupabaseService.instance.purchaseAvatar(avatar.id);
-      if (!mounted) return;
+      final newCoins = await _service.purchaseAvatar(avatar.id);
+      if (!mounted || epoch != _ownerEpoch) return;
       setState(() {
         _coins = newCoins;
         if (!_unlocked.contains(avatar.id)) _unlocked.add(avatar.id);
@@ -203,7 +243,7 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
       _showSnack(l10n.avatarPurchased(name), color: Colors.green);
     } catch (e) {
       debugPrint('[AVATAR] Satın alma başarısız: $e');
-      if (mounted) _showSnack(socialErrorText(l10n, e), color: Colors.red);
+      if (mounted && epoch == _ownerEpoch) _showSnack(socialErrorText(l10n, e), color: Colors.red);
     } finally {
       if (mounted) setState(() => _purchasingId = null);
     }
@@ -212,7 +252,8 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
   // Kuşanma yalnızca sunucu onaylarsa uygulanır; hata olursa ekran açık
   // kalır ve önceki avatar kuşanılı kalır.
   Future<void> _confirmSelection() async {
-    if (_isSaving || _purchasingId != null) return;
+    if (_ownerEpoch != 0 || _isSaving || _purchasingId != null) return;
+    final epoch = _ownerEpoch;
     if (_selection == _equippedId) {
       Navigator.pop(context);
       return;
@@ -220,11 +261,11 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
     final l10n = AppLocalizations.of(context)!;
     setState(() => _isSaving = true);
     try {
-      await SupabaseService.instance.setEquippedAvatar(_selection);
-      if (mounted) Navigator.pop(context, _selection);
+      await _service.setEquippedAvatar(_selection);
+      if (mounted && epoch == _ownerEpoch) Navigator.pop(context, _selection);
     } catch (e) {
       debugPrint('[AVATAR] Kuşanma başarısız: $e');
-      if (!mounted) return;
+      if (!mounted || epoch != _ownerEpoch) return;
       setState(() => _isSaving = false);
       _showSnack(socialErrorText(l10n, e), color: Colors.red);
     }
@@ -278,10 +319,14 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
   /// Hücre yüksekliği en-boy oranından gelir; büyük metin ölçeğinde iki
   /// satırlık ismin sığacağı yüksekliğin altına inmez.
   SliverGridDelegate _gridDelegate(double width, TextScaler textScaler) {
-    final count = math.max(1, (width / (_maxTileExtent + _tileSpacing)).ceil());
+    var count = math.max(1, (width / (_maxTileExtent + _tileSpacing)).ceil());
+    final avatarExtent = _avatarExtent(textScaler);
+    while (count > 1 && (width - _tileSpacing * (count - 1)) / count < avatarExtent + 2 * 8) {
+      count--;
+    }
     final tileWidth = (width - _tileSpacing * (count - 1)) / count;
-    // Kart: 8 px kenar + 54 px avatar + 6 px boşluk + iki satır isim + pay.
-    final contentHeight = 2 * 8 + 54 + 6 + 2 * textScaler.scale(12) * 1.15 + 12;
+    // Kart: 8 px kenar + avatar/kilit/fiyat + 6 px boşluk + iki satır isim + pay.
+    final contentHeight = 2 * 8 + avatarExtent + 6 + 2 * textScaler.scale(12) * 1.15 + 12;
     return SliverGridDelegateWithFixedCrossAxisCount(
       crossAxisCount: count,
       crossAxisSpacing: _tileSpacing,
@@ -376,6 +421,25 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
                           itemBuilder: (context, index) => _buildAvatarCard(_shopAvatars[index]),
                         ),
                       ),
+                      if (_specialAvatars.isNotEmpty) ...[
+                        SliverPadding(
+                          padding: EdgeInsets.fromLTRB(side, 28, side, 4),
+                          sliver: SliverToBoxAdapter(
+                            child: Text(
+                              l10n.specialAvatarsTitle,
+                              style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: onSurface),
+                            ),
+                          ),
+                        ),
+                        SliverPadding(
+                          padding: EdgeInsets.fromLTRB(side, 8, side, 0),
+                          sliver: SliverGrid.builder(
+                            gridDelegate: gridDelegate,
+                            itemCount: _specialAvatars.length,
+                            itemBuilder: (context, index) => _buildAvatarCard(_specialAvatars[index]),
+                          ),
+                        ),
+                      ],
                       if (_leagueAwards.isNotEmpty) ...[
                         SliverPadding(
                           padding: EdgeInsets.fromLTRB(side, 28, side, 4),
@@ -444,7 +508,7 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
           width: double.infinity,
           height: shortHeight ? 48 : 56,
           child: ElevatedButton(
-            onPressed: _isSaving || _purchasingId != null ? null : _confirmSelection,
+            onPressed: _ownerEpoch != 0 || _isSaving || _purchasingId != null ? null : _confirmSelection,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: AppColors.onPrimary,
@@ -483,8 +547,10 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
     final isOwned = avatar.isOwned(_unlocked);
     final isPurchasing = _purchasingId == avatar.id;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final avatarExtent = _avatarExtent(MediaQuery.textScalerOf(context));
 
     return GestureDetector(
+      key: ValueKey('avatar-card-${avatar.id}'),
       onTap: () => _onAvatarTap(avatar),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
@@ -506,13 +572,25 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
           ],
         ),
         child: Stack(
+          // Kısa isimde Column'un daralıp kartın soluna yerleşmesini
+          // önler; görsel ve metin kartın aynı yatay merkezini paylaşır.
+          fit: StackFit.expand,
           children: [
             Padding(
               padding: const EdgeInsets.all(8),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  AvatarWidget(avatar: avatar, size: 54, isUnlocked: isOwned),
+                  SizedBox.square(
+                    dimension: avatarExtent,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        AvatarWidget(avatar: avatar, size: avatarExtent, isUnlocked: isOwned),
+                        if (!isOwned) _buildLockOverlay(avatar, isPurchasing),
+                      ],
+                    ),
+                  ),
                   const SizedBox(height: 6),
                   Text(
                     avatar.getName(_isTurkish),
@@ -544,7 +622,6 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
                   child: const Icon(Icons.check, size: 14, color: Colors.white),
                 ),
               ),
-            if (!isOwned) Positioned.fill(child: _buildLockOverlay(avatar, isPurchasing)),
           ],
         ),
       ),
@@ -566,9 +643,10 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
     }
     return Container(
       decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.4),
-        borderRadius: BorderRadius.circular(16),
+        color: Colors.black.withValues(alpha: 0.6),
+        shape: BoxShape.circle,
       ),
+      padding: const EdgeInsets.all(4),
       child: Center(
         child: isPurchasing
             ? const SizedBox(
@@ -582,9 +660,13 @@ class _CharacterCollectionScreenState extends State<CharacterCollectionScreen> {
                   Icon(icon, color: Colors.white, size: 24),
                   if (label != null) ...[
                     const SizedBox(height: 4),
-                    Text(
-                      label,
-                      style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        label,
+                        maxLines: 1,
+                        style: const TextStyle(color: Colors.white, fontSize: 12, height: 1.2, fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ],
                 ],

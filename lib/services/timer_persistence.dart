@@ -4,21 +4,16 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utils/async_lock.dart';
+import '../models/marathon_progress.dart';
 
-/// Hızlı test sayacı: yalnızca `--dart-define=QUICK_TIMER=true` ile
-/// derlenince açıktır (VS Code: "PomoSprint (hızlı test sayacı,
-/// kaydedilmez)"). Sayaç 25 dk → 5 sn, 50 dk → 10 sn sürer, ekranda TEST
-/// rozeti görünür ve bu seanslar sunucuya da kuyruğa da gönderilmez
-/// (bkz. [ActiveTimerSession.isQuickTest]).
-const bool kQuickTimer = bool.fromEnvironment('QUICK_TIMER');
+/// Eski çağıranlarla uyumluluk için korunur. Derleme bayrakları uygulamanın
+/// gerçek 25/50 dakikalık sayacını artık kısaltamaz.
+const bool kQuickTimer = false;
 
 /// Sayacın saniye cinsinden uzunluğu. Varsayılan HER derlemede (debug dahil)
-/// gerçek süre; yalnızca hızlı test sayacında kısalır.
-///
-/// Eskiden debug derlemede kendiliğinden kısalıyordu: 5 sn'lik seans
-/// sunucuya 25 dk diye gidiyor, `session_not_finished` ile reddediliyor ve
-/// kullanıcı "cihazının saati ileri" uyarısı görüyordu.
-int timerDurationSeconds(int minutes, {bool quick = kQuickTimer}) {
+/// gerçek süre. [quick] yalnızca açıkça verilen birim/widget simülasyonudur;
+/// uygulama başlatma yapılandırmasından etkinleştirilemez.
+int timerDurationSeconds(int minutes, {bool quick = false}) {
   if (quick) return minutes == 25 ? 5 : 10;
   return minutes * 60;
 }
@@ -43,6 +38,7 @@ class ActiveTimerSession {
     this.pauseUsedCount = 0,
     this.foregroundSeconds = 0,
     this.recordAccelerated = false,
+    this.marathon,
   });
 
   /// Sunucu, başlangıcı bundan eski seansları reddeder (too_old).
@@ -73,19 +69,23 @@ class ActiveTimerSession {
   /// Uygulamanın ön planda geçirdiği saniye (sunucuda p_is_verified).
   final int foregroundSeconds;
 
-  /// Yalnızca yerel QA RPC'siyle 25/50 dk olarak kaydedilen kısa seans.
+  /// Eski kayıtlı QA seansının işareti. Uyumluluk için okunur ve korunur;
+  /// bu işareti taşıyan kayıt hiçbir ortamda normal seans olarak gönderilmez.
   final bool recordAccelerated;
 
-  bool get isRunning => endsAt != null;
+  /// Plan ve mola da aynı sahip anahtarında saklanır. Mola aşamasında bu
+  /// kaydın UUID'si son tamamlanan odaktır; mola için yeni UUID üretilmez.
+  final MarathonProgress? marathon;
+
+  /// Odak kaydı molanın/onay penceresinin diskteki taşıyıcısıdır; eski
+  /// odak bitiş anının bulunması bu aşamaları çalışan seans yapmaz.
+  bool get isRunning => endsAt != null && !(marathon?.isResting ?? false);
   bool get wasPaused => pauseUsedCount > 0;
 
-  /// Kısaltılmış sayaçla (hızlı test sayacı ya da eski debug derlemesi)
-  /// başlatılmış test seansı. Sunucu böyle bir seansı zaten reddeder
-  /// (`session_not_finished`); sunucuya ve kuyruğa gönderilmez. Seansın
-  /// kendisine bakılır, derleme bayrağına değil: hızlı test derlemesinde
-  /// geri yüklenen gerçek seans yine gönderilir, normal derlemede geri
-  /// yüklenen test seansı gönderilmez.
-  bool get isQuickTest => totalSeconds < durationMinutes * 60;
+  /// Kısaltılmış simülasyon veya eski kayıtlı QA seansı. Süre alanı sonradan
+  /// gerçek süreye çevrilmiş olsa bile eski QA işareti gönderimi engeller.
+  bool get isQuickTest =>
+      recordAccelerated || totalSeconds < durationMinutes * 60;
 
   /// Yeni seans: [now] anında başlar, [totalSeconds] sonra biter.
   factory ActiveTimerSession.start({
@@ -97,6 +97,7 @@ class ActiveTimerSession {
     required int totalSeconds,
     required DateTime now,
     bool recordAccelerated = false,
+    MarathonProgress? marathon,
   }) {
     return ActiveTimerSession(
       clientUuid: clientUuid,
@@ -108,13 +109,16 @@ class ActiveTimerSession {
       startedAt: now,
       endsAt: now.add(Duration(seconds: totalSeconds)),
       recordAccelerated: recordAccelerated,
+      marathon: marathon,
     );
   }
 
   /// [now] anında kalan saniye (yukarı yuvarlanır, en az 0).
   int remainingSecondsAt(DateTime now) {
     final end = endsAt;
-    if (end == null) return (pausedRemainingSeconds ?? totalSeconds).clamp(0, totalSeconds);
+    if (end == null) {
+      return (pausedRemainingSeconds ?? totalSeconds).clamp(0, totalSeconds);
+    }
     final ms = end.difference(now).inMilliseconds;
     return ms <= 0 ? 0 : (ms / 1000).ceil();
   }
@@ -148,10 +152,16 @@ class ActiveTimerSession {
   }
 
   ActiveTimerSession withForegroundSeconds(int seconds) => _copy(
-        endsAt: endsAt,
-        pausedRemainingSeconds: pausedRemainingSeconds,
-        foregroundSeconds: seconds,
-      );
+    endsAt: endsAt,
+    pausedRemainingSeconds: pausedRemainingSeconds,
+    foregroundSeconds: seconds,
+  );
+
+  ActiveTimerSession withMarathon(MarathonProgress progress) => _copy(
+    endsAt: endsAt,
+    pausedRemainingSeconds: pausedRemainingSeconds,
+    marathon: progress,
+  );
 
   // endsAt ve pausedRemainingSeconds her zaman açıkça verilir (null anlamlı).
   ActiveTimerSession _copy({
@@ -159,6 +169,7 @@ class ActiveTimerSession {
     required int? pausedRemainingSeconds,
     int? pauseUsedCount,
     int? foregroundSeconds,
+    MarathonProgress? marathon,
   }) {
     return ActiveTimerSession(
       clientUuid: clientUuid,
@@ -173,23 +184,25 @@ class ActiveTimerSession {
       pauseUsedCount: pauseUsedCount ?? this.pauseUsedCount,
       foregroundSeconds: foregroundSeconds ?? this.foregroundSeconds,
       recordAccelerated: recordAccelerated,
+      marathon: marathon ?? this.marathon,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'client_uuid': clientUuid,
-        'category_id': categoryId,
-        'category_name': categoryName,
-        if (categoryColorHex != null) 'category_color': categoryColorHex,
-        'duration_minutes': durationMinutes,
-        'total_seconds': totalSeconds,
-        'started_at': startedAt.toUtc().toIso8601String(),
-        'ends_at': endsAt?.toUtc().toIso8601String(),
-        'paused_remaining_seconds': pausedRemainingSeconds,
-        'pause_used_count': pauseUsedCount,
-        'foreground_seconds': foregroundSeconds,
-        if (recordAccelerated) 'record_accelerated': true,
-      };
+    'client_uuid': clientUuid,
+    'category_id': categoryId,
+    'category_name': categoryName,
+    if (categoryColorHex != null) 'category_color': categoryColorHex,
+    'duration_minutes': durationMinutes,
+    'total_seconds': totalSeconds,
+    'started_at': startedAt.toUtc().toIso8601String(),
+    'ends_at': endsAt?.toUtc().toIso8601String(),
+    'paused_remaining_seconds': pausedRemainingSeconds,
+    'pause_used_count': pauseUsedCount,
+    'foreground_seconds': foregroundSeconds,
+    if (recordAccelerated) 'record_accelerated': true,
+    if (marathon != null) 'marathon': marathon!.toJson(),
+  };
 
   /// Bozuk ya da eksik kayıtta null döner.
   static ActiveTimerSession? fromJson(Object? json) {
@@ -199,25 +212,40 @@ class ActiveTimerSession {
     final minutes = json['duration_minutes'];
     final total = json['total_seconds'];
     final startedAt = DateTime.tryParse(json['started_at']?.toString() ?? '');
-    if (uuid is! String || uuid.isEmpty || categoryId is! String || minutes is! int || minutes <= 0) return null;
+    if (uuid is! String ||
+        uuid.isEmpty ||
+        categoryId is! String ||
+        minutes is! int ||
+        minutes <= 0) {
+      return null;
+    }
     if (total is! int || total <= 0 || startedAt == null) return null;
     final endsRaw = json['ends_at'];
-    final endsAt = endsRaw == null ? null : DateTime.tryParse(endsRaw.toString());
+    final endsAt = endsRaw == null
+        ? null
+        : DateTime.tryParse(endsRaw.toString());
     final paused = json['paused_remaining_seconds'];
     if (endsAt == null && paused is! int) return null;
     return ActiveTimerSession(
       clientUuid: uuid,
       categoryId: categoryId,
       categoryName: json['category_name']?.toString() ?? '',
-      categoryColorHex: json['category_color'] is String ? json['category_color'] as String : null,
+      categoryColorHex: json['category_color'] is String
+          ? json['category_color'] as String
+          : null,
       durationMinutes: minutes,
       totalSeconds: total,
       startedAt: startedAt.toLocal(),
       endsAt: endsAt?.toLocal(),
       pausedRemainingSeconds: endsAt == null ? paused as int : null,
-      pauseUsedCount: json['pause_used_count'] is int ? json['pause_used_count'] as int : 0,
-      foregroundSeconds: json['foreground_seconds'] is int ? json['foreground_seconds'] as int : 0,
+      pauseUsedCount: json['pause_used_count'] is int
+          ? json['pause_used_count'] as int
+          : 0,
+      foregroundSeconds: json['foreground_seconds'] is int
+          ? json['foreground_seconds'] as int
+          : 0,
       recordAccelerated: json['record_accelerated'] == true,
+      marathon: MarathonProgress.fromJson(json['marathon']),
     );
   }
 }
@@ -241,11 +269,17 @@ class TimerPersistence {
       try {
         final prefs = await SharedPreferences.getInstance();
         var session = _decode(prefs.getString(keyFor(ownerKey)));
-        if (session == null && legacyOwnerKey != null && legacyOwnerKey.isNotEmpty && legacyOwnerKey != ownerKey) {
+        if (session == null &&
+            legacyOwnerKey != null &&
+            legacyOwnerKey.isNotEmpty &&
+            legacyOwnerKey != ownerKey) {
           final legacyKey = keyFor(legacyOwnerKey);
           session = _decode(prefs.getString(legacyKey));
           if (session != null) {
-            await prefs.setString(keyFor(ownerKey), jsonEncode(session.toJson()));
+            await prefs.setString(
+              keyFor(ownerKey),
+              jsonEncode(session.toJson()),
+            );
             await prefs.remove(legacyKey);
           }
         }
@@ -270,13 +304,135 @@ class TimerPersistence {
   }
 
   Future<void> save(String ownerKey, ActiveTimerSession session) {
-    if (_retiredOwners.contains(ownerKey)) return Future.value();
+    return saveChecked(ownerKey, session).then((_) {});
+  }
+
+  /// Maraton geçişi diske güvenle yazılmadan bir sonraki odak başlamaz.
+  /// Normal sayaç için [save] eski, hata fırlatmayan API'yi korur.
+  Future<bool> saveChecked(
+    String ownerKey,
+    ActiveTimerSession session, {
+    bool Function()? canCommit,
+  }) {
+    if (_retiredOwners.contains(ownerKey)) return Future.value(false);
+    return _lock.synchronized(() async {
+      if (_retiredOwners.contains(ownerKey)) return false;
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        return await _writeIfAllowed(
+          prefs,
+          ownerKey,
+          jsonEncode(session.toJson()),
+          canCommit,
+        );
+      } catch (e) {
+        debugPrint('[TIMER] Seans kaydedilemedi: $e');
+        return false;
+      }
+    });
+  }
+
+  /// Eski bir ekranın geciken gönderim yanıtı daha yeni molayı/odağı
+  /// ezmesin. Kontrol, dönüştürme ve yazma aynı kilit altında gerçekleşir.
+  /// null: kayıt ilerlemiş, silinmiş ya da yazılamamıştır.
+  Future<ActiveTimerSession?> compareAndUpdateMarathon(
+    String ownerKey, {
+    required String clientUuid,
+    required int completedSessions,
+    required Set<MarathonPhase> phases,
+    required ActiveTimerSession Function(ActiveTimerSession current) update,
+    bool Function()? canCommit,
+  }) {
+    return _lock.synchronized(() async {
+      if (_retiredOwners.contains(ownerKey)) return null;
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final stored = _decode(prefs.getString(keyFor(ownerKey)));
+        final plan = stored?.marathon;
+        if (stored == null ||
+            stored.clientUuid != clientUuid ||
+            plan == null ||
+            plan.completedSessions != completedSessions ||
+            !phases.contains(plan.phase)) {
+          return null;
+        }
+        if (canCommit != null && !canCommit()) return null;
+        final next = update(stored);
+        return await _writeIfAllowed(
+              prefs,
+              ownerKey,
+              jsonEncode(next.toJson()),
+              canCommit,
+            )
+            ? next
+            : null;
+      } catch (error) {
+        debugPrint('[MARATHON] Koşullu sayaç kaydı yazılamadı: $error');
+        return null;
+      }
+    });
+  }
+
+  /// Yeni odağın disk yazısı beklerken çıkış/arka plan başlayabilir. Önceki
+  /// JSON aynı kilitte geri alınır; [load] ve yeni ekran bu aradaki, henüz
+  /// başlatılmamış odağı görmez. Hesap silinmişse eski kayıt da geri gelmez.
+  Future<bool> _writeIfAllowed(
+    SharedPreferences prefs,
+    String ownerKey,
+    String nextJson,
+    bool Function()? canCommit,
+  ) async {
+    if (_retiredOwners.contains(ownerKey) ||
+        (canCommit != null && !canCommit())) {
+      return false;
+    }
+    final key = keyFor(ownerKey);
+    final previousJson = prefs.getString(key);
+    Future<void> restorePrevious() async {
+      if (previousJson == null || _retiredOwners.contains(ownerKey)) {
+        await prefs.remove(key);
+      } else {
+        await prefs.setString(key, previousJson);
+      }
+    }
+
+    final bool saved;
+    try {
+      saved = await prefs.setString(key, nextJson);
+    } catch (error) {
+      // Legacy SharedPreferences önce kendi önbelleğini değiştirir;
+      // native yazının hata vermesi bu değişikliği kendiliğinden geri almaz.
+      try {
+        await restorePrevious();
+      } catch (rollbackError) {
+        debugPrint(
+          '[TIMER] Başarısız yazının geri alınması tamamlanamadı: $rollbackError',
+        );
+      }
+      rethrow;
+    }
+    if (!saved ||
+        _retiredOwners.contains(ownerKey) ||
+        (canCommit != null && !canCommit())) {
+      await restorePrevious();
+      return false;
+    }
+    return saved;
+  }
+
+  /// Durdurma, o planda henüz ekrana uygulanmamış yeni odak UUID'sini de
+  /// kapsar; sonradan başlatılmış farklı planı veya tek seansı silmez.
+  Future<void> clearMarathon(String ownerKey, {required String marathonUuid}) {
     return _lock.synchronized(() async {
       try {
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString(keyFor(ownerKey), jsonEncode(session.toJson()));
-      } catch (e) {
-        debugPrint('[TIMER] Seans kaydedilemedi: $e');
+        final key = keyFor(ownerKey);
+        final current = _decode(prefs.getString(key));
+        if (current?.marathon?.marathonUuid == marathonUuid) {
+          await prefs.remove(key);
+        }
+      } catch (error) {
+        debugPrint('[MARATHON] Plan kaydı silinemedi: $error');
       }
     });
   }

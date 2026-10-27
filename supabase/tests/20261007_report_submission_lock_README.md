@@ -1,4 +1,12 @@
-# Rapor gönderimi eşzamanlılık düzeltmesi — hazırlanmış, canlıda değil
+# Rapor gönderimi eşzamanlılık düzeltmesi — 8 Ekim 2026 canlıda
+
+8 Ekim'de güncel canlı gövde, yetkiler ve rollback yeniden karşılaştırıldı.
+Canlı DRYRUN **23/23** geçip tamamen geri alındı. Kullanıcının canlıya alma
+ve production hazırlığı talebi kapsamında incelenen migration, Supabase CLI
+Management API ile ayrı transaction içinde uygulandı. Sonrasında mevcut
+gövdeyle geri alınan **23/23** fonksiyon senaryosu ve **9/9** salt okuma
+kontrolü geçti. Güncel hash `a7ee1b72778b92b59982e5bba8b86c7a`, migration
+`20261007110000` kayıtlı. [Güncel QA ve kanıtlar](../../analiz/QA_REPORT_SUBMISSION_LIVE_2026-10-08.md).
 
 7 Ekim 2026 canlı `submit_user_report` tanımı salt okunarak alındı. Aynı
 bildiriciden iki eşzamanlı istek duplicate/günlük sayımı INSERT'ten önce
@@ -13,21 +21,28 @@ RLS/yetkiler değişmez. Mevcut rapor verisi silinmez/düzenlenmez.
 
 | Kaynak | Durum |
 |---|---|
-| [İleri migration](../migrations/20261007110000_report_submission_lock.sql) | Hazır; eski canlı gövdenin hash'ini ön koşul olarak ister |
-| [DRYRUN](20261007_report_submission_lock_dryrun.sql) | 23/23 true; bilinçli `DRYRUN_RESULT` hatası tüm işlemi geri alır |
+| [İleri migration](../migrations/20261007110000_report_submission_lock.sql) | 8 Ekim'de uygulandı; eski canlı hash ön koşulu içerir, yeniden çalıştırma |
+| [DRYRUN](20261007_report_submission_lock_dryrun.sql) | 8 Ekim uygulama öncesi canlı 23/23 true; bilinçli `DRYRUN_RESULT` hatası tüm işlemi geri aldı. Güncel gövde eski hash olmadığından özgün ileri DRYRUN'u tekrar çalıştırma |
 | [Rollback](../rollbacks/20261007110000_report_submission_lock_down.sql) | Eski gövdeyi birebir döndürür; eşzamanlılık hatasını da geri getirir |
-| [Yerel HTTP yarış testi](20261007_report_submission_lock_local.py) | Önce eski hatalar doğrulandı, sonra yeni davranış 7/7 geçti |
+| [Yerel HTTP yarış testi](20261007_report_submission_lock_local.py) | 7 Ekim tarihsel kanıtı: önce eski hatalar doğrulandı, sonra yeni davranış 7/7 geçti. Bu turda canlı paralel HTTP yarışı yapılmadı |
+| Uygulama sonrası fonksiyon kontrolü (ham çıktı §37 temizliğinde kaldırıldı) | 8 Ekim mevcut canlı gövdeyle 23/23; yalnız transaction içinde sentetik hesap/rapor, bilinçli rollback |
+| Uygulama sonrası salt okuma (ham çıktı §37 temizliğinde kaldırıldı) | 9/9 hash, migration, RPC/tablo erişimi, RLS, normal seans ve Maraton kontrolü |
 
-Canlıda kullanıcı önce DRYRUN'u SQL Editor'de çalıştırmalı; her madde
-`true` olmalı. Sonra ileri migration'ı çalıştırabilir. Ajan bu dosyaları
-canlıya uygulamadı; kökte `supabase db push/reset` kullanılmaz.
+8 Ekim kapsam istisnası [AGENTS.md §2.4](../../AGENTS.md) içinde kayıtlıdır;
+başka bekleyen paketleri yetkilendirmez. Kökte `supabase db push/reset`
+kullanılmaz. Testlerden önce/sonra aynı 4 Auth hesabı, 9 seans,
+250 dakika/51 puan/150 kum ve 0 rapor korundu; test hesapları/raporları
+kalıcı olmadı, e-posta gönderilmedi. İmza, ACL ve RLS aynı, normal seans RPC
+gövdesi ve Maraton `available:true`, mola 300/onay 60 saniye yapılandırması
+korundu. 23 senaryo uygulama öncesi ve sonrası tekrarlanmıştır;
+46 farklı senaryo veya iki bağlantılı canlı yarış testi değildir.
 
 Salt okuma doğrulaması:
 
 ```sql
 select md5(pg_get_functiondef('public.submit_user_report(uuid,text,text,text)'::regprocedure));
--- Eski canlı: 547b73d8a9163466b19dafb4b89e9fe3
--- Yeni gövde: a7ee1b72778b92b59982e5bba8b86c7a
+-- 8 Ekim uygulamadan önce: 547b73d8a9163466b19dafb4b89e9fe3
+-- Güncel canlı: a7ee1b72778b92b59982e5bba8b86c7a
 select version, name from supabase_migrations.schema_migrations
 where version = '20261007110000';
 ```
@@ -39,8 +54,10 @@ olarak `ops` şema tanımları da kopyalanmalıdır (`handle_new_user`
 tablo kilidiyle bekleterek yarışı belirginleştirir; ürün gövdesine gecikme
 eklemez. Ana ortam/üretim üzerinde çalıştırılmaz. Kopya test sonunda kaldırılır.
 
-Kanıt: [report_concurrency/summary.json](../../analiz/qa_evidence_20261007/backend/report_concurrency/summary.json).
+7 Ekim izole yerel kanıtı: report_concurrency/summary.json (ham çıktı §37 temizliğinde kaldırıldı).
 Yeni davranışta aynı hedef 1 satır/UUID, 9+2 istekte 10 satır,
 farklı bildiricilerde bağımsız kabul doğrulandı. Önceki 21 ardışık sözleşme
 kontrolü de geçti. DRYRUN öncesi/sonrası hash, ACL ve kayıt sayıları aynı;
-down eski canlı hash'ini ve migration geçmişini geri getirdi.
+down o izole kopyada eski canlı hash'ini ve migration geçmişini geri getirdi.
+8 Ekim canlıya uygulanan düzeltme geri alınmadı; yalnız test fixture'ları
+geri alındı.

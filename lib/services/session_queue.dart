@@ -3,13 +3,15 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:supabase_flutter/supabase_flutter.dart' show AuthException, PostgrestException;
+import 'package:supabase_flutter/supabase_flutter.dart'
+    show AuthException, PostgrestException;
 import 'package:uuid/uuid.dart';
 
 import '../utils/async_lock.dart';
 import '../utils/category_names.dart';
 import 'server_clock.dart';
-import 'service_errors.dart' show ServiceErrorCode, ServiceException, isNetworkError;
+import 'service_errors.dart'
+    show ServiceErrorCode, ServiceException, isNetworkError;
 
 // Tamamlanan seanslar için kalıcı giden kutusu (outbox).
 //
@@ -19,8 +21,10 @@ import 'service_errors.dart' show ServiceErrorCode, ServiceException, isNetworkE
 // ayrı bir listeye taşınır ve kullanıcıya bir kez bildirilir. Seans hiçbir
 // durumda sessizce silinmez.
 
-final RegExp _uuidPattern =
-    RegExp(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', caseSensitive: false);
+final RegExp _uuidPattern = RegExp(
+  r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+  caseSensitive: false,
+);
 
 /// Sunucuda gerçekten var olabilecek (UUID biçiminde) bir kategori kimliği mi?
 /// Yerel yer tutucu kategorilerin kimlikleri ('1', '2', ...) bu kontrolü geçmez.
@@ -44,6 +48,9 @@ class PendingSession {
     this.categoryRemaps = 0,
     this.lastError,
     this.recordAccelerated = false,
+    this.marathonUuid,
+    this.marathonTargetSessions,
+    this.marathonSessionIndex,
   });
 
   final String clientUuid;
@@ -53,6 +60,10 @@ class PendingSession {
   final String categoryName;
   final int minutes;
   final bool recordAccelerated;
+  final String? marathonUuid;
+  final int? marathonTargetSessions;
+  final int? marathonSessionIndex;
+  bool get isMarathon => marathonUuid != null;
   final bool wasPaused;
 
   /// Uygulamanın ön planda geçirdiği saniye (RPC'de p_is_verified).
@@ -90,23 +101,31 @@ class PendingSession {
       categoryRemaps: categoryRemaps ?? this.categoryRemaps,
       lastError: lastError ?? this.lastError,
       recordAccelerated: recordAccelerated,
+      marathonUuid: marathonUuid,
+      marathonTargetSessions: marathonTargetSessions,
+      marathonSessionIndex: marathonSessionIndex,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'client_uuid': clientUuid,
-        'category_id': categoryId,
-        'category_name': categoryName,
-        'minutes': minutes,
-        if (recordAccelerated) 'record_accelerated': true,
-        'was_paused': wasPaused,
-        'is_verified': foregroundSeconds,
-        'started_at': startedAt.toUtc().toIso8601String(),
-        'queued_at': queuedAt.toUtc().toIso8601String(),
-        if (clockOffsetMs != null) 'clock_offset_ms': clockOffsetMs,
-        'category_remaps': categoryRemaps,
-        if (lastError != null) 'last_error': lastError,
-      };
+    'client_uuid': clientUuid,
+    'category_id': categoryId,
+    'category_name': categoryName,
+    'minutes': minutes,
+    if (recordAccelerated) 'record_accelerated': true,
+    if (marathonUuid != null) ...{
+      'marathon_uuid': marathonUuid,
+      'marathon_target_sessions': marathonTargetSessions,
+      'marathon_session_index': marathonSessionIndex,
+    },
+    'was_paused': wasPaused,
+    'is_verified': foregroundSeconds,
+    'started_at': startedAt.toUtc().toIso8601String(),
+    'queued_at': queuedAt.toUtc().toIso8601String(),
+    if (clockOffsetMs != null) 'clock_offset_ms': clockOffsetMs,
+    'category_remaps': categoryRemaps,
+    if (lastError != null) 'last_error': lastError,
+  };
 
   /// Eski sürümlerin kayıtlarını da okur. Zorunlu alanlar eksik ya da
   /// bozuksa null döner.
@@ -114,26 +133,57 @@ class PendingSession {
     final uuid = json['client_uuid'];
     final started = json['started_at'];
     final minutes = json['minutes'];
-    if (uuid is! String || uuid.isEmpty || started is! String || minutes is! num) return null;
+    if (uuid is! String ||
+        uuid.isEmpty ||
+        started is! String ||
+        minutes is! num) {
+      return null;
+    }
     // Eski sürümler started_at'i saat dilimsiz yerel saatle yazıyordu;
     // DateTime.parse bunu yerel saat olarak okur, toUtc doğru çevirir.
     final startedAt = DateTime.tryParse(started);
     if (startedAt == null) return null;
     final queued = json['queued_at'];
     final categoryId = json['category_id'];
+    final marathonUuid = json['marathon_uuid'];
+    final marathonTarget = json['marathon_target_sessions'];
+    final marathonIndex = json['marathon_session_index'];
+    final hasMarathon =
+        json.containsKey('marathon_uuid') ||
+        json.containsKey('marathon_target_sessions') ||
+        json.containsKey('marathon_session_index');
+    // Eksik/bozuk plan bilgisini sessizce tek seansa dönüştürmek bonusun
+    // kaybolmasına yol açar; bozuk kayıt normal ret geçmişine taşınır.
+    if (hasMarathon &&
+        (!isUuidCategoryId(marathonUuid is String ? marathonUuid : null) ||
+            marathonTarget is! int ||
+            marathonTarget < 2 ||
+            marathonTarget > 4 ||
+            marathonIndex is! int ||
+            marathonIndex < 1 ||
+            marathonIndex > marathonTarget)) {
+      return null;
+    }
     return PendingSession(
       clientUuid: uuid,
-      categoryId: categoryId is String && categoryId.isNotEmpty ? categoryId : null,
+      categoryId: categoryId is String && categoryId.isNotEmpty
+          ? categoryId
+          : null,
       categoryName: json['category_name']?.toString() ?? '',
       minutes: minutes.toInt(),
       wasPaused: json['was_paused'] == true,
       foregroundSeconds: _asInt(json['is_verified']) ?? 0,
       startedAt: startedAt.toUtc(),
-      queuedAt: (queued is String ? DateTime.tryParse(queued) : null)?.toUtc() ?? startedAt.toUtc(),
+      queuedAt:
+          (queued is String ? DateTime.tryParse(queued) : null)?.toUtc() ??
+          startedAt.toUtc(),
       clockOffsetMs: _asInt(json['clock_offset_ms']),
       categoryRemaps: _asInt(json['category_remaps']) ?? 0,
       lastError: json['last_error']?.toString(),
       recordAccelerated: json['record_accelerated'] == true,
+      marathonUuid: marathonUuid is String ? marathonUuid : null,
+      marathonTargetSessions: marathonTarget is int ? marathonTarget : null,
+      marathonSessionIndex: marathonIndex is int ? marathonIndex : null,
     );
   }
 }
@@ -158,13 +208,13 @@ class RejectedSession {
   final DateTime rejectedAt;
 
   Map<String, dynamic> toJson() => {
-        'client_uuid': clientUuid,
-        'started_at': startedAt.toUtc().toIso8601String(),
-        'minutes': minutes,
-        'category_name': categoryName,
-        'reason': reasonCode,
-        'rejected_at': rejectedAt.toUtc().toIso8601String(),
-      };
+    'client_uuid': clientUuid,
+    'started_at': startedAt.toUtc().toIso8601String(),
+    'minutes': minutes,
+    'category_name': categoryName,
+    'reason': reasonCode,
+    'rejected_at': rejectedAt.toUtc().toIso8601String(),
+  };
 
   static RejectedSession? fromJson(Map<String, dynamic> json) {
     final started = DateTime.tryParse(json['started_at']?.toString() ?? '');
@@ -227,6 +277,10 @@ final class SessionSubmitSuccess extends SessionSubmitResult {
     this.streak,
     this.dailyLimitReached = false,
     this.duplicate = false,
+    this.marathonBonusPoints = 0,
+    this.marathonInvalid = false,
+    this.marathonBreakEndsAt,
+    this.marathonConfirmationDeadline,
   });
 
   final int minutes;
@@ -236,6 +290,18 @@ final class SessionSubmitSuccess extends SessionSubmitResult {
   final int bonusPct;
   final int coinsEarned;
 
+  /// Yalnızca sunucunun, tüm plan bitince bir kez verdiği ek puan.
+  final int marathonBonusPoints;
+
+  /// Regular completed study is saved, but the plan cannot earn a bonus or
+  /// continue when its server-side presence gate was not satisfied.
+  final bool marathonInvalid;
+
+  /// Immutable server presence window, converted to the device clock. A
+  /// duplicate receipt retains its original window; it never creates a break.
+  final DateTime? marathonBreakEndsAt;
+  final DateTime? marathonConfirmationDeadline;
+
   /// Sunucunun hesapladığı güncel seri (yanıtta yoksa null).
   final int? streak;
   final bool dailyLimitReached;
@@ -244,9 +310,21 @@ final class SessionSubmitSuccess extends SessionSubmitResult {
   /// kullanıcıya ikinci kez eklenmemelidir.
   final bool duplicate;
 
-  factory SessionSubmitSuccess.fromResponse(Object? response, {required int minutes}) {
+  factory SessionSubmitSuccess.fromResponse(
+    Object? response, {
+    required int minutes,
+    Duration clockOffset = Duration.zero,
+  }) {
     final map = response is Map ? response : const <String, dynamic>{};
     int asInt(Object? v) => v is num ? v.toInt() : 0;
+    DateTime? deviceDate(Object? value) {
+      if (value is! String ||
+          !RegExp(r'(Z|[+-]\d{2}:?\d{2})$').hasMatch(value)) {
+        return null;
+      }
+      return DateTime.tryParse(value)?.subtract(clockOffset).toLocal();
+    }
+
     final total = asInt(map['total_points']);
     return SessionSubmitSuccess(
       minutes: minutes,
@@ -256,17 +334,30 @@ final class SessionSubmitSuccess extends SessionSubmitResult {
       bonusPct: asInt(map['bonus_pct']),
       // Canlı RPC kum tanesini puandan bağımsız 'coins_earned' ile döndürüyor;
       // eski gövdede yoktu, o durumda puan kadar verilirdi.
-      coinsEarned: map.containsKey('coins_earned') ? asInt(map['coins_earned']) : total,
+      coinsEarned: map.containsKey('coins_earned')
+          ? asInt(map['coins_earned'])
+          : total,
       streak: map['streak'] is num ? (map['streak'] as num).toInt() : null,
       dailyLimitReached: map['daily_limit_reached'] == true,
       duplicate: map['duplicate'] == true,
+      marathonBonusPoints: asInt(map['marathon_bonus_points']),
+      marathonInvalid:
+          map['marathon_invalid'] == true ||
+          map['marathon_presence_invalid'] == true,
+      marathonBreakEndsAt: deviceDate(map['marathon_break_ends_at']),
+      marathonConfirmationDeadline: deviceDate(
+        map['marathon_confirmation_deadline'],
+      ),
     );
   }
 }
 
 /// Seans kuyrukta; sonraki senkronda yeniden denenecek.
 final class SessionSubmitQueued extends SessionSubmitResult {
-  const SessionSubmitQueued({required this.reasonCode, required this.pendingCount});
+  const SessionSubmitQueued({
+    required this.reasonCode,
+    required this.pendingCount,
+  });
   final String reasonCode;
   final int pendingCount;
 }
@@ -338,9 +429,14 @@ SessionFailure classifySessionError(
   Duration appliedCorrection = Duration.zero,
 }) {
   SessionFailure timing(String reason) {
-    if (offsetNow == null) return SessionFailure(SessionFailureKind.clockSkew, reason);
+    if (offsetNow == null) {
+      return SessionFailure(SessionFailureKind.clockSkew, reason);
+    }
     if ((offsetNow - appliedCorrection).abs() >= ServerClock.significantSkew) {
-      return const SessionFailure(SessionFailureKind.clockSkew, SessionReason.clockSkew);
+      return const SessionFailure(
+        SessionFailureKind.clockSkew,
+        SessionReason.clockSkew,
+      );
     }
     return SessionFailure(SessionFailureKind.permanent, reason);
   }
@@ -348,72 +444,133 @@ SessionFailure classifySessionError(
   if (error is ServiceException) {
     final cause = error.cause;
     if (cause != null) {
-      return classifySessionError(cause, offsetNow: offsetNow, appliedCorrection: appliedCorrection);
+      return classifySessionError(
+        cause,
+        offsetNow: offsetNow,
+        appliedCorrection: appliedCorrection,
+      );
     }
     return switch (error.code) {
-      ServiceErrorCode.timeout => const SessionFailure(SessionFailureKind.offline, SessionReason.timeout),
-      ServiceErrorCode.network => const SessionFailure(SessionFailureKind.offline, SessionReason.network),
-      ServiceErrorCode.cloudUnavailable ||
-      ServiceErrorCode.notSignedIn =>
+      ServiceErrorCode.timeout => const SessionFailure(
+        SessionFailureKind.offline,
+        SessionReason.timeout,
+      ),
+      ServiceErrorCode.network => const SessionFailure(
+        SessionFailureKind.offline,
+        SessionReason.network,
+      ),
+      ServiceErrorCode.cloudUnavailable || ServiceErrorCode.notSignedIn =>
         const SessionFailure(SessionFailureKind.offline, SessionReason.auth),
-      _ => const SessionFailure(SessionFailureKind.transient, SessionReason.serverError),
+      _ => const SessionFailure(
+        SessionFailureKind.transient,
+        SessionReason.serverError,
+      ),
     };
   }
   if (error is PostgrestException) {
     final code = error.code ?? '';
     final msg = '${error.message} ${error.details ?? ''}'.toLowerCase();
     if (msg.contains('not authenticated')) {
-      return const SessionFailure(SessionFailureKind.offline, SessionReason.auth);
+      return const SessionFailure(
+        SessionFailureKind.offline,
+        SessionReason.auth,
+      );
     }
     if (code == 'P0001') {
       if (msg.contains('session_overlap') || msg.contains('overlap')) {
-        return const SessionFailure(SessionFailureKind.overlap, SessionReason.overlap);
+        return const SessionFailure(
+          SessionFailureKind.overlap,
+          SessionReason.overlap,
+        );
       }
-      if (msg.contains('session_not_finished') || msg.contains('session_not_elapsed')) {
+      if (msg.contains('session_not_finished') ||
+          msg.contains('session_not_elapsed')) {
         return timing(SessionReason.notElapsed);
       }
-      if (msg.contains('in the future')) return timing(SessionReason.futureStart);
+      if (msg.contains('in the future')) {
+        return timing(SessionReason.futureStart);
+      }
       if (msg.contains('older than')) {
-        return const SessionFailure(SessionFailureKind.permanent, SessionReason.tooOld);
+        return const SessionFailure(
+          SessionFailureKind.permanent,
+          SessionReason.tooOld,
+        );
       }
       if (msg.contains('invalid duration')) {
-        return const SessionFailure(SessionFailureKind.permanent, SessionReason.invalidDuration);
+        return const SessionFailure(
+          SessionFailureKind.permanent,
+          SessionReason.invalidDuration,
+        );
       }
       if (msg.contains('category')) {
-        return const SessionFailure(SessionFailureKind.categoryInvalid, SessionReason.categoryInvalid);
+        return const SessionFailure(
+          SessionFailureKind.categoryInvalid,
+          SessionReason.categoryInvalid,
+        );
       }
       if (msg.contains('session_missing_start')) {
-        return const SessionFailure(SessionFailureKind.permanent, SessionReason.invalidData);
+        return const SessionFailure(
+          SessionFailureKind.permanent,
+          SessionReason.invalidData,
+        );
       }
-      return const SessionFailure(SessionFailureKind.permanent, SessionReason.serverRejected);
+      return const SessionFailure(
+        SessionFailureKind.permanent,
+        SessionReason.serverRejected,
+      );
     }
     // Geçersiz kategori kimliği (uuid biçimi) ya da kategori yabancı anahtarı.
-    if ((code == '22P02' && msg.contains('uuid')) || (code == '23503' && msg.contains('categor'))) {
-      return const SessionFailure(SessionFailureKind.categoryInvalid, SessionReason.categoryInvalid);
+    if ((code == '22P02' && msg.contains('uuid')) ||
+        (code == '23503' && msg.contains('categor'))) {
+      return const SessionFailure(
+        SessionFailureKind.categoryInvalid,
+        SessionReason.categoryInvalid,
+      );
     }
     // 23505: aynı client_uuid ile yarış; bir sonraki denemede RPC 'duplicate' döner.
     // 23503: profil satırı henüz yok olabilir; profil oluşturulunca geçer.
     if (code == '23505' || code == '23503') {
-      return const SessionFailure(SessionFailureKind.transient, SessionReason.serverError);
+      return const SessionFailure(
+        SessionFailureKind.transient,
+        SessionReason.serverError,
+      );
     }
     if (code.startsWith('22') || code.startsWith('23')) {
-      return const SessionFailure(SessionFailureKind.permanent, SessionReason.invalidData);
+      return const SessionFailure(
+        SessionFailureKind.permanent,
+        SessionReason.invalidData,
+      );
     }
     if (code == 'PGRST301' || code == '42501') {
-      return const SessionFailure(SessionFailureKind.offline, SessionReason.auth);
+      return const SessionFailure(
+        SessionFailureKind.offline,
+        SessionReason.auth,
+      );
     }
-    return const SessionFailure(SessionFailureKind.transient, SessionReason.serverError);
+    return const SessionFailure(
+      SessionFailureKind.transient,
+      SessionReason.serverError,
+    );
   }
   if (error is AuthException) {
     return const SessionFailure(SessionFailureKind.offline, SessionReason.auth);
   }
   if (error is TimeoutException) {
-    return const SessionFailure(SessionFailureKind.offline, SessionReason.timeout);
+    return const SessionFailure(
+      SessionFailureKind.offline,
+      SessionReason.timeout,
+    );
   }
   if (isNetworkError(error)) {
-    return const SessionFailure(SessionFailureKind.offline, SessionReason.network);
+    return const SessionFailure(
+      SessionFailureKind.offline,
+      SessionReason.network,
+    );
   }
-  return const SessionFailure(SessionFailureKind.transient, SessionReason.serverError);
+  return const SessionFailure(
+    SessionFailureKind.transient,
+    SessionReason.serverError,
+  );
 }
 
 /// RPC'nin hata fırlatmadan döndürdüğü yanıtı sınıflandırır. Seans kabul
@@ -424,12 +581,17 @@ SessionFailure? classifySessionResponse(Object? response) {
   if (response is! Map || response['error'] == null) return null;
   final raw = response['error'].toString().toLowerCase();
   if (raw.contains('overlap')) {
-    return const SessionFailure(SessionFailureKind.overlap, SessionReason.overlap);
+    return const SessionFailure(
+      SessionFailureKind.overlap,
+      SessionReason.overlap,
+    );
   }
   final code = raw.replaceAll(RegExp(r'[^a-z0-9_]+'), '_');
   return SessionFailure(
     SessionFailureKind.permanent,
-    code.isEmpty ? SessionReason.serverRejected : (code.length > 40 ? code.substring(0, 40) : code),
+    code.isEmpty
+        ? SessionReason.serverRejected
+        : (code.length > 40 ? code.substring(0, 40) : code),
   );
 }
 
@@ -441,7 +603,9 @@ typedef CategoryRef = ({String id, String name, bool isArchived});
 /// ilk aktif kategori. Hiç kategori yoksa null. İsim eşlemesi dilden
 /// bağımsızdır: yer tutucu 'Fizik', İngilizce saklanmış 'Physics' ile eşleşir.
 String? resolveCategoryId(String categoryName, List<CategoryRef> categories) {
-  final wanted = categoryName.trim().isEmpty ? '' : categoryMatchKey(categoryName);
+  final wanted = categoryName.trim().isEmpty
+      ? ''
+      : categoryMatchKey(categoryName);
   CategoryRef? archivedMatch;
   CategoryRef? firstActive;
   CategoryRef? firstAny;
@@ -504,15 +668,19 @@ class SessionSyncReport {
   bool get hasRetryableFailure =>
       remaining > 0 &&
       (stopReason != null ||
-          outcomes.values.any((o) => o is SessionSubmitQueued && o.reasonCode != SessionReason.overlap));
+          outcomes.values.any(
+            (o) =>
+                o is SessionSubmitQueued &&
+                o.reasonCode != SessionReason.overlap,
+          ));
 
   SessionSyncReport _merge(SessionSyncReport later) => SessionSyncReport(
-        sent: sent + later.sent,
-        rejected: rejected + later.rejected,
-        remaining: later.remaining,
-        outcomes: {...outcomes, ...later.outcomes},
-        stopReason: later.stopReason,
-      );
+    sent: sent + later.sent,
+    rejected: rejected + later.rejected,
+    remaining: later.remaining,
+    outcomes: {...outcomes, ...later.outcomes},
+    stopReason: later.stopReason,
+  );
 }
 
 class SessionQueue {
@@ -529,7 +697,12 @@ class SessionQueue {
   final Duration rpcTimeout;
 
   /// Her kabul edilen seansta çağrılır (kullanıcı modelini güncellemek için).
-  final void Function(String userId, PendingSession session, SessionSubmitSuccess result)? onAccepted;
+  final void Function(
+    String userId,
+    PendingSession session,
+    SessionSubmitSuccess result,
+  )?
+  onAccepted;
 
   /// Kuyruk uzunluğu değiştiğinde çağrılır.
   final void Function(String userId, int pendingCount)? onQueueChanged;
@@ -542,9 +715,11 @@ class SessionQueue {
   static const int maxRejectedHistory = 50;
 
   static String queueKey(String userId) => 'pending_sessions_uid_$userId';
-  static String legacyQueueKey(String email) => 'pending_sessions_${email.trim().toLowerCase()}';
+  static String legacyQueueKey(String email) =>
+      'pending_sessions_${email.trim().toLowerCase()}';
   static String rejectedKey(String userId) => 'rejected_sessions_uid_$userId';
-  static String rejectedNoticeKey(String userId) => 'rejected_sessions_unseen_uid_$userId';
+  static String rejectedNoticeKey(String userId) =>
+      'rejected_sessions_unseen_uid_$userId';
 
   // Diskteki listeye yapılan her oku-değiştir-yaz bu kilitle serileşir.
   final AsyncLock _storageLock = AsyncLock();
@@ -556,11 +731,12 @@ class SessionQueue {
   /// Kullanıcının bekleyen seansları (started_at sırasıyla).
   Future<List<PendingSession>> pending(String userId) async {
     final prefs = await SharedPreferences.getInstance();
-    final list = _decode(prefs, queueKey(userId))
-        .map(PendingSession.fromJson)
-        .whereType<PendingSession>()
-        .toList()
-      ..sort((a, b) => a.startedAt.compareTo(b.startedAt));
+    final list =
+        _decode(
+            prefs,
+            queueKey(userId),
+          ).map(PendingSession.fromJson).whereType<PendingSession>().toList()
+          ..sort((a, b) => a.startedAt.compareTo(b.startedAt));
     return list;
   }
 
@@ -577,7 +753,9 @@ class SessionQueue {
 
   /// Seansı kalıcı kuyruğa yazar (aynı client_uuid varsa günceller).
   Future<void> enqueue(String userId, PendingSession session) async {
-    final count = await _storageLock.synchronized(() => _upsert(queueKey(userId), session));
+    final count = await _storageLock.synchronized(
+      () => _upsert(queueKey(userId), session),
+    );
     onQueueChanged?.call(userId, count);
   }
 
@@ -588,7 +766,10 @@ class SessionQueue {
       _storageLock.synchronized(() => _upsert(legacyQueueKey(email), session));
 
   /// E-posta anahtarlı eski kuyruktaki kayıtları kullanıcı kimliğine taşır.
-  Future<void> adoptLegacyQueue({required String userId, required String email}) async {
+  Future<void> adoptLegacyQueue({
+    required String userId,
+    required String email,
+  }) async {
     if (email.trim().isEmpty) return;
     final count = await _storageLock.synchronized(() async {
       final prefs = await SharedPreferences.getInstance();
@@ -596,7 +777,10 @@ class SessionQueue {
       final legacy = _decode(prefs, legacyKey);
       final current = _decode(prefs, queueKey(userId));
       if (legacy.isEmpty) return current.length;
-      final known = current.map((e) => e['client_uuid']).whereType<String>().toSet();
+      final known = current
+          .map((e) => e['client_uuid'])
+          .whereType<String>()
+          .toSet();
       for (final entry in legacy) {
         final uuid = entry['client_uuid'];
         if (uuid is String && known.contains(uuid)) continue;
@@ -619,15 +803,31 @@ class SessionQueue {
 
   /// Seansı önce diske yazar, sonra kuyruğu (bu seans dahil) gönderir ve bu
   /// seansın sonucunu döndürür.
-  Future<SessionSubmitResult> submit(String userId, PendingSession session) async {
+  Future<SessionSubmitResult> submit(
+    String userId,
+    PendingSession session,
+  ) async {
     // Yalnızca bu yazımdan sonra çalışan turların sonucu geçerli.
     _settledOutcomes.remove(session.clientUuid);
     await enqueue(userId, session);
+    if (session.recordAccelerated) {
+      // Önce diske yazılan eski QA girdisini, bağlantı ya da oturum olmasa
+      // bile kalıcı ret geçmişine taşı. Normal RPC'ye asla ulaşamaz.
+      await _reject(userId, session, SessionReason.invalidData, notify: false);
+      onQueueChanged?.call(userId, await pendingCount(userId));
+      return const SessionSubmitRejected(SessionReason.invalidData);
+    }
     if (backend.signedInUserId != userId) {
-      return SessionSubmitQueued(reasonCode: SessionReason.offline, pendingCount: await pendingCount(userId));
+      return SessionSubmitQueued(
+        reasonCode: SessionReason.offline,
+        pendingCount: await pendingCount(userId),
+      );
     }
     // Devam eden tur bu seansı görmemiş olabilir: her zaman yeni bir tur.
-    final report = await _schedulePass(userId, foregroundUuid: session.clientUuid);
+    final report = await _schedulePass(
+      userId,
+      foregroundUuid: session.clientUuid,
+    );
     // Seansı bu turdan önce başka bir tur (ör. kabuğun açılış senkronu)
     // göndermiş olabilir: bu turun anlık görüntüsünde yoktu, sonucu o turdan.
     final settledElsewhere = _settledOutcomes.remove(session.clientUuid);
@@ -660,7 +860,8 @@ class SessionQueue {
   }
 
   /// Bildirilmemiş reddedilen seans sayısını döndürür ve sıfırlar.
-  Future<int> takeRejectedNoticeCount(String userId) => _storageLock.synchronized(() async {
+  Future<int> takeRejectedNoticeCount(String userId) =>
+      _storageLock.synchronized(() async {
         final prefs = await SharedPreferences.getInstance();
         final count = prefs.getInt(rejectedNoticeKey(userId)) ?? 0;
         if (count != 0) await prefs.remove(rejectedNoticeKey(userId));
@@ -669,7 +870,10 @@ class SessionQueue {
 
   Future<List<RejectedSession>> rejectedSessions(String userId) async {
     final prefs = await SharedPreferences.getInstance();
-    return _decode(prefs, rejectedKey(userId)).map(RejectedSession.fromJson).whereType<RejectedSession>().toList();
+    return _decode(
+      prefs,
+      rejectedKey(userId),
+    ).map(RejectedSession.fromJson).whereType<RejectedSession>().toList();
   }
 
   /// Hesap silindiğinde kullanıcının kuyruk verisini tamamen kaldırır.
@@ -679,13 +883,20 @@ class SessionQueue {
       await prefs.remove(queueKey(userId));
       await prefs.remove(rejectedKey(userId));
       await prefs.remove(rejectedNoticeKey(userId));
-      if (email != null && email.trim().isNotEmpty) await prefs.remove(legacyQueueKey(email));
+      if (email != null && email.trim().isNotEmpty) {
+        await prefs.remove(legacyQueueKey(email));
+      }
     });
     onQueueChanged?.call(userId, 0);
   }
 
-  Future<SessionSyncReport> _schedulePass(String userId, {String? foregroundUuid}) {
-    final future = _syncLock.synchronized(() => _runPass(userId, foregroundUuid: foregroundUuid));
+  Future<SessionSyncReport> _schedulePass(
+    String userId, {
+    String? foregroundUuid,
+  }) {
+    final future = _syncLock.synchronized(
+      () => _runPass(userId, foregroundUuid: foregroundUuid),
+    );
     _scheduled = future;
     _scheduledUserId = userId;
     future.whenComplete(() {
@@ -709,9 +920,30 @@ class SessionQueue {
     var remapRequested = false;
 
     try {
-      final snapshot = await _storageLock.synchronized(() => _prepareSnapshot(userId));
+      final snapshot = await _storageLock.synchronized(
+        () => _prepareSnapshot(userId),
+      );
       rejected += snapshot.corruptCount;
-      final entries = snapshot.entries;
+      final entries = <PendingSession>[];
+      // Eski outbox'ta kayıtlı QA işaretini koruyarak reddet. Bu işlem
+      // kategori eşleme, varsayılan kategori üretme, saat ölçme veya auth
+      // kontrolünden önce yapılır; offline kayıtlar da normalleşemez.
+      for (final entry in snapshot.entries) {
+        if (!entry.recordAccelerated) {
+          entries.add(entry);
+          continue;
+        }
+        await _reject(
+          userId,
+          entry,
+          SessionReason.invalidData,
+          notify: entry.clientUuid != foregroundUuid,
+        );
+        rejected++;
+        outcomes[entry.clientUuid] = const SessionSubmitRejected(
+          SessionReason.invalidData,
+        );
+      }
 
       if (entries.isNotEmpty && backend.signedInUserId != userId) {
         stopReason = SessionReason.offline;
@@ -719,10 +951,14 @@ class SessionQueue {
         // 1) Yer tutucu kategorileri sunucu kategorilerine eşle.
         final resolved = <String, String>{};
         SessionFailure? categoryFailure;
-        final needsMapping = entries.where((e) => !isUuidCategoryId(e.categoryId)).toList();
+        final needsMapping = entries
+            .where((e) => !isUuidCategoryId(e.categoryId))
+            .toList();
         if (needsMapping.isNotEmpty) {
           try {
-            var categories = await backend.fetchCategories().timeout(rpcTimeout);
+            var categories = await backend.fetchCategories().timeout(
+              rpcTimeout,
+            );
             if (categories.isEmpty) {
               await backend.createDefaultCategories().timeout(rpcTimeout);
               categories = await backend.fetchCategories().timeout(rpcTimeout);
@@ -732,7 +968,9 @@ class SessionQueue {
               if (id != null) resolved[e.clientUuid] = id;
             }
           } catch (e) {
-            debugPrint('[QUEUE] Kategoriler alınamadı, eşlenemeyen seanslar bekleyecek: $e');
+            debugPrint(
+              '[QUEUE] Kategoriler alınamadı, eşlenemeyen seanslar bekleyecek: $e',
+            );
             categoryFailure = classifySessionError(e);
           }
         }
@@ -745,7 +983,8 @@ class SessionQueue {
         // öğretir. İstek başarısızsa tur durur; hiçbir seans gönderilmez.
         // (İstek başarılı olup başlık yine de okunamadıysa düzeltmesiz
         // gönderilir: başka bir yol yok.)
-        if (clock.offset == null && entries.any((e) => e.clockOffsetMs == null)) {
+        if (clock.offset == null &&
+            entries.any((e) => e.clockOffsetMs == null)) {
           if (categoryFailure != null) {
             stopReason = categoryFailure.reasonCode;
           } else {
@@ -753,7 +992,9 @@ class SessionQueue {
               await backend.fetchCategories().timeout(rpcTimeout);
             } catch (e) {
               stopReason = classifySessionError(e).reasonCode;
-              debugPrint('[QUEUE] Saat farkı öğrenilemedi, seanslar bekleyecek: $e');
+              debugPrint(
+                '[QUEUE] Saat farkı öğrenilemedi, seanslar bekleyecek: $e',
+              );
             }
           }
         }
@@ -771,20 +1012,35 @@ class SessionQueue {
               break;
             }
             final isForeground = entry.clientUuid == foregroundUuid;
-            final entryOffset = entry.clockOffsetMs != null ? Duration(milliseconds: entry.clockOffsetMs!) : null;
+            final entryOffset = entry.clockOffsetMs != null
+                ? Duration(milliseconds: entry.clockOffsetMs!)
+                : null;
 
             if (_serverAge(entry, entryOffset) > giveUpAge) {
-              await _reject(userId, entry, SessionReason.tooOld, notify: !isForeground);
+              await _reject(
+                userId,
+                entry,
+                SessionReason.tooOld,
+                notify: !isForeground,
+              );
               rejected++;
-              outcomes[entry.clientUuid] = const SessionSubmitRejected(SessionReason.tooOld);
+              outcomes[entry.clientUuid] = const SessionSubmitRejected(
+                SessionReason.tooOld,
+              );
               continue;
             }
 
-            final categoryId = isUuidCategoryId(entry.categoryId) ? entry.categoryId! : resolved[entry.clientUuid];
+            final categoryId = isUuidCategoryId(entry.categoryId)
+                ? entry.categoryId!
+                : resolved[entry.clientUuid];
             if (categoryId == null) {
               // Kategori eşlenemedi (çoğunlukla ağ yok). Sıra bozulmasın diye tur durur.
-              final reason = categoryFailure?.reasonCode ?? SessionReason.categoryInvalid;
-              outcomes[entry.clientUuid] = SessionSubmitQueued(reasonCode: reason, pendingCount: 0);
+              final reason =
+                  categoryFailure?.reasonCode ?? SessionReason.categoryInvalid;
+              outcomes[entry.clientUuid] = SessionSubmitQueued(
+                reasonCode: reason,
+                pendingCount: 0,
+              );
               stopReason = reason;
               break;
             }
@@ -794,13 +1050,25 @@ class SessionQueue {
             // Saat farkı bu denemede ilk kez öğrenildiyse bir kez düzeltilmiş
             // started_at ile yeniden denenir.
             for (var attempt = 0; attempt < 2; attempt++) {
-              final correction = ServerClock.correctionFor(entryOffset ?? passOffset);
+              final correction = ServerClock.correctionFor(
+                entryOffset ?? passOffset,
+              );
               try {
                 final response = await backend
-                    .completeSession(entry, categoryId: categoryId, startedAtForServer: entry.startedAt.add(correction))
+                    .completeSession(
+                      entry,
+                      categoryId: categoryId,
+                      startedAtForServer: entry.startedAt.add(correction),
+                    )
                     .timeout(rpcTimeout);
                 failure = classifySessionResponse(response);
-                if (failure == null) success = SessionSubmitSuccess.fromResponse(response, minutes: entry.minutes);
+                if (failure == null) {
+                  success = SessionSubmitSuccess.fromResponse(
+                    response,
+                    minutes: entry.minutes,
+                    clockOffset: ServerClock.correctionFor(clock.offset),
+                  );
+                }
               } catch (e) {
                 failure = classifySessionError(
                   e,
@@ -808,9 +1076,12 @@ class SessionQueue {
                   offsetNow: entryOffset ?? clock.offset,
                   appliedCorrection: correction,
                 );
-                debugPrint('[QUEUE] Seans gönderilemedi (${failure.kind.name}/${failure.reasonCode}): $e');
+                debugPrint(
+                  '[QUEUE] Seans gönderilemedi (${failure.kind.name}/${failure.reasonCode}): $e',
+                );
               }
-              final retryWithNewClock = failure?.kind == SessionFailureKind.clockSkew &&
+              final retryWithNewClock =
+                  failure?.kind == SessionFailureKind.clockSkew &&
                   entryOffset == null &&
                   ServerClock.correctionFor(clock.offset) != correction;
               if (!retryWithNewClock) break;
@@ -820,7 +1091,9 @@ class SessionQueue {
             }
 
             if (success != null) {
-              await _storageLock.synchronized(() => _remove(queueKey(userId), entry.clientUuid));
+              await _storageLock.synchronized(
+                () => _remove(queueKey(userId), entry.clientUuid),
+              );
               sent++;
               outcomes[entry.clientUuid] = success;
               onAccepted?.call(userId, entry, success);
@@ -830,40 +1103,77 @@ class SessionQueue {
             final f = failure!;
             switch (f.kind) {
               case SessionFailureKind.permanent:
-                await _reject(userId, entry, f.reasonCode, notify: !isForeground);
+                await _reject(
+                  userId,
+                  entry,
+                  f.reasonCode,
+                  notify: !isForeground,
+                );
                 rejected++;
-                outcomes[entry.clientUuid] = SessionSubmitRejected(f.reasonCode);
+                outcomes[entry.clientUuid] = SessionSubmitRejected(
+                  f.reasonCode,
+                );
               case SessionFailureKind.overlap:
                 if (_serverAge(entry, entryOffset) >= serverMaxAge) {
-                  await _reject(userId, entry, SessionReason.overlap, notify: !isForeground);
+                  await _reject(
+                    userId,
+                    entry,
+                    SessionReason.overlap,
+                    notify: !isForeground,
+                  );
                   rejected++;
-                  outcomes[entry.clientUuid] = const SessionSubmitRejected(SessionReason.overlap);
+                  outcomes[entry.clientUuid] = const SessionSubmitRejected(
+                    SessionReason.overlap,
+                  );
                 } else {
                   await _keep(userId, entry.copyWith(lastError: f.reasonCode));
-                  outcomes[entry.clientUuid] = SessionSubmitQueued(reasonCode: f.reasonCode, pendingCount: 0);
+                  outcomes[entry.clientUuid] = SessionSubmitQueued(
+                    reasonCode: f.reasonCode,
+                    pendingCount: 0,
+                  );
                 }
               case SessionFailureKind.categoryInvalid:
                 if (entry.categoryRemaps >= 1) {
-                  await _reject(userId, entry, SessionReason.categoryInvalid, notify: !isForeground);
+                  await _reject(
+                    userId,
+                    entry,
+                    SessionReason.categoryInvalid,
+                    notify: !isForeground,
+                  );
                   rejected++;
-                  outcomes[entry.clientUuid] = const SessionSubmitRejected(SessionReason.categoryInvalid);
+                  outcomes[entry.clientUuid] = const SessionSubmitRejected(
+                    SessionReason.categoryInvalid,
+                  );
                 } else {
                   await _keep(
                     userId,
-                    entry.copyWith(clearCategoryId: true, categoryRemaps: entry.categoryRemaps + 1, lastError: f.reasonCode),
+                    entry.copyWith(
+                      clearCategoryId: true,
+                      categoryRemaps: entry.categoryRemaps + 1,
+                      lastError: f.reasonCode,
+                    ),
                   );
                   remapRequested = true;
-                  outcomes[entry.clientUuid] = SessionSubmitQueued(reasonCode: f.reasonCode, pendingCount: 0);
+                  outcomes[entry.clientUuid] = SessionSubmitQueued(
+                    reasonCode: f.reasonCode,
+                    pendingCount: 0,
+                  );
                 }
               case SessionFailureKind.offline:
                 await _keep(userId, entry.copyWith(lastError: f.reasonCode));
-                outcomes[entry.clientUuid] = SessionSubmitQueued(reasonCode: f.reasonCode, pendingCount: 0);
+                outcomes[entry.clientUuid] = SessionSubmitQueued(
+                  reasonCode: f.reasonCode,
+                  pendingCount: 0,
+                );
                 stopReason = f.reasonCode;
                 break sendLoop;
               case SessionFailureKind.transient:
               case SessionFailureKind.clockSkew:
                 await _keep(userId, entry.copyWith(lastError: f.reasonCode));
-                outcomes[entry.clientUuid] = SessionSubmitQueued(reasonCode: f.reasonCode, pendingCount: 0);
+                outcomes[entry.clientUuid] = SessionSubmitQueued(
+                  reasonCode: f.reasonCode,
+                  pendingCount: 0,
+                );
             }
           }
         }
@@ -882,22 +1192,34 @@ class SessionQueue {
       outcomes: {
         for (final e in outcomes.entries)
           e.key: e.value is SessionSubmitQueued
-              ? SessionSubmitQueued(reasonCode: (e.value as SessionSubmitQueued).reasonCode, pendingCount: remaining)
+              ? SessionSubmitQueued(
+                  reasonCode: (e.value as SessionSubmitQueued).reasonCode,
+                  pendingCount: remaining,
+                )
               : e.value,
       },
       stopReason: stopReason,
     );
     _rememberSettled(report.outcomes);
     if (remapRequested && allowRemapRetry && stopReason == null) {
-      return report._merge(await _runPass(userId, foregroundUuid: foregroundUuid, allowRemapRetry: false));
+      return report._merge(
+        await _runPass(
+          userId,
+          foregroundUuid: foregroundUuid,
+          allowRemapRetry: false,
+        ),
+      );
     }
     return report;
   }
 
   /// Seansın sunucu saatine göre yaşı (başlangıcından bu yana geçen süre).
-  Duration _serverAge(PendingSession entry, Duration? entryOffset) => clock
-      .serverNow()
-      .difference(entry.startedAt.add(ServerClock.correctionFor(entryOffset ?? clock.offset)));
+  Duration _serverAge(PendingSession entry, Duration? entryOffset) =>
+      clock.serverNow().difference(
+        entry.startedAt.add(
+          ServerClock.correctionFor(entryOffset ?? clock.offset),
+        ),
+      );
 
   // ---- Depolama ----
   // _decode/_write/_upsert/_remove/_appendRejected/_prepareSnapshot yalnızca
@@ -909,13 +1231,20 @@ class SessionQueue {
     try {
       final decoded = jsonDecode(raw);
       if (decoded is! List) return [];
-      return decoded.whereType<Map>().map((e) => Map<String, dynamic>.from(e)).toList();
+      return decoded
+          .whereType<Map>()
+          .map((e) => Map<String, dynamic>.from(e))
+          .toList();
     } catch (_) {
       return [];
     }
   }
 
-  Future<void> _write(SharedPreferences prefs, String key, List<Map<String, dynamic>> list) async {
+  Future<void> _write(
+    SharedPreferences prefs,
+    String key,
+    List<Map<String, dynamic>> list,
+  ) async {
     if (list.isEmpty) {
       await prefs.remove(key);
     } else {
@@ -925,7 +1254,8 @@ class SessionQueue {
 
   Future<int> _upsert(String key, PendingSession session) async {
     final prefs = await SharedPreferences.getInstance();
-    final list = _decode(prefs, key)..removeWhere((e) => e['client_uuid'] == session.clientUuid);
+    final list = _decode(prefs, key)
+      ..removeWhere((e) => e['client_uuid'] == session.clientUuid);
     list.add(session.toJson());
     await _write(prefs, key, list);
     return list.length;
@@ -939,47 +1269,66 @@ class SessionQueue {
     if (list.length != before) await _write(prefs, key, list);
   }
 
-  Future<void> _keep(String userId, PendingSession updated) => _storageLock.synchronized(() async {
+  Future<void> _keep(String userId, PendingSession updated) =>
+      _storageLock.synchronized(() async {
         final prefs = await SharedPreferences.getInstance();
         final list = _decode(prefs, queueKey(userId));
-        final index = list.indexWhere((e) => e['client_uuid'] == updated.clientUuid);
+        final index = list.indexWhere(
+          (e) => e['client_uuid'] == updated.clientUuid,
+        );
         if (index == -1) return;
         list[index] = updated.toJson();
         await _write(prefs, queueKey(userId), list);
       });
 
-  Future<void> _reject(String userId, PendingSession entry, String reason, {required bool notify}) =>
-      _storageLock.synchronized(() async {
-        final prefs = await SharedPreferences.getInstance();
-        await _remove(queueKey(userId), entry.clientUuid);
-        await _appendRejected(
-          prefs,
-          userId,
-          RejectedSession(
-            clientUuid: entry.clientUuid,
-            startedAt: entry.startedAt,
-            minutes: entry.minutes,
-            categoryName: entry.categoryName,
-            reasonCode: reason,
-            rejectedAt: DateTime.now().toUtc(),
-          ),
-          notify: notify,
-        );
-      });
+  Future<void> _reject(
+    String userId,
+    PendingSession entry,
+    String reason, {
+    required bool notify,
+  }) => _storageLock.synchronized(() async {
+    final prefs = await SharedPreferences.getInstance();
+    await _remove(queueKey(userId), entry.clientUuid);
+    await _appendRejected(
+      prefs,
+      userId,
+      RejectedSession(
+        clientUuid: entry.clientUuid,
+        startedAt: entry.startedAt,
+        minutes: entry.minutes,
+        categoryName: entry.categoryName,
+        reasonCode: reason,
+        rejectedAt: DateTime.now().toUtc(),
+      ),
+      notify: notify,
+    );
+  });
 
-  Future<void> _appendRejected(SharedPreferences prefs, String userId, RejectedSession rejected, {required bool notify}) async {
+  Future<void> _appendRejected(
+    SharedPreferences prefs,
+    String userId,
+    RejectedSession rejected, {
+    required bool notify,
+  }) async {
     final list = _decode(prefs, rejectedKey(userId))..add(rejected.toJson());
-    final trimmed = list.length > maxRejectedHistory ? list.sublist(list.length - maxRejectedHistory) : list;
+    final trimmed = list.length > maxRejectedHistory
+        ? list.sublist(list.length - maxRejectedHistory)
+        : list;
     await _write(prefs, rejectedKey(userId), trimmed);
     if (notify) {
-      await prefs.setInt(rejectedNoticeKey(userId), (prefs.getInt(rejectedNoticeKey(userId)) ?? 0) + 1);
+      await prefs.setInt(
+        rejectedNoticeKey(userId),
+        (prefs.getInt(rejectedNoticeKey(userId)) ?? 0) + 1,
+      );
     }
   }
 
   /// Kuyruğu okur; client_uuid'i olmayan eski kayıtlara BİR KEZ kimlik
   /// üretip geri yazar (her denemede yeni kimlik çift kayıt yaratırdı),
   /// okunamayan kayıtları reddedilenlere taşır.
-  Future<({List<PendingSession> entries, int corruptCount})> _prepareSnapshot(String userId) async {
+  Future<({List<PendingSession> entries, int corruptCount})> _prepareSnapshot(
+    String userId,
+  ) async {
     final prefs = await SharedPreferences.getInstance();
     final key = queueKey(userId);
     final raw = _decode(prefs, key);
@@ -1002,7 +1351,11 @@ class SessionQueue {
           userId,
           RejectedSession(
             clientUuid: map['client_uuid'].toString(),
-            startedAt: DateTime.tryParse(map['started_at']?.toString() ?? '')?.toUtc() ?? DateTime.now().toUtc(),
+            startedAt:
+                DateTime.tryParse(
+                  map['started_at']?.toString() ?? '',
+                )?.toUtc() ??
+                DateTime.now().toUtc(),
             minutes: _asInt(map['minutes']) ?? 0,
             categoryName: map['category_name']?.toString() ?? '',
             reasonCode: SessionReason.corrupt,

@@ -1,8 +1,0 @@
-düzgün | t1-01 iki cihazdan eşzamanlı çakışan seans | 1 seans kaydı; 5 puan, 20 kum, 25 dk; B: {"sub" : "0828a41f-e9f3-4155-b08f-88b9654fc0ef", "role" : "authenticated"} B {"error": "overlap"} 
-düzgün | t1-01 aynı client_uuid eşzamanlı (R2) | B: {"sub" : "2726909d-a84d-49a5-aea1-478ea3f3c278", "role" : "authenticated"} B {"streak": 1, "bonus_pct": 0, "duplicate": true, "base_points":
-düzgün | t2-07 eşzamanlı iki kategori kurulumu (ücretsiz limit 8) | aktif kategori: 8
-düzgün | t2-07 eşzamanlı iki create_category (7 varken) | aktif kategori: 8; B: {"sub" : "122008ee-ef71-4b84-a41d-9e01af5c0b7d", "role" : "authenticated"} ERROR:  Ücretsiz planda e
-düzgün | t4-F1 300 kumla eşzamanlı iki 200'lük avatar | alınan: 1, kalan kum: 100; B: {"sub" : "4be94ec5-c586-47b2-ab7e-0ab6cc8ebd60", "role" : "authenticated"} ERROR:  Yetersiz bakiye. Bu avatar için 200 k
-düzgün | t4-F1 seans (+20 kum) sürerken satın alma: +20 ezilmemeli (300+20-200) | kalan kum: 120
-düzgün | t4-F7 aynı kademede eşzamanlı ilk seanslar aynı odaya | farklı oda sayısı: 1
-düzgün olmayan: 0

@@ -24,6 +24,6 @@ String leagueTierName(AppLocalizations l10n, int tier) {
   }
 }
 
-/// Örn. "🥉 Bronz Kum Saati Ligi".
+/// Örn. "🥉 Bronz Lig".
 String leagueTitle(AppLocalizations l10n, int tier) =>
-    '${leagueTierEmoji(tier)} ${l10n.leagueTierLeagueName(leagueTierName(l10n, tier))}';
+    '${leagueTierEmoji(tier)} ${leagueTierName(l10n, tier)}';

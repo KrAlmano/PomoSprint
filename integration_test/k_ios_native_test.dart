@@ -8,6 +8,7 @@ import 'package:pomodoro/services/lock_screen_timer.dart';
 import 'package:pomodoro/services/notification_service.dart';
 import 'package:pomodoro/services/timer_persistence.dart';
 import 'support/e2e.dart';
+import 'support/marathon_notifications.dart';
 
 void main() {
   initE2e();
@@ -51,11 +52,7 @@ void main() {
       after: const Duration(seconds: 3),
       categoryName: 'Matematik',
     );
-    await pumpFor(tester, const Duration(seconds: 5));
-    expect(
-      (await plugin.getActiveNotifications()).any((n) => n.id == 0),
-      isTrue,
-    );
+    await waitForNativeNotification(tester, 0);
     debugPrint('[QA] iOS provisional native zamanlama/teslim/iptal: PASS');
     const platform = IosLiveActivityPlatform();
     final contentBuilder = LockScreenTimer(platform: platform);
@@ -100,6 +97,7 @@ void main() {
       );
     }
     await platform.clear();
+    await verifyNativeMarathonNotifications(tester);
     await service.setEnabled(false);
     expect(await plugin.pendingNotificationRequests(), isEmpty);
     await plugin.cancel(id: 0);

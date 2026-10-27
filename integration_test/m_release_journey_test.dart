@@ -2,6 +2,7 @@
 // tema/dil kalıcılığı, avatar bakiye kontrolü ve açık route'ta tam çıkış.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:pomodoro/app/main_shell.dart';
 import 'package:pomodoro/models/avatar_model.dart';
 import 'package:pomodoro/screens/categories_management_screen.dart';
 import 'package:pomodoro/screens/character_collection_screen.dart';
@@ -12,9 +13,11 @@ import 'package:pomodoro/screens/timer_screen.dart';
 import 'package:pomodoro/services/language_service.dart';
 import 'package:pomodoro/services/notification_service.dart';
 import 'package:pomodoro/services/supabase_service.dart';
+import 'package:pomodoro/services/timer_persistence.dart';
 import 'package:pomodoro/widgets/auth/category_name_dialog.dart';
 import 'package:pomodoro/widgets/avatar_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 import 'support/e2e.dart';
 
 void main() {
@@ -95,11 +98,28 @@ void main() {
     await pumpUntilGone(tester, find.byType(ProfileScreen));
     await pumpUntil(tester, find.text('QA Odak'));
     await tapOn(tester, find.text('QA Odak'));
-    await tapOn(tester, find.text(tr('btn_start')));
+    // Normal 25 dk kayıt: kapalıyken bitmiş seansı yeniden yükle.
+    // Bu bir geçmiş fixture'ıdır; hızlı sayaç veya QA tamamlanma RPC'si yoktur.
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump(const Duration(milliseconds: 300));
+    final expired = ActiveTimerSession.start(
+      clientUuid: const Uuid().v4(),
+      categoryId: category['id'] as String,
+      categoryName: 'QA Odak',
+      categoryColorHex: '#FF4444',
+      durationMinutes: 25,
+      totalSeconds: 1500,
+      now: DateTime.now().subtract(const Duration(minutes: 26)),
+    ).withForegroundSeconds(1500);
+    expect(expired.recordAccelerated, isFalse);
+    expect(expired.isFinishedAt(DateTime.now()), isTrue);
+    await TimerPersistence.instance.save(account.id, expired);
+    await launchApp(tester);
+    await pumpUntil(tester, find.byType(MainNavigationShell));
     await pumpUntil(
       tester,
       find.byType(SessionCompletedDialog),
-      timeout: const Duration(seconds: 25),
+      timeout: const Duration(seconds: 30),
     );
     await pumpUntil(tester, find.text(trL10n.sessionResultPoints(5)));
     await tapOn(

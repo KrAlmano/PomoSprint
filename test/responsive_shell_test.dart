@@ -65,13 +65,15 @@ void _setView(WidgetTester tester, Size size, {double keyboard = 0, EdgeInsets s
 }
 
 /// Gerçek iPhone'ların dikey ekranı ve güvenli alanı (çentik / Dynamic
-/// Island ve ana ekran çubuğu) ile sayacın önceki kum saati boyutu (gövde
-/// yüksekliği ≥ 540 ise 220, değilse gövde × 0,34).
+/// Island ve ana ekran çubuğu) ile kum saatinin okunaklı alt sınırı.
+/// Maraton seçim satırı artık gövdede yer kaplar: büyük telefonlarda 150,
+/// kısa SE ekranında 96 dp alt sınırı, ana düğmeyi görünür tutan reflow'un
+/// ürün kararıdır. Yer olan ekranlarda eski büyüme kontrolü ayrıca sürer.
 const _iPhones = <(String, Size, EdgeInsets, double)>[
-  ('iPhone 16 Pro', Size(402, 874), EdgeInsets.only(top: 62, bottom: 34), 220),
-  ('iPhone 15/16', Size(393, 852), EdgeInsets.only(top: 59, bottom: 34), 220),
-  ('iPhone 12-14', Size(390, 844), EdgeInsets.only(top: 47, bottom: 34), 220),
-  ('iPhone SE 2/3', Size(375, 667), EdgeInsets.only(top: 20), 171),
+  ('iPhone 16 Pro', Size(402, 874), EdgeInsets.only(top: 62, bottom: 34), 150),
+  ('iPhone 15/16', Size(393, 852), EdgeInsets.only(top: 59, bottom: 34), 150),
+  ('iPhone 12-14', Size(390, 844), EdgeInsets.only(top: 47, bottom: 34), 150),
+  ('iPhone SE 2/3', Size(375, 667), EdgeInsets.only(top: 20), 96),
 ];
 
 Widget _app(Widget home, {double textScale = 1}) {
@@ -433,7 +435,15 @@ void main() {
               await tester.pumpAndSettle();
               _expectNoLayoutError(tester, label);
               final l10n = AppLocalizations.of(tester.element(find.byType(TimerScreen)))!;
-              expect(find.text(l10n.timerResetBtn), paused ? findsOneWidget : findsNothing, reason: label);
+              if (_isLandscape(size)) {
+                expect(find.text(l10n.timerResetBtn), findsNothing, reason: label);
+                expect(find.byKey(const ValueKey('timer-landscape-reset')), paused ? findsOneWidget : findsNothing, reason: label);
+                expect(find.byType(FilterChip), findsNothing, reason: label);
+                expect(find.byKey(const ValueKey('timer-duration-25')), findsNothing, reason: label);
+                expect(find.byKey(const ValueKey('marathon-open-planner')), findsNothing, reason: label);
+              } else {
+                expect(find.text(l10n.timerResetBtn), paused ? findsOneWidget : findsNothing, reason: label);
+              }
 
               final hourglass = tester.getRect(find.byType(HourglassWidget));
               final time = tester.getRect(find.textContaining(':').first);
@@ -478,8 +488,9 @@ void main() {
 
       // Gerçek iPhone'lar, kabukta (üst çubuk + alt gezinme), güvenli
       // alanlarıyla: BAŞLAT (seans varken DEVAM) kaydırmadan görünür, 25/50
-      // aynı satırda eşit genişlikte, kum saati önceki boyutundan büyük.
-      for (final (name, size, safeArea, previousHourglass) in _iPhones) {
+      // aynı satırda eşit genişlikte; Maraton satırı için küçülen kum saati
+      // yine okunaklı, ortalı ve kontrol sütunuyla çakışmadan kalır.
+      for (final (name, size, safeArea, minimumHourglass) in _iPhones) {
         for (final paused in [false, true]) {
           final label = '$name $size paused=$paused';
           // Önceki adımlardan kalan duraklatılmış seans boşta durumu bozmasın.
@@ -509,7 +520,7 @@ void main() {
           expect(option50.bottom, lessThanOrEqualTo(mainButton.top), reason: label);
 
           final hourglass = tester.getRect(find.byType(HourglassWidget));
-          expect(hourglass.width, greaterThan(previousHourglass), reason: '$label: kum saati büyüdü');
+          expect(hourglass.width, greaterThanOrEqualTo(minimumHourglass), reason: '$label: okunaklı kum saati');
           expect(hourglass.width, lessThanOrEqualTo(275), reason: label);
           expect(hourglass.top, greaterThanOrEqualTo(body.top), reason: label);
           expect(hourglass.bottom, lessThanOrEqualTo(tester.getRect(find.textContaining(':').first).top), reason: label);
@@ -782,9 +793,15 @@ void main() {
         await next('adım 5 (kurallar)');
         expect(find.text(l10n.gameRulesTitle), findsOneWidget, reason: '$size');
         await next('adım 6 (hedef)');
-        expect(find.text(l10n.onboardingFinishBtn), findsOneWidget, reason: '$size');
         // Seçenekler tablette form genişliğini aşmaz.
         expect(tester.getSize(find.text(l10n.onboardingGoal1h)).width, lessThanOrEqualTo(480), reason: '$size');
+        expect(find.text(l10n.onboardingFinishBtn), findsNothing, reason: '$size');
+        await next('adım 7 (ekran rehberi)');
+        expect(find.text(l10n.onboardingGuideTitle), findsOneWidget, reason: '$size');
+        expect(find.text(l10n.onboardingFinishBtn), findsOneWidget, reason: '$size');
+        await tester.ensureVisible(find.text(l10n.onboardingGuideProfileBody));
+        await tester.pumpAndSettle();
+        _expectNoLayoutError(tester, '$size rehber sonu');
       }
     });
   });

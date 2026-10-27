@@ -64,6 +64,7 @@ void main() {
         birthYear: 1990,
         segment: 'other',
         selectedCategories: ['Okuma', 'Proje'],
+        showInRankings: false,
         dailyGoalMinutes: 120,
       ),
     );
@@ -71,7 +72,7 @@ void main() {
     print('T2-DRAFT-1 gerçek: ekranda=${_stepText(tester)} kaydedilen taslak=${jsonEncode(saved.toJson())}');
     expect(saved.segment, 'other', reason: '"Diğer" seçimi taslaktan geri gelmeli');
     expect(saved.selectedCategories, ['Okuma', 'Proje'], reason: 'genel önerilerden yapılan seçim kaybolmamalı');
-    expect(find.text('5/6'), findsOneWidget, reason: 'kullanıcı kaldığı adıma (5/6) dönmeli');
+    expect(find.text('5/7'), findsOneWidget, reason: 'kullanıcı kaldığı adıma (5/7) dönmeli');
   });
 
   testWidgets('T2-DRAFT-2: segment seçmeden (isteğe bağlı) ilerleyen kullanıcının taslağı korunur', (tester) async {
@@ -82,7 +83,7 @@ void main() {
     // ignore: avoid_print
     print('T2-DRAFT-2 gerçek: ekranda=${_stepText(tester)} kaydedilen taslak=${jsonEncode(saved.toJson())}');
     expect(saved.selectedCategories, ['Ders Çalışma']);
-    expect(find.text('4/6'), findsOneWidget);
+    expect(find.text('4/7'), findsOneWidget);
   });
 
   testWidgets('T2-DRAFT-3: taslaktan dönen kullanıcı görünürlük sorusunu yanıtlamadan bitiremez', (tester) async {
@@ -99,8 +100,8 @@ void main() {
     final l10n = await AppLocalizations.delegate.load(const Locale('tr'));
     // ignore: avoid_print
     print('T2-DRAFT-3 gerçek: ekranda=${_stepText(tester)}');
-    expect(find.text('6/6'), findsOneWidget, reason: 'taslak son adıma döndü');
-    await tester.tap(find.text(l10n.onboardingFinishBtn));
+    expect(find.text('4/7'), findsOneWidget, reason: 'yanıtsız görünürlük son adıma atlayamaz');
+    await tester.tap(find.text(l10n.continueBtn));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
     final askedVisibility = find.text(l10n.onboardingSelectOptionError).evaluate().isNotEmpty ||

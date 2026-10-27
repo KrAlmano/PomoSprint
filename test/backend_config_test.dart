@@ -14,7 +14,12 @@ const _env = {
 
 void main() {
   test('dart-define yoksa .env kullanılır (mağaza derlemesi)', () {
-    final c = BackendConfig.resolve(_env, defineUrl: '', defineAnonKey: '', defineSentryDsn: '');
+    final c = BackendConfig.resolve(
+      _env,
+      defineUrl: '',
+      defineAnonKey: '',
+      defineSentryDsn: '',
+    );
     expect(c.source, BackendConfigSource.dotEnv);
     expect(c.usesDartDefine, isFalse);
     expect(c.supabaseUrl, 'https://canli.supabase.co');
@@ -23,26 +28,34 @@ void main() {
   });
 
   test('.env okunamadıysa ve dart-define yoksa bulut kapalı kalır', () {
-    final c = BackendConfig.resolve(const {}, defineUrl: '', defineAnonKey: '', defineSentryDsn: '');
+    final c = BackendConfig.resolve(
+      const {},
+      defineUrl: '',
+      defineAnonKey: '',
+      defineSentryDsn: '',
+    );
     expect(c.supabaseUrl, isEmpty);
     expect(c.supabaseAnonKey, isEmpty);
     expect(c.sentryDsn, isEmpty);
   });
 
-  test('URL ve anahtar birlikte verilince .env yerine kullanılır, Sentry kapanır', () {
-    final c = BackendConfig.resolve(
-      _env,
-      defineUrl: ' http://127.0.0.1:54321 ',
-      defineAnonKey: 'yerel-anon',
-      defineSentryDsn: '',
-    );
-    expect(c.source, BackendConfigSource.dartDefine);
-    expect(c.usesDartDefine, isTrue);
-    expect(c.supabaseUrl, 'http://127.0.0.1:54321');
-    expect(c.supabaseAnonKey, 'yerel-anon');
-    // Yerel denemelerin hataları canlı Sentry projesine gitmez.
-    expect(c.sentryDsn, isEmpty);
-  });
+  test(
+    'URL ve anahtar birlikte verilince .env yerine kullanılır, Sentry kapanır',
+    () {
+      final c = BackendConfig.resolve(
+        _env,
+        defineUrl: ' http://127.0.0.1:54321 ',
+        defineAnonKey: 'yerel-anon',
+        defineSentryDsn: '',
+      );
+      expect(c.source, BackendConfigSource.dartDefine);
+      expect(c.usesDartDefine, isTrue);
+      expect(c.supabaseUrl, 'http://127.0.0.1:54321');
+      expect(c.supabaseAnonKey, 'yerel-anon');
+      // Yerel denemelerin hataları canlı Sentry projesine gitmez.
+      expect(c.sentryDsn, isEmpty);
+    },
+  );
 
   test('dart-define ile Sentry DSN verilirse o kullanılır', () {
     final local = BackendConfig.resolve(
@@ -52,27 +65,95 @@ void main() {
       defineSentryDsn: 'https://test@sentry.example/2',
     );
     expect(local.sentryDsn, 'https://test@sentry.example/2');
-    final live = BackendConfig.resolve(_env, defineUrl: '', defineAnonKey: '', defineSentryDsn: 'https://test@sentry.example/2');
+    final live = BackendConfig.resolve(
+      _env,
+      defineUrl: '',
+      defineAnonKey: '',
+      defineSentryDsn: 'https://test@sentry.example/2',
+    );
     expect(live.source, BackendConfigSource.dotEnv);
     expect(live.sentryDsn, 'https://test@sentry.example/2');
   });
 
-  test('yalnızca biri verilirse canlı ve yerel değerler karışmaz: bulut kapalı', () {
-    for (final (url, key) in [('http://127.0.0.1:54321', ''), ('', 'yerel-anon'), ('  ', 'yerel-anon')]) {
-      final c = BackendConfig.resolve(_env, defineUrl: url, defineAnonKey: key, defineSentryDsn: '');
-      expect(c.source, BackendConfigSource.incompleteDartDefine, reason: '($url, $key)');
-      expect(c.supabaseUrl, isEmpty);
-      expect(c.supabaseAnonKey, isEmpty);
-      expect(c.sentryDsn, isEmpty);
-    }
-  });
+  test(
+    'yalnızca biri verilirse canlı ve yerel değerler karışmaz: bulut kapalı',
+    () {
+      for (final (url, key) in [
+        ('http://127.0.0.1:54321', ''),
+        ('', 'yerel-anon'),
+        ('  ', 'yerel-anon'),
+      ]) {
+        final c = BackendConfig.resolve(
+          _env,
+          defineUrl: url,
+          defineAnonKey: key,
+          defineSentryDsn: '',
+        );
+        expect(
+          c.source,
+          BackendConfigSource.incompleteDartDefine,
+          reason: '($url, $key)',
+        );
+        expect(c.supabaseUrl, isEmpty);
+        expect(c.supabaseAnonKey, isEmpty);
+        expect(c.sentryDsn, isEmpty);
+      }
+    },
+  );
 
-  test('iOS: yalnızca yerel ağa http izni (NSAllowsLocalNetworking), genel istisna yok', () {
-    final plist = File('ios/Runner/Info.plist').readAsStringSync();
-    final ats = RegExp(r'<key>NSAppTransportSecurity</key>\s*<dict>(.*?)</dict>', dotAll: true).firstMatch(plist)?.group(1);
-    expect(ats, isNotNull);
-    expect(ats, matches(RegExp(r'<key>NSAllowsLocalNetworking</key>\s*<true/>')));
-    expect(ats, isNot(contains('NSAllowsArbitraryLoads')));
-    expect(ats, isNot(contains('NSExceptionDomains')));
-  });
+  test(
+    'iOS: yalnızca yerel ağa http izni (NSAllowsLocalNetworking), genel istisna yok',
+    () {
+      final plist = File('ios/Runner/Info.plist').readAsStringSync();
+      final ats = RegExp(
+        r'<key>NSAppTransportSecurity</key>\s*<dict>(.*?)</dict>',
+        dotAll: true,
+      ).firstMatch(plist)?.group(1);
+      expect(ats, isNotNull);
+      expect(
+        ats,
+        matches(RegExp(r'<key>NSAllowsLocalNetworking</key>\s*<true/>')),
+      );
+      expect(ats, isNot(contains('NSAllowsArbitraryLoads')));
+      expect(ats, isNot(contains('NSExceptionDomains')));
+    },
+  );
+
+  test(
+    'yerel ortam açıklaması yalnız gerçek loopback/emülatör adresine çıkar',
+    () {
+      for (final url in [
+        'http://127.0.0.1:54321',
+        'http://localhost:54321',
+        'http://[::1]:54321',
+        'http://10.0.2.2:54321',
+      ]) {
+        final config = BackendConfig.resolve(
+          _env,
+          defineUrl: url,
+          defineAnonKey: 'local-anon',
+        );
+        expect(config.isLocalBackend, isTrue, reason: url);
+      }
+      for (final url in [
+        'https://eoosnyakvxmifmexpgxa.supabase.co',
+        'https://localhost.example.com',
+        'https://127.0.0.1.example.com',
+        'http://192.168.1.5:54321',
+      ]) {
+        final config = BackendConfig.resolve(
+          _env,
+          defineUrl: url,
+          defineAnonKey: 'anon',
+        );
+        expect(config.isLocalBackend, isFalse, reason: url);
+      }
+      final incomplete = BackendConfig.resolve(
+        _env,
+        defineUrl: 'http://127.0.0.1:54321',
+        defineAnonKey: '',
+      );
+      expect(incomplete.isLocalBackend, isFalse);
+    },
+  );
 }

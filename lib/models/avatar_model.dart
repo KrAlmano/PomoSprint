@@ -9,6 +9,14 @@ const String kDefaultAvatarId = 'avatar_16_basic';
 /// Lig ödülü avatarlarının kimlik öneki (league_{kademe}_{weekly|monthly}).
 const String _leagueAwardIdPrefix = 'league_';
 
+/// Kumla alınan özel seri, katalog kimliğinden tanınır; yeni bir sunucu
+/// kolonu veya istemci önbellek sürümü gerektirmez.
+const String _specialAvatarIdPrefix = 'special_';
+
+// Eski sunucu/cihaz kataloglarında kalabilen kaldırılmış avatarlar. Profil
+// ve sahiplik kayıtları silinmez; görünüm güvenli varsayılanı kullanır.
+const Set<String> _retiredAvatarIds = {'special_ronin'};
+
 class AvatarCharacter {
   final String id;
   final String nameTr;
@@ -93,7 +101,15 @@ class AvatarCharacter {
   /// give_default_avatars ile açılır. Diğer her avatar (0 kum tanesi olsa
   /// bile) bir avatar_unlocks kaydı gerektirir; aksi halde set_equipped_avatar
   /// reddeder.
-  bool get isFree => isDefault;
+  bool get isFree => isDefault && !isRetired;
+
+  /// Özel avatarlar kayıt seçicisinde değil, koleksiyonun ayrı bölümünde
+  /// görünür. Sahiplik ve satın alma mevcut sunucu kurallarını kullanır.
+  bool get isSpecial => id.startsWith(_specialAvatarIdPrefix);
+
+  bool get isRetired => isRetiredAvatarId(id);
+
+  static bool isRetiredAvatarId(String? id) => _retiredAvatarIds.contains(id);
 
   /// Kullanıcı bu avatarın sahibi mi? Sahiplik = avatar_unlocks kaydı ya da
   /// ücretsiz/varsayılan avatar. Bakiyenin yetmesi sahiplik SAYILMAZ; o
@@ -103,10 +119,10 @@ class AvatarCharacter {
   /// Kum tanesiyle satın alınabilir ve bakiye yetiyor mu? Lig ödülü ve
   /// Premium avatarlar kum tanesiyle alınamaz.
   bool canAfford(int userCoins) =>
-      !isLeagueAward && !isPremiumOnly && userCoins >= requiredCoins;
+      !isRetired && !isLeagueAward && !isPremiumOnly && userCoins >= requiredCoins;
 
   /// Premium kullanıcı bu avatarı ücretsiz açabilir mi (purchase_avatar).
-  bool canUnlockWithPremium(bool isPremium) => isPremiumOnly && isPremium && !isLeagueAward;
+  bool canUnlockWithPremium(bool isPremium) => !isRetired && isPremiumOnly && isPremium && !isLeagueAward;
 
   /// Koleksiyonun kum tanesi bölümünde listelenir mi? Uygulamada Premium'u
   /// edinme yolu (uygulama içi satın alma) olmadığı için Premium'a özel
@@ -114,10 +130,10 @@ class AvatarCharacter {
   /// herkese kilitli bir "Premium" vitrini gösterilmez (App Store 2.3.1,
   /// 3.1.1). Lig ödülleri ayrı bölümde listelenir.
   bool isListedInShop({required List<String> unlockedAvatars, required bool isPremium}) =>
-      !isLeagueAward && (!isPremiumOnly || isPremium || isOwned(unlockedAvatars));
+      !isRetired && !isLeagueAward && (!isPremiumOnly || isPremium || isOwned(unlockedAvatars));
 
   String unlockLabel(bool isPremium) {
-    if (isLeagueAward) return '';
+    if (isRetired || isLeagueAward) return '';
     if (isPremiumOnly && !isPremium) return 'Premium';
     return '$requiredCoins';
   }
@@ -130,7 +146,7 @@ class AvatarCharacter {
   /// Sunucu kataloğunu önbelleğe alır. Boş liste yok sayılır (yedek korunur).
   static void setCachedAvatars(List<AvatarCharacter> avatars) {
     if (avatars.isEmpty) return;
-    _cachedAvatars = List.unmodifiable(avatars);
+    _cachedAvatars = List.unmodifiable(avatars.where((a) => !a.isRetired));
   }
 
   @visibleForTesting
@@ -159,7 +175,7 @@ class AvatarCharacter {
   static AvatarCharacter? _find(List<AvatarCharacter> list, String? id) {
     if (id == null) return null;
     for (final a in list) {
-      if (a.id == id) return a;
+      if (a.id == id && !a.isRetired) return a;
     }
     return null;
   }
@@ -170,6 +186,7 @@ class AvatarCharacter {
   ///   avatar_8_striped
   /// - 200 kum tanesi: avatar_1_gamer, avatar_4_bowtie, avatar_9_viking,
   ///   avatar_10_dentist
+  /// - 500 kum tanesi: special_ özel seri (21 avatar)
   /// - Premium (Premium kullanıcıya bedava): avatar_11..avatar_15
   /// - lig ödülleri (satın alınamaz): league_{kademe}_{weekly|monthly};
   ///   1. sıraya *_monthly (Şampiyonluk), 2.-3. sıraya *_weekly (Podyum)
@@ -192,6 +209,27 @@ class AvatarCharacter {
     AvatarCharacter(id: 'avatar_14_teacher', nameTr: 'Öğretmen Kum Saati', nameEn: 'Teacher Hourglass', imagePath: 'assets/avatars/avatar_14_teacher.png', isPremiumOnly: true),
     AvatarCharacter(id: 'avatar_15_athlete', nameTr: 'Sporcu Kum Saati', nameEn: 'Athlete Hourglass', imagePath: 'assets/avatars/avatar_15_athlete.png', isPremiumOnly: true),
     AvatarCharacter(id: 'avatar_16_basic', nameTr: 'Klasik Kum Saati', nameEn: 'Classic Hourglass', imagePath: 'assets/avatars/avatar_16_basic.png', isDefault: true),
+    AvatarCharacter(id: 'special_gold_miner', nameTr: 'Altın Madencisi', nameEn: 'Gold Miner', imagePath: 'assets/avatars/special_gold_miner.png', requiredCoins: 500),
+    AvatarCharacter(id: 'special_vampire_lord', nameTr: 'Vampir Lordu', nameEn: 'Vampire Lord', imagePath: 'assets/avatars/special_vampire_lord.png', requiredCoins: 500),
+    AvatarCharacter(id: 'special_detective', nameTr: 'Dedektif', nameEn: 'Detective', imagePath: 'assets/avatars/special_detective.png', requiredCoins: 500),
+    AvatarCharacter(id: 'special_cowboy', nameTr: 'Kovboy', nameEn: 'Cowboy', imagePath: 'assets/avatars/special_cowboy.png', requiredCoins: 500),
+    AvatarCharacter(id: 'special_steampunk_pilot', nameTr: 'Buhar Pilotu', nameEn: 'Steampunk Pilot', imagePath: 'assets/avatars/special_steampunk_pilot.png', requiredCoins: 500),
+    AvatarCharacter(id: 'special_pharaoh', nameTr: 'Firavun', nameEn: 'Pharaoh', imagePath: 'assets/avatars/special_pharaoh.png', requiredCoins: 500),
+    AvatarCharacter(id: 'special_zen_master', nameTr: 'Zen Ustası', nameEn: 'Zen Master', imagePath: 'assets/avatars/special_zen_master.png', requiredCoins: 500),
+    AvatarCharacter(id: 'special_desert_princess', nameTr: 'Çöl Prensesi', nameEn: 'Desert Princess', imagePath: 'assets/avatars/special_desert_princess.png', requiredCoins: 500),
+    AvatarCharacter(id: 'special_forest_fairy', nameTr: 'Orman Perisi', nameEn: 'Forest Fairy', imagePath: 'assets/avatars/special_forest_fairy.png', requiredCoins: 500),
+    AvatarCharacter(id: 'special_star_wizard', nameTr: 'Yıldız Büyücüsü', nameEn: 'Star Wizard', imagePath: 'assets/avatars/special_star_wizard.png', requiredCoins: 500),
+    AvatarCharacter(id: 'special_shadow_queen', nameTr: 'Gölge Kraliçesi', nameEn: 'Shadow Queen', imagePath: 'assets/avatars/special_shadow_queen.png', requiredCoins: 500),
+    AvatarCharacter(id: 'special_astronaut', nameTr: 'Astronot', nameEn: 'Astronaut', imagePath: 'assets/avatars/special_astronaut.png', requiredCoins: 500),
+    AvatarCharacter(id: 'special_crystal_princess', nameTr: 'Kristal Prenses', nameEn: 'Crystal Princess', imagePath: 'assets/avatars/special_crystal_princess.png', requiredCoins: 500),
+    AvatarCharacter(id: 'special_potion_master', nameTr: 'İksir Ustası', nameEn: 'Potion Master', imagePath: 'assets/avatars/special_potion_master.png', requiredCoins: 500),
+    AvatarCharacter(id: 'special_archaeologist', nameTr: 'Arkeolog', nameEn: 'Archaeologist', imagePath: 'assets/avatars/special_archaeologist.png', requiredCoins: 500),
+    AvatarCharacter(id: 'special_cyber_robot', nameTr: 'Siber Robot', nameEn: 'Cyber Robot', imagePath: 'assets/avatars/special_cyber_robot.png', requiredCoins: 500),
+    AvatarCharacter(id: 'special_flame_spirit', nameTr: 'Alev Ruhu', nameEn: 'Flame Spirit', imagePath: 'assets/avatars/special_flame_spirit.png', requiredCoins: 500),
+    AvatarCharacter(id: 'special_light_knight', nameTr: 'Işık Şövalyesi', nameEn: 'Light Knight', imagePath: 'assets/avatars/special_light_knight.png', requiredCoins: 500),
+    AvatarCharacter(id: 'special_pirate_captain', nameTr: 'Korsan Kaptan', nameEn: 'Pirate Captain', imagePath: 'assets/avatars/special_pirate_captain.png', requiredCoins: 500),
+    AvatarCharacter(id: 'special_celestial_king', nameTr: 'Gökyüzü Kralı', nameEn: 'Celestial King', imagePath: 'assets/avatars/special_celestial_king.png', requiredCoins: 500),
+    AvatarCharacter(id: 'special_samurai', nameTr: 'Samuray', nameEn: 'Samurai', imagePath: 'assets/avatars/special_samurai.png', requiredCoins: 500),
     AvatarCharacter(id: 'league_bronze_weekly', nameTr: 'Bronz Lig Podyum Ödülü', nameEn: 'Bronze League Podium Award', imagePath: 'assets/avatars/league_bronze_weekly.png', isLeagueAward: true),
     AvatarCharacter(id: 'league_bronze_monthly', nameTr: 'Bronz Lig Şampiyonluk Ödülü', nameEn: 'Bronze League Champion Award', imagePath: 'assets/avatars/league_bronze_monthly.png', isLeagueAward: true),
     AvatarCharacter(id: 'league_silver_weekly', nameTr: 'Gümüş Lig Podyum Ödülü', nameEn: 'Silver League Podium Award', imagePath: 'assets/avatars/league_silver_weekly.png', isLeagueAward: true),

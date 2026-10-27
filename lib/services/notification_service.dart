@@ -9,6 +9,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n/app_localizations.dart';
+import '../utils/async_lock.dart';
 import 'language_service.dart';
 
 /// Sistem bildirim izninin durumu ([NotificationService.permissionStatus]).
@@ -59,6 +60,7 @@ class NotificationService {
 
   static const int _sessionEndId = 0;
   static const int _ongoingTimerId = 1;
+  static const int _marathonBreakEndId = 2;
   static const String _channelId = 'pomodoro_timer_channel';
   // Ayrı kanal: varsayılan önem (sessiz/"düşük" kanal kilit ekranında
   // gizlenebilir) ama ses ve titreşim yok.
@@ -68,6 +70,7 @@ class NotificationService {
   static const Color _brandColor = Color(0xFFFF5C4D);
 
   Future<void>? _initialization;
+  final AsyncLock _endNotifications = AsyncLock();
 
   /// Bildirim tercihi her değiştiğinde artar (kilit ekranı sayacı dinler).
   final ValueNotifier<int> preferenceRevision = ValueNotifier<int>(0);
@@ -140,6 +143,7 @@ class NotificationService {
     preferenceRevision.value++;
     if (!value) {
       await cancelSessionEndNotification();
+      await cancelMarathonBreakEnd();
       return false;
     }
     return ensurePermission(force: true);
@@ -216,7 +220,7 @@ class NotificationService {
 
   /// [after] süre sonra seans bitiş bildirimini zamanlar (önceki zamanlanmış
   /// bildirimin yerini alır).
-  Future<void> scheduleSessionEnd({required Duration after, required String categoryName}) async {
+  Future<void> scheduleSessionEnd({required Duration after, required String categoryName}) => _endNotifications.synchronized(() async {
     if (!await _ready() || !await isEnabled()) return;
     final l10n = _l10n();
     final scheduledDate = tz.TZDateTime.now(tz.local).add(after);
@@ -248,7 +252,65 @@ class NotificationService {
         return;
       }
     }
-  }
+  });
+
+  /// Maraton molası çalışma kaydı değildir; bildirimi de ayrı kimlik taşır.
+  /// Uygulama askıdayken sistem hatırlatır. Yeni Pomodoro ancak ön planda,
+  /// 1 dakikalık pencerede açık kullanıcı onayıyla başlar.
+  Future<void> scheduleMarathonBreakEnd({required int seconds, required int nextSession, required int totalSessions}) =>
+      _endNotifications.synchronized(() async {
+        if (seconds <= 0 || !await _ready() || !await isEnabled()) return;
+        final l10n = _l10n();
+        final scheduledDate = tz.TZDateTime.now(tz.local).add(Duration(seconds: seconds));
+        final exact = await _canScheduleExact();
+        for (final mode in [
+          if (exact) AndroidScheduleMode.exactAllowWhileIdle,
+          AndroidScheduleMode.inexactAllowWhileIdle,
+        ]) {
+          try {
+            await _plugin.zonedSchedule(
+              id: _marathonBreakEndId,
+              title: l10n.notifMarathonBreakDoneTitle,
+              body: l10n.notifMarathonBreakDoneBody(nextSession, totalSessions),
+              scheduledDate: scheduledDate,
+              notificationDetails: _details(l10n),
+              androidScheduleMode: mode,
+            );
+            return;
+          } on PlatformException catch (e) {
+            debugPrint('[NOTIF] Mola bildirimi zamanlanamadı ($mode): ${e.code}');
+          } catch (e) {
+            debugPrint('[NOTIF] Mola bildirimi zamanlanamadı: $e');
+            return;
+          }
+        }
+      });
+
+  Future<void> showMarathonBreakEndNow({required int nextSession, required int totalSessions}) =>
+      _endNotifications.synchronized(() async {
+        if (!await _ready() || !await isEnabled()) return;
+        final l10n = _l10n();
+        try {
+          await _plugin.cancel(id: _marathonBreakEndId);
+          await _plugin.show(
+            id: _marathonBreakEndId,
+            title: l10n.notifMarathonBreakDoneTitle,
+            body: l10n.notifMarathonBreakDoneBody(nextSession, totalSessions),
+            notificationDetails: _details(l10n),
+          );
+        } catch (e) {
+          debugPrint('[NOTIF] Mola bildirimi gösterilemedi: $e');
+        }
+      });
+
+  Future<void> cancelMarathonBreakEnd() => _endNotifications.synchronized(() async {
+        if (!await _ready()) return;
+        try {
+          await _plugin.cancel(id: _marathonBreakEndId);
+        } catch (e) {
+          debugPrint('[NOTIF] Mola bildirimi iptal edilemedi: $e');
+        }
+      });
 
   Future<bool> _canScheduleExact() async {
     try {
@@ -262,11 +324,11 @@ class NotificationService {
 
   /// Uygulama arka plandayken biten seans için bildirimi beklemeden gösterir
   /// (alarm Doze'da ya da exact izni yoksa geç tetiklenebilir).
-  Future<void> showSessionEndNow({required String categoryName}) async {
+  Future<void> showSessionEndNow({required String categoryName}) => _endNotifications.synchronized(() async {
     if (!await _ready() || !await isEnabled()) return;
     final l10n = _l10n();
     try {
-      await _plugin.cancelAllPendingNotifications();
+      await _plugin.cancel(id: _sessionEndId);
       await _plugin.show(
         id: _sessionEndId,
         title: l10n.notifSessionDoneTitle,
@@ -276,7 +338,7 @@ class NotificationService {
     } catch (e) {
       debugPrint('[NOTIF] Bildirim gösterilemedi: $e');
     }
-  }
+  });
 
   /// Uygulama ön plandayken biten seans: kısa titreşim; bildirim tercihi
   /// açıksa bitiş bildiriminin sesi de çalar. iOS'ta afiş gösterilmez
@@ -288,11 +350,11 @@ class NotificationService {
         playSound: _playSessionEndSound,
       );
 
-  Future<void> _playSessionEndSound() async {
-    if (!await _ready()) return;
+  Future<void> _playSessionEndSound() => _endNotifications.synchronized(() async {
+    if (!await _ready() || !await isEnabled()) return;
     final l10n = _l10n();
     try {
-      await _plugin.cancelAllPendingNotifications();
+      await _plugin.cancel(id: _sessionEndId);
       await _plugin.show(
         id: _sessionEndId,
         title: l10n.notifSessionDoneTitle,
@@ -313,7 +375,7 @@ class NotificationService {
     } catch (e) {
       debugPrint('[NOTIF] Bitiş sesi çalınamadı: $e');
     }
-  }
+  });
 
   static const Duration _foregroundAlertTimeout = Duration(seconds: 5);
   static const DarwinNotificationDetails _foregroundDarwinDetails = DarwinNotificationDetails(
@@ -377,16 +439,16 @@ class NotificationService {
     await _plugin.cancel(id: _ongoingTimerId);
   }
 
-  /// Hâlâ bekleyen zamanlanmış bildirimi iptal eder; gösterilmiş bildirime
-  /// dokunmaz.
-  Future<void> cancelSessionEndNotification() async {
+  /// Odak bitişi için zamanlanmış veya gösterilmiş bildirimi kaldırır.
+  /// Maraton mola bildirimi ve kalıcı sayaç kendi kimliklerinde korunur.
+  Future<void> cancelSessionEndNotification() => _endNotifications.synchronized(() async {
     if (!await _ready()) return;
     try {
-      await _plugin.cancelAllPendingNotifications();
+      await _plugin.cancel(id: _sessionEndId);
     } catch (e) {
       debugPrint('[NOTIF] Bildirim iptal edilemedi: $e');
     }
-  }
+  });
 
   // Bağlam (context) olmadan da o anki uygulama dilinde metin üretir.
   static AppLocalizations _l10n() => lookupAppLocalizations(LanguageService.instance.currentLocale);

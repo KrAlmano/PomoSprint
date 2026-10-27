@@ -1,425 +1,86 @@
-# Canlı Supabase'in yerel kopyası
+# Yerel Supabase test altyapısı
 
-Canlı projenin (`Pomodoro App`, ref `eoosnyakvxmifmexpgxa`) şemasının birebir
-yerel kopyası. Test hesapları **yalnızca burada** açılır. Docker'da çalışan,
-canlıya bağlı olmayan ayrı bir Supabase projesidir (`project_id =
-"pomosprint-local"`).
+9 Ekim 2026 yayın temizliğinde bu projeye ait yerel test veritabanı, test hesapları, kalıcı Docker verileri ve özel runtime fixture’ları silindi. Çalışan bir yerel QA ortamı veya hazır hesap yoktur. Yeniden denemek için Docker ve aşağıdaki yerel proje başlatılmalıdır. Silinmiş simülatör UUID’leri kullanılmaz; yeni bir test simülatörü/emülatörü oluşturup açıkça seçin.
 
-- Şema: `supabase/migrations/20261004120000_live_snapshot.sql`. 4 Ekim 2026'da
-  canlı katalogdan salt okuma sorgularıyla üretildi (33 fonksiyonun
-  `pg_get_functiondef` çıktısı, tablolar, kısıtlar, index'ler, RLS,
-  politikalar, tablo/kolon/fonksiyon yetkileri, `auth.users` dahil
-  trigger'lar, `pg_cron` işleri, extension'lar).
-- Referans verisi: `supabase/seed.sql` (avatar kataloğu, 27 satır). Kullanıcı
-  verisi kopyalanmadı.
-- Postgres imajı canlıyla aynı: `17.6.1.147` (`supabase/.temp/postgres-version`).
-- Repodaki `supabase/migrations` **kullanılmaz**; canlıyla uyuşmuyor.
+`project_id = "pomosprint-local"`. Bu proje canlı Supabase’e bağlı değildir ve `supabase link` ile bağlanmamalıdır. Komutlarda daima `--workdir tool/local_supabase` kullanın. Kök `supabase/` dizininde toplu `db push/reset` çalıştırılmaz; canlı SQL kurulumu [SQL rehberindeki](../../supabase/README.md) kullanıcı SQL Editor akışıdır.
 
-> Her komutta `--workdir tool/local_supabase` ver. Bu projeyi `supabase link`
-> ile canlıya **bağlama**. Kökteki `supabase/` klasörü için AGENTS.md'deki
-> `db push` / `db reset` yasağı geçerli; buradaki `db reset` yalnızca yerel
-> Docker veritabanını sıfırlar.
-
-## Kurulum (bir kez)
+## Yeniden kurulum ve ortam
 
 ```sh
-brew install supabase/tap/supabase       # resmi tap
-open -a Docker                            # Docker Desktop açık olmalı
-supabase start --workdir tool/local_supabase   # ilk açılışta imajlar iner (birkaç dakika)
-python3 tool/local_supabase/create_test_users.py
+supabase start --workdir tool/local_supabase
+supabase status --workdir tool/local_supabase
 ```
 
-## Günlük komutlar
-
-| İş | Komut |
-|---|---|
-| Başlat | `supabase start --workdir tool/local_supabase` |
-| Durdur (veri kalır) | `supabase stop --workdir tool/local_supabase` |
-| Durdur ve veriyi sil | `supabase stop --workdir tool/local_supabase --no-backup` |
-| Şemayı ve veriyi sıfırla | `supabase db reset --workdir tool/local_supabase` (snapshot + seed yeniden yüklenir, test hesapları silinir) |
-| Durum, URL'ler, anahtarlar | `supabase status --workdir tool/local_supabase` (`-o env` ile değişken olarak) |
-| SQL | `psql postgresql://postgres:postgres@127.0.0.1:54322/postgres` |
-| Studio | <http://127.0.0.1:54323> |
-| E-postalar (Mailpit) | <http://127.0.0.1:54324> |
-| Test hesapları | `python3 tool/local_supabase/create_test_users.py [adet]` |
-| Duman testi | `python3 tool/local_supabase/smoke_test.py` |
-| Parite (yerel = canlı?) | `tool/local_supabase/parity_check.sh` |
-| Öneri zinciri (kopyada) | `tool/local_supabase/proposed_chain_check.sh` (ayrıntı aşağıda) |
+Başlangıç kaynakları `supabase/migrations/20261004120000_live_snapshot.sql` (4 Ekim’de salt okunur katalogdan alınan şema; kullanıcı satırı içermez) ve `supabase/seed.sql` (27 tarihsel katalog satırı) dosyalarıdır. Bunlar güncel canlı şemanın/kataloğun otomatik kopyası olarak sunulmaz. Yeni özellik testi için ilgili incelenmiş migration zincirini yalnız izole yerel kopyaya uygulayın; tüm kök migration’ları topluca uygulamayın. `parity_check.sh` yalnız repodaki kayıtlı parmak iziyle karşılaştırır; güncel canlı okuması yapmaz.
 
 | Hizmet | Adres |
 |---|---|
-| API (Kong) | `http://127.0.0.1:54321` |
-| Veritabanı | `postgresql://postgres:postgres@127.0.0.1:54322/postgres` |
+| API | `http://127.0.0.1:54321` |
+| PostgreSQL | `postgresql://postgres:postgres@127.0.0.1:54322/postgres` |
 | Studio | `http://127.0.0.1:54323` |
 | Mailpit | `http://127.0.0.1:54324` |
 
-Anahtarlar Supabase CLI'nin herkese açık **yerel demo** anahtarlarıdır (her
-yerel kurulumda aynı, canlıda geçmez): `supabase status` `ANON_KEY` ve
-`SERVICE_ROLE_KEY` değerleri. Uygulama eski tip JWT `ANON_KEY`'i kullanır.
+Yerel sıfırlama e-postaları Mailpit’te kalır; kişisel e-posta kutusuna teslim edilmez. Kişisel canlı hesap veya üretim ayrıcalıklı anahtarı kullanmayın. Uygulama için yalnız `supabase status` çıktısındaki **yerel anon** anahtarı gerekir; service-role anahtarı istemciye verilmez. Yerel portları güvenmediğiniz ağa açmayın.
 
-Docker portları `0.0.0.0`'a açılır: aynı ağdaki cihazlar da erişebilir
-(veritabanı parolası `postgres`). Güvenmediğin ağda `supabase stop` ile kapat.
+## Uygulamayı yerel ortama bağlama
 
-## Test hesapları
-
-`create_test_users.py`, uygulamadaki kayıtla aynı `auth.signUp` metadata'sını
-gönderir; yerelde e-posta onayı kapalı olduğu için hesap hemen giriş yapar.
-`handle_new_user` profili, `give_default_avatars` varsayılan avatarları açar.
-
-- `test1@pomosprint.local`, `test2@pomosprint.local` (`create_test_users.py 5`
-  ile `test5`'e kadar).
-- Parola: `local_api.py` → `TEST_PASSWORD` (yalnızca bu yerel kopya;
-  `LOCAL_TEST_PASSWORD` ortam değişkeniyle değiştirilebilir).
-- Betik var olan hesaba dokunmaz; `db reset` sonrası yeniden çalıştır.
-- Google / Apple girişi yerelde kapalı; yalnızca e-posta + parola.
-
-`smoke_test.py`: anon ile `get_points_config`, `get_league_zones`, `avatars`;
-test1 ile kategori → `complete_study_session` (`started_at = şimdi - 25 dk`) →
-aynı `client_uuid` ile `duplicate` → bitmemiş seans reddi
-(`session_not_finished`) → profil puan/kum → `get_my_league_ranking`;
-test1 ↔ test2 arkadaşlık. Veriyi bırakır; son seans 25 dakikadan yeniyse seans
-adımını atlar.
-
-## Uygulamayı yerel kopyaya bağlama
-
-`--dart-define` ile `SUPABASE_URL` **ve** `SUPABASE_ANON_KEY` birlikte
-verilince `.env` yerine bunlar kullanılır (`lib/services/backend_config.dart`).
-Bu durumda Sentry kapalıdır (`--dart-define=SENTRY_DSN=…` verilmedikçe);
-yalnızca biri verilirse bulut bağlantısı kapalı kalır (yerel adresle canlı
-anahtar karışmasın diye).
-
-- **VS Code:** Çalıştır ve Hata Ayıkla → `PomoSprint (yerel Supabase)` (iOS
-  simülatörü) ya da `PomoSprint (yerel Supabase, Android emülatör)`.
-- **Komut satırı:**
-
-  ```sh
-  ANON=$(supabase status --workdir tool/local_supabase -o env | sed -n 's/^ANON_KEY="\(.*\)"$/\1/p')
-  flutter run --dart-define=SUPABASE_URL=http://127.0.0.1:54321 --dart-define=SUPABASE_ANON_KEY="$ANON"
-  ```
-
-- Android emülatöründe bilgisayar `10.0.2.2`'dir:
-  `--dart-define=SUPABASE_URL=http://10.0.2.2:54321`.
-- Gerçek cihaz: Mac'in yerel ağ IP'si (`http://192.168.x.y:54321`), cihaz aynı
-  ağda olmalı.
-- iOS: `Info.plist`'te `NSAppTransportSecurity` → `NSAllowsLocalNetworking`
-  (yalnızca yerel ağa http; App Store'da kabul edilir).
-- Sayaç her derlemede (debug dahil) gerçek süreli (25/50 dk). Hızlı deneme
-  `--dart-define=QUICK_TIMER=true` ile 5/10 sn'dir ve bu seanslar sunucuya
-  gönderilmez. Puan akışını beklemeden denemek için aşağıdaki simülatör
-  senaryosu (c) ya da `smoke_test.py`.
-
-## Simülatörde uçtan uca test
-
-Uygulama **gerçek `main()`** ile iOS simülatöründe açılır ve bu yerel kopyaya
-bağlanır (`integration_test/`, Flutter `integration_test`). Arayüz Türkçe'ye
-sabitlenir (`LanguageService.deviceLocale`); her testin başında oturum
-kapanır ve SharedPreferences silinir. `SUPABASE_URL` yerel değilse testler
-başlamadan düşer.
-
-Ön koşullar: yerel kopya açık (`supabase start --workdir tool/local_supabase`),
-iOS 18.6 simülatörü ve Xcode 27 (`DEVELOPER_DIR`; betik varsayılanı
-`/Applications/Xcode.app/Contents/Developer`). Betiğin varsayılan cihazı iPhone
-16 Pro (`7B8AF086-0864-42FD-B4D8-37A782C3F6B9`); iPhone 16 Plus’ta çalıştırmak
-için `SIM_UDID=BEA55019-D5C3-420F-90F2-0B0CBD5690CF` ver. Android emülatörü
-senaryoları için `run_android_e2e.sh` kullanılır.
+`SUPABASE_URL` ve `SUPABASE_ANON_KEY` birlikte verilmelidir; `lib/services/backend_config.dart` eksik ortam çiftini reddeder. Normal uygulamada sayaç her derlemede25/50dk, Maraton molası300sn ve onayı60sn’dir. Hızlandırılmış kayıt yolu ve QA tamamlanma RPC’leri kaldırılmıştır; kısa unit/widget simülasyonları yalnız test kaynağı içinde kalır.
 
 ```sh
-tool/local_supabase/e2e/sim/run_sim_e2e.sh            # a b c d e
-tool/local_supabase/e2e/sim/run_sim_e2e.sh c          # yalnızca biri
+flutter run -d <test-cihazı> \
+  --dart-define=SUPABASE_URL=http://127.0.0.1:54321 \
+  --dart-define=SUPABASE_ANON_KEY=<yerel-anon-anahtarı>
 ```
 
-Betik `e2e_host.py`'yi (yalnızca 127.0.0.1) başlatır: test ortasında ekran
-görüntüsü (`xcrun simctl io … screenshot` → `analiz/ekranlar/e2e-*.png`) ve
-yerel veritabanında **salt okuma** psql doğrulaması (`build/e2e_sim/psql.log`).
-Her dosyayı ayrı `flutter test integration_test/<dosya> -d <UDID>
---dart-define=SUPABASE_URL=… --dart-define=SUPABASE_ANON_KEY=…
---dart-define=E2E_HOST_PORT=… --dart-define=E2E_RUN_ID=…` ile koşturur, sonda
-`parity_check.sh` çalıştırır (testler yalnızca veri yazar). Günlükler
-`build/e2e_sim/<dosya>.log`. Hesaplar ve şifre: `e2e/ACCOUNTS.md`.
+Android emülatöründe URL `http://10.0.2.2:54321` olur. İki ortam define’ını kaldırınca normal `lib/main.dart` kök `.env` üretim yapılandırmasını kullanır. Yerel derlemeyi kullanıcıya canlı uygulama gibi açık bırakmayın.
 
-| Dosya | Senaryo | Doğrulama |
-|---|---|---|
-| `a_register_onboarding_test.dart` | (a1) Kayıt → YKS onboarding ve otomatik seçili 8 kategori. (a2) KPSS: şema `user_segment=kpss` kısıtını içeriyorsa segment kaydedilir; eski kısıt zincirinde onboarding segmentsiz tamamlanır | psql: `profiles` (ad, doğum yılı, segment, hedef, görünürlük, onboarding), `categories` sırası, `auth.users` onay metadata'sı |
-| `b_timer_layout_test.dart` | Cihazın gerçek mantıksal ekran boyutu ve güvenli alanları | BAŞLAT ekranda ve alt gezinmenin üstünde, kaydırmasız; 25/50 aynı satırda; kum saati görünür; taşma yok |
-| `c_session_points_test.dart` | (c) Uygulama kapalıyken biten seans: girişten sonra ağaç kapatılır, `TimerPersistence`'a (gerçek biçim, sahip = kullanıcı kimliği) 26 dk önce başlamış 25 dk'lık çalışan seans yazılır, uygulama yeniden açılır. (f) Lig | Diyalog 5 puan / 20 kum, kaydedilememe ve saat metni yok; üst çubuk PUAN 5 / KUM 20; psql `study_sessions` + profil toplamları (5 / 20 / 25 dk / seri 1); Raporlar'da bugün 25 dk; Sıralama > Lig'de "(Sen)" ve `get_my_league_ranking` sırası |
-| `d_friends_visibility_test.dart` | A API ile (onboarding tamam, görünür); uygulamada B, A'nın koduyla istek → A API ile kabul → B'nin listesinde A → A `start_study_session` → B'nin canlı akışında A → Sıralama > Arkadaşlar | psql `friendships` (pending → accepted), B olarak `get_live_friends`; ekranda "(Sen)" |
-| `e_settings_delete_test.dart` | Profil > Gizlilik ve yasal; Hesabımı Sil | Kullanım Şartları, Gizlilik, KVKK, Gizlenen kullanıcılar, Hesabımı Sil var; "Hesap silme hakkında", "Verilerimin kopyasını iste" yok. Silme sonrası giriş ekranı; psql'de `auth.users`, `profiles`, `categories` satırı yok |
+## Native uçtan uca test
 
-Süre (5 Ekim 2026, bu makine): ilk Xcode derlemesi ~2 dk, sonraki her
-dosya 45–90 sn (derleme ~20–40 sn + test); `a`–`e` birlikte ~6 dk.
+```sh
+xcrun simctl list devices available
+SIM_UDID=<yeni-test-simülatörü> tool/local_supabase/e2e/sim/run_sim_e2e.sh a b c d e
 
-### Ek uçtan uca senaryolar (f–l)
+adb devices
+ANDROID_SERIAL=<emulator-kimliği> tool/local_supabase/e2e/sim/run_android_e2e.sh a b c d e
+```
 
-Bu senaryolar `integration_test/` altında otomatikleştirilmiştir. `run_sim_e2e.sh`
-ve `run_android_e2e.sh` varsayılan olarak `a b c d e` çalıştırır; ek senaryoları
-senaryo harflerini argüman olarak ver (ör. `run_sim_e2e.sh f g` veya
-`run_android_e2e.sh j`). iOS betiği `SIM_UDID` ile cihaz seçer; Android betiği
-açık emülatörde `ANDROID_SERIAL` kullanır. Ayrıntılı ön koşullar test
-kaynaklarındadır.
+Her iki runner varsayılan `a b c d e` çalıştırır. Cihaz seçimi zorunludur. Android için SDK, JDK ve önceden başlatılmış `emulator-*` gerekir; iOS Xcode/simülatör gerekir. `DEVELOPER_DIR` ile farklı Xcode seçilebilir. Tek platformu ve tek Flutter komutunu aynı anda çalıştırın; Android Gradle iki worker/2GB ile sınırlandırılır.
 
-| Dosya | Kapsam |
+| Senaryo | Kapsam |
 |---|---|
-| `f_quick_multi_account_test.dart` | Beş yerel hesapta hızlandırılmış seans kaydı, raporlar, arkadaşlık ve sosyal görünürlük |
-| `g_review_flows_test.dart` | Onboarding ve hesap akışları |
-| `h_offline_lifecycle_test.dart` | API kesintisi, çevrimdışı kuyruk, yeniden açılış ve senkronizasyon |
-| `i_pause_resume_test.dart` | Duraklat/devam ve etkin seansın yeniden açılışta korunması |
-| `j_android_notifications_test.dart` | Android izin, kalıcı sayaç, alarm teslimi ve iptali |
-| `k_ios_native_test.dart` | iOS sessiz bildirim ve ActivityKit kanalı |
-| `l_followup_management_test.dart` | Native saat dilimi, onay kaydı ve arkadaş yönetimi UI'sı |
+| a | Kayıt ve onboarding |
+| b | Sayaç düzeni ve taşma |
+| c | Normal25dk kalıcı kayıtla, kapalıyken bitmiş seansın geri yüklenmesi; puan/kum/rapor/lig |
+| d | Arkadaş isteği, kabul, görünürlük ve sosyal odak |
+| e | Ayarlar ve yerel hesabın silinmesi |
+| g | Kendi yerel hesabıyla şifre sıfırlama ekranı, Mailpit akışı, hafta/ay raporu ve bildirim |
+| i | Gerçek50dk sayacın duraklatma hakkı, kalıcı kimliği, yeniden açılışı ve ödülsüz iptali |
+| j | Yalnız Android’de native bildirim izin/zamanlama/teslim/iptal |
+| k | Yalnız iOS’ta provisional bildirim ve ActivityKit kanalı |
+| l | Saat dilimi, yasal onay ve arkadaş yönetimi |
+| m | Kategori, arşivli rapor, tema/dil, avatar ve route açıkken çıkış |
+| n | Kullanıcı şikâyet akışı |
+| t | Görünür normal sayaç kontrolleri ve yatay düzen |
 
-Testler yerel veritabanında hesap/seans oluşturabilir ve platform izinlerini
-değiştirebilir. Doğrulama kapsamı ilgili test kaynaklarında tanımlıdır.
+Eski hızlandırılmış, tek seferlik çoklu cihaz ve dış fixture’a bağlı senaryolar runner listesinden kaldırılmıştır. Native bildirim testlerindeki birkaç saniyelik alarm teslimi, seans/puan süresini kısaltmaz. Test hesapları yalnız yeni yerel ortamda oluşturulur; native testler platform izinlerini ve seçilmiş test cihazının uygulama tercihlerini değiştirebilir. `c/m` geçmiş normal süreli kalıcı kayıt kullanır; OS süreç öldürme veya gerçek25dk boyunca bekleme kanıtı olarak sunulmaz.
 
-### Elle koşulan eski senaryolar (arşiv notu)
+Runner’lar yalnız loopback test hostu başlatır. Log/SQL/ekran görüntüsü çıktıları `build/e2e_sim/` veya `build/e2e_android/` altındadır. `E2E_RUN_ID` ile benzersiz koşu adı, `E2E_SHOT_DIR` ile farklı çıktı klasörü, `E2E_HOST_PORT` ile farklı loopback portu seçilebilir. Ham çıktıları repoya eklemeyin. Her platformun varsayılan koşusu kısa olsa da bazı native izin adımları kullanıcı/sistem koşullarına bağlıdır; kaynaklardaki doğrulamaya bakın.
 
-Aşağıdakiler 5 Ekim tarihli otomasyon öncesi QA adımlarıdır; güncel regresyon
-koşusu için yukarıdaki `f`–`l` testlerini kullan.
+## Korunan SQL ve regresyon altyapısı
 
-Normal debug derlemesi (`flutter build ios --simulator --debug
---dart-define=SUPABASE_URL=http://127.0.0.1:54321
---dart-define=SUPABASE_ANON_KEY=<yerel ANON_KEY>`) kurulur; hazır hesap:
-`python3 tool/local_supabase/e2e/sim/create_host_account.py <etiket>`
-(`e2e-sim-host-<etiket>@pomosprint.local`). Simülatör Claude Code'un
-simülatör aracıyla (ya da elle) sürülür; her adımda ekran görüntüsü.
+- `supabase/tests/run_local.sh`: yalnız yerel PostgreSQL’de sunucu assertion’ları.
+- `tool/local_supabase/parity_check.sh`: kayıtlı şema referansına yerel parite.
+- `tool/local_supabase/proposed_chain_check.sh`: öneri zinciri, DRYRUN/ileri gövde ve down kontrolleri; ayrı kopya veritabanında çalışır.
+- `tool/local_supabase/e2e/league_launch_independent.py`: izole yerel DB’de25kişilik lig, dönem, terfi/düşme/ödül ve yarış kontrolleri; ana yerel DB veya canlıya yazmaz.
+- `test/`, `scripts/test/` ve kalan `integration_test/`: anlamlı birim/widget/native regresyon kaynakları; üretim asset’lerine dahil değildir.
 
-- **(g) Bildirim izni.** İzin durumunu sıfırlamak için yalnızca uygulamayı
-  kaldırıp kur (`xcrun simctl uninstall <UDID> com.pomosprint.app`). Profil >
-  "Bildirimler ve kilit ekranı sayacı" aç → iOS izin penceresi → *Allow* →
-  anahtar açık (`e2e-bildirim-izni.png`, `e2e-bildirim-acik.png`). Kaldır-kur,
-  *Don't Allow* → anahtar kapalı, kırmızı açıklama ve "Ayarları aç"
-  (`e2e-bildirim-reddedildi.png`).
-- **(h) Sunucu kesintisi.** Seans sürerken `docker stop
-  supabase_kong_pomosprint-local` (yalnızca API ağ geçidi) → seans biter →
-  diyalog "cihazına kaydedildi…", turuncu bekleyen seans bandı
-  (`e2e-kesinti-kuyruk.png`); uygulama kapatılıp açılır → kabuk önbellekten
-  açılır, bant sürer (`e2e-kesinti-acilis.png`); `docker start …` → kuyruk
-  yeniden deneme zamanlayıcısıyla (≤30 sn) gönderilir, PUAN 5 / KUM 20, bant
-  kalkar (`e2e-kesinti-toparlandi.png`, psql'de `study_sessions` satırı).
-  Çıkış yapmış kullanıcı kesintide giriş denerse "İnternet veya sunucu
-  bağlantısı kurulamadı" (`e2e-kesinti-giris.png`); ağ geçidi açılınca aynı
-  ekrandan giriş olur (`ensureCloud` giriş anında yeniden dener). Sonunda
-  `docker ps` ile kong'un çalıştığını doğrula.
-- **(i) Kilit ekranı.** Bildirimler açıkken BAŞLAT → simülatörü kilitle
-  (LOCK) → Canlı Etkinlik: kategori, "Odaklanıyorsun", geri sayım ve ilerleme
-  çubuğu (`e2e-kilit-ekrani.png`; ilk seferde iOS "Allow Live Activities"
-  sorar: `e2e-kilit-ekrani-izin.png`). Kilitli ekranda sistem saniyeleri
-  `--` gösteriyor (uygulama `Text(timerInterval:)` veriyor; dakika her
-  dakika azalıyor); kilit açıkken bildirim merkezinde tam `MM:SS`
-  görünür.
+Eski30kişilik kapasite ve kaldırılmış hızlandırılmış RPC’yi kullanan `league_capacity_audit.py` emekliye ayrılmıştır. Güncel lig denetimi için korunan bağımsız SQL testini kullanın. Koşular önce gerekli incelenmiş yerel şemayı gerektirir; yalnız dosyanın varlığı testin çalıştırılmış olduğu anlamına gelmez.
 
-## Parite doğrulaması
-
-`parity/fingerprint_lines.sql` canlıda ve yerelde aynı metinle çalışan,
-yalnızca katalog okuyan parmak izi sorgusudur (kategoriler: `ext`, `extver`,
-`schema`, `defacl`, `func` (gövde md5'i, SECURITY DEFINER, sahip, yetki),
-`rel` (RLS, FORCE, tablo yetkisi), `col` (tip, varsayılan, identity,
-generated, kolon yetkisi), `con`, `idx`, `pol`, `trg` (etkinlik durumu dahil),
-`cron`, `pub`).
+## Durdurma ve veri temizliği
 
 ```sh
-tool/local_supabase/parity_check.sh          # özet: kategori başına satır sayısı + md5
-tool/local_supabase/parity_check.sh --diff   # fark varsa satır satır (parity/live_lines.tsv'ye göre)
+supabase stop --workdir tool/local_supabase             # yerel veri yedeği kalır
+supabase stop --workdir tool/local_supabase --no-backup # bu yerel projeye ait test verisi silinir
 ```
 
-Canlı taraf `parity/live_summary.tsv` ve `parity/live_lines.tsv`'dedir (betik
-canlıya bağlanmaz). 4 Ekim 2026 sonucu: 13 kategorinin 13'ü aynı (89 kolon,
-37 kısıt, 28 index, 18 politika, 33 fonksiyon md5, 11 tablo yetkisi, 8
-trigger, 2 cron işi, 6 varsayılan yetki, 7 extension ve sürümleri, 2 yayın);
-`live_lines.tsv`'nin md5'i canlıdaki aynı sorguyla eşit (249 satır).
-
-**Canlı değişince:**
-1. Canlıya uygulanan SQL'i (ör. `supabase/proposed/12_…`) aynı sürüm adıyla
-   `supabase/migrations/` altına kopyala; `supabase db reset --workdir tool/local_supabase`.
-2. Canlı özeti tazele: `parity_check.sh --print-summary-sql` çıktısını SQL
-   Editor'de (ya da MCP `execute_sql`, salt okuma) çalıştır; `(k, n, h)`
-   satırlarını sekmeyle `parity/live_summary.tsv`'ye yaz.
-3. `parity_check.sh` → hepsi `aynı` olmalı. Sonra
-   `parity_check.sh --local-lines > parity/live_lines.tsv`.
-
-Ek denetimler: avatar kataloğu satır md5'i (`seed.sql` başında) ve trigger'ın
-yerelde kapalı olduğu betikte ayrıca sınanır.
-
-## Öneri zincirini kopyada sınama
-
-> **5 Ekim 2026'dan beri** zincir (12 → … → 26, 19 yalnızca A) canlıda ve bu
-> ana kopyada uygulanmış hâlde; `parity/` taban dosyaları canlının yeni
-> hâlinden alındı (`parity_check.sh` 13/13 aynı). Bu yüzden betiği bu
-> hâlden çalıştırmak artık anlamlı değil (md5 ön koşullu adımlar durur). Zinciri yeniden sınamak
-> için ana kopyayı önce `_down` dosyalarıyla ters sırada (26 → 12) eski hâle
-> döndürmek gerekir; yeni öneriler artık bu hâlin üstüne yazılır.
-
-`proposed_chain_check.sh`, bu kopyanın `public`, `auth` ve
-`supabase_migrations` şemalarını (şema + veri) aynı Postgres'te ayrı bir
-veritabanına (`CHAIN_DB`, vars. `pomosprint_chain`) alır; ana kopya
-(`postgres`) değişmez, `parity_check.sh` geçmeye devam eder. pg_cron yalnızca
-`postgres`'te kurulabildiği için kopyada `cron.job` / `schedule` /
-`unschedule` taklit edilir. Sonra `supabase/proposed/README.md`'deki sırayla
-(12 → 15 → 16 → 19 → 13 → 14 → 20 → … → 25 → 26) her adımda önce DRYRUN'u, sonra
-dosyayı postgres rolüyle (SQL Editor'deki gibi) uygular; yeni adımların
-DRYRUN gövdesini ana dosyayla karşılaştırır ve `_down` dosyalarını ters
-sırada uygulayıp şemanın önceki adımla birebir aynı olduğunu denetler.
-
-```sh
-tool/local_supabase/proposed_chain_check.sh                          # hepsi; sonda kopya silinir
-CHAIN_DB=pomosprint_chain NO_DOWN=1 KEEP_DB=1 tool/local_supabase/proposed_chain_check.sh   # zincir + 20–26 hâli kalır
-CHAIN_DB=pomosprint_base UNTIL=0 KEEP_DB=1 tool/local_supabase/proposed_chain_check.sh      # yalnız kopya (canlı hâl)
-psql postgresql://postgres:postgres@127.0.0.1:54322/pomosprint_chain -X -f supabase/tests/proposed_20_25_bulgu_repro_local.sql
-supabase/tests/proposed_20_25_race_local.sh postgresql://postgres:postgres@127.0.0.1:54322/pomosprint_chain
-```
-
-Kopyalar işin sonunda `DROP DATABASE ... WITH (FORCE)` ile silinmeli (ya da
-betik `KEEP_DB` olmadan bir kez çalıştırılır).
-
-### İstemciyi zincir kopyasına bağlamak (`REST_PORT`)
-
-`REST_PORT` (yalnızca `KEEP_DB` ile) kopyaya bağlı ayrı bir PostgREST
-konteyneri (`<CHAIN_DB>_rest`; yerel REST'in imajı, rolleri ve yerel demo JWT
-anahtarıyla) açar. Giriş (Auth) ana kopyada kalır: aynı anahtarla imzalı oturum
-kopyada da geçer; kullanıcının `auth.users` satırı kopyaya ayrıca aktarılır
-(kopyadaki `handle_new_user` tetiklenir). Ana kopyanın REST'i değişmez.
-
-```sh
-CHAIN_DB=pomosprint_chain_client NO_DOWN=1 KEEP_DB=1 REST_PORT=54331 tool/local_supabase/proposed_chain_check.sh
-flutter test tool/local_supabase/e2e/client_compat/client_compat_e2e_test.dart   # ESKİ + YENİ
-CHAIN_DB=pomosprint_chain_client DROP_ONLY=1 tool/local_supabase/proposed_chain_check.sh  # konteyner + kopya silinir
-```
-
-`client_compat_e2e_test.dart` uygulamanın karar kodunu (`LeagueSnapshot`,
-`LeagueRules`, `reconcileOnboardingCategories`, `equipAvatarWithDefaultUnlock`,
-`normalizeFriendCode`, `serviceErrorCodeOf`) iki sunucuya gerçek HTTP ile
-çalıştırır; kendi `compat-…` hesaplarını açıp sonda iki veritabanından da siler.
-5 Ekim 2026: 18/18 (ESKİ 9, YENİ 9).
-
-## Bilinçli farklar
-
-| Fark | Neden |
-|---|---|
-| `after_insert_marketing_subscribers` trigger'ı yerelde **devre dışı** (`tgenabled = 'D'`); `invoke_send_welcome_email()` gövdesi canlıyla aynı | Gövde canlı `send-welcome-email` Edge Function'ına `net.http_post` atar; yerel kopya canlıya istek göndermez. Bülten onaylı kayıtta `marketing_subscribers` satırı yine açılır |
-| E-posta onayı kapalı, yönlendirmeler yerel (`config.toml`) | Test hesabı onay beklemeden giriş yapar. E-postalar Mailpit'e düşer |
-| Google / Apple sağlayıcıları kapalı | Native idToken girişi canlı istemci kimlikleri ister |
-| Edge Function yok (`/functions/v1/*` → 404) | İstemci hesap silmede 404'ü görüp `delete_own_account` RPC'sine düşer (canlıdaki gibi) |
-| `supabase_migrations.schema_migrations` yalnızca `20261004120000` kaydını içerir (canlıda 39 kayıt) | Geçmiş değil şema kopyalanır |
-| `supabase_realtime_messages_publication` sahibi `postgres` (canlıda `supabase_admin`) | Yerel Realtime açmadığı için migration açıyor; parmak izi sahibi içermez |
-| Veri: yalnızca `avatars` | Kullanıcı verisi (profil, seans, lig, arkadaşlık, abonelik, bekleme listesi, `auth.*`) kopyalanmaz. `leagues` satırları çalışma sırasında açılır |
-| Auth / PostgREST / Realtime servis sürümleri CLI'nin varsayılanları | Postgres imajı ve extension sürümleri canlıyla aynı; servis sürümleri farklı olabilir |
-| `pg_cron` işleri yerelde de çalışır | Yalnızca yerel veriye dokunur (`process_weekly_leagues`, `activity_feed` temizliği) |
-
-### Kayıtlı hızlı seans (geçici yerel QA, 5 Ekim 2026)
-
-Kullanıcı isteğiyle **5 saniye → 25 dakika, 10 saniye → 50 dakika** kayıt
-modu eklendi. Önce `python3 tool/local_supabase/quick_recording.py` çalıştırın,
-sonra VS Code'dan **PomoSprint (kayıtlı hızlı yerel test, iOS)** seçin.
-Android emülatör için aynı adlı Android yapılandırması `10.0.2.2` kullanır.
-5 Ekim QA: Android SDK ve JDK 17 kuruldu; ARM64 Android 16 emülatör UI ve release APK doğrulandı. Fiziksel cihaz testi sonraya bırakıldı.
-
-Bayraklar: `QUICK_TIMER=true`, `QUICK_TIMER_SAVE=true`, açıkça verilen yerel
-`SUPABASE_URL` ve demo `SUPABASE_ANON_KEY`. Kayıt modu debug derleme ve yalnızca
-HTTP localhost/127.0.0.1/::1/10.0.2.2 adreslerinde açılır. Normal hızlı mod
-(`QUICK_TIMER` tek başına) kaydetmez; release ve canlı URL kayıt modunu açamaz.
-
-Yerelde ek `complete_qa_study_session` RPC'si kurulur; **normal RPC değişmez**.
-Normal yerel gövdeden klonlanır: zaman denetimi ve seansın zaman aralığı 5/10
-saniye olur; `duration_minutes`, puan, kum, seri, lig, kategori sahipliği,
-çakışma ve mükerrer kayıt kontrolleri normal sunucu mantığıyla korunur.
-Art arda seanslar gerçek kısa aralıklarıyla kaydolur; raporlar dakika alanını
-kullanarak 25/50 dakika gösterir. QA işareti aktif seans ve outbox'ta saklanır.
-Bu test verileri gerçek 25/50 dakikalık zaman aralıkları değildir.
-
-Kaldırma: `python3 tool/local_supabase/quick_recording.py --remove` ve
-normal çalıştırma yapılandırmasına dönme. Ek QA RPC'si açıkken fonksiyon
-parite kontrolü beklenen ek fonksiyonu bildirir; kaldırınca normal parite
-kontrolü tekrar tam eşleşmelidir. Yerel konteyner adı betikte sabittir;
-canlı Supabase'e bu betik uygulanmaz.
-
-Beş hesaplı gerçek simülatör denemesi (seansları BAŞLAT ile çalıştırır):
-```sh
-QUICK_TIMER=true QUICK_TIMER_SAVE=true \
-SIM_UDID=BEA55019-D5C3-420F-90F2-0B0CBD5690CF \
-E2E_SHOT_DIR=/tmp/pomosprint-qa \
-tool/local_supabase/e2e/sim/run_sim_e2e.sh f
-```
-
-5 Ekim kontrolünde oluşturulan beş QA hesabı:
-`e2e-sim-qa1-1005qa@pomosprint.local` …
-`e2e-sim-qa5-1005qa@pomosprint.local`.
-Hepsinin **yalnızca yerel** şifresi `SimE2e-Yerel2026`.
-QA1'de 75 dk / 17 puan / 40 kum, diğerlerinde sırasıyla 25/50/25/50 dk;
-her birinin iki karşılıklı arkadaşı var. QA1'in arkadaşı QA2 ve QA5'tir.
-Canlı kullanıcı hesabıyla bu yerel kopyada giriş yapılamaz.
-Yerel sıfırlama e-postaları Mailpit'te (`http://127.0.0.1:54324`) tutulur.
-
-`lib/dev/local_qa_launcher.dart`, normal `main()` akışını açıp yalnızca bu
-korumalı yerel modda, `LOCAL_QA_EMAIL` ve `LOCAL_QA_PASSWORD` açıkça verilmişse
-hazır test hesabıyla giriş yapar. Normal uygulamadan import edilmez. İlk
-çalıştırmada bildirim tercihini kapatır; teslim testi için Profil'den açıp
-iOS sistem iznini vermek gerekir.
-
-Kayıtlı yerel QA modunda Sosyal görünürken sorgu aralığı 2 saniyedir;
-5/10 saniyelik odak denemeleri arada kaybolmasın. Normalde 30 saniye,
-sekmeden çıkınca ve uygulama arka plandayken sorgular durur. Dönüşte hemen
-yenilenir. Bu mekanizma gerçek zamanlı push yayını değil, periyodik okumadır.
-
-### 5 Ekim kapsamlı simülatör/emülatör denetimi
-
-Senaryo ve sonuç matrisi: `analiz/QA_FULL_2026-10-05.json`.
-`h` gerçek yerel API kesintisi, kalıcı outbox, ekranları yeniden kurma ve
-hesap izolasyonu; `i` duraklat/devam ve tek hak; `j` yalnızca Android'de
-native bildirim izni/zamanlama/teslim/iptal; `k` yalnızca iOS'ta sessiz
-provisional bildirim izni ve native ActivityKit kanalını sınar. Provisional
-izin, tam ses/banner izninin kullanıcı tarafından kabulü değildir.
-
-Android SDK + JDK 17 ve tek ARM64 emülatör hazırken:
-
-```bash
-E2E_RUN_ID=benzersiz-kosu E2E_SHOT_DIR=/tmp/pomosprint-android-qa \
-QUICK_TIMER=true QUICK_TIMER_SAVE=true E2E_ALLOW_OUTAGE=true \
-tool/local_supabase/e2e/sim/run_android_e2e.sh a b f h i j e
-```
-
-`E2E_ALLOW_OUTAGE` yalnızca yerel Kong konteynerini geçici durdurmaya izin
-verir. Her `h` koşusu API'yi `finally` içinde açar. Android yardımcı betiği
-çıkışta da açar. Host yalnızca loopback'e bağlanır; Android ekran görüntüsü
-ve bildirim izni işlemleri `emulator-*` cihaz kimliğiyle sınırlıdır.
-Android emülatörü hostu `10.0.2.2` üzerinden görür; `E2E_HOST_ADDRESS`
-bu yüzden Android betiğinde farklıdır. Gradle 2 işçi/2 GB ile sınırlandırılır.
-
-`lib/dev/process_death_qa.dart` yalnızca yerel kısa debug kayıt modunda bir
-50 dk/10 sn kalıcı seans hazırlar. Koşu başına bir kere hazırlanır; gerçek
-OS süreç kapatıp açma testinde tekrar başlangıç yaratmaz.
-`LOCAL_QA_EMAIL`, `LOCAL_QA_PASSWORD`, `LOCAL_QA_PROCESS_RUN` gerektirir.
-Normal giriş noktasından import edilmez.
-
-Yerel e-posta ve sosyal/RLS ek kontrolleri (kendi yeni hesaplarını siler):
-
-```bash
-python3 tool/local_supabase/e2e/auth_mail_test.py
-python3 tool/local_supabase/e2e/social_safety_test.py
-```
-
-Eski `t1`, `t2`, `t4` test beklentileri 5 Ekim sözleşmesine göre güncellendi:
-duplicate ilk puanı döndürür ama tekrar ödül vermez; geç seans kendi günüyle
-bonus alır; görünürlük açık seçim öncesi false; kategoriler JSON sayaçlarıyla
-uzlaştırılır; ligsiz kullanıcının `member_count` değeri 0'dır. `t2` artık
-başarısız kontrol varsa sıfır olmayan çıkış kodu verir. Son takip turunda cihaz IANA diliminin native kanaldan profile eşlenmesi
-eklendi ve iki platformda test edildi; fiziksel sistem dilimi değişimi bekliyor.
-
-
-## 5 Ekim takip kontrolleri
-
-Saat dilimi ve arkadaş yönetimi için gerçek uygulama UI senaryosu:
-
-```sh
-SIM_UDID=BEA55019-D5C3-420F-90F2-0B0CBD5690CF E2E_RUN_ID=followup_ios tool/local_supabase/e2e/sim/run_sim_e2e.sh l
-E2E_RUN_ID=followup_android tool/local_supabase/e2e/sim/run_android_e2e.sh l
-```
-
-`l`: native IANA dilimi / gerçek yerel profil güncellemesi, New York DST sınırı,
-geçersiz dilimden geri dönüş, yasal onay ledger idempotency, giden isteği iptal,
-arkadaş silme, engelleme / engeli kaldırma. Sağlayıcı girişi yapılmaz; onay
-metadata'sı olmayan yerel hesapla `accept_legal_documents` doğrulanır.
-Native IANA okuması gerçek; New York geçişinde sistem kanalı kontrollü taklit edilir.
-Sonuçlar: `analiz/QA_FOLLOWUP_2026-10-05.json`.
-
-Yerel QA başlatıcısında açıkça verilen `LOCAL_QA_EMAIL`, önceki yerel test
-oturumundan farklıysa yerel oturumu kapatıp istenen test hesabıyla giriş yapar.
-Bu giriş noktası normal uygulama tarafından import edilmez.
+İkinci komutu testler bittikten sonra çalıştırın. Diğer Docker projelerine, genel `docker prune` komutlarına, canlı Supabase verilerine veya kişisel cihazlara uygulanmaz. Son QA/devir özetleri [PROJE_DEVIR.md](../../PROJE_DEVIR.md) içindedir; silinmiş ham tarihsel kanıtlara bağlı kurulum adımı yoktur.

@@ -161,4 +161,27 @@ void main() {
     final copy = AvatarCharacter.fromMap(original.toMap());
     expect(copy.toMap(), original.toMap());
   });
+
+  test('kaldırılmış Ronin eski sunucu kataloğundan filtrelenir, güvenli varsayılana döner', () {
+    final retired = AvatarCharacter.fromMap(const {
+      'id': 'special_ronin',
+      'asset_key': 'assets/avatars/special_ronin.png',
+      'cost_coins': 500,
+      'is_default': true,
+      'is_premium_only': false,
+      'is_active': true,
+    });
+    expect(retired.isRetired, isTrue);
+    expect(retired.isFree, isFalse, reason: 'eski/yanlış katalog yeni kayıt seçicisini açamaz');
+    expect(retired.canAfford(10000), isFalse);
+    expect(retired.isListedInShop(unlockedAvatars: const ['special_ronin'], isPremium: true), isFalse);
+    AvatarCharacter.setCachedAvatars([...AvatarCharacter.fallbackCatalog, retired]);
+    expect(AvatarCharacter.allAvatars().any((a) => a.isRetired), isFalse);
+    expect(AvatarCharacter.allAvatars().where((a) => a.isSpecial), hasLength(21));
+    expect(AvatarCharacter.byId('special_ronin').id, kDefaultAvatarId);
+    expect(AvatarCharacter.isFreeAvatarId('special_ronin'), isFalse);
+    AvatarCharacter.setCachedAvatars([retired]);
+    expect(AvatarCharacter.allAvatars(), isNotEmpty);
+    expect(AvatarCharacter.allAvatars().any((a) => a.isRetired), isFalse);
+  });
 }

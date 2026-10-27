@@ -120,7 +120,7 @@ class _RankingScreenState extends State<RankingScreen> {
       final List<RankingEntry> entries;
       switch (tab) {
         case _RankingTab.league:
-          // Kural okunamazsa bugünkü kural döner (hata fırlatmaz).
+          // Son başarılı kurallar korunur; yeni satır kendi güncel yapılandırmasını taşır.
           final rulesFuture = service.getLeagueRules();
           final rows = await service.getLeagueRanking();
           league = rows.isEmpty
@@ -355,7 +355,16 @@ class _RankingScreenState extends State<RankingScreen> {
         if (league == null) return const [];
         banner = RankingCountdownBanner(
           title: leagueTitle(l10n, league.tier),
-          target: league.endDate,
+          target: league.rules.isCompetitionActive
+              ? league.endDate
+              : league.rules.competitionPhase == 'scheduled'
+              ? league.rules.competitionStartsAt
+              : null,
+          message: league.rules.isCompetitionActive
+              ? null
+              : league.rules.competitionPhase == 'scheduled'
+              ? l10n.leagueLaunchScheduledShort
+              : l10n.leagueLaunchPreparingShort,
           onHelp: () => showLeagueInfoSheet(context, league: league),
         );
       case _RankingTab.monthly:

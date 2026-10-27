@@ -64,4 +64,4 @@ deneme zamanlayıcısı değildir; webhook/çağrı yeniden yapılırsa güvenli
   onun deploy'u da bekliyor.
 
 Adres, mesaj gövdesi ve anahtar değeri içermeyen kanıtlar:
-[`analiz/qa_evidence_20261007/backend/email/`](../../analiz/qa_evidence_20261007/backend/email/).
+`analiz/qa_evidence_20261007/backend/email/` (ham çıktı §37 temizliğinde kaldırıldı).

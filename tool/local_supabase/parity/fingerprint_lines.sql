@@ -15,6 +15,10 @@
 -- public ve auth tablolarındaki trigger'lar, cron.job, extension'lar,
 -- public şeması yetkisi ve varsayılan yetkiler, yayınlar (publication).
 -- Sıralama kanonik: ACL girdileri sıralanır, OID kullanılmaz.
+-- 8 Ekim 2026 lig paketi: league_competition_state ve bütün _league_* /
+-- get_league_config / get_my_league_ranking_v2 nesneleri otomatik kapsamdadır.
+-- Çalışma verisi/config değeri/dinamik yarış başlangıcı bu ŞEMA sorgusuna girmez;
+-- yerel QA kullanıcılarının planladığı başlangıç canlıdan farklı olabilir.
 with lines(k, line) as (
   -- Extension'lar (sürüm ayrı satırda: imaj farkı bilgi amaçlı)
   select 'ext', e.extname || ' schema=' || e.extnamespace::regnamespace::text

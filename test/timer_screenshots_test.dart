@@ -91,10 +91,11 @@ void main() {
           supportedLocales: AppLocalizations.supportedLocales,
           home: Builder(
             builder: (context) => ShellNavigationScaffold(
+              showNavigation: MediaQuery.orientationOf(context) != Orientation.landscape,
               selectedIndex: 0,
               onDestinationSelected: (_) {},
               destinations: _destinations,
-              appBar: buildShellAppBar(
+              appBar: MediaQuery.orientationOf(context) == Orientation.landscape ? null : buildShellAppBar(
                 context,
                 streakDays: 7,
                 points: 1240,

@@ -3,11 +3,14 @@
   "use strict";
 
   var root = document.documentElement;
-  var prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var featuresPage = document.body && document.body.getAttribute("data-page") === "features";
+  var motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+  var prefersReduced = motionPreference.matches;
   var api = window.PomoSupabase || null;
 
   // boot.js'in gizlediği hero'yu görünür yap (animasyon yoksa ya da kurulduysa)
   var revealHero = function () { root.classList.remove("js-anim"); };
+  if (featuresPage) revealHero();
 
   /* ---------- Mobil menü ----------
      Açıkken sayfa kaydırması kilitlenir ve arkada karartma görünür (CSS:
@@ -362,85 +365,116 @@
     });
   });
 
-  /* ---------- Özellik ekran videoları (features.html) ----------
-     Telefon ekranlarında uygulama kaydı, gif gibi sessiz ve sonsuz
-     döngüde oynar. Listede olmayan ekranlar yer tutucusunu (ya da örnek
-     görünümü) gösterir. Her videonun ilk karesi poster olarak hemen görünür;
-     böylece video yüklenmese de (iOS Düşük Güç Modu, autoplay engeli) ekran
-     boş kalmaz. Hareket azaltma tercihinde video hiç indirilmez, yalnızca
-     poster görünür.
-     Eski arayüzü gösteren leaderboard.mp4 ve reports.mp4 güncel kayıt
-     gelene kadar listeden çıkarıldı (yer tutucu görünür). */
-  var SHOT_VIDEOS = {
-    timer: { src: "/videos/timer.mp4", poster: "/videos/timer.webp" },
-    languages: { src: "/videos/languages.mp4", poster: "/videos/languages.webp" }
-  };
-
-  var videoObserver = (!prefersReduced && "IntersectionObserver" in window)
-    ? new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-          var vid = entry.target;
-          if (entry.isIntersecting) {
-            var pr = vid.play();
-            if (pr && pr.catch) pr.catch(function () {});
-          } else {
-            vid.pause();
-          }
-        });
-      }, { threshold: 0.15 })
-    : null;
-
-  // Mobil veri dostu: video dosyası ancak ekranı yaklaşınca indirilir
-  var lazyLoader = (!prefersReduced && "IntersectionObserver" in window)
-    ? new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-          if (!entry.isIntersecting) return;
-          var vid = entry.target;
-          if (!vid.src) vid.src = vid.dataset.src;
-          lazyLoader.unobserve(vid);
-        });
-      }, { rootMargin: "700px 0px" })
-    : null;
-
-  Object.keys(SHOT_VIDEOS).forEach(function (key) {
-    var shot = SHOT_VIDEOS[key];
-    document.querySelectorAll('.phone-screen[data-shot="' + key + '"]').forEach(function (screen) {
-      var markReady = function () { screen.classList.add("has-video"); };
-      var v = document.createElement("video");
-      v.className = "shot-video";
-      v.muted = true;
-      v.playsInline = true;
-      v.setAttribute("muted", "");
-      v.setAttribute("playsinline", "");
-      v.setAttribute("aria-hidden", "true");
-      v.preload = prefersReduced ? "none" : "auto";
-
-      // Poster yüklenince yer tutucu hemen kalkar
-      if (shot.poster) {
-        var probe = new Image();
-        probe.onload = markReady;
-        probe.src = shot.poster;
-        v.poster = shot.poster;
-      }
-      screen.appendChild(v);
-      if (prefersReduced) return;
-
-      v.loop = true;
-      v.autoplay = true;
-      v.dataset.src = shot.src;
-      v.addEventListener("loadeddata", function () {
-        markReady();
-        var pr = v.play();
-        if (pr && pr.catch) pr.catch(function () {});
-        if (videoObserver) videoObserver.observe(v);
-      });
-      if (lazyLoader) {
-        lazyLoader.observe(v);
-      } else {
-        v.src = shot.src;
-      }
-    });
+  /* ---------- Gerçek uygulama kayıtları ----------
+     Sessiz kayıtlar yalnızca görünürken döngüde oynar. MP4 adresi data-src'de
+     tutulur: ekran dışındayken ve hareket azaltma açıkken indirme başlamaz.
+     Sekmeye/ekrana geri gelince aynı konumdan devam eder. JS kapalıysa,
+     oynatma engellenirse veya yükleme bozulursa gerçek görüntü kalır. */
+  var demoVideos = Array.prototype.slice.call(document.querySelectorAll("video[data-demo-video]"));
+  var videoStates = demoVideos.map(function (video) {
+    video.autoplay = false; // HTML autoplay'ini görünürlük denetimi devralır.
+    video.muted = true;
+    video.defaultMuted = true;
+    video.playsInline = true;
+    video.loop = true;
+    return { video: video, label: video.getAttribute("aria-label") || "Uygulama kaydı",
+      visible: false, loaded: false, failed: false, manuallyPaused: false, wantsPlay: false, revision: 0 };
   });
+  var canPlayVideo = function (state) {
+    return state.visible && !document.hidden && !motionPreference.matches && !state.failed && !state.manuallyPaused;
+  };
+  var showVideoScreenshot = function (state) {
+    state.failed = true;
+    state.wantsPlay = false;
+    state.revision += 1;
+    state.video.pause();
+    state.video.hidden = true;
+    if (videoObserver) videoObserver.unobserve(state.video);
+  };
+  var updateVideo = function (state) {
+    var video = state.video;
+    video.setAttribute("aria-label", state.label + ". " + (state.manuallyPaused ? "Kaydı oynat" : "Kaydı duraklat"));
+    if (!canPlayVideo(state)) {
+      state.wantsPlay = false;
+      state.revision += 1;
+      video.pause();
+      video.hidden = motionPreference.matches || state.failed;
+      return;
+    }
+    video.hidden = false;
+    if (state.wantsPlay) return;
+    if (!state.loaded) {
+      var src = video.getAttribute("data-src");
+      if (!src) { showVideoScreenshot(state); return; }
+      video.src = src;
+      state.loaded = true;
+    }
+    state.wantsPlay = true;
+    var revision = ++state.revision;
+    var onRejected = function () {
+      // pause() bekleyen play()'i iptal edebilir; eski istek yeni turu bozmaz.
+      if (revision === state.revision && canPlayVideo(state)) showVideoScreenshot(state);
+    };
+    try {
+      var playing = video.play();
+      if (playing && playing.then) {
+        playing.then(function () {
+          // Oynatma hazır olana kadar sekmeden/ekrandan çıkılmış olabilir.
+          if (!canPlayVideo(state)) video.pause();
+        }, onRejected);
+      }
+    } catch (error) { onRejected(); }
+  };
+  var videoObserver = ("IntersectionObserver" in window)
+    ? new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          videoStates.forEach(function (state) {
+            if (state.video !== entry.target) return;
+            state.visible = entry.isIntersecting && entry.intersectionRatio >= 0.03;
+            updateVideo(state);
+          });
+        });
+      }, { threshold: 0.03 })
+    : null;
+
+  videoStates.forEach(function (state) {
+    state.video.addEventListener("error", function () { showVideoScreenshot(state); });
+    var togglePlayback = function () {
+      if (motionPreference.matches || state.failed) return;
+      state.manuallyPaused = !state.manuallyPaused;
+      updateVideo(state);
+    };
+    state.video.addEventListener("click", togglePlayback);
+    state.video.addEventListener("keydown", function (event) {
+      if (event.key !== " " && event.key !== "Enter") return;
+      event.preventDefault();
+      togglePlayback();
+    });
+    updateVideo(state);
+    if (videoObserver) videoObserver.observe(state.video);
+  });
+  if (demoVideos.length) {
+    document.addEventListener("visibilitychange", function () {
+      videoStates.forEach(updateVideo);
+    });
+    var onMotionChange = function () { videoStates.forEach(updateVideo); };
+    if (motionPreference.addEventListener) motionPreference.addEventListener("change", onMotionChange);
+    else if (motionPreference.addListener) motionPreference.addListener(onMotionChange);
+    if (!videoObserver) {
+      var updateVideoPositions = function () {
+        videoStates.forEach(function (state) {
+          var screen = state.video.parentElement || state.video;
+          var rect = screen.getBoundingClientRect();
+          state.visible = rect.bottom > 0 && rect.top < window.innerHeight &&
+            rect.right > 0 && rect.left < window.innerWidth;
+          updateVideo(state);
+        });
+      };
+      updateVideoPositions();
+      window.addEventListener("scroll", updateVideoPositions, { passive: true });
+      window.addEventListener("resize", updateVideoPositions, { passive: true });
+    }
+  }
 
   /* ---------- Arka plan kum saati: GSAP'sız yedek ----------
      Hareket azaltma tercihinde ya da GSAP yüklenemediğinde kum akmaz;
@@ -467,17 +501,24 @@
     gsap.registerPlugin(ScrollTrigger);
   }
 
+  // Özellik açıklamaları kaydırma tetikleyicisini beklerken de okunabilir
+  // kalır. Bu sayfada yalnızca konum animasyonu var; diğer sayfaların
+  // mevcut fade davranışı korunur.
+  var revealOptions = function (options) {
+    if (!featuresPage) options.autoAlpha = 0;
+    return options;
+  };
+
   // Sayfa yüklenirken hero öğeleri: hafif fade-in + slide-up
   var heroEls = document.querySelectorAll("[data-hero]");
   if (heroEls.length) {
-    gsap.from(heroEls, {
+    gsap.from(heroEls, revealOptions({
       y: 26,
-      autoAlpha: 0,
       duration: 0.5,
       ease: "power2.out",
       stagger: 0.09,
       clearProps: "all"
-    });
+    }));
   }
   // Sayfa başlığı (LCP öğesi) hiç gizlenmez; yalnızca hafifçe yukarı kayar
   var heroTitles = document.querySelectorAll("[data-hero-title]");
@@ -492,28 +533,29 @@
     return;
   }
 
-  // Scroll ile tek seferlik, abartısız reveal
-  document.querySelectorAll("[data-reveal]").forEach(function (el) {
-    gsap.from(el, {
-      y: 32,
-      autoAlpha: 0,
-      duration: 0.6,
-      ease: "power2.out",
-      scrollTrigger: { trigger: el, start: "top 86%", once: true }
+  // Özellik açıklamalarının konumu sabit kalır: ankerle gidilen başlık
+  // sonradan yukarı hareket edip sabit menünün altında kalmamalı.
+  // Diğer sayfaların mevcut tekil/grup reveal davranışı değişmez.
+  if (!featuresPage) {
+    document.querySelectorAll("[data-reveal]").forEach(function (el) {
+      gsap.from(el, revealOptions({
+        y: 32,
+        duration: 0.6,
+        ease: "power2.out",
+        scrollTrigger: { trigger: el, start: "top 86%", once: true }
+      }));
     });
-  });
 
-  // Grup reveal: kartlar hafif gecikmeli (stagger) belirir
-  document.querySelectorAll("[data-reveal-group]").forEach(function (group) {
-    gsap.from(group.children, {
-      y: 32,
-      autoAlpha: 0,
-      duration: 0.6,
-      ease: "power2.out",
-      stagger: 0.12,
-      scrollTrigger: { trigger: group, start: "top 84%", once: true }
+    document.querySelectorAll("[data-reveal-group]").forEach(function (group) {
+      gsap.from(group.children, revealOptions({
+        y: 32,
+        duration: 0.6,
+        ease: "power2.out",
+        stagger: 0.12,
+        scrollTrigger: { trigger: group, start: "top 84%", once: true }
+      }));
     });
-  });
+  }
 
   /* ---------- İmza öğesi: kum saati ----------
      Hero'daki kum saati ile sabit arka plan kopyası aynı anda çizilir. Kum,
@@ -661,17 +703,17 @@
       scrollTrigger: { trigger: row, start: "top 80%", once: true }
     });
     // Dar ekranda tek kolon: yandan kaydırma taşma yaratır, alttan belirir
-    if (text) {
-      tl.from(text, rowsNarrow
-        ? { y: 32, autoAlpha: 0, duration: 0.6, ease: "power2.out" }
-        : { x: fromRight ? 56 : -56, autoAlpha: 0, duration: 0.7, ease: "power3.out" }, 0);
+    if (text && !featuresPage) {
+      tl.from(text, revealOptions(rowsNarrow
+        ? { y: 32, duration: 0.6, ease: "power2.out" }
+        : { x: fromRight ? 56 : -56, duration: 0.7, ease: "power3.out" }), 0);
     }
     if (media) {
-      tl.from(media, rowsNarrow
-        ? { y: 36, autoAlpha: 0, duration: 0.65, ease: "power2.out" }
-        : { x: fromRight ? -64 : 64, autoAlpha: 0, duration: 0.75, ease: "power3.out" }, 0.12);
+      tl.from(media, revealOptions(rowsNarrow
+        ? { y: 36, duration: 0.65, ease: "power2.out" }
+        : { x: fromRight ? -64 : 64, duration: 0.75, ease: "power3.out" }), 0.12);
     }
-    if (items.length) {
+    if (items.length && !featuresPage) {
       tl.from(items, { y: 16, autoAlpha: 0, duration: 0.4, stagger: 0.09, ease: "power2.out" }, 0.4);
     }
 

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Elle koşulan simülatör senaryoları (g, h, i) için hazır yerel hesap.
+"""Elle koşulan simülatör senaryoları için yeni izole yerel hesap.
 
 `e2e-sim-host-<etiket>@pomosprint.local` açar (yalnızca yerel kopya),
 onboarding'i uygulamanın yaptığı gibi bitirir (YKS önerileri, görünürlük
 açık) ve kullanıcı kimliğini yazar. Şifre integration_test/support/e2e.dart
-`kE2ePassword` (tool/local_supabase/e2e/ACCOUNTS.md).
+`kE2ePassword` sabitidir; eski hazır hesap envanteri kaldırılmıştır.
 
     python3 tool/local_supabase/e2e/sim/create_host_account.py <etiket>
 """

@@ -1,6 +1,4 @@
 {
-  // VS Code > Çalıştır ve Hata Ayıkla (Ctrl/Cmd+Shift+D) listesinde görünür.
-  // Cihaz, sağ alttaki durum çubuğundaki cihaz seçicisinden seçilir.
   "version": "0.2.0",
   "configurations": [
     {
@@ -10,7 +8,6 @@
       "program": "lib/main.dart"
     },
     {
-      // profile modu simülatörde çalışmaz; yalnızca kabloyla bağlı gerçek cihazda.
       "name": "PomoSprint (profile, gerçek cihaz)",
       "request": "launch",
       "type": "dart",
@@ -18,69 +15,11 @@
       "flutterMode": "profile"
     },
     {
-      // Canlının yerel kopyasına bağlanır (tool/local_supabase/README.md;
-      // önce `supabase start --workdir tool/local_supabase`). iOS simülatörü
-      // için. Anahtar Supabase CLI'nin herkese açık yerel demo anahtarıdır,
-      // sır değil. Sentry bu yapılandırmada kapalı.
-      "name": "PomoSprint (yerel Supabase)",
+      "name": "PomoSprint (release, gerçek cihaz)",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
-      "toolArgs": [
-        "--dart-define=SUPABASE_URL=http://127.0.0.1:54321",
-        "--dart-define=SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0"
-      ]
-    },
-    {
-      // Android emülatöründe bilgisayarın 127.0.0.1'i 10.0.2.2'dir.
-      "name": "PomoSprint (yerel Supabase, Android emülatör)",
-      "request": "launch",
-      "type": "dart",
-      "program": "lib/main.dart",
-      "toolArgs": [
-        "--dart-define=SUPABASE_URL=http://10.0.2.2:54321",
-        "--dart-define=SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0"
-      ]
-    },
-    {
-      "name": "PomoSprint (kayıtlı hızlı yerel test, iOS)",
-      "request": "launch",
-      "type": "dart",
-      "program": "lib/main.dart",
-      "toolArgs": [
-        "--dart-define=QUICK_TIMER=true",
-        "--dart-define=QUICK_TIMER_SAVE=true",
-        "--dart-define=SUPABASE_URL=http://127.0.0.1:54321",
-        "--dart-define=SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0"
-      ]
-    },
-    {
-      "name": "PomoSprint (kayıtlı hızlı yerel test, Android)",
-      "request": "launch",
-      "type": "dart",
-      "program": "lib/main.dart",
-      "toolArgs": [
-        "--dart-define=QUICK_TIMER=true",
-        "--dart-define=QUICK_TIMER_SAVE=true",
-        "--dart-define=SUPABASE_URL=http://10.0.2.2:54321",
-        "--dart-define=SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0"
-      ]
-    },
-    {
-      "name": "Kilit ekranı önizleme (girişsiz)",
-      "request": "launch",
-      "type": "dart",
-      "program": "lib/dev/lock_screen_preview.dart"
-    },
-    {
-      // Sayaç 25 dk → 5 sn, 50 dk → 10 sn; ekranda TEST rozeti. Bu
-      // seanslar sunucuya ve kuyruğa gönderilmez (puan/kum gelmez). Gerçek
-      // seans için yukarıdaki "PomoSprint" yapılandırmasını kullan.
-      "name": "PomoSprint (hızlı test sayacı, kaydedilmez)",
-      "request": "launch",
-      "type": "dart",
-      "program": "lib/main.dart",
-      "toolArgs": ["--dart-define=QUICK_TIMER=true"]
+      "flutterMode": "release"
     }
   ]
 }

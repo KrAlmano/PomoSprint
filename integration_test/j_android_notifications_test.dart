@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:pomodoro/services/notification_service.dart';
 import 'support/e2e.dart';
+import 'support/marathon_notifications.dart';
 
 void main() {
   initE2e();
@@ -47,6 +48,7 @@ void main() {
       isTrue,
     );
     await service.cancelOngoingTimer();
+    await waitForNativeNotificationRemoved(tester, 1);
     expect(
       (await plugin.getActiveNotifications()).any((n) => n.id == 1),
       isFalse,
@@ -68,22 +70,18 @@ void main() {
       after: const Duration(seconds: 3),
       categoryName: 'Matematik',
     );
-    await pumpFor(tester, const Duration(seconds: 5));
-    expect(
-      (await plugin.getActiveNotifications()).any((n) => n.id == 0),
-      isTrue,
-      reason: 'Gerçek AlarmManager bitiş bildirimi teslim edildi',
-    );
+    await waitForNativeNotification(tester, 0);
     await E2eHost.screenshot(tester, 'e2e-android-bildirim-native');
+    await verifyNativeMarathonNotifications(tester);
     await service.setEnabled(false);
     expect(await service.isEnabled(), isFalse);
     expect(await plugin.pendingNotificationRequests(), isEmpty);
+    await waitForNativeNotificationRemoved(tester, 1);
     expect(
       (await plugin.getActiveNotifications()).any((n) => n.id == 1),
       isFalse,
     );
-    // Tercih kapatmak geçmişte teslim edilmiş bildirimi silmez. Testin
-    // teslim kaydını yalnızca senaryo temizliği için açıkça kaldır.
+    // Testin teslim kayıtlarını da açıkça temizle.
     await plugin.cancel(id: 0);
     expect(await plugin.getActiveNotifications(), isEmpty);
     expect(tester.takeException(), isNull);

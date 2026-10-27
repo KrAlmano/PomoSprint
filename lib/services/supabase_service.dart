@@ -26,8 +26,9 @@ import '../widgets/auth/legal_links.dart' show kLegalDocumentsVersion;
 import 'backend_config.dart';
 import 'hidden_users.dart';
 import 'language_service.dart';
-import 'local_test_mode.dart';
+import 'league_backend.dart';
 import 'lock_screen_timer.dart';
+import 'marathon_presence.dart';
 import 'notification_service.dart';
 import 'onboarding_categories.dart';
 import 'onboarding_draft.dart';
@@ -66,13 +67,18 @@ class SupabaseService {
     );
     // Çalışma günü hesapları (istatistikler, 'bugün', seri) oturumdaki
     // kullanıcının profil saat dilimini izler; sunucu da onu kullanır.
-    currentUser.addListener(() => setStudyTimeZone(currentUser.value?.timezone));
+    currentUser.addListener(
+      () => setStudyTimeZone(currentUser.value?.timezone),
+    );
   }
 
   static final SupabaseService instance = SupabaseService._init();
 
   bool _isCloudActive = false;
   bool get isCloudActive => _isCloudActive;
+
+  BackendConfig? _backendConfig;
+  bool get isLocalBackend => _backendConfig?.isLocalBackend ?? false;
 
   SupabaseClient get _client => Supabase.instance.client;
 
@@ -101,7 +107,8 @@ class SupabaseService {
   /// Oturumun neden kapandığı (hesap silindi, oturum uzaktan düştü, Apple
   /// izni kaldırıldı). Giriş ekranı [takeSignOutNotice] ile bir kez okur.
   /// Kullanıcının kendi çıkışında ayarlanmaz.
-  final ValueNotifier<SignOutNotice?> signOutNotice = ValueNotifier<SignOutNotice?>(null);
+  final ValueNotifier<SignOutNotice?> signOutNotice =
+      ValueNotifier<SignOutNotice?>(null);
 
   /// Bekleyen açıklamayı döndürür ve temizler.
   SignOutNotice? takeSignOutNotice() {
@@ -114,17 +121,25 @@ class SupabaseService {
   // signedOut olayları (ör. silinen hesabın token yenilemesi) "oturum
   // uzaktan düştü" sayılmaz.
   int _localSignOutDepth = 0;
+  bool _isRemoteSessionEnding = false;
+
+  /// Native çıkış/temizlik beklerken mevcut kullanıcı henüz null değildir.
+  /// Bu aralıkta sayaç yeni odak veya cihaz alarmı başlatamaz.
+  bool get isDeviceSessionEnding =>
+      _localSignOutDepth > 0 || _isRemoteSessionEnding;
 
   /// Oturum kapanınca (çıkış, silme, uzaktan düşme) cihazda kalan seans
   /// göstergelerini kapatır: zamanlanmış bitiş bildirimi (Android exact
   /// alarm dahil), Android kalıcı bildirimi, iOS Canlı Etkinlik. Testte
   /// değiştirilebilir.
   @visibleForTesting
-  static Future<void> Function() sessionEndedCleanup = _defaultSessionEndedCleanup;
+  static Future<void> Function() sessionEndedCleanup =
+      _defaultSessionEndedCleanup;
 
   static Future<void> _defaultSessionEndedCleanup() async {
     if (isFlutterTestEnvironment) return;
     await NotificationService.instance.cancelSessionEndNotification();
+    await NotificationService.instance.cancelMarathonBreakEnd();
     await LockScreenTimer.instance.clear();
   }
 
@@ -173,13 +188,17 @@ class SupabaseService {
   // ---- Ortak yardımcılar ----
 
   void _requireCloud() {
-    if (!_isCloudActive) throw const ServiceException(ServiceErrorCode.cloudUnavailable);
+    if (!_isCloudActive) {
+      throw const ServiceException(ServiceErrorCode.cloudUnavailable);
+    }
   }
 
   User _requireAuthUser() {
     _requireCloud();
     final user = _client.auth.currentUser;
-    if (user == null) throw const ServiceException(ServiceErrorCode.notSignedIn);
+    if (user == null) {
+      throw const ServiceException(ServiceErrorCode.notSignedIn);
+    }
     return user;
   }
 
@@ -188,7 +207,9 @@ class SupabaseService {
   // Açılışta başlatılamamış bulut giriş anında yeniden denenir; aksi halde
   // giriş ekranı uygulama yeniden açılana dek "Sunucuya bağlanılamadı" diyordu.
   Future<void> _ensureCloudForAuth() async {
-    if (!await ensureCloud()) throw const AuthFailure(AuthErrorCode.cloudUnavailable);
+    if (!await ensureCloud()) {
+      throw const AuthFailure(AuthErrorCode.cloudUnavailable);
+    }
   }
 
   /// Auth isteğini zaman aşımıyla çalıştırır. Zaman aşımı
@@ -208,7 +229,10 @@ class SupabaseService {
   }
 
   /// İsteği zaman aşımıyla çalıştırır, hatayı [ServiceException]'a çevirir.
-  Future<T> _guard<T>(Future<T> Function() body, {Duration timeout = _requestTimeout}) async {
+  Future<T> _guard<T>(
+    Future<T> Function() body, {
+    Duration timeout = _requestTimeout,
+  }) async {
     try {
       return await body().timeout(timeout);
     } catch (e, st) {
@@ -217,7 +241,10 @@ class SupabaseService {
   }
 
   static List<Map<String, dynamic>> _rows(Object? response) => response is List
-      ? response.whereType<Map>().map((e) => Map<String, dynamic>.from(e)).toList()
+      ? response
+            .whereType<Map>()
+            .map((e) => Map<String, dynamic>.from(e))
+            .toList()
       : <Map<String, dynamic>>[];
 
   // ---- Başlatma ----
@@ -233,11 +260,16 @@ class SupabaseService {
     }
     // --dart-define SUPABASE_URL + SUPABASE_ANON_KEY (ör. yerel Supabase
     // kopyası) verilmişse .env'in önüne geçer (BackendConfig).
-    final backend = BackendConfig.resolve(dotenv.isInitialized ? dotenv.env : const {});
+    final backend = BackendConfig.resolve(
+      dotenv.isInitialized ? dotenv.env : const {},
+    );
+    _backendConfig = backend;
     url = backend.supabaseUrl;
     anonKey = backend.supabaseAnonKey;
     if (backend.source == BackendConfigSource.incompleteDartDefine) {
-      debugPrint('[INIT] SUPABASE_URL ve SUPABASE_ANON_KEY birlikte verilmeli; bulut kapalı.');
+      debugPrint(
+        '[INIT] SUPABASE_URL ve SUPABASE_ANON_KEY birlikte verilmeli; bulut kapalı.',
+      );
     }
 
     if (url.isEmpty ||
@@ -270,7 +302,8 @@ class SupabaseService {
       _isCloudActive = true;
       _authSubscription ??= _client.auth.onAuthStateChange.listen(
         handleAuthStateChange,
-        onError: (Object e) => debugPrint('[AUTH] onAuthStateChange hatası: $e'),
+        onError: (Object e) =>
+            debugPrint('[AUTH] onAuthStateChange hatası: $e'),
       );
       debugPrint('[INIT] Supabase bağlandı.');
     } catch (e) {
@@ -295,7 +328,9 @@ class SupabaseService {
   /// bilgisi yoksa (.env boş) false.
   Future<bool> ensureCloud({Duration timeout = _requestTimeout}) async {
     if (_isCloudActive) return true;
-    final attempt = _cloudAttempt ??= _attemptCloud().whenComplete(() => _cloudAttempt = null);
+    final attempt = _cloudAttempt ??= _attemptCloud().whenComplete(
+      () => _cloudAttempt = null,
+    );
     try {
       return await attempt.timeout(timeout);
     } on TimeoutException {
@@ -304,7 +339,8 @@ class SupabaseService {
   }
 
   Future<bool> _attemptCloud() async {
-    final init = debugCloudInitializer ?? (isFlutterTestEnvironment ? null : initialize);
+    final init =
+        debugCloudInitializer ?? (isFlutterTestEnvironment ? null : initialize);
     if (init == null) return _isCloudActive;
     try {
       await init();
@@ -322,8 +358,10 @@ class SupabaseService {
 
   // Tek bir GoogleSignIn örneği: her çağrıda yeniden oluşturmak,
   // paketin sessiz oturum önbelleğini (signInSilently) sıfırlıyordu.
-  static const String _googleWebClientId = '722417205043-d7t27n7usp9nrfeuh8o97fald6a5v9ku.apps.googleusercontent.com';
-  static const String _googleIosClientId = '722417205043-luq0knjdncu1aitpg9udbfgmo2qdtced.apps.googleusercontent.com';
+  static const String _googleWebClientId =
+      '722417205043-d7t27n7usp9nrfeuh8o97fald6a5v9ku.apps.googleusercontent.com';
+  static const String _googleIosClientId =
+      '722417205043-luq0knjdncu1aitpg9udbfgmo2qdtced.apps.googleusercontent.com';
   late final GoogleSignIn _googleSignIn = GoogleSignIn(
     serverClientId: _googleWebClientId,
     clientId: _googleIosClientId,
@@ -362,7 +400,9 @@ class SupabaseService {
   @visibleForTesting
   void handleAuthStateChange(AuthState data) {
     if (data.event != AuthChangeEvent.signedOut) return;
-    final remote = data.signOutReason == SignOutReason.sessionExpired &&
+    if (_isRemoteSessionEnding) return;
+    final remote =
+        data.signOutReason == SignOutReason.sessionExpired &&
         _localSignOutDepth == 0 &&
         currentUser.value != null;
     if (!remote) {
@@ -371,9 +411,14 @@ class SupabaseService {
       return;
     }
     signOutNotice.value = SignOutNotice.sessionExpired;
+    _isRemoteSessionEnding = true;
     unawaited(() async {
-      await _endDeviceSession();
-      await _clearUserScopedState();
+      try {
+        await _endDeviceSession();
+        await _clearUserScopedState();
+      } finally {
+        _isRemoteSessionEnding = false;
+      }
     }());
   }
 
@@ -410,8 +455,12 @@ class SupabaseService {
       await prefs.remove('saved_categories');
       // Apple ile girişin cihazdaki kaydı yalnızca o oturum için geçerli.
       await prefs.remove(_appleIdentityKey);
-      if (mail != null && mail.isNotEmpty) await prefs.remove('saved_categories_$mail');
-      if (id != null && id.isNotEmpty) await prefs.remove('saved_categories_uid_$id');
+      if (mail != null && mail.isNotEmpty) {
+        await prefs.remove('saved_categories_$mail');
+      }
+      if (id != null && id.isNotEmpty) {
+        await prefs.remove('saved_categories_uid_$id');
+      }
     } catch (e) {
       debugPrint('[AUTH] Yerel kullanıcı önbelleği temizlenemedi: $e');
     }
@@ -431,12 +480,16 @@ class SupabaseService {
     String? name,
   }) {
     final cleanEmail = email.trim().toLowerCase();
-    final displayName = (name != null && name.trim().isNotEmpty) ? name.trim() : cleanEmail.split('@').first;
+    final displayName = (name != null && name.trim().isNotEmpty)
+        ? name.trim()
+        : cleanEmail.split('@').first;
     return {
       'name': displayName,
       // Yalnızca varsayılan (ücretsiz) avatarlar kayıtta seçilebilir;
       // sunucu (handle_new_user) diğerlerini avatar_16_basic'e çeker.
-      'avatar_id': AvatarCharacter.isFreeAvatarId(avatarId) ? avatarId : kDefaultAvatarId,
+      'avatar_id': AvatarCharacter.isFreeAvatarId(avatarId)
+          ? avatarId
+          : kDefaultAvatarId,
       ...consent.toMetadata(),
     };
   }
@@ -449,7 +502,12 @@ class SupabaseService {
     String? name,
   }) async {
     // Zorunlu onaylar olmadan istek hiç gönderilmez (UI da engeller).
-    final data = signUpMetadata(email: email, avatarId: avatarId, consent: consent, name: name);
+    final data = signUpMetadata(
+      email: email,
+      avatarId: avatarId,
+      consent: consent,
+      name: name,
+    );
     await _ensureCloudForAuth();
     final cleanEmail = email.trim().toLowerCase();
 
@@ -480,10 +538,12 @@ class SupabaseService {
 
   Future<UserModel?> loginUser(String email, String password) async {
     await _ensureCloudForAuth();
-    final response = await runAuthRequest(() => _client.auth.signInWithPassword(
-          email: email.trim().toLowerCase(),
-          password: password,
-        ));
+    final response = await runAuthRequest(
+      () => _client.auth.signInWithPassword(
+        email: email.trim().toLowerCase(),
+        password: password,
+      ),
+    );
     if (response.user == null) return null;
     return _loadUserAfterSignIn();
   }
@@ -498,24 +558,33 @@ class SupabaseService {
     try {
       // Önce sessiz oturum: kullanıcı daha önce izin verdiyse hesap seçici
       // gösterilmez. Yalnızca null dönerse interaktif signIn'e düşülür.
-      googleUser = await _googleSignIn.signInSilently() ?? await _googleSignIn.signIn();
+      googleUser =
+          await _googleSignIn.signInSilently() ?? await _googleSignIn.signIn();
       if (googleUser == null) return null;
       final googleAuth = await runAuthRequest(() => googleUser!.authentication);
       idToken = googleAuth.idToken;
       accessToken = googleAuth.accessToken;
     } on PlatformException catch (e) {
       if (e.code == GoogleSignIn.kSignInCanceledError) return null;
-      if (e.code == GoogleSignIn.kNetworkError) throw AuthFailure(AuthErrorCode.network, e);
+      if (e.code == GoogleSignIn.kNetworkError) {
+        throw AuthFailure(AuthErrorCode.network, e);
+      }
       throw AuthFailure(AuthErrorCode.googleSignInFailed, e);
     }
-    if (idToken == null) throw const AuthFailure(AuthErrorCode.googleSignInFailed);
+    if (idToken == null) {
+      throw const AuthFailure(AuthErrorCode.googleSignInFailed);
+    }
 
-    final response = await runAuthRequest(() => _client.auth.signInWithIdToken(
-          provider: OAuthProvider.google,
-          idToken: idToken!,
-          accessToken: accessToken,
-        ));
-    if (response.user == null) throw const AuthFailure(AuthErrorCode.googleSignInFailed);
+    final response = await runAuthRequest(
+      () => _client.auth.signInWithIdToken(
+        provider: OAuthProvider.google,
+        idToken: idToken!,
+        accessToken: accessToken,
+      ),
+    );
+    if (response.user == null) {
+      throw const AuthFailure(AuthErrorCode.googleSignInFailed);
+    }
 
     await _recordProviderLegalAcceptance();
     await _cleanupDuplicateIdentity();
@@ -548,14 +617,20 @@ class SupabaseService {
     }
 
     final idToken = credential.identityToken;
-    if (idToken == null) throw const AuthFailure(AuthErrorCode.appleSignInFailed);
+    if (idToken == null) {
+      throw const AuthFailure(AuthErrorCode.appleSignInFailed);
+    }
 
-    final response = await runAuthRequest(() => _client.auth.signInWithIdToken(
-          provider: OAuthProvider.apple,
-          idToken: idToken,
-          nonce: rawNonce,
-        ));
-    if (response.user == null) throw const AuthFailure(AuthErrorCode.appleSignInFailed);
+    final response = await runAuthRequest(
+      () => _client.auth.signInWithIdToken(
+        provider: OAuthProvider.apple,
+        idToken: idToken,
+        nonce: rawNonce,
+      ),
+    );
+    if (response.user == null) {
+      throw const AuthFailure(AuthErrorCode.appleSignInFailed);
+    }
     // Bu cihazda Apple ile girildi: açılışta/ön plana dönüşte izin durumu
     // bu kimlikle denetlenir (verifyAppleCredential).
     await _rememberAppleIdentity(response.user!.id, credential.userIdentifier);
@@ -583,7 +658,10 @@ class SupabaseService {
     final result = await _guard(
       () => _client.rpc(
         'accept_legal_documents',
-        params: {'p_terms_version': kLegalDocumentsVersion, 'p_privacy_version': kLegalDocumentsVersion},
+        params: {
+          'p_terms_version': kLegalDocumentsVersion,
+          'p_privacy_version': kLegalDocumentsVersion,
+        },
       ),
     );
     if (result is! Map || result['success'] != true) {
@@ -600,7 +678,10 @@ class SupabaseService {
   /// görünüyordu. Yalnızca ad hâlâ trigger'ın varsayılanıysa (e-posta yerel
   /// kısmı; ya da onboarding bitmemişken sağlayıcının tam adı) değiştirilir;
   /// kullanıcının kendi seçtiği ada dokunulmaz. Hata girişi bozmaz.
-  Future<UserModel> _applyProviderFirstName(UserModel user, {String? givenName}) async {
+  Future<UserModel> _applyProviderFirstName(
+    UserModel user, {
+    String? givenName,
+  }) async {
     final authUser = _isCloudActive ? _client.auth.currentUser : null;
     if (authUser == null || user.id != authUser.id) return user;
     final desired = providerFirstNameUpdate(
@@ -616,7 +697,9 @@ class SupabaseService {
     try {
       await updateUserName(desired);
     } catch (e) {
-      debugPrint('[AUTH] Profil adı sağlayıcının ilk adına çekilemedi (yok sayılıyor): $e');
+      debugPrint(
+        '[AUTH] Profil adı sağlayıcının ilk adına çekilemedi (yok sayılıyor): $e',
+      );
     }
     return currentUser.value ?? user;
   }
@@ -643,23 +726,34 @@ class SupabaseService {
     String? userId,
   }) {
     const triggerNameMax = 50; // handle_new_user: left(..., 50)
-    String clip(String v) => v.length > triggerNameMax ? v.substring(0, triggerNameMax) : v;
+    String clip(String v) =>
+        v.length > triggerNameMax ? v.substring(0, triggerNameMax) : v;
     final current = currentName.trim();
     final emailLocal = (email ?? '').split('@').first.trim();
-    final fullName = (metadata['full_name'] ?? metadata['name'])?.toString().trim() ?? '';
+    final fullName =
+        (metadata['full_name'] ?? metadata['name'])?.toString().trim() ?? '';
     final neutral = neutralProfileName(userId);
     final isEmailDefault = emailLocal.isNotEmpty && current == clip(emailLocal);
     // proposed/14: handle_new_user uygun ad bulamazsa 'Pomo 1234' (rastgele
     // dört rakam) yazar. Onboarding bitmeden bu da varsayılandır; sonrasında
     // (ör. ops.reset_display_name ile sıfırlanmış ad) dokunulmaz.
-    final isNeutralDefault = (userId != null && current == neutral) ||
+    final isNeutralDefault =
+        (userId != null && current == neutral) ||
         (!onboardingCompleted && RegExp(r'^Pomo \d{4}$').hasMatch(current));
-    final isFullNameDefault = !onboardingCompleted && fullName.contains(RegExp(r'\s')) && current == clip(fullName);
+    final isFullNameDefault =
+        !onboardingCompleted &&
+        fullName.contains(RegExp(r'\s')) &&
+        current == clip(fullName);
     if (!isEmailDefault && !isNeutralDefault && !isFullNameDefault) return null;
-    final providerName = _providerGivenName(provider: provider, metadata: metadata, nameHint: givenName);
+    final providerName = _providerGivenName(
+      provider: provider,
+      metadata: metadata,
+      nameHint: givenName,
+    );
     final desired = providerName == null ? '' : _clipName(providerName);
     // Sağlayıcıdaki ad başkalarına görünecek; küfür içeriyorsa yazılmaz.
-    final usable = desired.length >= _nameMinLength && !NameFilter.isOffensive(desired);
+    final usable =
+        desired.length >= _nameMinLength && !NameFilter.isOffensive(desired);
     if (usable) return desired == current ? null : desired;
     // Kullanılabilir ad yok (Apple adı yalnızca ilk yetkilendirmede verir):
     // e-postanın yerel kısmı herkese açık listelerde (anon dahil, tek parça
@@ -675,10 +769,15 @@ class SupabaseService {
     if (email == null || email.isEmpty) return;
     try {
       await _client
-          .rpc('cleanup_unconfirmed_duplicate_identity', params: {'p_email': email})
+          .rpc(
+            'cleanup_unconfirmed_duplicate_identity',
+            params: {'p_email': email},
+          )
           .timeout(_requestTimeout);
     } catch (e) {
-      debugPrint('[AUTH] cleanup_unconfirmed_duplicate_identity hatası (yok sayılıyor): $e');
+      debugPrint(
+        '[AUTH] cleanup_unconfirmed_duplicate_identity hatası (yok sayılıyor): $e',
+      );
     }
   }
 
@@ -696,7 +795,9 @@ class SupabaseService {
         if (user != null) return user;
       } catch (e) {
         lastError = e;
-        debugPrint('[AUTH] Giriş sonrası profil okunamadı (deneme ${attempt + 1}): $e');
+        debugPrint(
+          '[AUTH] Giriş sonrası profil okunamadı (deneme ${attempt + 1}): $e',
+        );
       }
     }
     final uid = _client.auth.currentUser?.id;
@@ -711,21 +812,25 @@ class SupabaseService {
 
   Future<void> resendConfirmationEmail(String email) async {
     await _ensureCloudForAuth();
-    await runAuthRequest(() => _client.auth.resend(
-          type: OtpType.signup,
-          email: email.trim().toLowerCase(),
-          emailRedirectTo: 'https://pomosprint.app/confirmed.html',
-        ));
+    await runAuthRequest(
+      () => _client.auth.resend(
+        type: OtpType.signup,
+        email: email.trim().toLowerCase(),
+        emailRedirectTo: 'https://pomosprint.app/confirmed.html',
+      ),
+    );
   }
 
   // Supabase, hesap keşfini önlemek için e-posta kayıtlı olsun ya da olmasın
   // aynı şekilde davranır; başarılı dönüş e-postanın var olduğunu göstermez.
   Future<void> resetPassword(String email) async {
     await _ensureCloudForAuth();
-    await runAuthRequest(() => _client.auth.resetPasswordForEmail(
-          email.trim().toLowerCase(),
-          redirectTo: 'https://pomosprint.app/reset-password.html',
-        ));
+    await runAuthRequest(
+      () => _client.auth.resetPasswordForEmail(
+        email.trim().toLowerCase(),
+        redirectTo: 'https://pomosprint.app/reset-password.html',
+      ),
+    );
   }
 
   // ---- Şifre ve sağlayıcılar ----
@@ -736,7 +841,10 @@ class SupabaseService {
   static bool userHasProvider(User user, String provider) {
     final meta = user.appMetadata;
     final providers = meta['providers'];
-    if (providers is List && providers.map((e) => e.toString()).contains(provider)) return true;
+    if (providers is List &&
+        providers.map((e) => e.toString()).contains(provider)) {
+      return true;
+    }
     if (meta['provider']?.toString() == provider) return true;
     return user.identities?.any((i) => i.provider == provider) ?? false;
   }
@@ -747,26 +855,43 @@ class SupabaseService {
   /// şifre yoktur; "Şifremi unuttum" ile şifre belirlenebilir.)
   bool get canChangePassword {
     final user = _authUserOrNull;
-    return user != null && (user.email ?? '').isNotEmpty && userHasProvider(user, 'email');
+    return user != null &&
+        (user.email ?? '').isNotEmpty &&
+        userHasProvider(user, 'email');
   }
 
   /// Uygulama içi şifre değiştirme: önce mevcut şifreyle yeniden doğrulanır
   /// (yanlışsa [AuthErrorCode.invalidCredentials]), sonra yeni şifre
   /// yazılır. GoTrue şifre değişince hesabın diğer oturumlarını kapatır.
-  Future<void> changePassword({required String currentPassword, required String newPassword}) async {
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
     await _ensureCloudForAuth();
     final email = _client.auth.currentUser?.email;
-    if (email == null || email.isEmpty) throw const AuthFailure(AuthErrorCode.unknown);
-    if (newPassword == currentPassword) throw const AuthFailure(AuthErrorCode.samePassword);
-    await runAuthRequest(() => _client.auth.signInWithPassword(email: email, password: currentPassword));
-    await runAuthRequest(() => _client.auth.updateUser(UserAttributes(password: newPassword)));
+    if (email == null || email.isEmpty) {
+      throw const AuthFailure(AuthErrorCode.unknown);
+    }
+    if (newPassword == currentPassword) {
+      throw const AuthFailure(AuthErrorCode.samePassword);
+    }
+    await runAuthRequest(
+      () => _client.auth.signInWithPassword(
+        email: email,
+        password: currentPassword,
+      ),
+    );
+    await runAuthRequest(
+      () => _client.auth.updateUser(UserAttributes(password: newPassword)),
+    );
   }
 
   // ---- Sign in with Apple ----
 
   // Debug yapılandırması Sign in with Apple entitlement'ı olmadan derlenir
   // (bkz. LoginScreen); Apple yalnızca iOS release/profile'da kullanılabilir.
-  static bool get _appleSignInSupported => !kIsWeb && !kDebugMode && defaultTargetPlatform == TargetPlatform.iOS;
+  static bool get _appleSignInSupported =>
+      !kIsWeb && !kDebugMode && defaultTargetPlatform == TargetPlatform.iOS;
 
   /// Oturumdaki hesapta Apple kimliği var mı?
   bool get hasAppleIdentity {
@@ -784,7 +909,9 @@ class SupabaseService {
   Future<String?> requestAppleAuthorizationCode() async {
     if (!_appleSignInSupported) return null;
     try {
-      final credential = await SignInWithApple.getAppleIDCredential(scopes: const []);
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: const [],
+      );
       final code = credential.authorizationCode.trim();
       return code.isEmpty ? null : code;
     } catch (e) {
@@ -797,7 +924,10 @@ class SupabaseService {
     if (appleUserId == null || appleUserId.isEmpty) return;
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_appleIdentityKey, jsonEncode({'uid': uid, 'apple_user': appleUserId}));
+      await prefs.setString(
+        _appleIdentityKey,
+        jsonEncode({'uid': uid, 'apple_user': appleUserId}),
+      );
     } catch (e) {
       debugPrint('[AUTH] Apple kimliği kaydedilemedi: $e');
     }
@@ -841,7 +971,9 @@ class SupabaseService {
       debugPrint('[AUTH] Apple izin durumu okunamadı: $e');
       return;
     }
-    if (!appleCredentialRequiresSignOut(state) || _authUserOrNull?.id != uid) return;
+    if (!appleCredentialRequiresSignOut(state) || _authUserOrNull?.id != uid) {
+      return;
+    }
     await signOutFully(notice: SignOutNotice.appleCredentialRevoked);
   }
 
@@ -862,7 +994,9 @@ class SupabaseService {
   /// gizlenen kullanıcılar, onboarding taslağı, lig bilgisi ve hedef taşıma
   /// bayrakları, kullanıcı/kategori önbelleği. Google ile bağlı hesapta
   /// Google erişimi de kaldırılır (disconnect).
-  Future<AppleRevocation> deleteUserAccount({String? appleAuthorizationCode}) async {
+  Future<AppleRevocation> deleteUserAccount({
+    String? appleAuthorizationCode,
+  }) async {
     final authUser = _requireAuthUser();
     final uid = authUser.id;
     final email = authUser.email ?? currentUser.value?.email;
@@ -870,27 +1004,45 @@ class SupabaseService {
     final hasGoogle = userHasProvider(authUser, 'google');
     _localSignOutDepth++;
     try {
-      var apple = hasApple ? AppleRevocation.notRevoked : AppleRevocation.notApplicable;
+      var apple = hasApple
+          ? AppleRevocation.notRevoked
+          : AppleRevocation.notApplicable;
       try {
         try {
           final response = await _client.functions
-              .invoke('delete-account', body: {
-                if (appleAuthorizationCode != null && appleAuthorizationCode.isNotEmpty)
-                  'apple_authorization_code': appleAuthorizationCode,
-              })
+              .invoke(
+                'delete-account',
+                body: {
+                  if (appleAuthorizationCode != null &&
+                      appleAuthorizationCode.isNotEmpty)
+                    'apple_authorization_code': appleAuthorizationCode,
+                },
+              )
               .timeout(_deleteAccountTimeout);
-          apple = appleRevocationFromResponse(response.data, hasAppleIdentity: hasApple);
+          apple = appleRevocationFromResponse(
+            response.data,
+            hasAppleIdentity: hasApple,
+          );
         } on FunctionException catch (e) {
           if (!shouldFallBackToDeleteRpc(e)) rethrow;
           // Edge Function deploy edilmemiş ya da çalışamadı: canlıdaki RPC.
           // 5xx gövdesi Apple iptalinin yapılıp yapılmadığını söyleyebilir.
-          debugPrint('[AUTH] delete-account kullanılamadı (${e.status}); delete_own_account RPC.');
-          apple = appleRevocationFromResponse(e.details, hasAppleIdentity: hasApple);
+          debugPrint(
+            '[AUTH] delete-account kullanılamadı (${e.status}); delete_own_account RPC.',
+          );
+          apple = appleRevocationFromResponse(
+            e.details,
+            hasAppleIdentity: hasApple,
+          );
           await _client.rpc('delete_own_account').timeout(_requestTimeout);
         }
       } catch (e, st) {
-        if (!await _accountNoLongerExists()) Error.throwWithStackTrace(ServiceException.wrap(e), st);
-        debugPrint('[AUTH] Silme yanıtı alınamadı ama hesap artık yok; temizliğe devam ediliyor.');
+        if (!await _accountNoLongerExists()) {
+          Error.throwWithStackTrace(ServiceException.wrap(e), st);
+        }
+        debugPrint(
+          '[AUTH] Silme yanıtı alınamadı ama hesap artık yok; temizliğe devam ediliyor.',
+        );
       }
       await clearDeletedAccountLocalData(uid, email: email);
       if (hasGoogle) await _disconnectGoogle(email);
@@ -906,7 +1058,8 @@ class SupabaseService {
   /// (5xx: açılış hatası, kaynak sınırı, silme hatası). 401/4xx (oturum,
   /// istek) yedeğe düşmez.
   @visibleForTesting
-  static bool shouldFallBackToDeleteRpc(FunctionException e) => e.status == 404 || e.status >= 500;
+  static bool shouldFallBackToDeleteRpc(FunctionException e) =>
+      e.status == 404 || e.status >= 500;
 
   /// Silme yanıtı kaybolduğunda hesabın sunucuda artık olmadığını doğrular.
   Future<bool> _accountNoLongerExists() async {
@@ -923,7 +1076,8 @@ class SupabaseService {
   /// GoTrue `GET /user` hatası kullanıcının silindiğini mi gösteriyor?
   /// (Süresi dolmuş JWT'nin 401'i silinme sayılmaz.)
   @visibleForTesting
-  static bool authErrorMeansUserGone(AuthException e) => e.code == 'user_not_found' || e.statusCode == '404';
+  static bool authErrorMeansUserGone(AuthException e) =>
+      e.code == 'user_not_found' || e.statusCode == '404';
 
   /// Silinen hesabın Google erişimini kaldırır (yalnızca cihazdaki Google
   /// hesabı silinen hesabın e-postasıysa). Hata yutulur.
@@ -931,7 +1085,9 @@ class SupabaseService {
     final mail = email?.trim().toLowerCase();
     if (mail == null || mail.isEmpty || isFlutterTestEnvironment) return;
     try {
-      final account = _googleSignIn.currentUser ?? await _googleSignIn.signInSilently().timeout(_requestTimeout);
+      final account =
+          _googleSignIn.currentUser ??
+          await _googleSignIn.signInSilently().timeout(_requestTimeout);
       if (account == null || account.email.trim().toLowerCase() != mail) return;
       await _googleSignIn.disconnect().timeout(_requestTimeout);
     } catch (e) {
@@ -948,14 +1104,21 @@ class SupabaseService {
       try {
         await body();
       } catch (e) {
-        debugPrint('[AUTH] Silinen hesabın yerel verisi temizlenemedi ($what): $e');
+        debugPrint(
+          '[AUTH] Silinen hesabın yerel verisi temizlenemedi ($what): $e',
+        );
       }
     }
 
     await step('kuyruk', () => _queue.clearUser(uid, email: email));
     // Sayaç ekranı kapanırken seansı yeniden yazmasın diye sahip emekliye ayrılır.
     await step('sayaç', () => TimerPersistence.instance.retireOwner(uid));
-    if (mail != null && mail.isNotEmpty) await step('sayaç (e-posta)', () => TimerPersistence.instance.clear(mail));
+    if (mail != null && mail.isNotEmpty) {
+      await step(
+        'sayaç (e-posta)',
+        () => TimerPersistence.instance.clear(mail),
+      );
+    }
     await step('gizlenenler', () => HiddenUsersStore.instance.forget(uid));
     await step('onboarding taslağı', () => OnboardingDraftStore.clear(uid));
     await step('tercihler', () async {
@@ -967,7 +1130,9 @@ class SupabaseService {
         await prefs.remove('league_info_shown_$email');
         await prefs.remove('saved_categories_$email');
       }
-      if (mail != null && mail.isNotEmpty && mail != email) await prefs.remove('saved_categories_$mail');
+      if (mail != null && mail.isNotEmpty && mail != email) {
+        await prefs.remove('saved_categories_$mail');
+      }
     });
   }
 
@@ -1015,9 +1180,17 @@ class SupabaseService {
     return user;
   }
 
-  Future<void> _syncProfileTimeZone(String uid, int epoch, Map<String, dynamic> profile) async {
+  Future<void> _syncProfileTimeZone(
+    String uid,
+    int epoch,
+    Map<String, dynamic> profile,
+  ) async {
     final zone = await DeviceTimeZone.read();
-    if (zone == null || zone == profile['timezone'] || !_isCurrentSession(uid, epoch)) return;
+    if (zone == null ||
+        zone == profile['timezone'] ||
+        !_isCurrentSession(uid, epoch)) {
+      return;
+    }
     try {
       final rows = await _client
           .from('profiles')
@@ -1025,9 +1198,13 @@ class SupabaseService {
           .eq('id', uid)
           .select('timezone')
           .timeout(const Duration(seconds: 3));
-      if (_isCurrentSession(uid, epoch) && rows.isNotEmpty) profile['timezone'] = rows.first['timezone'];
+      if (_isCurrentSession(uid, epoch) && rows.isNotEmpty) {
+        profile['timezone'] = rows.first['timezone'];
+      }
     } catch (e) {
-      debugPrint('[DATA] Cihaz saat dilimi senkronize edilemedi; profil dilimi korundu: $e');
+      debugPrint(
+        '[DATA] Cihaz saat dilimi senkronize edilemedi; profil dilimi korundu: $e',
+      );
     }
   }
 
@@ -1038,7 +1215,11 @@ class SupabaseService {
     final profile = <String, dynamic>{'timezone': user!.timezone};
     await _syncProfileTimeZone(user.id!, epoch, profile);
     if (profile['timezone'] != user.timezone) {
-      _updateUserIfCurrent(user.id!, epoch, (u) => u.copyWith(timezone: profile['timezone'] as String));
+      _updateUserIfCurrent(
+        user.id!,
+        epoch,
+        (u) => u.copyWith(timezone: profile['timezone'] as String),
+      );
       _notifyStatsChanged();
     }
   }
@@ -1055,7 +1236,10 @@ class SupabaseService {
   }
 
   Future<List<String>> _fetchUnlockedAvatars(String userId) async {
-    final rows = await _client.from('avatar_unlocks').select('avatar_id').eq('user_id', userId);
+    final rows = await _client
+        .from('avatar_unlocks')
+        .select('avatar_id')
+        .eq('user_id', userId);
     return _rows(rows).map((e) => e['avatar_id'].toString()).toList();
   }
 
@@ -1064,29 +1248,51 @@ class SupabaseService {
   /// bir kopmada mevcut kullanıcının istatistikleri sıfırlanabilirdi).
   /// Oluşturma `ignoreDuplicates` ile yapılır; yalnızca istemcinin INSERT
   /// yetkisi olan kolonlar (id, email, name, avatar_id) gönderilir.
-  Future<Map<String, dynamic>> _ensureOwnProfile(User authUser, {String? nameHint}) async {
-    final existing = await _client.from('profiles').select(ownProfileColumns).eq('id', authUser.id).maybeSingle();
+  Future<Map<String, dynamic>> _ensureOwnProfile(
+    User authUser, {
+    String? nameHint,
+  }) async {
+    final existing = await _client
+        .from('profiles')
+        .select(ownProfileColumns)
+        .eq('id', authUser.id)
+        .maybeSingle();
     if (existing != null) return existing;
 
     final metadata = authUser.userMetadata ?? const <String, dynamic>{};
     final requestedAvatar = metadata['avatar_id']?.toString();
-    await _client.from('profiles').upsert({
-      'id': authUser.id,
-      'email': authUser.email ?? '',
-      'name': _initialProfileName(authUser, nameHint),
-      // Yalnızca varsayılan (ücretsiz) bir avatar kabul edilir; Google/Apple'da
-      // kDefaultAvatarId. Sunucu (sanitize_profile_insert) de aynısını zorlar.
-      'avatar_id': AvatarCharacter.isFreeAvatarId(requestedAvatar) ? requestedAvatar : kDefaultAvatarId,
-    }, onConflict: 'id', ignoreDuplicates: true);
+    await _client
+        .from('profiles')
+        .upsert(
+          {
+            'id': authUser.id,
+            'email': authUser.email ?? '',
+            'name': _initialProfileName(authUser, nameHint),
+            // Yalnızca varsayılan (ücretsiz) bir avatar kabul edilir; Google/Apple'da
+            // kDefaultAvatarId. Sunucu (sanitize_profile_insert) de aynısını zorlar.
+            'avatar_id': AvatarCharacter.isFreeAvatarId(requestedAvatar)
+                ? requestedAvatar
+                : kDefaultAvatarId,
+          },
+          onConflict: 'id',
+          ignoreDuplicates: true,
+        );
 
-    final created = await _client.from('profiles').select(ownProfileColumns).eq('id', authUser.id).maybeSingle();
-    if (created == null) throw const ServiceException(ServiceErrorCode.notFound);
+    final created = await _client
+        .from('profiles')
+        .select(ownProfileColumns)
+        .eq('id', authUser.id)
+        .maybeSingle();
+    if (created == null) {
+      throw const ServiceException(ServiceErrorCode.notFound);
+    }
     return created;
   }
 
   /// Yeni profilin adı. E-posta kaydında kullanıcının yazdığı ad; Google/Apple
   /// girişinde (herkese açık sıralamada görüneceği için) yalnızca ilk ad.
-  static String _initialProfileName(User authUser, String? nameHint) => _initialProfileNameFrom(
+  static String _initialProfileName(User authUser, String? nameHint) =>
+      _initialProfileNameFrom(
         provider: authUser.appMetadata['provider']?.toString(),
         metadata: authUser.userMetadata ?? const <String, dynamic>{},
         userId: authUser.id,
@@ -1103,11 +1309,17 @@ class SupabaseService {
     if ((provider ?? 'email') == 'email') {
       candidate = metadata['name']?.toString().trim();
     } else {
-      candidate = _providerGivenName(provider: provider, metadata: metadata, nameHint: nameHint);
+      candidate = _providerGivenName(
+        provider: provider,
+        metadata: metadata,
+        nameHint: nameHint,
+      );
     }
     // Ad yoksa e-postanın yerel kısmı değil nötr ad: profil adı herkese
     // açık sıralamalarda görünür.
-    return (candidate == null || candidate.isEmpty) ? neutralProfileName(userId) : _clipName(candidate);
+    return (candidate == null || candidate.isEmpty)
+        ? neutralProfileName(userId)
+        : _clipName(candidate);
   }
 
   /// Google/Apple'ın verdiği ilk ad (Apple'da yalnızca ilk yetkilendirmede
@@ -1120,12 +1332,14 @@ class SupabaseService {
     final full = (metadata['full_name'] ?? metadata['name'])?.toString().trim();
     final candidate = (nameHint != null && nameHint.trim().isNotEmpty)
         ? nameHint
-        : (metadata['given_name']?.toString() ?? full?.split(RegExp(r'\s+')).first);
+        : (metadata['given_name']?.toString() ??
+              full?.split(RegExp(r'\s+')).first);
     final name = candidate?.trim() ?? '';
     return name.isEmpty ? null : name;
   }
 
-  static String _clipName(String name) => name.length > _nameMaxLength ? name.substring(0, _nameMaxLength) : name;
+  static String _clipName(String name) =>
+      name.length > _nameMaxLength ? name.substring(0, _nameMaxLength) : name;
 
   /// Önbellekteki ('saved_user') kullanıcıyı ağsız okur ve [currentUser]'a
   /// koyar. Çevrimdışı açılış için.
@@ -1149,13 +1363,19 @@ class SupabaseService {
 
   /// [uid] hâlâ oturumdaki kullanıcı mı ve [epoch]'tan beri çıkış olmadı mı?
   bool _isCurrentSession(String uid, int epoch) =>
-      epoch == _userEpoch && _isCloudActive && _client.auth.currentUser?.id == uid;
+      epoch == _userEpoch &&
+      _isCloudActive &&
+      _client.auth.currentUser?.id == uid;
 
   /// Bir istek yanıtından sonra kullanıcı modelini günceller; ancak istek
   /// başladığından beri ([epoch]) çıkış olmadıysa ve [uid] hâlâ oturumdaysa.
   /// Aksi halde (uçuştaki yanıt çıkıştan/hesap değişiminden sonra geldi)
   /// hiçbir şey yayınlanmaz.
-  void _updateUserIfCurrent(String uid, int epoch, UserModel Function(UserModel user) change) {
+  void _updateUserIfCurrent(
+    String uid,
+    int epoch,
+    UserModel Function(UserModel user) change,
+  ) {
     final user = currentUser.value;
     if (user == null || !_isCurrentSession(uid, epoch)) return;
     if (user.id != null && user.id != uid) return;
@@ -1182,7 +1402,9 @@ class SupabaseService {
       final prefs = await SharedPreferences.getInstance();
       final raw = prefs.getString(_savedUserKey);
       if (raw == null || raw.isEmpty) return null;
-      return UserModel.fromMap(Map<String, dynamic>.from(jsonDecode(raw) as Map));
+      return UserModel.fromMap(
+        Map<String, dynamic>.from(jsonDecode(raw) as Map),
+      );
     } catch (e) {
       debugPrint('[DATA] saved_user okunamadı: $e');
       return null;
@@ -1193,32 +1415,58 @@ class SupabaseService {
   /// [NameFilter]). Başarıda [currentUser] güncellenir.
   Future<void> updateUserName(String newName) async {
     final cleanName = newName.trim();
-    if (cleanName.length < _nameMinLength) throw const ServiceException(ServiceErrorCode.nameTooShort);
-    if (cleanName.length > _nameMaxLength) throw const ServiceException(ServiceErrorCode.nameTooLong);
-    if (NameFilter.isOffensive(cleanName)) throw const ServiceException(ServiceErrorCode.nameNotAllowed);
+    if (cleanName.length < _nameMinLength) {
+      throw const ServiceException(ServiceErrorCode.nameTooShort);
+    }
+    if (cleanName.length > _nameMaxLength) {
+      throw const ServiceException(ServiceErrorCode.nameTooLong);
+    }
+    if (NameFilter.isOffensive(cleanName)) {
+      throw const ServiceException(ServiceErrorCode.nameNotAllowed);
+    }
     final uid = _requireUserId();
     final epoch = _userEpoch;
     final rows = await _guard(
-      () => _client.from('profiles').update({'name': cleanName}).eq('id', uid).select('name'),
+      () => _client
+          .from('profiles')
+          .update({'name': cleanName})
+          .eq('id', uid)
+          .select('name'),
     );
     if (rows.isEmpty) throw const ServiceException(ServiceErrorCode.notFound);
-    _updateUserIfCurrent(uid, epoch, (user) => user.copyWith(name: rows.first['name']?.toString() ?? cleanName));
+    _updateUserIfCurrent(
+      uid,
+      epoch,
+      (user) =>
+          user.copyWith(name: rows.first['name']?.toString() ?? cleanName),
+    );
   }
 
   /// Günlük hedefi (dakika) profile yazar; tek kaynak profiles.daily_goal_minutes.
   /// Aralık sunucudaki CHECK ile aynı: 5..1440.
   Future<void> updateDailyGoalMinutes(int minutes) async {
-    if (minutes < _dailyGoalMin || minutes > _dailyGoalMax) throw const ServiceException(ServiceErrorCode.invalidInput);
+    if (minutes < _dailyGoalMin || minutes > _dailyGoalMax) {
+      throw const ServiceException(ServiceErrorCode.invalidInput);
+    }
     final uid = _requireUserId();
     final epoch = _userEpoch;
     final rows = await _guard(
-      () => _client.from('profiles').update({'daily_goal_minutes': minutes}).eq('id', uid).select('daily_goal_minutes'),
+      () => _client
+          .from('profiles')
+          .update({'daily_goal_minutes': minutes})
+          .eq('id', uid)
+          .select('daily_goal_minutes'),
     );
     if (rows.isEmpty) throw const ServiceException(ServiceErrorCode.notFound);
-    _updateUserIfCurrent(uid, epoch, (user) => user.copyWith(dailyGoalMinutes: minutes));
+    _updateUserIfCurrent(
+      uid,
+      epoch,
+      (user) => user.copyWith(dailyGoalMinutes: minutes),
+    );
   }
 
-  static String _dailyGoalMigratedKey(String userId) => 'daily_goal_migrated_$userId';
+  static String _dailyGoalMigratedKey(String userId) =>
+      'daily_goal_migrated_$userId';
 
   // Eski sürümler bazı anahtar adlarında e-postayı kullanıyordu (iOS'ta düz
   // plist, yedeğe girer). Kimlik bilinince uid anahtarına taşınır. Kategori
@@ -1233,7 +1481,9 @@ class SupabaseService {
     for (final mail in {email, email.toLowerCase()}) {
       final legacyLeagueKey = 'league_info_shown_$mail';
       if (!prefs.containsKey(legacyLeagueKey)) continue;
-      if (prefs.getBool(legacyLeagueKey) ?? false) await prefs.setBool('league_info_shown_$uid', true);
+      if (prefs.getBool(legacyLeagueKey) ?? false) {
+        await prefs.setBool('league_info_shown_$uid', true);
+      }
       await prefs.remove(legacyLeagueKey);
     }
   }
@@ -1257,7 +1507,14 @@ class SupabaseService {
   /// 'university', 'work'ü kabul eder; 'kpss' ve 'language' supabase/proposed/26
   /// ile eklenir. 26 uygulanmadan reddedilirse [completeOnboarding] segmentsiz
   /// tamamlar ([writeOnboardingProfileWithSegmentFallback]).
-  static const Set<String> validUserSegments = {'lgs', 'yks', 'kpss', 'language', 'university', 'work'};
+  static const Set<String> validUserSegments = {
+    'lgs',
+    'yks',
+    'kpss',
+    'language',
+    'university',
+    'work',
+  };
 
   /// Onboarding'in profiles satırına yazdığı alanlar. Doğum yılı CHECK
   /// aralığı (1900..2100) dışındaysa, segment bilinen kümede değilse null
@@ -1275,10 +1532,16 @@ class SupabaseService {
     required DateTime completedAt,
   }) {
     final validBirthYear =
-        (birthYear != null && birthYear >= _birthYearMin && birthYear <= _birthYearMax) ? birthYear : null;
+        (birthYear != null &&
+            birthYear >= _birthYearMin &&
+            birthYear <= _birthYearMax)
+        ? birthYear
+        : null;
     return {
       'birth_year': validBirthYear,
-      'user_segment': validUserSegments.contains(userSegment) ? userSegment : null,
+      'user_segment': validUserSegments.contains(userSegment)
+          ? userSegment
+          : null,
       'daily_goal_minutes': dailyGoalMinutes,
       'show_in_social_feed': showInSocialFeed,
       'onboarding_completed_at': completedAt.toUtc().toIso8601String(),
@@ -1291,7 +1554,9 @@ class SupabaseService {
   static bool isUserSegmentCheckViolation(Object error) {
     final cause = error is ServiceException ? error.cause : error;
     if (cause is! PostgrestException || cause.code != '23514') return false;
-    return '${cause.message} ${cause.details ?? ''}'.toLowerCase().contains('user_segment');
+    return '${cause.message} ${cause.details ?? ''}'.toLowerCase().contains(
+      'user_segment',
+    );
   }
 
   /// Onboarding profil güncellemesini [write] ile yazar ve yazılan değerleri
@@ -1308,8 +1573,12 @@ class SupabaseService {
       await write(update);
       return update;
     } catch (e) {
-      if (update['user_segment'] == null || !isUserSegmentCheckViolation(e)) rethrow;
-      debugPrint('[DATA] Sunucu segmenti tanımıyor (proposed/26 yok); onboarding segmentsiz tamamlanıyor.');
+      if (update['user_segment'] == null || !isUserSegmentCheckViolation(e)) {
+        rethrow;
+      }
+      debugPrint(
+        '[DATA] Sunucu segmenti tanımıyor (proposed/26 yok); onboarding segmentsiz tamamlanıyor.',
+      );
       final fallback = {...update, 'user_segment': null};
       await write(fallback);
       return fallback;
@@ -1336,8 +1605,9 @@ class SupabaseService {
     final authUser = _requireAuthUser();
     final epoch = _userEpoch;
     await _guard(() => _ensureOwnProfile(authUser));
-    final categoriesResult =
-        categories.isEmpty ? null : await _setupOnboardingCategoriesReconciled(authUser.id, categories);
+    final categoriesResult = categories.isEmpty
+        ? null
+        : await _setupOnboardingCategoriesReconciled(authUser.id, categories);
     final completedAt = DateTime.now();
     final update = onboardingProfileUpdate(
       birthYear: birthYear,
@@ -1346,8 +1616,16 @@ class SupabaseService {
       showInSocialFeed: showInSocialFeed,
       completedAt: completedAt,
     );
-    final written = await writeOnboardingProfileWithSegmentFallback(update, (values) async {
-      final rows = await _guard(() => _client.from('profiles').update(values).eq('id', authUser.id).select('id'));
+    final written = await writeOnboardingProfileWithSegmentFallback(update, (
+      values,
+    ) async {
+      final rows = await _guard(
+        () => _client
+            .from('profiles')
+            .update(values)
+            .eq('id', authUser.id)
+            .select('id'),
+      );
       if (rows.isEmpty) throw const ServiceException(ServiceErrorCode.notFound);
     });
     _socialVisibleCache = showInSocialFeed;
@@ -1376,21 +1654,26 @@ class SupabaseService {
   Future<OnboardingCategoriesResult?> _setupOnboardingCategoriesReconciled(
     String uid,
     List<Map<String, dynamic>> categories,
-  ) =>
-      reconcileOnboardingCategories(
-        requested: categories,
-        fetchAll: () => fetchUserCategories(includeArchived: true),
-        canArchive: () async =>
-            currentUser.value?.onboardingCompletedAt == null &&
-            pendingSessionCount.value == 0 &&
-            !await _hasAnyStudySession(uid),
-        archive: archiveCategory,
-        unarchive: unarchiveCategory,
-        setup: setupOnboardingCategories,
-      );
+  ) => reconcileOnboardingCategories(
+    requested: categories,
+    fetchAll: () => fetchUserCategories(includeArchived: true),
+    canArchive: () async =>
+        currentUser.value?.onboardingCompletedAt == null &&
+        pendingSessionCount.value == 0 &&
+        !await _hasAnyStudySession(uid),
+    archive: archiveCategory,
+    unarchive: unarchiveCategory,
+    setup: setupOnboardingCategories,
+  );
 
   Future<bool> _hasAnyStudySession(String uid) async {
-    final rows = await _guard(() => _client.from('study_sessions').select('id').eq('user_id', uid).limit(1));
+    final rows = await _guard(
+      () => _client
+          .from('study_sessions')
+          .select('id')
+          .eq('user_id', uid)
+          .limit(1),
+    );
     return rows.isNotEmpty;
   }
 
@@ -1399,24 +1682,35 @@ class SupabaseService {
 
   void _scheduleUserStatsRefresh() {
     _statsRefreshTimer?.cancel();
-    _statsRefreshTimer = Timer(const Duration(seconds: 2), () => unawaited(_refreshUserStats()));
+    _statsRefreshTimer = Timer(
+      const Duration(seconds: 2),
+      () => unawaited(_refreshUserStats()),
+    );
   }
 
   Future<void> _refreshUserStats() async {
     final user = currentUser.value;
     final uid = _isCloudActive ? _client.auth.currentUser?.id : null;
-    if (user == null || uid == null || (user.id != null && user.id != uid)) return;
+    if (user == null || uid == null || (user.id != null && user.id != uid)) {
+      return;
+    }
     final epoch = _userEpoch;
     try {
       final row = await _client
           .from('profiles')
-          .select('total_minutes, lifetime_points, coins, current_streak, longest_streak, last_study_date')
+          .select(
+            'total_minutes, lifetime_points, coins, current_streak, longest_streak, last_study_date',
+          )
           .eq('id', uid)
           .maybeSingle()
           .timeout(_requestTimeout);
       // A için okunan sayaçlar, bu arada oturuma giren B'nin modeline yazılmaz.
       if (row == null) return;
-      _updateUserIfCurrent(uid, epoch, (latest) => UserModel.fromMap({...latest.toMap(), ...row}));
+      _updateUserIfCurrent(
+        uid,
+        epoch,
+        (latest) => UserModel.fromMap({...latest.toMap(), ...row}),
+      );
     } catch (e) {
       debugPrint('[DATA] Profil sayaçları tazelenemedi: $e');
     }
@@ -1451,10 +1745,21 @@ class SupabaseService {
     required int foregroundSeconds,
     required DateTime startedAt,
     bool recordAccelerated = false,
+    String? marathonUuid,
+    int? marathonTargetSessions,
+    int? marathonSessionIndex,
   }) async {
+    // Eski QA kaydı normal tamamlanmış seansa dönüşemez. Auth/ortam ve
+    // çevrimdışı legacy kuyruk dallarından önce kalıcı olarak reddet.
+    if (recordAccelerated) {
+      return const SessionSubmitRejected(SessionReason.invalidData);
+    }
     final session = PendingSession(
       clientUuid: clientUuid,
       recordAccelerated: recordAccelerated,
+      marathonUuid: marathonUuid,
+      marathonTargetSessions: marathonTargetSessions,
+      marathonSessionIndex: marathonSessionIndex,
       categoryId: categoryId.isEmpty ? null : categoryId,
       categoryName: categoryName,
       minutes: durationMinutes,
@@ -1474,7 +1779,10 @@ class SupabaseService {
       await _queue.enqueueLegacy(owner.email!, session);
       final pending = await _queue.legacyPendingCount(owner.email!);
       pendingSessionCount.value = pending;
-      result = SessionSubmitQueued(reasonCode: SessionReason.offline, pendingCount: pending);
+      result = SessionSubmitQueued(
+        reasonCode: SessionReason.offline,
+        pendingCount: pending,
+      );
     } else {
       result = const SessionSubmitRejected(SessionReason.auth);
     }
@@ -1490,12 +1798,14 @@ class SupabaseService {
     final owner = _queueOwner();
     final uid = owner.userId;
     if (uid == null) return (remaining: 0, retryable: false);
-    if (owner.email != null) await _queue.adoptLegacyQueue(userId: uid, email: owner.email!);
-    if (!_isCloudActive || _client.auth.currentUser?.id != uid) {
-      // Oturum henüz yok/başka hesap: oturum olayı (giriş, token yenileme) tetikler.
-      return (remaining: await _queue.pendingCount(uid), retryable: false);
+    if (owner.email != null) {
+      await _queue.adoptLegacyQueue(userId: uid, email: owner.email!);
     }
     final report = await _queue.sync(uid);
+    if (!_isCloudActive || _client.auth.currentUser?.id != uid) {
+      // Oturum henüz yok/başka hesap: oturum olayı (giriş, token yenileme) tetikler.
+      return (remaining: report.remaining, retryable: false);
+    }
     if (report.sent > 0) _notifyStatsChanged();
     return (remaining: report.remaining, retryable: report.hasRetryableFailure);
   }
@@ -1508,11 +1818,18 @@ class SupabaseService {
 
   /// Bekleyen seans sayısını okur ve [pendingSessionCount]'u günceller.
   Future<int> getPendingSessionCount() async {
+    final epoch = _userEpoch;
     final owner = _queueOwner();
     final count = owner.userId != null
         ? await _queue.pendingCount(owner.userId!)
-        : (owner.email != null ? await _queue.legacyPendingCount(owner.email!) : 0);
-    pendingSessionCount.value = count;
+        : (owner.email != null
+              ? await _queue.legacyPendingCount(owner.email!)
+              : 0);
+    // Disk okuması sürerken hesap veya oturum değişmiş olabilir. Eski
+    // kuyruğun sayısı yeni hesabın (ya da giriş ekranının) göstergesine yazılmaz.
+    if (epoch == _userEpoch && owner == _queueOwner()) {
+      pendingSessionCount.value = count;
+    }
     return count;
   }
 
@@ -1533,23 +1850,73 @@ class SupabaseService {
     if (_queueOwner().userId == userId) pendingSessionCount.value = count;
   }
 
-  void _onSessionAccepted(String userId, PendingSession session, SessionSubmitSuccess result) {
+  void _onSessionAccepted(
+    String userId,
+    PendingSession session,
+    SessionSubmitSuccess result,
+  ) {
     final user = currentUser.value;
     if (user == null || (user.id != null && user.id != userId)) return;
     if (!result.duplicate) {
-      final day = studyDayKey(studyDayOf(session.startedAt, timeZone: user.timezone));
+      final day = studyDayKey(
+        studyDayOf(session.startedAt, timeZone: user.timezone),
+      );
       final last = user.lastStudyDate;
-      _publishUser(user.copyWith(
-        id: userId,
-        totalMinutes: user.totalMinutes + result.minutes,
-        lifetimePoints: user.lifetimePoints + result.totalPoints,
-        coins: user.coins + result.coinsEarned,
-        currentStreak: result.streak,
-        longestStreak: math.max(user.longestStreak, result.streak ?? 0),
-        lastStudyDate: (last == null || day.compareTo(last) > 0) ? day : last,
-      ));
+      _publishUser(
+        user.copyWith(
+          id: userId,
+          totalMinutes: user.totalMinutes + result.minutes,
+          lifetimePoints: user.lifetimePoints + result.totalPoints,
+          coins: user.coins + result.coinsEarned,
+          currentStreak: result.streak,
+          longestStreak: math.max(user.longestStreak, result.streak ?? 0),
+          lastStudyDate: (last == null || day.compareTo(last) > 0) ? day : last,
+        ),
+      );
     }
     _scheduleUserStatsRefresh();
+  }
+
+  /// Sunucu Maraton sözleşmesini desteklemiyorsa yeni plan başlatılmaz.
+  /// Ağ hatası ile eski sunucu ayrılır; yeniden bağlantıda tekrar okunur.
+  Future<Map<String, dynamic>?> getMarathonConfig() async {
+    if (!_isCloudActive || _client.auth.currentUser == null) return null;
+    try {
+      final response = await _client
+          .rpc('get_marathon_config')
+          .timeout(_requestTimeout);
+      return response is Map ? Map<String, dynamic>.from(response) : null;
+    } on PostgrestException catch (e) {
+      if (e.code == 'PGRST202') return null;
+      rethrow;
+    }
+  }
+
+  /// Only an explicit UI tap calls this. Pending prior focus is synchronized
+  /// first; server confirmation is never queued to run after the deadline.
+  Future<bool> confirmMarathonPresence({
+    required String marathonUuid,
+    required int completedSessionIndex,
+    required String previousClientUuid,
+    required String nextClientUuid,
+  }) async {
+    if (!_isCloudActive || isDeviceSessionEnding) return false;
+    final uid = _client.auth.currentUser?.id;
+    if (uid == null) return false;
+    final epoch = _userEpoch;
+    bool isCurrent() => !isDeviceSessionEnding && _isCurrentSession(uid, epoch);
+    await syncPendingSessions();
+    return requestMarathonPresence(
+      marathonUuid: marathonUuid,
+      completedSessionIndex: completedSessionIndex,
+      previousClientUuid: previousClientUuid,
+      nextClientUuid: nextClientUuid,
+      isCurrent: isCurrent,
+      serverNow: _clock.serverNow,
+      rpc: (name, params) => _guard(
+        () => _client.rpc(name, params: params).timeout(_requestTimeout),
+      ),
+    );
   }
 
   /// Kullanıcının TÜM seanslarını (yalnızca kendi user_id'si) sayfalayarak
@@ -1558,10 +1925,15 @@ class SupabaseService {
   Future<List<StudySession>> fetchStudySessions({DateTime? since}) async {
     final uid = _requireUserId();
     final sessions = <StudySession>[];
-    for (var from = 0;; from += _sessionsPageSize) {
+    for (var from = 0; ; from += _sessionsPageSize) {
       final page = await _guard(() {
-        var query = _client.from('study_sessions').select(_studySessionColumns).eq('user_id', uid);
-        if (since != null) query = query.gte('started_at', since.toUtc().toIso8601String());
+        var query = _client
+            .from('study_sessions')
+            .select(_studySessionColumns)
+            .eq('user_id', uid);
+        if (since != null) {
+          query = query.gte('started_at', since.toUtc().toIso8601String());
+        }
         return query
             .order('started_at', ascending: false)
             .order('id', ascending: true)
@@ -1570,7 +1942,10 @@ class SupabaseService {
       try {
         sessions.addAll(page.map(StudySession.fromJson));
       } catch (e, st) {
-        Error.throwWithStackTrace(ServiceException(ServiceErrorCode.server, e), st);
+        Error.throwWithStackTrace(
+          ServiceException(ServiceErrorCode.server, e),
+          st,
+        );
       }
       if (page.length < _sessionsPageSize) break;
     }
@@ -1585,9 +1960,11 @@ class SupabaseService {
   /// gönderdiğinde çağrılır. (Eski herkese açık 'ranking_updates' yayını,
   /// her kullanıcının seansında tüm istemcilere tam geçmiş çektirdiği ve
   /// anon anahtarla kötüye kullanılabildiği için kaldırıldı.)
-  void addStatsChangedListener(VoidCallback listener) => _statsListeners.add(listener);
+  void addStatsChangedListener(VoidCallback listener) =>
+      _statsListeners.add(listener);
 
-  void removeStatsChangedListener(VoidCallback listener) => _statsListeners.remove(listener);
+  void removeStatsChangedListener(VoidCallback listener) =>
+      _statsListeners.remove(listener);
 
   /// Bağlantı geri geldi ya da bulut sonradan başlatıldı: bağlantısızken
   /// yüklenemeyen veri ekranları (Raporlar, Sıralama) aynı dinleyicilerle
@@ -1615,7 +1992,9 @@ class SupabaseService {
     if (!_isCloudActive) return true;
     final uid = _client.auth.currentUser?.id;
     if (uid == null) return true;
-    if (_socialVisibleCacheUid == uid && _socialVisibleCache != null) return _socialVisibleCache!;
+    if (_socialVisibleCacheUid == uid && _socialVisibleCache != null) {
+      return _socialVisibleCache!;
+    }
     try {
       final row = await _client
           .from('profiles')
@@ -1636,7 +2015,12 @@ class SupabaseService {
   /// Tercihi sunucuya yazar; hata durumunda fırlatır (UI eski değere dönmeli).
   Future<void> setSocialVisibility(bool value) async {
     final uid = _requireUserId();
-    await _guard(() => _client.from('profiles').update({'show_in_social_feed': value}).eq('id', uid));
+    await _guard(
+      () => _client
+          .from('profiles')
+          .update({'show_in_social_feed': value})
+          .eq('id', uid),
+    );
     _socialVisibleCache = value;
     _socialVisibleCacheUid = uid;
   }
@@ -1645,13 +2029,25 @@ class SupabaseService {
     required int durationMinutes,
     required String categoryName,
   }) async {
-    if (!_isCloudActive || _client.auth.currentUser == null) return;
-    if (!await getSocialVisibility()) return;
+    if (!_isCloudActive || isDeviceSessionEnding) return;
+    final uid = _client.auth.currentUser?.id;
+    if (uid == null) return;
+    final epoch = _userEpoch;
+    if (!await getSocialVisibility() ||
+        isDeviceSessionEnding ||
+        !_isCurrentSession(uid, epoch)) {
+      return;
+    }
     try {
-      await _client.rpc('start_study_session', params: {
-        'p_duration_minutes': durationMinutes,
-        'p_category_name': categoryName,
-      }).timeout(_requestTimeout);
+      await _client
+          .rpc(
+            'start_study_session',
+            params: {
+              'p_duration_minutes': durationMinutes,
+              'p_category_name': categoryName,
+            },
+          )
+          .timeout(_requestTimeout);
     } catch (e) {
       debugPrint('[SOCIAL] startStudySession hatası: $e');
     }
@@ -1666,10 +2062,62 @@ class SupabaseService {
     }
   }
 
-  /// Şu an odaklanan arkadaşlar. Hata durumunda fırlatır.
+  /// Maraton molası sosyal durumu; puan/seans kaydı değildir. Tarih cihaz
+  /// saatindedir ve RPC'ye gönderilirken sunucu saatine düzeltilir.
+  /// Eski sunucuda odak kapatılır; mola odakmış gibi yayınlanmaz.
+  Future<bool> startStudyBreak({required DateTime endsAt}) async {
+    if (!_isCloudActive || isDeviceSessionEnding) return false;
+    final uid = _client.auth.currentUser?.id;
+    if (uid == null) return false;
+    final epoch = _userEpoch;
+    if (!await getSocialVisibility() ||
+        isDeviceSessionEnding ||
+        !_isCurrentSession(uid, epoch)) {
+      return false;
+    }
+    final serverEnd = endsAt
+        .add(ServerClock.correctionFor(_clock.offset))
+        .toUtc();
+    if (!serverEnd.isAfter(_clock.serverNow())) return false;
+    try {
+      await _client
+          .rpc(
+            'start_study_break',
+            params: {'p_ends_at': serverEnd.toIso8601String()},
+          )
+          .timeout(_requestTimeout);
+      return _isCurrentSession(uid, epoch);
+    } catch (e) {
+      if (isMissingRpcError(e) && _isCurrentSession(uid, epoch)) {
+        await cancelStudySession();
+      } else {
+        debugPrint('[SOCIAL] startStudyBreak hatası: $e');
+      }
+      return false;
+    }
+  }
+
+  /// Şu an odaklanan veya Maraton molasındaki arkadaşlar. Eski sunucuda
+  /// yalnız odaklananları döndüren RPC'ye düşer. Hata durumunda fırlatır.
   Future<List<Map<String, dynamic>>> getLiveFriends() async {
-    _requireUserId();
-    return _rows(await _guard(() => _client.rpc('get_live_friends')));
+    final uid = _requireUserId();
+    final epoch = _userEpoch;
+    Object? response;
+    try {
+      response = await _client
+          .rpc('get_live_friends_with_breaks')
+          .timeout(_requestTimeout);
+    } catch (e) {
+      if (!isMissingRpcError(e)) throw ServiceException.wrap(e);
+      if (!_isCurrentSession(uid, epoch)) {
+        throw const ServiceException(ServiceErrorCode.notSignedIn);
+      }
+      response = await _guard(() => _client.rpc('get_live_friends'));
+    }
+    if (!_isCurrentSession(uid, epoch)) {
+      throw const ServiceException(ServiceErrorCode.notSignedIn);
+    }
+    return _rows(response);
   }
 
   // ---- Arkadaşlar ----
@@ -1680,7 +2128,12 @@ class SupabaseService {
     final uid = _client.auth.currentUser?.id;
     if (uid == null) return null;
     try {
-      final row = await _client.from('profiles').select('friend_code').eq('id', uid).maybeSingle().timeout(_requestTimeout);
+      final row = await _client
+          .from('profiles')
+          .select('friend_code')
+          .eq('id', uid)
+          .maybeSingle()
+          .timeout(_requestTimeout);
       return row?['friend_code'] as String?;
     } catch (e) {
       debugPrint('[SOCIAL] getMyFriendCode hatası: $e');
@@ -1695,7 +2148,9 @@ class SupabaseService {
   Future<Map<String, dynamic>> addFriendByCode(String code) async {
     _requireUserId();
     final normalized = normalizeFriendCode(code);
-    final response = await _guard(() => _client.rpc('add_friend_by_code', params: {'p_code': normalized}));
+    final response = await _guard(
+      () => _client.rpc('add_friend_by_code', params: {'p_code': normalized}),
+    );
     if (response is Map) return Map<String, dynamic>.from(response);
     throw const ServiceException(ServiceErrorCode.server);
   }
@@ -1715,23 +2170,32 @@ class SupabaseService {
   /// p_from_user_id). Hata durumunda fırlatır.
   Future<List<Map<String, dynamic>>> fetchPendingFriendRequests() async {
     _requireUserId();
-    return _rows(await _guard(() => _client.rpc('get_incoming_friend_requests')));
+    return _rows(
+      await _guard(() => _client.rpc('get_incoming_friend_requests')),
+    );
   }
 
   /// Gelen isteği kabul eder ya da reddeder; sunucunun yanıtını döndürür.
-  Future<Map<String, dynamic>> respondToFriendRequest(String fromUserId, bool accept) async {
+  Future<Map<String, dynamic>> respondToFriendRequest(
+    String fromUserId,
+    bool accept,
+  ) async {
     _requireUserId();
-    final response = await _guard(() => _client.rpc('respond_friend_request', params: {
-          'p_from_user_id': fromUserId,
-          'p_accept': accept,
-        }));
+    final response = await _guard(
+      () => _client.rpc(
+        'respond_friend_request',
+        params: {'p_from_user_id': fromUserId, 'p_accept': accept},
+      ),
+    );
     if (response is Map) return Map<String, dynamic>.from(response);
     throw const ServiceException(ServiceErrorCode.server);
   }
 
   Future<List<Map<String, dynamic>>> fetchOutgoingFriendRequests() async {
     _requireUserId();
-    return _rows(await _guard(() => _client.rpc('get_outgoing_friend_requests')));
+    return _rows(
+      await _guard(() => _client.rpc('get_outgoing_friend_requests')),
+    );
   }
 
   Future<List<Map<String, dynamic>>> fetchBlockedUsers() async {
@@ -1739,7 +2203,11 @@ class SupabaseService {
     return _rows(await _guard(() => _client.rpc('get_my_blocks')));
   }
 
-  Future<Map<String, dynamic>> _friendMutation(String rpc, String param, String id) async {
+  Future<Map<String, dynamic>> _friendMutation(
+    String rpc,
+    String param,
+    String id,
+  ) async {
     _requireUserId();
     final response = await _guard(() => _client.rpc(rpc, params: {param: id}));
     if (response is! Map) throw const ServiceException(ServiceErrorCode.server);
@@ -1748,11 +2216,14 @@ class SupabaseService {
     return result;
   }
 
-  Future<Map<String, dynamic>> removeFriend(String id) => _friendMutation('remove_friend', 'p_friend_id', id);
+  Future<Map<String, dynamic>> removeFriend(String id) =>
+      _friendMutation('remove_friend', 'p_friend_id', id);
   Future<Map<String, dynamic>> cancelFriendRequest(String id) =>
       _friendMutation('cancel_friend_request', 'p_to_user_id', id);
-  Future<Map<String, dynamic>> blockUser(String id) => _friendMutation('block_user', 'p_user_id', id);
-  Future<Map<String, dynamic>> unblockUser(String id) => _friendMutation('unblock_user', 'p_user_id', id);
+  Future<Map<String, dynamic>> blockUser(String id) =>
+      _friendMutation('block_user', 'p_user_id', id);
+  Future<Map<String, dynamic>> unblockUser(String id) =>
+      _friendMutation('unblock_user', 'p_user_id', id);
 
   /// Uygulama içi bildirim: sunucu hedefi, sebebi, hız sınırını ve mükerrer
   /// kaydı doğrular. Başka oturumun geç yanıtı mevcut hesaba gösterilmez.
@@ -1764,13 +2235,20 @@ class SupabaseService {
   }) async {
     final uid = _requireUserId();
     final epoch = _userEpoch;
-    final response = await _guard(() => _client.rpc('submit_user_report', params: {
+    final response = await _guard(
+      () => _client.rpc(
+        'submit_user_report',
+        params: {
           'p_target_user_id': targetUserId,
           'p_place': place,
           'p_reason': reason,
           'p_details': details,
-        }));
-    if (!_isCurrentSession(uid, epoch)) throw const ServiceException(ServiceErrorCode.notSignedIn);
+        },
+      ),
+    );
+    if (!_isCurrentSession(uid, epoch)) {
+      throw const ServiceException(ServiceErrorCode.notSignedIn);
+    }
     if (response is! Map) throw const ServiceException(ServiceErrorCode.server);
     return Map<String, dynamic>.from(response);
   }
@@ -1787,7 +2265,14 @@ class SupabaseService {
   Future<List<Map<String, dynamic>>> getMonthlyRanking({int limit = 50}) async {
     _requireCloud();
     final pLimit = limit.clamp(1, _publicLeaderboardMaxLimit);
-    return _rows(await _guard(() => _client.rpc('get_public_monthly_leaderboard', params: {'p_limit': pLimit})));
+    return _rows(
+      await _guard(
+        () => _client.rpc(
+          'get_public_monthly_leaderboard',
+          params: {'p_limit': pLimit},
+        ),
+      ),
+    );
   }
 
   /// Tüm zamanlar sıralaması: get_public_alltime_leaderboard → (name,
@@ -1796,18 +2281,41 @@ class SupabaseService {
   Future<List<Map<String, dynamic>>> getAllTimeRanking({int limit = 50}) async {
     _requireCloud();
     final pLimit = limit.clamp(1, _publicLeaderboardMaxLimit);
-    return _rows(await _guard(() => _client.rpc('get_public_alltime_leaderboard', params: {'p_limit': pLimit})));
+    return _rows(
+      await _guard(
+        () => _client.rpc(
+          'get_public_alltime_leaderboard',
+          params: {'p_limit': pLimit},
+        ),
+      ),
+    );
   }
 
-  /// Oturum sahibinin lig odası (14 günlük dönem): get_my_league_ranking →
-  /// (name, avatar_id, weekly_points, tier, end_date, is_me,
-  /// promotion_zone_end, demotion_zone_start, member_count; proposed/14 ile
-  /// id, is_blocked). Kullanıcı henüz bir odada değilse sunucu tek satır
-  /// döndürür (is_me, 0 puan, member_count canlıda 1, proposed/20 sonrası 0);
-  /// bkz. `LeagueSnapshot.awaitingPlacement`. Hata durumunda fırlatır.
+  /// Oturum sahibinin odası ve sunucunun hesapladığı dönem sonu uygunluğu.
+  /// Yeni RPC yoksa mevcut get_my_league_ranking sözleşmesi kullanılır.
   Future<List<Map<String, dynamic>>> getLeagueRanking() async {
     _requireUserId();
-    return _rows(await _guard(() => _client.rpc('get_my_league_ranking')));
+    final rows = _rows(
+      await _guard(
+        () => fetchLeagueRankingResponse(
+          (name) async => await _client.rpc(name).timeout(_requestTimeout),
+        ),
+      ),
+    );
+    final config = rows
+        .map((row) => row['league_config'])
+        .whereType<Map>()
+        .firstOrNull;
+    if (config != null) {
+      final rules = LeagueRules.fromAppConfig(
+        Map<String, dynamic>.from(config),
+      );
+      if (rules.hasLaunchPolicy) {
+        _leagueRules = rules;
+        _leagueRulesLoadedAt = DateTime.now();
+      }
+    }
+    return rows;
   }
 
   // Son okunan puan kuralları; seans sonucu bildirimi gibi eşzamanlı
@@ -1822,7 +2330,9 @@ class SupabaseService {
   /// ve 0 kum alır; yalnızca dakika ve seri sayılır.
   int get dailySessionLimit {
     final value = _pointsConfigCache['daily_league_session_limit'];
-    return value is num && value > 0 ? value.toInt() : _defaultDailySessionLimit;
+    return value is num && value > 0
+        ? value.toInt()
+        : _defaultDailySessionLimit;
   }
 
   // Puan hesabında kullanılan sabitleri sunucudan okur (bkz. get_points_config
@@ -1831,8 +2341,12 @@ class SupabaseService {
   Future<Map<String, dynamic>> getPointsConfig() async {
     if (_isCloudActive) {
       try {
-        final response = await _client.rpc('get_points_config').timeout(_requestTimeout);
-        if (response is Map) return _pointsConfigCache = Map<String, dynamic>.from(response);
+        final response = await _client
+            .rpc('get_points_config')
+            .timeout(_requestTimeout);
+        if (response is Map) {
+          return _pointsConfigCache = Map<String, dynamic>.from(response);
+        }
       } catch (e) {
         debugPrint('[RANKING] getPointsConfig hatası: $e');
       }
@@ -1840,35 +2354,49 @@ class SupabaseService {
     return {};
   }
 
-  // Lig ödül/terfi kuralı (proposed/20). Süreç boyunca bir kez okunur.
-  LeagueRules _leagueRules = LeagueRules.standard;
-  bool _leagueRulesKnown = false;
+  // İlk açılış çevrimdışıysa eski 30 kişilik ödül kuralı gösterilmez.
+  // Gerçek yanıt bu yedeğin yerini alır; eski sözleşme yalnız sunucu
+  // yeni RPC'nin bulunmadığını doğrularsa _fetchLeagueRules'da kullanılır.
+  // Hazırlık → planlandı → aktif geçişi süreç boyunca sabitlenmez.
+  LeagueRules _leagueRules = const LeagueRules(
+    awardMinMembers: 10,
+    roomCapacity: 25,
+    policyVersion: 1,
+    competitionPhase: 'preparing',
+  );
+  DateTime? _leagueRulesLoadedAt;
   Future<LeagueRules>? _leagueRulesRequest;
+  static const _leagueRulesFreshFor = Duration(seconds: 30);
 
-  /// Son okunan lig ödül/terfi kuralı (henüz okunmadıysa bugünkü kural).
   LeagueRules get leagueRules => _leagueRules;
 
-  /// Lig düğmelerini get_app_config()'ten okur ve süreç boyunca saklar.
-  /// RPC canlıda yok (PGRST202: proposed/13 uygulanmadı) ya da anahtarlar
-  /// yoksa bugünkü kural ([LeagueRules.standard]). Ağ/sunucu hatasında da
-  /// bugünkü kuralı döndürür ama saklamaz (sonraki çağrı yeniden dener).
-  /// Hata fırlatmaz.
+  /// Kamuya açık lig yapılandırmasını en fazla 30 saniye saklar. Geçici
+  /// hata son başarılı kuralları korur, sonraki çağrıda tekrar denenir.
   Future<LeagueRules> getLeagueRules() {
-    if (_leagueRulesKnown || !_isCloudActive) return Future.value(_leagueRules);
-    return _leagueRulesRequest ??= _fetchLeagueRules().whenComplete(() => _leagueRulesRequest = null);
+    if (!_isCloudActive) return Future.value(_leagueRules);
+    final loadedAt = _leagueRulesLoadedAt;
+    final age = loadedAt == null ? null : DateTime.now().difference(loadedAt);
+    if (age != null && !age.isNegative && age < _leagueRulesFreshFor) {
+      return Future.value(_leagueRules);
+    }
+    return _leagueRulesRequest ??= _fetchLeagueRules().whenComplete(
+      () => _leagueRulesRequest = null,
+    );
   }
 
   Future<LeagueRules> _fetchLeagueRules() async {
     try {
-      final response = await _client.rpc('get_app_config').timeout(_requestTimeout);
+      final response = await fetchLeagueRulesResponse(
+        (name) async => await _client.rpc(name).timeout(_requestTimeout),
+      );
       _leagueRules = LeagueRules.fromAppConfigResponse(response);
-      _leagueRulesKnown = true;
+      _leagueRulesLoadedAt = DateTime.now();
     } catch (e) {
       if (isMissingRpcError(e)) {
         _leagueRules = LeagueRules.standard;
-        _leagueRulesKnown = true;
+        _leagueRulesLoadedAt = DateTime.now();
       } else {
-        debugPrint('[RANKING] get_app_config okunamadı: $e');
+        debugPrint('[RANKING] Lig yapılandırması okunamadı: $e');
       }
     }
     return _leagueRules;
@@ -1902,24 +2430,31 @@ class SupabaseService {
   /// yanıtta (oturumsuz istekte RLS boş döndürebilir) mevcut katalog korunur.
   /// Aynı anda tek istek yapılır.
   Future<void> refreshAvatarCatalog() {
-    return _catalogRefresh ??= _refreshAvatarCatalog().whenComplete(() => _catalogRefresh = null);
+    return _catalogRefresh ??= _refreshAvatarCatalog().whenComplete(
+      () => _catalogRefresh = null,
+    );
   }
 
   Future<void> _refreshAvatarCatalog() async {
     if (!_isCloudActive) return;
     try {
-      final rows = _rows(await _client
-          .from('avatars')
-          .select()
-          .eq('is_active', true)
-          .order('sort_order', ascending: true)
-          .timeout(const Duration(seconds: 8)));
+      final rows = _rows(
+        await _client
+            .from('avatars')
+            .select()
+            .eq('is_active', true)
+            .order('sort_order', ascending: true)
+            .timeout(const Duration(seconds: 8)),
+      );
       final avatars = rows.map(AvatarCharacter.fromMap).toList();
       if (avatars.isEmpty) return;
       AvatarCharacter.setCachedAvatars(avatars);
       _avatarCatalogFresh = true;
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_avatarCatalogKey, jsonEncode(avatars.map((a) => a.toMap()).toList()));
+      await prefs.setString(
+        _avatarCatalogKey,
+        jsonEncode(avatars.map((a) => a.toMap()).toList()),
+      );
     } catch (e) {
       debugPrint('[AVATAR] Katalog çekilemedi: $e');
     }
@@ -1931,13 +2466,18 @@ class SupabaseService {
   Future<int> purchaseAvatar(String avatarId) async {
     final uid = _requireUserId();
     final epoch = _userEpoch;
-    final response = await _guard(() => _client.rpc('purchase_avatar', params: {'p_avatar_id': avatarId}));
+    final response = await _guard(
+      () => _client.rpc('purchase_avatar', params: {'p_avatar_id': avatarId}),
+    );
     if (response is! num) throw const ServiceException(ServiceErrorCode.server);
     final newCoins = response.toInt();
     _updateUserIfCurrent(
       uid,
       epoch,
-      (user) => user.copyWith(coins: newCoins, unlockedAvatars: {...user.unlockedAvatars, avatarId}.toList()),
+      (user) => user.copyWith(
+        coins: newCoins,
+        unlockedAvatars: {...user.unlockedAvatars, avatarId}.toList(),
+      ),
     );
     return newCoins;
   }
@@ -1951,8 +2491,15 @@ class SupabaseService {
     final epoch = _userEpoch;
     await equipAvatarWithDefaultUnlock(
       avatarId: avatarId,
-      equip: () => _guard(() => _client.rpc('set_equipped_avatar', params: {'p_avatar_id': avatarId})),
-      unlockFree: () => _guard(() => _client.rpc('purchase_avatar', params: {'p_avatar_id': avatarId})),
+      equip: () => _guard(
+        () => _client.rpc(
+          'set_equipped_avatar',
+          params: {'p_avatar_id': avatarId},
+        ),
+      ),
+      unlockFree: () => _guard(
+        () => _client.rpc('purchase_avatar', params: {'p_avatar_id': avatarId}),
+      ),
     );
     // Kuşanma başarılıysa sunucuda sahiplik kaydı vardır (22 varsayılan
     // avatarınkini kendisi yazar).
@@ -1961,8 +2508,9 @@ class SupabaseService {
       epoch,
       (user) => user.copyWith(
         avatarId: avatarId,
-        unlockedAvatars:
-            user.unlockedAvatars.contains(avatarId) ? user.unlockedAvatars : [...user.unlockedAvatars, avatarId],
+        unlockedAvatars: user.unlockedAvatars.contains(avatarId)
+            ? user.unlockedAvatars
+            : [...user.unlockedAvatars, avatarId],
       ),
     );
   }
@@ -1974,7 +2522,9 @@ class SupabaseService {
   /// Kullanıcının buluttaki kategorileri. Ağ/sunucu hatasında ya da bulut
   /// kapalıyken fırlatır; çağıran yerel önbelleğe düşmelidir. Bulutta hiç
   /// kategori yoksa boş liste döner.
-  Future<List<CourseCategory>> fetchUserCategories({bool includeArchived = false}) async {
+  Future<List<CourseCategory>> fetchUserCategories({
+    bool includeArchived = false,
+  }) async {
     final uid = _requireUserId();
     final rows = await _guard(() {
       var query = _client
@@ -1997,43 +2547,64 @@ class SupabaseService {
   /// varsayılanları, [defaultCategorySeedForCurrentUser]) sunucuda
   /// oluşturur; kimlikleri sunucu üretir. Güncel bulut listesini döndürür.
   /// Yer tutucu kategorilerden kurtulmanın tek yolu budur.
-  Future<List<CourseCategory>> ensureServerCategories(List<CourseCategory> localFallback) async {
+  Future<List<CourseCategory>> ensureServerCategories(
+    List<CourseCategory> localFallback,
+  ) async {
     final active = await fetchUserCategories();
     if (active.isNotEmpty) return active;
     // Yer tutucular ('1'..'5') yalnızca cihazdaki varsayılan listedir; tohum olmaz.
-    final source = localFallback.where((c) => !c.isArchived && isUuidCategoryId(c.id)).toList();
-    final seed = source.isNotEmpty ? source.map((c) => c.toServerJson()).toList() : defaultCategorySeedForCurrentUser();
+    final source = localFallback
+        .where((c) => !c.isArchived && isUuidCategoryId(c.id))
+        .toList();
+    final seed = source.isNotEmpty
+        ? source.map((c) => c.toServerJson()).toList()
+        : defaultCategorySeedForCurrentUser();
     await setupOnboardingCategories(seed);
     return fetchUserCategories();
   }
 
   /// Kategorisiz hesabın varsayılanları: profildeki segmentin önerileri,
   /// arayüz dilinde ('work' kullanıcısına okul dersleri açılmaz).
-  List<Map<String, dynamic>> defaultCategorySeedForCurrentUser() => defaultCategorySeed(
+  List<Map<String, dynamic>> defaultCategorySeedForCurrentUser() =>
+      defaultCategorySeed(
         segment: currentUser.value?.userSegment,
         turkish: LanguageService.instance.isTurkish,
       );
 
   /// Yeni kategori (create_category RPC). Limit ve aynı isim kontrolü
   /// sunucuda; reddedilirse ham hata fırlatılır (bkz. [serviceErrorCodeOf]).
-  Future<String?> createCategory(String name, String colorHex, String iconName) async {
+  Future<String?> createCategory(
+    String name,
+    String colorHex,
+    String iconName,
+  ) async {
     _requireUserId();
-    final result = await _client.rpc('create_category', params: {
-      'p_name': name,
-      'p_color_hex': colorHex,
-      'p_icon_name': iconName,
-    }).timeout(_requestTimeout);
+    final result = await _client
+        .rpc(
+          'create_category',
+          params: {
+            'p_name': name,
+            'p_color_hex': colorHex,
+            'p_icon_name': iconName,
+          },
+        )
+        .timeout(_requestTimeout);
     _bumpCategories();
     return result as String?;
   }
 
   /// setup_onboarding_categories. Canlı sunucu void döndürür (sonuç null);
   /// proposed/23 sonrası sayıları döndürür ([OnboardingCategoriesResult]).
-  Future<OnboardingCategoriesResult?> setupOnboardingCategories(List<Map<String, dynamic>> categories) async {
+  Future<OnboardingCategoriesResult?> setupOnboardingCategories(
+    List<Map<String, dynamic>> categories,
+  ) async {
     _requireUserId();
-    final response = await _client.rpc('setup_onboarding_categories', params: {
-      'p_categories': categories,
-    }).timeout(_requestTimeout);
+    final response = await _client
+        .rpc(
+          'setup_onboarding_categories',
+          params: {'p_categories': categories},
+        )
+        .timeout(_requestTimeout);
     _bumpCategories();
     return OnboardingCategoriesResult.fromResponse(response);
   }
@@ -2062,7 +2633,12 @@ class SupabaseService {
     _bumpCategories();
   }
 
-  Future<void> updateCategory(String categoryId, String name, String colorHex, String iconName) async {
+  Future<void> updateCategory(
+    String categoryId,
+    String name,
+    String colorHex,
+    String iconName,
+  ) async {
     final uid = _requireUserId();
     await _client
         .from('categories')
@@ -2102,7 +2678,8 @@ class _SupabaseQueueBackend implements SessionQueueBackend {
   final SupabaseService _service;
 
   @override
-  String? get signedInUserId => _service._isCloudActive ? _service._client.auth.currentUser?.id : null;
+  String? get signedInUserId =>
+      _service._isCloudActive ? _service._client.auth.currentUser?.id : null;
 
   @override
   Future<Object?> completeSession(
@@ -2110,11 +2687,13 @@ class _SupabaseQueueBackend implements SessionQueueBackend {
     required String categoryId,
     required DateTime startedAtForServer,
   }) {
-    if (session.recordAccelerated && !recordLocalQuickSessions) {
-      throw StateError('local_only_accelerated_session');
+    if (session.recordAccelerated) {
+      return Future.value({'error': SessionReason.invalidData});
     }
     return _service._client.rpc(
-      session.recordAccelerated ? 'complete_qa_study_session' : 'complete_study_session',
+      session.isMarathon
+          ? 'complete_marathon_study_session'
+          : 'complete_study_session',
       params: {
         'p_client_uuid': session.clientUuid,
         'p_category_id': categoryId,
@@ -2122,17 +2701,23 @@ class _SupabaseQueueBackend implements SessionQueueBackend {
         'p_was_paused': session.wasPaused,
         'p_is_verified': session.foregroundSeconds,
         'p_started_at': startedAtForServer.toUtc().toIso8601String(),
+        if (session.isMarathon) ...{
+          'p_marathon_uuid': session.marathonUuid,
+          'p_target_sessions': session.marathonTargetSessions,
+          'p_session_index': session.marathonSessionIndex,
+        },
       },
     );
   }
 
   @override
   Future<List<CategoryRef>> fetchCategories() async => [
-        for (final c in await _service.fetchUserCategories(includeArchived: true))
-          (id: c.id, name: c.name, isArchived: c.isArchived),
-      ];
+    for (final c in await _service.fetchUserCategories(includeArchived: true))
+      (id: c.id, name: c.name, isArchived: c.isArchived),
+  ];
 
   @override
-  Future<void> createDefaultCategories() =>
-      _service.setupOnboardingCategories(_service.defaultCategorySeedForCurrentUser());
+  Future<void> createDefaultCategories() => _service.setupOnboardingCategories(
+    _service.defaultCategorySeedForCurrentUser(),
+  );
 }

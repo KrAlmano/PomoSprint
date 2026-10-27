@@ -8,7 +8,6 @@ import '../models/registration_consent.dart';
 import '../widgets/avatar_widget.dart';
 import '../models/user_model.dart';
 import '../services/supabase_service.dart';
-import '../services/language_service.dart';
 import '../utils/auth_error_text.dart';
 import '../utils/name_filter.dart';
 import '../utils/responsive.dart';
@@ -491,7 +490,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     List<AvatarCharacter> avatars,
     AvatarCharacter selectedAvatar,
   ) {
-    final isTurkish = LanguageService.instance.isTurkish;
+    final isTurkish = l10n.localeName == 'tr';
     final muted = isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant;
     Widget item(AvatarCharacter avatar) {
       final isSelected = avatar.id == selectedAvatar.id;

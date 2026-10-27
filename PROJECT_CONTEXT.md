@@ -1,76 +1,55 @@
 # PomoSprint — kısa proje bağlamı
 
-> Son güncelleme: 7 Ekim 2026. Güncel test ve yayın durumu: [QA_RELEASE_2026-10-07.md](analiz/QA_RELEASE_2026-10-07.md). En kapsamlı çalışma/devir belgesi: [PROJE_DEVIR.md](PROJE_DEVIR.md). Kodlama ve sunucu sözleşmeleri: [AGENTS.md](AGENTS.md). Bu turda canlı DB/Auth/Edge/Resend/DNS salt okunarak doğrulandı; üretim yazımı, posta gönderimi veya deploy yapılmadı.
+**Güncel: 9 Ekim 2026 / §37.** Proje kökü `/Users/almano/Desktop/Projects/Pomodoro`. [Temizlik QA](analiz/QA_RELEASE_CLEANUP_2026-10-09.md), [detaylı devir](PROJE_DEVIR.md) ve [sözleşmeler](AGENTS.md) okunmalı. Önceki tarihli ortam notları, güncel çalışan cihaz veya veritabanı anlamına gelmez.
 
-## 1. Ürün
+## Ürün ve teknoloji
 
-Android ve iOS için oyunlaştırılmış çalışma/Pomodoro uygulaması. 25 veya 50 dakikalık odak seansı, ders kategorileri, raporlar, seri, puan/kum, lig, avatar, arkadaş ve sosyal çalışma akışı.
+Flutter/Dart mobil uygulaması yalnız Android ve iOS içindir. Supabase projesi `Pomodoro App`, ref `eoosnyakvxmifmexpgxa`, bölge `eu-north-1`; Postgres, RLS, Auth, RPC, Edge ve pg_cron kullanılır. Site `pomosprint.app`, Cloudflare static Worker ile yayınlanır; kaynak `landing/` altındadır.
 
-| Özellik | Davranış |
+| Alan | Davranış |
 |---|---|
-| Seans | 25/50 dakika; tek duraklatma; seans cihazda sürer ve offline tamamlanmış seans kalıcı outbox'ta bekler |
-| Ödül | Puan, kum, seri ve lig sunucu RPC sonucudur; istemci formül üretmez |
-| Rapor | Günlük/haftalık/aylık, kategori ve hedef; çalışma günü profil IANA diliminde 04:00 |
-| Kategori | Ücretsiz 8, premium 15; silinmez, arşivlenir |
-| Lig | 5 kademe, en fazla 30 kişi, 14 günlük dönem; yeni ilk oda 7–14 günlük döneme denk gelebilir |
-| Arkadaş | Kod, gelen/giden istek, arkadaşlıktan çıkarma, engelle/geri aç, canlı odak ve sıralama |
-| Auth | E-posta/parola ve Google kod akışı; iOS Apple düğmesi var fakat canlı provider kapalı. Yeni şifre en az 8 karakter + ASCII küçük/büyük harf/rakam; reset web'de tamamlanır |
-| Yerel test | Yalnızca debug + yerel backend seçilirse 5/10 saniye 25/50 dakika diye kaydedilebilir; canlıya kısa kayıt yok |
-| Dil/tema | Türkçe/İngilizce, sistem/açık/koyu tema |
-| Bildirim | Android yerel bildirim/kalıcı sayaç; iOS bildirim/Live Activity |
+| Sayaç | Gerçek 25/50 dk, 1 duraklatma hakkı; kalan süre kalıcı bitiş zamanından hesaplanır |
+| Maraton | Planlama penceresinde 2/3/4 odak ve ortak 25/50 dk seçilir. Arada 300 sn mola, ardından 60 sn içinde ön planda Buradayım ve sunucu onayı gerekir; tamamlanan odaklar normal ödülle korunur |
+| Bonus | Geçerli plan tamamlandığında 25 dk için +2/+3/+5, 50 dk için +4/+6/+10; sunucu bir kez hesaplar |
+| Rapor | Günlük, haftalık, aylık, kategori ve hedef takibi; IANA saat diliminde 04:00 çalışma günü sınırı |
+| Lig | Bronz/Gümüş/Altın/Safir/Elmas; ilk puanlı seansla uygun, en fazla 25 kişilik odaya yerleşilir. Hazırlık → 25 farklı aktif kullanıcı → tam 14 günlük dönem; terfi ve ödül aktiflik/yeterliliğe bağlıdır |
+| Sosyal | Tek liste: Odaklanıyor; yalnız Maraton molasında Molada. 30 sn aralıkla yenilenir; push yoktur |
+| Avatar | Kayıtta 7 ücretsiz avatar; 21 özel avatarın her biri 500 kum. Ronin istemci kataloğundan ve canlıdan kaldırıldı; eski profilde güvenli varsayılan görsel kullanılır. Ödül avatarları satın alınamaz |
+| Onboarding | 7 adım; son adım tüm sekmeleri anlatır. Onboarding kaydı son adımda Bitir ile yapılır |
+| Dil/tema | TR/EN, sistem/açık/koyu; ARB → gen-l10n |
+| Bildirim | Android yerel bildirim, exact alarm ve kalıcı sayaç; iOS yerel bildirim ve LiveActivity |
+| Yatay | Animasyon, sayaç, duraklatma hakkı ve uygun kontroller; mola/onayda hak gösterilmez, kahve yalnız moladadır |
 
-## 2. Teknoloji ve çalıştırma
-
-- Flutter, Dart `^3.12.2`; ürün platformları `android/`, `ios/`.
-- Supabase projesi `Pomodoro App`, ref `eoosnyakvxmifmexpgxa`, bölge `eu-north-1`.
-- `pomosprint.app`: statik Cloudflare Workers site (`landing/`).
-- Sentry: DSN boşsa veya açık yerel `--dart-define` bağlantısında ayrıca verilmezse kapalı.
-- Google plugin kodu 6.x API'sinde. Gerçek Google/Apple sağlayıcı girişi son QA'da doğrulanmadı.
-- Mobil/site/Edge kaynak düzeltmeleri çalışma ağacında olabilir; `git status` ile koru. Test geçişi deploy veya GitHub push anlamına gelmez.
-
-Kurulum ve komutlar kök [README.md](README.md)'de; yerel backend/test hesapları [tool/local_supabase/README.md](tool/local_supabase/README.md)'de. Yerel projeyi canlıya `supabase link` ile bağlama. Canlı migration geçmişiyle repo kök migration'ları farklı olduğundan kökte `supabase db push/reset` kullanma.
-
-## 3. Mimari
+## Bağımlılıklar ve veri akışı
 
 ```text
 main.dart → SplashScreen → AppGate
-                           ├─ Login / Register / Password reset
-                           ├─ PostAuthOnboardingScreen
-                           └─ MainNavigationShell (IndexedStack, 4 sekme)
-                              ├─ TimerScreen
-                              ├─ ReportsScreen → stats_calculator / study_day
-                              ├─ RankingScreen
-                              └─ SocialScreen / FriendsSheet
-
-TimerScreen → TimerPersistence → SessionQueue → SupabaseService → RPC/Postgres
-ReportsScreen ← remote sessions + pending outbox
-DeviceTimeZone native IANA → own profiles.timezone → çalışma günü / rapor
+                           ├─ Login/Register/Reset
+                           ├─ PostAuthOnboarding
+                           └─ MainNavigationShell (IndexedStack)
+                              ├─ TimerScreen → TimerPersistence
+                              │                → SessionQueue → SupabaseService → RPC
+                              ├─ ReportsScreen ← own remote sessions + outbox
+                              ├─ RankingScreen ← league_backend / LeagueRules
+                              └─ SocialScreen ← friends/live RPC
 ```
 
-`AppGate` tek yönlendirme kapısıdır. `SupabaseService.currentUser` tek kullanıcı kaynağıdır. Sahip değişiminde eski hesabın Profil/Koleksiyon/dialog/sheet route'ları frame sonunda kapanır; aynı sahibin profil yenilemesi overlay kapatmaz. Onboarding/Shell UID ile anahtarlanır. Hesap silme başarıda ayrıca pop/onLogout yapmaz; servis→AppGate yönlendirir. Tamamlanan seans önce diskteki `SessionQueue`'ya yazılır; `client_uuid` idempotency sağlar. Raporlar uzak kayıtları ve pending seansları `mergeStatSessions` ile birleştirir. Profil, ekonomi veya başka kullanıcının verisine ekrandan rastgele doğrudan erişme; [AGENTS.md](AGENTS.md)'deki RLS/RPC sözleşmesini izle.
+Puan, kum, seri ve lig sunucu sonucudur. `client_uuid` bir kez üretilir, tekrar kaydı önler ve yeniden denemede değişmez. Owner ve epoch kontrolleri geç yanıtların başka hesaba yazılmasını engeller. Yerel kategori, önbellek ve outbox UID’ye bağlıdır; başkasının verisi yalnız güvenli RPC ile gelir. Auth kullanıcılarını Supabase yönetir; istemcide parola veritabanı yoktur.
 
-## 4. Çalışma günü, arkadaşlık ve yasal kayıt
+## Son temizlik ve doğrulama
 
-- `study_day.dart`: 04:00 çalışma günü, Pazartesi başlayan hafta ve DST güvenli takvim. Yerel IANA saat dilimi iOS/Android MethodChannel'ından (`device_time_zone.dart`) okunur. Profil açılışında ve uygulama ön plana dönünce eşitlenir. Geçersiz dilim veya ağ hatası eski profil değerini korur.
-- Sosyal sekmenin görünür tazelemesi normalde 30 saniye; kısa kayıtlı yerel testte 2 saniye. Bu push realtime yayını değil.
-- Arkadaş sheet: gelen/giden, iptal, remove, block/unblock. Gizle cihazda saklanan ayrı davranış. Bilinen kullanıcı kimliğinde uygulama içi zorunlu neden/isteğe bağlı not formu `submit_user_report` RPC'sine bağlıdır; kimliksiz eski sunucu satırında destek e-postası yedeği vardır. Duplicate/hız sınırı/hata/hesap izolasyonu test edildi.
-- Paralel arkadaş yenilemesinde yalnız son yanıt uygulanır. Sosyal görünürlük ilk okuma/kayıt boyunca tek işlemle korunur. Gizlenen kullanıcı async yüklemesi logout/silme/hesap değişiminden sonra eski veriyi yayınlayamaz.
-- SocialSignInNotice sonrasında başarıyla Google/Apple girişi yapılırsa `accept_legal_documents` terms/privacy sürümünü `consents` ledger'ına yazar. Hata durumunda Shell'e ilerlenmez. Bu yeni provider adımı gerçek provider login testi değildir.
-- Şifre unuttum formu adres alır ve reset mailinden sonra “gönderildi” ekranını gösterir; reset bağlantısı web'de tamamlanır.
-- Yasal sürüm `2026-10-07`; TR/EN kaynak sayfaları güncel, canlı site deploy edilmedi. iOS privacy manifest özel kategori/bildirim notu için hesapla bağlantılı `OtherUserContent` içerir; takip yok. Store etiketleri ayrı panel işidir.
+Ronin görseli kaldırıldı; Ronin’e ait manifest, mağaza ve yedek katalog kayıtları temizlendi. Eski önbellekteki Ronin görünmez; kuşanılmış eski kimlik temel görselle gösterilir. Kartın dış `StackFit.expand` düzeni, görsel ile kısa ve uzun TR/EN adları aynı merkeze hizalar. Fiyat ve kilit ayrı avatar alanında kalır.
 
-## 5. Son QA ve kapsam sınırı
+Kullanıcı `20261009233000_remove_unowned_ronin` SQL’ini uyguladı; 20/20 salt okuma kontrolü PASS. Canlı katalogda toplam 48 avatar, 47 aktif, 21 özel ve 7 ücretsiz avatar var; MD5 `9ad12fc8edb016c69eb45a24f4ac1e11`. Dört Auth kullanıcısı/profil, dokuz seans, on bir kategori ve 42 avatar sahipliği kaydı aynı. Ekonomi ve seans hash’leri 8 Ekim’deki özgün kayıtla eşleşir. Kesin biçimde QA hesabı olduğu belirlenen silinebilir bir hesap bulunmadı; mevcut hesaplar korundu.
 
-7 Ekim 2026 güncel tur: `flutter analyze` temiz; screenshot senaryoları dahil birim/widget **1091/1091, 0 atlama**; New York DST alt kümesi **93/93**; izole backend 9 paket **466/466**; son site/Edge/e-posta Node paketi **99/99** (welcome 15/15, unsubscribe 24/24, delete-account 25/25 alt kümeleri; ilk site turu 61/61 tarihsel). Gerçek iOS normal `a,b,c,d` ve düzeltme sonrası `e,m,n` 3/3 geçti. İlk hesap silme koşusundaki gerçek Navigator yarışı düzeltildi. iOS kayıtlı hızlı `f,k,g,h,i,l,m` 7/7 geçti; seanslar 5/10 saniyede test edildi. Android gerçek UI temel koşusu 6/6, tam koşusu 8/8 geçti. İki platformda gerçek OS süreç sonlandırma/restore aynı UUID'yi bir kez kaydetti. Alt kümeleri tam test sayısına tekrar ekleme. `o/q/r` toplu import dosyaları bu koşunun geçici yardımcılarıydı ve kaldırıldı; kalıcı senaryolar `a`–`n` dosyalarıdır.
+Flutter testlerinde 1291 PASS var; isteğe bağlı 5 ekran görüntüsü testi atlandı. Analiz temiz. Avatar ve eski kayıt odaklı 114 PASS bu toplamın alt kümesidir; toplama eklenmez. Ronin SQL’i için 24 kontrol, ayrı 12 DRYRUN ve bağımsız 17 statik inceleme vardır; canlıdaki 20 kontrol ayrı kapsamdır. Native görsel ve fiziksel cihaz testleri bu tur çalıştırılmadı; simülatör/runtime sayısı 0.
 
-Android mağaza pipeline 64,2 MB AAB üretti; imzası doğrulandı, mağazaya yüklenmedi. Yerel QA release APK'sı 28,0 MB derlendi; normal main ile emülatörde release giriş/rapor/sekme/sayaç/native bildirim, duraklat/sıfırla ve soğuk açılış kontrolleri geçti; bu koşuda çökme yok. iOS obfuscated imzasız release geçti (28,4 MB uygulama); imzalı IPA kişisel takımın Sign In with Apple / Time Sensitive Notifications ve provisioning kısıtında kaldı. Son artifact/runtime durumu [ana QA raporunda](analiz/QA_RELEASE_2026-10-07.md). 5 Ekim APK/unsigned iOS ve eski süreç testleri tarihsel kanıttır; güncel tur yerine kullanılmaz. Önceki detaylar [QA_FOLLOWUP](analiz/QA_FOLLOWUP_2026-10-05.txt) ve [QA_FULL](analiz/QA_FULL_2026-10-05.txt) içinde korunur.
+`pomosprint-local` Docker projesi `stop --no-backup` ile veri hacimleri dahil temizlendi; başka Docker projelerine dokunulmadı. Eski fixture, ekran görüntüsü, ham log, hızlı demo/gece başlatma kaynakları ve macos/linux/windows/web şablonları kaldırıldı. Anlamlı regresyon ve SQL kaynakları korunur. Normal giriş noktası `lib/main.dart`; QUICK/SAVE define’ları etkisizdir, QA tamamlama RPC’si seçimi yoktur. Eski hızlandırılmış aktif kayıt temizlenir; outbox kaydı `invalid_data` ile ret geçmişine alınır. Normal kayıtlar korunur.
 
-Doğrulanmamışlar: fiziksel Android/iOS; gerçek Google/Apple giriş; fiziksel tam bildirim/ses/kilit ekranı sunumu; gerçek cihazda saat dilimini değiştirme; mağaza imzalı dağıtım ve yayın. Apple provider kapalı ve `delete-account` Edge Function yok: Apple login/revoke operasyonu yayın engelidir. Test geçişi bütün mağaza koşullarının tamamlandığı anlamına gelmez.
+## Çalıştırma ve devam
 
-## 6. Backend durumu
+`flutter pub get`, `flutter gen-l10n`, `flutter analyze`, `flutter test --concurrency=2`. Kullanıcı daha sonra cihaz istediğinde tek yeni runtime/cihaz kur ve `flutter devices` ile güncel ID seç. Açık normal veya QA uygulaması yok; eski BEA/HMV UUID’leri silindi. `.env` canlı bağlantısı ve imzalama korunur. Yerel ortam için URL ve anon define’ları birlikte, açıkça verilmelidir.
 
-5 Ekim uygulama sırası `12 → 15 → 16 → 19 A → 13 → 14 → 20 → 21 → 22 → 23 → 24 → 25 → 26`. 7 Ekim yeniden canlı salt-okuma: **409 katalog kaydı** baseline ile aynı; **14 ops fonksiyonu** canlı/yerel eşleşiyor. 19 B uygulanmadı. Yeni SQL işi için o andaki canlı tanımı yeniden oku; [supabase/README.md](supabase/README.md) ve `AGENTS.md` §2.3–2.4 akışını izle.
+Canlı veritabanı önceliklidir; migration klasörü canlı geçmişi temsil etmez. Kör `db push/reset` yapılmaz. Yeni SQL akışı: güncel canlı tanım/ACL okuması → izole test → DRYRUN → kullanıcının SQL Editor’de uygulaması → kontrol. Ronin ileri SQL’i yeniden uygulanmaz. Güncel yerel snapshot’ın canlıyla eşit olduğu varsayılmaz; [yerel rehber](tool/local_supabase/README.md).
 
-Canlı Auth: minimum şifre 8 + `lower_upper_letters_digits`, Google açık, Apple kapalı/client ID boş. Mobil/web yeni şifre doğrulaması ve yerel Auth config minimumu 8'e hizalandı; çalışan yerel Auth restart edilmedi, mevcut yerel fikstürlerin karakter politikası boş kaldı. Canlı sunucu ayarı değiştirilmedi. Canlı welcome v9 ve unsubscribe v10 yeni kaynak düzeltmelerini içermiyor; deploy bekliyor. Resend gönderici domaini verified ve geçmiş tek reset postası Delivered, 0 bounce/complaint; yeni posta gönderilmedi. Welcome gönderici adı/adresi secret'ları yok. Güncel SMTP alanları CLI çıktısında redakte/eksik olduğu için ayrıca doğrulanmalı.
-
-Kanıt kökü [analiz/qa_evidence_20261007](analiz/qa_evidence_20261007); [backend özeti](analiz/qa_evidence_20261007/backend/summary.json), [mobil inceleme](analiz/qa_evidence_20261007/mobile_audit/mobile_review.md), [site raporu](analiz/qa_evidence_20261007/site/report.md), [e-posta özeti](analiz/qa_evidence_20261007/backend/email/summary.json). Gönderici/geliştirici kimliği, site/Edge deploy, Apple ayarları, mağaza privacy/Data Safety/exact-alarm beyanları ve fiziksel cihaz doğrulamaları kullanıcı/operasyon işleri olarak açık kalır.
+§33 güvenlik ve operasyon eksikleri halen açıktır: derin Sentry maskelemesi ve HTTP 500 hata yakalama, bekleme listesi onayı ve istek limiti, başlangıç API’sindeki yarış, operasyonel Maraton kill switch’i ve hosted staging. Apple Auth/imzalama, gerçek Google/Apple sağlayıcı ve fiziksel cihaz testleri, mağaza beyanları ve yasal/gönderen kimliği ayrıca tamamlanacak. Kullanıcı kimlik bilgilerini en son verecek; tekrar sorma. Bu temizlik genel yayın onayı değildir; GitHub push veya site yayını yapılmadı.

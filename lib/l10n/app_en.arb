@@ -36,17 +36,17 @@
   "socialFocusingNow": "Focusing Right Now",
   "socialFocusing": "Focusing",
   "socialFocusingOn": "Focusing on {category}",
-  "socialNoLiveFriends": "No friends studying right now. They'll show up here once someone starts focusing.",
+  "socialNoLiveFriends": "None of your friends are focusing or on a break right now. They’ll appear here when they start studying.",
   "socialLoadError": "Couldn't load your friends' status. Check your connection and try again.",
-  "leagueTierBronze": "Bronze Hourglass",
-  "leagueTierSilver": "Silver Hourglass",
-  "leagueTierGold": "Gold Hourglass",
-  "leagueTierSapphire": "Sapphire Hourglass",
-  "leagueTierDiamond": "Diamond Hourglass",
+  "leagueTierBronze": "Bronze League",
+  "leagueTierSilver": "Silver League",
+  "leagueTierGold": "Gold League",
+  "leagueTierSapphire": "Sapphire League",
+  "leagueTierDiamond": "Diamond League",
   "leagueTierLeagueName": "{tier} League",
   "leagueInfoTitle": "How the League System Works",
   "leagueInfoWhatTitle": "What is a League?",
-  "leagueInfoWhatBody": "Each league period you're grouped with up to 30 people at a similar level. Whoever focuses the most during the period climbs to the top.",
+  "leagueInfoWhatBody": "After your first session that earns points, you join a league room with people at a similar level. Room capacity and period rules come from the server; earning points moves you up the ranking.",
   "leagueInfoTiersTitle": "League Tiers",
   "leagueInfoYouAreHere": "You are here",
   "leagueInfoPointsTitle": "How Do You Earn Points?",
@@ -67,7 +67,7 @@
   "leagueInfoNoDemotionBronze": "There's no demotion from the Bronze league.",
   "leagueInfoNoDemotionThisPeriod": "No one moves down from this league this period.",
   "leagueAwaitingPlacementTitle": "You're not in a league room yet",
-  "leagueAwaitingPlacementBody": "Complete your first pomodoro this period to join a room of up to 30 people at a similar level. Your rank and promotion status will show up here.",
+  "leagueAwaitingPlacementBody": "Complete your first pomodoro that earns points to join a suitable league room at your tier. Your ranking and current period rules appear here.",
   "leagueInfoDailyLimitTitle": "Daily Limit",
   "leagueInfoDailyLimitBody": "Up to {limit} sessions a day earn points and sand (league points, monthly ranking, total points). Sessions after that only add to your study time and streak.",
   "leagueInfoFaqTitle": "Why Didn't My Points Go Up?",
@@ -114,6 +114,7 @@
   "profileSettingSaveError": "Couldn't save the setting. Please try again.",
   "avatarBalance": "Your balance: {coins} sand grains",
   "avatarPurchaseTitle": "Buy",
+  "specialAvatarsTitle": "Special Avatars",
   "avatarPurchaseBody": "Buy {name} for {price} sand grains?",
   "avatarNotEnoughCoins": "Not enough sand grains: you need {missing} more.",
   "avatarPurchased": "{name} is yours!",
@@ -503,7 +504,7 @@
   "onboardingCategoryStepTitle": "Great choice! 🎉",
   "onboardingCategoryStepPreparedTitle": "Picked for your goal 🎯",
   "onboardingCreateOwnCategory": "+ Create my own category",
-  "onboardingGoalStepTitle": "One last step! 🚀",
+  "onboardingGoalStepTitle": "Choose your daily goal",
   "onboardingGoalStepBody": "How much do you want to focus together each day?",
   "onboardingGoal1h": "1 Hour",
   "onboardingGoal2h": "2 Hours",
@@ -655,6 +656,8 @@
   "sendPasswordResetEmail": "Send verification email",
   "passwordResetSentTitle": "Check your email",
   "passwordResetSentDescription": "If an account is registered with this address, we sent a password reset link. Check your inbox and spam folder, then follow the link to set a new password.",
+  "passwordResetLocalTitle": "Local email",
+  "passwordResetLocalDescription": "This build uses the local environment. Emails are kept in the local Mailpit inbox and are not sent to your real inbox. Accounts and passwords here are separate from your normal account. Use the normal PomoSprint launch option to reset your normal account.",
   "timerQuickRecordedSemantics": "Local quick test timer: sessions are saved as 25 or 50 minutes",
   "friendsOutgoingTitle": "Sent requests",
   "friendsCancelRequest": "Cancel request",
@@ -684,5 +687,240 @@
   "reportAlreadyReceived": "We already received your report about this user.",
   "reportRateLimited": "You reached the daily report limit. Please try again later.",
   "reportUserUnavailable": "This user is no longer available to report. Refresh the list.",
-  "reportSendFailed": "Could not send the report. Please try again."
+  "reportSendFailed": "Could not send the report. Please try again.",
+  "marathonTitle": "Marathon",
+  "marathonSingle": "Single session",
+  "marathonChooseCount": "How many sessions would you like?",
+  "marathonCountOption": "{count} Pomodoros",
+  "@marathonCountOption": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "marathonProgress": "Pomodoro {current}/{total}",
+  "@marathonProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "marathonBreakTitle": "Break",
+  "marathonBreakHint": "When your break ends, tap “I’m here” within 1 minute to continue.",
+  "marathonAutomaticHint": "A marathon is a study plan with 2, 3 or 4 Pomodoros in a row. Choose 25 or 50 minutes for the plan; all Pomodoros in the marathon use that same duration.\n\nTake a 5-minute break between sessions. When it ends, tap “I’m here” within 1 minute to start the next session. An internet connection is required to confirm.\n\nIf you miss a confirmation or choose to end the marathon early, the remaining plan stops. Completed sessions and their regular points are kept, but no completion bonus is awarded. Breaks and confirmation waiting time do not count as study time.",
+  "marathonBreakRemainingSemantics": "Break: {minutes} minutes and {seconds} seconds remaining",
+  "@marathonBreakRemainingSemantics": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "marathonStart": "START MARATHON",
+  "marathonStop": "End marathon",
+  "marathonStopped": "Marathon ended. Your completed Pomodoros and regular points were kept.",
+  "marathonStopConfirmTitle": "End this marathon?",
+  "marathonStopConfirmBody": "You completed {completed}/{total} Pomodoros. Completed sessions are kept; the current Pomodoro will not be saved.",
+  "@marathonStopConfirmBody": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "marathonStopConfirmAction": "End marathon",
+  "marathonCompletedTitle": "Marathon complete!",
+  "marathonCompletedBody": "You focused for {minutes} minutes across {count} Pomodoros.",
+  "@marathonCompletedBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "marathonSaving": "Saving Pomodoro…",
+  "marathonRetrySave": "Retry saving",
+  "marathonSaveFailed": "Your completed Pomodoro is stored on this device. Retry to send the saved session. If the continuation window expires, the marathon stops; your completed session is kept.",
+  "marathonStoppedRejected": "This Pomodoro could not be saved. The marathon stopped; your earlier sessions were kept.",
+  "marathonMinutesSummary": "{focusMinutes} min focus · about {elapsedMinutes} min with breaks",
+  "@marathonMinutesSummary": {
+    "placeholders": {
+      "focusMinutes": {
+        "type": "int"
+      },
+      "elapsedMinutes": {
+        "type": "int"
+      }
+    }
+  },
+  "marathonResumePlan": "Resume marathon",
+  "notifMarathonBreakDoneTitle": "Break is over",
+  "notifMarathonBreakDoneBody": "Marathon: Pomodoro {nextSession}/{totalSessions}. Open the app and tap “I’m here” within 1 minute to continue.",
+  "@notifMarathonBreakDoneBody": {
+    "placeholders": {
+      "nextSession": {
+        "type": "int"
+      },
+      "totalSessions": {
+        "type": "int"
+      }
+    }
+  },
+  "socialOnBreak": "On break",
+  "socialNoBreakFriends": "None of your friends are on a break right now.",
+  "marathonBonusPoints": "+{points} marathon bonus",
+  "@marathonBonusPoints": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "marathonBonusHint": "Complete the marathon for {points} extra points",
+  "@marathonBonusHint": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "marathonBonusPending": "Your marathon bonus will be calculated when pending Pomodoros are saved and the completion requirements are met.",
+  "marathonUnavailable": "Marathon is currently unavailable.",
+  "marathonStartFailed": "The marathon could not start. Please try again.",
+  "marathonPresenceTitle": "Are you here?",
+  "marathonPresenceHint": "Your break is over. Tap “I’m here” within 1 minute to start the next session.",
+  "marathonPresenceConfirm": "I’m here",
+  "marathonPresenceChecking": "Confirming…",
+  "marathonPresenceConnectionNeeded": "Confirmation failed. Check your internet connection and try again before time runs out.",
+  "marathonPresenceExpired": "The marathon stopped because you did not confirm. Your completed sessions were kept.",
+  "marathonPresenceRemainingSemantics": "{minutes} minutes and {seconds} seconds left to confirm",
+  "marathonStepStart": "Start",
+  "marathonStepGoal": "Goal",
+  "marathonSessionCount": "{count} sessions",
+  "marathonStepCompleted": "Completed",
+  "marathonStepCurrent": "Current session",
+  "marathonStepUpcoming": "Next session",
+  "@marathonPresenceRemainingSemantics": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "@marathonSessionCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "marathonStoppedInvalid": "Your Pomodoro was saved. The marathon stopped because its verification could not be completed; your sessions were kept.",
+  "marathonPlanTitle": "Plan your marathon",
+  "marathonDurationLabel": "Pomodoro duration",
+  "marathonStartingWelcome": "Your marathon is starting. Happy focusing!",
+  "marathonViewProgress": "Marathon progress",
+  "marathonInfoTitle": "What is a marathon?",
+  "marathonInfoBonusMatrix": "Completion bonus\n25 min: 2 sessions +{shortTwo}, 3 sessions +{shortThree}, 4 sessions +{shortFour} points.\n50 min: 2 sessions +{longTwo}, 3 sessions +{longThree}, 4 sessions +{longFour} points.\n\nThese extra points are awarded once, after every session has been saved and earned regular points, and every continuation is confirmed on time. They are added to the regular session points and do not earn extra sand.",
+  "onboardingGuideTitle": "Get to know the app",
+  "onboardingGuideBody": "See how each screen works before you begin.",
+  "onboardingGuidePomoTitle": "Pomo",
+  "onboardingGuidePomoBody": "Choose a category and a 25- or 50-minute session, then tap Start. You can pause once per session; pausing reduces its points. Completed sessions are saved.",
+  "onboardingGuideMarathonTitle": "Marathon",
+  "onboardingGuideMarathonBody": "Use Start Marathon to plan 2, 3 or 4 sessions. Each break lasts 5 minutes. Tap I’m here within 1 minute after the break to continue; without confirmation, the marathon ends. Completed sessions keep their normal points. Finishing the whole plan adds +2/+3/+5 points for 25-minute sessions or +4/+6/+10 for 50-minute sessions, respectively.",
+  "onboardingGuideReportsTitle": "Reports",
+  "onboardingGuideReportsBody": "See your daily, weekly and monthly study time, completed sessions and category breakdown. Track and change your daily goal. Your study day resets at 4:00 a.m.",
+  "onboardingGuideRankingTitle": "Ranking",
+  "onboardingGuideRankingBody": "After your first session that earns points, you join a suitable league room at your tier. Follow the League, Monthly and Friends rankings here. The tiers are Bronze, Silver, Gold, Sapphire and Diamond. Sessions and reports are saved during preparation; official 14-day competitions start once there are enough active participants. The ? in Ranking explains the current promotion and award requirements.",
+  "onboardingGuideSocialTitle": "Social",
+  "onboardingGuideSocialBody": "Send a request using a friend code; once accepted, you can see each other’s status. Studying friends show as Focusing. Only friends taking a marathon break show as On break. A red dot means focus; a green dot means a break. Change your visibility in Profile.",
+  "onboardingGuideProfileTitle": "Profile",
+  "onboardingGuideProfileBody": "Tap your avatar at the top to open Profile. Manage categories, use earned sand to expand your avatar collection, and choose an avatar. You can also find language, theme, notification and visibility settings, help, privacy and account actions here.",
+  "leagueInfoWhatBodyWithCapacity": "After your first completed session that earns points, you join a suitable existing room in the same tier and period. A room holds up to {capacity} people; a new room opens when it is full. Period rankings use points from sessions accepted by the server.",
+  "@leagueInfoWhatBodyWithCapacity": {
+    "placeholders": {
+      "capacity": {
+        "type": "int"
+      }
+    }
+  },
+  "leagueLaunchPreparingBody": "Leagues are preparing. Once {users} different users have completed a session in the last 14 days, the first official competition starts in the next full 14-day period. Sessions, points and reports are saved; preparation has no promotion, demotion or league avatar awards. Preparation points do not carry into the official competition.",
+  "@leagueLaunchPreparingBody": {
+    "placeholders": {
+      "users": {
+        "type": "int"
+      }
+    }
+  },
+  "leagueLaunchScheduledBody": "The first official league period starts on {date}. Until then, sessions and reports are saved without promotion, demotion or league avatar awards. Preparation points do not carry into the competition.",
+  "@leagueLaunchScheduledBody": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "leagueLaunchScheduledShort": "Official league period starts",
+  "leaguePromotionPolicyBody": "Promotion requires at least {active} active people who completed a session in your room this period. The promotion quota is one third of the active count, rounded down (3 active people: 1; 25 active people: 8). Complete at least {minutes} focus minutes across {days} different study days, earn at least {points} points and finish within the quota this period. Diamond League has no promotion.",
+  "@leaguePromotionPolicyBody": {
+    "placeholders": {
+      "active": {
+        "type": "int"
+      },
+      "days": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      },
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "leaguePromotionCurrentQuota": "Current promotion quota in this room: the first {count} places. The study day, minute and point requirements also apply.",
+  "@leaguePromotionCurrentQuota": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leagueNoPromotionCurrentPeriod": "This room currently has too few active participants for promotion. Completed sessions continue to be saved.",
+  "leagueDemotionPolicyBody": "Demotion applies only in rooms with at least 10 active people: the bottom one third of the active count, rounded down, move down one tier. People who joined in the last 3 days and those in Bronze League are protected.",
+  "leagueAwardActiveRequirements": "An official league period needs at least {members} active people in the room. Complete {minutes} focus minutes across at least {days} different study days and earn {points} points. Preparation has no awards.",
+  "@leagueAwardActiveRequirements": {
+    "placeholders": {
+      "members": {
+        "type": "int"
+      },
+      "days": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      },
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "leaguePreparationNoChanges": "Everyone stays in their current league during preparation; no promotion, demotion or league avatar awards are given.",
+  "leagueLaunchPreparingShort": "Preparation · Promotion, demotion and league awards have not started yet."
 }

@@ -1,67 +1,131 @@
 import 'package:flutter/foundation.dart';
 
-/// Lig dönem sonu ödül ve terfi kuralı. proposed/20 bunları ürün düğmesi
-/// yapar (app_config, herkese açık get_app_config()):
-/// `league_award_min_members`, `league_award_min_points`,
-/// `league_promotion_min_points`; varsayılanları 1/1/1 = bugünkü kural.
-///
-/// Canlıda get_app_config yok (proposed/13; çağrı PGRST202 verir) ve
-/// process_weekly_leagues bugünkü kuralla çalışır: puanı > 0 olan ilk 3 ödül
-/// alır, terfi kotasındaki puanı > 0 olan terfi eder, oda büyüklüğü şartı
-/// yok. Değer okunamadığında istemci de bu kuralla ([standard]) çalışır.
+/// Sunucunun dönem, oda kapasitesi ve ödül kuralları. Eski sunucu yanıtı
+/// eski davranışı korur; yeni politikada terfi/ödül uygunluğu satırdan okunur.
 @immutable
 class LeagueRules {
   const LeagueRules({
     this.awardMinMembers = 1,
     this.awardMinPoints = 1,
     this.promotionMinPoints = 1,
+    this.roomCapacity = 30,
+    this.launchMinActiveUsers = 25,
+    this.promotionMinActiveMembers = 3,
+    this.qualificationMinDays = 3,
+    this.qualificationMinMinutes = 300,
+    this.policyVersion = 0,
+    this.competitionPhase = 'active',
+    this.competitionStartsAt,
     this.fromServer = false,
   });
 
-  /// Bugünkü (canlı) kural.
+  /// Yeni RPC bulunmayan sunucunun mevcut kuralları.
   static const LeagueRules standard = LeagueRules();
 
-  /// Ödül için dönem sonunda odadaki en az üye sayısı.
+  /// V2 sıralama geldiği halde yapılandırma geçici olarak okunamıyorsa
+  /// eski tek-kişilik ödül şartı gösterilmez. Satırın aşaması yine önceliklidir.
+  static const LeagueRules launchPolicyDefaults = LeagueRules(
+    awardMinMembers: 10,
+    roomCapacity: 25,
+    policyVersion: 1,
+    competitionPhase: 'preparing',
+    fromServer: true,
+  );
   final int awardMinMembers;
-
-  /// Ödül için en az dönem puanı (1 = puanı > 0).
   final int awardMinPoints;
-
-  /// Terfi için en az dönem puanı (1 = puanı > 0).
   final int promotionMinPoints;
-
-  /// Değerler sunucunun get_app_config yanıtındaki lig anahtarlarından
-  /// geldi: proposed/20 uygulanmış. 20 ligsiz kullanıcının satırını
-  /// member_count 0 ile bildirir; tek kişilik gerçek oda 1 döner.
+  final int roomCapacity;
+  final int launchMinActiveUsers;
+  final int promotionMinActiveMembers;
+  final int qualificationMinDays;
+  final int qualificationMinMinutes;
+  final int policyVersion;
+  final String competitionPhase;
+  final DateTime? competitionStartsAt;
   final bool fromServer;
 
-  static const String _awardMinMembersKey = 'league_award_min_members';
-  static const String _awardMinPointsKey = 'league_award_min_points';
-  static const String _promotionMinPointsKey = 'league_promotion_min_points';
+  bool get hasLaunchPolicy => policyVersion >= 1;
+  bool get isCompetitionActive =>
+      !hasLaunchPolicy || competitionPhase == 'active';
 
-  /// get_app_config() yanıtından. Sunucuyla aynı okuma:
-  /// `greatest(coalesce(app_config_int(key), 1), 1)`; sayı olmayan değer 1.
   factory LeagueRules.fromAppConfig(Map<String, dynamic> config) {
-    int read(String key) {
+    int read(String key, int fallback) {
       final value = config[key];
-      if (value is! num || !value.isFinite) return 1;
-      final floored = value.floor();
-      return floored < 1 ? 1 : floored;
+      if (value is! num || !value.isFinite) return fallback;
+      return value.floor().clamp(1, 2147483647);
     }
 
+    final policy = config['policy_version'];
+    final version = policy is num && policy.isFinite
+        ? policy.floor().clamp(0, 2147483647)
+        : 0;
+    final phase = config['competition_phase'];
     return LeagueRules(
-      awardMinMembers: read(_awardMinMembersKey),
-      awardMinPoints: read(_awardMinPointsKey),
-      promotionMinPoints: read(_promotionMinPointsKey),
-      fromServer: config.containsKey(_awardMinMembersKey) ||
-          config.containsKey(_awardMinPointsKey) ||
-          config.containsKey(_promotionMinPointsKey),
+      awardMinMembers: read('league_award_min_members', version > 0 ? 10 : 1),
+      awardMinPoints: read('league_award_min_points', 1),
+      promotionMinPoints: read('league_promotion_min_points', 1),
+      roomCapacity: read('league_room_capacity', version > 0 ? 25 : 30),
+      launchMinActiveUsers: read('league_launch_min_active_users', 25),
+      promotionMinActiveMembers: read('league_promotion_min_active_members', 3),
+      qualificationMinDays: read('league_qualification_min_days', 3),
+      qualificationMinMinutes: read('league_qualification_min_minutes', 300),
+      policyVersion: version,
+      competitionPhase: version == 0 ? 'active' : _phase(phase),
+      competitionStartsAt: DateTime.tryParse(
+        config['competition_starts_at']?.toString() ?? '',
+      ),
+      fromServer:
+          version > 0 ||
+          const [
+            'league_award_min_members',
+            'league_award_min_points',
+            'league_promotion_min_points',
+          ].any(config.containsKey),
     );
   }
 
-  /// get_app_config çağrısının yanıtı (hatasız): Map değilse bugünkü kural.
-  static LeagueRules fromAppConfigResponse(Object? response) =>
-      response is Map ? LeagueRules.fromAppConfig(Map<String, dynamic>.from(response)) : standard;
+  static LeagueRules fromAppConfigResponse(Object? response) => response is Map
+      ? LeagueRules.fromAppConfig(Map<String, dynamic>.from(response))
+      : standard;
+
+  /// Sıralama anındaki aşama, daha önce okunan yapılandırmadan yenidir.
+  LeagueRules withRankingStatus(Map<String, dynamic> row) {
+    if (!row.containsKey('competition_phase')) return this;
+    final capacity = row['room_capacity'];
+    final embedded = row['league_config'];
+    final serverRules = embedded is Map
+        ? LeagueRules.fromAppConfig(Map<String, dynamic>.from(embedded))
+        : null;
+    final base = serverRules?.hasLaunchPolicy == true
+        ? serverRules!
+        : hasLaunchPolicy
+        ? this
+        : launchPolicyDefaults;
+    return LeagueRules(
+      awardMinMembers: base.awardMinMembers,
+      awardMinPoints: base.awardMinPoints,
+      promotionMinPoints: base.promotionMinPoints,
+      roomCapacity: capacity is num && capacity.isFinite && capacity >= 1
+          ? capacity.toInt()
+          : base.roomCapacity,
+      launchMinActiveUsers: base.launchMinActiveUsers,
+      promotionMinActiveMembers: base.promotionMinActiveMembers,
+      qualificationMinDays: base.qualificationMinDays,
+      qualificationMinMinutes: base.qualificationMinMinutes,
+      policyVersion: base.policyVersion < 1 ? 1 : base.policyVersion,
+      competitionPhase: _phase(row['competition_phase']),
+      competitionStartsAt: row.containsKey('competition_starts_at')
+          ? DateTime.tryParse(row['competition_starts_at']?.toString() ?? '')
+          : base.competitionStartsAt,
+      fromServer: true,
+    );
+  }
+
+  static String _phase(Object? phase) => switch (phase) {
+    'active' => 'active',
+    'scheduled' => 'scheduled',
+    _ => 'preparing',
+  };
 
   @override
   bool operator ==(Object other) =>
@@ -69,12 +133,35 @@ class LeagueRules {
       other.awardMinMembers == awardMinMembers &&
       other.awardMinPoints == awardMinPoints &&
       other.promotionMinPoints == promotionMinPoints &&
+      other.roomCapacity == roomCapacity &&
+      other.launchMinActiveUsers == launchMinActiveUsers &&
+      other.promotionMinActiveMembers == promotionMinActiveMembers &&
+      other.qualificationMinDays == qualificationMinDays &&
+      other.qualificationMinMinutes == qualificationMinMinutes &&
+      other.policyVersion == policyVersion &&
+      other.competitionPhase == competitionPhase &&
+      other.competitionStartsAt == competitionStartsAt &&
       other.fromServer == fromServer;
 
   @override
-  int get hashCode => Object.hash(awardMinMembers, awardMinPoints, promotionMinPoints, fromServer);
+  int get hashCode => Object.hash(
+    awardMinMembers,
+    awardMinPoints,
+    promotionMinPoints,
+    roomCapacity,
+    launchMinActiveUsers,
+    promotionMinActiveMembers,
+    qualificationMinDays,
+    qualificationMinMinutes,
+    policyVersion,
+    competitionPhase,
+    competitionStartsAt,
+    fromServer,
+  );
 
   @override
-  String toString() => 'LeagueRules(awardMinMembers: $awardMinMembers, awardMinPoints: $awardMinPoints, '
+  String toString() =>
+      'LeagueRules(policy: $policyVersion, phase: $competitionPhase, capacity: $roomCapacity, '
+      'awardMinMembers: $awardMinMembers, awardMinPoints: $awardMinPoints, '
       'promotionMinPoints: $promotionMinPoints, fromServer: $fromServer)';
 }

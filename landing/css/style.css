@@ -873,7 +873,7 @@ main { overflow-x: clip; }
 
 .feature-row {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
   align-items: center;
   gap: 56px;
   padding: 56px 0;
@@ -883,6 +883,8 @@ main { overflow-x: clip; }
 
 .feature-row.reverse .feature-row-text { order: 2; }
 .feature-row.reverse .feature-row-media { order: 1; }
+
+.feature-row-text { min-width: 0; }
 
 .feature-row-text h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin: 14px 0 14px; }
 
@@ -916,227 +918,109 @@ main { overflow-x: clip; }
   background: var(--coral-tint) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23C24733' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 13l4 4L19 7'/%3E%3C/svg%3E") no-repeat center / 11px;
 }
 
-/* Telefon çerçeveli ekran görüntüsü placeholder'ı */
-.feature-row-media { display: flex; justify-content: center; }
+/* ---------------- Gerçek uygulama ekranları ---------------- */
+
+.feature-row-media { display: flex; justify-content: center; min-width: 0; }
 
 .phone {
   width: min(260px, 72vw);
-  aspect-ratio: 9 / 18.6;
-  border-radius: 40px;
+  border-radius: 38px;
   background: var(--dark);
-  padding: 10px;
+  padding: 8px;
   box-shadow: var(--shadow-lg);
   position: relative;
+  flex: none;
 }
 
-.phone::before {
-  content: "";
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 84px;
-  height: 22px;
-  border-radius: 999px;
-  background: var(--dark);
-  z-index: 2;
-}
-
+/* Görüntü oranı çerçevenin padding'inden etkilenmez: ekran kendi yüksekliğini
+   belirler. Simülatör zaten durum çubuğu ve Dynamic Island'ı içerir. */
 .phone-screen {
   position: relative;
   overflow: hidden;
   width: 100%;
-  height: 100%;
-  border-radius: 31px;
-  background:
-    radial-gradient(circle at 50% 40%, rgba(239, 176, 84, 0.24), transparent 62%),
-    linear-gradient(180deg, #F4EDE7, #E9DFD6);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  text-align: center;
-  padding: 28px 22px;
-  color: var(--ink-soft);
+  height: auto;
+  aspect-ratio: 540 / 1170;
+  border-radius: 30px;
+  background: #F7F8FA;
 }
 
-/* Yer tutucu: bölüme özel ikon ve ekran adı */
-.ps-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 20px;
-  background: var(--card);
-  box-shadow: var(--shadow-sm);
-  color: var(--coral);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.ps-icon svg { width: 30px; height: 30px; }
-
-.phone-screen p { font-size: 0.88rem; font-weight: 700; line-height: 1.4; max-width: 15rem; }
-
-/* Ekran videosu: gif gibi sessiz döngüde oynar (JS ekler);
-   video hazır olduğunda yer tutucu içerik gizlenir */
+.shot-image,
 .shot-video {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
 }
 
-.phone-screen.has-video {
-  border: none;
-  padding: 0;
-  background: var(--dark);
-}
+.shot-video { z-index: 1; background: transparent; }
+.shot-video:focus-visible { outline-offset: -4px; border-radius: 30px; }
 
-.phone-screen.has-video > :not(.shot-video) { display: none; }
-
-/* ---------------- Telefon içinde örnek görünüm (HTML/CSS) ----------------
-   Video gelene kadar gerçek uygulama etiketleriyle çizilmiş örnek ekran;
-   "Örnek görünüm" notu taşır, gerçek veri değildir. */
-
-.phone-screen.phone-mock {
-  padding: 0;
-  background: var(--bg);
-  justify-content: flex-start;
-  align-items: stretch;
-  text-align: left;
-}
-
-.mock {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  height: 100%;
-  padding: 56px 14px 16px;
-}
-
-.phone-screen .mock-title {
-  font-family: "Baloo 2", "Nunito", system-ui, sans-serif;
+.media-figure { display: grid; justify-items: center; gap: 18px; width: 100%; }
+.media-caption {
+  color: var(--muted);
+  font-size: 0.86rem;
   font-weight: 700;
-  font-size: 1.3rem;
-  line-height: 1.2;
-  color: var(--ink);
-  padding: 0 4px;
+  text-align: center;
+  line-height: 1.5;
+  max-width: 34rem;
+  margin-inline: auto;
 }
 
-.mock-card {
+.app-showcase { padding-top: 28px; }
+.app-screen-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+  margin-bottom: 30px;
+}
+.app-screen-card { display: grid; justify-items: center; align-content: start; gap: 28px; }
+.app-screen-card figcaption { text-align: center; max-width: 17rem; }
+.app-screen-card h3 { font-size: 1.15rem; margin-bottom: 8px; }
+.app-screen-card p { color: var(--ink-soft); font-size: 0.95rem; text-wrap: pretty; }
+
+.feature-row-text .marathon-note {
+  font-size: 0.9rem;
+  margin-top: 22px;
+  padding: 14px 18px;
+  background: var(--sand-soft);
+  border-radius: 14px;
+}
+
+.marathon-spotlight-row { padding-block: 0; }
+.feature-row-text .spotlight-action { margin-top: 26px; margin-bottom: 0; }
+.feature-support { margin-top: 48px; }
+.feature-support-heading { text-align: center; margin-bottom: 28px; }
+.feature-support-heading h2 { font-size: clamp(1.5rem, 3vw, 2rem); }
+.support-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+.support-card {
+  min-width: 0;
+  padding: 26px 24px;
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 18px;
-  padding: 12px;
+  border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
 }
+.support-card h3 { font-size: 1.2rem; margin-bottom: 14px; }
+.support-card .feature-row-text p { font-size: 0.95rem; }
+.support-card .feature-row-text li { font-size: 0.91rem; padding-left: 27px; }
+.support-card .eyebrow { font-size: 0.74rem; }
 
-.phone-screen .mock-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.78rem;
-  font-weight: 800;
-  color: var(--ink-soft);
-  margin-bottom: 10px;
+@media (max-width: 960px) {
+  .app-screen-grid { gap: 20px; }
+  .app-screen-grid .phone { width: min(220px, 100%); }
+  .support-grid { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .support-card { max-width: 760px; width: 100%; margin-inline: auto; }
 }
-
-.mock-live {
-  flex: none;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #1F9D62;
-  animation: live-pulse 1.8s ease-out infinite;
-}
-
-@keyframes live-pulse {
-  0% { box-shadow: 0 0 0 0 rgba(31, 157, 98, 0.5); }
-  100% { box-shadow: 0 0 0 8px rgba(31, 157, 98, 0); }
-}
-
-.mock-list { list-style: none; display: grid; gap: 10px; }
-
-.mock-list li { display: flex; align-items: center; gap: 8px; }
-
-.mock-list img {
-  flex: none;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--sand-soft);
-  border: 2px solid var(--bg);
-}
-
-.mock-name {
-  flex: 1;
-  min-width: 0;
-  font-weight: 800;
-  font-size: 0.85rem;
-  color: var(--ink);
-}
-
-.mock-chip {
-  flex: none;
-  font-size: 0.7rem;
-  font-weight: 800;
-  padding: 3px 9px;
-  border-radius: 999px;
-}
-
-.mock-request { display: flex; align-items: center; gap: 8px; }
-
-.mock-request img {
-  flex: none;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--sand-soft);
-  border: 2px solid var(--bg);
-}
-
-.mock-btn {
-  flex: none;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.mock-btn svg { width: 14px; height: 14px; }
-.mb-yes { background: rgba(31, 157, 98, 0.16); color: #146C43; }
-.mb-no { background: var(--coral-tint); color: var(--coral-text); }
-
-.mc-blue { background: rgba(59, 130, 246, 0.14); color: #1D4ED8; }
-.mc-green { background: rgba(16, 185, 129, 0.16); color: #047857; }
-.mc-purple { background: rgba(139, 92, 246, 0.16); color: #6D28D9; }
-
-.mock-code {
-  margin-top: auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  background: var(--coral-tint);
-  border-radius: 14px;
-  padding: 10px 12px;
-  font-size: 0.74rem;
-  font-weight: 800;
-  color: var(--coral-text);
-}
-
-.mock-code strong { font-size: 0.92rem; letter-spacing: 0.12em; color: var(--ink); }
-
-.phone-screen .mock-note {
-  text-align: center;
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: var(--muted);
+@media (max-width: 640px) {
+  .app-screen-grid { grid-template-columns: minmax(0, 1fr); gap: 44px; }
+  .app-screen-grid .phone { width: min(260px, 72vw); }
+  .support-card { padding: 24px 20px; }
 }
 
 /* ---------------- Lig kademeleri (features.html) ---------------- */
@@ -1185,7 +1069,7 @@ main { overflow-x: clip; }
 /* ---------------- Ritim: yörüngeli kum saati (features.html) ----------------
    Ortada kum akan bir kum saati: kum üst haznede bitince kısa bir "mola"
    verir, sonra kendi etrafında 180° dönüp döngüye baştan başlar.
-   Çevresinde karakter avatarları ve noktalar yörüngede döner (saf CSS). */
+   Çevresinde beş kupalı lig avatarı eşit aralıklarla döner (saf CSS). */
 
 /* Dönen kare izler dar ekranda yatay taşma yaratmasın */
 .orbit-section { padding-top: 36px; overflow-x: hidden; overflow-x: clip; }
@@ -1213,14 +1097,13 @@ main { overflow-x: clip; }
   animation-delay: var(--D, 0s);
 }
 
-.orbit-track.rev { animation-direction: reverse; }
-
-/* Yörünge süreleri ve faz kaymaları (inline style yerine; sıkı CSP için) */
+/* Beş avatar 18 saniyelik turda 72° aralıklıdır; ters dönüşle dik kalır.
+   Faz kaymaları inline style yerine CSS'te tanımlıdır (sıkı CSP için). */
 .ot-a1 { --T: 18s; --D: 0s; }
-.ot-a2 { --T: 18s; --D: -6s; }
-.ot-a3 { --T: 18s; --D: -12s; }
-.ot-d1 { --T: 28s; --D: 0s; }
-.ot-d2 { --T: 28s; --D: -14s; }
+.ot-a2 { --T: 18s; --D: -3.6s; }
+.ot-a3 { --T: 18s; --D: -7.2s; }
+.ot-a4 { --T: 18s; --D: -10.8s; }
+.ot-a5 { --T: 18s; --D: -14.4s; }
 .ot-cycle { --T: 30s; --D: 0s; }
 
 .orbit-track > * {
@@ -1250,8 +1133,6 @@ main { overflow-x: clip; }
   transform: translate(-50%, -50%);
   box-shadow: 0 2px 6px rgba(70, 50, 38, 0.18);
 }
-
-.orbit-dot.od-2 { width: 9px; height: 9px; background: var(--coral); }
 
 @keyframes orbit-spin {
   to { transform: rotate(1turn); }
@@ -1925,12 +1806,12 @@ html.nav-lock { overflow: hidden; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
+  .shot-video { display: none; }
   .hg-stream { animation: none; }
   .hourglass.is-flowing .hg-stream,
   .hourglass.is-flowing .hg-grain { opacity: 0; }
   .marquee-track { animation: none; }
   .btn, .feature-card, .skip-link { transition: none; }
-  .mock-live { animation: none; }
 
   /* Yörüngeli kum saati: durağan, yarı dolu bir kare olarak gösterilir */
   .orbit-ring, .orbit-track, .orbit-avatar, .orbit-hg svg,
@@ -2419,9 +2300,12 @@ html.nav-lock { overflow: hidden; }
 
 /* Hareket azaltıldığında yörünge karakterleri üst üste binmesin: sabit açılarla dağılır */
 @media (prefers-reduced-motion: reduce) {
-  .ot-a2 { transform: rotate(120deg); }
-  .ot-a3 { transform: rotate(240deg); }
-  .ot-a2 .orbit-avatar { transform: translate(-50%, -50%) rotate(-120deg); }
-  .ot-a3 .orbit-avatar { transform: translate(-50%, -50%) rotate(-240deg); }
-  .ot-d2 { transform: rotate(180deg); }
+  .ot-a2 { transform: rotate(72deg); }
+  .ot-a3 { transform: rotate(144deg); }
+  .ot-a4 { transform: rotate(216deg); }
+  .ot-a5 { transform: rotate(288deg); }
+  .ot-a2 .orbit-avatar { transform: translate(-50%, -50%) rotate(-72deg); }
+  .ot-a3 .orbit-avatar { transform: translate(-50%, -50%) rotate(-144deg); }
+  .ot-a4 .orbit-avatar { transform: translate(-50%, -50%) rotate(-216deg); }
+  .ot-a5 .orbit-avatar { transform: translate(-50%, -50%) rotate(-288deg); }
 }

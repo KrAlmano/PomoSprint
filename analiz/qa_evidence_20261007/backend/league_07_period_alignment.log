@@ -1,3 +1,0 @@
-psql:07_period_alignment.sql:65: ERROR:  started_at is older than 24 hours
-CONTEXT:  PL/pgSQL function complete_study_session(uuid,uuid,integer,boolean,integer,timestamp with time zone) line 96 at RAISE
-PL/pgSQL function inline_code_block line 8 at assignment

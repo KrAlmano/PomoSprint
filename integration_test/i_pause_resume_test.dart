@@ -1,8 +1,7 @@
-// Kısa gerçek sayaç: duraklat/devam, kalıcı kimlik ve tek duraklatma hakkı.
+// Gerçek 50 dk sayaç: duraklat/devam, kalıcı kimlik, tek hak ve ödülsüz iptal.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro/app/main_shell.dart';
-import 'package:pomodoro/screens/timer_screen.dart';
 import 'package:pomodoro/services/notification_service.dart';
 import 'package:pomodoro/services/timer_persistence.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,8 +31,9 @@ void main() {
     final paused = (await TimerPersistence.instance.load(a.id))!;
     expect(paused.wasPaused, isTrue);
     expect(paused.pauseUsedCount, 1);
-    expect(paused.recordAccelerated, isTrue);
-    expect(paused.totalSeconds, 10);
+    expect(paused.recordAccelerated, isFalse);
+    expect(paused.durationMinutes, 50);
+    expect(paused.totalSeconds, 3000);
     expect(paused.isRunning, isFalse);
     await pumpFor(tester, const Duration(seconds: 2));
     expect(
@@ -62,29 +62,20 @@ void main() {
     await pumpUntil(tester, find.byType(AlertDialog));
     expect(find.text(tr('pause_limit_title')), findsOneWidget);
     Navigator.of(tester.element(find.byType(AlertDialog))).pop();
-    await pumpUntil(
-      tester,
-      find.byType(SessionCompletedDialog),
-      timeout: const Duration(seconds: 25),
-    );
-    await pumpUntil(tester, find.text(trL10n.sessionResultPoints(9)));
-    await tapOn(
-      tester,
-      find.widgetWithText(ElevatedButton, trL10n.sessionCompletedOk),
-    );
-    expect(shellStats(tester), (points: 9, coins: 20));
+    // 50 dakika beklemeden normal seansı iptal et; ödül üretmemeli.
+    await tapOn(tester, find.text(trL10n.timerResetBtn));
+    await pumpUntil(tester, find.text(trL10n.timerResetConfirmTitle));
+    await tapOn(tester, find.text(trL10n.timerResetConfirmAction).last);
+    await pumpUntilGone(tester, find.byType(AlertDialog));
+    expect(shellStats(tester), (points: 0, coins: 0));
     final rows = await E2eHost.rows(
-      'select client_uuid::text, duration_minutes, was_paused, base_points from study_sessions where user_id=${sqlText(a.id)}',
+      'select client_uuid::text from study_sessions where user_id=${sqlText(a.id)}',
     );
-    expect(rows.length, 1);
-    expect(rows.single['client_uuid'], paused.clientUuid);
-    expect(rows.single['duration_minutes'], 50);
-    expect(rows.single['was_paused'], isTrue);
-    expect(rows.single['base_points'], 9);
+    expect(rows, isEmpty);
     expect(await TimerPersistence.instance.load(a.id), isNull);
     expect(tester.takeException(), isNull);
     debugPrint(
-      '[QA] Duraklatma hakkı, aynı client_uuid/started_at, kalıcı devam, 50 dk ve duraklatma puanı: PASS',
+      '[QA] Duraklatma hakkı, aynı client_uuid/started_at, kalıcı devam, gerçek 50 dk süre ve ödülsüz iptal: PASS',
     );
   });
 }

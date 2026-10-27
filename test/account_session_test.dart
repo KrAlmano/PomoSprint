@@ -89,6 +89,72 @@ void main() {
     service.pendingSessionCount.value = 0;
   });
 
+  group('Bekleyen seans sayısı: geç okuma hesap izolasyonu', () {
+    void seedPending() {
+      SharedPreferences.setMockInitialValues({
+        'pending_sessions_uid_uid-1': jsonEncode([
+          PendingSessionFixture.json(DateTime.utc(2026, 10, 8, 8)),
+        ]),
+        'pending_sessions_ayse@example.com': jsonEncode([
+          PendingSessionFixture.json(DateTime.utc(2026, 10, 8, 8)),
+        ]),
+      });
+    }
+
+    test('A okuması geç tamamlanınca B göstergesini değiştirmez', () async {
+      seedPending();
+      service.currentUser.value = _user;
+      final readA = service.getPendingSessionCount();
+      service.currentUser.value = UserModel(id: 'uid-2', name: 'Ali', email: 'ali@example.com');
+      service.pendingSessionCount.value = 2;
+
+      expect(await readA, 1, reason: 'okuma başlangıçtaki A kuyruğuna aittir');
+      expect(service.pendingSessionCount.value, 2, reason: 'B göstergesi A yanıtıyla ezilmez');
+    });
+
+    test('kullanıcı çıkınca geç okuma bekleyen göstergesini geri açmaz', () async {
+      seedPending();
+      service.currentUser.value = _user;
+      final readA = service.getPendingSessionCount();
+      service.handleAuthStateChange(AuthState(AuthChangeEvent.signedOut, null, signOutReason: SignOutReason.userInitiated));
+
+      expect(await readA, 1);
+      expect(service.pendingSessionCount.value, 0);
+    });
+
+    test('aynı UID ile yeni oturumda eski dönem okuması göstergeyi değiştirmez', () async {
+      seedPending();
+      service.currentUser.value = _user;
+      final readA = service.getPendingSessionCount();
+      service.handleAuthStateChange(AuthState(AuthChangeEvent.signedOut, null, signOutReason: SignOutReason.userInitiated));
+      service.currentUser.value = _user;
+      service.pendingSessionCount.value = 2;
+
+      expect(await readA, 1);
+      expect(service.pendingSessionCount.value, 2, reason: 'UID aynı olsa da önceki oturumun yanıtı bayattır');
+    });
+
+    test('UID bilinmeyen eski e-posta kuyruğu yeni hesabın göstergesini değiştirmez', () async {
+      seedPending();
+      service.currentUser.value = UserModel(name: 'Ayşe', email: _user.email);
+      final readA = service.getPendingSessionCount();
+      service.currentUser.value = UserModel(name: 'Ali', email: 'ali@example.com');
+      service.pendingSessionCount.value = 0;
+
+      expect(await readA, 1);
+      expect(service.pendingSessionCount.value, 0);
+    });
+
+    test('sahip değişmediyse güncel sayıyı göstergeye yazar', () async {
+      seedPending();
+      service.currentUser.value = _user;
+      service.pendingSessionCount.value = 0;
+
+      expect(await service.getPendingSessionCount(), 1);
+      expect(service.pendingSessionCount.value, 1);
+    });
+  });
+
   group('Oturum kapanış kancası', () {
     // Kanca, servis tekillerine (kilit zincirleri) dokunduğu için gerçek zone'da çağrılır.
     Future<void> emit(WidgetTester tester, SignOutReason reason) => tester.runAsync(() async {
@@ -139,6 +205,32 @@ void main() {
       await tester.runAsync(() => service.signOutFully());
       expect(service.signOutNotice.value, notice);
     });
+
+    for (final remote in [false, true]) {
+      testWidgets('${remote ? 'uzaktan düşme' : 'çıkış'}: native temizlik beklerken yeni odak kapalı', (tester) async {
+        final cleanup = Completer<void>();
+        SupabaseService.sessionEndedCleanup = () => cleanup.future;
+        service.currentUser.value = _user;
+        expect(service.isDeviceSessionEnding, isFalse);
+        await tester.runAsync(() async {
+          Future<void>? signOut;
+          if (remote) {
+            service.handleAuthStateChange(AuthState(AuthChangeEvent.signedOut, null, signOutReason: SignOutReason.sessionExpired));
+          } else {
+            signOut = service.signOutFully();
+          }
+          expect(service.isDeviceSessionEnding, isTrue);
+          expect(service.currentUser.value, _user, reason: 'native temizlik henüz bitmedi');
+          cleanup.complete();
+          if (signOut != null) await signOut;
+          for (var i = 0; i < 100 && service.isDeviceSessionEnding; i++) {
+            await Future<void>.delayed(const Duration(milliseconds: 1));
+          }
+          expect(service.currentUser.value, isNull);
+          expect(service.isDeviceSessionEnding, isFalse);
+        });
+      });
+    }
   });
 
   group('Hesap silme yardımcıları', () {
@@ -552,7 +644,7 @@ void main() {
       await _pump(tester, screen);
       await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
       await tester.pumpAndSettle();
-      expect(find.text('3/6'), findsOneWidget);
+      expect(find.text('3/7'), findsOneWidget);
 
       // Ekranın son hâli taslağa yazılır.
       final prefs = await SharedPreferences.getInstance();
@@ -591,7 +683,7 @@ void main() {
           dailyGoalMinutes: 120,
         ),
       );
-      expect(find.text('5/6'), findsOneWidget);
+      expect(find.text('5/7'), findsOneWidget);
       expect(saved.segment, 'other');
       expect(saved.selectedCategories, ['Okuma', 'Proje']);
       expect(saved.showInRankings, isFalse);
@@ -607,7 +699,7 @@ void main() {
           dailyGoalMinutes: 60,
         ),
       );
-      expect(find.text('4/6'), findsOneWidget);
+      expect(find.text('4/7'), findsOneWidget);
       expect(saved.segment, isNull);
       expect(saved.selectedCategories, ['Ders Çalışma']);
     });
@@ -626,7 +718,7 @@ void main() {
           dailyGoalMinutes: 60,
         ),
       );
-      expect(find.text('3/6'), findsOneWidget);
+      expect(find.text('3/7'), findsOneWidget);
       expect(restored.autoCategories, ['Matematik', 'Fizik']);
 
       await tester.tap(find.byTooltip(MaterialLocalizations.of(tester.element(find.byType(Scaffold))).backButtonTooltip));
@@ -647,7 +739,7 @@ void main() {
         tester,
         const OnboardingDraft(step: 1, birthYear: 2000, segment: 'kpss', dailyGoalMinutes: 60),
       );
-      expect(find.text('2/6'), findsOneWidget, reason: 'adım korunur');
+      expect(find.text('2/7'), findsOneWidget, reason: 'adım korunur');
       expect(saved.selectedCategories, saved.autoCategories);
       expect(saved.autoCategories, ['Türkçe', 'Matematik', 'Tarih', 'Coğrafya', 'Vatandaşlık', 'Güncel Bilgiler', 'Eğitim Bilimleri']);
     });
@@ -657,7 +749,7 @@ void main() {
         tester,
         const OnboardingDraft(step: 4, birthYear: 2000, segment: 'yks', autoCategories: [], showInRankings: true),
       );
-      expect(find.text('3/6'), findsOneWidget, reason: 'kategorisiz taslak kategori adımına döner');
+      expect(find.text('3/7'), findsOneWidget, reason: 'kategorisiz taslak kategori adımına döner');
       expect(saved.selectedCategories, isEmpty);
       expect(saved.autoCategories, isEmpty);
     });
@@ -676,13 +768,13 @@ void main() {
           dailyGoalMinutes: 60,
         ),
       );
-      expect(find.text('4/6'), findsOneWidget);
+      expect(find.text('4/7'), findsOneWidget);
       expect(find.text(l10n.onboardingVisibilityYes), findsOneWidget);
       expect(saved.step, 3);
       expect(saved.showInRankings, isNull);
     });
 
-    testWidgets('"Hayır" yanıtı taslakla geri gelir ve son adımdan bitirilebilir', (tester) async {
+    testWidgets('"Hayır" yanıtı eski hedef taslağıyla geri gelir; rehberden bitirilebilir', (tester) async {
       final saved = await restore(
         tester,
         const OnboardingDraft(
@@ -694,8 +786,13 @@ void main() {
           dailyGoalMinutes: 60,
         ),
       );
-      expect(find.text('6/6'), findsOneWidget);
+      expect(find.text('6/7'), findsOneWidget, reason: 'eski taslağın hedef adımı korunur');
       expect(saved.showInRankings, isFalse);
+      expect(find.text(l10n.onboardingFinishBtn), findsNothing);
+      await tester.tap(find.text(l10n.continueBtn));
+      await tester.pumpAndSettle();
+      expect(find.text('7/7'), findsOneWidget);
+      expect(find.text(l10n.onboardingGuideTitle), findsOneWidget);
       // Bulut kapalı: kayıt denenir (doğrulama engellemez) ve hata gösterilir.
       await tester.tap(find.text(l10n.onboardingFinishBtn));
       await tester.pump();

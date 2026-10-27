@@ -19,7 +19,8 @@ import '../widgets/game_rules.dart';
 /// Yıl tekerleğinde [index] satırının doğum yılı. 0. satır "Doğum yılını
 /// seç" yer tutucusudur (null); sonrakiler [currentYear]'dan geriye doğru.
 @visibleForTesting
-int? birthYearForPickerIndex(int currentYear, int index) => index <= 0 ? null : currentYear - (index - 1);
+int? birthYearForPickerIndex(int currentYear, int index) =>
+    index <= 0 ? null : currentYear - (index - 1);
 
 class PostAuthOnboardingScreen extends StatefulWidget {
   /// Onboarding sunucuya kaydedildikten sonra çağrılır. Güncel kullanıcı
@@ -45,18 +46,20 @@ class PostAuthOnboardingScreen extends StatefulWidget {
   });
 
   @override
-  State<PostAuthOnboardingScreen> createState() => _PostAuthOnboardingScreenState();
+  State<PostAuthOnboardingScreen> createState() =>
+      _PostAuthOnboardingScreenState();
 }
 
 class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
-  // Adımlar: yaş, segment, kategoriler, sıralamalarda görünürlük, kurallar, hedef.
+  // Adımlar: yaş, segment, kategoriler, görünürlük, kurallar, hedef, ekran rehberi.
   static const int _ageStep = 0;
   static const int _segmentStep = 1;
   static const int _categoryStep = 2;
   static const int _visibilityStep = 3;
   static const int _rulesStep = 4;
-  static const int _goalStep = 5; // son adım: "Bitir"
-  static const int _totalSteps = _goalStep + 1;
+  static const int _goalStep = 5;
+  static const int _guideStep = 6; // son adım: "Bitir"
+  static const int _totalSteps = _guideStep + 1;
   static const int _minimumAge = 13; // Kullanım Şartları ve Gizlilik Politikası
   static const int _birthYearCount = 87;
 
@@ -72,7 +75,8 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
   // Yaş sorusu nötrdür: tekerlek bir yaşa önceden ayarlı değildir (ilk satır
   // "Doğum yılını seç"); yıl seçilmeden ilerlenemez.
   int? _birthYear;
-  final FixedExtentScrollController _yearController = FixedExtentScrollController();
+  final FixedExtentScrollController _yearController =
+      FixedExtentScrollController();
 
   int _currentPage = 0;
   String? _userSegment;
@@ -97,10 +101,12 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
     return year != null && _currentYear - year < _minimumAge;
   }
 
-  List<String> get _recommendedCategoryNames => recommendedCategoryNames(_userSegment);
+  List<String> get _recommendedCategoryNames =>
+      recommendedCategoryNames(_userSegment);
 
-  int get _categoryLimit =>
-      categoryLimitFor(isPremium: _service.currentUser.value?.isPremium ?? false);
+  int get _categoryLimit => categoryLimitFor(
+    isPremium: _service.currentUser.value?.isPremium ?? false,
+  );
 
   static const Set<int> _goalOptions = {60, 120, 180, 240};
 
@@ -135,24 +141,28 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
   void _saveDraft() {
     final uid = _draftOwner;
     if (_draftClosed || uid == null || uid.isEmpty) return;
-    unawaited(OnboardingDraftStore.save(
-      uid,
-      OnboardingDraft(
-        step: _currentPage,
-        birthYear: _birthYear,
-        segment: _userSegment,
-        selectedCategories: _selectedCategoryNames.toList(),
-        customCategories: List.of(_customCategoryNames),
-        autoCategories: _autoCategoryNames.toList(),
-        showInRankings: _showInRankings,
-        dailyGoalMinutes: _dailyGoalMinutes,
+    unawaited(
+      OnboardingDraftStore.save(
+        uid,
+        OnboardingDraft(
+          step: _currentPage,
+          birthYear: _birthYear,
+          segment: _userSegment,
+          selectedCategories: _selectedCategoryNames.toList(),
+          customCategories: List.of(_customCategoryNames),
+          autoCategories: _autoCategoryNames.toList(),
+          showInRankings: _showInRankings,
+          dailyGoalMinutes: _dailyGoalMinutes,
+        ),
       ),
-    ));
+    );
   }
 
   Future<void> _restoreDraft() async {
     final uid = _draftOwner;
-    final draft = (uid == null || uid.isEmpty) ? null : await OnboardingDraftStore.load(uid);
+    final draft = (uid == null || uid.isEmpty)
+        ? null
+        : await OnboardingDraftStore.load(uid);
     if (!mounted) return;
     _draftLoaded = true;
     if (draft == null || _changedBeforeDraftLoad) return;
@@ -160,34 +170,56 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
     // "Diğer" de geçerli bir seçimdir (sunucuya null yazılır); segment
     // isteğe bağlı olduğu için seçilmemiş olması adımı geri çekmez.
     final segment =
-        (draft.segment == _otherSegment || kRecommendedCategoriesBySegment.containsKey(draft.segment))
-            ? draft.segment
-            : null;
+        (draft.segment == _otherSegment ||
+            kRecommendedCategoriesBySegment.containsKey(draft.segment))
+        ? draft.segment
+        : null;
     final year = draft.birthYear;
-    final birthYear = (year != null && year <= _currentYear && year > _currentYear - _birthYearCount) ? year : _birthYear;
+    final birthYear =
+        (year != null &&
+            year <= _currentYear &&
+            year > _currentYear - _birthYearCount)
+        ? year
+        : _birthYear;
     final custom = draft.customCategories.toSet().take(_categoryLimit).toList();
     // Öneriler (herhangi bir segmentin: segment değişince elle seçilen öneri
     // korunur) ve özel adlar; başka ad atılır.
     final selected = draft.selectedCategories
-        .where((name) => custom.contains(name) || isRecommendedCategoryName(name))
+        .where(
+          (name) => custom.contains(name) || isRecommendedCategoryName(name),
+        )
         .toSet()
         .take(_categoryLimit)
         .toList();
     // Otomatik gelenler seçimin alt kümesidir. Otomatik seçimden önceki
     // sürümün taslağında ('auto' yok) segment seçilmiş ama kategori
     // seçilmemişse öneriler bugünkü gibi seçilir ve kategori adımı gösterilir.
-    final legacyAutoFill = draft.autoCategories == null && segment != null && selected.isEmpty;
+    final legacyAutoFill =
+        draft.autoCategories == null && segment != null && selected.isEmpty;
     final auto = legacyAutoFill
-        ? autoSelectedCategoryNames(segment, kept: const [], limit: _categoryLimit)
-        : [for (final name in draft.autoCategories ?? const <String>[]) if (selected.contains(name)) name];
+        ? autoSelectedCategoryNames(
+            segment,
+            kept: const [],
+            limit: _categoryLimit,
+          )
+        : [
+            for (final name in draft.autoCategories ?? const <String>[])
+              if (selected.contains(name)) name,
+          ];
     if (legacyAutoFill) selected.addAll(auto);
-    final goal = _goalOptions.contains(draft.dailyGoalMinutes) ? draft.dailyGoalMinutes! : _dailyGoalMinutes;
+    final goal = _goalOptions.contains(draft.dailyGoalMinutes)
+        ? draft.dailyGoalMinutes!
+        : _dailyGoalMinutes;
     final showInRankings = draft.showInRankings;
     // Adım, doğrulamanın izin verdiği yerden ileride olamaz.
     var step = draft.step.clamp(0, _totalSteps - 1);
     if (birthYear == null || _currentYear - birthYear < _minimumAge) step = 0;
-    if ((selected.isEmpty || legacyAutoFill) && step > _categoryStep) step = _categoryStep;
-    if (showInRankings == null && step > _visibilityStep) step = _visibilityStep;
+    if ((selected.isEmpty || legacyAutoFill) && step > _categoryStep) {
+      step = _categoryStep;
+    }
+    if (showInRankings == null && step > _visibilityStep) {
+      step = _visibilityStep;
+    }
 
     setState(() {
       _birthYear = birthYear;
@@ -209,7 +241,9 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
     if (_yearController.hasClients && restoredYear != null) {
       _yearController.jumpToItem(_currentYear - restoredYear + 1);
     }
-    if (step > 0 && _pageController.hasClients) _pageController.jumpToPage(step);
+    if (step > 0 && _pageController.hasClients) {
+      _pageController.jumpToPage(step);
+    }
   }
 
   Future<void> _closeDraft() async {
@@ -233,11 +267,13 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
   void _showSnack(String message, {bool isError = false}) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? Colors.red.shade700 : null,
-        behavior: SnackBarBehavior.floating,
-      ));
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: isError ? Colors.red.shade700 : null,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
   }
 
   void _nextPage() {
@@ -250,8 +286,10 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
     final error = switch (_currentPage) {
       _ageStep when _birthYear == null => l10n.onboardingBirthYearRequired,
       _ageStep when _isUnderMinimumAge => l10n.onboardingUnder13Error,
-      _categoryStep when _selectedCategoryNames.isEmpty => l10n.onboardingSelectCategoryError,
-      _visibilityStep when _showInRankings == null => l10n.onboardingSelectOptionError,
+      _categoryStep when _selectedCategoryNames.isEmpty =>
+        l10n.onboardingSelectCategoryError,
+      _visibilityStep when _showInRankings == null =>
+        l10n.onboardingSelectOptionError,
       _ => null,
     };
     if (error != null) {
@@ -274,7 +312,11 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
     if (MediaQuery.maybeDisableAnimationsOf(context) ?? false) {
       _pageController.jumpToPage(page);
     } else {
-      _pageController.animateToPage(page, duration: const Duration(milliseconds: 300), curve: Curves.ease);
+      _pageController.animateToPage(
+        page,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.ease,
+      );
     }
   }
 
@@ -285,7 +327,10 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
     final names = _selectedCategoryNames.isNotEmpty
         ? _selectedCategoryNames.toList()
         : _recommendedCategoryNames.take(3).toList();
-    return categorySeedPayload(names, turkish: LanguageService.instance.isTurkish);
+    return categorySeedPayload(
+      names,
+      turkish: LanguageService.instance.isTurkish,
+    );
   }
 
   Future<void> _finishOnboarding() async {
@@ -323,7 +368,9 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
       switch (serviceErrorCodeOf(e)) {
         case ServiceErrorCode.notSignedIn:
           await _signOut(message: l10n.onboardingSessionExpired);
-        case ServiceErrorCode.timeout || ServiceErrorCode.network || ServiceErrorCode.cloudUnavailable:
+        case ServiceErrorCode.timeout ||
+            ServiceErrorCode.network ||
+            ServiceErrorCode.cloudUnavailable:
           _showSnack(l10n.onboardingTimeoutError, isError: true);
         case ServiceErrorCode.underMinimumAge:
           // Sunucu (proposed/24) yılı 13 yaş altı saydı (ör. cihaz saati
@@ -342,7 +389,11 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
     // ScaffoldMessenger'da kabuğa geçişte de görünür kalır.
     final skippedLimit = categoriesResult?.skippedLimit ?? 0;
     if (skippedLimit > 0 && mounted) {
-      _showSnack(AppLocalizations.of(context)!.onboardingCategoriesSkippedLimit(skippedLimit, _categoryLimit));
+      _showSnack(
+        AppLocalizations.of(
+          context,
+        )!.onboardingCategoriesSkippedLimit(skippedLimit, _categoryLimit),
+      );
     }
 
     // completeOnboarding kullanıcıyı yalnızca önceden yüklenmişse günceller.
@@ -382,14 +433,29 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
         scrollable: true,
         constraints: const BoxConstraints(minWidth: 280, maxWidth: 440),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(l10n.deleteAccount, style: const TextStyle(fontWeight: FontWeight.bold)),
-        content: Text(confirmText, style: const TextStyle(fontSize: 14, height: 1.4)),
+        title: Text(
+          l10n.deleteAccount,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          confirmText,
+          style: const TextStyle(fontSize: 14, height: 1.4),
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.cancel),
+          ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text(l10n.deleteAccount, style: const TextStyle(fontWeight: FontWeight.bold)),
+            child: Text(
+              l10n.deleteAccount,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -400,7 +466,9 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
       // Apple kimliği varsa (iOS) token iptali için taze kod; vazgeçilirse
       // silme yine yapılır. Servis yerel veriyi (taslak dahil) temizleyip
       // oturumu kapatır; AppGate girişe döner ve "hesabın silindi" der.
-      final appleCode = service.canReauthorizeWithApple ? await service.requestAppleAuthorizationCode() : null;
+      final appleCode = service.canReauthorizeWithApple
+          ? await service.requestAppleAuthorizationCode()
+          : null;
       _draftClosed = true;
       await service.deleteUserAccount(appleAuthorizationCode: appleCode);
       if (!mounted) return;
@@ -424,7 +492,13 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
       _selectedCategoryNames.removeAll(_autoCategoryNames);
       _autoCategoryNames
         ..clear()
-        ..addAll(autoSelectedCategoryNames(value, kept: _selectedCategoryNames, limit: _categoryLimit));
+        ..addAll(
+          autoSelectedCategoryNames(
+            value,
+            kept: _selectedCategoryNames,
+            limit: _categoryLimit,
+          ),
+        );
       _selectedCategoryNames.addAll(_autoCategoryNames);
     });
   }
@@ -434,10 +508,16 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
   /// bağımsız ad) bir kez görünür; seçili olan ad öne geçer.
   List<String> get _categoryChipNames {
     final byKey = <String, String>{};
-    for (final name in [..._recommendedCategoryNames, ..._customCategoryNames, ..._selectedCategoryNames]) {
+    for (final name in [
+      ..._recommendedCategoryNames,
+      ..._customCategoryNames,
+      ..._selectedCategoryNames,
+    ]) {
       final key = categoryMatchKey(name);
       final shown = byKey[key];
-      if (shown == null || (!_selectedCategoryNames.contains(shown) && _selectedCategoryNames.contains(name))) {
+      if (shown == null ||
+          (!_selectedCategoryNames.contains(shown) &&
+              _selectedCategoryNames.contains(name))) {
         byKey[key] = name;
       }
     }
@@ -453,7 +533,9 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
       return;
     }
     if (_selectedCategoryNames.length >= _categoryLimit) {
-      _showSnack(AppLocalizations.of(context)!.categoryLimitReachedMsg(_categoryLimit));
+      _showSnack(
+        AppLocalizations.of(context)!.categoryLimitReachedMsg(_categoryLimit),
+      );
       return;
     }
     setState(() => _selectedCategoryNames.add(name));
@@ -506,14 +588,19 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
               children: [
                 // Progress bar
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: sideBySide ? 2 : 10),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: sideBySide ? 2 : 10,
+                  ),
                   child: Row(
                     children: [
                       if (_currentPage > 0)
                         IconButton(
                           icon: Icon(Icons.arrow_back, color: textColor),
                           // Ekran okuyucuda "Geri" diye okunur.
-                          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+                          tooltip: MaterialLocalizations.of(
+                            context,
+                          ).backButtonTooltip,
                           onPressed: _isSaving ? null : _prevPage,
                         )
                       else
@@ -526,8 +613,12 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
                       Expanded(
                         child: LinearProgressIndicator(
                           value: (_currentPage + 1) / _totalSteps,
-                          backgroundColor: isDark ? Colors.grey[800] : Colors.grey[300],
-                          valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
+                          backgroundColor: isDark
+                              ? Colors.grey[800]
+                              : Colors.grey[300],
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                            AppColors.primary,
+                          ),
                         ),
                       ),
                       SizedBox(
@@ -536,7 +627,10 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
                           '${_currentPage + 1}/$_totalSteps',
                           textAlign: TextAlign.center,
                           // Küçük metin: en az 4,5:1 kontrast için %70 opaklık.
-                          style: TextStyle(fontSize: 12, color: textColor.withValues(alpha: 0.7)),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: textColor.withValues(alpha: 0.7),
+                          ),
                         ),
                       ),
                     ],
@@ -551,38 +645,77 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
                     children: [
                       for (var step = 0; step < _totalSteps; step++)
                         switch (step) {
-                          _ageStep => _buildAgeStep(isDark, textColor, sideBySide),
-                          _segmentStep => _buildSegmentStep(isDark, textColor, sideBySide),
-                          _categoryStep => _buildCategoryStep(isDark, textColor, sideBySide),
-                          _visibilityStep => _buildVisibilityStep(isDark, textColor, sideBySide),
+                          _ageStep => _buildAgeStep(
+                            isDark,
+                            textColor,
+                            sideBySide,
+                          ),
+                          _segmentStep => _buildSegmentStep(
+                            isDark,
+                            textColor,
+                            sideBySide,
+                          ),
+                          _categoryStep => _buildCategoryStep(
+                            isDark,
+                            textColor,
+                            sideBySide,
+                          ),
+                          _visibilityStep => _buildVisibilityStep(
+                            isDark,
+                            textColor,
+                            sideBySide,
+                          ),
                           _rulesStep => _buildRulesStep(textColor, sideBySide),
-                          _ => _buildGoalStep(isDark, textColor, sideBySide),
+                          _goalStep => _buildGoalStep(
+                            isDark,
+                            textColor,
+                            sideBySide,
+                          ),
+                          _ => _buildGuideStep(isDark, textColor, sideBySide),
                         },
                     ],
                   ),
                 ),
 
                 Padding(
-                  padding: EdgeInsets.fromLTRB(20, sideBySide ? 4 : 0, 20, sideBySide ? 8 : (r.height < 700 ? 12 : 30)),
+                  padding: EdgeInsets.fromLTRB(
+                    20,
+                    sideBySide ? 4 : 0,
+                    20,
+                    sideBySide ? 8 : (r.height < 700 ? 12 : 30),
+                  ),
                   child: ContentWidth(
                     maxWidth: ContentWidth.form,
                     child: ElevatedButton(
                       onPressed: _isSaving ? null : _nextPage,
                       style: ElevatedButton.styleFrom(
-                        minimumSize: Size(double.infinity, sideBySide ? 46 : 54),
+                        minimumSize: Size(
+                          double.infinity,
+                          sideBySide ? 46 : 54,
+                        ),
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                       ),
                       child: _isSaving
                           ? const SizedBox(
                               width: 24,
                               height: 24,
-                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
                             )
                           : Text(
-                              _currentPage == _totalSteps - 1 ? l10n.onboardingFinishBtn : l10n.continueBtn,
-                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              _currentPage == _totalSteps - 1
+                                  ? l10n.onboardingFinishBtn
+                                  : l10n.continueBtn,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                     ),
                   ),
@@ -603,7 +736,8 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
     required List<Widget> header,
     required List<Widget> Function(double columnHeight) content,
   }) {
-    Widget column(List<Widget> children, double height) => SingleChildScrollView(
+    Widget column(List<Widget> children, double height) =>
+        SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: ConstrainedBox(
             constraints: BoxConstraints(minHeight: math.max(0, height - 16)),
@@ -618,14 +752,21 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(flex: 5, child: column(header, constraints.maxHeight)),
-          Expanded(flex: 6, child: column(content(constraints.maxHeight), constraints.maxHeight)),
+          Expanded(
+            flex: 6,
+            child: column(
+              content(constraints.maxHeight),
+              constraints.maxHeight,
+            ),
+          ),
         ],
       ),
     );
   }
 
   /// Seçenek düğmeleri ve çipler tablette form genişliğini aşmaz.
-  Widget _formWidth(Widget child) => ContentWidth(maxWidth: ContentWidth.form, child: child);
+  Widget _formWidth(Widget child) =>
+      ContentWidth(maxWidth: ContentWidth.form, child: child);
 
   Widget _buildMascotAvatar({double size = 92}) {
     return Container(
@@ -655,10 +796,14 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
   Widget _buildAgeStep(bool isDark, Color textColor, bool sideBySide) {
     final l10n = AppLocalizations.of(context)!;
     Widget title(double fontSize) => Text(
-          l10n.onboardingWelcomeTitle,
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold, color: textColor),
-        );
+      l10n.onboardingWelcomeTitle,
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontSize: fontSize,
+        fontWeight: FontWeight.bold,
+        color: textColor,
+      ),
+    );
     final body = Text(
       l10n.onboardingWelcomeBody,
       style: TextStyle(fontSize: 14, color: textColor.withValues(alpha: 0.7)),
@@ -669,50 +814,64 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
     // değildir; metin sorunun amacını söyler ama eşik yaşı söylemez (nötr
     // yaş sorusu).
     Widget picker(double height) => SizedBox(
-          height: height,
-          // 13 yaş altı yanıttan sonra kilitli (bkz. _ageRejected).
-          child: IgnorePointer(
-            ignoring: _ageRejected,
-            child: Opacity(
-              opacity: _ageRejected ? 0.4 : 1,
-              child: CupertinoPicker(
-                itemExtent: 52,
-                scrollController: _yearController,
-                onSelectedItemChanged: (i) {
-                  setState(() => _birthYear = birthYearForPickerIndex(_currentYear, i));
-                },
-                children: [
-                  Center(
-                    child: Text(
-                      l10n.onboardingBirthYearPlaceholder,
-                      style: TextStyle(
-                          fontSize: 18, color: textColor.withValues(alpha: 0.55), fontWeight: FontWeight.w500),
+      height: height,
+      // 13 yaş altı yanıttan sonra kilitli (bkz. _ageRejected).
+      child: IgnorePointer(
+        ignoring: _ageRejected,
+        child: Opacity(
+          opacity: _ageRejected ? 0.4 : 1,
+          child: CupertinoPicker(
+            itemExtent: 52,
+            scrollController: _yearController,
+            onSelectedItemChanged: (i) {
+              setState(
+                () => _birthYear = birthYearForPickerIndex(_currentYear, i),
+              );
+            },
+            children: [
+              Center(
+                child: Text(
+                  l10n.onboardingBirthYearPlaceholder,
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: textColor.withValues(alpha: 0.55),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              for (var i = 0; i < _birthYearCount; i++)
+                Center(
+                  child: Text(
+                    (_currentYear - i).toString(),
+                    style: TextStyle(
+                      fontSize: 22,
+                      color: textColor,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                  for (var i = 0; i < _birthYearCount; i++)
-                    Center(
-                      child: Text(
-                        (_currentYear - i).toString(),
-                        style: TextStyle(
-                          fontSize: 22,
-                          color: textColor,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
+                ),
+            ],
           ),
-        );
+        ),
+      ),
+    );
     final underAge = [
       if (_ageRejected) ...[
         Padding(
-          padding: EdgeInsets.fromLTRB(sideBySide ? 8 : 32, 12, sideBySide ? 8 : 32, 0),
+          padding: EdgeInsets.fromLTRB(
+            sideBySide ? 8 : 32,
+            12,
+            sideBySide ? 8 : 32,
+            0,
+          ),
           child: Text(
             l10n.onboardingUnder13Error,
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 13, color: Colors.red.shade700, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.red.shade700,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
         // Yaş sınırına takılan kullanıcı burada kalmaz: çıkabilir ya da
@@ -729,8 +888,15 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
             ),
             TextButton.icon(
               onPressed: _isSaving ? null : _confirmDeleteAccount,
-              icon: Icon(Icons.delete_outline, size: 18, color: Colors.red.shade700),
-              label: Text(l10n.deleteAccount, style: TextStyle(color: Colors.red.shade700)),
+              icon: Icon(
+                Icons.delete_outline,
+                size: 18,
+                color: Colors.red.shade700,
+              ),
+              label: Text(
+                l10n.deleteAccount,
+                style: TextStyle(color: Colors.red.shade700),
+              ),
             ),
           ],
         ),
@@ -763,10 +929,7 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
         Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (!compact) ...[
-              _buildMascotAvatar(),
-              const SizedBox(height: 20),
-            ],
+            if (!compact) ...[_buildMascotAvatar(), const SizedBox(height: 20)],
             title(compact ? 24 : 28),
             const SizedBox(height: 8),
             Padding(
@@ -784,29 +947,82 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
 
   Widget _buildSegmentStep(bool isDark, Color textColor, bool sideBySide) {
     final l10n = AppLocalizations.of(context)!;
-    final title = Text(l10n.onboardingSegmentTitle,
-        textAlign: TextAlign.center,
-        style: TextStyle(fontSize: sideBySide ? 22 : 26, fontWeight: FontWeight.bold, color: textColor));
-    final body = Text(l10n.onboardingSegmentBody,
-        textAlign: TextAlign.center,
-        style: TextStyle(fontSize: 14, color: textColor.withValues(alpha: 0.7)));
+    final title = Text(
+      l10n.onboardingSegmentTitle,
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontSize: sideBySide ? 22 : 26,
+        fontWeight: FontWeight.bold,
+        color: textColor,
+      ),
+    );
+    final body = Text(
+      l10n.onboardingSegmentBody,
+      textAlign: TextAlign.center,
+      style: TextStyle(fontSize: 14, color: textColor.withValues(alpha: 0.7)),
+    );
     final options = [
-      _optionButton(l10n.onboardingSegmentLgs, _userSegment == 'lgs', () => _selectSegment('lgs'), isDark, textColor),
-      _optionButton(l10n.onboardingSegmentYks, _userSegment == 'yks', () => _selectSegment('yks'), isDark, textColor),
-      _optionButton(l10n.onboardingSegmentKpss, _userSegment == 'kpss', () => _selectSegment('kpss'), isDark, textColor),
-      _optionButton(l10n.onboardingSegmentLanguage, _userSegment == 'language', () => _selectSegment('language'),
-          isDark, textColor),
-      _optionButton(l10n.onboardingSegmentUniversity, _userSegment == 'university',
-          () => _selectSegment('university'), isDark, textColor),
-      _optionButton(l10n.onboardingSegmentWork, _userSegment == 'work', () => _selectSegment('work'), isDark, textColor),
+      _optionButton(
+        l10n.onboardingSegmentLgs,
+        _userSegment == 'lgs',
+        () => _selectSegment('lgs'),
+        isDark,
+        textColor,
+      ),
+      _optionButton(
+        l10n.onboardingSegmentYks,
+        _userSegment == 'yks',
+        () => _selectSegment('yks'),
+        isDark,
+        textColor,
+      ),
+      _optionButton(
+        l10n.onboardingSegmentKpss,
+        _userSegment == 'kpss',
+        () => _selectSegment('kpss'),
+        isDark,
+        textColor,
+      ),
+      _optionButton(
+        l10n.onboardingSegmentLanguage,
+        _userSegment == 'language',
+        () => _selectSegment('language'),
+        isDark,
+        textColor,
+      ),
+      _optionButton(
+        l10n.onboardingSegmentUniversity,
+        _userSegment == 'university',
+        () => _selectSegment('university'),
+        isDark,
+        textColor,
+      ),
+      _optionButton(
+        l10n.onboardingSegmentWork,
+        _userSegment == 'work',
+        () => _selectSegment('work'),
+        isDark,
+        textColor,
+      ),
       // Segment isteğe bağlı: "Diğer" ile (ya da seçmeden) genel öneriler gelir.
-      _optionButton(l10n.onboardingSegmentOther, _userSegment == _otherSegment, () => _selectSegment(_otherSegment),
-          isDark, textColor),
+      _optionButton(
+        l10n.onboardingSegmentOther,
+        _userSegment == _otherSegment,
+        () => _selectSegment(_otherSegment),
+        isDark,
+        textColor,
+      ),
     ];
 
     if (sideBySide) {
       return _sideBySideStep(
-        header: [_buildMascotAvatar(size: 64), const SizedBox(height: 12), title, const SizedBox(height: 6), body],
+        header: [
+          _buildMascotAvatar(size: 64),
+          const SizedBox(height: 12),
+          title,
+          const SizedBox(height: 6),
+          body,
+        ],
         content: (_) => options,
       );
     }
@@ -830,7 +1046,13 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
     );
   }
 
-  Widget _optionButton(String label, bool isSelected, VoidCallback onTap, bool isDark, Color textColor) {
+  Widget _optionButton(
+    String label,
+    bool isSelected,
+    VoidCallback onTap,
+    bool isDark,
+    Color textColor,
+  ) {
     // Koyu temada darkPrimary: seçili metin koyu zeminde okunur kalır.
     final accent = Theme.of(context).colorScheme.primary;
     return Padding(
@@ -847,11 +1069,15 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               border: Border.all(
-                color: isSelected ? accent : (isDark ? Colors.white24 : Colors.black12),
+                color: isSelected
+                    ? accent
+                    : (isDark ? Colors.white24 : Colors.black12),
                 width: isSelected ? 2 : 1,
               ),
               borderRadius: BorderRadius.circular(14),
-              color: isSelected ? accent.withValues(alpha: 0.1) : Colors.transparent,
+              color: isSelected
+                  ? accent.withValues(alpha: 0.1)
+                  : Colors.transparent,
             ),
             child: Text(
               label,
@@ -877,21 +1103,36 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
       return ChoiceChip(
         label: Text(lang.translateCatName(name)),
         selected: selected,
-        selectedColor: isDark ? AppColors.darkPrimaryContainer : AppColors.primary.withValues(alpha: 0.2),
+        selectedColor: isDark
+            ? AppColors.darkPrimaryContainer
+            : AppColors.primary.withValues(alpha: 0.2),
         // Koyu temada temanın seçili çip metni (siyah) koyu kırmızı zeminde
         // okunmuyordu (1,2:1); açık ton kullanılır.
-        labelStyle: selected && isDark ? const TextStyle(color: AppColors.darkOnPrimaryContainer) : null,
+        labelStyle: selected && isDark
+            ? const TextStyle(color: AppColors.darkOnPrimaryContainer)
+            : null,
         checkmarkColor: isDark ? AppColors.darkOnPrimaryContainer : null,
         onSelected: (val) => _toggleCategory(name, val),
       );
     }
+
     // Hedef seçildiyse öneriler hazır gelir: başlık ve açıklama bunu söyler.
     final prepared = _userSegment != null && _userSegment != _otherSegment;
-    final title = Text(prepared ? l10n.onboardingCategoryStepPreparedTitle : l10n.onboardingCategoryStepTitle,
-        textAlign: TextAlign.center,
-        style: TextStyle(fontSize: sideBySide ? 22 : 26, fontWeight: FontWeight.bold, color: textColor));
+    final title = Text(
+      prepared
+          ? l10n.onboardingCategoryStepPreparedTitle
+          : l10n.onboardingCategoryStepTitle,
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontSize: sideBySide ? 22 : 26,
+        fontWeight: FontWeight.bold,
+        color: textColor,
+      ),
+    );
     final body = Text(
-      prepared ? l10n.onboardingCategoryStepPreparedBody(limit) : l10n.onboardingCategoryStepBodyLimit(limit),
+      prepared
+          ? l10n.onboardingCategoryStepPreparedBody(limit)
+          : l10n.onboardingCategoryStepBodyLimit(limit),
       textAlign: TextAlign.center,
       style: TextStyle(fontSize: 13, color: textColor.withValues(alpha: 0.7)),
     );
@@ -904,7 +1145,11 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
       child: Text(
         '${_selectedCategoryNames.length} / $limit',
         // Koyu temada darkPrimary (okunur kontrast).
-        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Theme.of(context).colorScheme.primary),
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
+          color: Theme.of(context).colorScheme.primary,
+        ),
       ),
     );
     // Çipler satırlara sarılır; geniş ekranda satır başına daha çok çip düşer.
@@ -912,9 +1157,7 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
       spacing: 10,
       runSpacing: 10,
       alignment: WrapAlignment.center,
-      children: [
-        for (final name in _categoryChipNames) chip(name),
-      ],
+      children: [for (final name in _categoryChipNames) chip(name)],
     );
     // Metin '+' içerdiği için ayrıca ikon kullanılmaz.
     final addButton = TextButton(
@@ -967,15 +1210,33 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
     required Color textColor,
     required bool sideBySide,
   }) {
-    final title = Text(titleText,
-        textAlign: TextAlign.center,
-        style: TextStyle(fontSize: sideBySide ? 22 : 24, fontWeight: FontWeight.bold, color: textColor));
-    final body = Text(bodyText,
-        textAlign: TextAlign.center,
-        style: TextStyle(fontSize: 14, height: 1.4, color: textColor.withValues(alpha: 0.7)));
+    final title = Text(
+      titleText,
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontSize: sideBySide ? 22 : 24,
+        fontWeight: FontWeight.bold,
+        color: textColor,
+      ),
+    );
+    final body = Text(
+      bodyText,
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontSize: 14,
+        height: 1.4,
+        color: textColor.withValues(alpha: 0.7),
+      ),
+    );
     if (sideBySide) {
       return _sideBySideStep(
-        header: [_buildMascotAvatar(size: 56), const SizedBox(height: 10), title, const SizedBox(height: 6), body],
+        header: [
+          _buildMascotAvatar(size: 56),
+          const SizedBox(height: 10),
+          title,
+          const SizedBox(height: 6),
+          body,
+        ],
         content: (_) => options,
       );
     }
@@ -1008,10 +1269,20 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
       textColor: textColor,
       sideBySide: sideBySide,
       options: [
-        _optionButton(l10n.onboardingVisibilityYes, _showInRankings == true,
-            () => setState(() => _showInRankings = true), isDark, textColor),
-        _optionButton(l10n.onboardingVisibilityNo, _showInRankings == false,
-            () => setState(() => _showInRankings = false), isDark, textColor),
+        _optionButton(
+          l10n.onboardingVisibilityYes,
+          _showInRankings == true,
+          () => setState(() => _showInRankings = true),
+          isDark,
+          textColor,
+        ),
+        _optionButton(
+          l10n.onboardingVisibilityNo,
+          _showInRankings == false,
+          () => setState(() => _showInRankings = false),
+          isDark,
+          textColor,
+        ),
       ],
     );
   }
@@ -1032,7 +1303,11 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
     final l10n = AppLocalizations.of(context)!;
     final title = Text(
       l10n.onboardingGoalStepTitle,
-      style: TextStyle(fontSize: sideBySide ? 22 : 24, fontWeight: FontWeight.bold, color: textColor),
+      style: TextStyle(
+        fontSize: sideBySide ? 22 : 24,
+        fontWeight: FontWeight.bold,
+        color: textColor,
+      ),
       textAlign: TextAlign.center,
     );
     final body = Text(
@@ -1047,13 +1322,24 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
         (l10n.onboardingGoal3h, 180),
         (l10n.onboardingGoal4hPlus, 240),
       ])
-        _optionButton(label, _dailyGoalMinutes == minutes, () => setState(() => _dailyGoalMinutes = minutes),
-            isDark, textColor),
+        _optionButton(
+          label,
+          _dailyGoalMinutes == minutes,
+          () => setState(() => _dailyGoalMinutes = minutes),
+          isDark,
+          textColor,
+        ),
     ];
 
     if (sideBySide) {
       return _sideBySideStep(
-        header: [_buildMascotAvatar(size: 64), const SizedBox(height: 12), title, const SizedBox(height: 6), body],
+        header: [
+          _buildMascotAvatar(size: 64),
+          const SizedBox(height: 12),
+          title,
+          const SizedBox(height: 6),
+          body,
+        ],
         content: (_) => options,
       );
     }
@@ -1073,6 +1359,69 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
             ...options,
           ],
         ),
+      ),
+    );
+  }
+
+  /// Kurulumun son adımı yalnızca mevcut ekranları açıklar. Burada yeni
+  /// tercih alınmaz; "Bitir" diğer adımlardaki seçimleri kaydeder.
+  Widget _buildGuideStep(bool isDark, Color textColor, bool sideBySide) {
+    final l10n = AppLocalizations.of(context)!;
+    final background = isDark
+        ? AppColors.darkSurfaceContainerLow
+        : AppColors.surfaceContainerLow;
+    final sections = [
+      (l10n.onboardingGuidePomoTitle, l10n.onboardingGuidePomoBody),
+      (l10n.onboardingGuideMarathonTitle, l10n.onboardingGuideMarathonBody),
+      (l10n.onboardingGuideReportsTitle, l10n.onboardingGuideReportsBody),
+      (l10n.onboardingGuideRankingTitle, l10n.onboardingGuideRankingBody),
+      (l10n.onboardingGuideSocialTitle, l10n.onboardingGuideSocialBody),
+      (l10n.onboardingGuideProfileTitle, l10n.onboardingGuideProfileBody),
+    ];
+    return KeyedSubtree(
+      key: const ValueKey('onboarding-guide-content'),
+      child: _optionsStep(
+        titleText: l10n.onboardingGuideTitle,
+        bodyText: l10n.onboardingGuideBody,
+        textColor: textColor,
+        sideBySide: sideBySide,
+        options: [
+          for (final (title, body) in sections)
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: background,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Semantics(
+                    header: true,
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: textColor,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    body,
+                    style: TextStyle(
+                      fontSize: 14,
+                      height: 1.45,
+                      color: textColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
       ),
     );
   }

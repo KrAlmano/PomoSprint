@@ -1,3 +1,0 @@
-psql:supabase/migrations/20261007110000_report_submission_lock.sql:99: ERROR:  syntax error at or near "INSERT"
-LINE 72: INSERT INTO supabase_migrations.schema_migrations (version, ...
-         ^

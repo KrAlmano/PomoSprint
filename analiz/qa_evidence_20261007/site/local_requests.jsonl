@@ -1,4 +1,0 @@
-{"method": "POST", "path": "/rest/v1/rpc/get_public_monthly_leaderboard", "body": {"p_limit": 10}}
-{"method": "POST", "path": "/rest/v1/rpc/get_public_monthly_leaderboard", "body": {"p_limit": 10}}
-{"method": "POST", "path": "/rest/v1/waitlist", "body": {"email": "site-qa-20261007@example.invalid", "marketing_consent": true, "consent_text_version": "waitlist-2026-10-03"}}
-{"method": "POST", "path": "/rest/v1/rpc/get_public_monthly_leaderboard", "body": {"p_limit": 10}}

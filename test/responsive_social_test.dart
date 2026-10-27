@@ -55,17 +55,21 @@ Future<void> _pump(
   tester.view.padding = padding;
   tester.view.viewPadding = padding;
   addTearDown(tester.view.reset);
-  await tester.pumpWidget(MaterialApp(
-    locale: const Locale('tr'),
-    localizationsDelegates: AppLocalizations.localizationsDelegates,
-    supportedLocales: AppLocalizations.supportedLocales,
-    theme: AppTheme.lightTheme,
-    builder: (context, child) => MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(textScale)),
-      child: child!,
+  await tester.pumpWidget(
+    MaterialApp(
+      locale: const Locale('tr'),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      theme: AppTheme.lightTheme,
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(
+          context,
+        ).copyWith(textScaler: TextScaler.linear(textScale)),
+        child: child!,
+      ),
+      home: home,
     ),
-    home: home,
-  ));
+  );
   await tester.pumpAndSettle();
 }
 
@@ -76,20 +80,26 @@ Future<void> _unmount(WidgetTester tester) async {
   await tester.pump();
 }
 
-void _expectNoOverflow(WidgetTester tester) => expect(tester.takeException(), isNull);
+void _expectNoOverflow(WidgetTester tester) =>
+    expect(tester.takeException(), isNull);
 
 List<RankingEntry> _entries(int count, {int meIndex = 5}) => [
-      for (var i = 0; i < count; i++)
-        RankingEntry(
-          name: i == 1 ? 'Çok uzun isimli bir çalışkan kum saati kullanıcısı' : 'Kullanıcı ${i + 1}',
-          avatarId: AvatarCharacter.allAvatars()[i % AvatarCharacter.allAvatars().length].id,
-          points: 12000 - i * 700,
-          minutes: 9000 - i * 300,
-          isMe: i == meIndex,
-        ),
-    ];
+  for (var i = 0; i < count; i++)
+    RankingEntry(
+      name: i == 1
+          ? 'Çok uzun isimli bir çalışkan kum saati kullanıcısı'
+          : 'Kullanıcı ${i + 1}',
+      avatarId:
+          AvatarCharacter.allAvatars()[i % AvatarCharacter.allAvatars().length]
+              .id,
+      points: 12000 - i * 700,
+      minutes: 9000 - i * 300,
+      isMe: i == meIndex,
+    ),
+];
 
-LeagueSnapshot _league({int memberCount = 12, int myPoints = 500}) => LeagueSnapshot(
+LeagueSnapshot _league({int memberCount = 12, int myPoints = 500}) =>
+    LeagueSnapshot(
       tier: 3,
       endDate: DateTime.now().add(const Duration(days: 5, hours: 3)),
       promotionZoneEnd: 3,
@@ -113,7 +123,10 @@ class _RankingBodyHost extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: compact ? 12 : 20),
+          padding: EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: compact ? 12 : 20,
+          ),
           child: ContentWidth(
             maxWidth: ContentWidth.dashboard,
             child: Column(
@@ -125,7 +138,9 @@ class _RankingBodyHost extends StatelessWidget {
                     children: [
                       RankingCountdownBanner(
                         title: leagueTitle(l10n, league?.tier ?? 1),
-                        target: DateTime.now().add(const Duration(days: 3, hours: 4)),
+                        target: DateTime.now().add(
+                          const Duration(days: 3, hours: 4),
+                        ),
                         onHelp: () {},
                       ),
                       const SizedBox(height: 12),
@@ -133,7 +148,11 @@ class _RankingBodyHost extends StatelessWidget {
                     ],
                   ),
                 ),
-                RankingStandings(entries: entries, league: league, compact: compact),
+                RankingStandings(
+                  entries: entries,
+                  league: league,
+                  compact: compact,
+                ),
               ],
             ),
           ),
@@ -149,7 +168,9 @@ void main() {
   group('Sıralama parçaları', () {
     for (final MapEntry(key: name, value: size) in _sizes.entries) {
       for (final scale in _textScales) {
-        testWidgets('lig listesi (podyum + liste) · $name · metin x$scale', (tester) async {
+        testWidgets('lig listesi (podyum + liste) · $name · metin x$scale', (
+          tester,
+        ) async {
           await _pump(
             tester,
             size,
@@ -159,30 +180,50 @@ void main() {
           _expectNoOverflow(tester);
           expect(find.byType(RankingPodium), findsOneWidget);
           expect(find.byType(RankingRow), findsNWidgets(9));
-          expect(find.byType(MyRankCard), findsOneWidget);
+          final l10n = AppLocalizations.of(
+            tester.element(find.byType(RankingPodium)),
+          )!;
+          expect(find.text(l10n.rankingMyStatus(6, 8500)), findsNothing);
+          expect(find.text(l10n.rankingZonePromotionChip), findsNothing);
           await _unmount(tester);
         });
 
-        testWidgets('az kişi, yerleşim bekleniyor, boş · $name · metin x$scale', (tester) async {
-          // Arkadaşlar sekmesi: iki kişi, podyumda boş koltuk.
-          await _pump(tester, size, _RankingBodyHost(entries: _entries(2, meIndex: 0)), textScale: scale);
-          _expectNoOverflow(tester);
-          expect(find.byType(RankingRow), findsNothing);
+        testWidgets(
+          'az kişi, yerleşim bekleniyor, boş · $name · metin x$scale',
+          (tester) async {
+            // Arkadaşlar sekmesi: iki kişi, podyumda boş koltuk.
+            await _pump(
+              tester,
+              size,
+              _RankingBodyHost(entries: _entries(2, meIndex: 0)),
+              textScale: scale,
+            );
+            _expectNoOverflow(tester);
+            expect(find.byType(RankingRow), findsNothing);
 
-          await _pump(
-            tester,
-            size,
-            _RankingBodyHost(entries: _entries(1, meIndex: 0), league: _league(memberCount: 1, myPoints: 0)),
-            textScale: scale,
-          );
-          _expectNoOverflow(tester);
-          expect(find.byType(LeaguePlacementView), findsOneWidget);
+            await _pump(
+              tester,
+              size,
+              _RankingBodyHost(
+                entries: _entries(1, meIndex: 0),
+                league: _league(memberCount: 1, myPoints: 0),
+              ),
+              textScale: scale,
+            );
+            _expectNoOverflow(tester);
+            expect(find.byType(LeaguePlacementView), findsOneWidget);
 
-          await _pump(tester, size, const _RankingBodyHost(entries: []), textScale: scale);
-          _expectNoOverflow(tester);
-          expect(find.byType(RankingEmptyView), findsOneWidget);
-          await _unmount(tester);
-        });
+            await _pump(
+              tester,
+              size,
+              const _RankingBodyHost(entries: []),
+              textScale: scale,
+            );
+            _expectNoOverflow(tester);
+            expect(find.byType(RankingEmptyView), findsOneWidget);
+            await _unmount(tester);
+          },
+        );
       }
 
       testWidgets('hata kartı ve geri sayım · $name', (tester) async {
@@ -196,9 +237,18 @@ void main() {
                 child: ContentWidth(
                   child: Column(
                     children: [
-                      LoadErrorView(message: 'Sıralama yüklenemedi. Bağlantını kontrol edip tekrar dene.', onRetry: () {}),
+                      LoadErrorView(
+                        message:
+                            'Sıralama yüklenemedi. Bağlantını kontrol edip tekrar dene.',
+                        onRetry: () {},
+                      ),
                       const SizedBox(height: 12),
-                      CountdownText(target: DateTime.now().add(const Duration(hours: 5, minutes: 7)), prefix: '⏱️ '),
+                      CountdownText(
+                        target: DateTime.now().add(
+                          const Duration(hours: 5, minutes: 7),
+                        ),
+                        prefix: '⏱️ ',
+                      ),
                     ],
                   ),
                 ),
@@ -212,28 +262,57 @@ void main() {
       });
     }
 
-    testWidgets('geniş ekranda podyum solda, liste sağda; dikey telefonda alt alta', (tester) async {
-      await _pump(tester, const Size(1180, 820), _RankingBodyHost(entries: _entries(12), league: _league()));
-      final podium = tester.getRect(find.byType(RankingPodium));
-      final firstRow = tester.getRect(find.byType(RankingRow).first);
-      expect(podium.right, lessThan(firstRow.left));
-      expect(firstRow.width, lessThanOrEqualTo(ContentWidth.dashboard));
+    testWidgets(
+      'geniş ekranda podyum solda, liste sağda; dikey telefonda alt alta',
+      (tester) async {
+        await _pump(
+          tester,
+          const Size(1180, 820),
+          _RankingBodyHost(entries: _entries(12), league: _league()),
+        );
+        final podium = tester.getRect(find.byType(RankingPodium));
+        final firstRow = tester.getRect(find.byType(RankingRow).first);
+        expect(podium.right, lessThan(firstRow.left));
+        expect(firstRow.width, lessThanOrEqualTo(ContentWidth.dashboard));
 
-      await _pump(tester, const Size(390, 844), _RankingBodyHost(entries: _entries(12), league: _league()));
-      final podiumPortrait = tester.getRect(find.byType(RankingPodium));
-      final firstRowPortrait = tester.getRect(find.byType(RankingRow).first);
-      expect(podiumPortrait.bottom, lessThan(firstRowPortrait.top));
-      // Dikey telefonda podyum tam boy (altın avatar 96 px).
-      expect(
-        tester.getSize(find.descendant(of: find.byType(RankingPodium), matching: find.byType(AvatarWidget)).at(1)).width,
-        96,
-      );
-      await _unmount(tester);
-    });
+        await _pump(
+          tester,
+          const Size(390, 844),
+          _RankingBodyHost(entries: _entries(12), league: _league()),
+        );
+        final podiumPortrait = tester.getRect(find.byType(RankingPodium));
+        final firstRowPortrait = tester.getRect(find.byType(RankingRow).first);
+        expect(podiumPortrait.bottom, lessThan(firstRowPortrait.top));
+        // Dikey telefonda podyum tam boy (altın avatar 96 px).
+        expect(
+          tester
+              .getSize(
+                find
+                    .descendant(
+                      of: find.byType(RankingPodium),
+                      matching: find.byType(AvatarWidget),
+                    )
+                    .at(1),
+              )
+              .width,
+          96,
+        );
+        await _unmount(tester);
+      },
+    );
 
     testWidgets('yatay telefonda podyum küçülür', (tester) async {
-      await _pump(tester, const Size(568, 320), _RankingBodyHost(entries: _entries(12), league: _league()));
-      final gold = find.descendant(of: find.byType(RankingPodium), matching: find.byType(AvatarWidget)).at(1);
+      await _pump(
+        tester,
+        const Size(568, 320),
+        _RankingBodyHost(entries: _entries(12), league: _league()),
+      );
+      final gold = find
+          .descendant(
+            of: find.byType(RankingPodium),
+            matching: find.byType(AvatarWidget),
+          )
+          .at(1);
       expect(tester.getSize(gold).width, lessThan(96));
       await _unmount(tester);
     });
@@ -253,9 +332,21 @@ void main() {
                 spacing: 8,
                 runSpacing: 8,
                 children: [
-                  for (final s in const [36.0, 40.0, 44.0, 54.0, 60.0, 76.0, 96.0])
+                  for (final s in const [
+                    36.0,
+                    40.0,
+                    44.0,
+                    54.0,
+                    60.0,
+                    76.0,
+                    96.0,
+                  ])
                     for (var i = 0; i < 3; i++)
-                      AvatarWidget(avatar: avatars[i % avatars.length], size: s, isUnlocked: i != 2),
+                      AvatarWidget(
+                        avatar: avatars[i % avatars.length],
+                        size: s,
+                        isUnlocked: i != 2,
+                      ),
                 ],
               ),
             ),
@@ -278,7 +369,8 @@ void main() {
               builder: (context) => Scaffold(
                 body: Center(
                   child: TextButton(
-                    onPressed: () => showLeagueInfoSheet(context, league: _league()),
+                    onPressed: () =>
+                        showLeagueInfoSheet(context, league: _league()),
                     child: const Text('aç'),
                   ),
                 ),
@@ -290,7 +382,10 @@ void main() {
           await tester.pumpAndSettle();
           _expectNoOverflow(tester);
           expect(find.byType(LeagueInfoSheet), findsOneWidget);
-          expect(tester.getSize(find.byType(LeagueInfoSheet)).width, lessThanOrEqualTo(640));
+          expect(
+            tester.getSize(find.byType(LeagueInfoSheet)).width,
+            lessThanOrEqualTo(640),
+          );
 
           // Sheet'in sonuna kadar kaydırılır (SSS bölümü).
           await tester.drag(find.byType(ListView), const Offset(0, -3000));
@@ -315,20 +410,32 @@ void main() {
 
     for (final MapEntry(key: name, value: size) in _sizes.entries) {
       for (final scale in _textScales) {
-        testWidgets('RankingScreen hata durumu ve aylık sekme · $name · metin x$scale', (tester) async {
-          await _pump(tester, size, RankingScreen(currentUser: user), textScale: scale);
-          _expectNoOverflow(tester);
-          expect(find.byType(LoadErrorView), findsOneWidget);
+        testWidgets(
+          'RankingScreen hata durumu ve aylık sekme · $name · metin x$scale',
+          (tester) async {
+            await _pump(
+              tester,
+              size,
+              RankingScreen(currentUser: user),
+              textScale: scale,
+            );
+            _expectNoOverflow(tester);
+            expect(find.byType(LoadErrorView), findsOneWidget);
 
-          final l10n = await AppLocalizations.delegate.load(const Locale('tr'));
-          await tester.tap(find.text(l10n.rankingTabMonthly));
-          await tester.pumpAndSettle();
-          _expectNoOverflow(tester);
-          expect(find.byType(RankingCountdownBanner), findsOneWidget);
-          await _unmount(tester);
-        });
+            final l10n = await AppLocalizations.delegate.load(
+              const Locale('tr'),
+            );
+            await tester.tap(find.text(l10n.rankingTabMonthly));
+            await tester.pumpAndSettle();
+            _expectNoOverflow(tester);
+            expect(find.byType(RankingCountdownBanner), findsOneWidget);
+            await _unmount(tester);
+          },
+        );
 
-        testWidgets('SocialScreen hata durumu · $name · metin x$scale', (tester) async {
+        testWidgets('SocialScreen hata durumu · $name · metin x$scale', (
+          tester,
+        ) async {
           await _pump(tester, size, const SocialScreen(), textScale: scale);
           _expectNoOverflow(tester);
           expect(find.byType(LoadErrorView), findsOneWidget);
@@ -344,7 +451,10 @@ void main() {
             Builder(
               builder: (context) => Scaffold(
                 body: Center(
-                  child: TextButton(onPressed: () => showFriendsSheet(context), child: const Text('aç')),
+                  child: TextButton(
+                    onPressed: () => showFriendsSheet(context),
+                    child: const Text('aç'),
+                  ),
                 ),
               ),
             ),
@@ -354,7 +464,10 @@ void main() {
           await tester.pumpAndSettle();
           _expectNoOverflow(tester);
           expect(find.byType(FriendsSheet), findsOneWidget);
-          expect(tester.getSize(find.byType(FriendsSheet)).width, lessThanOrEqualTo(640));
+          expect(
+            tester.getSize(find.byType(FriendsSheet)).width,
+            lessThanOrEqualTo(640),
+          );
 
           // Klavye açıkken (yatay telefonda sheet klavyenin üstüne alınır).
           tester.view.viewInsets = FakeViewPadding(bottom: size.height * 0.45);
@@ -375,58 +488,116 @@ void main() {
             textScale: scale,
           );
           _expectNoOverflow(tester);
-          await tester.drag(find.byType(SingleChildScrollView).first, const Offset(0, -3000));
+          await tester.drag(
+            find.byType(SingleChildScrollView).first,
+            const Offset(0, -3000),
+          );
           await tester.pumpAndSettle();
           _expectNoOverflow(tester);
           // Kartlar okunabilir genişliği aşmaz.
-          expect(tester.getSize(find.byType(SwitchListTile).first).width, lessThanOrEqualTo(ContentWidth.reading));
+          expect(
+            tester.getSize(find.byType(SwitchListTile).first).width,
+            lessThanOrEqualTo(ContentWidth.reading),
+          );
         });
 
-        testWidgets('CharacterCollectionScreen ve satın alma diyaloğu · $name · metin x$scale', (tester) async {
-          await _pump(tester, size, CharacterCollectionScreen(user: user), textScale: scale);
-          _expectNoOverflow(tester);
+        testWidgets(
+          'CharacterCollectionScreen ve satın alma diyaloğu · $name · metin x$scale',
+          (tester) async {
+            await _pump(
+              tester,
+              size,
+              CharacterCollectionScreen(user: user),
+              textScale: scale,
+            );
+            _expectNoOverflow(tester);
 
-          // Bakiye yetmeyen bir avatar: satın alma diyaloğu.
-          final locked = find.byIcon(Icons.lock_rounded);
-          for (var i = 0; i < 20 && locked.evaluate().isEmpty; i++) {
-            await tester.drag(find.byType(CustomScrollView), const Offset(0, -200));
+            // Bakiye yetmeyen bir avatar: satın alma diyaloğu.
+            final locked = find.byIcon(Icons.lock_rounded);
+            for (var i = 0; i < 20 && locked.evaluate().isEmpty; i++) {
+              await tester.drag(
+                find.byType(CustomScrollView),
+                const Offset(0, -200),
+              );
+              await tester.pumpAndSettle();
+            }
+            await tester.ensureVisible(locked.first);
             await tester.pumpAndSettle();
-          }
-          await tester.ensureVisible(locked.first);
-          await tester.pumpAndSettle();
-          await tester.tap(locked.first);
-          await tester.pumpAndSettle();
-          _expectNoOverflow(tester);
-          expect(find.byType(AlertDialog), findsOneWidget);
-          final dialogSurface = find.descendant(of: find.byType(AlertDialog), matching: find.byType(Material)).first;
-          expect(tester.getSize(dialogSurface).width, lessThanOrEqualTo(ContentWidth.form));
-        });
+            await tester.tap(locked.first);
+            await tester.pumpAndSettle();
+            _expectNoOverflow(tester);
+            expect(find.byType(AlertDialog), findsOneWidget);
+            final dialogSurface = find
+                .descendant(
+                  of: find.byType(AlertDialog),
+                  matching: find.byType(Material),
+                )
+                .first;
+            expect(
+              tester.getSize(dialogSurface).width,
+              lessThanOrEqualTo(ContentWidth.form),
+            );
+          },
+        );
       }
     }
 
-    testWidgets('çentikli yatay telefon (yan güvenli alan) taşmaz', (tester) async {
+    testWidgets('çentikli yatay telefon (yan güvenli alan) taşmaz', (
+      tester,
+    ) async {
       const size = Size(844, 390);
       const notch = FakeViewPadding(left: 47, right: 47, bottom: 21);
-      await _pump(tester, size, _RankingBodyHost(entries: _entries(12), league: _league()), padding: notch);
+      await _pump(
+        tester,
+        size,
+        _RankingBodyHost(entries: _entries(12), league: _league()),
+        padding: notch,
+      );
       _expectNoOverflow(tester);
       // İçerik çentik tarafındaki güvenli alanın içinde kalır.
-      expect(tester.getRect(find.byType(RankingPodium)).left, greaterThanOrEqualTo(47));
+      expect(
+        tester.getRect(find.byType(RankingPodium)).left,
+        greaterThanOrEqualTo(47),
+      );
 
-      await _pump(tester, size, RankingScreen(currentUser: user), padding: notch);
+      await _pump(
+        tester,
+        size,
+        RankingScreen(currentUser: user),
+        padding: notch,
+      );
       _expectNoOverflow(tester);
 
       SupabaseService.instance.currentUser.value = user;
-      await _pump(tester, size, ProfileScreen(onDarkModeChanged: (_) {}, onLogout: () {}), padding: notch);
+      await _pump(
+        tester,
+        size,
+        ProfileScreen(onDarkModeChanged: (_) {}, onLogout: () {}),
+        padding: notch,
+      );
       _expectNoOverflow(tester);
-      expect(tester.getRect(find.byType(SwitchListTile).first).left, greaterThanOrEqualTo(47));
+      expect(
+        tester.getRect(find.byType(SwitchListTile).first).left,
+        greaterThanOrEqualTo(47),
+      );
 
-      await _pump(tester, size, CharacterCollectionScreen(user: user), padding: notch);
+      await _pump(
+        tester,
+        size,
+        CharacterCollectionScreen(user: user),
+        padding: notch,
+      );
       _expectNoOverflow(tester);
-      expect(tester.getRect(find.byType(AvatarWidget).first).left, greaterThanOrEqualTo(47));
+      expect(
+        tester.getRect(find.byType(AvatarWidget).first).left,
+        greaterThanOrEqualTo(47),
+      );
       await _unmount(tester);
     });
 
-    testWidgets('koleksiyon ızgarası genişliğe göre sütun sayısını artırır', (tester) async {
+    testWidgets('koleksiyon ızgarası genişliğe göre sütun sayısını artırır', (
+      tester,
+    ) async {
       double firstRowCount() {
         final cards = find.byType(AvatarWidget);
         final top = tester.getRect(cards.first).top;
@@ -437,11 +608,19 @@ void main() {
         return count.toDouble();
       }
 
-      await _pump(tester, const Size(390, 844), CharacterCollectionScreen(user: user));
+      await _pump(
+        tester,
+        const Size(390, 844),
+        CharacterCollectionScreen(user: user),
+      );
       // AppBar bakiyesi avatar değil; ilk satır ızgaranın ilk satırıdır.
       expect(firstRowCount(), 3);
 
-      await _pump(tester, const Size(1180, 820), CharacterCollectionScreen(user: user));
+      await _pump(
+        tester,
+        const Size(1180, 820),
+        CharacterCollectionScreen(user: user),
+      );
       expect(firstRowCount(), greaterThan(6));
     });
   });

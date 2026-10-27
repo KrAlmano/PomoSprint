@@ -9,10 +9,15 @@ class ForgotPasswordScreen extends StatefulWidget {
   final String initialEmail;
   final Future<void> Function(String email)? sendResetEmail;
 
+  /// Yerel hesaplar ve test posta kutusu canlı ortamdan ayrıdır.
+  /// Verilmezse servisin bağlı olduğu backend kullanılır.
+  final bool? localTestEnvironment;
+
   const ForgotPasswordScreen({
     super.key,
     this.initialEmail = '',
     this.sendResetEmail,
+    this.localTestEnvironment,
   });
 
   @override
@@ -38,6 +43,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     FocusScope.of(context).unfocus();
     final l10n = AppLocalizations.of(context)!;
     final email = _email.text.trim();
+    final isLocal =
+        widget.localTestEnvironment ?? SupabaseService.instance.isLocalBackend;
     setState(() {
       _sending = true;
       _error = null;
@@ -48,7 +55,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       );
       if (!mounted) return;
       await Navigator.of(context).pushReplacement<void, void>(
-        MaterialPageRoute(builder: (_) => const PasswordResetSentScreen()),
+        MaterialPageRoute(
+          builder: (_) =>
+              PasswordResetSentScreen(localTestEnvironment: isLocal),
+        ),
       );
     } catch (e) {
       if (!mounted) return;
@@ -65,12 +75,19 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isLocal =
+        widget.localTestEnvironment ?? SupabaseService.instance.isLocalBackend;
     return _PasswordRecoveryLayout(
       title: l10n.forgotPassword,
       children: [
         const Icon(Icons.lock_reset_rounded, size: 72),
         const SizedBox(height: 24),
-        Text(l10n.forgotPasswordDescription, textAlign: TextAlign.center),
+        Text(
+          isLocal
+              ? l10n.passwordResetLocalDescription
+              : l10n.forgotPasswordDescription,
+          textAlign: TextAlign.center,
+        ),
         const SizedBox(height: 24),
         if (_error != null) ...[
           AuthErrorBanner(message: _error!),
@@ -115,13 +132,19 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 }
 
 class PasswordResetSentScreen extends StatelessWidget {
-  const PasswordResetSentScreen({super.key});
+  final bool? localTestEnvironment;
+
+  const PasswordResetSentScreen({super.key, this.localTestEnvironment});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isLocal =
+        localTestEnvironment ?? SupabaseService.instance.isLocalBackend;
     return _PasswordRecoveryLayout(
-      title: l10n.passwordResetSentTitle,
+      title: isLocal
+          ? l10n.passwordResetLocalTitle
+          : l10n.passwordResetSentTitle,
       children: [
         Icon(
           Icons.mark_email_read_outlined,
@@ -129,7 +152,12 @@ class PasswordResetSentScreen extends StatelessWidget {
           color: Theme.of(context).colorScheme.primary,
         ),
         const SizedBox(height: 24),
-        Text(l10n.passwordResetSentDescription, textAlign: TextAlign.center),
+        Text(
+          isLocal
+              ? l10n.passwordResetLocalDescription
+              : l10n.passwordResetSentDescription,
+          textAlign: TextAlign.center,
+        ),
         const SizedBox(height: 24),
         FilledButton(
           onPressed: () => Navigator.of(context).pop(),

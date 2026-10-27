@@ -102,6 +102,62 @@ test("reset: süresi dolmuş token formu kapatır; sunucu hata açıklaması bas
   assert.doesNotMatch(ctx.els.message.textContent, /UNTRUSTED/);
 });
 
+async function verifyRetry(firstResponse, expectedMessage) {
+  let verifies = 0;
+  const ctx = setupReset({ search: "?token_hash=single-use&type=recovery", respond(path) {
+    if (path === "/auth/v1/verify") {
+      if (++verifies === 1) return Promise.resolve(firstResponse);
+      return Promise.resolve({ ok: true, status: 200, data: { access_token: "qa-recovery-token" } });
+    }
+    return Promise.resolve({ ok: true, status: 200, data: {} });
+  }});
+  await submit(ctx);
+  assert.equal(ctx.els.form.hidden, false, "geçici doğrulama hatası formu kapatmamalı");
+  assert.equal(ctx.els.submit.disabled, false);
+  assert.match(ctx.els.error.textContent, expectedMessage);
+  assert.equal(ctx.calls.length, 1, "başarısız doğrulamada şifre güncellemesi yapılmamalı");
+  await submit(ctx);
+  const attempts = ctx.calls.filter((x) => x.path === "/auth/v1/verify");
+  assert.equal(attempts.length, 2);
+  for (const attempt of attempts) assert.deepEqual(plain(attempt.opts.body), { type: "recovery", token_hash: "single-use" });
+  assert.equal(ctx.calls.filter((x) => x.path === "/auth/v1/user").length, 1);
+  assert.match(ctx.els.title.textContent, /Güncellendi/);
+  assert.equal(ctx.els.form.hidden, true);
+}
+
+test("reset: doğrulamada 5xx formu ve token'ı korur, yeniden deneme tamamlanır", async () => {
+  for (const response of [
+    { ok: false, status: 500, data: { code: "unexpected_failure", message: "UNTRUSTED SERVER TEXT" } },
+    { ok: false, status: 503, data: null },
+  ]) await verifyRetry(response, /Şifre güncellenemedi/);
+});
+
+test("reset: doğrulamada kodsuz ya da bilinmeyen 429 yeniden denenebilir hız sınırı gösterir", async () => {
+  for (const data of [null, { code: "unknown_rate_limit" }]) {
+    await verifyRetry({ ok: false, status: 429, data }, /çok fazla deneme/);
+  }
+});
+
+test("reset: doğrulamada eksik veya bozuk başarılı yanıt bağlantıyı süresi dolmuş saymaz", async () => {
+  for (const data of [null, {}, { access_token: {} }, { access_token: "   " }]) {
+    await verifyRetry({ ok: true, status: 200, data }, /Şifre güncellenemedi/);
+  }
+});
+
+test("reset: doğrulamadaki kalıcı bağlantı ve yetki hataları formu kapatır", async () => {
+  for (const response of [
+    { ok: false, status: 403, data: { code: "otp_expired" } },
+    { ok: false, status: 401, data: null },
+    { ok: false, status: 403, data: { code: "unexpected_authorization_error" } },
+  ]) {
+    const ctx = setupReset({ search: "?token_hash=single-use&type=recovery", respond: () => Promise.resolve(response) });
+    await submit(ctx);
+    assert.equal(ctx.els.form.hidden, true);
+    assert.match(ctx.els.title.textContent, /Geçersiz/);
+    assert.equal(ctx.calls.length, 1);
+  }
+});
+
 test("reset: ağ kesintisi formu korur ve yeniden denemeye izin verir", async () => {
   const ctx = setupReset({ hash: "#access_token=qa-recovery-token&type=recovery", respond: () => Promise.reject(Object.assign(new Error("aborted"), { name: "AbortError" })) });
   await submit(ctx);

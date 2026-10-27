@@ -156,10 +156,12 @@ Future<void> pumpFor(WidgetTester tester, Duration duration) async {
   }
 }
 
-/// Görünür yapıp dokunur, ardından kısa süre kare çizer.
+/// Görünür hedefi kaydırmadan dokunur; ekran dışındaki hedefi önce görünür yapar.
 Future<void> tapOn(WidgetTester tester, Finder finder, {Duration settle = const Duration(milliseconds: 600)}) async {
   expect(finder, findsWidgets, reason: 'dokunulacak öğe yok: $finder');
-  await tester.ensureVisible(finder.first);
+  if (finder.first.hitTestable().evaluate().isEmpty) {
+    await tester.ensureVisible(finder.first);
+  }
   await pumpFor(tester, const Duration(milliseconds: 300));
   await tester.tap(finder.first);
   await pumpFor(tester, settle);

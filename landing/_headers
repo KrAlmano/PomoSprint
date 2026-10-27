@@ -40,6 +40,10 @@
 /avatars/*
   Cache-Control: public, max-age=86400
 
+# Ekran adları sürümsüz; yeni uygulama görüntüleri kısa sürede yenilensin.
+/screenshots/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
 /videos/*
   Cache-Control: public, max-age=86400
 

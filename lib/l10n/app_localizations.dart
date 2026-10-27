@@ -317,7 +317,7 @@ abstract class AppLocalizations {
   /// No description provided for @socialNoLiveFriends.
   ///
   /// In tr, this message translates to:
-  /// **'Şu an çalışan arkadaşın yok. Biri odaklanmaya başladığında burada görünecek.'**
+  /// **'Şu an odaklanan veya molada olan arkadaşın yok. Çalışmaya başladıklarında burada görünecekler.'**
   String get socialNoLiveFriends;
 
   /// No description provided for @socialLoadError.
@@ -329,31 +329,31 @@ abstract class AppLocalizations {
   /// No description provided for @leagueTierBronze.
   ///
   /// In tr, this message translates to:
-  /// **'Bronz Kum Saati'**
+  /// **'Bronz Lig'**
   String get leagueTierBronze;
 
   /// No description provided for @leagueTierSilver.
   ///
   /// In tr, this message translates to:
-  /// **'Gümüş Kum Saati'**
+  /// **'Gümüş Lig'**
   String get leagueTierSilver;
 
   /// No description provided for @leagueTierGold.
   ///
   /// In tr, this message translates to:
-  /// **'Altın Kum Saati'**
+  /// **'Altın Lig'**
   String get leagueTierGold;
 
   /// No description provided for @leagueTierSapphire.
   ///
   /// In tr, this message translates to:
-  /// **'Safir Kum Saati'**
+  /// **'Safir Lig'**
   String get leagueTierSapphire;
 
   /// No description provided for @leagueTierDiamond.
   ///
   /// In tr, this message translates to:
-  /// **'Elmas Kum Saati'**
+  /// **'Elmas Lig'**
   String get leagueTierDiamond;
 
   /// No description provided for @leagueTierLeagueName.
@@ -377,7 +377,7 @@ abstract class AppLocalizations {
   /// No description provided for @leagueInfoWhatBody.
   ///
   /// In tr, this message translates to:
-  /// **'Her lig döneminde seninle benzer seviyedeki en fazla 30 kişiyle aynı gruba düşersin. Dönem boyunca kim daha çok odaklanırsa üst sıraya çıkar.'**
+  /// **'İlk puanlı seansından sonra benzer seviyedeki kullanıcılarla bir lig odasına yerleşirsin. Oda kapasitesi ve dönem kuralları sunucudan okunur; puan topladıkça sıralamada ilerlersin.'**
   String get leagueInfoWhatBody;
 
   /// No description provided for @leagueInfoTiersTitle.
@@ -503,7 +503,7 @@ abstract class AppLocalizations {
   /// No description provided for @leagueAwaitingPlacementBody.
   ///
   /// In tr, this message translates to:
-  /// **'Bu dönem ilk pomodoronu tamamladığında seninle benzer seviyedeki en fazla 30 kişilik bir odaya yerleşirsin. Sıralaman ve yükselme durumun burada görünür.'**
+  /// **'İlk puanlı pomodoronu tamamladığında seninle aynı kademedeki uygun bir lig odasına yerleşirsin. Sıralaman ve güncel dönem kuralları burada görünür.'**
   String get leagueAwaitingPlacementBody;
 
   /// No description provided for @leagueInfoDailyLimitTitle.
@@ -781,6 +781,12 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Satın Al'**
   String get avatarPurchaseTitle;
+
+  /// No description provided for @specialAvatarsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Özel Avatarlar'**
+  String get specialAvatarsTitle;
 
   /// No description provided for @avatarPurchaseBody.
   ///
@@ -2645,7 +2651,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingGoalStepTitle.
   ///
   /// In tr, this message translates to:
-  /// **'Son bir adım kaldı! 🚀'**
+  /// **'Günlük hedefini seç'**
   String get onboardingGoalStepTitle;
 
   /// No description provided for @onboardingGoalStepBody.
@@ -3550,7 +3556,7 @@ abstract class AppLocalizations {
   /// No description provided for @passwordResetSentTitle.
   ///
   /// In tr, this message translates to:
-  /// **'Mailinize gönderildi'**
+  /// **'E-postanı kontrol et'**
   String get passwordResetSentTitle;
 
   /// No description provided for @passwordResetSentDescription.
@@ -3558,6 +3564,18 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Bu adresle kayıtlı bir hesap varsa şifre sıfırlama bağlantısını gönderdik. Gelen kutunu ve spam klasörünü kontrol et; e-postadaki bağlantıdan yeni şifreni belirleyebilirsin.'**
   String get passwordResetSentDescription;
+
+  /// No description provided for @passwordResetLocalTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yerel e-posta'**
+  String get passwordResetLocalTitle;
+
+  /// No description provided for @passwordResetLocalDescription.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu sürüm yerel ortama bağlı. E-postalar gerçek gelen kutuna gönderilmez; yerel Mailpit kutusunda tutulur. Buradaki hesaplar ve şifreler normal hesabından ayrıdır. Normal hesabını sıfırlamak için PomoSprint normal çalıştırma seçeneğini kullan.'**
+  String get passwordResetLocalDescription;
 
   /// No description provided for @timerQuickRecordedSemantics.
   ///
@@ -3738,6 +3756,485 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Bildirim gönderilemedi. Tekrar dene.'**
   String get reportSendFailed;
+
+  /// No description provided for @marathonTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Maraton'**
+  String get marathonTitle;
+
+  /// No description provided for @marathonSingle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tek seans'**
+  String get marathonSingle;
+
+  /// No description provided for @marathonChooseCount.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaç seans yapmak istiyorsunuz?'**
+  String get marathonChooseCount;
+
+  /// No description provided for @marathonCountOption.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} Pomodoro'**
+  String marathonCountOption(int count);
+
+  /// No description provided for @marathonProgress.
+  ///
+  /// In tr, this message translates to:
+  /// **'{current}/{total} Pomodoro'**
+  String marathonProgress(int current, int total);
+
+  /// No description provided for @marathonBreakTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mola'**
+  String get marathonBreakTitle;
+
+  /// No description provided for @marathonBreakHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mola bitince 1 dakika içinde “Buradayım” diyerek devam et.'**
+  String get marathonBreakHint;
+
+  /// No description provided for @marathonAutomaticHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Maraton, art arda 2, 3 veya 4 Pomodoro yapmanı sağlayan bir çalışma planıdır. Planın için 25 ya da 50 dakika seçersin; maratondaki tüm Pomodorolar bu sürede olur.\n\nSeansların arasında 5 dakika mola verirsin. Mola bitince 1 dakika içinde “Buradayım”a dokunarak sıradaki seansı başlatırsın. Devam onayı için internet bağlantısı gerekir.\n\nOnay vermezsen veya maratonu erken bitirirsen kalan plan durur. Tamamladığın seanslar ve normal puanların korunur; tamamlama bonusu kazanılmaz. Mola ve onay bekleme süresi çalışma sürene eklenmez.'**
+  String get marathonAutomaticHint;
+
+  /// No description provided for @marathonBreakRemainingSemantics.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mola: {minutes} dakika {seconds} saniye kaldı'**
+  String marathonBreakRemainingSemantics(int minutes, int seconds);
+
+  /// No description provided for @marathonStart.
+  ///
+  /// In tr, this message translates to:
+  /// **'MARATONU BAŞLAT'**
+  String get marathonStart;
+
+  /// No description provided for @marathonStop.
+  ///
+  /// In tr, this message translates to:
+  /// **'Maratonu bitir'**
+  String get marathonStop;
+
+  /// No description provided for @marathonStopped.
+  ///
+  /// In tr, this message translates to:
+  /// **'Maraton bitirildi. Tamamladığın Pomodorolar ve normal puanların korundu.'**
+  String get marathonStopped;
+
+  /// No description provided for @marathonStopConfirmTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Maratonu bitirelim mi?'**
+  String get marathonStopConfirmTitle;
+
+  /// No description provided for @marathonStopConfirmBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'{completed}/{total} Pomodoro tamamladın. Tamamladıkların korunur; devam eden Pomodoro kaydedilmez.'**
+  String marathonStopConfirmBody(int completed, int total);
+
+  /// No description provided for @marathonStopConfirmAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Maratonu bitir'**
+  String get marathonStopConfirmAction;
+
+  /// No description provided for @marathonCompletedTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Maraton tamamlandı!'**
+  String get marathonCompletedTitle;
+
+  /// No description provided for @marathonCompletedBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} Pomodoro ile {minutes} dakika odaklandın.'**
+  String marathonCompletedBody(int count, int minutes);
+
+  /// No description provided for @marathonSaving.
+  ///
+  /// In tr, this message translates to:
+  /// **'Pomodoro kaydediliyor…'**
+  String get marathonSaving;
+
+  /// No description provided for @marathonRetrySave.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydı tekrar dene'**
+  String get marathonRetrySave;
+
+  /// No description provided for @marathonSaveFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tamamlanan Pomodoro cihazında saklanıyor. Kaydı yeniden göndermek için tekrar dene. Devam süresi dolarsa maraton durur; tamamladığın kayıt korunur.'**
+  String get marathonSaveFailed;
+
+  /// No description provided for @marathonStoppedRejected.
+  ///
+  /// In tr, this message translates to:
+  /// **'Pomodoro kaydı kabul edilmedi. Maraton durduruldu; önceki kayıtların korundu.'**
+  String get marathonStoppedRejected;
+
+  /// No description provided for @marathonMinutesSummary.
+  ///
+  /// In tr, this message translates to:
+  /// **'{focusMinutes} dk çalışma · molalarla yaklaşık {elapsedMinutes} dk'**
+  String marathonMinutesSummary(int focusMinutes, int elapsedMinutes);
+
+  /// No description provided for @marathonResumePlan.
+  ///
+  /// In tr, this message translates to:
+  /// **'Maratona devam et'**
+  String get marathonResumePlan;
+
+  /// No description provided for @notifMarathonBreakDoneTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mola bitti'**
+  String get notifMarathonBreakDoneTitle;
+
+  /// No description provided for @notifMarathonBreakDoneBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Maraton: {nextSession}/{totalSessions} Pomodoro. 1 dakika içinde uygulamayı açıp “Buradayım” diyerek devam et.'**
+  String notifMarathonBreakDoneBody(int nextSession, int totalSessions);
+
+  /// No description provided for @socialOnBreak.
+  ///
+  /// In tr, this message translates to:
+  /// **'Molada'**
+  String get socialOnBreak;
+
+  /// No description provided for @socialNoBreakFriends.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şu an molada olan arkadaşın yok.'**
+  String get socialNoBreakFriends;
+
+  /// No description provided for @marathonBonusPoints.
+  ///
+  /// In tr, this message translates to:
+  /// **'+{points} Maraton bonusu'**
+  String marathonBonusPoints(int points);
+
+  /// No description provided for @marathonBonusHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Maratonu tamamlayınca +{points} ek puan'**
+  String marathonBonusHint(int points);
+
+  /// No description provided for @marathonBonusPending.
+  ///
+  /// In tr, this message translates to:
+  /// **'Maraton bonusu, bekleyen Pomodorolar kaydedildiğinde ve tamamlama koşulları sağlandığında hesaplanacak.'**
+  String get marathonBonusPending;
+
+  /// No description provided for @marathonUnavailable.
+  ///
+  /// In tr, this message translates to:
+  /// **'Maraton şu an kullanılamıyor.'**
+  String get marathonUnavailable;
+
+  /// No description provided for @marathonStartFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Maraton başlatılamadı. Lütfen tekrar dene.'**
+  String get marathonStartFailed;
+
+  /// No description provided for @marathonPresenceTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Burada mısın?'**
+  String get marathonPresenceTitle;
+
+  /// No description provided for @marathonPresenceHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Molan bitti. Sıradaki seansı başlatmak için 1 dakika içinde “Buradayım”a dokun.'**
+  String get marathonPresenceHint;
+
+  /// No description provided for @marathonPresenceConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Buradayım'**
+  String get marathonPresenceConfirm;
+
+  /// No description provided for @marathonPresenceChecking.
+  ///
+  /// In tr, this message translates to:
+  /// **'Onaylanıyor…'**
+  String get marathonPresenceChecking;
+
+  /// No description provided for @marathonPresenceConnectionNeeded.
+  ///
+  /// In tr, this message translates to:
+  /// **'Onay alınamadı. İnternet bağlantını kontrol edip süre dolmadan tekrar dene.'**
+  String get marathonPresenceConnectionNeeded;
+
+  /// No description provided for @marathonPresenceExpired.
+  ///
+  /// In tr, this message translates to:
+  /// **'Devam onayı gelmediği için maraton durdu. Tamamladığın seanslar korundu.'**
+  String get marathonPresenceExpired;
+
+  /// No description provided for @marathonPresenceRemainingSemantics.
+  ///
+  /// In tr, this message translates to:
+  /// **'Devam onayı için {minutes} dakika {seconds} saniye kaldı'**
+  String marathonPresenceRemainingSemantics(int minutes, int seconds);
+
+  /// No description provided for @marathonStepStart.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başlangıç'**
+  String get marathonStepStart;
+
+  /// No description provided for @marathonStepGoal.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedef'**
+  String get marathonStepGoal;
+
+  /// No description provided for @marathonSessionCount.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} seans'**
+  String marathonSessionCount(int count);
+
+  /// No description provided for @marathonStepCompleted.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tamamlandı'**
+  String get marathonStepCompleted;
+
+  /// No description provided for @marathonStepCurrent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şimdiki seans'**
+  String get marathonStepCurrent;
+
+  /// No description provided for @marathonStepUpcoming.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıradaki seans'**
+  String get marathonStepUpcoming;
+
+  /// No description provided for @marathonStoppedInvalid.
+  ///
+  /// In tr, this message translates to:
+  /// **'Pomodoro kaydedildi. Maraton doğrulaması tamamlanamadığı için plan durduruldu; kayıtların korundu.'**
+  String get marathonStoppedInvalid;
+
+  /// No description provided for @marathonPlanTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Maratonunu planla'**
+  String get marathonPlanTitle;
+
+  /// No description provided for @marathonDurationLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Pomodoro süresi'**
+  String get marathonDurationLabel;
+
+  /// No description provided for @marathonStartingWelcome.
+  ///
+  /// In tr, this message translates to:
+  /// **'Maraton başlıyor. İyi çalışmalar!'**
+  String get marathonStartingWelcome;
+
+  /// No description provided for @marathonViewProgress.
+  ///
+  /// In tr, this message translates to:
+  /// **'Maraton ilerlemesi'**
+  String get marathonViewProgress;
+
+  /// No description provided for @marathonInfoTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Maraton nedir?'**
+  String get marathonInfoTitle;
+
+  /// No description provided for @marathonInfoBonusMatrix.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tamamlama bonusu\n25 dk: 2 seans +{shortTwo}, 3 seans +{shortThree}, 4 seans +{shortFour} puan.\n50 dk: 2 seans +{longTwo}, 3 seans +{longThree}, 4 seans +{longFour} puan.\n\nBu ek puan, tüm seanslar kaydedilip normal puan kazandığında ve her devam onayı zamanında verildiğinde bir kez kazanılır. Her seansın normal puanına eklenir; ek kum kazandırmaz.'**
+  String marathonInfoBonusMatrix(
+    int shortTwo,
+    int shortThree,
+    int shortFour,
+    int longTwo,
+    int longThree,
+    int longFour,
+  );
+
+  /// No description provided for @onboardingGuideTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uygulamayı tanı'**
+  String get onboardingGuideTitle;
+
+  /// No description provided for @onboardingGuideBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başlamadan önce ekranların nasıl çalıştığına göz at.'**
+  String get onboardingGuideBody;
+
+  /// No description provided for @onboardingGuidePomoTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Pomo'**
+  String get onboardingGuidePomoTitle;
+
+  /// No description provided for @onboardingGuidePomoBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategorini ve 25 ya da 50 dakikalık seansını seçip Başlat’a dokun. Her seansta bir duraklatma hakkın var; duraklatılan seansın puanı azalır. Tamamlanan seanslar kaydedilir.'**
+  String get onboardingGuidePomoBody;
+
+  /// No description provided for @onboardingGuideMarathonTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Maraton'**
+  String get onboardingGuideMarathonTitle;
+
+  /// No description provided for @onboardingGuideMarathonBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Maraton’u başlat düğmesinden 2, 3 veya 4 seans planla. Seanslar arasında 5 dakika mola verilir. Mola bitince 1 dakika içinde Buradayım’a dokunarak devam et; onay vermezsen Maraton biter. Bitirdiğin seansların normal puanları korunur. Planın tamamını bitirince 25 dakikalık seanslarda sırasıyla +2/+3/+5, 50 dakikalıklarda +4/+6/+10 ek puan kazanırsın.'**
+  String get onboardingGuideMarathonBody;
+
+  /// No description provided for @onboardingGuideReportsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Raporlar'**
+  String get onboardingGuideReportsTitle;
+
+  /// No description provided for @onboardingGuideReportsBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük, haftalık ve aylık çalışma süreni, tamamlanan seanslarını ve kategori dağılımını burada görürsün. Günlük hedefini takip edebilir ve değiştirebilirsin. Çalışma günü saat 04.00’te yenilenir.'**
+  String get onboardingGuideReportsBody;
+
+  /// No description provided for @onboardingGuideRankingTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sıralama'**
+  String get onboardingGuideRankingTitle;
+
+  /// No description provided for @onboardingGuideRankingBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlk puanlı seansını bitirince aynı kademedeki uygun bir lig odasına yerleşirsin. Lig, Aylık ve Arkadaşlar sıralamalarını buradan takip et. Bronz, Gümüş, Altın, Safir ve Elmas ligleri vardır. Hazırlık döneminde seanslar ve raporlar kaydolur; resmi 14 günlük yarışmalar aktif katılımcı sayısı yeterli olunca başlar. Güncel terfi ve ödül şartları Sıralama ekranındaki ? bölümündedir.'**
+  String get onboardingGuideRankingBody;
+
+  /// No description provided for @onboardingGuideSocialTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sosyal'**
+  String get onboardingGuideSocialTitle;
+
+  /// No description provided for @onboardingGuideSocialBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Arkadaş koduyla istek gönder; kabul edilince birbirinizin durumunu görebilirsiniz. Çalışan arkadaşların Odaklanıyor, yalnız Maraton molasına çıkanlar Molada olarak görünür. Kırmızı daire odağı, yeşil daire molayı gösterir. Görünürlük tercihini Profil’den değiştirebilirsin.'**
+  String get onboardingGuideSocialBody;
+
+  /// No description provided for @onboardingGuideProfileTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Profil'**
+  String get onboardingGuideProfileTitle;
+
+  /// No description provided for @onboardingGuideProfileBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Üstteki avatarına dokunarak Profil’i aç. Kategorilerini düzenle, kazandığın kumla avatar koleksiyonunu genişlet ve avatarını seç. Dil, tema, bildirim ve görünürlük ayarlarını; yardım, gizlilik ve hesap işlemlerini burada bulursun.'**
+  String get onboardingGuideProfileBody;
+
+  /// No description provided for @leagueInfoWhatBodyWithCapacity.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlk puanlı seansını tamamladığında aynı kademede ve aynı dönemdeki uygun mevcut odaya yerleşirsin. Her odada en fazla {capacity} kişi bulunur; oda doluysa yeni oda açılır. Dönem sırası sunucunun kabul ettiği seans puanlarına göre belirlenir.'**
+  String leagueInfoWhatBodyWithCapacity(int capacity);
+
+  /// No description provided for @leagueLaunchPreparingBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ligler hazırlık döneminde. Son 14 günde seans tamamlayan {users} farklı kullanıcıya ulaşınca ilk resmi yarışma sonraki tam 14 günlük dönemde başlar. Seansların, puanın ve raporların kaydolur; hazırlıkta terfi, düşme ve lig avatar ödülü yoktur. Hazırlık puanları resmi yarışmaya taşınmaz.'**
+  String leagueLaunchPreparingBody(int users);
+
+  /// No description provided for @leagueLaunchScheduledBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlk resmi lig dönemi {date} başlayacak. O zamana kadar seansların ve raporların kaydolur; terfi, düşme ve lig avatar ödülü verilmez. Hazırlık puanları yarışmaya taşınmaz.'**
+  String leagueLaunchScheduledBody(String date);
+
+  /// No description provided for @leagueLaunchScheduledShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'Resmi lig dönemi başlıyor'**
+  String get leagueLaunchScheduledShort;
+
+  /// No description provided for @leaguePromotionPolicyBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Terfi için odada bu dönem seans tamamlayan en az {active} aktif kişi olmalı. Terfi kotası aktif kişi sayısının üçte biridir, aşağı yuvarlanır (3 aktif kişi: 1; 25 aktif kişi: 8). Bu dönem en az {days} farklı çalışma gününde toplam {minutes} dakika odaklanıp en az {points} puan kazanmalı ve kotanın içinde bitirmelisin. Elmas Lig’de terfi yoktur.'**
+  String leaguePromotionPolicyBody(
+    int active,
+    int days,
+    int minutes,
+    int points,
+  );
+
+  /// No description provided for @leaguePromotionCurrentQuota.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu odada mevcut terfi kotası: ilk {count} sıra. Gün, dakika ve puan şartları ayrıca sağlanmalıdır.'**
+  String leaguePromotionCurrentQuota(int count);
+
+  /// No description provided for @leagueNoPromotionCurrentPeriod.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu odada şu an terfi için yeterli aktif katılımcı yok. Tamamladığın seanslar kaydolmaya devam eder.'**
+  String get leagueNoPromotionCurrentPeriod;
+
+  /// No description provided for @leagueDemotionPolicyBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Düşme yalnızca en az 10 aktif kişinin bulunduğu odalarda uygulanır: sıralamanın sonundan aktif kişi sayısının üçte biri, aşağı yuvarlanarak bir alt lige düşer. Son 3 günde katılanlar ve Bronz Lig’dekiler düşmez.'**
+  String get leagueDemotionPolicyBody;
+
+  /// No description provided for @leagueAwardActiveRequirements.
+  ///
+  /// In tr, this message translates to:
+  /// **'Resmi lig döneminde odada en az {members} aktif kişi olmalı. En az {days} farklı çalışma gününde toplam {minutes} dakika odaklanıp {points} puana ulaşman gerekir. Hazırlık döneminde ödül verilmez.'**
+  String leagueAwardActiveRequirements(
+    int members,
+    int days,
+    int minutes,
+    int points,
+  );
+
+  /// No description provided for @leaguePreparationNoChanges.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hazırlık sırasında herkes mevcut liginde kalır; terfi, düşme ve lig avatar ödülü verilmez.'**
+  String get leaguePreparationNoChanges;
+
+  /// No description provided for @leagueLaunchPreparingShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hazırlık dönemi · Terfi, düşme ve lig ödülleri henüz başlamadı.'**
+  String get leagueLaunchPreparingShort;
 }
 
 class _AppLocalizationsDelegate

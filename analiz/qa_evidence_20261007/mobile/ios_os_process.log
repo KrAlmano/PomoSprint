@@ -1,5 +1,0 @@
-Traceback (most recent call last):
-  File "/tmp/pomosprint-20261007/os_process_qa.py", line 44, in <module>
-    assert seeded,'Seeding not observed; do not claim process test passed'
-           ^^^^^^
-AssertionError: Seeding not observed; do not claim process test passed

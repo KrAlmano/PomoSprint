@@ -13,7 +13,11 @@ tools
 *.md
 wrangler.jsonc
 worker.js
-# Eski arayüzü gösteren kayıtlar: güncel kayıt gelene kadar yayınlanmaz
-# (main.js SHOT_VIDEOS listesinde değiller)
+# Eski arayüz kayıtları ve posterleri: yeni sürümlü gerçek kayıtlar kullanılır.
+# Kaynak dosyalar yerelde korunur; herkese açık varlık olarak yayınlanmaz.
 videos/leaderboard.mp4
 videos/reports.mp4
+videos/timer.mp4
+videos/timer.webp
+videos/languages.mp4
+videos/languages.webp

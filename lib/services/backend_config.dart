@@ -18,7 +18,9 @@ class BackendConfig {
   });
 
   static const String _defineUrl = String.fromEnvironment('SUPABASE_URL');
-  static const String _defineAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
+  static const String _defineAnonKey = String.fromEnvironment(
+    'SUPABASE_ANON_KEY',
+  );
   static const String _defineSentryDsn = String.fromEnvironment('SENTRY_DSN');
 
   final String supabaseUrl;
@@ -29,6 +31,13 @@ class BackendConfig {
   final BackendConfigSource source;
 
   bool get usesDartDefine => source == BackendConfigSource.dartDefine;
+
+  /// Yalnızca ortam açıklaması için; kısa seans veya API yetkisi vermez.
+  bool get isLocalBackend {
+    final uri = Uri.tryParse(supabaseUrl);
+    return (uri?.scheme == 'http' || uri?.scheme == 'https') &&
+        const {'127.0.0.1', 'localhost', '::1', '10.0.2.2'}.contains(uri?.host);
+  }
 
   /// [env]: yüklenen `.env` değerleri (okunamadıysa boş harita). `define*`
   /// parametreleri testler içindir; uygulamada derleme sabitleri kullanılır.

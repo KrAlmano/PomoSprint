@@ -107,13 +107,13 @@
       }
     }
   },
-  "socialNoLiveFriends": "Şu an çalışan arkadaşın yok. Biri odaklanmaya başladığında burada görünecek.",
+  "socialNoLiveFriends": "Şu an odaklanan veya molada olan arkadaşın yok. Çalışmaya başladıklarında burada görünecekler.",
   "socialLoadError": "Arkadaşlarının durumu yüklenemedi. Bağlantını kontrol edip tekrar dene.",
-  "leagueTierBronze": "Bronz Kum Saati",
-  "leagueTierSilver": "Gümüş Kum Saati",
-  "leagueTierGold": "Altın Kum Saati",
-  "leagueTierSapphire": "Safir Kum Saati",
-  "leagueTierDiamond": "Elmas Kum Saati",
+  "leagueTierBronze": "Bronz Lig",
+  "leagueTierSilver": "Gümüş Lig",
+  "leagueTierGold": "Altın Lig",
+  "leagueTierSapphire": "Safir Lig",
+  "leagueTierDiamond": "Elmas Lig",
   "leagueTierLeagueName": "{tier} Ligi",
   "@leagueTierLeagueName": {
     "placeholders": {
@@ -124,7 +124,7 @@
   },
   "leagueInfoTitle": "Lig Sistemi Nasıl Çalışır?",
   "leagueInfoWhatTitle": "Lig Nedir?",
-  "leagueInfoWhatBody": "Her lig döneminde seninle benzer seviyedeki en fazla 30 kişiyle aynı gruba düşersin. Dönem boyunca kim daha çok odaklanırsa üst sıraya çıkar.",
+  "leagueInfoWhatBody": "İlk puanlı seansından sonra benzer seviyedeki kullanıcılarla bir lig odasına yerleşirsin. Oda kapasitesi ve dönem kuralları sunucudan okunur; puan topladıkça sıralamada ilerlersin.",
   "leagueInfoTiersTitle": "Lig Kademeleri",
   "leagueInfoYouAreHere": "Şu an buradasın",
   "leagueInfoPointsTitle": "Puan Nasıl Kazanılır?",
@@ -220,7 +220,7 @@
   "leagueInfoNoDemotionBronze": "Bronz ligde düşme yoktur.",
   "leagueInfoNoDemotionThisPeriod": "Bu dönem bu ligde düşme yok.",
   "leagueAwaitingPlacementTitle": "Henüz bir lig odasında değilsin",
-  "leagueAwaitingPlacementBody": "Bu dönem ilk pomodoronu tamamladığında seninle benzer seviyedeki en fazla 30 kişilik bir odaya yerleşirsin. Sıralaman ve yükselme durumun burada görünür.",
+  "leagueAwaitingPlacementBody": "İlk puanlı pomodoronu tamamladığında seninle aynı kademedeki uygun bir lig odasına yerleşirsin. Sıralaman ve güncel dönem kuralları burada görünür.",
   "leagueInfoDailyLimitTitle": "Günlük Sınır",
   "leagueInfoDailyLimitBody": "Günde en fazla {limit} seans puan ve kum kazandırır (lig puanı, aylık sıralama, toplam puan). Sonraki seanslar yalnızca çalışma süresine ve serine eklenir.",
   "@leagueInfoDailyLimitBody": {
@@ -330,6 +330,7 @@
     }
   },
   "avatarPurchaseTitle": "Satın Al",
+  "specialAvatarsTitle": "Özel Avatarlar",
   "avatarPurchaseBody": "{name} avatarını {price} kum tanesine satın almak ister misin?",
   "@avatarPurchaseBody": {
     "placeholders": {
@@ -848,7 +849,7 @@
   "onboardingCategoryStepTitle": "Harika seçim! 🎉",
   "onboardingCategoryStepPreparedTitle": "Hedefine göre hazırladık 🎯",
   "onboardingCreateOwnCategory": "+ Kendi kategorimi oluştur",
-  "onboardingGoalStepTitle": "Son bir adım kaldı! 🚀",
+  "onboardingGoalStepTitle": "Günlük hedefini seç",
   "onboardingGoalStepBody": "Günde ne kadar birlikte odaklanmak istersin?",
   "onboardingGoal1h": "1 Saat",
   "onboardingGoal2h": "2 Saat",
@@ -1186,8 +1187,10 @@
   },
   "forgotPasswordDescription": "E-posta adresini gir. Şifreni yenilemen için bir doğrulama bağlantısı göndereceğiz.",
   "sendPasswordResetEmail": "Doğrulama maili gönder",
-  "passwordResetSentTitle": "Mailinize gönderildi",
+  "passwordResetSentTitle": "E-postanı kontrol et",
   "passwordResetSentDescription": "Bu adresle kayıtlı bir hesap varsa şifre sıfırlama bağlantısını gönderdik. Gelen kutunu ve spam klasörünü kontrol et; e-postadaki bağlantıdan yeni şifreni belirleyebilirsin.",
+  "passwordResetLocalTitle": "Yerel e-posta",
+  "passwordResetLocalDescription": "Bu sürüm yerel ortama bağlı. E-postalar gerçek gelen kutuna gönderilmez; yerel Mailpit kutusunda tutulur. Buradaki hesaplar ve şifreler normal hesabından ayrıdır. Normal hesabını sıfırlamak için PomoSprint normal çalıştırma seçeneğini kullan.",
   "timerQuickRecordedSemantics": "Yerel hızlı test sayacı: seanslar 25 veya 50 dakika olarak kaydedilir",
   "friendsOutgoingTitle": "Gönderilen istekler",
   "friendsCancelRequest": "İsteği iptal et",
@@ -1217,5 +1220,262 @@
   "reportAlreadyReceived": "Bu kullanıcı hakkında bildirimin zaten alındı.",
   "reportRateLimited": "Bugünkü bildirim sınırına ulaştın. Daha sonra tekrar dene.",
   "reportUserUnavailable": "Bu kullanıcı artık bildirilemiyor. Listeyi yenile.",
-  "reportSendFailed": "Bildirim gönderilemedi. Tekrar dene."
+  "reportSendFailed": "Bildirim gönderilemedi. Tekrar dene.",
+  "marathonTitle": "Maraton",
+  "marathonSingle": "Tek seans",
+  "marathonChooseCount": "Kaç seans yapmak istiyorsunuz?",
+  "marathonCountOption": "{count} Pomodoro",
+  "@marathonCountOption": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "marathonProgress": "{current}/{total} Pomodoro",
+  "@marathonProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "marathonBreakTitle": "Mola",
+  "marathonBreakHint": "Mola bitince 1 dakika içinde “Buradayım” diyerek devam et.",
+  "marathonAutomaticHint": "Maraton, art arda 2, 3 veya 4 Pomodoro yapmanı sağlayan bir çalışma planıdır. Planın için 25 ya da 50 dakika seçersin; maratondaki tüm Pomodorolar bu sürede olur.\n\nSeansların arasında 5 dakika mola verirsin. Mola bitince 1 dakika içinde “Buradayım”a dokunarak sıradaki seansı başlatırsın. Devam onayı için internet bağlantısı gerekir.\n\nOnay vermezsen veya maratonu erken bitirirsen kalan plan durur. Tamamladığın seanslar ve normal puanların korunur; tamamlama bonusu kazanılmaz. Mola ve onay bekleme süresi çalışma sürene eklenmez.",
+  "marathonBreakRemainingSemantics": "Mola: {minutes} dakika {seconds} saniye kaldı",
+  "@marathonBreakRemainingSemantics": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "marathonStart": "MARATONU BAŞLAT",
+  "marathonStop": "Maratonu bitir",
+  "marathonStopped": "Maraton bitirildi. Tamamladığın Pomodorolar ve normal puanların korundu.",
+  "marathonStopConfirmTitle": "Maratonu bitirelim mi?",
+  "marathonStopConfirmBody": "{completed}/{total} Pomodoro tamamladın. Tamamladıkların korunur; devam eden Pomodoro kaydedilmez.",
+  "@marathonStopConfirmBody": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "marathonStopConfirmAction": "Maratonu bitir",
+  "marathonCompletedTitle": "Maraton tamamlandı!",
+  "marathonCompletedBody": "{count} Pomodoro ile {minutes} dakika odaklandın.",
+  "@marathonCompletedBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "marathonSaving": "Pomodoro kaydediliyor…",
+  "marathonRetrySave": "Kaydı tekrar dene",
+  "marathonSaveFailed": "Tamamlanan Pomodoro cihazında saklanıyor. Kaydı yeniden göndermek için tekrar dene. Devam süresi dolarsa maraton durur; tamamladığın kayıt korunur.",
+  "marathonStoppedRejected": "Pomodoro kaydı kabul edilmedi. Maraton durduruldu; önceki kayıtların korundu.",
+  "marathonMinutesSummary": "{focusMinutes} dk çalışma · molalarla yaklaşık {elapsedMinutes} dk",
+  "@marathonMinutesSummary": {
+    "placeholders": {
+      "focusMinutes": {
+        "type": "int"
+      },
+      "elapsedMinutes": {
+        "type": "int"
+      }
+    }
+  },
+  "marathonResumePlan": "Maratona devam et",
+  "notifMarathonBreakDoneTitle": "Mola bitti",
+  "notifMarathonBreakDoneBody": "Maraton: {nextSession}/{totalSessions} Pomodoro. 1 dakika içinde uygulamayı açıp “Buradayım” diyerek devam et.",
+  "@notifMarathonBreakDoneBody": {
+    "placeholders": {
+      "nextSession": {
+        "type": "int"
+      },
+      "totalSessions": {
+        "type": "int"
+      }
+    }
+  },
+  "socialOnBreak": "Molada",
+  "socialNoBreakFriends": "Şu an molada olan arkadaşın yok.",
+  "marathonBonusPoints": "+{points} Maraton bonusu",
+  "@marathonBonusPoints": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "marathonBonusHint": "Maratonu tamamlayınca +{points} ek puan",
+  "@marathonBonusHint": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "marathonBonusPending": "Maraton bonusu, bekleyen Pomodorolar kaydedildiğinde ve tamamlama koşulları sağlandığında hesaplanacak.",
+  "marathonUnavailable": "Maraton şu an kullanılamıyor.",
+  "marathonStartFailed": "Maraton başlatılamadı. Lütfen tekrar dene.",
+  "marathonPresenceTitle": "Burada mısın?",
+  "marathonPresenceHint": "Molan bitti. Sıradaki seansı başlatmak için 1 dakika içinde “Buradayım”a dokun.",
+  "marathonPresenceConfirm": "Buradayım",
+  "marathonPresenceChecking": "Onaylanıyor…",
+  "marathonPresenceConnectionNeeded": "Onay alınamadı. İnternet bağlantını kontrol edip süre dolmadan tekrar dene.",
+  "marathonPresenceExpired": "Devam onayı gelmediği için maraton durdu. Tamamladığın seanslar korundu.",
+  "marathonPresenceRemainingSemantics": "Devam onayı için {minutes} dakika {seconds} saniye kaldı",
+  "marathonStepStart": "Başlangıç",
+  "marathonStepGoal": "Hedef",
+  "marathonSessionCount": "{count} seans",
+  "marathonStepCompleted": "Tamamlandı",
+  "marathonStepCurrent": "Şimdiki seans",
+  "marathonStepUpcoming": "Sıradaki seans",
+  "@marathonPresenceRemainingSemantics": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "@marathonSessionCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "marathonStoppedInvalid": "Pomodoro kaydedildi. Maraton doğrulaması tamamlanamadığı için plan durduruldu; kayıtların korundu.",
+  "marathonPlanTitle": "Maratonunu planla",
+  "marathonDurationLabel": "Pomodoro süresi",
+  "marathonStartingWelcome": "Maraton başlıyor. İyi çalışmalar!",
+  "marathonViewProgress": "Maraton ilerlemesi",
+  "marathonInfoTitle": "Maraton nedir?",
+  "marathonInfoBonusMatrix": "Tamamlama bonusu\n25 dk: 2 seans +{shortTwo}, 3 seans +{shortThree}, 4 seans +{shortFour} puan.\n50 dk: 2 seans +{longTwo}, 3 seans +{longThree}, 4 seans +{longFour} puan.\n\nBu ek puan, tüm seanslar kaydedilip normal puan kazandığında ve her devam onayı zamanında verildiğinde bir kez kazanılır. Her seansın normal puanına eklenir; ek kum kazandırmaz.",
+  "@marathonInfoBonusMatrix": {
+    "placeholders": {
+      "shortTwo": {
+        "type": "int"
+      },
+      "shortThree": {
+        "type": "int"
+      },
+      "shortFour": {
+        "type": "int"
+      },
+      "longTwo": {
+        "type": "int"
+      },
+      "longThree": {
+        "type": "int"
+      },
+      "longFour": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingGuideTitle": "Uygulamayı tanı",
+  "onboardingGuideBody": "Başlamadan önce ekranların nasıl çalıştığına göz at.",
+  "onboardingGuidePomoTitle": "Pomo",
+  "onboardingGuidePomoBody": "Kategorini ve 25 ya da 50 dakikalık seansını seçip Başlat’a dokun. Her seansta bir duraklatma hakkın var; duraklatılan seansın puanı azalır. Tamamlanan seanslar kaydedilir.",
+  "onboardingGuideMarathonTitle": "Maraton",
+  "onboardingGuideMarathonBody": "Maraton’u başlat düğmesinden 2, 3 veya 4 seans planla. Seanslar arasında 5 dakika mola verilir. Mola bitince 1 dakika içinde Buradayım’a dokunarak devam et; onay vermezsen Maraton biter. Bitirdiğin seansların normal puanları korunur. Planın tamamını bitirince 25 dakikalık seanslarda sırasıyla +2/+3/+5, 50 dakikalıklarda +4/+6/+10 ek puan kazanırsın.",
+  "onboardingGuideReportsTitle": "Raporlar",
+  "onboardingGuideReportsBody": "Günlük, haftalık ve aylık çalışma süreni, tamamlanan seanslarını ve kategori dağılımını burada görürsün. Günlük hedefini takip edebilir ve değiştirebilirsin. Çalışma günü saat 04.00’te yenilenir.",
+  "onboardingGuideRankingTitle": "Sıralama",
+  "onboardingGuideRankingBody": "İlk puanlı seansını bitirince aynı kademedeki uygun bir lig odasına yerleşirsin. Lig, Aylık ve Arkadaşlar sıralamalarını buradan takip et. Bronz, Gümüş, Altın, Safir ve Elmas ligleri vardır. Hazırlık döneminde seanslar ve raporlar kaydolur; resmi 14 günlük yarışmalar aktif katılımcı sayısı yeterli olunca başlar. Güncel terfi ve ödül şartları Sıralama ekranındaki ? bölümündedir.",
+  "onboardingGuideSocialTitle": "Sosyal",
+  "onboardingGuideSocialBody": "Arkadaş koduyla istek gönder; kabul edilince birbirinizin durumunu görebilirsiniz. Çalışan arkadaşların Odaklanıyor, yalnız Maraton molasına çıkanlar Molada olarak görünür. Kırmızı daire odağı, yeşil daire molayı gösterir. Görünürlük tercihini Profil’den değiştirebilirsin.",
+  "onboardingGuideProfileTitle": "Profil",
+  "onboardingGuideProfileBody": "Üstteki avatarına dokunarak Profil’i aç. Kategorilerini düzenle, kazandığın kumla avatar koleksiyonunu genişlet ve avatarını seç. Dil, tema, bildirim ve görünürlük ayarlarını; yardım, gizlilik ve hesap işlemlerini burada bulursun.",
+  "leagueInfoWhatBodyWithCapacity": "İlk puanlı seansını tamamladığında aynı kademede ve aynı dönemdeki uygun mevcut odaya yerleşirsin. Her odada en fazla {capacity} kişi bulunur; oda doluysa yeni oda açılır. Dönem sırası sunucunun kabul ettiği seans puanlarına göre belirlenir.",
+  "@leagueInfoWhatBodyWithCapacity": {
+    "placeholders": {
+      "capacity": {
+        "type": "int"
+      }
+    }
+  },
+  "leagueLaunchPreparingBody": "Ligler hazırlık döneminde. Son 14 günde seans tamamlayan {users} farklı kullanıcıya ulaşınca ilk resmi yarışma sonraki tam 14 günlük dönemde başlar. Seansların, puanın ve raporların kaydolur; hazırlıkta terfi, düşme ve lig avatar ödülü yoktur. Hazırlık puanları resmi yarışmaya taşınmaz.",
+  "@leagueLaunchPreparingBody": {
+    "placeholders": {
+      "users": {
+        "type": "int"
+      }
+    }
+  },
+  "leagueLaunchScheduledBody": "İlk resmi lig dönemi {date} başlayacak. O zamana kadar seansların ve raporların kaydolur; terfi, düşme ve lig avatar ödülü verilmez. Hazırlık puanları yarışmaya taşınmaz.",
+  "@leagueLaunchScheduledBody": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "leagueLaunchScheduledShort": "Resmi lig dönemi başlıyor",
+  "leaguePromotionPolicyBody": "Terfi için odada bu dönem seans tamamlayan en az {active} aktif kişi olmalı. Terfi kotası aktif kişi sayısının üçte biridir, aşağı yuvarlanır (3 aktif kişi: 1; 25 aktif kişi: 8). Bu dönem en az {days} farklı çalışma gününde toplam {minutes} dakika odaklanıp en az {points} puan kazanmalı ve kotanın içinde bitirmelisin. Elmas Lig’de terfi yoktur.",
+  "@leaguePromotionPolicyBody": {
+    "placeholders": {
+      "active": {
+        "type": "int"
+      },
+      "days": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      },
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "leaguePromotionCurrentQuota": "Bu odada mevcut terfi kotası: ilk {count} sıra. Gün, dakika ve puan şartları ayrıca sağlanmalıdır.",
+  "@leaguePromotionCurrentQuota": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leagueNoPromotionCurrentPeriod": "Bu odada şu an terfi için yeterli aktif katılımcı yok. Tamamladığın seanslar kaydolmaya devam eder.",
+  "leagueDemotionPolicyBody": "Düşme yalnızca en az 10 aktif kişinin bulunduğu odalarda uygulanır: sıralamanın sonundan aktif kişi sayısının üçte biri, aşağı yuvarlanarak bir alt lige düşer. Son 3 günde katılanlar ve Bronz Lig’dekiler düşmez.",
+  "leagueAwardActiveRequirements": "Resmi lig döneminde odada en az {members} aktif kişi olmalı. En az {days} farklı çalışma gününde toplam {minutes} dakika odaklanıp {points} puana ulaşman gerekir. Hazırlık döneminde ödül verilmez.",
+  "@leagueAwardActiveRequirements": {
+    "placeholders": {
+      "members": {
+        "type": "int"
+      },
+      "days": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      },
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "leaguePreparationNoChanges": "Hazırlık sırasında herkes mevcut liginde kalır; terfi, düşme ve lig avatar ödülü verilmez.",
+  "leagueLaunchPreparingShort": "Hazırlık dönemi · Terfi, düşme ve lig ödülleri henüz başlamadı."
 }

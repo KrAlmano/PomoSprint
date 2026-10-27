@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Özellikler — PomoSprint</title>
-  <meta name="description" content="PomoSprint özellikleri: 25/50 dk pomodoro zamanlayıcısı, internet yokken de çalışan seanslar, ders kategorileri ve günlük hedef, raporlar, arkadaşlarla odak, ligler ve kum saati karakterleri.">
+  <meta name="description" content="25/50 dk Pomodoro, 2/3/4 seanslık Maraton, raporlar, arkadaşlar, ligler, karakter koleksiyonu ve kişisel ayarlar. PomoSprint'in tüm özelliklerinin nasıl çalıştığını keşfet.">
   <link rel="canonical" href="https://pomosprint.app/features">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="PomoSprint">
   <meta property="og:locale" content="tr_TR">
   <meta property="og:title" content="Özellikler — PomoSprint">
-  <meta property="og:description" content="Pomodoro zamanlayıcısı, çevrimdışı seanslar, raporlar, arkadaşlarla birlikte odak, ligler ve karakter koleksiyonu.">
+  <meta property="og:description" content="Pomodoro ve Maraton, günlük/haftalık/aylık raporlar, arkadaşlarla odak, ligler ve kişisel ayarlar: tüm özellikler bir arada.">
   <meta property="og:url" content="https://pomosprint.app/features">
   <meta property="og:image" content="https://pomosprint.app/og-image.png">
   <meta property="og:image:width" content="1200">
@@ -18,7 +18,7 @@
   <meta property="og:image:alt" content="PomoSprint: kum saati logosu ve 'Odaklanmanın en keyifli hali' yazısı">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Özellikler — PomoSprint">
-  <meta name="twitter:description" content="Pomodoro zamanlayıcısı, çevrimdışı seanslar, raporlar, arkadaşlarla birlikte odak, ligler ve karakter koleksiyonu.">
+  <meta name="twitter:description" content="Pomodoro ve Maraton, günlük/haftalık/aylık raporlar, arkadaşlarla odak, ligler ve kişisel ayarlar: tüm özellikler bir arada.">
   <meta name="twitter:image" content="https://pomosprint.app/og-image.png">
   <!-- partial:head -->
   <meta name="theme-color" content="#F6F0EA">
@@ -27,7 +27,7 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="stylesheet" href="/css/fonts.css?v=20261003">
-  <link rel="stylesheet" href="/css/style.css?v=20261007a">
+  <link rel="stylesheet" href="/css/style.css?v=20261008e">
   <script src="/js/boot.js?v=20261003b"></script>
   <!-- /partial:head -->
 </head>
@@ -64,13 +64,11 @@
       </div>
     </section>
 
-    <!-- Özellikler: normal akışta alt alta; görünüme girerken metin ve telefon
-         iki yandan animasyonla süzülür (JS), telefon hafif parallax ile yüzer.
-         Video olmayan telefonlarda yer tutucu (ya da örnek görünüm) durur. -->
+    <!-- Güncel simülatör görüntüleri: sessiz kayıtlar görünürken döngüde oynar. -->
     <section class="section features-flow" id="ozellikler">
       <div class="container">
-
-        <article class="feature-row" id="zamanlayici">
+        <div class="feature-media-flow">
+        <article class="feature-row reverse" id="zamanlayici">
           <div class="feature-row-text">
             <span class="eyebrow">Odak</span>
             <h2>Zamanlayıcı &amp; Pomodoro</h2>
@@ -78,9 +76,10 @@
               25 ya da 50 dakikalık seansını seç, çalışacağın dersi işaretle ve BAŞLAT'a bas.
               3-2-1 geri sayımından sonra kum, seçtiğin dersin renginde akmaya başlar.
               Uygulamadan çıksan ya da ekranı kilitlesen de sayaç durmaz; geri döndüğünde
-              seansın kaldığı yerden sürer, süre dolunca da bildirimle haber veririz. Seans
-              bitince puanını ve 20 kum tanesini alırsın. Ayrı bir mola sayacı yok; molanı
-              sen verirsin.</p>
+              seansın kaldığı yerden sürer. İzin ve bildirim tercihin açıksa süre dolunca
+              bildirimle haber veririz. Seans
+              bitince puanını ve 20 kum tanesini alırsın. Tek seansın ardından molanı
+              kendin verirsin; Maraton'da molalar planın bir parçasıdır.</p>
             <ul>
               <li>25 dk odak 5 puan, 50 dk odak 12 puan; her seans 20 kum tanesi</li>
               <li>Seans başına bir duraklatma hakkı: kullanırsan puan %20 azalır (25 dk'da 4, 50 dk'da 9 puan); ikinci kez durdurursan seans sıfırlanır</li>
@@ -89,90 +88,122 @@
             </ul>
           </div>
           <div class="feature-row-media">
-            <div class="phone">
-              <div class="phone-screen" data-shot="timer">
-                <span class="ps-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5"/><path d="M9 2h6"/></svg></span>
-                <p>Zamanlayıcı ekranı</p>
+            <figure class="media-figure">
+              <div class="phone phone-real">
+                <div class="phone-screen phone-screen-real">
+                  <img class="shot-image" src="/videos/timer-demo-20261008d.webp" alt="Güncel Pomo ekranında kum saati, kategoriler ve 25/50 dakika seçimi" width="540" height="1170" loading="lazy" decoding="async">
+                  <video class="shot-video" data-demo-video data-src="/videos/timer-demo-20261008d.mp4" autoplay muted loop playsinline preload="none" poster="/videos/timer-demo-20261008d.webp" role="button" tabindex="0" aria-label="PomoSprint kum saati ve çalışan sayacın sessiz uygulama kaydı" aria-describedby="timer-video-caption">
+                    <a href="/screenshots/timer.webp">Pomo ekran görüntüsünü aç</a>
+                  </video>
+                </div>
               </div>
-            </div>
+              <figcaption class="media-caption" id="timer-video-caption">Gerçek uygulama kaydı · sessiz ve döngüde</figcaption>
+            </figure>
           </div>
         </article>
 
-        <article class="feature-row reverse" id="cevrimdisi">
+        <article class="feature-row" id="maraton">
           <div class="feature-row-text">
-            <span class="eyebrow">Her koşulda</span>
-            <h2>İnternet yokken de odaklan</h2>
-            <p>Kütüphanede çekmiyor mu, uçak modunda mısın? Sorun değil. Sayacın internete
-              ihtiyacı yok. Bağlantı yokken biten seans telefonunda güvenle saklanır, bağlantı
-              geri geldiğinde kendiliğinden gönderilir. Puanın ve serin o anda işlenir.</p>
+            <span class="eyebrow">Maraton</span>
+            <h2>Bir sonraki odağını şimdiden planla</h2>
+            <p>Maraton, 2, 3 ya da 4 Pomodoro'yu tek bir plana bağlar. Ana ekrandaki
+              Maraton düğmesinden seans sayını ve 25 ya da 50 dakikalık odak süreni seçersin.
+              Her tamamlanan seans ilerlemene eklenir; aralarda 5 dakikalık mola verirsin.</p>
             <ul>
-              <li>Bağlantı yokken biten seanslar telefonda saklanır</li>
-              <li>Bağlantı gelince otomatik gönderilir; bekleyen seans sayısı ekranda görünür</li>
-              <li>Seansın kaydedilmesi için başlangıcından itibaren 24 saat içinde gönderilmesi gerekir</li>
+              <li>Mola bitince 1 dakika içinde “Buradayım” diyerek sonraki seansa geç; bu sürede onay vermezsen plan sonlanır</li>
+              <li>Devam edemezsen bitmiş seansların kaydı ve normal seans puanı korunur</li>
+              <li>Planın tamamını bitirince seçtiğin süre ve seans sayısına göre ek puan kazan</li>
+              <li>25 dk'lık 2/3/4 seans için +2/+3/+5; 50 dk'lık 2/3/4 seans için +4/+6/+10 ek puan</li>
             </ul>
+            <p class="marathon-note">Maraton'u başlatmak ve moladan sonra “Buradayım” onayıyla devam etmek için internet bağlantısı gerekir.</p>
           </div>
           <div class="feature-row-media">
-            <div class="phone">
-              <div class="phone-screen" data-shot="offline">
-                <span class="ps-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 2l20 20"/><path d="M8.5 16.5a5 5 0 0 1 7 0"/><path d="M2 8.82a15 15 0 0 1 4.17-2.65"/><path d="M10.66 5c4.01-.36 8.14.9 11.34 3.76"/><path d="M16.85 11.25a10 10 0 0 1 2.22 1.68"/><path d="M5 13a10 10 0 0 1 5.24-2.76"/><path d="M12 20h.01"/></svg></span>
-                <p>Çevrimdışı seans ekranı</p>
+            <figure class="media-figure">
+              <div class="phone phone-real">
+                <div class="phone-screen phone-screen-real">
+                  <img class="shot-image" src="/videos/marathon-demo-20261008d.webp" alt="Maraton planlama penceresi: 2, 3 veya 4 seans seçimi, odak süresi ve plan ilerlemesi" width="540" height="1170" loading="lazy" decoding="async">
+                  <video class="shot-video" data-demo-video data-src="/videos/marathon-demo-20261008d.mp4" autoplay muted loop playsinline preload="none" poster="/videos/marathon-demo-20261008d.webp" role="button" tabindex="0" aria-label="Maraton planlama penceresinde seans sayısı ve odak süresi seçiminin sessiz uygulama kaydı" aria-describedby="marathon-video-caption">
+                    <a href="/screenshots/marathon.webp">Maraton ekran görüntüsünü aç</a>
+                  </video>
+                </div>
               </div>
-            </div>
-          </div>
-        </article>
-
-        <article class="feature-row" id="dersler">
-          <div class="feature-row-text">
-            <span class="eyebrow">Düzen</span>
-            <h2>Dersler ve Günlük Hedef</h2>
-            <p>Kaydolurken hangi yolculukta olduğunu (LGS, YKS, üniversite ya da iş ve kişisel
-              gelişim) seçersin; sana uygun dersler hazır gelir. Profil → Kategorileri Yönet'ten
-              yeni ders ekleyebilir, adını ve rengini değiştirebilir, sürükleyerek
-              sıralayabilirsin. Artık çalışmadığın bir dersi silmezsin, arşivlersin: ders
-              seçicide görünmez ama eski raporlarında kalır. Günde ne kadar odaklanmak
-              istediğini de belirlersin; hedefini Raporlar ekranından istediğin an
-              değiştirebilirsin.</p>
-            <ul>
-              <li>Aynı anda 8 aktif ders (Premium ile 15 — Premium yakında)</li>
-              <li>Her dersin kendi rengi; kum saati o renkte akar</li>
-              <li>Ekle, yeniden adlandır, sırala, arşivle</li>
-              <li>25 dakikadan 10 saate kadar günlük odak hedefi</li>
-            </ul>
-          </div>
-          <div class="feature-row-media">
-            <div class="phone">
-              <div class="phone-screen" data-shot="categories">
-                <span class="ps-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2H2v10l9.29 9.29a1 1 0 0 0 1.41 0l8.59-8.59a1 1 0 0 0 0-1.41Z"/><circle cx="7" cy="7" r="1.5"/></svg></span>
-                <p>Kategoriler ekranı</p>
-              </div>
-            </div>
+              <figcaption class="media-caption" id="marathon-video-caption">Maraton planlaması · sessiz ve döngüde</figcaption>
+            </figure>
           </div>
         </article>
 
         <article class="feature-row reverse" id="raporlar">
           <div class="feature-row-text">
             <span class="eyebrow">Takip</span>
-            <h2>Raporlar</h2>
-            <p>Ne kadar çalıştığını hissetmek başka, görmek başka. PomoSprint her seansını
-              kaydeder ve üç sekmede önüne serer. Günlük Çalışma'da bugünkü ders dağılımını ve
-              günlük hedefine ne kadar yaklaştığını görürsün. Haftalık Çalışma'da son 7 günü,
-              en verimli gününü ve en çok çalıştığın dersleri bulursun. Aylık Takip'te ayın
-              yoğunluk takvimi ve geçen aya göre değişimin var. Gelişimin artık tahmin değil,
-              veri.</p>
+            <h2>Bugünkü emeğini gör</h2>
+            <p>Günlük Çalışma'da tamamladığın seansları, bugünkü odak süreni ve
+              kategorilere ayırdığın zamanı bir arada görürsün. Günlük hedefine ne kadar
+              yaklaştığını takip eder, hedefini aynı ekrandan değiştirebilirsin.</p>
             <ul>
-              <li>Günlük, haftalık ve aylık raporlar</li>
-              <li>Ders bazında süre ve yüzde dağılımı</li>
-              <li>Düzenlenebilir günlük hedef; haftalık hedef kendiliğinden hesaplanır</li>
-              <li>Aylık yoğunluk takvimi ve gün gün döküm</li>
+              <li>Kategorilere göre süre ve yüzde dağılımı</li>
+              <li>Düzenlenebilir günlük odak hedefi</li>
+              <li>Haftalık ve aylık görünümle daha geniş bir dönemi takip et</li>
             </ul>
           </div>
           <div class="feature-row-media">
-            <div class="phone">
-              <div class="phone-screen" data-shot="reports">
-                <span class="ps-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 16v-4"/><path d="M12 16V8"/><path d="M17 16v-6"/></svg></span>
-                <p>Raporlar ekranı (Günlük · Haftalık · Aylık)</p>
+            <figure class="media-figure">
+              <div class="phone phone-real">
+                <div class="phone-screen phone-screen-real">
+                  <img class="shot-image" src="/screenshots/reports.webp" alt="Günlük raporda toplam odak süresi, hedef ve kategorilerin çalışma dağılımı" width="540" height="1170" loading="lazy" decoding="async">
+                </div>
               </div>
-            </div>
+              <figcaption class="media-caption">Günlük çalışma raporu</figcaption>
+            </figure>
+          </div>
+        </article>
+
+        <article class="feature-row" id="haftalik">
+          <div class="feature-row-text">
+            <span class="eyebrow">Haftalık çalışma</span>
+            <h2>Haftanı bir bakışta gör</h2>
+            <p>Pazartesiden pazara çalışma düzenini takip et. Günlere göre odak süreni,
+              en verimli gününü ve en çok çalıştığın kategorileri görerek haftanın nasıl
+              geçtiğini daha kolay anlarsın.</p>
+            <ul>
+              <li>Günlere göre çalışma grafiği ve haftalık toplam süre</li>
+              <li>Kategorilere göre çalışma dağılımı</li>
+              <li>Günlük hedefine göre kendiliğinden hesaplanan haftalık hedef</li>
+            </ul>
+          </div>
+          <div class="feature-row-media">
+            <figure class="media-figure">
+              <div class="phone phone-real">
+                <div class="phone-screen phone-screen-real">
+                  <img class="shot-image" src="/screenshots/weekly.webp" alt="Haftalık rapor: günlere göre çalışma grafiği, toplam odak süresi ve kategori dağılımı" width="540" height="1170" loading="lazy" decoding="async">
+                </div>
+              </div>
+              <figcaption class="media-caption">Pazartesi–Pazar haftasındaki çalışma düzenin</figcaption>
+            </figure>
+          </div>
+        </article>
+
+        <article class="feature-row reverse" id="aylik">
+          <div class="feature-row-text">
+            <span class="eyebrow">Aylık takip</span>
+            <h2>Gelişimini gün gün izle</h2>
+            <p>Yoğunluk takvimi, ay boyunca çalıştığın günleri bir araya getirir.
+              Gün gün dökümden odak sürelerini, aylık toplamdan biriken emeğini ve
+              önceki aya göre değişimini görürsün.</p>
+            <ul>
+              <li>Aylık çalışma yoğunluğu takvimi</li>
+              <li>Günlere göre kaydedilen odak süreleri</li>
+              <li>Önceki ayla çalışma süresi karşılaştırması</li>
+            </ul>
+          </div>
+          <div class="feature-row-media">
+            <figure class="media-figure">
+              <div class="phone phone-real">
+                <div class="phone-screen phone-screen-real">
+                  <img class="shot-image" src="/screenshots/monthly.webp" alt="Aylık rapor: çalışma yoğunluğu takvimi ve günlere göre kaydedilen odak süreleri" width="540" height="1170" loading="lazy" decoding="async">
+                </div>
+              </div>
+              <figcaption class="media-caption">Ay boyunca odaklandığın günler ve süreleri</figcaption>
+            </figure>
           </div>
         </article>
 
@@ -183,59 +214,26 @@
             <p>Arkadaşlarınla yan yana çalışmanın motivasyonunu bilirsin — PomoSprint o hissi
               cebine taşıyor. Ekranın üstündeki arkadaş simgesine dokun. Kendi arkadaşlık kodunu
               paylaş ya da arkadaşının kodunu (ör. A1B2C3) girip istek gönder; o kabul edince
-              arkadaş olursunuz. Sosyal sekmesindeki “Şu An Çalışanlar” listesinde o an
-              odaklanan arkadaşlarını ve hangi derse çalıştıklarını görürsün. Kimse konuşmaz,
+              arkadaş olursunuz. Sosyal sekmesindeki “Arkadaşların” listesinde o an
+              odaklanan arkadaşlarının durumunu görürsün. Kimse konuşmaz,
               ama herkes oradadır.</p>
             <ul>
               <li>Arkadaşlık koduyla istek gönder; gelen istekleri kabul et ya da reddet</li>
-              <li>Şu an çalışan arkadaşlarını ve derslerini canlı gör</li>
+              <li>Arkadaşlarının “Odaklanıyor” durumunu kırmızı noktayla gör</li>
+              <li>Maraton molasına çıkan arkadaşın “Molada” durumunda yeşil noktayla görünür</li>
               <li>Sıralama → Arkadaşlar sekmesinde toplam puanlarınızı karşılaştır</li>
-              <li>Görünmek istemezsen Profil'den “Sosyal Listede Görün”ü kapat</li>
+              <li>Görünmek istemezsen Profil'den “Sıralamalarda ve canlı listede görün”ü kapat</li>
             </ul>
           </div>
           <div class="feature-row-media">
-            <div class="phone">
-              <!-- Video gelene kadar HTML/CSS ile çizilmiş örnek görünüm (gerçek veri değil) -->
-              <div class="phone-screen phone-mock" data-shot="friends">
-                <div class="mock" role="img" aria-label="Örnek görünüm: Sosyal sekmesinde Şu An Çalışanlar listesi (üç arkadaş ve çalıştıkları dersler), bir gelen arkadaşlık isteği ve arkadaşlık kodu">
-                  <p class="mock-title" aria-hidden="true">Sosyal</p>
-                  <div class="mock-card" aria-hidden="true">
-                    <p class="mock-label"><span class="mock-live"></span>Şu An Çalışanlar</p>
-                    <ul class="mock-list">
-                      <li>
-                        <img src="/avatars/avatar_3_gentleman.webp" alt="" width="36" height="36" loading="lazy">
-                        <span class="mock-name">Can</span>
-                        <span class="mock-chip mc-blue">Matematik</span>
-                      </li>
-                      <li>
-                        <img src="/avatars/avatar_5_flower.webp" alt="" width="36" height="36" loading="lazy">
-                        <span class="mock-name">Elif</span>
-                        <span class="mock-chip mc-green">Biyoloji</span>
-                      </li>
-                      <li>
-                        <img src="/avatars/avatar_14_teacher.webp" alt="" width="36" height="36" loading="lazy">
-                        <span class="mock-name">Deniz</span>
-                        <span class="mock-chip mc-purple">İngilizce</span>
-                      </li>
-                    </ul>
-                  </div>
-                  <div class="mock-card" aria-hidden="true">
-                    <p class="mock-label">Gelen İstekler (1)</p>
-                    <div class="mock-request">
-                      <img src="/avatars/avatar_7_scholar.webp" alt="" width="36" height="36" loading="lazy">
-                      <span class="mock-name">Zeynep</span>
-                      <span class="mock-btn mb-yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>
-                      <span class="mock-btn mb-no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></svg></span>
-                    </div>
-                  </div>
-                  <div class="mock-code" aria-hidden="true">
-                    <span>Arkadaşlık kodun</span>
-                    <strong>A1B2C3</strong>
-                  </div>
-                  <p class="mock-note" aria-hidden="true">Örnek görünüm</p>
+            <figure class="media-figure">
+              <div class="phone phone-real">
+                <div class="phone-screen phone-screen-real">
+                  <img class="shot-image" src="/screenshots/social.webp" alt="Arkadaşların ekranı: Mert Molada olarak yeşil noktayla, Ece Odaklanıyor olarak kırmızı noktayla görünüyor" width="540" height="1170" loading="lazy" decoding="async">
                 </div>
               </div>
-            </div>
+              <figcaption class="media-caption">Arkadaşlarınla aynı anda odaklan</figcaption>
+            </figure>
           </div>
         </article>
 
@@ -243,12 +241,18 @@
           <div class="feature-row-text">
             <span class="eyebrow">Rekabet</span>
             <h2>Lig Sistemi</h2>
-            <p>Bu dönemki ilk seansını tamamladığında, aynı ligdeki en fazla 30 kişilik bir odaya
-              yerleşirsin. 14 günlük dönem boyunca topladığın puanla sıralamada yükselirsin.
-              Dönem sonunda puan toplamış üst sıralar bir üst lige çıkar, alt sıralar bir alt
-              lige düşer; Bronz'da ve 10 kişiden küçük odalarda düşme yoktur. Dönemi ilk 3'te
-              bitirenler, o lige özel ödül karakterini kazanır. Bronz'dan Elmas'a beş kademe
-              var — hangisine kadar çıkacaksın?</p>
+            <p>İlk puanlı seansını tamamladığında, kendi kademendeki en fazla 25 kişilik uygun
+              mevcut odaya yerleşirsin; oda doluysa yenisi açılır. Başlangıçta hazırlık dönemi
+              vardır: puan ve raporların kaydedilir, terfi, düşme ve lig ödülleri bekler.
+              Son 14 günde seans tamamlayan 25 farklı kullanıcıya ulaşınca sıradaki tam
+              14 günlük lig dönemiyle resmî rekabet başlar.</p>
+            <p>Odanda en az 3 aktif kişi varsa aktif kişi sayısının üçte biri kadar terfi yeri
+              açılır; sayı aşağı yuvarlanır. Terfi için bu dönemde en az 3 ayrı çalışma gününde
+              toplam 300 dakika odaklanmış ve terfi sırasına girmiş olman gerekir.
+              En az 10 aktif kişinin olduğu odalarda aynı çalışma şartını sağlayan ilk 3,
+              lig ödülü kazanır: 1.'ye Şampiyonluk, 2. ve 3.'ye Podyum karakteri.
+              Düşme yalnızca en az 10 aktif kişili odalarda alt sıralar içindir; Bronz'da
+              düşme yoktur. Dönemin son 3 gününde katılanlar o dönem düşmez.</p>
             <div class="tier-chips" role="list" aria-label="Lig kademeleri, en alttan en üste">
               <span class="tier-chip" role="listitem"><img src="/avatars/league_bronze_weekly.webp" alt="" width="24" height="24" loading="lazy">Bronz</span>
               <span class="tier-chip" role="listitem"><img src="/avatars/league_silver_weekly.webp" alt="" width="24" height="24" loading="lazy">Gümüş</span>
@@ -263,38 +267,112 @@
             </ul>
           </div>
           <div class="feature-row-media">
-            <div class="phone">
-              <div class="phone-screen" data-shot="leaderboard">
-                <span class="ps-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg></span>
-                <p>Sıralama ekranı (Lig · Aylık · Arkadaşlar)</p>
+            <figure class="media-figure">
+              <div class="phone phone-real">
+                <div class="phone-screen phone-screen-real">
+                  <img class="shot-image" src="/screenshots/ranking.webp" alt="Sıralama ekranı: Arkadaşlar sekmesinde örnek arkadaşların puan sıralaması ve Lig, Aylık, Arkadaşlar sekmeleri" width="540" height="1170" loading="lazy" decoding="async">
+                </div>
               </div>
-            </div>
+              <figcaption class="media-caption">Arkadaşlarınla toplam puanlarını karşılaştır</figcaption>
+            </figure>
           </div>
         </article>
-
-        <article class="feature-row" id="dil">
-          <div class="feature-row-text">
-            <span class="eyebrow">Ayarlar</span>
-            <h2>Türkçe ve İngilizce</h2>
-            <p>PomoSprint Türkçe ve İngilizce arayüzle geliyor. Uygulama Türkçe açılır; dili
-              Profil → Uygulama Dili'nden tek dokunuşla değiştirebilirsin. Karanlık modu ve
-              seans bildirimlerini de aynı ekrandan açıp kapatırsın.</p>
-            <ul>
-              <li>Türkçe ve İngilizce arayüz</li>
-              <li>Dili Profil'den tek dokunuşla değiştir</li>
-              <li>Karanlık mod ve bildirim ayarı aynı ekranda</li>
-            </ul>
+        </div>
+        <section class="feature-support" aria-labelledby="support-heading">
+          <div class="feature-support-heading" data-reveal>
+            <span class="eyebrow">Sana uyum sağlar</span>
+            <h2 id="support-heading">Odak düzenini kendine göre kur</h2>
           </div>
-          <div class="feature-row-media">
-            <div class="phone">
-              <div class="phone-screen" data-shot="languages">
-                <span class="ps-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>
-                <p>Dil ve ayarlar ekranı</p>
+          <div class="support-grid" data-reveal-group>
+            <article class="support-card" id="cevrimdisi">
+              <div class="feature-row-text">
+                <span class="eyebrow">Her koşulda</span>
+                <h3>İnternet yokken de odaklan</h3>
+                <p>Tek Pomodoro'nun sayacı internetsiz de çalışır. Bağlantı yokken biten
+                  seans telefonunda saklanır; bağlantı geri geldiğinde kendiliğinden
+                  gönderilir. Puanın ve serin sunucuya kaydedildiğinde işlenir.</p>
+                <ul>
+                  <li>Bekleyen seans sayısı ekranda görünür</li>
+                  <li>Seans, başlangıcından itibaren 24 saat içinde gönderilmelidir</li>
+                  <li>Maraton'u başlatmak ve mola sonrası onay vermek için internet gerekir</li>
+                </ul>
               </div>
-            </div>
-          </div>
-        </article>
+            </article>
 
+            <article class="support-card" id="dersler">
+              <div class="feature-row-text">
+                <span class="eyebrow">Düzen</span>
+                <h3>Dersler ve Günlük Hedef</h3>
+                <p>İlk kurulumda LGS, YKS, üniversite veya iş ve kişisel gelişim yolunu
+                  seçersin; uygun kategoriler hazır gelir. Profil'den kategorilerini
+                  yönetir, Raporlar'dan günlük hedefini değiştirirsin.</p>
+                <ul>
+                  <li>Aynı anda en fazla 8 aktif kategori</li>
+                  <li>Adını ve rengini değiştir, sırala veya arşivle; geçmiş raporlar korunur</li>
+                  <li>25 dakikadan 10 saate kadar günlük odak hedefi</li>
+                </ul>
+              </div>
+            </article>
+
+            <article class="support-card" id="dil">
+              <div class="feature-row-text">
+                <span class="eyebrow">Görünüm</span>
+                <h3>Dil ve Tema</h3>
+                <p>Cihazın dili Türkçeyse Türkçe, diğer dillerde İngilizce açılır.
+                  Profil'den dili ve temayı istediğin zaman değiştirirsin.</p>
+                <ul>
+                  <li>Türkçe ve İngilizce arayüz</li>
+                  <li>İlk açılışta cihazın teması kullanılır; Profil'den açık/koyu görünümü seç</li>
+                  <li>Yatay odak görünümünde animasyon, sayaç ve seans kontrolleri kalır</li>
+                </ul>
+              </div>
+            </article>
+
+            <article class="support-card" id="bildirimler">
+              <div class="feature-row-text">
+                <span class="eyebrow">Hatırlatıcı</span>
+                <h3>Bildirimler ve Kilit Ekranı</h3>
+                <p>İlk seansı başlatırken bildirim izni istenir. İzin verirsen seans
+                  bittiğinde haber alırsın; bildirim tercihini Profil'den yönetirsin.</p>
+                <ul>
+                  <li>Android'de süren seans bildirimi, destekleyen iPhone'larda Canlı Etkinlik sayacı</li>
+                  <li>Maraton mola bitiş bildiriminde 1 dakika içinde “Buradayım” onayı hatırlatılır</li>
+                  <li>İzin reddedilmişse Profil'deki bağlantıdan sistem ayarlarına geç</li>
+                </ul>
+              </div>
+            </article>
+
+            <article class="support-card" id="hesap">
+              <div class="feature-row-text">
+                <span class="eyebrow">Senin hesabın</span>
+                <h3>Profil ve Hesap</h3>
+                <p>Kullanıcı adını, kuşandığın karakteri ve kişisel tercihlerini
+                  Profil'den düzenle. Tamamlanan seansların hesabına kaydedilir;
+                  aynı hesapla giriş yaptığında raporlarına yeniden ulaşırsın.</p>
+                <ul>
+                  <li>Şifreni unuttuğunda e-posta adresinle sıfırlama bağlantısı iste</li>
+                  <li>E-posta/şifre hesabında Profil'den şifreni değiştir; hesabını silme seçeneği de burada</li>
+                  <li>Gizlilik, kullanım şartları ve destek bağlantılarına uygulamadan ulaş</li>
+                </ul>
+              </div>
+            </article>
+
+            <article class="support-card" id="gizlilik">
+              <div class="feature-row-text">
+                <span class="eyebrow">Kontrol sende</span>
+                <h3>Sosyal Görünürlük ve Güvenlik</h3>
+                <p>Arkadaşlık isteklerini yönetir, aylık sıralamada ve canlı listede
+                  görünüp görünmeyeceğini belirlersin. Bu tercih lig odanı ve arkadaş
+                  listeni gizlemez.</p>
+                <ul>
+                  <li>Profil'den sosyal görünürlüğünü aç veya kapat</li>
+                  <li>İstemediğin kullanıcıyı gizle, engelle ya da uygulama içinden bildir</li>
+                  <li>Gizlenen kullanıcıları ve engelleri daha sonra yönet</li>
+                </ul>
+              </div>
+            </article>
+          </div>
+        </section>
       </div>
     </section>
 
@@ -306,27 +384,26 @@
           <span class="eyebrow">Koleksiyon</span>
           <h2>Kum tanelerini karakterlere dönüştür</h2>
           <p>Her tamamlanan seans 20 kum tanesi kazandırır. Yedi kum saati karakteri baştan açık
-            gelir; dört karakteri 200'er kum tanesiyle açarsın (yaklaşık 10 seans). Lig dönemini
-            puan toplayarak ilk 3'te bitirenler, o lige özel ödül karakterini kazanır; bu
-            karakterler satın alınamaz. Premium etiketli beş karakter ise Premium kullanıma
-            açıldığında gelecek.</p>
+            gelir; dört karakteri 200'er kum tanesiyle açarsın (yaklaşık 10 seans). Resmî lig döneminde
+            en az 10 aktif kişili bir odada, en az 3 ayrı çalışma gününde toplam 300 dakika
+            odaklanıp ilk 3'e girenler lig ödülü kazanır; bu karakterler satın alınamaz.</p>
         </div>
         <div class="hg-orbit" data-reveal aria-hidden="true">
           <div class="orbit-ring"></div>
           <div class="orbit-track ot-a1">
-            <img class="orbit-avatar" src="/avatars/avatar_6_cool.webp" alt="" width="56" height="56">
+            <img class="orbit-avatar" src="/avatars/league_bronze_monthly.webp" alt="" width="56" height="56" loading="lazy" decoding="async">
           </div>
           <div class="orbit-track ot-a2">
-            <img class="orbit-avatar" src="/avatars/avatar_9_viking.webp" alt="" width="56" height="56">
+            <img class="orbit-avatar" src="/avatars/league_silver_monthly.webp" alt="" width="56" height="56" loading="lazy" decoding="async">
           </div>
           <div class="orbit-track ot-a3">
-            <img class="orbit-avatar" src="/avatars/league_gold_weekly.webp" alt="" width="56" height="56">
+            <img class="orbit-avatar" src="/avatars/league_gold_monthly.webp" alt="" width="56" height="56" loading="lazy" decoding="async">
           </div>
-          <div class="orbit-track rev ot-d1">
-            <span class="orbit-dot od-1"></span>
+          <div class="orbit-track ot-a4">
+            <img class="orbit-avatar" src="/avatars/league_sapphire_monthly.webp" alt="" width="56" height="56" loading="lazy" decoding="async">
           </div>
-          <div class="orbit-track rev ot-d2">
-            <span class="orbit-dot od-2"></span>
+          <div class="orbit-track ot-a5">
+            <img class="orbit-avatar" src="/avatars/league_diamond_monthly.webp" alt="" width="56" height="56" loading="lazy" decoding="async">
           </div>
           <div class="orbit-hg">
             <svg viewBox="0 0 220 300">
@@ -414,7 +491,7 @@
   <!-- partial:scripts -->
   <script src="/vendor/gsap-3.13.0/gsap.min.js" integrity="sha384-HOvlOYPIs/zjoIkWUGXkVmXsjr8GuZLV+Q+rcPwmJOVZVpvTSXQChiN4t9Euv9Vc" defer></script>
   <script src="/vendor/gsap-3.13.0/ScrollTrigger.min.js" integrity="sha384-P8VzCVnT9NBUkMrpcIZrJbA7EBjJvh/fJS6PmP+4nLIM284DtsImIv8D0fFjIkeh" defer></script>
-  <script src="/js/main.js?v=20261007a" defer></script>
+  <script src="/js/main.js?v=20261008d" defer></script>
   <!-- /partial:scripts -->
 </body>
 </html>

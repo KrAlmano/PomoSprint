@@ -4,24 +4,30 @@ import 'package:flutter/material.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../models/avatar_model.dart';
-import '../../models/league_rules.dart';
 import '../../theme.dart';
 import '../../utils/responsive.dart';
 import '../avatar_widget.dart';
 import 'countdown_text.dart';
-import 'league_rule_texts.dart';
 import 'ranking_models.dart';
 import 'user_safety.dart';
 
-Color _muted(bool isDark) => isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant;
+Color _muted(bool isDark) =>
+    isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant;
 
 /// Lig/aylık sekmesindeki başlık ve geri sayım kartı.
 class RankingCountdownBanner extends StatelessWidget {
   final String title;
   final DateTime? target;
+  final String? message;
   final VoidCallback? onHelp;
 
-  const RankingCountdownBanner({super.key, required this.title, this.target, this.onHelp});
+  const RankingCountdownBanner({
+    super.key,
+    required this.title,
+    this.target,
+    this.message,
+    this.onHelp,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,11 +37,19 @@ class RankingCountdownBanner extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurfaceContainerLowest : AppColors.surfaceContainerLowest,
+        color: isDark
+            ? AppColors.darkSurfaceContainerLowest
+            : AppColors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.primaryContainer.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: AppColors.primaryContainer.withValues(alpha: 0.3),
+        ),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 8, offset: const Offset(0, 2)),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
         ],
       ),
       child: Row(
@@ -46,7 +60,11 @@ class RankingCountdownBanner extends StatelessWidget {
               color: AppColors.primaryContainer.withValues(alpha: 0.15),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.timer_outlined, color: AppColors.primaryContainer, size: 22),
+            child: const Icon(
+              Icons.timer_outlined,
+              color: AppColors.primaryContainer,
+              size: 22,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -55,8 +73,23 @@ class RankingCountdownBanner extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: _muted(isDark)),
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: _muted(isDark),
+                  ),
                 ),
+                if (message != null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    message!,
+                    style: TextStyle(
+                      fontSize: 13,
+                      height: 1.4,
+                      color: _muted(isDark),
+                    ),
+                  ),
+                ],
                 if (target != null) ...[
                   const SizedBox(height: 2),
                   CountdownText(
@@ -78,7 +111,9 @@ class RankingCountdownBanner extends StatelessWidget {
               tooltip: l10n.leagueInfoTitle,
               visualDensity: VisualDensity.compact,
               style: IconButton.styleFrom(
-                backgroundColor: AppColors.primaryContainer.withValues(alpha: 0.15),
+                backgroundColor: AppColors.primaryContainer.withValues(
+                  alpha: 0.15,
+                ),
               ),
               icon: Icon(
                 Icons.question_mark_rounded,
@@ -98,82 +133,6 @@ const Color kPromotionZoneColor = Color(0xFF2E7D32);
 /// Düşme bölgesi rengi.
 const Color kDemotionZoneColor = Color(0xFFC62828);
 
-/// Kullanıcının listedeki yeri. Liste ezilmez; bu ayrı bir göstergedir.
-/// Lig sekmesinde [zone] verilirse dönem sonu durumu da yazılır.
-class MyRankCard extends StatelessWidget {
-  final int rank;
-  final int points;
-  final LeagueZone? zone;
-
-  /// Lig kuralı (terfi için gereken puan metni; bugünkü kural: 0 puanla terfi yok).
-  final LeagueRules rules;
-
-  const MyRankCard({
-    super.key,
-    required this.rank,
-    required this.points,
-    this.zone,
-    this.rules = LeagueRules.standard,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final (String? zoneText, Color zoneColor, IconData zoneIcon) = switch (zone) {
-      LeagueZone.promotion => (l10n.rankingZonePromotionMe, kPromotionZoneColor, Icons.arrow_upward_rounded),
-      LeagueZone.promotionNeedsPoints => (promotionNeedsPointsText(l10n, rules), Colors.orange.shade800, Icons.info_outline),
-      LeagueZone.demotion => (l10n.rankingZoneDemotionMe, kDemotionZoneColor, Icons.arrow_downward_rounded),
-      _ => (null, AppColors.primary, Icons.info_outline),
-    };
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: BoxDecoration(
-        color: AppColors.primaryContainer.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              // Koyu temada darkPrimary (okunur kontrast).
-              Icon(Icons.person_pin_circle_rounded, color: Theme.of(context).colorScheme.primary, size: 20),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  l10n.rankingMyStatus(rank, points),
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          if (zoneText != null) ...[
-            const SizedBox(height: 6),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(zoneIcon, color: zoneColor, size: 18),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    zoneText,
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: zoneColor, height: 1.3),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
 /// Boş liste kartı.
 class RankingEmptyView extends StatelessWidget {
   const RankingEmptyView({super.key});
@@ -186,7 +145,9 @@ class RankingEmptyView extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurfaceContainerLowest : AppColors.surfaceContainerLowest,
+        color: isDark
+            ? AppColors.darkSurfaceContainerLowest
+            : AppColors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -224,26 +185,34 @@ class LeaguePlacementView extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurfaceContainerLowest : AppColors.surfaceContainerLowest,
+        color: isDark
+            ? AppColors.darkSurfaceContainerLowest
+            : AppColors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            alone ? Icons.person_outline_rounded : Icons.hourglass_empty_rounded,
+            alone
+                ? Icons.person_outline_rounded
+                : Icons.hourglass_empty_rounded,
             size: 48,
             color: AppColors.primaryContainer,
           ),
           const SizedBox(height: 12),
           Text(
-            alone ? l10n.leagueAloneInRoomTitle : l10n.leagueAwaitingPlacementTitle,
+            alone
+                ? l10n.leagueAloneInRoomTitle
+                : l10n.leagueAwaitingPlacementTitle,
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
-            alone ? l10n.leagueAloneInRoomBody : l10n.leagueAwaitingPlacementBody,
+            alone
+                ? l10n.leagueAloneInRoomBody
+                : l10n.leagueAwaitingPlacementBody,
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 14, height: 1.4, color: _muted(isDark)),
           ),
@@ -301,37 +270,35 @@ class RankingStandings extends StatelessWidget {
     final league = this.league;
     // Lig-yok satırı: sahte "#1" podyumu gösterilmez. Odasında yalnız ve
     // puansız kullanıcıya "henüz odada değilsin" denmez (t4-F6).
-    if (league != null && league.awaitingPlacement) return const ContentWidth(child: LeaguePlacementView());
+    if (league != null && league.awaitingPlacement) {
+      return const ContentWidth(child: LeaguePlacementView());
+    }
     if (league != null && league.isAloneInRoom && league.myPoints <= 0) {
       return const ContentWidth(child: LeaguePlacementView(alone: true));
     }
     if (entries.isEmpty) return const ContentWidth(child: RankingEmptyView());
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final myIndex = entries.indexWhere((e) => e.isMe);
 
     // Terfi/düşme bölgesi podyum dahil her sıra için aynı kuralla gösterilir.
-    LeagueZone zoneOf(RankingEntry entry, int rank) => league?.zoneOf(rank, entry.points) ?? LeagueZone.none;
+    LeagueZone zoneOf(RankingEntry entry, int rank) =>
+        league?.zoneOf(rank, entry.points, entry: entry) ?? LeagueZone.none;
 
-    Color? zoneColor(RankingEntry entry, int rank) => switch (zoneOf(entry, rank)) {
+    Color? zoneColor(RankingEntry entry, int rank) =>
+        switch (zoneOf(entry, rank)) {
           LeagueZone.promotion => Colors.green.withValues(alpha: 0.15),
           LeagueZone.demotion => Colors.red.withValues(alpha: 0.15),
           _ => null,
         };
 
-    final myRank = myIndex == -1
-        ? null
-        : MyRankCard(
-            rank: myIndex + 1,
-            points: entries[myIndex].points,
-            zone: league == null ? null : zoneOf(entries[myIndex], myIndex + 1),
-            rules: league?.rules ?? LeagueRules.standard,
-          );
     final podium = RankingPodium(
       top: entries.take(3).toList(),
       zoneOf: league == null ? null : zoneOf,
       // Lig sekmesinde madalya dönem sonu ödülünün kuralıyla (proposed/20).
-      showMedal: league == null ? null : (entry, rank) => league.earnsAward(rank, entry.points),
+      showMedal: league == null
+          ? null
+          : (entry, rank) =>
+                league.earnsAward(rank, entry.points, entry: entry),
       compact: compact,
       actionsFor: onEntryActions == null ? null : _actionsFor,
     );
@@ -340,10 +307,16 @@ class RankingStandings extends StatelessWidget {
         : Container(
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
-              color: isDark ? AppColors.darkSurfaceContainerLowest : AppColors.surfaceContainerLowest,
+              color: isDark
+                  ? AppColors.darkSurfaceContainerLowest
+                  : AppColors.surfaceContainerLowest,
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
-                BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2)),
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
               ],
             ),
             child: Column(
@@ -352,7 +325,9 @@ class RankingStandings extends StatelessWidget {
                   if (i > 3)
                     Divider(
                       height: 1,
-                      color: isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow,
+                      color: isDark
+                          ? AppColors.darkSurfaceContainerLow
+                          : AppColors.surfaceContainerLow,
                     ),
                   RankingRow(
                     entry: entries[i],
@@ -368,22 +343,21 @@ class RankingStandings extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
-        if (list == null || width < (compact ? compactSplitMinWidth : splitMinWidth)) {
+        if (list == null ||
+            width < (compact ? compactSplitMinWidth : splitMinWidth)) {
           return ContentWidth(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (myRank != null) ...[myRank, const SizedBox(height: 12)],
-                podium,
-                const SizedBox(height: 20),
-                ?list,
-              ],
+              children: [podium, const SizedBox(height: 20), ?list],
             ),
           );
         }
         // Sol sütun podyumun tam (ya da küçük) boyuna yetecek kadar geniş
         // tutulur; kalan alan listeye kalır.
-        final leftWidth = math.max(compact ? 280.0 : 360.0, (width - _gap) * 0.42);
+        final leftWidth = math.max(
+          compact ? 280.0 : 360.0,
+          (width - _gap) * 0.42,
+        );
         return Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -391,10 +365,7 @@ class RankingStandings extends StatelessWidget {
               width: leftWidth,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (myRank != null) ...[myRank, const SizedBox(height: 12)],
-                  podium,
-                ],
+                children: [podium],
               ),
             ),
             const SizedBox(width: _gap),
@@ -454,24 +425,34 @@ class RankingPodium extends StatelessWidget {
         // Koltuklar Flexible: metin ölçeği büyüse ya da alan daralsa da satır
         // taşmaz; sığdığında yerleşim eskisiyle aynıdır (spaceEvenly).
         Widget seat(int index) => Flexible(
-              child: _PodiumSeat(
-                entry: top[index],
-                rank: index + 1,
-                zone: zoneOf?.call(top[index], index + 1),
-                medal: showMedal?.call(top[index], index + 1) ?? top[index].points > 0,
-                scale: scale,
-                onActions: actionsFor?.call(top[index]),
-              ),
-            );
+          child: _PodiumSeat(
+            entry: top[index],
+            rank: index + 1,
+            zone: zoneOf?.call(top[index], index + 1),
+            medal:
+                showMedal?.call(top[index], index + 1) ?? top[index].points > 0,
+            scale: scale,
+            onActions: actionsFor?.call(top[index]),
+          ),
+        );
         final placeholder = SizedBox(width: 80 * scale);
         return Container(
           width: double.infinity,
-          padding: EdgeInsets.symmetric(vertical: small ? 12 : 20, horizontal: _horizontalPadding),
+          padding: EdgeInsets.symmetric(
+            vertical: small ? 12 : 20,
+            horizontal: _horizontalPadding,
+          ),
           decoration: BoxDecoration(
-            color: isDark ? AppColors.darkSurfaceContainerLowest : AppColors.surfaceContainerLowest,
+            color: isDark
+                ? AppColors.darkSurfaceContainerLowest
+                : AppColors.surfaceContainerLowest,
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
-              BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 4)),
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
             ],
           ),
           child: Row(
@@ -497,13 +478,42 @@ class _PodiumStyle {
   final Color badgeText;
   final IconData badgeIcon;
 
-  const _PodiumStyle(this.avatarSize, this.medalSize, this.medal, this.ring, this.badgeText, this.badgeIcon);
+  const _PodiumStyle(
+    this.avatarSize,
+    this.medalSize,
+    this.medal,
+    this.ring,
+    this.badgeText,
+    this.badgeIcon,
+  );
 
-  static const gold = _PodiumStyle(96, 36, Color(0xFFFFD700), [Color(0xFFFFD700), Color(0xFFFFA500)], Colors.black, Icons.workspace_premium);
-  static const silver = _PodiumStyle(76, 30, Color(0xFFC0C0C0), [Color(0xFFE0E0E0), Color(0xFF9E9E9E)], Colors.black87, Icons.looks_two_rounded);
-  static const bronze = _PodiumStyle(60, 26, Color(0xFFCD7F32), [Color(0xFFD7CCC8), Color(0xFF8D6E63)], Colors.white, Icons.looks_3_rounded);
+  static const gold = _PodiumStyle(
+    96,
+    36,
+    Color(0xFFFFD700),
+    [Color(0xFFFFD700), Color(0xFFFFA500)],
+    Colors.black,
+    Icons.workspace_premium,
+  );
+  static const silver = _PodiumStyle(
+    76,
+    30,
+    Color(0xFFC0C0C0),
+    [Color(0xFFE0E0E0), Color(0xFF9E9E9E)],
+    Colors.black87,
+    Icons.looks_two_rounded,
+  );
+  static const bronze = _PodiumStyle(
+    60,
+    26,
+    Color(0xFFCD7F32),
+    [Color(0xFFD7CCC8), Color(0xFF8D6E63)],
+    Colors.white,
+    Icons.looks_3_rounded,
+  );
 
-  static _PodiumStyle forRank(int rank) => rank == 1 ? gold : (rank == 2 ? silver : bronze);
+  static _PodiumStyle forRank(int rank) =>
+      rank == 1 ? gold : (rank == 2 ? silver : bronze);
 }
 
 class _PodiumSeat extends StatelessWidget {
@@ -558,9 +568,14 @@ class _PodiumSeat extends StatelessWidget {
           children: [
             Container(
               padding: EdgeInsets.all(rank == 1 ? 4 : 3),
-              decoration: BoxDecoration(shape: BoxShape.circle, gradient: LinearGradient(colors: style.ring)),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(colors: style.ring),
+              ),
               child: AvatarWidget(
-                avatar: AvatarCharacter.byId(entry.hidden ? null : entry.avatarId),
+                avatar: AvatarCharacter.byId(
+                  entry.hidden ? null : entry.avatarId,
+                ),
                 size: style.avatarSize * scale,
               ),
             ),
@@ -574,11 +589,20 @@ class _PodiumSeat extends StatelessWidget {
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: style.medal,
                       borderRadius: BorderRadius.circular(12),
-                      boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2))],
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -587,7 +611,11 @@ class _PodiumSeat extends StatelessWidget {
                         const SizedBox(width: 2),
                         Text(
                           '#$rank',
-                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: style.badgeText),
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: style.badgeText,
+                          ),
                         ),
                       ],
                     ),
@@ -601,31 +629,41 @@ class _PodiumSeat extends StatelessWidget {
         SizedBox(
           width: small ? 80 : 90,
           child: Text(
-            entry.hidden ? l10n.hiddenUserLabel : (entry.name ?? l10n.userDefault),
+            entry.hidden
+                ? l10n.hiddenUserLabel
+                : (entry.name ?? l10n.userDefault),
             textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: rank == 1 ? 15 : 13,
-              fontWeight: rank == 1 || entry.isMe ? FontWeight.bold : FontWeight.w600,
+              fontWeight: rank == 1 || entry.isMe
+                  ? FontWeight.bold
+                  : FontWeight.w600,
               fontStyle: entry.hidden ? FontStyle.italic : null,
-              color: entry.isMe ? Theme.of(context).colorScheme.primary : (entry.hidden ? _muted(isDark) : null),
+              color: entry.isMe
+                  ? Theme.of(context).colorScheme.primary
+                  : (entry.hidden ? _muted(isDark) : null),
             ),
           ),
         ),
         if (entry.isMe)
           Text(
             l10n.youBadge,
-            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.primary),
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.primary,
+            ),
           ),
         const SizedBox(height: 2),
         _PointsBadge(points: entry.points, small: true),
-        if (zone == LeagueZone.promotion) ...[
+        if (zone == LeagueZone.demotion) ...[
           const SizedBox(height: 4),
-          _ZoneChip(label: l10n.rankingZonePromotionChip, color: kPromotionZoneColor),
-        ] else if (zone == LeagueZone.demotion) ...[
-          const SizedBox(height: 4),
-          _ZoneChip(label: l10n.rankingZoneDemotionChip, color: kDemotionZoneColor),
+          _ZoneChip(
+            label: l10n.rankingZoneDemotionChip,
+            color: kDemotionZoneColor,
+          ),
         ],
       ],
     );
@@ -660,7 +698,11 @@ class _ZoneChip extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: color),
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+          color: color,
+        ),
       ),
     );
   }
@@ -677,7 +719,13 @@ class RankingRow extends StatelessWidget {
   /// Başka kullanıcının satırında güvenlik menüsü (uzun basma ve "⋮").
   final VoidCallback? onActions;
 
-  const RankingRow({super.key, required this.entry, required this.rank, this.zoneColor, this.onActions});
+  const RankingRow({
+    super.key,
+    required this.entry,
+    required this.rank,
+    this.zoneColor,
+    this.onActions,
+  });
 
   static const double _actionsButtonWidth = 36;
 
@@ -685,9 +733,14 @@ class RankingRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final background = zoneColor ??
-        (entry.isMe ? AppColors.primaryContainer.withValues(alpha: 0.12) : Colors.transparent);
-    final name = entry.hidden ? l10n.hiddenUserLabel : (entry.name ?? l10n.userDefault);
+    final background =
+        zoneColor ??
+        (entry.isMe
+            ? AppColors.primaryContainer.withValues(alpha: 0.12)
+            : Colors.transparent);
+    final name = entry.hidden
+        ? l10n.hiddenUserLabel
+        : (entry.name ?? l10n.userDefault);
     final onActions = this.onActions;
     // Satırın iç genişliği (yatay dolgu, menü düğmesi ve kendi satırındaki
     // sol çizgi hariç); puan rozeti bunun en fazla ~üçte birini alır, isme
@@ -695,11 +748,16 @@ class RankingRow extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final rightInset = onActions == null ? 16.0 : 4.0 + _actionsButtonWidth;
-        final rowWidth = constraints.maxWidth - 16 - rightInset - (entry.isMe ? 4 : 0);
+        final rowWidth =
+            constraints.maxWidth - 16 - rightInset - (entry.isMe ? 4 : 0);
         final row = Container(
           decoration: BoxDecoration(
             color: background,
-            border: entry.isMe ? const Border(left: BorderSide(color: AppColors.primary, width: 4)) : null,
+            border: entry.isMe
+                ? const Border(
+                    left: BorderSide(color: AppColors.primary, width: 4),
+                  )
+                : null,
           ),
           padding: EdgeInsets.fromLTRB(16, 12, onActions == null ? 16 : 4, 12),
           child: Row(
@@ -708,17 +766,28 @@ class RankingRow extends StatelessWidget {
               Container(
                 constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
                 decoration: BoxDecoration(
-                  color: isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow,
+                  color: isDark
+                      ? AppColors.darkSurfaceContainerLow
+                      : AppColors.surfaceContainerLow,
                   shape: BoxShape.circle,
                 ),
                 alignment: Alignment.center,
                 child: Text(
                   '$rank',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: _muted(isDark)),
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: _muted(isDark),
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
-              AvatarWidget(avatar: AvatarCharacter.byId(entry.hidden ? null : entry.avatarId), size: 40),
+              AvatarWidget(
+                avatar: AvatarCharacter.byId(
+                  entry.hidden ? null : entry.avatarId,
+                ),
+                size: 40,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -730,7 +799,9 @@ class RankingRow extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 15,
-                        fontWeight: entry.hidden ? FontWeight.w600 : FontWeight.bold,
+                        fontWeight: entry.hidden
+                            ? FontWeight.w600
+                            : FontWeight.bold,
                         fontStyle: entry.hidden ? FontStyle.italic : null,
                         color: entry.isMe
                             ? Theme.of(context).colorScheme.primary
@@ -748,7 +819,9 @@ class RankingRow extends StatelessWidget {
                 ),
               ),
               ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: math.max(0.0, rowWidth * 0.35)),
+                constraints: BoxConstraints(
+                  maxWidth: math.max(0.0, rowWidth * 0.35),
+                ),
                 child: _PointsBadge(points: entry.points),
               ),
               if (onActions != null) UserActionsButton(onPressed: onActions),
@@ -771,7 +844,10 @@ class _PointsBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: small ? 8 : 10, vertical: small ? 3 : 4),
+      padding: EdgeInsets.symmetric(
+        horizontal: small ? 8 : 10,
+        vertical: small ? 3 : 4,
+      ),
       decoration: BoxDecoration(
         color: AppColors.primaryFixed,
         borderRadius: BorderRadius.circular(small ? 10 : 12),

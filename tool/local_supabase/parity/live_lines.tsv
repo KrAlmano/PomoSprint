@@ -61,6 +61,12 @@ col	friendships.created_at timestamp with time zone notnull=true default=now() i
 col	friendships.friend_id uuid notnull=true default= identity= generated= collation= acl= comment=
 col	friendships.status text notnull=true default='accepted'::text identity= generated= collation= acl= comment=
 col	friendships.user_id uuid notnull=true default= identity= generated= collation= acl= comment=
+col	league_competition_state.applied_at timestamp with time zone notnull=true default=now() identity= generated= collation= acl= comment=
+col	league_competition_state.initialized boolean notnull=true default=false identity= generated= collation= acl= comment=
+col	league_competition_state.period_started_at timestamp with time zone notnull=false default= identity= generated= collation= acl= comment=
+col	league_competition_state.rollback_snapshot jsonb notnull=true default= identity= generated= collation= acl= comment=
+col	league_competition_state.singleton boolean notnull=true default=true identity= generated= collation= acl= comment=
+col	league_competition_state.start_at timestamp with time zone notnull=false default= identity= generated= collation= acl= comment=
 col	league_memberships.carry_points integer notnull=true default=0 identity= generated= collation= acl= comment=proposed/20: bitmiş ama dönem sonu işlenmemiş odadaki üyenin, oda bitişinden SONRA biten seanslarının lig puanı. process_weekly_leagues yeni dönemi bununla başlatır.
 col	league_memberships.id uuid notnull=true default=gen_random_uuid() identity= generated= collation= acl= comment=
 col	league_memberships.joined_at timestamp with time zone notnull=true default=now() identity= generated= collation= acl= comment=
@@ -73,12 +79,38 @@ col	leagues.id uuid notnull=true default=gen_random_uuid() identity= generated= 
 col	leagues.is_active boolean notnull=true default=true identity= generated= collation= acl= comment=
 col	leagues.start_date timestamp with time zone notnull=true default=now() identity= generated= collation= acl= comment=
 col	leagues.tier integer notnull=true default=1 identity= generated= collation= acl= comment=
+col	marathon_presence_gates.break_ends_at timestamp with time zone notnull=true default= identity= generated= collation= acl= comment=
+col	marathon_presence_gates.break_started_at timestamp with time zone notnull=true default= identity= generated= collation= acl= comment=
+col	marathon_presence_gates.confirmation_deadline timestamp with time zone notnull=true default= identity= generated= collation= acl= comment=
+col	marathon_presence_gates.confirmed_at timestamp with time zone notnull=false default= identity= generated= collation= acl= comment=
+col	marathon_presence_gates.marathon_uuid uuid notnull=true default= identity= generated= collation= acl= comment=
+col	marathon_presence_gates.next_client_uuid uuid notnull=false default= identity= generated= collation= acl= comment=
+col	marathon_presence_gates.next_session_index integer notnull=true default= identity= generated= collation= acl= comment=
+col	marathon_presence_gates.previous_client_uuid uuid notnull=true default= identity= generated= collation= acl= comment=
+col	marathon_presence_gates.user_id uuid notnull=true default= identity= generated= collation= acl= comment=
+col	marathon_presence_settings.break_seconds integer notnull=true default=300 identity= generated= collation= acl= comment=
+col	marathon_presence_settings.presence_seconds integer notnull=true default=60 identity= generated= collation= acl= comment=
+col	marathon_presence_settings.singleton boolean notnull=true default=true identity= generated= collation= acl= comment=
+col	marathon_run_sessions.client_uuid uuid notnull=true default= identity= generated= collation= acl= comment=
+col	marathon_run_sessions.marathon_uuid uuid notnull=true default= identity= generated= collation= acl= comment=
+col	marathon_run_sessions.result_json jsonb notnull=true default= identity= generated= collation= acl= comment=
+col	marathon_run_sessions.session_index integer notnull=true default= identity= generated= collation= acl= comment=
+col	marathon_run_sessions.study_session_id uuid notnull=true default= identity= generated= collation= acl= comment=
+col	marathon_run_sessions.user_id uuid notnull=true default= identity= generated= collation= acl= comment=
+col	marathon_runs.bonus_awarded integer notnull=true default=0 identity= generated= collation= acl= comment=
+col	marathon_runs.client_uuid uuid notnull=true default= identity= generated= collation= acl= comment=
+col	marathon_runs.created_at timestamp with time zone notnull=true default=now() identity= generated= collation= acl= comment=
+col	marathon_runs.duration_minutes integer notnull=true default= identity= generated= collation= acl= comment=
+col	marathon_runs.is_invalid boolean notnull=true default=false identity= generated= collation= acl= comment=
+col	marathon_runs.target_sessions integer notnull=true default= identity= generated= collation= acl= comment=
+col	marathon_runs.user_id uuid notnull=true default= identity= generated= collation= acl= comment=
 col	marketing_subscribers.email text notnull=true default= identity= generated= collation= acl= comment=
 col	marketing_subscribers.id uuid notnull=true default=uuid_generate_v4() identity= generated= collation= acl= comment=
 col	marketing_subscribers.subscribed_at timestamp with time zone notnull=false default=now() identity= generated= collation= acl= comment=
 col	marketing_subscribers.unsubscribe_token uuid notnull=true default=gen_random_uuid() identity= generated= collation= acl= comment=
 col	marketing_subscribers.user_id uuid notnull=false default= identity= generated= collation= acl= comment=
 col	marketing_subscribers.welcome_sent_at timestamp with time zone notnull=false default= identity= generated= collation= acl= comment=
+col	profiles.active_break_ends_at timestamp with time zone notnull=false default= identity= generated= collation= acl= comment=Temporary marathon break presence. Set only by owner RPC; never study time/rewards.
 col	profiles.active_session_category_name text notnull=false default= identity= generated= collation= acl=authenticated=r/postgres comment=
 col	profiles.active_session_ends_at timestamp with time zone notnull=false default= identity= generated= collation= acl=authenticated=r/postgres comment=
 col	profiles.avatar_id text notnull=false default='avatar_16_basic'::text identity= generated= collation= acl=authenticated=ar/postgres comment=
@@ -174,12 +206,37 @@ con	friendships friendships_friend_id_fkey f FOREIGN KEY (friend_id) REFERENCES 
 con	friendships friendships_pkey p PRIMARY KEY (user_id, friend_id) deferrable=false validated=true
 con	friendships friendships_status_check c CHECK ((status = ANY (ARRAY['pending'::text, 'accepted'::text]))) deferrable=false validated=true
 con	friendships friendships_user_id_fkey f FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE deferrable=false validated=true
+con	league_competition_state league_competition_state_check c CHECK (((initialized AND (start_at IS NOT NULL) AND (period_started_at IS NOT NULL)) OR (NOT initialized))) deferrable=false validated=true
+con	league_competition_state league_competition_state_pkey p PRIMARY KEY (singleton) deferrable=false validated=true
+con	league_competition_state league_competition_state_singleton_check c CHECK (singleton) deferrable=false validated=true
 con	league_memberships league_memberships_league_id_fkey f FOREIGN KEY (league_id) REFERENCES leagues(id) ON DELETE CASCADE deferrable=false validated=true
 con	league_memberships league_memberships_league_id_user_id_key u UNIQUE (league_id, user_id) deferrable=false validated=true
 con	league_memberships league_memberships_pkey p PRIMARY KEY (id) deferrable=false validated=true
 con	league_memberships league_memberships_user_id_fkey f FOREIGN KEY (user_id) REFERENCES profiles(id) ON DELETE CASCADE deferrable=false validated=true
 con	leagues leagues_pkey p PRIMARY KEY (id) deferrable=false validated=true
 con	leagues leagues_tier_check c CHECK (((tier >= 1) AND (tier <= 5))) deferrable=false validated=true
+con	marathon_presence_gates marathon_presence_gates_check c CHECK (((break_started_at < break_ends_at) AND (break_ends_at < confirmation_deadline))) deferrable=false validated=true
+con	marathon_presence_gates marathon_presence_gates_check1 c CHECK (((confirmed_at IS NULL) = (next_client_uuid IS NULL))) deferrable=false validated=true
+con	marathon_presence_gates marathon_presence_gates_check2 c CHECK (((confirmed_at IS NULL) OR ((confirmed_at >= break_ends_at) AND (confirmed_at < confirmation_deadline)))) deferrable=false validated=true
+con	marathon_presence_gates marathon_presence_gates_next_session_index_check c CHECK (((next_session_index >= 2) AND (next_session_index <= 4))) deferrable=false validated=true
+con	marathon_presence_gates marathon_presence_gates_pkey p PRIMARY KEY (user_id, marathon_uuid, next_session_index) deferrable=false validated=true
+con	marathon_presence_gates marathon_presence_gates_user_id_marathon_uuid_fkey f FOREIGN KEY (user_id, marathon_uuid) REFERENCES marathon_runs(user_id, client_uuid) ON DELETE CASCADE deferrable=false validated=true
+con	marathon_presence_gates marathon_presence_gates_user_id_next_client_uuid_key u UNIQUE (user_id, next_client_uuid) deferrable=false validated=true
+con	marathon_presence_settings marathon_presence_settings_break_seconds_check c CHECK (((break_seconds >= 1) AND (break_seconds <= 300))) deferrable=false validated=true
+con	marathon_presence_settings marathon_presence_settings_pkey p PRIMARY KEY (singleton) deferrable=false validated=true
+con	marathon_presence_settings marathon_presence_settings_presence_seconds_check c CHECK (((presence_seconds >= 1) AND (presence_seconds <= 60))) deferrable=false validated=true
+con	marathon_presence_settings marathon_presence_settings_singleton_check c CHECK (singleton) deferrable=false validated=true
+con	marathon_run_sessions marathon_run_sessions_pkey p PRIMARY KEY (user_id, marathon_uuid, session_index) deferrable=false validated=true
+con	marathon_run_sessions marathon_run_sessions_session_index_check c CHECK (((session_index >= 1) AND (session_index <= 4))) deferrable=false validated=true
+con	marathon_run_sessions marathon_run_sessions_study_session_id_fkey f FOREIGN KEY (study_session_id) REFERENCES study_sessions(id) ON DELETE CASCADE deferrable=false validated=true
+con	marathon_run_sessions marathon_run_sessions_study_session_id_key u UNIQUE (study_session_id) deferrable=false validated=true
+con	marathon_run_sessions marathon_run_sessions_user_id_client_uuid_key u UNIQUE (user_id, client_uuid) deferrable=false validated=true
+con	marathon_run_sessions marathon_run_sessions_user_id_marathon_uuid_fkey f FOREIGN KEY (user_id, marathon_uuid) REFERENCES marathon_runs(user_id, client_uuid) ON DELETE CASCADE deferrable=false validated=true
+con	marathon_runs marathon_runs_bonus_awarded_check c CHECK ((bonus_awarded >= 0)) deferrable=false validated=true
+con	marathon_runs marathon_runs_duration_minutes_check c CHECK ((duration_minutes = ANY (ARRAY[25, 50]))) deferrable=false validated=true
+con	marathon_runs marathon_runs_pkey p PRIMARY KEY (user_id, client_uuid) deferrable=false validated=true
+con	marathon_runs marathon_runs_target_sessions_check c CHECK ((target_sessions = ANY (ARRAY[2, 3, 4]))) deferrable=false validated=true
+con	marathon_runs marathon_runs_user_id_fkey f FOREIGN KEY (user_id) REFERENCES profiles(id) ON DELETE CASCADE deferrable=false validated=true
 con	marketing_subscribers marketing_subscribers_pkey p PRIMARY KEY (id) deferrable=false validated=true
 con	marketing_subscribers marketing_subscribers_user_id_fkey f FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE deferrable=false validated=true
 con	profiles profiles_birth_year_range_check c CHECK (((birth_year IS NULL) OR ((birth_year >= 1900) AND (birth_year <= 2100)))) deferrable=false validated=true
@@ -234,6 +291,15 @@ extver	pgcrypto 1.3
 extver	plpgsql 1.0
 extver	supabase_vault 0.3.1
 extver	uuid-ossp 1.1
+func	_complete_marathon_study_session_before_presence(p_client_uuid uuid, p_category_id uuid, p_duration_minutes integer, p_was_paused boolean, p_is_verified integer, p_started_at timestamp with time zone, p_marathon_uuid uuid, p_target_sessions integer, p_session_index integer) md5=68615a917cffc7a3cbbe75094a6520a6 secdef=true owner=postgres acl=postgres=X/postgres comment=
+func	_league_after_completed_session() md5=ef0769d2c96022ddc544546af85269cf secdef=true owner=postgres acl=postgres=X/postgres comment=
+func	_league_grid_start(p_at timestamp with time zone) md5=e69345e17b917dc5fa555b32695cb4b7 secdef=false owner=postgres acl=postgres=X/postgres comment=
+func	_league_period_activity(p_start timestamp with time zone, p_end timestamp with time zone) md5=f4844666583b5c65a07c17b321ae8bf9 secdef=true owner=postgres acl=postgres=X/postgres comment=
+func	_league_place_member(p_user_id uuid, p_points integer) md5=4d180626c8f39518f5c33f487b22274a secdef=true owner=postgres acl=postgres=X/postgres comment=
+func	_league_policy_int(p_key text, p_default integer, p_min integer, p_max integer) md5=16d46e306f605be187fe966c55902d98 secdef=true owner=postgres acl=postgres=X/postgres comment=
+func	_league_ranking_rows(p_user_id uuid) md5=78d54ace95e3e5483fa70f9c35baa6cb secdef=true owner=postgres acl=postgres=X/postgres comment=
+func	_league_refresh_start() md5=02c8684e66de0ec5db7ec0eb69f52a1e secdef=true owner=postgres acl=postgres=X/postgres comment=
+func	_league_repack(p_start timestamp with time zone, p_end timestamp with time zone, p_reset boolean) md5=d1a322977c212caed49bb22e4f205550 secdef=true owner=postgres acl=postgres=X/postgres comment=
 func	accept_legal_documents(p_terms_version text, p_privacy_version text) md5=0e8126c03a2280308fb27dd7b49796ca secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
 func	activity_feed_guard() md5=8b2b98ad4cc4fff4627f7e1fbcc6ddd7 secdef=true owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
 func	activity_feed_on_visibility_off() md5=d2edd847a10d3e4144276023b8bc7085 secdef=true owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
@@ -241,11 +307,13 @@ func	add_friend_by_code(p_code text) md5=4fc61b856e7a457d6ed1ebac4a54dd2d secdef
 func	app_config_int(p_key text) md5=832edcc3fca0de4871dc456775e63e34 secdef=false owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
 func	block_user(p_user_id uuid) md5=eb3cd28481245c759109ed423c31fbf2 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
 func	cancel_friend_request(p_to_user_id uuid) md5=a5415a72cfc1c58d71b201b855305cca secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
-func	cancel_study_session() md5=7c1adf25d21513e01f70ffe792957ba2 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	cancel_study_session() md5=abbe86c1b74c4dfab1c16a543483b90f secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
 func	category_name_key(p_name text) md5=5652da39c3a8fe1f98d160cfad854431 secdef=false owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
 func	clean_display_text(p_text text) md5=b9f0054c10690a9369f358807ec8f4e9 secdef=false owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
 func	cleanup_unconfirmed_duplicate_identity(p_email text) md5=4a1653914896c7f989055455d9cc79b8 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
-func	complete_study_session(p_client_uuid uuid, p_category_id uuid, p_duration_minutes integer, p_was_paused boolean, p_is_verified integer, p_started_at timestamp with time zone) md5=f0f2b9bcc09ae8440a66d889b5f22fcc secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	complete_marathon_study_session(p_client_uuid uuid, p_category_id uuid, p_duration_minutes integer, p_was_paused boolean, p_is_verified integer, p_started_at timestamp with time zone, p_marathon_uuid uuid, p_target_sessions integer, p_session_index integer) md5=177a238a9aa8a4ffd3738b2865120568 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	complete_study_session(p_client_uuid uuid, p_category_id uuid, p_duration_minutes integer, p_was_paused boolean, p_is_verified integer, p_started_at timestamp with time zone) md5=72023f3f4d8636363cf0231f42d4c7e1 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	confirm_marathon_presence(p_marathon_uuid uuid, p_next_session_index integer, p_next_client_uuid uuid) md5=705f97eb50ff8dd976e516b3d7efb966 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
 func	consents_append_only() md5=a2256d04b4e6663adc70beec78fd916e secdef=false owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
 func	create_category(p_name text, p_color_hex text, p_icon_name text) md5=728c31888e49ef9cd230d900ef75ca5e secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
 func	delete_own_account() md5=e8775df60c020a1df5f03a6cb7a49d1e secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
@@ -256,18 +324,22 @@ func	enforce_category_name() md5=a8d81ef6293c646213e6c53cb83032ec secdef=true ow
 func	enforce_category_rules() md5=16841fdc789947c584a9fb136fe50502 secdef=true owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
 func	enforce_minimum_age() md5=03080f9bcaf3550a6c005fe3bd640f35 secdef=false owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
 func	enforce_profile_name() md5=958f61f629205c27a8059f5cba7102ff secdef=true owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
-func	ensure_user_in_league(p_user_id uuid, p_points integer) md5=8fd1f1a6fa0af892c73a8f37456ee29d secdef=true owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
+func	ensure_user_in_league(p_user_id uuid, p_points integer) md5=65faa90deaf3f8e988a801d1628aabce secdef=true owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
 func	generate_friend_code(p_length integer) md5=a13a4f0f99c8a25b0fc6766ef8f3db03 secdef=false owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
 func	get_app_config() md5=6207b41dfe1495c39043bfdbec954e3d secdef=true owner=postgres acl=anon=X/postgres,authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
 func	get_friends_feed(p_limit integer) md5=967aa64529d97c8730a8065f594a22b4 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
 func	get_incoming_friend_requests() md5=130122ec681cb64999395feb9ea513cf secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
-func	get_league_ranking(p_user_id uuid) md5=b49f8d84ac55437f1d45ea7dcab362ea secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
-func	get_league_zones(p_member_count integer) md5=a6f397d1030391e2913e87ed681f2009 secdef=false owner=postgres acl=anon=X/postgres,authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	get_league_config() md5=bbcb4673dfa311b076789764207e49b5 secdef=true owner=postgres acl=anon=X/postgres,authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	get_league_ranking(p_user_id uuid) md5=f90981ef879bcfbe3e456190c0929263 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	get_league_zones(p_member_count integer) md5=35ded9dfccffb88696eb680cc5aef06f secdef=true owner=postgres acl=anon=X/postgres,authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
 func	get_live_friends() md5=b7edb95b65e1f04b6a298c97b250aa30 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	get_live_friends_with_breaks() md5=342b58cfe59ef5766d85ec66f4aee2ce secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	get_marathon_config() md5=f6c80ecd60e9f94b4debee127b0f1c43 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
 func	get_my_blocks() md5=4f9c52cd6118b0e8e5c4de85c9672f6e secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
 func	get_my_friends() md5=d074ae2639e17ef8d2b5b5a43e430a66 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
 func	get_my_league_ids() md5=1f5f7e699f9e3b93dfbda06b6f888fb8 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
 func	get_my_league_ranking() md5=a6e5ec04783800080c36b03704c4e320 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	get_my_league_ranking_v2() md5=154eebf5aea8060d104b58d5208807b7 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
 func	get_my_marketing_consent() md5=7d8a7a9cd26633b3cca61dcd55b7eb34 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
 func	get_outgoing_friend_requests() md5=436e35895418c34cc78f7495ebc6d317 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
 func	get_points_config() md5=3c81d0f3e89a0e655cb62b472d7c91c9 secdef=false owner=postgres acl=anon=X/postgres,authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
@@ -281,10 +353,11 @@ func	league_award_avatar_id(p_tier integer, p_rank integer) md5=f6ed7f1c88a233f1
 func	league_membership_period_start() md5=622780658a08efaf2484342395bd7743 secdef=false owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
 func	league_period_rollover() md5=a42801cb6e19c6d77d3f401c8950e1ca secdef=false owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
 func	log_marketing_subscription_change() md5=85fe617cbbbcdc1e524eb5216941f603 secdef=true owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
+func	marathon_bonus_for(p_duration_minutes integer, p_target_sessions integer) md5=1180e380db117c4336a9e63b8abb7af0 secdef=false owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
 func	mask_public_name(p_name text) md5=51fafbef69c68d92998d01b44f805ac6 secdef=false owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
 func	normalize_friend_code(p_code text) md5=17108b46e2ba8ebfdeb52e013716297d secdef=false owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
 func	place_unarchived_category_last() md5=84201e84e20ee3f5a06aef0409445caf secdef=true owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
-func	process_weekly_leagues() md5=094ff2f6076341f33cf6cbabad297cae secdef=true owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
+func	process_weekly_leagues() md5=f6d02ce7217264dcf44e45056b8fd5b6 secdef=true owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
 func	purchase_avatar(p_avatar_id text) md5=38689aed887865e04bc6c23db8daeb32 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
 func	register_session_start(p_client_uuid uuid, p_duration_minutes integer) md5=9500c7c45503a3e5031e52c879b1dba2 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
 func	remove_friend(p_friend_id uuid) md5=878ecf99c8752d112a2deed711114bb3 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
@@ -294,8 +367,10 @@ func	sanitize_profile_insert() md5=41dfb7b4d7ac5fba873263b9373c3af3 secdef=false
 func	set_equipped_avatar(p_avatar_id text) md5=5a3e3e513a9fbf41619f842cdffc8a96 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
 func	set_marketing_consent(p_enabled boolean, p_text_version text) md5=f73412d519bd43cc3962737a0fc1a2e8 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
 func	setup_onboarding_categories(p_categories jsonb) md5=4721be2abe083a358e59867e8a11251e secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
-func	start_study_session(p_duration_minutes integer, p_category_name text) md5=0a109f61759dae7ddea73b0a68919cae secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
-func	submit_user_report(p_target_user_id uuid, p_place text, p_reason text, p_details text) md5=547b73d8a9163466b19dafb4b89e9fe3 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	start_marathon_break(p_marathon_uuid uuid, p_completed_session_index integer, p_previous_client_uuid uuid) md5=ec575bd004a54190ccd809a6bc17defe secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	start_study_break(p_ends_at timestamp with time zone) md5=7e6f32e5b39260f773fab0b4025f4646 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	start_study_session(p_duration_minutes integer, p_category_name text) md5=56a13ce596649189df480f5e39454f95 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
+func	submit_user_report(p_target_user_id uuid, p_place text, p_reason text, p_details text) md5=a7ee1b72778b92b59982e5bba8b86c7a secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
 func	unblock_user(p_user_id uuid) md5=19d78d9221f40a9b41b06b76d9894f20 secdef=true owner=postgres acl=authenticated=X/postgres,postgres=X/postgres,service_role=X/postgres comment=
 func	validate_profile_timezone() md5=c49c44be36ef5423e062985f8435ce62 secdef=false owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
 func	waitlist_set_consent_time() md5=67f6c03b46a30f5cef4c9404130ed6a0 secdef=false owner=postgres acl=postgres=X/postgres,service_role=X/postgres comment=
@@ -329,9 +404,17 @@ idx	CREATE UNIQUE INDEX friend_code_attempts_pkey ON public.friend_code_attempts
 idx	CREATE UNIQUE INDEX friend_code_rotations_pkey ON public.friend_code_rotations USING btree (user_id)
 idx	CREATE UNIQUE INDEX friend_request_rejections_pkey ON public.friend_request_rejections USING btree (requester_id, target_id)
 idx	CREATE UNIQUE INDEX friendships_pkey ON public.friendships USING btree (user_id, friend_id)
+idx	CREATE UNIQUE INDEX league_competition_state_pkey ON public.league_competition_state USING btree (singleton)
 idx	CREATE UNIQUE INDEX league_memberships_league_id_user_id_key ON public.league_memberships USING btree (league_id, user_id)
 idx	CREATE UNIQUE INDEX league_memberships_pkey ON public.league_memberships USING btree (id)
 idx	CREATE UNIQUE INDEX leagues_pkey ON public.leagues USING btree (id)
+idx	CREATE UNIQUE INDEX marathon_presence_gates_pkey ON public.marathon_presence_gates USING btree (user_id, marathon_uuid, next_session_index)
+idx	CREATE UNIQUE INDEX marathon_presence_gates_user_id_next_client_uuid_key ON public.marathon_presence_gates USING btree (user_id, next_client_uuid)
+idx	CREATE UNIQUE INDEX marathon_presence_settings_pkey ON public.marathon_presence_settings USING btree (singleton)
+idx	CREATE UNIQUE INDEX marathon_run_sessions_pkey ON public.marathon_run_sessions USING btree (user_id, marathon_uuid, session_index)
+idx	CREATE UNIQUE INDEX marathon_run_sessions_study_session_id_key ON public.marathon_run_sessions USING btree (study_session_id)
+idx	CREATE UNIQUE INDEX marathon_run_sessions_user_id_client_uuid_key ON public.marathon_run_sessions USING btree (user_id, client_uuid)
+idx	CREATE UNIQUE INDEX marathon_runs_pkey ON public.marathon_runs USING btree (user_id, client_uuid)
 idx	CREATE UNIQUE INDEX marketing_subscribers_email_lower_key ON public.marketing_subscribers USING btree (lower(email))
 idx	CREATE UNIQUE INDEX marketing_subscribers_pkey ON public.marketing_subscribers USING btree (id)
 idx	CREATE UNIQUE INDEX marketing_subscribers_unsubscribe_token_key ON public.marketing_subscribers USING btree (unsubscribe_token)
@@ -376,8 +459,13 @@ rel	friend_code_attempts kind=r rls=true force=false owner=postgres acl=postgres
 rel	friend_code_rotations kind=r rls=true force=false owner=postgres acl=postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres comment=proposed/25: kullanıcının arkadaş kodunu son yenilediği an (24 saatte bir). Yalnızca rotate_friend_code.
 rel	friend_request_rejections kind=r rls=true force=false owner=postgres acl=postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres comment=
 rel	friendships kind=r rls=true force=false owner=postgres acl=authenticated=rm/postgres,postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres comment=
+rel	league_competition_state kind=r rls=true force=false owner=postgres acl=postgres=arwdDxtm/postgres comment=
 rel	league_memberships kind=r rls=true force=false owner=postgres acl=authenticated=m/postgres,postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres comment=
 rel	leagues kind=r rls=true force=false owner=postgres acl=authenticated=m/postgres,postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres comment=
+rel	marathon_presence_gates kind=r rls=true force=false owner=postgres acl=postgres=arwdDxtm/postgres comment=
+rel	marathon_presence_settings kind=r rls=true force=false owner=postgres acl=postgres=arwdDxtm/postgres comment=Owner-only duration config. Production defaults 300/60; shorter values exclusively local Docker QA helper.
+rel	marathon_run_sessions kind=r rls=true force=false owner=postgres acl=postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres comment=
+rel	marathon_runs kind=r rls=true force=false owner=postgres acl=postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres comment=
 rel	marketing_subscribers kind=r rls=true force=false owner=postgres acl=authenticated=rdm/postgres,postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres comment=
 rel	profiles kind=r rls=true force=false owner=postgres acl=authenticated=rm/postgres,postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres comment=
 rel	session_starts kind=r rls=true force=false owner=postgres acl=postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres comment=
@@ -406,4 +494,5 @@ trg	public.profiles enforce_profile_name enabled=O CREATE TRIGGER enforce_profil
 trg	public.profiles on_profile_created_give_avatars enabled=O CREATE TRIGGER on_profile_created_give_avatars AFTER INSERT ON public.profiles FOR EACH ROW EXECUTE FUNCTION give_default_avatars()
 trg	public.profiles sanitize_profile_insert enabled=O CREATE TRIGGER sanitize_profile_insert BEFORE INSERT ON public.profiles FOR EACH ROW EXECUTE FUNCTION sanitize_profile_insert()
 trg	public.profiles validate_profile_timezone enabled=O CREATE TRIGGER validate_profile_timezone BEFORE INSERT OR UPDATE OF timezone ON public.profiles FOR EACH ROW EXECUTE FUNCTION validate_profile_timezone()
+trg	public.study_sessions league_schedule_after_completed_session enabled=O CREATE TRIGGER league_schedule_after_completed_session AFTER INSERT ON public.study_sessions FOR EACH ROW EXECUTE FUNCTION _league_after_completed_session()
 trg	public.waitlist waitlist_set_consent_time enabled=O CREATE TRIGGER waitlist_set_consent_time BEFORE INSERT ON public.waitlist FOR EACH ROW EXECUTE FUNCTION waitlist_set_consent_time()

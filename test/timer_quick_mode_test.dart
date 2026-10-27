@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro/l10n/app_localizations.dart';
 import 'package:pomodoro/models/category_model.dart';
+import 'package:pomodoro/models/marathon_progress.dart';
 import 'package:pomodoro/screens/timer_screen.dart';
 import 'package:pomodoro/services/language_service.dart';
 import 'package:pomodoro/services/lock_screen_timer.dart';
@@ -13,16 +14,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'support/fake_lock_screen_platform.dart';
 
-// Sayaç her derlemede gerçek süreli; kısaltılmış sayaç yalnızca hızlı test
-// modunda (--dart-define=QUICK_TIMER=true). Test seansı ekranda TEST
-// rozetiyle görünür, bitince sunucuya/kuyruğa verilmez ve diyalog
-// "kaydedilmez" der. (TimerPersistence tekil olduğu için dosyada tek
+// Ürün her derlemede gerçek süreli; kısa sayaç yalnızca widget testinde
+// açık parametreyle simüle edilir ve sunucuya/kuyruğa verilmez.
+// (TimerPersistence tekil olduğu için dosyada tek
 // testWidgets var; bkz. timer_screen_test.dart.)
 void main() {
   const owner = 'u-quick';
   final category = CourseCategory.initialCategories().first;
 
-  testWidgets('hızlı test sayacı: TEST rozeti, 5/10 sn; test seansı gönderilmez', (tester) async {
+  testWidgets('kısa sayaç 5/10 sn, test metni yok ve kayıt korumaları sürer', (
+    tester,
+  ) async {
     final semantics = tester.ensureSemantics();
     // Dikey ekran (yatayda süre çipleri gizlenir).
     tester.view.physicalSize = const Size(1200, 2400);
@@ -37,25 +39,42 @@ void main() {
       categoryLabel: (name) => name,
     );
     final submissions = <ActiveTimerSession>[];
+    final presenceCalls = <String>[];
 
-    Future<void> mount({required bool quick}) async {
-      await tester.pumpWidget(MaterialApp(
-        locale: const Locale('tr'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        home: TimerScreen(
-          key: UniqueKey(),
-          categories: [category],
-          sessionOwnerKey: owner,
-          onOpenSettings: () {},
-          onSessionCompleted: (session) async {
-            submissions.add(session);
-            return const SessionSubmitSuccess(minutes: 25, totalPoints: 5, coinsEarned: 20);
-          },
-          lockScreenTimer: lockScreen,
-          quickTimer: quick,
+    Future<void> mount({bool? quick}) async {
+      TimerScreen screen({bool? quickTimer}) => TimerScreen(
+        key: UniqueKey(),
+        categories: [category],
+        sessionOwnerKey: owner,
+        onOpenSettings: () {},
+        onSessionCompleted: (session) async {
+          submissions.add(session);
+          return const SessionSubmitSuccess(
+            minutes: 25,
+            totalPoints: 5,
+            coinsEarned: 20,
+          );
+        },
+        onTimerStateChanged: (running, name, minutes) =>
+            presenceCalls.add('focus:$running'),
+        onMarathonBreakChanged: (onBreak, seconds) =>
+            presenceCalls.add('break:$onBreak'),
+        onConfirmMarathonPresence: (previous, next) async {
+          presenceCalls.add('confirm');
+          return true;
+        },
+        lockScreenTimer: lockScreen,
+        // Null deliberately exercises the actual product constructor default.
+        quickTimer: quickTimer ?? false,
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('tr'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: screen(quickTimer: quick),
         ),
-      ));
+      );
       // Cihazdaki kayıt (varsa) geri yüklenir; süresi dolduysa tamamlanır.
       await tester.pump();
       await tester.pump();
@@ -74,7 +93,8 @@ void main() {
       return raw == null ? null : jsonDecode(raw) as Map<String, dynamic>;
     }
 
-    ActiveTimerSession finished(String uuid, {required int totalSeconds}) => ActiveTimerSession.start(
+    ActiveTimerSession finished(String uuid, {required int totalSeconds}) =>
+        ActiveTimerSession.start(
           clientUuid: uuid,
           categoryId: category.id,
           categoryName: category.name,
@@ -84,15 +104,22 @@ void main() {
         );
 
     // 1) Normal derleme (debug dahil): gerçek süre, rozet yok.
-    await mount(quick: false);
+    final defaults = TimerScreen(
+      categories: [category],
+      sessionOwnerKey: owner,
+      onOpenSettings: () {},
+      onSessionCompleted: (session) async => null,
+    );
+    expect(defaults.quickTimer, isFalse);
+    await mount();
     expect(find.text('25:00'), findsOneWidget);
     expect(find.text(l10n.timerQuickTestBadge), findsNothing);
     await unmount();
 
-    // 2) Hızlı test: rozet (ekran okuyucuda açıklamasıyla), 5/10 sn.
+    // 2) Kısa sayaç 5/10 sn, görsel veya erişilebilirlikte test metni yok.
     await mount(quick: true);
-    expect(find.text(l10n.timerQuickTestBadge), findsOneWidget);
-    expect(find.bySemanticsLabel(l10n.timerQuickTestSemantics), findsOneWidget);
+    expect(find.text(l10n.timerQuickTestBadge), findsNothing);
+    expect(find.bySemanticsLabel(l10n.timerQuickTestSemantics), findsNothing);
     expect(find.text('00:05'), findsOneWidget);
     await tester.tap(find.textContaining('50 '));
     await tester.pump();
@@ -110,15 +137,18 @@ void main() {
     final record = await stored();
     expect(record?['duration_minutes'], 25);
     expect(record?['total_seconds'], 5);
-    expect(find.text(l10n.timerQuickTestBadge), findsOneWidget);
+    expect(find.text(l10n.timerQuickTestBadge), findsNothing);
     await unmount();
 
-    // Süresi dolmuş test seansı tamamlanınca gönderilmez; "kaydedilmez".
-    await TimerPersistence.instance.save(owner, finished('quick-done', totalSeconds: 5));
+    // Süresi dolmuş kısa seans kaydedilmez; test açıklaması da gösterilmez.
+    await TimerPersistence.instance.save(
+      owner,
+      finished('quick-done', totalSeconds: 5),
+    );
     await mount(quick: true);
     expect(submissions, isEmpty);
     expect(find.byType(SessionCompletedDialog), findsOneWidget);
-    expect(find.text(l10n.sessionResultTestNotSaved), findsOneWidget);
+    expect(find.text(l10n.sessionResultTestNotSaved), findsNothing);
     expect(find.text(l10n.sessionResultSaving), findsNothing);
     expect(await stored(), isNull);
     await tester.tap(find.byType(ElevatedButton).last);
@@ -127,10 +157,13 @@ void main() {
 
     // 3) Normal derlemede geri yüklenen eski test seansı (eski debug
     // derlemesinin 5 sn'lik seansı) da gönderilmez; sonraki seans gerçek süreli.
-    await TimerPersistence.instance.save(owner, finished('old-debug', totalSeconds: 5));
+    await TimerPersistence.instance.save(
+      owner,
+      finished('old-debug', totalSeconds: 5),
+    );
     await mount(quick: false);
     expect(submissions, isEmpty);
-    expect(find.text(l10n.sessionResultTestNotSaved), findsOneWidget);
+    expect(find.text(l10n.sessionResultTestNotSaved), findsNothing);
     expect(await stored(), isNull);
     await tester.tap(find.byType(ElevatedButton).last);
     await tester.pump(const Duration(milliseconds: 300));
@@ -139,7 +172,10 @@ void main() {
     await unmount();
 
     // 4) Hızlı test derlemesinde geri yüklenen GERÇEK seans yine gönderilir.
-    await TimerPersistence.instance.save(owner, finished('real-done', totalSeconds: 25 * 60));
+    await TimerPersistence.instance.save(
+      owner,
+      finished('real-done', totalSeconds: 25 * 60),
+    );
     await mount(quick: true);
     expect(submissions.map((s) => s.clientUuid), ['real-done']);
     expect(find.text(l10n.sessionResultTestNotSaved), findsNothing);
@@ -148,6 +184,40 @@ void main() {
     await tester.tap(find.byType(ElevatedButton).last);
     await tester.pump(const Duration(milliseconds: 300));
     await unmount();
+
+    // Legacy accelerated markers are never restored as focus/break/presence,
+    // even when the stored duration was changed to a full 25-minute session.
+    final submissionCount = submissions.length;
+    for (final phase in <MarathonPhase?>[null, ...MarathonPhase.values]) {
+      presenceCalls.clear();
+      final previous = ActiveTimerSession.start(
+        clientUuid: 'legacy-${phase?.name ?? 'single'}',
+        categoryId: category.id,
+        categoryName: category.name,
+        durationMinutes: 25,
+        totalSeconds: 1500,
+        recordAccelerated: true,
+        now: DateTime.now().subtract(const Duration(minutes: 30)),
+        marathon: phase == null
+            ? null
+            : MarathonProgress(
+                totalSessions: 2,
+                marathonUuid: 'cf091f18-1d45-4e82-9377-d55b92753c2c',
+                completedSessions: phase == MarathonPhase.finished ? 2 : 1,
+                phase: phase,
+                breakEndsAt: DateTime.now(),
+              ),
+      );
+      await TimerPersistence.instance.save(owner, previous);
+      await mount();
+      expect(await stored(), isNull, reason: '$phase legacy storage cleared');
+      expect(find.text('25:00'), findsOneWidget);
+      expect(submissions.length, submissionCount);
+      expect(presenceCalls, isEmpty, reason: '$phase sends no presence');
+      expect(find.byType(SessionCompletedDialog), findsNothing);
+      expect(tester.takeException(), isNull);
+      await unmount();
+    }
     semantics.dispose();
   });
 }

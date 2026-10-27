@@ -179,7 +179,10 @@ void main() {
     await tap(find.text(l10n.onboardingVisibilityNo));
     await tap(find.text(l10n.continueBtn));
     await tap(find.text(l10n.continueBtn));
-    expect(find.text('6/6'), findsOneWidget);
+    expect(find.text('6/7'), findsOneWidget);
+    await tap(find.text(l10n.continueBtn));
+    expect(find.text('7/7'), findsOneWidget);
+    expect(find.text(l10n.onboardingGuideTitle), findsOneWidget);
 
     // "Bitir" gerçek zamanda: ağ istekleri yerel kopyaya gider.
     final finish = tester.widget<ElevatedButton>(find.widgetWithText(ElevatedButton, l10n.onboardingFinishBtn));

@@ -1,6 +1,8 @@
 -- 20261007110000_report_submission_lock
--- HAZIRLANDI, CANLIYA UYGULANMADI. Kullanıcı SQL Editor'de önce DRYRUN,
--- sonra bu migration'ı çalıştırır; kökte CLI db push/reset yapmayın.
+-- 8 Ekim 2026 CANLIYA UYGULANDI: incelenmiş CLI Management API transaction.
+-- Önce canlı DRYRUN 23/23, sonra geri alınan 23/23 ve salt okuma 9/9 geçti.
+-- Güncel hash a7ee1b72778b92b59982e5bba8b86c7a; yeniden uygulamayın.
+-- Kökte CLI db push/reset kullanmayın; kapsam istisnası AGENTS.md §2.4.
 -- Kaynak: 7 Ekim 2026 canlı pg_get_functiondef, md5 547b73d8a9163466b19dafb4b89e9fe3.
 -- İzole yerel gerçek HTTP: aynı hedefe paralel iki istek iki kayıt açıyor;
 -- 9 bildirimi olan hesap iki paralel yeni hedefle 11'e çıkabiliyor.

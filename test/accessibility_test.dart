@@ -11,7 +11,6 @@ import 'package:pomodoro/screens/timer_screen.dart';
 import 'package:pomodoro/services/language_service.dart';
 import 'package:pomodoro/services/notification_service.dart';
 import 'package:pomodoro/theme.dart';
-import 'package:pomodoro/utils/text_util.dart';
 import 'package:pomodoro/widgets/auth/legal_links.dart';
 import 'package:pomodoro/widgets/avatar_widget.dart';
 import 'package:pomodoro/widgets/hourglass_widget.dart';
@@ -257,15 +256,6 @@ void main() {
       expect(find.text('Congratulations! 🎉'), findsOneWidget);
       expect(find.textContaining('50-minute'), findsOneWidget);
       expect(find.text('Awesome!'), findsOneWidget);
-    });
-
-    test('kategori başlığı segmente göre ve arayüz dilinde', () async {
-      final tr = await AppLocalizations.delegate.load(const Locale('tr'));
-      final en = await AppLocalizations.delegate.load(const Locale('en'));
-      expect(TextUtil.getCategorySelectionLabel(tr, 'work'), 'KATEGORİ SEÇ');
-      expect(TextUtil.getCategorySelectionLabel(tr, 'yks'), 'DERS SEÇ');
-      expect(TextUtil.getCategorySelectionLabel(en, 'work'), 'SELECT CATEGORY');
-      expect(TextUtil.getCategorySelectionLabel(en, null), 'SELECT SUBJECT');
     });
 
     test('İngilizce onboarding LGS ve YKS\'yi açıklar', () async {

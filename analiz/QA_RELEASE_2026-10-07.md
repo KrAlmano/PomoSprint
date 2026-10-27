@@ -28,7 +28,7 @@ Bu rapor mevcut çalışma ağacının baştan sona denetimidir. Sonuçlar gerç
 
 [Makine tarafından okunabilir özet](QA_RELEASE_2026-10-07.json) aynı sonuçları ve artifact hash’lerini içerir. QA emülatörü ve bu turdaki Gradle daemon’u iş sonunda durduruldu; yerel backend verisi korundu.
 
-Kanıt yolları [qa_evidence_20261007](qa_evidence_20261007/) altındadır. Süit toplamlarını birbirine ekleyip bağımsız kullanıcı senaryosu sayısı gibi sunmuyoruz; odaklı testler tam paketin alt kümesidir. DB fingerprint/hash karşılaştırması davranış testlerinin yerine geçmez.
+Kanıt yolları qa_evidence_20261007 (ham çıktı §37 temizliğinde kaldırıldı) altındadır. Süit toplamlarını birbirine ekleyip bağımsız kullanıcı senaryosu sayısı gibi sunmuyoruz; odaklı testler tam paketin alt kümesidir. DB fingerprint/hash karşılaştırması davranış testlerinin yerine geçmez.
 
 ## Mobil senaryo planı ve doğrulanan davranışlar
 
@@ -113,4 +113,4 @@ TZ=America/New_York flutter test test/reports_correctness_test.dart test/reports
 cd scripts && npm test
 ```
 
-Gerçek UI komutları ve hesap kısıtları [yerel Supabase rehberinde](../tool/local_supabase/README.md). Yeni `m_release_journey` ve `n_user_report` senaryoları kalıcı; bu turda PC yükünü azaltan o/q/r toplu import dosyaları geçiciydi ve kaldırıldı. Ana kanıtlar ve cihaz ekranları [20261007_release_qa](ekranlar/20261007_release_qa/) altında seçili olarak saklanır.
+Gerçek UI komutları ve hesap kısıtları [yerel Supabase rehberinde](../tool/local_supabase/README.md). Yeni `m_release_journey` ve `n_user_report` senaryoları kalıcı; bu turda PC yükünü azaltan o/q/r toplu import dosyaları geçiciydi ve kaldırıldı. Ana kanıtlar ve cihaz ekranları 20261007_release_qa (ham çıktı §37 temizliğinde kaldırıldı) altında seçili olarak saklanır.

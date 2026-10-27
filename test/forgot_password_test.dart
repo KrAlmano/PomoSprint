@@ -91,8 +91,7 @@ void main() {
       app(
         ForgotPasswordScreen(
           initialEmail: 'person@example.com',
-          sendResetEmail: (_) async =>
-              throw AuthFailure(AuthErrorCode.network),
+          sendResetEmail: (_) async => throw AuthFailure(AuthErrorCode.network),
         ),
       ),
     );
@@ -107,6 +106,36 @@ void main() {
       tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
       isNotNull,
     );
+  });
+
+  testWidgets('local recovery keeps the test-mail explanation after sending', (
+    tester,
+  ) async {
+    final l10n = await AppLocalizations.delegate.load(const Locale('tr'));
+    final emails = <String>[];
+    await tester.pumpWidget(
+      app(
+        ForgotPasswordScreen(
+          initialEmail: 'local-person@pomosprint.local',
+          localTestEnvironment: true,
+          sendResetEmail: (email) async => emails.add(email),
+        ),
+      ),
+    );
+    expect(find.text(l10n.passwordResetLocalDescription), findsOneWidget);
+    expect(find.text(l10n.forgotPasswordDescription), findsNothing);
+    await tester.tap(find.text(l10n.sendPasswordResetEmail));
+    await tester.pumpAndSettle();
+    expect(emails, ['local-person@pomosprint.local']);
+    expect(
+      tester
+          .widget<PasswordResetSentScreen>(find.byType(PasswordResetSentScreen))
+          .localTestEnvironment,
+      isTrue,
+    );
+    expect(find.text(l10n.passwordResetLocalTitle), findsOneWidget);
+    expect(find.text(l10n.passwordResetLocalDescription), findsOneWidget);
+    expect(find.text(l10n.passwordResetSentDescription), findsNothing);
   });
 
   for (final size in const [
@@ -128,8 +157,10 @@ void main() {
           addTearDown(tester.view.reset);
           addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
           for (final screen in const [
-            ForgotPasswordScreen(),
-            PasswordResetSentScreen(),
+            ForgotPasswordScreen(localTestEnvironment: false),
+            PasswordResetSentScreen(localTestEnvironment: false),
+            ForgotPasswordScreen(localTestEnvironment: true),
+            PasswordResetSentScreen(localTestEnvironment: true),
           ]) {
             await tester.pumpWidget(
               app(screen, locale: locale, dark: locale.languageCode == 'en'),

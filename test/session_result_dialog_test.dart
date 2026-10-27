@@ -210,7 +210,7 @@ void main() {
       expect(find.text(l10n.sessionQueuedClockSkew), findsNothing);
     });
 
-    testWidgets('hızlı test seansı: "kaydedilmez" denir, sonuç beklenmez', (tester) async {
+    testWidgets('gönderilmeyen kısa seansta test metni veya kayıt sonucu görünmez', (tester) async {
       tester.view.physicalSize = const Size(800, 1600);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
@@ -221,7 +221,7 @@ void main() {
         home: const Scaffold(body: SessionCompletedDialog(minutes: 25, testSession: true)),
       ));
       await tester.pumpAndSettle();
-      expect(find.text(l10n.sessionResultTestNotSaved), findsOneWidget);
+      expect(find.text(l10n.sessionResultTestNotSaved), findsNothing);
       expect(find.text(l10n.sessionResultSaving), findsNothing);
       expect(find.text(l10n.sessionQueuedOffline), findsNothing);
       expect(find.text(l10n.sessionNotSavedTitle), findsNothing);

@@ -145,7 +145,7 @@ void main() {
       await tester.tap(find.text(l10n.continueBtn));
       await tester.pumpAndSettle();
       expect(find.text(l10n.onboardingBirthYearRequired), findsOneWidget);
-      expect(find.text('1/6'), findsOneWidget);
+      expect(find.text('1/7'), findsOneWidget);
 
       void clearSnackBars() =>
           ScaffoldMessenger.of(tester.element(find.byType(PostAuthOnboardingScreen))).clearSnackBars();
@@ -163,7 +163,7 @@ void main() {
       // çıkış ve hesap silme yolu görünür.
       await tester.tap(find.text(l10n.continueBtn));
       await tester.pumpAndSettle();
-      expect(find.text('1/6'), findsOneWidget);
+      expect(find.text('1/7'), findsOneWidget);
       expect(find.text(l10n.onboardingUnder13Error), findsNWidgets(2));
       expect(find.text(l10n.deleteAccount), findsOneWidget, reason: 'hesap silme yolu kalır');
       expect(find.text(l10n.logout), findsOneWidget);
@@ -176,7 +176,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text(l10n.continueBtn));
       await tester.pumpAndSettle();
-      expect(find.text('1/6'), findsOneWidget);
+      expect(find.text('1/7'), findsOneWidget);
       expect(find.text(l10n.onboardingUnder13Error), findsNWidgets(2));
     });
 
@@ -194,18 +194,18 @@ void main() {
       await tester.drag(find.byType(CupertinoPicker), const Offset(0, -1040));
       await tester.pumpAndSettle();
       await next();
-      expect(find.text('2/6'), findsOneWidget);
+      expect(find.text('2/7'), findsOneWidget);
       expect(find.text(l10n.onboardingSegmentOther), findsOneWidget);
 
       // Segment seçmeden devam: genel öneriler gelir.
       await next();
-      expect(find.text('3/6'), findsOneWidget);
+      expect(find.text('3/7'), findsOneWidget);
       await tester.tap(find.text('Ders Çalışma'));
       await tester.pump();
       await next();
 
       // KVKK-01: görünürlük adımı, iki seçenek ve varsayılan seçim yok.
-      expect(find.text('4/6'), findsOneWidget);
+      expect(find.text('4/7'), findsOneWidget);
       expect(find.text(l10n.onboardingVisibilityTitle), findsOneWidget);
       expect(find.text(l10n.onboardingVisibilityYes), findsOneWidget);
       expect(find.text(l10n.onboardingVisibilityNo), findsOneWidget);
@@ -217,7 +217,7 @@ void main() {
       semantics.dispose();
       await next();
       expect(find.text(l10n.onboardingSelectOptionError), findsOneWidget);
-      expect(find.text('4/6'), findsOneWidget);
+      expect(find.text('4/7'), findsOneWidget);
       // Uyarı (SnackBar) düğmelerin üstünü kapatmasın.
       ScaffoldMessenger.of(tester.element(find.byType(PostAuthOnboardingScreen))).clearSnackBars();
       await tester.pumpAndSettle();
@@ -228,9 +228,14 @@ void main() {
       await tester.pump();
       await next();
       // UX-21: kurallar adımı.
-      expect(find.text('5/6'), findsOneWidget);
+      expect(find.text('5/7'), findsOneWidget);
       expect(find.byType(GameRulesList), findsOneWidget);
       await next();
+      expect(find.text('6/7'), findsOneWidget);
+      expect(find.text(l10n.onboardingFinishBtn), findsNothing);
+      await next();
+      expect(find.text('7/7'), findsOneWidget);
+      expect(find.text(l10n.onboardingGuideTitle), findsOneWidget);
       expect(find.text(l10n.onboardingFinishBtn), findsOneWidget);
     });
   });

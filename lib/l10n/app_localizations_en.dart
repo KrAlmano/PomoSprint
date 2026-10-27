@@ -146,26 +146,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get socialNoLiveFriends =>
-      'No friends studying right now. They\'ll show up here once someone starts focusing.';
+      'None of your friends are focusing or on a break right now. They’ll appear here when they start studying.';
 
   @override
   String get socialLoadError =>
       'Couldn\'t load your friends\' status. Check your connection and try again.';
 
   @override
-  String get leagueTierBronze => 'Bronze Hourglass';
+  String get leagueTierBronze => 'Bronze League';
 
   @override
-  String get leagueTierSilver => 'Silver Hourglass';
+  String get leagueTierSilver => 'Silver League';
 
   @override
-  String get leagueTierGold => 'Gold Hourglass';
+  String get leagueTierGold => 'Gold League';
 
   @override
-  String get leagueTierSapphire => 'Sapphire Hourglass';
+  String get leagueTierSapphire => 'Sapphire League';
 
   @override
-  String get leagueTierDiamond => 'Diamond Hourglass';
+  String get leagueTierDiamond => 'Diamond League';
 
   @override
   String leagueTierLeagueName(String tier) {
@@ -180,7 +180,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get leagueInfoWhatBody =>
-      'Each league period you\'re grouped with up to 30 people at a similar level. Whoever focuses the most during the period climbs to the top.';
+      'After your first session that earns points, you join a league room with people at a similar level. Room capacity and period rules come from the server; earning points moves you up the ranking.';
 
   @override
   String get leagueInfoTiersTitle => 'League Tiers';
@@ -267,7 +267,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get leagueAwaitingPlacementBody =>
-      'Complete your first pomodoro this period to join a room of up to 30 people at a similar level. Your rank and promotion status will show up here.';
+      'Complete your first pomodoro that earns points to join a suitable league room at your tier. Your ranking and current period rules appear here.';
 
   @override
   String get leagueInfoDailyLimitTitle => 'Daily Limit';
@@ -449,6 +449,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get avatarPurchaseTitle => 'Buy';
+
+  @override
+  String get specialAvatarsTitle => 'Special Avatars';
 
   @override
   String avatarPurchaseBody(String name, int price) {
@@ -1559,7 +1562,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingCreateOwnCategory => '+ Create my own category';
 
   @override
-  String get onboardingGoalStepTitle => 'One last step! 🚀';
+  String get onboardingGoalStepTitle => 'Choose your daily goal';
 
   @override
   String get onboardingGoalStepBody =>
@@ -2118,6 +2121,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'If an account is registered with this address, we sent a password reset link. Check your inbox and spam folder, then follow the link to set a new password.';
 
   @override
+  String get passwordResetLocalTitle => 'Local email';
+
+  @override
+  String get passwordResetLocalDescription =>
+      'This build uses the local environment. Emails are kept in the local Mailpit inbox and are not sent to your real inbox. Accounts and passwords here are separate from your normal account. Use the normal PomoSprint launch option to reset your normal account.';
+
+  @override
   String get timerQuickRecordedSemantics =>
       'Local quick test timer: sessions are saved as 25 or 50 minutes';
 
@@ -2215,4 +2225,312 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportSendFailed => 'Could not send the report. Please try again.';
+
+  @override
+  String get marathonTitle => 'Marathon';
+
+  @override
+  String get marathonSingle => 'Single session';
+
+  @override
+  String get marathonChooseCount => 'How many sessions would you like?';
+
+  @override
+  String marathonCountOption(int count) {
+    return '$count Pomodoros';
+  }
+
+  @override
+  String marathonProgress(int current, int total) {
+    return 'Pomodoro $current/$total';
+  }
+
+  @override
+  String get marathonBreakTitle => 'Break';
+
+  @override
+  String get marathonBreakHint =>
+      'When your break ends, tap “I’m here” within 1 minute to continue.';
+
+  @override
+  String get marathonAutomaticHint =>
+      'A marathon is a study plan with 2, 3 or 4 Pomodoros in a row. Choose 25 or 50 minutes for the plan; all Pomodoros in the marathon use that same duration.\n\nTake a 5-minute break between sessions. When it ends, tap “I’m here” within 1 minute to start the next session. An internet connection is required to confirm.\n\nIf you miss a confirmation or choose to end the marathon early, the remaining plan stops. Completed sessions and their regular points are kept, but no completion bonus is awarded. Breaks and confirmation waiting time do not count as study time.';
+
+  @override
+  String marathonBreakRemainingSemantics(int minutes, int seconds) {
+    return 'Break: $minutes minutes and $seconds seconds remaining';
+  }
+
+  @override
+  String get marathonStart => 'START MARATHON';
+
+  @override
+  String get marathonStop => 'End marathon';
+
+  @override
+  String get marathonStopped =>
+      'Marathon ended. Your completed Pomodoros and regular points were kept.';
+
+  @override
+  String get marathonStopConfirmTitle => 'End this marathon?';
+
+  @override
+  String marathonStopConfirmBody(int completed, int total) {
+    return 'You completed $completed/$total Pomodoros. Completed sessions are kept; the current Pomodoro will not be saved.';
+  }
+
+  @override
+  String get marathonStopConfirmAction => 'End marathon';
+
+  @override
+  String get marathonCompletedTitle => 'Marathon complete!';
+
+  @override
+  String marathonCompletedBody(int count, int minutes) {
+    return 'You focused for $minutes minutes across $count Pomodoros.';
+  }
+
+  @override
+  String get marathonSaving => 'Saving Pomodoro…';
+
+  @override
+  String get marathonRetrySave => 'Retry saving';
+
+  @override
+  String get marathonSaveFailed =>
+      'Your completed Pomodoro is stored on this device. Retry to send the saved session. If the continuation window expires, the marathon stops; your completed session is kept.';
+
+  @override
+  String get marathonStoppedRejected =>
+      'This Pomodoro could not be saved. The marathon stopped; your earlier sessions were kept.';
+
+  @override
+  String marathonMinutesSummary(int focusMinutes, int elapsedMinutes) {
+    return '$focusMinutes min focus · about $elapsedMinutes min with breaks';
+  }
+
+  @override
+  String get marathonResumePlan => 'Resume marathon';
+
+  @override
+  String get notifMarathonBreakDoneTitle => 'Break is over';
+
+  @override
+  String notifMarathonBreakDoneBody(int nextSession, int totalSessions) {
+    return 'Marathon: Pomodoro $nextSession/$totalSessions. Open the app and tap “I’m here” within 1 minute to continue.';
+  }
+
+  @override
+  String get socialOnBreak => 'On break';
+
+  @override
+  String get socialNoBreakFriends =>
+      'None of your friends are on a break right now.';
+
+  @override
+  String marathonBonusPoints(int points) {
+    return '+$points marathon bonus';
+  }
+
+  @override
+  String marathonBonusHint(int points) {
+    return 'Complete the marathon for $points extra points';
+  }
+
+  @override
+  String get marathonBonusPending =>
+      'Your marathon bonus will be calculated when pending Pomodoros are saved and the completion requirements are met.';
+
+  @override
+  String get marathonUnavailable => 'Marathon is currently unavailable.';
+
+  @override
+  String get marathonStartFailed =>
+      'The marathon could not start. Please try again.';
+
+  @override
+  String get marathonPresenceTitle => 'Are you here?';
+
+  @override
+  String get marathonPresenceHint =>
+      'Your break is over. Tap “I’m here” within 1 minute to start the next session.';
+
+  @override
+  String get marathonPresenceConfirm => 'I’m here';
+
+  @override
+  String get marathonPresenceChecking => 'Confirming…';
+
+  @override
+  String get marathonPresenceConnectionNeeded =>
+      'Confirmation failed. Check your internet connection and try again before time runs out.';
+
+  @override
+  String get marathonPresenceExpired =>
+      'The marathon stopped because you did not confirm. Your completed sessions were kept.';
+
+  @override
+  String marathonPresenceRemainingSemantics(int minutes, int seconds) {
+    return '$minutes minutes and $seconds seconds left to confirm';
+  }
+
+  @override
+  String get marathonStepStart => 'Start';
+
+  @override
+  String get marathonStepGoal => 'Goal';
+
+  @override
+  String marathonSessionCount(int count) {
+    return '$count sessions';
+  }
+
+  @override
+  String get marathonStepCompleted => 'Completed';
+
+  @override
+  String get marathonStepCurrent => 'Current session';
+
+  @override
+  String get marathonStepUpcoming => 'Next session';
+
+  @override
+  String get marathonStoppedInvalid =>
+      'Your Pomodoro was saved. The marathon stopped because its verification could not be completed; your sessions were kept.';
+
+  @override
+  String get marathonPlanTitle => 'Plan your marathon';
+
+  @override
+  String get marathonDurationLabel => 'Pomodoro duration';
+
+  @override
+  String get marathonStartingWelcome =>
+      'Your marathon is starting. Happy focusing!';
+
+  @override
+  String get marathonViewProgress => 'Marathon progress';
+
+  @override
+  String get marathonInfoTitle => 'What is a marathon?';
+
+  @override
+  String marathonInfoBonusMatrix(
+    int shortTwo,
+    int shortThree,
+    int shortFour,
+    int longTwo,
+    int longThree,
+    int longFour,
+  ) {
+    return 'Completion bonus\n25 min: 2 sessions +$shortTwo, 3 sessions +$shortThree, 4 sessions +$shortFour points.\n50 min: 2 sessions +$longTwo, 3 sessions +$longThree, 4 sessions +$longFour points.\n\nThese extra points are awarded once, after every session has been saved and earned regular points, and every continuation is confirmed on time. They are added to the regular session points and do not earn extra sand.';
+  }
+
+  @override
+  String get onboardingGuideTitle => 'Get to know the app';
+
+  @override
+  String get onboardingGuideBody =>
+      'See how each screen works before you begin.';
+
+  @override
+  String get onboardingGuidePomoTitle => 'Pomo';
+
+  @override
+  String get onboardingGuidePomoBody =>
+      'Choose a category and a 25- or 50-minute session, then tap Start. You can pause once per session; pausing reduces its points. Completed sessions are saved.';
+
+  @override
+  String get onboardingGuideMarathonTitle => 'Marathon';
+
+  @override
+  String get onboardingGuideMarathonBody =>
+      'Use Start Marathon to plan 2, 3 or 4 sessions. Each break lasts 5 minutes. Tap I’m here within 1 minute after the break to continue; without confirmation, the marathon ends. Completed sessions keep their normal points. Finishing the whole plan adds +2/+3/+5 points for 25-minute sessions or +4/+6/+10 for 50-minute sessions, respectively.';
+
+  @override
+  String get onboardingGuideReportsTitle => 'Reports';
+
+  @override
+  String get onboardingGuideReportsBody =>
+      'See your daily, weekly and monthly study time, completed sessions and category breakdown. Track and change your daily goal. Your study day resets at 4:00 a.m.';
+
+  @override
+  String get onboardingGuideRankingTitle => 'Ranking';
+
+  @override
+  String get onboardingGuideRankingBody =>
+      'After your first session that earns points, you join a suitable league room at your tier. Follow the League, Monthly and Friends rankings here. The tiers are Bronze, Silver, Gold, Sapphire and Diamond. Sessions and reports are saved during preparation; official 14-day competitions start once there are enough active participants. The ? in Ranking explains the current promotion and award requirements.';
+
+  @override
+  String get onboardingGuideSocialTitle => 'Social';
+
+  @override
+  String get onboardingGuideSocialBody =>
+      'Send a request using a friend code; once accepted, you can see each other’s status. Studying friends show as Focusing. Only friends taking a marathon break show as On break. A red dot means focus; a green dot means a break. Change your visibility in Profile.';
+
+  @override
+  String get onboardingGuideProfileTitle => 'Profile';
+
+  @override
+  String get onboardingGuideProfileBody =>
+      'Tap your avatar at the top to open Profile. Manage categories, use earned sand to expand your avatar collection, and choose an avatar. You can also find language, theme, notification and visibility settings, help, privacy and account actions here.';
+
+  @override
+  String leagueInfoWhatBodyWithCapacity(int capacity) {
+    return 'After your first completed session that earns points, you join a suitable existing room in the same tier and period. A room holds up to $capacity people; a new room opens when it is full. Period rankings use points from sessions accepted by the server.';
+  }
+
+  @override
+  String leagueLaunchPreparingBody(int users) {
+    return 'Leagues are preparing. Once $users different users have completed a session in the last 14 days, the first official competition starts in the next full 14-day period. Sessions, points and reports are saved; preparation has no promotion, demotion or league avatar awards. Preparation points do not carry into the official competition.';
+  }
+
+  @override
+  String leagueLaunchScheduledBody(String date) {
+    return 'The first official league period starts on $date. Until then, sessions and reports are saved without promotion, demotion or league avatar awards. Preparation points do not carry into the competition.';
+  }
+
+  @override
+  String get leagueLaunchScheduledShort => 'Official league period starts';
+
+  @override
+  String leaguePromotionPolicyBody(
+    int active,
+    int days,
+    int minutes,
+    int points,
+  ) {
+    return 'Promotion requires at least $active active people who completed a session in your room this period. The promotion quota is one third of the active count, rounded down (3 active people: 1; 25 active people: 8). Complete at least $minutes focus minutes across $days different study days, earn at least $points points and finish within the quota this period. Diamond League has no promotion.';
+  }
+
+  @override
+  String leaguePromotionCurrentQuota(int count) {
+    return 'Current promotion quota in this room: the first $count places. The study day, minute and point requirements also apply.';
+  }
+
+  @override
+  String get leagueNoPromotionCurrentPeriod =>
+      'This room currently has too few active participants for promotion. Completed sessions continue to be saved.';
+
+  @override
+  String get leagueDemotionPolicyBody =>
+      'Demotion applies only in rooms with at least 10 active people: the bottom one third of the active count, rounded down, move down one tier. People who joined in the last 3 days and those in Bronze League are protected.';
+
+  @override
+  String leagueAwardActiveRequirements(
+    int members,
+    int days,
+    int minutes,
+    int points,
+  ) {
+    return 'An official league period needs at least $members active people in the room. Complete $minutes focus minutes across at least $days different study days and earn $points points. Preparation has no awards.';
+  }
+
+  @override
+  String get leaguePreparationNoChanges =>
+      'Everyone stays in their current league during preparation; no promotion, demotion or league avatar awards are given.';
+
+  @override
+  String get leagueLaunchPreparingShort =>
+      'Preparation · Promotion, demotion and league awards have not started yet.';
 }

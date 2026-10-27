@@ -59,7 +59,7 @@ Future<void> _toSegmentStep(WidgetTester tester, AppLocalizations l10n) async {
   await tester.drag(find.byType(CupertinoPicker), const Offset(0, -1040));
   await tester.pumpAndSettle();
   await _tap(tester, find.text(l10n.continueBtn));
-  expect(find.text('2/6'), findsOneWidget);
+  expect(find.text('2/7'), findsOneWidget);
 }
 
 List<String> _chips(WidgetTester tester, {bool selectedOnly = false}) => [
@@ -102,7 +102,7 @@ void main() {
       await _tap(tester, find.text(l10n.onboardingSegmentYks));
       await _tap(tester, find.text(l10n.continueBtn));
 
-      expect(find.text('3/6'), findsOneWidget);
+      expect(find.text('3/7'), findsOneWidget);
       expect(find.text(l10n.onboardingCategoryStepPreparedTitle), findsOneWidget);
       expect(find.text(l10n.onboardingCategoryStepPreparedBody(8)), findsOneWidget);
       expect(_chips(tester, selectedOnly: true), _yksFirst8);
@@ -111,7 +111,7 @@ void main() {
       expect((await _savedDraft()).autoCategories, _yksFirst8);
 
       await _tap(tester, find.text(l10n.continueBtn));
-      expect(find.text('4/6'), findsOneWidget, reason: 'hazır seçimle doğrudan devam edilir');
+      expect(find.text('4/7'), findsOneWidget, reason: 'hazır seçimle doğrudan devam edilir');
     });
 
     testWidgets('segment değişince yalnızca otomatik gelenler değişir; elle seçilen ve özel kategori korunur',
@@ -133,7 +133,7 @@ void main() {
 
       // Segment adımına dönüp KPSS: YKS'nin otomatik gelenleri gider.
       await _tap(tester, find.byTooltip(MaterialLocalizations.of(tester.element(find.byType(Scaffold))).backButtonTooltip));
-      expect(find.text('2/6'), findsOneWidget);
+      expect(find.text('2/7'), findsOneWidget);
       await _tap(tester, find.text(l10n.onboardingSegmentKpss));
       await _tap(tester, find.text(l10n.continueBtn));
 

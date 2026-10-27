@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../l10n/app_localizations.dart';
+import '../models/league_rules.dart';
 import '../theme.dart';
 import '../services/supabase_service.dart';
 import '../utils/responsive.dart';
@@ -20,7 +21,10 @@ import 'social/ranking_models.dart';
 // gösterilir.
 // Tablette ve yatay telefonda sheet tam genişliğe yayılmaz; içerik zaten
 // kaydırılabilir bir liste olduğu için kısa ekranda da taşmaz.
-Future<void> showLeagueInfoSheet(BuildContext context, {LeagueSnapshot? league}) {
+Future<void> showLeagueInfoSheet(
+  BuildContext context, {
+  LeagueSnapshot? league,
+}) {
   return showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -43,6 +47,7 @@ class _LeagueInfoSheetState extends State<LeagueInfoSheet> {
   bool _isLoading = true;
   LeagueSnapshot? _league;
   Map<String, dynamic> _pointsConfig = {};
+  LeagueRules _rules = LeagueRules.standard;
 
   @override
   void initState() {
@@ -54,8 +59,8 @@ class _LeagueInfoSheetState extends State<LeagueInfoSheet> {
   Future<void> _load() async {
     final service = SupabaseService.instance;
     final configFuture = service.getPointsConfig();
+    final rulesFuture = service.getLeagueRules();
     if (_league == null) {
-      final rulesFuture = service.getLeagueRules();
       try {
         final rows = await service.getLeagueRanking();
         if (rows.isNotEmpty) {
@@ -70,6 +75,7 @@ class _LeagueInfoSheetState extends State<LeagueInfoSheet> {
         debugPrint('[RANKING] Lig bilgisi alınamadı: $e');
       }
     }
+    _rules = _league?.rules ?? await rulesFuture;
     final config = await configFuture;
     if (mounted) {
       setState(() {
@@ -79,16 +85,23 @@ class _LeagueInfoSheetState extends State<LeagueInfoSheet> {
     }
   }
 
-  String _config(String key, Object fallback) => '${_pointsConfig[key] ?? fallback}';
+  String _config(String key, Object fallback) =>
+      '${_pointsConfig[key] ?? fallback}';
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColors.darkSurfaceContainerLowest : AppColors.surfaceContainerLowest;
-    final cardBg = isDark ? AppColors.darkSurfaceContainerLow : AppColors.surfaceContainerLow;
+    final bg = isDark
+        ? AppColors.darkSurfaceContainerLowest
+        : AppColors.surfaceContainerLowest;
+    final cardBg = isDark
+        ? AppColors.darkSurfaceContainerLow
+        : AppColors.surfaceContainerLow;
     final onSurface = isDark ? AppColors.darkOnSurface : AppColors.onSurface;
-    final onSurfaceVariant = isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant;
+    final onSurfaceVariant = isDark
+        ? AppColors.darkOnSurfaceVariant
+        : AppColors.onSurfaceVariant;
     final dailyLimit = _config('daily_league_session_limit', 16);
     // Yatay telefonda ekranın %85'i birkaç satıra denk gelir; sheet en
     // yüksek boyunda açılır (içerik yine kaydırılır).
@@ -106,7 +119,9 @@ class _LeagueInfoSheetState extends State<LeagueInfoSheet> {
             borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
           ),
           child: _isLoading
-              ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+              ? const Center(
+                  child: CircularProgressIndicator(color: AppColors.primary),
+                )
               : ListView(
                   controller: scrollController,
                   padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
@@ -127,16 +142,26 @@ class _LeagueInfoSheetState extends State<LeagueInfoSheet> {
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: AppColors.primaryContainer.withValues(alpha: 0.15),
+                            color: AppColors.primaryContainer.withValues(
+                              alpha: 0.15,
+                            ),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.hourglass_bottom_rounded, color: AppColors.primaryContainer, size: 24),
+                          child: const Icon(
+                            Icons.hourglass_bottom_rounded,
+                            color: AppColors.primaryContainer,
+                            size: 24,
+                          ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             l10n.leagueInfoTitle,
-                            style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: onSurface),
+                            style: TextStyle(
+                              fontSize: 19,
+                              fontWeight: FontWeight.bold,
+                              color: onSurface,
+                            ),
                           ),
                         ),
                       ],
@@ -147,8 +172,14 @@ class _LeagueInfoSheetState extends State<LeagueInfoSheet> {
                     _card(
                       cardBg,
                       Text(
-                        l10n.leagueInfoWhatBody,
-                        style: TextStyle(fontSize: 14, height: 1.5, color: onSurfaceVariant),
+                        l10n.leagueInfoWhatBodyWithCapacity(
+                          _rules.roomCapacity,
+                        ),
+                        style: TextStyle(
+                          fontSize: 14,
+                          height: 1.5,
+                          color: onSurfaceVariant,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -163,11 +194,27 @@ class _LeagueInfoSheetState extends State<LeagueInfoSheet> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _pointRow(Icons.timer_outlined, l10n.leagueInfoPoints25(_config('base_points_25min', 5)), onSurface),
+                          _pointRow(
+                            Icons.timer_outlined,
+                            l10n.leagueInfoPoints25(
+                              _config('base_points_25min', 5),
+                            ),
+                            onSurface,
+                          ),
                           const SizedBox(height: 8),
-                          _pointRow(Icons.timer, l10n.leagueInfoPoints50(_config('base_points_50min', 12)), onSurface),
+                          _pointRow(
+                            Icons.timer,
+                            l10n.leagueInfoPoints50(
+                              _config('base_points_50min', 12),
+                            ),
+                            onSurface,
+                          ),
                           const SizedBox(height: 8),
-                          _pointRow(Icons.local_fire_department_outlined, l10n.leagueInfoStreakBonus, onSurface),
+                          _pointRow(
+                            Icons.local_fire_department_outlined,
+                            l10n.leagueInfoStreakBonus,
+                            onSurface,
+                          ),
                           const SizedBox(height: 6),
                           ..._buildStreakTiers(l10n, onSurfaceVariant),
                           const SizedBox(height: 4),
@@ -175,19 +222,27 @@ class _LeagueInfoSheetState extends State<LeagueInfoSheet> {
                             padding: const EdgeInsets.only(left: 28),
                             child: Text(
                               l10n.leagueInfoStreakKeep,
-                              style: TextStyle(fontSize: 12, color: onSurfaceVariant),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: onSurfaceVariant,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 8),
                           _pointRow(
                             Icons.pause_circle_outline,
-                            l10n.leagueInfoPausePenalty(_config('pause_penalty_pct', 20)),
+                            l10n.leagueInfoPausePenalty(
+                              _config('pause_penalty_pct', 20),
+                            ),
                             onSurfaceVariant,
                           ),
                           const SizedBox(height: 8),
                           _pointRow(
                             Icons.savings_outlined,
-                            l10n.leagueInfoCoins(_config('coins_per_session', 20), dailyLimit),
+                            l10n.leagueInfoCoins(
+                              _config('coins_per_session', 20),
+                              dailyLimit,
+                            ),
                             onSurfaceVariant,
                           ),
                         ],
@@ -203,13 +258,56 @@ class _LeagueInfoSheetState extends State<LeagueInfoSheet> {
                         children: [
                           Text(
                             _periodText(l10n),
-                            style: TextStyle(fontSize: 13, color: onSurfaceVariant, height: 1.5),
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: onSurfaceVariant,
+                              height: 1.5,
+                            ),
                           ),
+                          if (_rules.hasLaunchPolicy) ...[
+                            const SizedBox(height: 10),
+                            Text(
+                              l10n.leaguePromotionPolicyBody(
+                                _rules.promotionMinActiveMembers,
+                                _rules.qualificationMinDays,
+                                _rules.qualificationMinMinutes,
+                                _rules.promotionMinPoints,
+                              ),
+                              style: TextStyle(
+                                fontSize: 14,
+                                height: 1.5,
+                                color: onSurfaceVariant,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              l10n.leagueDemotionPolicyBody,
+                              style: TextStyle(
+                                fontSize: 14,
+                                height: 1.5,
+                                color: onSurfaceVariant,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              leagueAwardsSubText(l10n, _rules),
+                              style: TextStyle(
+                                fontSize: 14,
+                                height: 1.5,
+                                color: onSurfaceVariant,
+                              ),
+                            ),
+                          ],
                           if (_league != null) ...[
                             const SizedBox(height: 10),
                             Text(
                               promotionDemotionText(l10n, _league!),
-                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: onSurface, height: 1.5),
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: onSurface,
+                                height: 1.5,
+                              ),
                             ),
                           ],
                         ],
@@ -222,7 +320,11 @@ class _LeagueInfoSheetState extends State<LeagueInfoSheet> {
                       cardBg,
                       Text(
                         l10n.leagueInfoDailyLimitBody(dailyLimit),
-                        style: TextStyle(fontSize: 14, height: 1.5, color: onSurfaceVariant),
+                        style: TextStyle(
+                          fontSize: 14,
+                          height: 1.5,
+                          color: onSurfaceVariant,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -233,9 +335,15 @@ class _LeagueInfoSheetState extends State<LeagueInfoSheet> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _faqRow(l10n.leagueInfoFaqLimit(dailyLimit), onSurfaceVariant),
+                          _faqRow(
+                            l10n.leagueInfoFaqLimit(dailyLimit),
+                            onSurfaceVariant,
+                          ),
                           const SizedBox(height: 8),
-                          _faqRow(l10n.leagueInfoFaqCancelled, onSurfaceVariant),
+                          _faqRow(
+                            l10n.leagueInfoFaqCancelled,
+                            onSurfaceVariant,
+                          ),
                           const SizedBox(height: 8),
                           _faqRow(l10n.leagueInfoFaqPending, onSurfaceVariant),
                           const SizedBox(height: 8),
@@ -261,13 +369,20 @@ class _LeagueInfoSheetState extends State<LeagueInfoSheet> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: isCurrent ? AppColors.primaryContainer.withValues(alpha: 0.15) : Colors.transparent,
+              color: isCurrent
+                  ? AppColors.primaryContainer.withValues(alpha: 0.15)
+                  : Colors.transparent,
               borderRadius: BorderRadius.circular(12),
-              border: isCurrent ? Border.all(color: AppColors.primaryContainer, width: 1.5) : null,
+              border: isCurrent
+                  ? Border.all(color: AppColors.primaryContainer, width: 1.5)
+                  : null,
             ),
             child: Row(
               children: [
-                Text(leagueTierEmoji(tier), style: const TextStyle(fontSize: 22)),
+                Text(
+                  leagueTierEmoji(tier),
+                  style: const TextStyle(fontSize: 22),
+                ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -281,14 +396,21 @@ class _LeagueInfoSheetState extends State<LeagueInfoSheet> {
                 ),
                 if (isCurrent)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
                       l10n.leagueInfoYouAreHere,
-                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
+                      style: const TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
               ],
@@ -300,14 +422,22 @@ class _LeagueInfoSheetState extends State<LeagueInfoSheet> {
   }
 
   String _periodText(AppLocalizations l10n) {
+    if (_rules.hasLaunchPolicy && !_rules.isCompetitionActive) {
+      return leaguePreparationText(l10n, _rules);
+    }
     final end = _league?.endDate;
     if (end == null) return l10n.leagueInfoPeriodGeneric;
-    final formatted = DateFormat.MMMMEEEEd(l10n.localeName).add_Hm().format(end.toLocal());
+    final formatted = DateFormat.MMMMEEEEd(
+      l10n.localeName,
+    ).add_Hm().format(end.toLocal());
     return l10n.leagueInfoPeriodEnds(formatted);
   }
 
   List<Widget> _buildStreakTiers(AppLocalizations l10n, Color color) {
-    final tiers = (_pointsConfig['streak_bonus_tiers'] as List?)?.whereType<Map>().toList() ??
+    final tiers =
+        (_pointsConfig['streak_bonus_tiers'] as List?)
+            ?.whereType<Map>()
+            .toList() ??
         const [
           {'min_days': 3, 'bonus_pct': 10},
           {'min_days': 7, 'bonus_pct': 20},
@@ -320,7 +450,11 @@ class _LeagueInfoSheetState extends State<LeagueInfoSheet> {
         Padding(
           padding: const EdgeInsets.only(left: 28, bottom: 4),
           child: Text(
-            _streakRangeText(l10n, tiers[i], i + 1 < tiers.length ? tiers[i + 1] : null),
+            _streakRangeText(
+              l10n,
+              tiers[i],
+              i + 1 < tiers.length ? tiers[i + 1] : null,
+            ),
             style: TextStyle(fontSize: 13, color: color),
           ),
         ),
@@ -331,7 +465,9 @@ class _LeagueInfoSheetState extends State<LeagueInfoSheet> {
     final from = '${tier['min_days']}';
     final pct = '${tier['bonus_pct']}';
     final nextMin = next?['min_days'];
-    if (nextMin is num) return l10n.leagueInfoStreakRange(from, '${nextMin.toInt() - 1}', pct);
+    if (nextMin is num) {
+      return l10n.leagueInfoStreakRange(from, '${nextMin.toInt() - 1}', pct);
+    }
     return l10n.leagueInfoStreakRangeOpen(from, pct);
   }
 
@@ -340,7 +476,11 @@ class _LeagueInfoSheetState extends State<LeagueInfoSheet> {
       padding: const EdgeInsets.only(bottom: 8, left: 4),
       child: Text(
         text,
-        style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: color),
+        style: TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.bold,
+          color: color,
+        ),
       ),
     );
   }
@@ -364,7 +504,10 @@ class _LeagueInfoSheetState extends State<LeagueInfoSheet> {
         Icon(icon, size: 18, color: AppColors.primaryContainer),
         const SizedBox(width: 10),
         Expanded(
-          child: Text(text, style: TextStyle(fontSize: 14, color: color, height: 1.4)),
+          child: Text(
+            text,
+            style: TextStyle(fontSize: 14, color: color, height: 1.4),
+          ),
         ),
       ],
     );
@@ -374,9 +517,19 @@ class _LeagueInfoSheetState extends State<LeagueInfoSheet> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('•  ', style: TextStyle(fontSize: 14, color: color, fontWeight: FontWeight.bold)),
+        Text(
+          '•  ',
+          style: TextStyle(
+            fontSize: 14,
+            color: color,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         Expanded(
-          child: Text(text, style: TextStyle(fontSize: 14, color: color, height: 1.4)),
+          child: Text(
+            text,
+            style: TextStyle(fontSize: 14, color: color, height: 1.4),
+          ),
         ),
       ],
     );
@@ -390,6 +543,20 @@ class _LeagueInfoSheetState extends State<LeagueInfoSheet> {
 @visibleForTesting
 String promotionDemotionText(AppLocalizations l10n, LeagueSnapshot league) {
   if (league.awaitingPlacement) return l10n.leagueAwaitingPlacementBody;
+  if (!league.rules.isCompetitionActive) return l10n.leaguePreparationNoChanges;
+  if (league.rules.hasLaunchPolicy) {
+    final promotion = league.isTopTier
+        ? l10n.leagueInfoTopTier
+        : league.promotionZoneEnd > 0
+        ? l10n.leaguePromotionCurrentQuota(league.promotionZoneEnd)
+        : l10n.leagueNoPromotionCurrentPeriod;
+    final demotion = league.isBottomTier
+        ? l10n.leagueInfoNoDemotionBronze
+        : league.demotionCount > 0
+        ? l10n.leagueInfoDemote(league.demotionCount)
+        : l10n.leagueInfoNoDemotionThisPeriod;
+    return '$promotion\n$demotion';
+  }
   final promotion = league.isTopTier
       ? l10n.leagueInfoTopTier
       : leagueInfoPromoteText(l10n, league.promotionZoneEnd, league.rules);
@@ -402,4 +569,17 @@ String promotionDemotionText(AppLocalizations l10n, LeagueSnapshot league) {
     demotion = l10n.leagueInfoDemote(league.demotionCount);
   }
   return '$promotion\n$demotion';
+}
+
+/// Hazırlıkta bir bitiş tarihi varmış gibi geri sayılmaz; planlanmışsa
+/// sunucunun verdiği ilk resmi başlangıç tarihi açıklanır.
+String leaguePreparationText(AppLocalizations l10n, LeagueRules rules) {
+  final start = rules.competitionStartsAt;
+  if (rules.competitionPhase == 'scheduled' && start != null) {
+    final formatted = DateFormat.MMMMEEEEd(
+      l10n.localeName,
+    ).add_Hm().format(start.toLocal());
+    return l10n.leagueLaunchScheduledBody(formatted);
+  }
+  return l10n.leagueLaunchPreparingBody(rules.launchMinActiveUsers);
 }

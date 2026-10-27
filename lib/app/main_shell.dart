@@ -17,11 +17,12 @@ import '../screens/reports_screen.dart';
 import '../screens/social_screen.dart';
 import '../screens/timer_screen.dart';
 import '../services/language_service.dart';
-import '../services/local_test_mode.dart';
 import '../services/lock_screen_timer.dart';
+import '../services/marathon_presence.dart';
 import '../services/notification_service.dart';
 import '../services/supabase_service.dart';
 import '../services/timer_persistence.dart';
+import '../utils/async_lock.dart';
 import '../widgets/avatar_widget.dart';
 import '../widgets/league_info_sheet.dart';
 import '../widgets/shell_app_bar.dart';
@@ -49,7 +50,8 @@ class MainNavigationShell extends StatefulWidget {
   State<MainNavigationShell> createState() => _MainNavigationShellState();
 }
 
-class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsBindingObserver {
+class _MainNavigationShellState extends State<MainNavigationShell>
+    with WidgetsBindingObserver {
   // Kuyrukta geçici bir nedenle (ağ, zaman aşımı, sunucu, oturum) kalan
   // seanslar, uygulama ön plandayken artan aralıklarla yeniden denenir.
   // Bağlantı türü değişmeden ağ düzelirse ya da ilk istek ölü sokete
@@ -68,6 +70,13 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
   int _currentIndex = 0;
   late List<CourseCategory> _categories;
   bool _isTimerRunning = false;
+  bool _isMarathonBreak = false;
+  bool _isLoggingOut = false;
+  final AsyncLock _presenceLock = AsyncLock();
+  int _presenceRevision = 0;
+  bool _marathonAvailable = false;
+  bool _loadingMarathonConfig = false;
+  Map<int, Map<int, int>>? _marathonBonuses;
   bool _categorySeedAttempted = false;
   // Bulut hazırken yapılan açılış işleri (auth dinleyicisi, profil,
   // kategoriler) bu kabukta yapıldı mı? Bulut açılıştan sonra gelirse
@@ -75,14 +84,17 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
   late bool _cloudSeen;
 
   StreamSubscription<AuthState>? _authSubscription;
-  late final ConnectionWatcher _connection = ConnectionWatcher(onOnline: _onConnectivityOnline);
+  late final ConnectionWatcher _connection = ConnectionWatcher(
+    onOnline: _onConnectivityOnline,
+  );
   Timer? _syncRetryTimer;
   int _syncRetryAttempt = 0;
 
   UserModel get _user => widget.user;
 
   bool get _needsCategoryReload =>
-      _categories.isEmpty || _categories.any((c) => !SupabaseService.isServerCategoryId(c.id));
+      _categories.isEmpty ||
+      _categories.any((c) => !SupabaseService.isServerCategoryId(c.id));
 
   @override
   void initState() {
@@ -101,6 +113,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
     unawaited(_service.getPointsConfig());
     // Apple ile girilmiş oturumda Ayarlar'dan izin kaldırıldıysa tam çıkış.
     unawaited(_service.verifyAppleCredential());
+    unawaited(_loadMarathonConfig());
   }
 
   @override
@@ -115,7 +128,9 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
 
   static bool get _isInForeground {
     final state = WidgetsBinding.instance.lifecycleState;
-    return state == null || state == AppLifecycleState.resumed || state == AppLifecycleState.inactive;
+    return state == null ||
+        state == AppLifecycleState.resumed ||
+        state == AppLifecycleState.inactive;
   }
 
   @override
@@ -125,10 +140,15 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
         // Ön plana dönüş: askıdayken kaçan bağlantı olayı yerine bekleyenler
         // denenir; bulut başlatılamamışsa yeniden denenir.
         _syncRetryAttempt = 0;
-        if (_service.pendingSessionCount.value > 0 || !_service.isCloudActive) unawaited(_syncPendingSessions());
+        if (_service.pendingSessionCount.value > 0 || !_service.isCloudActive) {
+          unawaited(_syncPendingSessions());
+        }
         unawaited(_service.verifyAppleCredential());
         unawaited(_service.syncDeviceTimeZone());
-      case AppLifecycleState.paused || AppLifecycleState.hidden || AppLifecycleState.detached:
+        unawaited(_loadMarathonConfig());
+      case AppLifecycleState.paused ||
+          AppLifecycleState.hidden ||
+          AppLifecycleState.detached:
         _cancelSyncRetry();
       case AppLifecycleState.inactive:
         break;
@@ -139,26 +159,31 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
     if (!_service.isCloudActive || _authSubscription != null) return;
     // Oturumun düşmesi (signedOut) serviste işlenir: kullanıcı null olur ve
     // AppGate giriş ekranını gösterir.
-    _authSubscription = Supabase.instance.client.auth.onAuthStateChange.listen(
-      (data) {
-        final session = data.session;
-        if (session == null) return;
-        // Girişte zaten yüklenmiş kullanıcı için yeniden okuma yapılmaz.
-        final isNewSignIn = data.event == AuthChangeEvent.signedIn && session.user.id != _user.id;
-        if (isNewSignIn || data.event == AuthChangeEvent.tokenRefreshed) {
-          unawaited(_refreshUser());
-          unawaited(_loadCategories());
-          // Süresi dolmuş oturum yüzünden ('auth') bekleyen seanslar artık gönderilebilir.
-          if (_service.pendingSessionCount.value > 0) unawaited(_syncPendingSessions());
+    _authSubscription = Supabase.instance.client.auth.onAuthStateChange.listen((
+      data,
+    ) {
+      final session = data.session;
+      if (session == null) return;
+      // Girişte zaten yüklenmiş kullanıcı için yeniden okuma yapılmaz.
+      final isNewSignIn =
+          data.event == AuthChangeEvent.signedIn && session.user.id != _user.id;
+      if (isNewSignIn || data.event == AuthChangeEvent.tokenRefreshed) {
+        unawaited(_refreshUser());
+        unawaited(_loadCategories());
+        // Süresi dolmuş oturum yüzünden ('auth') bekleyen seanslar artık gönderilebilir.
+        if (_service.pendingSessionCount.value > 0) {
+          unawaited(_syncPendingSessions());
         }
-      },
-      onError: (Object e) => debugPrint('[AUTH] onAuthStateChange hatası: $e'),
-    );
+      }
+    }, onError: (Object e) => debugPrint('[AUTH] onAuthStateChange hatası: $e'));
   }
 
   void _listenConnectivity() {
     final connectivity = Connectivity();
-    _connection.start(changes: connectivity.onConnectivityChanged, check: connectivity.checkConnectivity);
+    _connection.start(
+      changes: connectivity.onConnectivityChanged,
+      check: connectivity.checkConnectivity,
+    );
   }
 
   // Bağlı görünen her olayda kuyruk (ve gerekirse bulut başlatması) denenir;
@@ -170,6 +195,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
     if (cameOnline) _syncRetryAttempt = 0;
     unawaited(_syncPendingSessions());
     if (cameOnline) {
+      unawaited(_loadMarathonConfig());
       unawaited(_refreshUser());
       unawaited(_service.refreshAvatarCatalog());
       _service.notifyConnectionRestored();
@@ -189,6 +215,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
       unawaited(_refreshUser());
       unawaited(_service.refreshAvatarCatalog());
       _service.notifyConnectionRestored();
+      unawaited(_loadMarathonConfig());
     }
     return true;
   }
@@ -201,6 +228,44 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
       await _service.fetchCurrentUserModel();
     } catch (e) {
       debugPrint('[SHELL] Profil tazelenemedi: $e');
+    }
+  }
+
+  Future<void> _loadMarathonConfig() async {
+    if (_loadingMarathonConfig || !mounted || !_ownsCurrentSession) return;
+    _loadingMarathonConfig = true;
+    final owner = _user.id;
+    try {
+      final config = await _service.getMarathonConfig();
+      final raw = config?['bonuses'];
+      final bonuses = <int, Map<int, int>>{};
+      if (raw is Map) {
+        for (final minutes in [25, 50]) {
+          final row = raw[minutes.toString()];
+          if (row is! Map) continue;
+          bonuses[minutes] = {
+            for (final count in [2, 3, 4])
+              if (row[count.toString()] is int &&
+                  (row[count.toString()] as int) >= 0)
+                count: row[count.toString()] as int,
+          };
+        }
+      }
+      final available =
+          supportsMarathonPresence(config) &&
+          bonuses.length == 2 &&
+          bonuses.values.every((row) => row.length == 3);
+      if (mounted && _ownsCurrentSession && _user.id == owner) {
+        setState(() {
+          _marathonAvailable = available;
+          _marathonBonuses = available ? bonuses : null;
+        });
+      }
+    } catch (e) {
+      // Daha önce doğrulanmış sözleşme kısa ağ kesintisinde unutulmaz.
+      debugPrint('[SHELL] Maraton ayarları okunamadı: $e');
+    } finally {
+      _loadingMarathonConfig = false;
     }
   }
 
@@ -217,7 +282,9 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
       final before = await _service.getPendingSessionCount();
       final result = await _service.syncPendingSessions();
       // İlerleme olduysa (ya da kuyruk boşaldıysa) bekleme aralığı baştan başlar.
-      if (result.remaining < before || result.remaining == 0) _syncRetryAttempt = 0;
+      if (result.remaining < before || result.remaining == 0) {
+        _syncRetryAttempt = 0;
+      }
       // Gönderilen seansların puan/kum/dakika etkisi sunucudan taze okunur.
       if (result.remaining < before) await _refreshUser();
       retry = result.retryable;
@@ -235,7 +302,11 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
   void _scheduleSyncRetry() {
     if (!mounted || !_isInForeground) return;
     _syncRetryTimer?.cancel();
-    final delay = _syncRetryDelays[math.min(_syncRetryAttempt, _syncRetryDelays.length - 1)];
+    final delay =
+        _syncRetryDelays[math.min(
+          _syncRetryAttempt,
+          _syncRetryDelays.length - 1,
+        )];
     _syncRetryAttempt++;
     _syncRetryTimer = Timer(delay, () {
       _syncRetryTimer = null;
@@ -266,23 +337,77 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
     if (mounted) setState(() => _categories = result.categories);
   }
 
-  void _onTimerStateChanged(bool isRunning, String categoryName, int minutesLeft) {
-    if (mounted && _isTimerRunning != isRunning) setState(() => _isTimerRunning = isRunning);
-    // Kayıtsız hızlı sayaç canlı listeye girmez. Yerel kayıtlı QA modu
-    // normal sosyal başlat/bitir akışını da çalıştırır.
-    if (kQuickTimer && !recordLocalQuickSessions) return;
-    if (isRunning) {
-      unawaited(_service.startStudySession(durationMinutes: minutesLeft, categoryName: categoryName));
-    } else {
-      unawaited(_service.cancelStudySession());
+  void _onTimerStateChanged(
+    bool isRunning,
+    String categoryName,
+    int minutesLeft,
+  ) {
+    if (mounted && _isTimerRunning != isRunning) {
+      setState(() => _isTimerRunning = isRunning);
     }
+    _queuePresence(
+      () => isRunning
+          ? _service.startStudySession(
+              durationMinutes: minutesLeft,
+              categoryName: categoryName,
+            )
+          : _service.cancelStudySession(),
+    );
+  }
+
+  bool get _ownsCurrentSession =>
+      !_isLoggingOut &&
+      !_service.isDeviceSessionEnding &&
+      _service.currentUser.value?.id == _user.id;
+
+  /// Odak/mola/iptal istekleri sırayla gider. Geç kalan bir iptal, yeni
+  /// molayı ya da Pomodoro'yu sunucuda silemez; eski hesap da yeni hesaba
+  /// durum yazamaz. Henüz başlamamış bayat istekler atlanır.
+  void _queuePresence(Future<void> Function() action) {
+    final owner = _user.id;
+    final revision = ++_presenceRevision;
+    unawaited(
+      _presenceLock.synchronized(() async {
+        if (!mounted ||
+            !_ownsCurrentSession ||
+            _user.id != owner ||
+            revision != _presenceRevision) {
+          return;
+        }
+        try {
+          await action();
+        } catch (e) {
+          debugPrint('[SHELL] Sosyal çalışma durumu güncellenemedi: $e');
+        }
+      }),
+    );
+  }
+
+  void _onMarathonBreakChanged(bool isOnBreak, int secondsLeft) {
+    if (mounted && _isMarathonBreak != isOnBreak) {
+      setState(() => _isMarathonBreak = isOnBreak);
+    }
+    final endsAt = DateTime.now().add(Duration(seconds: secondsLeft));
+    _queuePresence(() async {
+      if (isOnBreak && secondsLeft > 0) {
+        await _service.startStudyBreak(endsAt: endsAt);
+      } else {
+        await _service.cancelStudySession();
+      }
+    });
   }
 
   /// Seans önce cihazdaki kuyruğa yazılır, sonra (bekleyen eski seanslarla
   /// birlikte, başlangıç sırasıyla) gönderilir. Başarıda servis kullanıcıyı
   /// günceller. Sonucu (puan, kum, seri, kuyruk ya da ret nedeni) sayaç
   /// ekranının seans sonu diyaloğu gösterir.
-  Future<SessionSubmitResult?> _onSessionCompleted(ActiveTimerSession session) async {
+  Future<SessionSubmitResult?> _onSessionCompleted(
+    ActiveTimerSession session,
+  ) async {
+    if (!_ownsCurrentSession) return null;
+    if (session.isQuickTest) {
+      return const SessionSubmitRejected(SessionReason.invalidData);
+    }
     final result = await _service.submitCompletedSession(
       clientUuid: session.clientUuid,
       categoryId: session.categoryId,
@@ -292,21 +417,50 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
       foregroundSeconds: session.foregroundSeconds,
       startedAt: session.startedAt,
       recordAccelerated: session.recordAccelerated,
+      marathonUuid: session.marathon?.marathonUuid,
+      marathonTargetSessions: session.marathon?.totalSessions,
+      marathonSessionIndex: session.marathon?.sessionIndex,
     );
     if (!mounted) return result;
     // Ağ/sunucu yüzünden kuyrukta kaldıysa kendiliğinden yeniden denenir
     // (yalnızca çakışma nedeniyle bekleyen seans için anlamsız).
-    if (result is SessionSubmitQueued && result.reasonCode != SessionReason.overlap) _scheduleSyncRetry();
+    if (result is SessionSubmitQueued &&
+        result.reasonCode != SessionReason.overlap) {
+      _scheduleSyncRetry();
+    }
     unawaited(_showRejectedNotices());
     return result;
+  }
+
+  Future<bool> _onConfirmMarathonPresence(
+    ActiveTimerSession previous,
+    String nextUuid,
+  ) async {
+    final plan = previous.marathon;
+    if (!_ownsCurrentSession || plan == null || !_isInForeground) return false;
+    final owner = _user.id;
+    final confirmed = await _service.confirmMarathonPresence(
+      marathonUuid: plan.marathonUuid,
+      completedSessionIndex: plan.completedSessions,
+      previousClientUuid: previous.clientUuid,
+      nextClientUuid: nextUuid,
+    );
+    return confirmed &&
+        mounted &&
+        _ownsCurrentSession &&
+        _user.id == owner &&
+        _isInForeground;
   }
 
   Future<void> _logout() async {
     // Süren seans kullanıcıya bağlı olarak cihazda kalır (aynı hesapla
     // girişte sürer); canlı listeden çıkılır, bekleyen bildirim iptal edilir
     // ve kilit ekranı sayacı kaldırılır.
-    if (_isTimerRunning) await _service.cancelStudySession();
+    _isLoggingOut = true;
+    _presenceRevision++;
+    await _presenceLock.synchronized(_service.cancelStudySession);
     await NotificationService.instance.cancelSessionEndNotification();
+    await NotificationService.instance.cancelMarathonBreakEnd();
     await LockScreenTimer.instance.clear();
     await _service.signOutFully();
   }
@@ -335,7 +489,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
       setState(() => _currentIndex = 0);
       return;
     }
-    if (!_isTimerRunning) return;
+    if (!_isTimerRunning && !_isMarathonBreak) return;
     final l10n = AppLocalizations.of(context)!;
     final leave = await showDialog<bool>(
       context: context,
@@ -362,8 +516,11 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
   @override
   Widget build(BuildContext context) {
     final user = _user;
-    final isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
-    final hideUI = isLandscape && _isTimerRunning && _currentIndex == 0;
+    final isLandscape =
+        MediaQuery.orientationOf(context) == Orientation.landscape;
+    // Yatay Pomo yalnız animasyon, sayaç ve seans kontrollerini gösterir.
+    // Duraklatma/mola sırasında da kabuk geri gelerek düzeni değiştirmez.
+    final hideUI = isLandscape && _currentIndex == 0;
     final ownerEmail = user.email.toLowerCase();
 
     final screens = [
@@ -371,8 +528,13 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
         categories: _categories,
         sessionOwnerKey: user.id ?? ownerEmail,
         legacySessionOwnerKey: ownerEmail,
+        isSessionActive: () => _ownsCurrentSession,
         onOpenSettings: _openProfile,
         onTimerStateChanged: _onTimerStateChanged,
+        onMarathonBreakChanged: _onMarathonBreakChanged,
+        onConfirmMarathonPresence: _onConfirmMarathonPresence,
+        marathonAvailable: _marathonAvailable,
+        marathonBonuses: _marathonBonuses,
         onSessionCompleted: _onSessionCompleted,
         userSegment: user.userSegment,
       ),
@@ -390,7 +552,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
         final lang = LanguageService.instance;
 
         return PopScope(
-          canPop: _currentIndex == 0 && !_isTimerRunning,
+          canPop: _currentIndex == 0 && !_isTimerRunning && !_isMarathonBreak,
           onPopInvokedWithResult: (didPop, _) {
             if (!didPop) unawaited(_onBackPressed());
           },
@@ -398,9 +560,14 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
           child: ShellNavigationScaffold(
             showNavigation: !hideUI,
             selectedIndex: _currentIndex,
-            onDestinationSelected: (index) => setState(() => _currentIndex = index),
+            onDestinationSelected: (index) =>
+                setState(() => _currentIndex = index),
             destinations: [
-              const ShellDestination(icon: Icons.timer_outlined, selectedIcon: Icons.timer, label: 'Pomo'),
+              const ShellDestination(
+                icon: Icons.timer_outlined,
+                selectedIcon: Icons.timer,
+                label: 'Pomo',
+              ),
               ShellDestination(
                 icon: Icons.analytics_outlined,
                 selectedIcon: Icons.analytics,
@@ -438,8 +605,11 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
               children: [
                 ValueListenableBuilder<int>(
                   valueListenable: _service.pendingSessionCount,
-                  builder: (context, count, _) => count > 0
-                      ? ShellPendingBanner(count: count, onTap: _syncPendingSessions)
+                  builder: (context, count, _) => count > 0 && !hideUI
+                      ? ShellPendingBanner(
+                          count: count,
+                          onTap: _syncPendingSessions,
+                        )
                       : const SizedBox.shrink(),
                 ),
                 Expanded(
@@ -449,7 +619,10 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
                     index: _currentIndex,
                     children: [
                       for (var i = 0; i < screens.length; i++)
-                        TickerMode(enabled: i == _currentIndex, child: screens[i]),
+                        TickerMode(
+                          enabled: i == _currentIndex,
+                          child: screens[i],
+                        ),
                     ],
                   ),
                 ),
@@ -468,7 +641,8 @@ class _MainNavigationShellState extends State<MainNavigationShell> with WidgetsB
 /// dahil) olmayan hesap. [seedAttempted] tur başına tek tohumlama denemesini
 /// izler.
 @visibleForTesting
-Future<({List<CourseCategory> categories, bool seedAttempted})> loadShellCategories(
+Future<({List<CourseCategory> categories, bool seedAttempted})>
+loadShellCategories(
   SupabaseService service, {
   required String email,
   String? uid,
@@ -490,10 +664,14 @@ Future<({List<CourseCategory> categories, bool seedAttempted})> loadShellCategor
         final all = await service.fetchUserCategories(includeArchived: true);
         cloud = all.isNotEmpty
             ? active
-            : await service.ensureServerCategories(await CategoryCache.read(email, uid: uid) ?? const []);
+            : await service.ensureServerCategories(
+                await CategoryCache.read(email, uid: uid) ?? const [],
+              );
       }
     } catch (e) {
-      debugPrint('[SHELL] Kategoriler buluttan alınamadı, önbelleğe düşülüyor: $e');
+      debugPrint(
+        '[SHELL] Kategoriler buluttan alınamadı, önbelleğe düşülüyor: $e',
+      );
       cloud = null;
     }
   }
@@ -504,7 +682,9 @@ Future<({List<CourseCategory> categories, bool seedAttempted})> loadShellCategor
     await CategoryCache.write(email, cloud, uid: uid);
     categories = cloud;
   } else {
-    categories = await CategoryCache.read(email, uid: uid) ?? CourseCategory.initialCategories();
+    categories =
+        await CategoryCache.read(email, uid: uid) ??
+        CourseCategory.initialCategories();
   }
   return (categories: categories, seedAttempted: attempted);
 }

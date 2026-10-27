@@ -17,16 +17,18 @@ class AvatarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final displayAvatar = avatar.isRetired ? AvatarCharacter.byId(kDefaultAvatarId) : avatar;
     // Görsel gösterildiği boyutta çözülür; listelerde tam boy PNG çözmek
     // gereksiz bellek tüketiyordu.
     final cacheWidth = (size * MediaQuery.devicePixelRatioOf(context)).round();
     final Widget image = Image.asset(
-      avatar.imagePath,
+      displayAvatar.imagePath,
       fit: BoxFit.cover,
+      alignment: Alignment.center,
       cacheWidth: cacheWidth,
       errorBuilder: (context, error, stackTrace) => Center(
         child: Text(
-          avatar.emoji,
+          displayAvatar.emoji,
           style: TextStyle(fontSize: size * 0.5),
         ),
       ),
@@ -36,7 +38,7 @@ class AvatarWidget extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: avatar.backgroundColor,
+        color: displayAvatar.backgroundColor,
         shape: BoxShape.circle,
         border: Border.all(
           color: Colors.white,

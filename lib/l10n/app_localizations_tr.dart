@@ -145,26 +145,26 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get socialNoLiveFriends =>
-      'Şu an çalışan arkadaşın yok. Biri odaklanmaya başladığında burada görünecek.';
+      'Şu an odaklanan veya molada olan arkadaşın yok. Çalışmaya başladıklarında burada görünecekler.';
 
   @override
   String get socialLoadError =>
       'Arkadaşlarının durumu yüklenemedi. Bağlantını kontrol edip tekrar dene.';
 
   @override
-  String get leagueTierBronze => 'Bronz Kum Saati';
+  String get leagueTierBronze => 'Bronz Lig';
 
   @override
-  String get leagueTierSilver => 'Gümüş Kum Saati';
+  String get leagueTierSilver => 'Gümüş Lig';
 
   @override
-  String get leagueTierGold => 'Altın Kum Saati';
+  String get leagueTierGold => 'Altın Lig';
 
   @override
-  String get leagueTierSapphire => 'Safir Kum Saati';
+  String get leagueTierSapphire => 'Safir Lig';
 
   @override
-  String get leagueTierDiamond => 'Elmas Kum Saati';
+  String get leagueTierDiamond => 'Elmas Lig';
 
   @override
   String leagueTierLeagueName(String tier) {
@@ -179,7 +179,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get leagueInfoWhatBody =>
-      'Her lig döneminde seninle benzer seviyedeki en fazla 30 kişiyle aynı gruba düşersin. Dönem boyunca kim daha çok odaklanırsa üst sıraya çıkar.';
+      'İlk puanlı seansından sonra benzer seviyedeki kullanıcılarla bir lig odasına yerleşirsin. Oda kapasitesi ve dönem kuralları sunucudan okunur; puan topladıkça sıralamada ilerlersin.';
 
   @override
   String get leagueInfoTiersTitle => 'Lig Kademeleri';
@@ -263,7 +263,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get leagueAwaitingPlacementBody =>
-      'Bu dönem ilk pomodoronu tamamladığında seninle benzer seviyedeki en fazla 30 kişilik bir odaya yerleşirsin. Sıralaman ve yükselme durumun burada görünür.';
+      'İlk puanlı pomodoronu tamamladığında seninle aynı kademedeki uygun bir lig odasına yerleşirsin. Sıralaman ve güncel dönem kuralları burada görünür.';
 
   @override
   String get leagueInfoDailyLimitTitle => 'Günlük Sınır';
@@ -440,6 +440,9 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get avatarPurchaseTitle => 'Satın Al';
+
+  @override
+  String get specialAvatarsTitle => 'Özel Avatarlar';
 
   @override
   String avatarPurchaseBody(String name, int price) {
@@ -1519,7 +1522,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get onboardingCreateOwnCategory => '+ Kendi kategorimi oluştur';
 
   @override
-  String get onboardingGoalStepTitle => 'Son bir adım kaldı! 🚀';
+  String get onboardingGoalStepTitle => 'Günlük hedefini seç';
 
   @override
   String get onboardingGoalStepBody =>
@@ -2065,11 +2068,18 @@ class AppLocalizationsTr extends AppLocalizations {
   String get sendPasswordResetEmail => 'Doğrulama maili gönder';
 
   @override
-  String get passwordResetSentTitle => 'Mailinize gönderildi';
+  String get passwordResetSentTitle => 'E-postanı kontrol et';
 
   @override
   String get passwordResetSentDescription =>
       'Bu adresle kayıtlı bir hesap varsa şifre sıfırlama bağlantısını gönderdik. Gelen kutunu ve spam klasörünü kontrol et; e-postadaki bağlantıdan yeni şifreni belirleyebilirsin.';
+
+  @override
+  String get passwordResetLocalTitle => 'Yerel e-posta';
+
+  @override
+  String get passwordResetLocalDescription =>
+      'Bu sürüm yerel ortama bağlı. E-postalar gerçek gelen kutuna gönderilmez; yerel Mailpit kutusunda tutulur. Buradaki hesaplar ve şifreler normal hesabından ayrıdır. Normal hesabını sıfırlamak için PomoSprint normal çalıştırma seçeneğini kullan.';
 
   @override
   String get timerQuickRecordedSemantics =>
@@ -2169,4 +2179,310 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get reportSendFailed => 'Bildirim gönderilemedi. Tekrar dene.';
+
+  @override
+  String get marathonTitle => 'Maraton';
+
+  @override
+  String get marathonSingle => 'Tek seans';
+
+  @override
+  String get marathonChooseCount => 'Kaç seans yapmak istiyorsunuz?';
+
+  @override
+  String marathonCountOption(int count) {
+    return '$count Pomodoro';
+  }
+
+  @override
+  String marathonProgress(int current, int total) {
+    return '$current/$total Pomodoro';
+  }
+
+  @override
+  String get marathonBreakTitle => 'Mola';
+
+  @override
+  String get marathonBreakHint =>
+      'Mola bitince 1 dakika içinde “Buradayım” diyerek devam et.';
+
+  @override
+  String get marathonAutomaticHint =>
+      'Maraton, art arda 2, 3 veya 4 Pomodoro yapmanı sağlayan bir çalışma planıdır. Planın için 25 ya da 50 dakika seçersin; maratondaki tüm Pomodorolar bu sürede olur.\n\nSeansların arasında 5 dakika mola verirsin. Mola bitince 1 dakika içinde “Buradayım”a dokunarak sıradaki seansı başlatırsın. Devam onayı için internet bağlantısı gerekir.\n\nOnay vermezsen veya maratonu erken bitirirsen kalan plan durur. Tamamladığın seanslar ve normal puanların korunur; tamamlama bonusu kazanılmaz. Mola ve onay bekleme süresi çalışma sürene eklenmez.';
+
+  @override
+  String marathonBreakRemainingSemantics(int minutes, int seconds) {
+    return 'Mola: $minutes dakika $seconds saniye kaldı';
+  }
+
+  @override
+  String get marathonStart => 'MARATONU BAŞLAT';
+
+  @override
+  String get marathonStop => 'Maratonu bitir';
+
+  @override
+  String get marathonStopped =>
+      'Maraton bitirildi. Tamamladığın Pomodorolar ve normal puanların korundu.';
+
+  @override
+  String get marathonStopConfirmTitle => 'Maratonu bitirelim mi?';
+
+  @override
+  String marathonStopConfirmBody(int completed, int total) {
+    return '$completed/$total Pomodoro tamamladın. Tamamladıkların korunur; devam eden Pomodoro kaydedilmez.';
+  }
+
+  @override
+  String get marathonStopConfirmAction => 'Maratonu bitir';
+
+  @override
+  String get marathonCompletedTitle => 'Maraton tamamlandı!';
+
+  @override
+  String marathonCompletedBody(int count, int minutes) {
+    return '$count Pomodoro ile $minutes dakika odaklandın.';
+  }
+
+  @override
+  String get marathonSaving => 'Pomodoro kaydediliyor…';
+
+  @override
+  String get marathonRetrySave => 'Kaydı tekrar dene';
+
+  @override
+  String get marathonSaveFailed =>
+      'Tamamlanan Pomodoro cihazında saklanıyor. Kaydı yeniden göndermek için tekrar dene. Devam süresi dolarsa maraton durur; tamamladığın kayıt korunur.';
+
+  @override
+  String get marathonStoppedRejected =>
+      'Pomodoro kaydı kabul edilmedi. Maraton durduruldu; önceki kayıtların korundu.';
+
+  @override
+  String marathonMinutesSummary(int focusMinutes, int elapsedMinutes) {
+    return '$focusMinutes dk çalışma · molalarla yaklaşık $elapsedMinutes dk';
+  }
+
+  @override
+  String get marathonResumePlan => 'Maratona devam et';
+
+  @override
+  String get notifMarathonBreakDoneTitle => 'Mola bitti';
+
+  @override
+  String notifMarathonBreakDoneBody(int nextSession, int totalSessions) {
+    return 'Maraton: $nextSession/$totalSessions Pomodoro. 1 dakika içinde uygulamayı açıp “Buradayım” diyerek devam et.';
+  }
+
+  @override
+  String get socialOnBreak => 'Molada';
+
+  @override
+  String get socialNoBreakFriends => 'Şu an molada olan arkadaşın yok.';
+
+  @override
+  String marathonBonusPoints(int points) {
+    return '+$points Maraton bonusu';
+  }
+
+  @override
+  String marathonBonusHint(int points) {
+    return 'Maratonu tamamlayınca +$points ek puan';
+  }
+
+  @override
+  String get marathonBonusPending =>
+      'Maraton bonusu, bekleyen Pomodorolar kaydedildiğinde ve tamamlama koşulları sağlandığında hesaplanacak.';
+
+  @override
+  String get marathonUnavailable => 'Maraton şu an kullanılamıyor.';
+
+  @override
+  String get marathonStartFailed =>
+      'Maraton başlatılamadı. Lütfen tekrar dene.';
+
+  @override
+  String get marathonPresenceTitle => 'Burada mısın?';
+
+  @override
+  String get marathonPresenceHint =>
+      'Molan bitti. Sıradaki seansı başlatmak için 1 dakika içinde “Buradayım”a dokun.';
+
+  @override
+  String get marathonPresenceConfirm => 'Buradayım';
+
+  @override
+  String get marathonPresenceChecking => 'Onaylanıyor…';
+
+  @override
+  String get marathonPresenceConnectionNeeded =>
+      'Onay alınamadı. İnternet bağlantını kontrol edip süre dolmadan tekrar dene.';
+
+  @override
+  String get marathonPresenceExpired =>
+      'Devam onayı gelmediği için maraton durdu. Tamamladığın seanslar korundu.';
+
+  @override
+  String marathonPresenceRemainingSemantics(int minutes, int seconds) {
+    return 'Devam onayı için $minutes dakika $seconds saniye kaldı';
+  }
+
+  @override
+  String get marathonStepStart => 'Başlangıç';
+
+  @override
+  String get marathonStepGoal => 'Hedef';
+
+  @override
+  String marathonSessionCount(int count) {
+    return '$count seans';
+  }
+
+  @override
+  String get marathonStepCompleted => 'Tamamlandı';
+
+  @override
+  String get marathonStepCurrent => 'Şimdiki seans';
+
+  @override
+  String get marathonStepUpcoming => 'Sıradaki seans';
+
+  @override
+  String get marathonStoppedInvalid =>
+      'Pomodoro kaydedildi. Maraton doğrulaması tamamlanamadığı için plan durduruldu; kayıtların korundu.';
+
+  @override
+  String get marathonPlanTitle => 'Maratonunu planla';
+
+  @override
+  String get marathonDurationLabel => 'Pomodoro süresi';
+
+  @override
+  String get marathonStartingWelcome => 'Maraton başlıyor. İyi çalışmalar!';
+
+  @override
+  String get marathonViewProgress => 'Maraton ilerlemesi';
+
+  @override
+  String get marathonInfoTitle => 'Maraton nedir?';
+
+  @override
+  String marathonInfoBonusMatrix(
+    int shortTwo,
+    int shortThree,
+    int shortFour,
+    int longTwo,
+    int longThree,
+    int longFour,
+  ) {
+    return 'Tamamlama bonusu\n25 dk: 2 seans +$shortTwo, 3 seans +$shortThree, 4 seans +$shortFour puan.\n50 dk: 2 seans +$longTwo, 3 seans +$longThree, 4 seans +$longFour puan.\n\nBu ek puan, tüm seanslar kaydedilip normal puan kazandığında ve her devam onayı zamanında verildiğinde bir kez kazanılır. Her seansın normal puanına eklenir; ek kum kazandırmaz.';
+  }
+
+  @override
+  String get onboardingGuideTitle => 'Uygulamayı tanı';
+
+  @override
+  String get onboardingGuideBody =>
+      'Başlamadan önce ekranların nasıl çalıştığına göz at.';
+
+  @override
+  String get onboardingGuidePomoTitle => 'Pomo';
+
+  @override
+  String get onboardingGuidePomoBody =>
+      'Kategorini ve 25 ya da 50 dakikalık seansını seçip Başlat’a dokun. Her seansta bir duraklatma hakkın var; duraklatılan seansın puanı azalır. Tamamlanan seanslar kaydedilir.';
+
+  @override
+  String get onboardingGuideMarathonTitle => 'Maraton';
+
+  @override
+  String get onboardingGuideMarathonBody =>
+      'Maraton’u başlat düğmesinden 2, 3 veya 4 seans planla. Seanslar arasında 5 dakika mola verilir. Mola bitince 1 dakika içinde Buradayım’a dokunarak devam et; onay vermezsen Maraton biter. Bitirdiğin seansların normal puanları korunur. Planın tamamını bitirince 25 dakikalık seanslarda sırasıyla +2/+3/+5, 50 dakikalıklarda +4/+6/+10 ek puan kazanırsın.';
+
+  @override
+  String get onboardingGuideReportsTitle => 'Raporlar';
+
+  @override
+  String get onboardingGuideReportsBody =>
+      'Günlük, haftalık ve aylık çalışma süreni, tamamlanan seanslarını ve kategori dağılımını burada görürsün. Günlük hedefini takip edebilir ve değiştirebilirsin. Çalışma günü saat 04.00’te yenilenir.';
+
+  @override
+  String get onboardingGuideRankingTitle => 'Sıralama';
+
+  @override
+  String get onboardingGuideRankingBody =>
+      'İlk puanlı seansını bitirince aynı kademedeki uygun bir lig odasına yerleşirsin. Lig, Aylık ve Arkadaşlar sıralamalarını buradan takip et. Bronz, Gümüş, Altın, Safir ve Elmas ligleri vardır. Hazırlık döneminde seanslar ve raporlar kaydolur; resmi 14 günlük yarışmalar aktif katılımcı sayısı yeterli olunca başlar. Güncel terfi ve ödül şartları Sıralama ekranındaki ? bölümündedir.';
+
+  @override
+  String get onboardingGuideSocialTitle => 'Sosyal';
+
+  @override
+  String get onboardingGuideSocialBody =>
+      'Arkadaş koduyla istek gönder; kabul edilince birbirinizin durumunu görebilirsiniz. Çalışan arkadaşların Odaklanıyor, yalnız Maraton molasına çıkanlar Molada olarak görünür. Kırmızı daire odağı, yeşil daire molayı gösterir. Görünürlük tercihini Profil’den değiştirebilirsin.';
+
+  @override
+  String get onboardingGuideProfileTitle => 'Profil';
+
+  @override
+  String get onboardingGuideProfileBody =>
+      'Üstteki avatarına dokunarak Profil’i aç. Kategorilerini düzenle, kazandığın kumla avatar koleksiyonunu genişlet ve avatarını seç. Dil, tema, bildirim ve görünürlük ayarlarını; yardım, gizlilik ve hesap işlemlerini burada bulursun.';
+
+  @override
+  String leagueInfoWhatBodyWithCapacity(int capacity) {
+    return 'İlk puanlı seansını tamamladığında aynı kademede ve aynı dönemdeki uygun mevcut odaya yerleşirsin. Her odada en fazla $capacity kişi bulunur; oda doluysa yeni oda açılır. Dönem sırası sunucunun kabul ettiği seans puanlarına göre belirlenir.';
+  }
+
+  @override
+  String leagueLaunchPreparingBody(int users) {
+    return 'Ligler hazırlık döneminde. Son 14 günde seans tamamlayan $users farklı kullanıcıya ulaşınca ilk resmi yarışma sonraki tam 14 günlük dönemde başlar. Seansların, puanın ve raporların kaydolur; hazırlıkta terfi, düşme ve lig avatar ödülü yoktur. Hazırlık puanları resmi yarışmaya taşınmaz.';
+  }
+
+  @override
+  String leagueLaunchScheduledBody(String date) {
+    return 'İlk resmi lig dönemi $date başlayacak. O zamana kadar seansların ve raporların kaydolur; terfi, düşme ve lig avatar ödülü verilmez. Hazırlık puanları yarışmaya taşınmaz.';
+  }
+
+  @override
+  String get leagueLaunchScheduledShort => 'Resmi lig dönemi başlıyor';
+
+  @override
+  String leaguePromotionPolicyBody(
+    int active,
+    int days,
+    int minutes,
+    int points,
+  ) {
+    return 'Terfi için odada bu dönem seans tamamlayan en az $active aktif kişi olmalı. Terfi kotası aktif kişi sayısının üçte biridir, aşağı yuvarlanır (3 aktif kişi: 1; 25 aktif kişi: 8). Bu dönem en az $days farklı çalışma gününde toplam $minutes dakika odaklanıp en az $points puan kazanmalı ve kotanın içinde bitirmelisin. Elmas Lig’de terfi yoktur.';
+  }
+
+  @override
+  String leaguePromotionCurrentQuota(int count) {
+    return 'Bu odada mevcut terfi kotası: ilk $count sıra. Gün, dakika ve puan şartları ayrıca sağlanmalıdır.';
+  }
+
+  @override
+  String get leagueNoPromotionCurrentPeriod =>
+      'Bu odada şu an terfi için yeterli aktif katılımcı yok. Tamamladığın seanslar kaydolmaya devam eder.';
+
+  @override
+  String get leagueDemotionPolicyBody =>
+      'Düşme yalnızca en az 10 aktif kişinin bulunduğu odalarda uygulanır: sıralamanın sonundan aktif kişi sayısının üçte biri, aşağı yuvarlanarak bir alt lige düşer. Son 3 günde katılanlar ve Bronz Lig’dekiler düşmez.';
+
+  @override
+  String leagueAwardActiveRequirements(
+    int members,
+    int days,
+    int minutes,
+    int points,
+  ) {
+    return 'Resmi lig döneminde odada en az $members aktif kişi olmalı. En az $days farklı çalışma gününde toplam $minutes dakika odaklanıp $points puana ulaşman gerekir. Hazırlık döneminde ödül verilmez.';
+  }
+
+  @override
+  String get leaguePreparationNoChanges =>
+      'Hazırlık sırasında herkes mevcut liginde kalır; terfi, düşme ve lig avatar ödülü verilmez.';
+
+  @override
+  String get leagueLaunchPreparingShort =>
+      'Hazırlık dönemi · Terfi, düşme ve lig ödülleri henüz başlamadı.';
 }

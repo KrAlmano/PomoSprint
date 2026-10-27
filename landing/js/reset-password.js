@@ -223,15 +223,20 @@
     return api.request("/auth/v1/verify", {
       body: { type: "recovery", token_hash: link.tokenHash }
     }).then(function (res) {
-      if (res.ok && res.data && res.data.access_token) {
+      if (res.ok && res.data && typeof res.data.access_token === "string" && res.data.access_token.trim()) {
         sessionToken = res.data.access_token;
         link.tokenHash = null;
         return sessionToken;
       }
       var code = api.errorCode(res.data);
+      if (LINK_ERRORS[code]) throw new LinkError(LINK_ERRORS[code]);
       if (code === "weak_password") throw new Error(weakPasswordText(res.data));
       if (FORM_ERRORS[code] && code !== "validation_failed") throw new Error(FORM_ERRORS[code]);
-      throw new LinkError(LINK_ERRORS[code] || MSG.expired);
+      if (res.status === 429) throw new Error(MSG.rateLimit);
+      if (res.status === 401 || res.status === 403) throw new LinkError(MSG.invalid);
+      // Sunucu hatası veya eksik/bozuk yanıt token'ın süresinin dolduğunu
+      // göstermez. Formu ve token'ı koru; kullanıcı yeniden deneyebilsin.
+      throw new Error(MSG.generic);
     });
   };
 

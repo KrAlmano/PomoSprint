@@ -81,5 +81,13 @@ android/build/
 # Supabase CLI geçici dosyaları
 supabase/.temp/
 
+# Private generated local Maraton defines and optional demo login
+tool/local_supabase/.runtime/
+
 # Ajan worktree kopyaları
 .claude/worktrees/
+
+# Geçici yerel QA hesabı/fixture, ham çıktı ve ekran görüntüsü
+/analiz/qa_evidence_*/
+/analiz/ekranlar/
+**/__pycache__/

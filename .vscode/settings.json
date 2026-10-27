@@ -7,5 +7,9 @@
   // Telefona (iOS 27) yükleme için de Xcode 27 gerekiyor.
   "dart.env": {
     "DEVELOPER_DIR": "/Applications/Xcode.app/Contents/Developer"
+  },
+  // Yeni entegre terminaller de F5/E2E ile aynı Xcode'u kullansın.
+  "terminal.integrated.env.osx": {
+    "DEVELOPER_DIR": "/Applications/Xcode.app/Contents/Developer"
   }
 }
