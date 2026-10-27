@@ -15,7 +15,10 @@ sunucuya 127.0.0.1 üzerinden istek atar:
   (``default_transaction_read_only=on``) açılır; test bununla sunucu
   durumunu doğrular. Her sorgu ve sonucu ``build/e2e_sim/psql.log``'a yazılır.
 
-Yalnızca 127.0.0.1'e bağlanır. Çalıştırma: ``run_sim_e2e.sh`` başlatır;
+Yalnızca 127.0.0.1'e bağlanır. Tarayıcı Origin / Sec-Fetch başlıkları bütün
+GET ve POST yollarında reddedilir; Host yalnızca açık yerel adlar ve dinlenen
+port olabilir. Native Dart istemcisinin text/plain SQL isteği korunur.
+Çalıştırma: ``run_sim_e2e.sh`` başlatır;
 elle: ``python3 tool/local_supabase/e2e/sim/e2e_host.py --udid <UDID> --port 54399``.
 """
 
@@ -157,7 +160,27 @@ class Handler(BaseHTTPRequestHandler):
         safe_args = tuple(re.sub(r"\?[^\s\"]*", "?[redacted]", arg) if isinstance(arg, str) else arg for arg in args)
         sys.stderr.write("[e2e_host] " + (fmt % safe_args) + "\n")
 
+    def _guard_local_client(self):
+        # Browser-origin requests must never reach SQL, device, or mail code.
+        # Presence matters, including Origin:null and same-origin fetches.
+        if (self.headers.get_all("Origin") is not None
+                or any(name.lower().startswith("sec-fetch-") for name in self.headers)):
+            self._reply(403, "browser_request_forbidden")
+            return False
+        # Reject DNS rebinding, missing/duplicate Host, userinfo and wrong
+        # ports without resolving any caller-controlled name. Android uses
+        # 10.0.2.2 when the emulator reaches the host loopback directly.
+        hosts = self.headers.get_all("Host", [])
+        port = self.server.server_address[1]
+        allowed = {f"{host}:{port}" for host in ("127.0.0.1", "localhost", "10.0.2.2")}
+        if len(hosts) != 1 or hosts[0].lower() not in allowed:
+            self._reply(403, "invalid_local_host")
+            return False
+        return True
+
     def do_GET(self):  # noqa: N802
+        if not self._guard_local_client():
+            return
         url = urllib.parse.urlparse(self.path)
         if url.path == "/health":
             return self._reply(200, "ok")
@@ -172,6 +195,8 @@ class Handler(BaseHTTPRequestHandler):
         return self._reply(404, "yok")
 
     def do_POST(self):  # noqa: N802
+        if not self._guard_local_client():
+            return
         url = urllib.parse.urlparse(self.path)
         if url.path == '/recover-password':
             try:

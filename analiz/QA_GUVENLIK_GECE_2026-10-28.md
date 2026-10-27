@@ -33,3 +33,15 @@ Normal ödülün daha sıkı doğrulanması, mevcut offline ürün davranışıy
 Parite negatif kontrolleri **8/8**: eski referans korunur;30 için ayrı açık seçenek vardır. Aday yalnız bir işlev hash'i ve kendi migration kaydını değiştirir. `test/session_start_atomic_contract_test.dart` yeni hata metinlerinin mevcut Dart sınıflandırmasıyla uyumunu kontrol eder; Flutter komutları root tarafından çalıştırılır.
 
 Kanıtlar git dışındaki `build/overnight_backend/security_audit_results.json`, `security_candidate_results.json`, `session_start_atomic_results.json`; tekrar aracı `tool/local_supabase/e2e/overnight_session_start_atomic.py`. İlk geniş güvenlik denetiminin yerel betikleri aynı build klasöründe saklanır. Bu rapor yazılırken30 anaQA veya canlıya uygulanmış sayılmaz; son yerel uygulama/parite sonucu kök ilerleme kaydına ayrıca yazılmalıdır.
+
+## 28 Ekim 00:38 — yerel parola saklama doğrulaması
+
+Salt okunur, yalnız loopback bağlantıyla son 12 saatteki `e2e-sim-*@pomosprint.local` hesapları incelendi: **47 QA hesabının 47'sinde bcrypt biçiminde parola özeti** bulundu. `public.profiles` içinde adında `password`, `secret` veya `token` geçen sütun sayısı **0**. Parola özeti, gerçek parola, token veya e-posta listesi çıktıya yazılmadı; yalnız toplu sayılar okundu. Bu kontrol canlı Auth ayarları veya tüm uygulama güvenliği için onay değildir; canlı servise bağlanılmadı.
+
+## 28 Ekim 01:24 — yalnız yerel native test hostu
+
+`e2e_host.py` için gerçek geçici HTTP sunucusunda fail-first kontrol yapıldı: yabancı Origin ve `Origin: null` ile `POST /psql` çağrısı önce 200 dönüyor ve mock SQL çalışıyordu. Bu, canlı API bulgusu değil, loopback QA aracına tarayıcı erişimi bulgusudur. Genel GET/POST kapısı eklendi: Origin veya herhangi bir Sec-Fetch başlığı reddedilir; tek Host başlığı yalnız loopback/Android alias ve gerçek dinleme portu olabilir. Böylece SQL, ekran görüntüsü, cihaz, yerel e-posta ve bağlantı kesme yolları aynı korumadan geçer.
+
+Yeni 16 HTTP güvenlik testi + mevcut 12 ekran görüntüsü testi **28/28 geçti**. Testlerin SQL/cihaz/e-posta yan etkileri mock'tur. Tarayıcıdan engellenen isteklerin mock çağrı sayısı sıfır; native text/plain SQL ve cihaz yolları çalışır. `PGOPTIONS=default_transaction_read_only=on` trusted QA sorgularında hata önlemidir; keyfî SQL için tek başına güvenlik sınırı olarak sunulmaz.
+
+Çalışan Android hostu, gerçek Maraton odak sayacı devam ederken aynı port ve cihazla yeniden yüklendi; uygulama/sayaç/veritabanı yeniden başlatılmadı. Yerel gerçek smoke: native `/health` 200, yabancı Origin ile aynı yol 403. iOS sonraki test hostu yeni korumayla açıldı. Kanıt: `/tmp/pomosprint_e2e_host_security_before.log`, `..._after.log`, `/tmp/pomosprint_android_v13_reloaded_host.log`.

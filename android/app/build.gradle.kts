@@ -75,16 +75,21 @@ android {
 // için yukarıdaki debug fallback'i korunuyor; bu yüzden release APK
 // (assembleRelease) durdurulmaz, yalnızca uyarı verilir: debug imzalı APK
 // dağıtılırsa kullanıcılar Play sürümüne güncelleyemez.
+val releaseBundleTaskName = Regex("^bundle(?:[A-Z][A-Za-z0-9]*)?Release$")
+val releaseApkTaskName = Regex("^assemble(?:[A-Z][A-Za-z0-9]*)?Release$")
 gradle.taskGraph.whenReady {
     if (!keystorePropertiesFile.exists()) {
-        val buildsStoreBundle = allTasks.any { it.name.contains("bundleRelease", ignoreCase = true) }
+        // APK derlemesi bağımlı eklentilerin bundleReleaseLocalLintAar
+        // görevlerini de çalıştırır; bunlar mağazaya gönderilecek AAB değildir.
+        val appTasks = allTasks.filter { it.project == project }
+        val buildsStoreBundle = appTasks.any { releaseBundleTaskName.matches(it.name) }
         if (buildsStoreBundle) {
             throw GradleException(
                 "android/key.properties bulunamadı: release AAB debug anahtarıyla imzalanamaz. " +
                     "key.properties dosyasını oluşturup tekrar deneyin."
             )
         }
-        val buildsReleaseApk = allTasks.any { it.name.contains("assembleRelease", ignoreCase = true) }
+        val buildsReleaseApk = appTasks.any { releaseApkTaskName.matches(it.name) }
         if (buildsReleaseApk) {
             logger.warn(
                 "UYARI: android/key.properties bulunamadı; release APK DEBUG anahtarıyla imzalanıyor. " +
