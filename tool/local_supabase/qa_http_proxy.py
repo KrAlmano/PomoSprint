@@ -175,7 +175,10 @@ class ProxyHandler(_QuietHandler):
                 token.strip().lower() for token in response.getheader("Connection", "").split(",")
             }
             self.close_connection = True
-            self.send_response(response.status)
+            # Forward the upstream clock verbatim. send_response() would add
+            # another Date header; HTTP clients merge those into an invalid
+            # clock string and the app cannot measure its server offset.
+            self.send_response_only(response.status)
             for key, value in response.getheaders():
                 if key.lower() not in HOP_HEADERS | response_connection:
                     self.send_header(key, value)

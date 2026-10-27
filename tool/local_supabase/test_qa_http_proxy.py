@@ -137,6 +137,14 @@ class ProxyTests(unittest.TestCase):
         self.assertEqual(body, b"")
         self.assertIn(("Content-Length", "123"), headers)
 
+    def test_upstream_clock_header_is_not_duplicated(self):
+        status, _, headers = self.request(method="HEAD", body=None)
+        self.assertEqual(status, 200)
+        dates = [value for name, value in headers if name.lower() == "date"]
+        self.assertEqual(len(dates), 1,
+                         "A second proxy Date header breaks the app's server clock parser")
+        self.assertEqual(len(dates[0].split()), 6)
+
     def test_chunked_upstream_response_is_reframed_correctly(self):
         status, body, headers = self.request(method="GET", body=None)
         self.assertEqual((status, body), (200, b"hello"))

@@ -9,7 +9,7 @@ python3 tool/local_supabase/qa_http_proxy.py
 - Veri: `127.0.0.1:54325` → sabit `127.0.0.1:54321`.
 - Admin: `127.0.0.1:54326`, yalnız `/health` ve `/availability`.
 - iOS simülatöründe QA `SUPABASE_URL=http://127.0.0.1:54325`.
-- Android emülatöründe QA `SUPABASE_URL=http://10.0.2.2:54325`.
+- Android çalıştırıcısı ADB reverse ile `SUPABASE_URL=http://127.0.0.1:54325` kullanır; elle kurulan emülatör köprüsünde `10.0.2.2:54325` de desteklenir.
 - Aynı yerel anahtar kullanılır; anahtar/token komut satırına veya proxy loguna yazılmaz. Anahtar bu araç tarafından okunmaz, saklanmaz, değiştirilmez.
 
 ```sh
@@ -27,5 +27,7 @@ python3 -m unittest discover -s tool/local_supabase -p 'test_qa_http_proxy.py' -
 ```
 
 Testler geçici loopback portlarında echo upstream kullanır; Supabase hesabı, gerçek anahtar veya veritabanı gerektirmez. Durdurmak için Ctrl+C.
+
+Proxy, üst sunucunun `Date` başlığını tek başlık olarak iletir. Kendi tarihini başarılı üst sunucu yanıtına eklemez: iki tarih HTTP istemcisinde birleştiğinde uygulamanın sunucu saati ölçümü okunamaz hale geliyordu. Bu test aracı hatası 28 Ekim'de bir başarısız regresyonla gösterilip düzeltildi; proxy paketi artık 10/10 kontrolden geçiyor. İlk uzun test bu hata fark edilince uygulama başlamadan, derleme sırasında iptal edildi; gerçek süre kanıtı olarak kullanılmaz.
 
 Native `integration_test/u_exam_http_recovery_test.dart` ayrıca açık `--dart-define=E2E_HTTP_PROXY=true` ister; admin portu `--dart-define=E2E_PROXY_ADMIN_PORT=54326` (varsayılan) olur. Test veri URL'sinin `127.0.0.1:54325` veya Android için `10.0.2.2:54325` olduğunu doğrular. Gerçek TYT başlangıcından sonra proxy'yi kapatır, vazgeçme isteğinin cihazda beklediğini ve ödül verilmediğini denetler; proxy'yi açınca tek terk edilmiş kayda dönüşmesini doğrular. Testin `finally` bloğu proxy'yi yeniden açar. Wrapper ve uygulama ortam ayarları bu araç tarafından değiştirilmez.
