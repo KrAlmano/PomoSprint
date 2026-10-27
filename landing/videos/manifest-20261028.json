@@ -1,0 +1,294 @@
+{
+  "schema_version": 1,
+  "source": "real native PomoSprint QA simulator video",
+  "raw_sha256": "b5a86705e2e49cea893e3d04980a71f6ca52dbeb2b0af13858498eb2305ef51a",
+  "metadata_sha256": "587e9d2146f6cfb01565f0434589e9775d272a8104e8862dafdf1e7b34e618a9",
+  "event_log_sha256": "181f05d29ef707683da64d3ca431607ebfc74b3ec8e7085c4dd83e7e5791c717",
+  "recorded_at": "2026-10-27T22:04:56.570327Z",
+  "recorded_until": "2026-10-27T22:07:08.754101Z",
+  "sync_offset_seconds": 0,
+  "speed_changed": false,
+  "source_dimensions": {
+    "width": 1178,
+    "height": 2556
+  },
+  "dimension_policy": "Aspect-preserving scale with padding; no crop or stretch.",
+  "quality_policy": {
+    "crf_candidates": [
+      32,
+      34,
+      36,
+      38,
+      40,
+      42
+    ],
+    "maximum_crf": 42,
+    "maximum_video_bytes": 262144
+  },
+  "editorial_overlay": "White/black ASS vector cursor and fading click ring derived only from logged real native tap coordinates/timestamps; underlying UI is recorded footage.",
+  "scenes": [
+    {
+      "scene": "timer",
+      "video": "timer-demo-20261008d.mp4",
+      "poster": "timer-demo-20261008d.webp",
+      "video_sha256": "24210e41129058eab3c912443a772898db4a10930379faef35616615f65d95ab",
+      "poster_sha256": "01f8a4905069a48cca84565e6d1e02d459c40a33f9aa20011fd74adeda26db54",
+      "bytes": 205761,
+      "crf": 32,
+      "attempts": [
+        {
+          "crf": 32,
+          "bytes": 205761
+        }
+      ],
+      "poster_at_seconds": 0.5,
+      "trim_start_seconds": 63.099527,
+      "duration_seconds": 24.594618,
+      "scene_started_at": "2026-10-27T22:05:59.669854+00:00",
+      "scene_ended_at": "2026-10-27T22:06:24.264472+00:00",
+      "taps": [
+        {
+          "at": "2026-10-27T22:06:01.824118+00:00",
+          "seconds_in_scene": 2.154264,
+          "logical": {
+            "x": 279.5,
+            "y": 618.0,
+            "width": 393.0,
+            "height": 852.0
+          },
+          "video_x": 384.0458015267175,
+          "video_y": 848.661971830986
+        },
+        {
+          "at": "2026-10-27T22:06:03.097098+00:00",
+          "seconds_in_scene": 3.427244,
+          "logical": {
+            "x": 113.5,
+            "y": 618.0,
+            "width": 393.0,
+            "height": 852.0
+          },
+          "video_x": 155.95419847328245,
+          "video_y": 848.661971830986
+        },
+        {
+          "at": "2026-10-27T22:06:04.336152+00:00",
+          "seconds_in_scene": 4.666298,
+          "logical": {
+            "x": 191.8868179321289,
+            "y": 438.0,
+            "width": 393.0,
+            "height": 852.0
+          },
+          "video_x": 263.6612765479634,
+          "video_y": 601.4788732394366
+        },
+        {
+          "at": "2026-10-27T22:06:05.571012+00:00",
+          "seconds_in_scene": 5.901158,
+          "logical": {
+            "x": 196.5,
+            "y": 708.0,
+            "width": 393.0,
+            "height": 852.0
+          },
+          "video_x": 270.0,
+          "video_y": 972.2535211267606
+        },
+        {
+          "at": "2026-10-27T22:06:11.065778+00:00",
+          "seconds_in_scene": 11.395924,
+          "logical": {
+            "x": 196.5,
+            "y": 708.0,
+            "width": 393.0,
+            "height": 852.0
+          },
+          "video_x": 270.0,
+          "video_y": 972.2535211267606
+        },
+        {
+          "at": "2026-10-27T22:06:15.022148+00:00",
+          "seconds_in_scene": 15.352294,
+          "logical": {
+            "x": 196.5,
+            "y": 708.0,
+            "width": 393.0,
+            "height": 852.0
+          },
+          "video_x": 270.0,
+          "video_y": 972.2535211267606
+        },
+        {
+          "at": "2026-10-27T22:06:20.537186+00:00",
+          "seconds_in_scene": 20.867332,
+          "logical": {
+            "x": 207.5,
+            "y": 722.0,
+            "width": 393.0,
+            "height": 852.0
+          },
+          "video_x": 285.1145038167939,
+          "video_y": 991.4788732394367
+        },
+        {
+          "at": "2026-10-27T22:06:21.968407+00:00",
+          "seconds_in_scene": 22.298553,
+          "logical": {
+            "x": 295.8123531341553,
+            "y": 504.5,
+            "width": 393.0,
+            "height": 852.0
+          },
+          "video_x": 406.4597218637248,
+          "video_y": 692.7992957746478
+        }
+      ],
+      "fps": 24,
+      "width": 540,
+      "height": 1170,
+      "codec": "h264",
+      "pixel_format": "yuv420p",
+      "audio": false,
+      "encoded_duration_seconds": 24.583333
+    },
+    {
+      "scene": "marathon",
+      "video": "marathon-demo-20261008d.mp4",
+      "poster": "marathon-demo-20261008d.webp",
+      "video_sha256": "f1e2f910be53a34f3696dbfc20008b96dec2d0ec4d1b924c173ad5402d6ee459",
+      "poster_sha256": "5563cb068f2bf0fa14042d841f0ee0d2105d36070451c31f19934ee0603988f3",
+      "bytes": 199294,
+      "crf": 32,
+      "attempts": [
+        {
+          "crf": 32,
+          "bytes": 199294
+        }
+      ],
+      "poster_at_seconds": 6.471424,
+      "trim_start_seconds": 90.27839,
+      "duration_seconds": 20.463947,
+      "scene_started_at": "2026-10-27T22:06:26.848717+00:00",
+      "scene_ended_at": "2026-10-27T22:06:47.312664+00:00",
+      "taps": [
+        {
+          "at": "2026-10-27T22:06:28.985879+00:00",
+          "seconds_in_scene": 2.137162,
+          "logical": {
+            "x": 172.5,
+            "y": 568.0,
+            "width": 393.0,
+            "height": 852.0
+          },
+          "video_x": 237.0229007633588,
+          "video_y": 780.0
+        },
+        {
+          "at": "2026-10-27T22:06:30.388558+00:00",
+          "seconds_in_scene": 3.539841,
+          "logical": {
+            "x": 86.83333333333334,
+            "y": 242.0,
+            "width": 393.0,
+            "height": 852.0
+          },
+          "video_x": 119.31297709923666,
+          "video_y": 332.32394366197184
+        },
+        {
+          "at": "2026-10-27T22:06:31.612796+00:00",
+          "seconds_in_scene": 4.764079,
+          "logical": {
+            "x": 196.50000000000003,
+            "y": 242.0,
+            "width": 393.0,
+            "height": 852.0
+          },
+          "video_x": 270.00000000000006,
+          "video_y": 332.32394366197184
+        },
+        {
+          "at": "2026-10-27T22:06:32.820141+00:00",
+          "seconds_in_scene": 5.971424,
+          "logical": {
+            "x": 306.1666666666667,
+            "y": 242.0,
+            "width": 393.0,
+            "height": 852.0
+          },
+          "video_x": 420.68702290076334,
+          "video_y": 332.32394366197184
+        },
+        {
+          "at": "2026-10-27T22:06:34.103338+00:00",
+          "seconds_in_scene": 7.254621,
+          "logical": {
+            "x": 280.75,
+            "y": 338.0,
+            "width": 393.0,
+            "height": 852.0
+          },
+          "video_x": 385.76335877862596,
+          "video_y": 464.15492957746477
+        },
+        {
+          "at": "2026-10-27T22:06:35.369931+00:00",
+          "seconds_in_scene": 8.521214,
+          "logical": {
+            "x": 112.25,
+            "y": 338.0,
+            "width": 393.0,
+            "height": 852.0
+          },
+          "video_x": 154.23664122137404,
+          "video_y": 464.15492957746477
+        },
+        {
+          "at": "2026-10-27T22:06:36.619935+00:00",
+          "seconds_in_scene": 9.771218,
+          "logical": {
+            "x": 196.5,
+            "y": 695.0,
+            "width": 393.0,
+            "height": 852.0
+          },
+          "video_x": 270.0,
+          "video_y": 954.4014084507041
+        },
+        {
+          "at": "2026-10-27T22:06:43.610235+00:00",
+          "seconds_in_scene": 16.761518,
+          "logical": {
+            "x": 196.5,
+            "y": 722.0,
+            "width": 393.0,
+            "height": 852.0
+          },
+          "video_x": 270.0,
+          "video_y": 991.4788732394367
+        },
+        {
+          "at": "2026-10-27T22:06:45.004479+00:00",
+          "seconds_in_scene": 18.155762,
+          "logical": {
+            "x": 266.42499923706055,
+            "y": 504.5,
+            "width": 393.0,
+            "height": 852.0
+          },
+          "video_x": 366.08015162344196,
+          "video_y": 692.7992957746478
+        }
+      ],
+      "fps": 24,
+      "width": 540,
+      "height": 1170,
+      "codec": "h264",
+      "pixel_format": "yuv420p",
+      "audio": false,
+      "encoded_duration_seconds": 20.458333
+    }
+  ],
+  "release_note": "Local source preparation, 28 October 2026. Not deployed. Legacy URLs retained for the existing Worker Range allowlist; HTML cache version is 20261028."
+}

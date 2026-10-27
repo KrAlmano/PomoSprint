@@ -3,6 +3,7 @@
 // No timer speed, catalog, product layout or server dates are changed.
 import 'dart:convert';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -20,6 +21,68 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'support/e2e.dart';
 
 const _enabled = bool.fromEnvironment('E2E_MEDIA_CAPTURE');
+int _mediaPointer = 10000;
+
+/// Send the actual pointer gesture through the binding's device path. The
+/// LiveTestBinding test path paints large debugging crosshairs; the device
+/// path reaches the same hit-test/gesture handling without that test overlay.
+/// The native scene uses the real view's logical coordinate space.
+@visibleForTesting
+Future<void> mediaTapWithoutPointerOverlay(
+  WidgetTester tester,
+  Offset position,
+) async {
+  final binding = tester.binding;
+  final previous = binding.shouldPropagateDevicePointerEvents;
+  final pointer = ++_mediaPointer;
+  final watch = Stopwatch()..start();
+  var pointerDown = false;
+  void send(PointerEvent event) => binding.handlePointerEventForSource(
+    event,
+    source: TestBindingEventSource.device,
+  );
+  binding.shouldPropagateDevicePointerEvents = true;
+  try {
+    pointerDown = true;
+    send(
+      PointerDownEvent(
+        pointer: pointer,
+        position: position,
+        kind: PointerDeviceKind.touch,
+        buttons: kPrimaryButton,
+        timeStamp: watch.elapsed,
+        viewId: tester.view.viewId,
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 60));
+    send(
+      PointerUpEvent(
+        pointer: pointer,
+        position: position,
+        kind: PointerDeviceKind.touch,
+        timeStamp: watch.elapsed,
+        viewId: tester.view.viewId,
+      ),
+    );
+    pointerDown = false;
+  } finally {
+    try {
+      if (pointerDown) {
+        send(
+          PointerCancelEvent(
+            pointer: pointer,
+            position: position,
+            kind: PointerDeviceKind.touch,
+            viewId: tester.view.viewId,
+          ),
+        );
+      }
+    } finally {
+      binding.shouldPropagateDevicePointerEvents = previous;
+      watch.stop();
+    }
+  }
+}
 
 class _MediaEvents {
   String? _scene;
@@ -81,7 +144,7 @@ class _MediaEvents {
       'width': size.width,
       'height': size.height,
     });
-    await tester.tap(finder);
+    await mediaTapWithoutPointerOverlay(tester, center);
     await pumpFor(tester, const Duration(seconds: 1));
     expect(tester.takeException(), isNull);
   }
@@ -297,7 +360,15 @@ void main() {
         expect(paused.clientUuid, first.clientUuid);
         expect(paused.pauseUsedCount, 1);
         expect(tester.widget<HourglassWidget>(hourglass).isRunning, isFalse);
-        await pumpFor(tester, const Duration(seconds: 1));
+        // The real pause notice temporarily covers the primary button.
+        // Wait as a user would; do not let ensureVisible scroll the controls
+        // underneath that overlay merely to make this recording tap succeed.
+        await pumpUntilGone(tester, find.byType(SnackBar));
+        expect(
+          primary.hitTestable(),
+          findsOneWidget,
+          reason: 'Resume is reachable without auto-scrolling',
+        );
         await events.tap(tester, primary);
         final resumed = await _waitTimer(
           tester,

@@ -1,5 +1,18 @@
 # pomosprint.app (landing)
 
+## Güncel native videolar — 28 Ekim 2026 / yerel hazırlık
+
+Mevcut ana sayfa Maraton ve Özellikler Pomo/Maraton alanları, iOS18.6'daki gerçek uygulamadan yeniden kaydedildi. Düzen değişmedi; yeni alan eklenmedi. Sessiz, otomatik dönen ve görünmezken duran davranış korunur. Hareket azaltmada gerçek poster gösterilir. Bu dosyalar **henüz deploy edilmedi**; yeni site, sunucu27→28→29 ve yeni uygulama yayını sonrasında yayımlanmalıdır (D-06).
+
+| Kayıt | Bayt | Gerçek sahne süresi | Boyut/format |
+|---|---:|---:|---|
+| `videos/timer-demo-20261008d.mp4` | 205761 | 24,595sn | 540×1170,24fps,H.264,yuv420p,sessiz |
+| `videos/marathon-demo-20261008d.mp4` | 199294 | 20,464sn | 540×1170,24fps,H.264,yuv420p,sessiz |
+
+Eski dosya adları mevcut Worker Range izin listesiyle uyum için korunur; HTML'de video/poster adresleri `?v=20261028` taşır. Her dosya256KiB sınırının altındadır. Gerçek kayıtta süre hızlandırılmaz, kırpma/esnetme yoktur. Beyaz imleç ve küçük dokunma halkası, gerçek dokunma konumları ve UTC zamanlarından sonradan üretilen açıklama katmanıdır; işletim sisteminin kaydettiği imleç diye sunulmaz. Flutter'ın renkli test artısı son kayıtta yoktur. Maraton posteri açık planlama penceresinden seçilir.
+
+Kaynak/çıktı SHA-256, sahne aralıkları, dokunuşlar ve format bilgileri [manifestte](videos/manifest-20261028.json); araç ve native kanıtlar [video QA raporunda](../analiz/QA_SITE_VIDEO_TOOLS_2026-10-28.md). Yerel hesapta seanslar kısa gösterim sonunda iptal edildi; bitmiş seans veya ödül üretilmedi. Bu görsel kayıt 25/50 dakikalık tamamlama testi yerine geçmez. Safari'nin son otomasyon denemesi `cgWindowNotFound` ile engellendiği için yeni dosyalarda gerçek Safari oynatma sonucu henüz yoktur; kaynak, format, Range ve görsel kare kontrolleri ayrı kaydedilir.
+
 ## Yerel gece güncellemesi — 28 Ekim 2026 / I-13
 
 **Bu bölüm yerel hazırlığı anlatır; yeni site deploy edilmedi.** Türkçe ana sayfa, Özellikler ve SSS güncellendi; `/en/`, `/en/features` ve `/en/faq` İngilizce karşılıkları eklendi. Eski URL'ler ve yasal metinler korunur. Ortak menüde dil bağlantıları vardır; canonical/hreflang ve sitemap eşlenir.

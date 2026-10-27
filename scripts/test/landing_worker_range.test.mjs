@@ -31,7 +31,7 @@ function request(path = paths[0], headers = {}, method = "GET") {
 async function checkRange(path, range, start, end) {
   const env = assets();
   const result = await worker.fetch(request(path, { Range: range }), env);
-  const bytes = videos.get(path);
+  const bytes = videos.get(new URL(`https://pomosprint.app${path}`).pathname);
   assert.equal(result.status, 206);
   assert.equal(result.headers.get("Accept-Ranges"), "bytes");
   assert.equal(result.headers.get("Content-Range"), `bytes ${start}-${end}/${bytes.byteLength}`);
@@ -39,6 +39,7 @@ async function checkRange(path, range, start, end) {
   assert.deepEqual(new Uint8Array(await result.arrayBuffer()), bytes.slice(start, end + 1));
   for (const [key, value] of Object.entries(assetHeaders)) assert.equal(result.headers.get(key), value, key);
   assert.equal(env.calls.length, 1);
+  assert.equal(new URL(env.calls[0].url).search, new URL(`https://pomosprint.app${path}`).search);
 }
 
 for (const path of paths) {
@@ -51,6 +52,13 @@ for (const path of paths) {
     await checkRange(path, `bytes=${size - 16}-${size + 1000}`, size - 16, size - 1);
   });
 }
+
+test("güncel native video cache sürümü Range yanıtını ve byte konumunu değiştirmez", async () => {
+  for (const path of paths.filter((value) => value.includes("-demo-"))) {
+    await checkRange(`${path}?v=20261028`, "bytes=0-1", 0, 1);
+    await checkRange(`${path}?v=20261028`, "bytes=512-1023", 512, 1023);
+  }
+});
 
 test("videolar 256 KiB Range sınırının altında; tam GET aynı byte'ları döndürür", async () => {
   for (const path of paths) {

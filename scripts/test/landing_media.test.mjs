@@ -235,8 +235,8 @@ test("gerçek görüntü oranı iç ekrandadır; kayıtlar sessiz döngü ve sta
       assert.match(attrs, /role="button"/);
       assert.match(attrs, /tabindex="0"/);
       assert.match(attrs, /preload="none"/);
-      assert.match(attrs, /data-src="\/videos\/(?:timer|marathon)-demo-20261008d\.mp4"/);
-      assert.match(attrs, /poster="\/videos\/(?:timer|marathon)-demo-20261008d\.webp"/);
+      assert.match(attrs, /data-src="\/videos\/(?:timer|marathon)-demo-20261008d\.mp4\?v=20261028"/);
+      assert.match(attrs, /poster="\/videos\/(?:timer|marathon)-demo-20261008d\.webp\?v=20261028"/);
       assert.doesNotMatch(content, /<source\b[^>]*\bsrc=/);
       const fallback = content.match(/href="(\/screenshots\/[a-z0-9-]+\.(?:webp|png))"/);
       assert.ok(fallback, "video has a real screenshot fallback link");
