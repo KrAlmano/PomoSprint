@@ -3,14 +3,16 @@
   "use strict";
 
   var root = document.documentElement;
-  var featuresPage = document.body && document.body.getAttribute("data-page") === "features";
+  var featuresPage = document.body && /^(?:en-)?features$/.test(document.body.getAttribute("data-page") || "");
+  var isEnglish = document.documentElement.getAttribute("lang") === "en";
+  var text = function (tr, en) { return isEnglish ? en : tr; };
   var motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
   var prefersReduced = motionPreference.matches;
   var api = window.PomoSupabase || null;
 
   // boot.js'in gizlediği hero'yu görünür yap (animasyon yoksa ya da kurulduysa)
   var revealHero = function () { root.classList.remove("js-anim"); };
-  if (featuresPage) revealHero();
+  revealHero();
 
   /* ---------- Mobil menü ----------
      Açıkken sayfa kaydırması kilitlenir ve arkada karartma görünür (CSS:
@@ -91,10 +93,10 @@
     document.addEventListener("keydown", markInteraction, true);
     document.addEventListener("pointerdown", markInteraction, true);
 
-    var MSG_EMPTY = "E-posta adresini yazar mısın?";
-    var MSG_INVALID = "Geçerli bir e-posta adresi girer misin?";
-    var MSG_FAILED = "Bir şeyler ters gitti, tekrar dener misin?";
-    var MSG_CONSENT = "Sana haber verebilmemiz için onay kutusunu işaretlemen gerekiyor.";
+    var MSG_EMPTY = text("E-posta adresini yazar mısın?", "Enter your email address.");
+    var MSG_INVALID = text("Geçerli bir e-posta adresi girer misin?", "Enter a valid email address.");
+    var MSG_FAILED = text("Bir şeyler ters gitti, tekrar dener misin?", "Something went wrong. Please try again.");
+    var MSG_CONSENT = text("Sana haber verebilmemiz için onay kutusunu işaretlemen gerekiyor.", "Select the consent checkbox so we can notify you.");
     var EMAIL_RE = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 
     var hideStatus = function () {
@@ -133,7 +135,7 @@
       sending = busy;
       if (!notifyBtn) return;
       notifyBtn.disabled = busy;
-      notifyBtn.textContent = busy ? "Gönderiliyor…" : notifyBtnLabel;
+      notifyBtn.textContent = busy ? text("Gönderiliyor…", "Sending…") : notifyBtnLabel;
     };
     // Başarıda form yerine onay kartı görünür; odak karta taşınır ki ekran okuyucu okusun
     var showSuccess = function () {
@@ -235,18 +237,19 @@
   }
 
   /* ---------- Canlı aylık sıralama (ana sayfa) ----------
-     Herkese açık, oturum gerektirmeyen get_public_monthly_leaderboard RPC'si.
-     Dönen alanlar: name, avatar_id, total_points (e-posta/id dönmez).
-     Bölüm gizli başlar: lansman öncesi boş ya da çok kısa bir liste "kimse
-     kullanmıyor" izlenimi vermesin diye en az 3 kişi varsa gösterilir;
-     hata durumunda da gizli kalır. */
+     Yalnız İstanbul 00:00 aylık global odak verisini veren yeni RPC kullanılır.
+     Eski 04:00 hesabına fallback yapılmaz. Hazırlık, boş ve hata durumları
+     görünür bir açıklamadır; gerçek olmayan kişi veya puan üretilmez. */
   var lbSection = document.getElementById("siralama");
   var lbList = document.getElementById("lb-list");
   var lbPodium = document.getElementById("lb-podium");
-  var LB_MIN_ROWS = 3;
+  var lbEmpty = document.getElementById("lb-empty");
 
-  var hideLeaderboard = function () {
-    if (lbSection) lbSection.hidden = true;
+  var showLeaderboardNotice = function (message) {
+    if (lbSection) lbSection.hidden = false;
+    if (lbPodium) lbPodium.hidden = true;
+    if (lbList) { lbList.textContent = ""; lbList.hidden = true; }
+    if (lbEmpty) { lbEmpty.textContent = message; lbEmpty.hidden = false; }
   };
   var revealLeaderboard = function () {
     if (!lbSection || !lbSection.hidden) return;
@@ -257,9 +260,9 @@
   var formatPoints = function (value) {
     var n = Number(value) || 0;
     try {
-      return n.toLocaleString("tr-TR") + " puan";
+      return n.toLocaleString(isEnglish ? "en-US" : "tr-TR") + text(" puan", " points");
     } catch (e) {
-      return n + " puan";
+      return n + text(" puan", " points");
     }
   };
 
@@ -272,16 +275,25 @@
     }
     slot.hidden = false;
     setAvatar(slot.querySelector(".lb-podium-avatar"), row.avatar_id);
-    slot.querySelector(".lb-podium-name").textContent = row.name || "PomoSprint kullanıcısı";
+    slot.querySelector(".lb-podium-name").textContent = row.name || text("PomoSprint kullanıcısı", "PomoSprint user");
     slot.querySelector(".lb-podium-points").textContent = formatPoints(row.total_points);
   };
 
   var renderLeaderboard = function (rows) {
-    if (!Array.isArray(rows) || rows.length < LB_MIN_ROWS) {
-      hideLeaderboard();
+    if (!Array.isArray(rows) || rows.some(function (row) {
+      return !row || typeof row.name !== "string" || row.name.length > 100 ||
+        typeof row.total_points !== "number" || !Number.isFinite(row.total_points) || row.total_points < 0;
+    })) {
+      showLeaderboardNotice(text("Sıralama şu an yüklenemedi. Daha sonra tekrar deneyebilirsin.", "The ranking could not load. Please try again later."));
       return;
     }
-    lbList.innerHTML = "";
+    rows = rows.slice(0, 10);
+    if (!rows.length) {
+      showLeaderboardNotice(text("Bu ay henüz sıralanacak tamamlanmış bir seans yok. İlk odaklar burada yerini alacak.", "No completed sessions are ranked this month yet. The first focused sessions will appear here."));
+      return;
+    }
+    lbList.textContent = "";
+    if (lbEmpty) lbEmpty.hidden = true;
 
     if (lbPodium) {
       lbPodium.hidden = false;
@@ -312,7 +324,7 @@
 
       var name = document.createElement("span");
       name.className = "lb-name";
-      name.textContent = row.name || "PomoSprint kullanıcısı";
+      name.textContent = row.name || text("PomoSprint kullanıcısı", "PomoSprint user");
       li.appendChild(name);
 
       var pts = document.createElement("span");
@@ -328,20 +340,23 @@
   var loadLeaderboard = function () {
     if (!lbList) return;
     if (!api) {
-      hideLeaderboard();
+      showLeaderboardNotice(text("Aylık sıralama hazırlanıyor. Odak zamanı!", "The monthly ranking is getting ready. Time to focus!"));
       return;
     }
-    api.request("/rest/v1/rpc/get_public_monthly_leaderboard", {
+    api.request("/rest/v1/rpc/get_public_monthly_competition", {
       body: { p_limit: 10 },
       timeout: 10000
     }).then(function (res) {
       if (!res.ok) {
-        hideLeaderboard();
+        var upcoming = api.errorCode(res.data) === "PGRST202";
+        showLeaderboardNotice(upcoming
+          ? text("Aylık sıralama hazırlanıyor. Odak zamanı!", "The monthly ranking is getting ready. Time to focus!")
+          : text("Sıralama şu an yüklenemedi. Daha sonra tekrar deneyebilirsin.", "The ranking could not load. Please try again later."));
         return;
       }
       renderLeaderboard(res.data);
     }, function () {
-      hideLeaderboard();
+      showLeaderboardNotice(text("Sıralama şu an yüklenemedi. Daha sonra tekrar deneyebilirsin.", "The ranking could not load. Please try again later."));
     });
   };
   loadLeaderboard();
@@ -377,7 +392,7 @@
     video.defaultMuted = true;
     video.playsInline = true;
     video.loop = true;
-    return { video: video, label: video.getAttribute("aria-label") || "Uygulama kaydı",
+    return { video: video, label: video.getAttribute("aria-label") || text("Uygulama kaydı", "App recording"),
       visible: false, loaded: false, failed: false, manuallyPaused: false, wantsPlay: false, revision: 0 };
   });
   var canPlayVideo = function (state) {
@@ -393,7 +408,7 @@
   };
   var updateVideo = function (state) {
     var video = state.video;
-    video.setAttribute("aria-label", state.label + ". " + (state.manuallyPaused ? "Kaydı oynat" : "Kaydı duraklat"));
+    video.setAttribute("aria-label", state.label + ". " + (state.manuallyPaused ? text("Kaydı oynat", "Play recording") : text("Kaydı duraklat", "Pause recording")));
     if (!canPlayVideo(state)) {
       state.wantsPlay = false;
       state.revision += 1;
@@ -476,24 +491,9 @@
     }
   }
 
-  /* ---------- Arka plan kum saati: GSAP'sız yedek ----------
-     Hareket azaltma tercihinde ya da GSAP yüklenemediğinde kum akmaz;
-     arka plan kopyası yalnızca hero geride kalınca (geçişsiz) soluk belirir. */
-  var backdrop = document.getElementById("hg-backdrop");
-  var heroSection = document.querySelector(".hero");
-  var staticBackdrop = function () {
-    if (!backdrop || !heroSection) return;
-    var update = function () {
-      root.classList.toggle("hg-past-hero", window.scrollY > heroSection.offsetHeight * 0.6);
-    };
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-  };
-
   /* ---------- GSAP animasyonları ---------- */
   if (prefersReduced || typeof gsap === "undefined") {
     revealHero();
-    staticBackdrop();
     return;
   }
 
@@ -509,27 +509,14 @@
     return options;
   };
 
-  // Sayfa yüklenirken hero öğeleri: hafif fade-in + slide-up
-  var heroEls = document.querySelectorAll("[data-hero]");
-  if (heroEls.length) {
-    gsap.from(heroEls, revealOptions({
-      y: 26,
-      duration: 0.5,
-      ease: "power2.out",
-      stagger: 0.09,
-      clearProps: "all"
-    }));
+  // Metin, başlık ve CTA animasyonla gizlenmez; yalnız dekor hareket eder.
+  var heroDecorations = document.querySelectorAll("[data-hero-decoration]");
+  if (heroDecorations.length) {
+    gsap.from(heroDecorations, { y: 16, duration: 0.3, ease: "power2.out", clearProps: "transform" });
   }
-  // Sayfa başlığı (LCP öğesi) hiç gizlenmez; yalnızca hafifçe yukarı kayar
-  var heroTitles = document.querySelectorAll("[data-hero-title]");
-  if (heroTitles.length) {
-    gsap.from(heroTitles, { y: 16, duration: 0.5, ease: "power2.out", clearProps: "transform" });
-  }
-  // gsap.from başlangıç durumunu hemen uyguladığı için sınıf artık kaldırılabilir
   revealHero();
 
   if (typeof ScrollTrigger === "undefined") {
-    staticBackdrop();
     return;
   }
 
@@ -571,8 +558,6 @@
     var timerEl = document.getElementById("hg-timer");
 
     var TOTAL_SECONDS = 25 * 60;
-    // Dar ekranda arka plan kopyası içeriğin arkasına düşer: daha da soluk kalır
-    var isNarrow = window.matchMedia("(max-width: 960px)").matches;
 
     // Üst hazne: yüzey iner, ortadaki huni çukuru derinleşir
     var topPath = function (p) {
@@ -610,20 +595,6 @@
 
     render(0);
 
-    // Arka plan kopyası: hero'nun alt kenarı ekranın üst kısmına yaklaşırken belirir
-    if (backdrop) {
-      var endAlpha = isNarrow ? 0.14 : 0.24;
-      if (heroSection) {
-        gsap.fromTo(backdrop, { opacity: 0 }, {
-          opacity: endAlpha,
-          ease: "none",
-          scrollTrigger: { trigger: heroSection, start: "bottom 70%", end: "bottom 10%", scrub: 0.4 }
-        });
-      } else {
-        backdrop.style.opacity = String(endAlpha);
-      }
-    }
-
     // Taneler: akış çizgisi boyunca düşen küçük kum zerreleri (her kum saatinde)
     var grainAnim = gsap.timeline({ repeat: -1, paused: true });
     glasses.forEach(function (glass) {
@@ -657,9 +628,9 @@
     };
 
     ScrollTrigger.create({
-      trigger: document.body,
+      trigger: document.querySelector(".hero") || document.body,
       start: "top top",
-      end: "bottom bottom",
+      end: "bottom top",
       scrub: 0.5,
       onUpdate: function (st) {
         markFlowing();

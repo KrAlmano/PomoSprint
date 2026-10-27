@@ -3,22 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PomoSprint — Odaklanmanın En Keyifli Hali</title>
-  <meta name="description" content="PomoSprint ile 25 ya da 50 dakikalık pomodoro seansları başlat, arkadaşlarının şu an çalıştığını gör, liglerde yarış ve serini koru. iOS ve Android için ücretsiz.">
+  <title>PomoSprint: Arkadaşlarla Pomodoro ve Ders Çalışma Uygulaması</title>
+  <meta name="description" content="LGS, YKS ve TUS için Pomodoro, Maraton ve deneme sürelerini takip et. Arkadaşlarınla çalış, aylık liglerde yarış; çalışma sürenin netlerinle ilişkisini gör.">
   <link rel="canonical" href="https://pomosprint.app/">
+  <link rel="alternate" hreflang="tr" href="https://pomosprint.app/">
+  <link rel="alternate" hreflang="en" href="https://pomosprint.app/en/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="PomoSprint">
   <meta property="og:locale" content="tr_TR">
-  <meta property="og:title" content="PomoSprint — Odaklanmanın En Keyifli Hali">
-  <meta property="og:description" content="Pomodoro seansları, arkadaşlarla birlikte odak, ligler ve raporlar. Odaklanmayı keyifli ve sosyal bir alışkanlığa dönüştür.">
+  <meta property="og:title" content="PomoSprint: Arkadaşlarla Pomodoro ve Ders Çalışma Uygulaması">
+  <meta property="og:description" content="Pomodoro, Maraton, LGS/YKS/TUS denemeleri, süre–net takibi ve aylık hedef ligleri. Arkadaşlarınla birlikte çalış.">
   <meta property="og:url" content="https://pomosprint.app/">
   <meta property="og:image" content="https://pomosprint.app/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="PomoSprint: kum saati logosu ve 'Odaklanmanın en keyifli hali' yazısı">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="PomoSprint — Odaklanmanın En Keyifli Hali">
-  <meta name="twitter:description" content="Pomodoro seansları, arkadaşlarla birlikte odak, ligler ve raporlar.">
+  <meta name="twitter:title" content="PomoSprint: Arkadaşlarla Pomodoro ve Ders Çalışma Uygulaması">
+  <meta name="twitter:description" content="Pomodoro, Maraton, denemeler, süre–net takibi ve aylık ligler.">
   <meta name="twitter:image" content="https://pomosprint.app/og-image.png">
   <!-- partial:head -->
   <meta name="theme-color" content="#F6F0EA">
@@ -27,8 +29,8 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="stylesheet" href="/css/fonts.css?v=20261003">
-  <link rel="stylesheet" href="/css/style.css?v=20261008e">
-  <script src="/js/boot.js?v=20261003b"></script>
+  <link rel="stylesheet" href="/css/style.css?v=20261028a">
+  <script src="/js/boot.js?v=20261028a"></script>
   <!-- /partial:head -->
   <script type="application/ld+json">
   {
@@ -43,7 +45,7 @@
       {
         "@type": "SoftwareApplication",
         "name": "PomoSprint",
-        "description": "Oyunlaştırılmış pomodoro uygulaması: 25 ya da 50 dakikalık odak seansları, arkadaşlarla birlikte odak, ligler, avatar koleksiyonu ve çalışma raporları.",
+        "description": "Pomodoro, Maraton, sınav denemeleri, çalışma süresi ve net takibi, arkadaşlarla odak ve aylık hedef ligleri.",
         "applicationCategory": "ProductivityApplication",
         "operatingSystem": "iOS, Android",
         "inLanguage": ["tr", "en"],
@@ -52,6 +54,7 @@
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "TRY", "availability": "https://schema.org/PreOrder" },
         "publisher": {
           "@type": "Organization",
+          "@id": "https://pomosprint.app/#organization",
           "name": "PomoSprint",
           "url": "https://pomosprint.app/",
           "email": "destek@pomosprint.app",
@@ -63,45 +66,6 @@
   </script>
 </head>
 <body data-page="home">
-
-  <!-- Sabit arka plan kum saati: hero bittikten sonra soluk olarak belirir;
-       kum, sayfa kaydırıldıkça akar / geri dolar (hero'daki kum saatiyle eş zamanlı) -->
-  <div class="hg-backdrop" id="hg-backdrop" aria-hidden="true">
-    <div class="hourglass" id="hourglass">
-      <svg viewBox="0 0 220 300">
-        <defs>
-          <clipPath id="hgClipTop">
-            <path d="M69 46 L151 46 C151 90 128 116 112 140 L108 140 C92 116 69 90 69 46 Z"/>
-          </clipPath>
-          <clipPath id="hgClipBottom">
-            <path d="M108 160 L112 160 C128 184 151 210 151 254 L69 254 C69 210 92 184 108 160 Z"/>
-          </clipPath>
-        </defs>
-
-        <path class="hg-glass" d="M62 38 L158 38 C158 88 132 118 116 142 L116 158 C132 182 158 212 158 262 L62 262 C62 212 88 182 104 158 L104 142 C88 118 62 88 62 38 Z"/>
-
-        <g clip-path="url(#hgClipTop)">
-          <path class="hg-sand hg-sand-top" d="M 56 48 Q 110 60 164 48 L 164 162 L 56 162 Z"/>
-        </g>
-
-        <line class="hg-stream" x1="110" y1="156" x2="110" y2="248"/>
-        <g class="hg-grains">
-          <circle class="hg-grain" cx="110" cy="172" r="2.2"/>
-          <circle class="hg-grain" cx="107.5" cy="198" r="1.7"/>
-          <circle class="hg-grain" cx="112.5" cy="224" r="2"/>
-        </g>
-
-        <g clip-path="url(#hgClipBottom)">
-          <path class="hg-sand hg-sand-pile" d="M 54 258 Q 82 256 104 255 Q 110 254 116 255 Q 138 256 166 258 L 166 262 L 54 262 Z"/>
-        </g>
-
-        <rect class="hg-cap" x="42" y="16" width="136" height="18" rx="9"/>
-        <rect class="hg-cap" x="42" y="266" width="136" height="18" rx="9"/>
-        <rect class="hg-post" x="46" y="26" width="9" height="248" rx="4.5"/>
-        <rect class="hg-post" x="165" y="26" width="9" height="248" rx="4.5"/>
-      </svg>
-    </div>
-  </div>
 
   <!-- ============ HEADER ============ -->
   <!-- partial:header -->
@@ -117,6 +81,7 @@
         <a href="/features">Özellikler</a>
         <a href="/pomodoro-nedir">Pomodoro Nedir?</a>
         <a href="/faq">SSS</a>
+        <a class="language-link" href="/en/" hreflang="en" lang="en">EN</a>
         <a href="/#yakinda" class="btn btn-primary btn-sm nav-cta">Haberdar Ol</a>
       </nav>
       <button class="nav-toggle" type="button" aria-label="Menüyü aç/kapat" aria-expanded="false" aria-controls="site-nav">
@@ -131,11 +96,11 @@
     <section class="hero">
       <div class="container hero-inner">
         <div class="hero-text">
-          <span class="hero-chip" data-hero>🍅 Pomodoro tekniği, arkadaşlarınla birlikte</span>
-          <h1 data-hero-title>Odaklanmanın en <span class="hl">keyifli</span> hali</h1>
+          <span class="hero-chip" data-hero>LGS’den YKS’ye ve TUS’a, arkadaşlarınla birlikte çalış</span>
+          <h1 data-hero-title>PomoSprint: <span class="hl">birlikte</span> Pomodoro ile ders çalış</h1>
           <p class="hero-sub" data-hero>
-            PomoSprint ile 25 ya da 50 dakikalık odak seansları başlat, arkadaşlarının
-            şu an çalıştığını gör, liglerde yüksel. Ertelemeyi bırak — kumu akıt.
+            Çalıştığın süre netine nasıl yansıyor? Pomodoro ve Maraton ile odağını koru;
+            denemelerini, netlerini ve gelişimini aynı yerde takip et.
           </p>
           <div class="hero-actions" data-hero>
             <a href="#yakinda" class="btn btn-primary btn-lg">Yayınlanınca haber ver</a>
@@ -157,9 +122,8 @@
           </div>
         </div>
 
-        <!-- Hero'nun kum saati: rozetler ona göre konumlanır. Kum, sayfa
-             kaydırıldıkça akar; hero bitince sabit arka plan kopyası devralır. -->
-        <div class="hourglass-stage" data-hero aria-hidden="true">
+        <!-- Dekoratif kum saati yalnızca hero içinde kalır; metin ilk boyamada görünür. -->
+        <div class="hourglass-stage" data-hero-decoration aria-hidden="true">
           <div class="hg-hero">
             <div class="hourglass hourglass-hero">
               <svg viewBox="0 0 220 300">
@@ -209,10 +173,10 @@
           <figure class="app-screen-card">
             <div class="phone phone-real">
               <div class="phone-screen phone-screen-real">
-                <img class="shot-image" src="/screenshots/timer.webp" alt="Pomo ekranı: renkli kum saati, ders kategorileri, Maraton düğmesi ve 25 veya 50 dakikalık seans seçimi" width="540" height="1170" loading="lazy" decoding="async">
+                <img class="shot-image" src="/screenshots/timer-20261028-tr.png" alt="Güncel Pomo ekranı: kum saati, kategoriler, Maraton düğmesi, 25/50 dakika seçimi ve Deneme dahil beş sekme" width="604" height="1311" loading="lazy" decoding="async">
               </div>
             </div>
-            <figcaption><h3>Kumu akıt</h3><p>Çalışacağın kategoriyi ve süreni seç. Geri kalan zamanı odaklanmaya ayır.</p></figcaption>
+            <figcaption><h3>Kumu akıt: sayacını başlat</h3><p>Çalışacağın kategoriyi ve süreni seç. Geri kalan zamanı odaklanmaya ayır.</p></figcaption>
           </figure>
           <figure class="app-screen-card">
             <div class="phone phone-real">
@@ -220,12 +184,12 @@
                 <img class="shot-image" src="/screenshots/reports.webp" alt="Raporlar ekranı: günlük çalışma süresi, hedef ilerlemesi ve kategorilere göre çalışma dağılımı" width="540" height="1170" loading="lazy" decoding="async">
               </div>
             </div>
-            <figcaption><h3>Emeğini gör</h3><p>Günlük hedefini takip et; haftalık ve aylık raporlarla çalışma düzenini tanı.</p></figcaption>
+            <figcaption><h3>Emeğini gör</h3><p>Pomodoro, Maraton ve tamamlanan denemelerle toplam emeğini gör; netlerini ayrıca takip et.</p></figcaption>
           </figure>
           <figure class="app-screen-card">
             <div class="phone phone-real">
               <div class="phone-screen phone-screen-real">
-                <img class="shot-image" src="/screenshots/social.webp" alt="Sosyal ekranı: Mert Molada olarak yeşil noktayla, Ece Odaklanıyor olarak kırmızı noktayla görünüyor" width="540" height="1170" loading="lazy" decoding="async">
+                <img class="shot-image" src="/screenshots/social-20261028-tr.png" alt="Yerel örnek hesaplarla sosyal ekran: Odaklanıyor, Molada ve Denemede durumları" width="604" height="1311" loading="lazy" decoding="async">
               </div>
             </div>
             <figcaption><h3>Birlikte odaklan</h3><p>Arkadaşlarını ekle, kimin odaklandığını gör. Çalışırken birbirinize eşlik edin.</p></figcaption>
@@ -298,14 +262,14 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
             </div>
             <h3>Lig Sistemi</h3>
-            <p>İlk puanlı seansında en fazla 25 kişilik bir odaya yerleş. Hazırlık sonrasında 14 günlük dönemlerde yarış; çalışma ve aktif rakip şartlarını sağlayarak üst lige çık ve lig ödülleri kazan.</p>
+            <p>Kendi hedefindeki arkadaşlarla aylık liglerde yarış, global sıralamada yerini gör. Pomodoro ve deneme puanları ayrı liglerde değerlendirilir.</p>
           </article>
           <article class="feature-card">
             <div class="feature-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 16v-4"/><path d="M12 16V8"/><path d="M17 16v-6"/></svg>
             </div>
             <h3>Raporlar</h3>
-            <p>Günlük, haftalık ve aylık raporlarla hangi derse ne kadar çalıştığını net grafiklerle gör.</p>
+            <p>Günlük, haftalık ve aylık toplamını gör. Deneme netlerini derslere ayır; yeterli veri biriktiğinde çalışma sürenle değişimi birlikte incele.</p>
           </article>
         </div>
       </div>
@@ -334,7 +298,7 @@
               <span class="step-num">2</span>
             </div>
             <h3>Kategorilerini Belirle</h3>
-            <p>Hangi yolculukta olduğunu (LGS, YKS, üniversite ya da iş) seç; sana uygun dersler hazır gelsin. Sonra günlük hedefini belirle.</p>
+            <p>Dilini ve hedefini seç: LGS, YKS, TUS, KPSS, dil, üniversite ya da iş. Derslerini düzenle, günlük hedefini belirle.</p>
           </div>
           <div class="step">
             <div class="step-bubble">
@@ -342,22 +306,21 @@
               <span class="step-num">3</span>
             </div>
             <h3>Odaklan</h3>
-            <p>25 ya da 50 dakikalık seansı başlat; kum akarken sen de akışa gir.</p>
+            <p>25/50 dakika odaklan, Maraton planla ya da sınavına uygun bir deneme başlat.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ============ CANLI AYLIK SIRALAMA ============
-         Lansman öncesi boş liste "kimse kullanmıyor" izlenimi vermesin diye
-         bölüm gizli başlar; en az 3 kişi puan topladığında JS görünür yapar. -->
-    <section class="section section-deep" id="siralama" hidden>
+    <!-- Yeni aylık RPC yoksa hazırlık; sıfır kişide gerçek boş durum gösterilir. -->
+    <section class="section section-deep" id="siralama">
       <div class="container">
         <div class="section-head" data-reveal>
           <span class="eyebrow">Canlı sıralama</span>
           <h2>Bu ayın ilk 10'u</h2>
-          <p class="lb-intro">Uygulamada bu ay en çok odak puanı toplayan kullanıcılar. Her kullanıcının çalışma ayı, kendi saat diliminde ayın 1'i saat 04:00'te başlar.</p>
+          <p class="lb-intro">Bu ay en çok odak puanı toplayan kullanıcılar. Aylık sıralama, İstanbul saatine göre ayın 1’inde 00:00’da yenilenir.</p>
         </div>
+        <p class="lb-empty" id="lb-empty" role="status" aria-live="polite">Aylık sıralama hazırlanıyor. Odak zamanı!</p>
         <div class="leaderboard-live" data-reveal>
           <div class="lb-podium" id="lb-podium" hidden>
             <div class="lb-podium-slot lb-podium-1" id="lb-podium-1">
@@ -380,11 +343,7 @@
             </div>
           </div>
 
-          <ol class="lb-list" id="lb-list" aria-live="polite" start="4">
-            <li class="lb-item lb-skeleton" aria-hidden="true"></li>
-            <li class="lb-item lb-skeleton" aria-hidden="true"></li>
-            <li class="lb-item lb-skeleton" aria-hidden="true"></li>
-          </ol>
+          <ol class="lb-list" id="lb-list" aria-live="polite" start="4" hidden></ol>
         </div>
         <p class="lb-note" data-reveal>Sıralamada yalnızca kısaltılmış görünen ad (ör. “Elif&nbsp;Y.”; tek kelimelik adlar olduğu gibi), karakter ve puan yer alır; “Sıralamalarda ve canlı listede görün” ayarını kapatanlar listelenmez. Ayrıntılar <a href="/privacy#siralama">Gizlilik Politikası</a>'nda.</p>
       </div>
@@ -401,7 +360,7 @@
               PomoSprint App Store ve Google Play'de ücretsiz olarak yayınlandığında
               sana tek bir <span class="nowrap">e-postayla</span> haber verelim.
             </p>
-            <form class="notify-form" id="notify-form" novalidate>
+            <form class="notify-form" id="notify-form" method="post" novalidate>
               <label class="sr-only" for="notify-email">E-posta adresin</label>
               <input type="email" id="notify-email" name="email" required maxlength="254"
                      placeholder="eposta@ornek.com" autocomplete="email">
@@ -424,9 +383,9 @@
             <p class="notify-status" id="notify-status" role="status" aria-live="polite"></p>
             <p class="notify-note">Adresini yalnızca lansman haberi için kullanırız — spam yok, söz. <a href="/privacy#bekleme-listesi">Gizlilik Politikası</a> · <a href="/kvkk">KVKK Aydınlatma Metni</a></p>
           </div>
-          <div class="character-strip" aria-hidden="true">
-            <p class="strip-title">Karakterini seç, kişiliğini yansıt</p>
-            <div class="marquee">
+          <div class="character-strip">
+            <p class="strip-title">Uygulamada 42 karakteri keşfet</p>
+            <div class="marquee" aria-hidden="true">
               <div class="marquee-track">
                 <img class="m-avatar" src="/avatars/avatar_1_gamer.webp" alt="" width="68" height="68">
                 <img class="m-avatar" src="/avatars/avatar_2_glasses.webp" alt="" width="68" height="68">
@@ -497,7 +456,7 @@
           <li><a href="/terms">Kullanım Şartları</a></li>
           <li><a href="/kvkk">KVKK Aydınlatma Metni</a></li>
           <li><a href="/hesap-silme">Hesap Silme</a></li>
-          <li><a href="/en/privacy" hreflang="en" lang="en">Privacy &amp; Terms (English)</a></li>
+          <li><a href="/en/" hreflang="en" lang="en">English site</a></li>
         </ul>
       </div>
     </div>
@@ -512,7 +471,7 @@
   <!-- partial:scripts -->
   <script src="/vendor/gsap-3.13.0/gsap.min.js" integrity="sha384-HOvlOYPIs/zjoIkWUGXkVmXsjr8GuZLV+Q+rcPwmJOVZVpvTSXQChiN4t9Euv9Vc" defer></script>
   <script src="/vendor/gsap-3.13.0/ScrollTrigger.min.js" integrity="sha384-P8VzCVnT9NBUkMrpcIZrJbA7EBjJvh/fJS6PmP+4nLIM284DtsImIv8D0fFjIkeh" defer></script>
-  <script src="/js/main.js?v=20261008d" defer></script>
+  <script src="/js/main.js?v=20261028a" defer></script>
   <!-- /partial:scripts -->
 </body>
 </html>

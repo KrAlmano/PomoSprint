@@ -3,11 +3,15 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://pomosprint.app/</loc>
-    <lastmod>2026-10-08</lastmod>
+    <lastmod>2026-10-28</lastmod>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pomosprint.app/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pomosprint.app/en/"/>
   </url>
   <url>
     <loc>https://pomosprint.app/features</loc>
-    <lastmod>2026-10-08</lastmod>
+    <lastmod>2026-10-28</lastmod>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pomosprint.app/features"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pomosprint.app/en/features"/>
   </url>
   <url>
     <loc>https://pomosprint.app/pomodoro-nedir</loc>
@@ -15,7 +19,9 @@
   </url>
   <url>
     <loc>https://pomosprint.app/faq</loc>
-    <lastmod>2026-10-08</lastmod>
+    <lastmod>2026-10-28</lastmod>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pomosprint.app/faq"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pomosprint.app/en/faq"/>
   </url>
   <url>
     <loc>https://pomosprint.app/privacy</loc>
@@ -76,5 +82,23 @@
     <lastmod>2026-10-03</lastmod>
     <xhtml:link rel="alternate" hreflang="tr" href="https://pomosprint.app/destek"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://pomosprint.app/en/support"/>
+  </url>
+  <url>
+    <loc>https://pomosprint.app/en/</loc>
+    <lastmod>2026-10-28</lastmod>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pomosprint.app/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pomosprint.app/en/"/>
+  </url>
+  <url>
+    <loc>https://pomosprint.app/en/features</loc>
+    <lastmod>2026-10-28</lastmod>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pomosprint.app/features"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pomosprint.app/en/features"/>
+  </url>
+  <url>
+    <loc>https://pomosprint.app/en/faq</loc>
+    <lastmod>2026-10-28</lastmod>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pomosprint.app/faq"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pomosprint.app/en/faq"/>
   </url>
 </urlset>

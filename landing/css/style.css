@@ -110,13 +110,7 @@ h1, h2 {
 /* "e-posta" gibi tireli sözcükler ve "Elif Y." gibi adlar satır sonunda bölünmesin */
 .nowrap { white-space: nowrap; }
 
-/* İlk boyamada hero gizli başlar; GSAP giriş animasyonu kurulunca main.js
-   bu sınıfı kaldırır (boot.js 3 sn sonra her durumda kaldırır). */
-.js-anim [data-hero] { opacity: 0; }
-
-/* Sayfa başlığı (LCP öğesi) gizlenmez; yalnızca hafif aşağıda başlar ve
-   GSAP onu yerine kaydırır. Böylece ilk boyamada görünür, sıçrama da olmaz. */
-.js-anim [data-hero-title] { transform: translateY(16px); }
+/* Hero metni ve eylemleri ilk boyamadan itibaren okunur; girişte gizlenmez. */
 
 /* ---------------- İçeriğe geç (klavye) ---------------- */
 
@@ -433,24 +427,7 @@ main, .site-footer { position: relative; z-index: 1; }
 /* Giriş animasyonlarındaki yatay kaydırmalar (x ofsetleri) sayfayı yana taşırmasın */
 main { overflow-x: clip; }
 
-/* Arka plan kopyası hero'daki kum saatiyle aynı yatay konumda durur; hero
-   görünürken gizlidir, hero geride kalınca soluk belirir (JS ya da
-   .hg-past-hero). JS yoksa hiç görünmez; hero'daki kum saati yeterli. */
-.hg-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding-right: calc(max(0px, (100vw - var(--wrap)) / 2) + 24px + ((min(100vw, var(--wrap)) - 96px) * 0.475 - var(--hg-w)) / 2);
-  pointer-events: none;
-  opacity: 0;
-}
 
-.hg-past-hero .hg-backdrop { opacity: 0.22; }
-
-.hg-backdrop .hourglass,
 .hourglass-hero {
   position: relative;
   width: var(--hg-w);
@@ -460,7 +437,6 @@ main { overflow-x: clip; }
 /* Gölge yalnızca svg'de: kapsayıcıdaki filtre parıltıyı dikey şeritlerle kırpıyordu */
 .hourglass svg { filter: drop-shadow(0 18px 28px rgba(70, 50, 38, 0.16)); }
 
-.hg-backdrop .hourglass::before,
 .hourglass-hero::before {
   content: "";
   position: absolute;
@@ -1663,9 +1639,6 @@ main { overflow-x: clip; }
   .hourglass-stage { padding: 0; }
   .hg-chip-1 { left: -20%; }
   .hg-chip-2 { right: -26%; }
-  /* Arka plan kopyası içeriğin arkasında ortalanır ve daha soluk kalır */
-  .hg-backdrop { justify-content: center; padding-right: 0; }
-  .hg-past-hero .hg-backdrop { opacity: 0.14; }
 
   /* Tablette özellik satırları iki sütunda kalır: metin solda, telefon dar sütunda */
   .feature-row { grid-template-columns: minmax(0, 1fr) 240px; gap: 32px; }
@@ -2309,3 +2282,22 @@ html.nav-lock { overflow: hidden; }
   .ot-a4 .orbit-avatar { transform: translate(-50%, -50%) rotate(-216deg); }
   .ot-a5 .orbit-avatar { transform: translate(-50%, -50%) rotate(-288deg); }
 }
+
+/* Gece güncellemesi: okunur medya, kısa lig özeti ve erişilebilir kontroller. */
+.feature-text-panel { max-width: 860px; padding: 32px; margin: 22px auto 42px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); }
+.feature-text-panel h2 { margin: 8px 0 16px; }
+.feature-text-panel p, .feature-text-panel li { color: var(--ink-soft); }
+.feature-text-panel p + p { margin-top: 12px; }
+.feature-text-panel ul { margin: 18px 0 0 22px; }
+.league-ladder { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: clamp(4px, .8vw, 8px); list-style: none; padding: 0; margin: 24px 0; }
+.league-ladder li { min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px 4px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); color: var(--ink); font-size: clamp(.72rem, 1.1vw, .85rem); font-weight: 800; text-align: center; overflow-wrap: anywhere; }
+.league-ladder img { width: clamp(24px, 4vw, 44px); height: auto; max-width: 100%; border-radius: 50%; }
+.league-details { border-top: 1px solid var(--line); padding-top: 12px; }
+.league-details summary { cursor: pointer; min-height: 44px; padding: 10px 0; color: var(--coral-text); font-weight: 800; }
+.league-details p { margin: 12px 0; }
+.notify-note a { display: inline-flex; align-items: center; min-height: 44px; padding: 6px 2px; }
+.site-nav .language-link { min-height: 44px; display: inline-flex; align-items: center; }
+.app-screen-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 36px; }
+.app-screen-card .phone { max-width: 290px; }
+.lb-empty { text-align: center; color: var(--ink-soft); padding: 24px; }
+@media (max-width: 960px) { .app-screen-grid { grid-template-columns: 1fr; } .app-screen-card .phone { max-width: 320px; } .feature-text-panel { padding: 24px; } }

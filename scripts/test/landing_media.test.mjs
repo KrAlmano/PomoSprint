@@ -238,7 +238,9 @@ test("gerçek görüntü oranı iç ekrandadır; kayıtlar sessiz döngü ve sta
       assert.match(attrs, /data-src="\/videos\/(?:timer|marathon)-demo-20261008d\.mp4"/);
       assert.match(attrs, /poster="\/videos\/(?:timer|marathon)-demo-20261008d\.webp"/);
       assert.doesNotMatch(content, /<source\b[^>]*\bsrc=/);
-      assert.match(content, /href="\/screenshots\/[a-z]+\.webp"/);
+      const fallback = content.match(/href="(\/screenshots\/[a-z0-9-]+\.(?:webp|png))"/);
+      assert.ok(fallback, "video has a real screenshot fallback link");
+      assert.ok(fs.existsSync(path.join(REPO, "landing", fallback[1])), "fallback asset exists");
     }
     assert.doesNotMatch(html, /phone-mock|data-shot=|Oynat düğmesi|oynat düğmesi/);
   }

@@ -108,9 +108,11 @@ test("Features: hareket azaltma tercihi okunabilir durağan içerik gösterir", 
   assert.equal(page.root.classList.contains("js-anim"), false);
 });
 
-test("Ana sayfanın mevcut hero, kart ve özellik fade animasyonları korunur", () => {
+test("Ana sayfanın kritik hero içeriği görünür kalır, alt kartların hafif animasyonu korunur", () => {
   const page = setup({ page: "home" });
-  for (const node of [page.hero, page.heading, page.cta, ...page.cards, page.text, page.media, ...page.items]) {
+  readable([page.hero]);
+  assert.equal(page.calls.some(({ targets = [] }) => targets.includes(page.hero)), false);
+  for (const node of [page.heading, page.cta, ...page.cards, page.text, page.media, ...page.items]) {
     assert.equal(node.style.opacity, "0", node.id);
     assert.equal(node.style.visibility, "hidden", node.id);
   }
