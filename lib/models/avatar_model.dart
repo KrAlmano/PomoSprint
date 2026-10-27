@@ -40,14 +40,23 @@ class AvatarCharacter {
 
   factory AvatarCharacter.fromMap(Map<String, dynamic> map) {
     final id = map['id'] as String;
+    final fallback = _find(fallbackCatalog, id) ??
+        (isRetiredAvatarId(id) ? _find(fallbackCatalog, kDefaultAvatarId) : null);
+    String label(String key, String? fallbackLabel) {
+      final value = map[key];
+      if (value is String && value.trim().isNotEmpty) return value.trim();
+      if (fallbackLabel != null) return fallbackLabel;
+      // Reject an incomplete future catalogue instead of showing a technical ID.
+      throw const FormatException('avatar_missing_localization');
+    }
     // Sunucu satırında 'is_league_award' kolonu yoksa lig ödülü kimlik
     // önekinden tanınır; aksi halde 0 kum tanesi + Premium değil olduğu için
     // satın alınabilir/ücretsiz görünürdü.
     final leagueAward = map['is_league_award'];
     return AvatarCharacter(
       id: id,
-      nameTr: map['name_tr'] as String? ?? id,
-      nameEn: map['name_en'] as String? ?? id,
+      nameTr: label('name_tr', fallback?.nameTr),
+      nameEn: label('name_en', fallback?.nameEn),
       imagePath: map['asset_key'] as String? ?? 'assets/avatars/$id.png',
       requiredCoins: (map['cost_coins'] as num?)?.toInt() ?? 0,
       isPremiumOnly: map['is_premium_only'] as bool? ?? false,

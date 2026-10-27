@@ -50,7 +50,7 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
   bool _obscure = true;
   bool _busy = false;
   bool _submitted = false;
-  String? _error;
+  String Function(AppLocalizations)? _error;
 
   @override
   void dispose() {
@@ -62,7 +62,6 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
 
   Future<void> _submit() async {
     if (_busy) return;
-    final l10n = AppLocalizations.of(context)!;
     setState(() {
       _submitted = true;
       _error = null;
@@ -77,7 +76,7 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
       if (!mounted) return;
       setState(() {
         _busy = false;
-        _error = changePasswordErrorText(l10n, e);
+        _error = (current) => changePasswordErrorText(current, e);
       });
     }
   }
@@ -112,7 +111,7 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               if (_error != null) ...[
-                AuthErrorBanner(message: _error!),
+                AuthErrorBanner(message: _error!(l10n)),
                 const SizedBox(height: 12),
               ],
               TextFormField(

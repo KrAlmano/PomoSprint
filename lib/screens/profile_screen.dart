@@ -70,7 +70,7 @@ class _ProfileScreenState extends State<ProfileScreen> with WidgetsBindingObserv
   late final TextEditingController _emailController;
   bool _isSavingName = false;
   bool _isNameEditing = false;
-  String? _nameError;
+  String Function(AppLocalizations)? _nameError;
   bool _isDeleting = false;
   bool _isLoggingOut = false;
 
@@ -198,7 +198,7 @@ class _ProfileScreenState extends State<ProfileScreen> with WidgetsBindingObserv
     final newName = _nameController.text.trim();
     final validationError = _validateName(l10n, newName);
     if (validationError != null) {
-      setState(() => _nameError = validationError);
+      setState(() => _nameError = (current) => _validateName(current, newName)!);
       return;
     }
     if (newName == _user?.name) {
@@ -227,7 +227,7 @@ class _ProfileScreenState extends State<ProfileScreen> with WidgetsBindingObserv
       );
     } catch (e) {
       debugPrint('[PROFILE] İsim kaydedilemedi: $e');
-      if (mounted) setState(() => _nameError = socialErrorText(l10n, e));
+      if (mounted) setState(() => _nameError = (current) => socialErrorText(current, e));
     } finally {
       if (mounted) setState(() => _isSavingName = false);
     }
@@ -597,7 +597,7 @@ class _ProfileScreenState extends State<ProfileScreen> with WidgetsBindingObserv
             onSubmitted: (_) => _saveName(),
             decoration: InputDecoration(
               prefixIcon: const Icon(Icons.person_outline, size: 20),
-              errorText: _nameError,
+              errorText: _nameError?.call(l10n),
               suffixIcon: _isNameEditing
                   ? IconButton(
                       icon: _isSavingName

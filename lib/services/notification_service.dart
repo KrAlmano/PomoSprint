@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'dart:ui' show Color;
 
 import 'package:flutter/foundation.dart';
@@ -56,7 +58,9 @@ class NotificationService {
   static final NotificationService instance = NotificationService._init();
   final FlutterLocalNotificationsPlugin _plugin = FlutterLocalNotificationsPlugin();
 
-  NotificationService._init();
+  NotificationService._init() {
+    LanguageService.instance.addListener(_onLanguageChanged);
+  }
 
   static const int _sessionEndId = 0;
   static const int _ongoingTimerId = 1;
@@ -71,6 +75,45 @@ class NotificationService {
 
   Future<void>? _initialization;
   final AsyncLock _endNotifications = AsyncLock();
+  ({tz.TZDateTime at, String category})? _scheduledSessionEnd;
+  ({tz.TZDateTime at, int next, int total})? _scheduledBreakEnd;
+
+  void _onLanguageChanged() {
+    if (_scheduledSessionEnd == null && _scheduledBreakEnd == null) return;
+    unawaited(_refreshScheduledLanguage());
+  }
+
+  Future<void> _refreshScheduledLanguage() => _endNotifications.synchronized(() async {
+    if (!await _ready() || !await isEnabled()) return;
+    final now = DateTime.now();
+    final session = _scheduledSessionEnd;
+    final pause = _scheduledBreakEnd;
+    final l10n = _l10n();
+    if (session != null) {
+      if (session.at.isAfter(now)) {
+        await _scheduleAt(
+          id: _sessionEndId,
+          at: session.at,
+          title: l10n.notifSessionDoneTitle,
+          body: l10n.notifSessionDoneBody(displayCategoryName(session.category)),
+        );
+      } else {
+        _scheduledSessionEnd = null;
+      }
+    }
+    if (pause != null) {
+      if (pause.at.isAfter(now)) {
+        await _scheduleAt(
+          id: _marathonBreakEndId,
+          at: pause.at,
+          title: l10n.notifMarathonBreakDoneTitle,
+          body: l10n.notifMarathonBreakDoneBody(pause.next, pause.total),
+        );
+      } else {
+        _scheduledBreakEnd = null;
+      }
+    }
+  });
 
   /// Bildirim tercihi her değiştiğinde artar (kilit ekranı sayacı dinler).
   final ValueNotifier<int> preferenceRevision = ValueNotifier<int>(0);
@@ -93,7 +136,11 @@ class NotificationService {
 
   /// Testte başarılı ya da başarısız başlatmayı unutturur.
   @visibleForTesting
-  void debugResetInitialization() => _initialization = null;
+  void debugResetInitialization() {
+    _initialization = null;
+    _scheduledSessionEnd = null;
+    _scheduledBreakEnd = null;
+  }
 
   Future<void> _initialize() async {
     // Veri study_day.dart tarafından zaten yüklenmiş olabilir.
@@ -222,72 +269,66 @@ class NotificationService {
   /// bildirimin yerini alır).
   Future<void> scheduleSessionEnd({required Duration after, required String categoryName}) => _endNotifications.synchronized(() async {
     if (!await _ready() || !await isEnabled()) return;
+    final at = tz.TZDateTime.now(tz.local).add(after);
+    _scheduledSessionEnd = (at: at, category: categoryName);
     final l10n = _l10n();
-    final scheduledDate = tz.TZDateTime.now(tz.local).add(after);
-    // Android: bitiş bildirimi tam zamanında gelsin diye exact alarm
-    // (Android 13+ USE_EXACT_ALARM, 12-12L SCHEDULE_EXACT_ALARM). İzin yoksa
-    // (ör. kullanıcı Android 12'de kapattıysa) inexact'e düşülür; Doze'da
-    // birkaç dakika gecikebilir.
+    await _scheduleAt(
+      id: _sessionEndId,
+      at: at,
+      title: l10n.notifSessionDoneTitle,
+      body: l10n.notifSessionDoneBody(displayCategoryName(categoryName)),
+    );
+  });
+
+  /// Maraton molası ayrı bildirim kimliğindedir. Dil değişince özgün mutlak
+  /// bitiş korunur; yeni bir mola veya onay penceresi açılmaz.
+  Future<void> scheduleMarathonBreakEnd({required int seconds, required int nextSession, required int totalSessions}) =>
+      _endNotifications.synchronized(() async {
+        if (seconds <= 0 || !await _ready() || !await isEnabled()) return;
+        final at = tz.TZDateTime.now(tz.local).add(Duration(seconds: seconds));
+        _scheduledBreakEnd = (at: at, next: nextSession, total: totalSessions);
+        final l10n = _l10n();
+        await _scheduleAt(
+          id: _marathonBreakEndId,
+          at: at,
+          title: l10n.notifMarathonBreakDoneTitle,
+          body: l10n.notifMarathonBreakDoneBody(nextSession, totalSessions),
+        );
+      });
+
+  Future<void> _scheduleAt({
+    required int id,
+    required tz.TZDateTime at,
+    required String title,
+    required String body,
+  }) async {
     final exact = await _canScheduleExact();
-    final modes = [
+    for (final mode in [
       if (exact) AndroidScheduleMode.exactAllowWhileIdle,
       AndroidScheduleMode.inexactAllowWhileIdle,
-    ];
-    for (final mode in modes) {
+    ]) {
       try {
         await _plugin.zonedSchedule(
-          id: _sessionEndId,
-          title: l10n.notifSessionDoneTitle,
-          body: l10n.notifSessionDoneBody(displayCategoryName(categoryName)),
-          scheduledDate: scheduledDate,
-          notificationDetails: _details(l10n),
+          id: id,
+          title: title,
+          body: body,
+          scheduledDate: at,
+          notificationDetails: _details(_l10n()),
           androidScheduleMode: mode,
         );
         return;
       } on PlatformException catch (e) {
-        // exact_alarms_not_permitted: izin bu arada geri alınmış olabilir.
         debugPrint('[NOTIF] Bildirim zamanlanamadı ($mode): ${e.code}');
       } catch (e) {
         debugPrint('[NOTIF] Bildirim zamanlanamadı: $e');
         return;
       }
     }
-  });
-
-  /// Maraton molası çalışma kaydı değildir; bildirimi de ayrı kimlik taşır.
-  /// Uygulama askıdayken sistem hatırlatır. Yeni Pomodoro ancak ön planda,
-  /// 1 dakikalık pencerede açık kullanıcı onayıyla başlar.
-  Future<void> scheduleMarathonBreakEnd({required int seconds, required int nextSession, required int totalSessions}) =>
-      _endNotifications.synchronized(() async {
-        if (seconds <= 0 || !await _ready() || !await isEnabled()) return;
-        final l10n = _l10n();
-        final scheduledDate = tz.TZDateTime.now(tz.local).add(Duration(seconds: seconds));
-        final exact = await _canScheduleExact();
-        for (final mode in [
-          if (exact) AndroidScheduleMode.exactAllowWhileIdle,
-          AndroidScheduleMode.inexactAllowWhileIdle,
-        ]) {
-          try {
-            await _plugin.zonedSchedule(
-              id: _marathonBreakEndId,
-              title: l10n.notifMarathonBreakDoneTitle,
-              body: l10n.notifMarathonBreakDoneBody(nextSession, totalSessions),
-              scheduledDate: scheduledDate,
-              notificationDetails: _details(l10n),
-              androidScheduleMode: mode,
-            );
-            return;
-          } on PlatformException catch (e) {
-            debugPrint('[NOTIF] Mola bildirimi zamanlanamadı ($mode): ${e.code}');
-          } catch (e) {
-            debugPrint('[NOTIF] Mola bildirimi zamanlanamadı: $e');
-            return;
-          }
-        }
-      });
+  }
 
   Future<void> showMarathonBreakEndNow({required int nextSession, required int totalSessions}) =>
       _endNotifications.synchronized(() async {
+        _scheduledBreakEnd = null;
         if (!await _ready() || !await isEnabled()) return;
         final l10n = _l10n();
         try {
@@ -304,6 +345,7 @@ class NotificationService {
       });
 
   Future<void> cancelMarathonBreakEnd() => _endNotifications.synchronized(() async {
+        _scheduledBreakEnd = null;
         if (!await _ready()) return;
         try {
           await _plugin.cancel(id: _marathonBreakEndId);
@@ -325,6 +367,7 @@ class NotificationService {
   /// Uygulama arka plandayken biten seans için bildirimi beklemeden gösterir
   /// (alarm Doze'da ya da exact izni yoksa geç tetiklenebilir).
   Future<void> showSessionEndNow({required String categoryName}) => _endNotifications.synchronized(() async {
+    _scheduledSessionEnd = null;
     if (!await _ready() || !await isEnabled()) return;
     final l10n = _l10n();
     try {
@@ -351,6 +394,7 @@ class NotificationService {
       );
 
   Future<void> _playSessionEndSound() => _endNotifications.synchronized(() async {
+    _scheduledSessionEnd = null;
     if (!await _ready() || !await isEnabled()) return;
     final l10n = _l10n();
     try {
@@ -442,6 +486,7 @@ class NotificationService {
   /// Odak bitişi için zamanlanmış veya gösterilmiş bildirimi kaldırır.
   /// Maraton mola bildirimi ve kalıcı sayaç kendi kimliklerinde korunur.
   Future<void> cancelSessionEndNotification() => _endNotifications.synchronized(() async {
+    _scheduledSessionEnd = null;
     if (!await _ready()) return;
     try {
       await _plugin.cancel(id: _sessionEndId);

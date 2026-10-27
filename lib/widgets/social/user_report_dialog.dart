@@ -66,7 +66,7 @@ class _UserReportDialogState extends State<_UserReportDialog> {
   final _form = GlobalKey<FormState>();
   final _details = TextEditingController();
   String? _reason;
-  String? _error;
+  String Function(AppLocalizations)? _error;
   bool _busy = false;
 
   @override
@@ -77,7 +77,6 @@ class _UserReportDialogState extends State<_UserReportDialog> {
 
   Future<void> _send() async {
     if (_busy || !(_form.currentState?.validate() ?? false)) return;
-    final l10n = AppLocalizations.of(context)!;
     FocusScope.of(context).unfocus();
     final details = _details.text.trim();
     setState(() {
@@ -95,14 +94,14 @@ class _UserReportDialogState extends State<_UserReportDialog> {
         return;
       }
       setState(
-        () => _error = switch (response['code']) {
-          'rate_limited' => l10n.reportRateLimited,
-          'not_found' || 'self' => l10n.reportUserUnavailable,
-          _ => l10n.reportSendFailed,
+        () => _error = (current) => switch (response['code']) {
+          'rate_limited' => current.reportRateLimited,
+          'not_found' || 'self' => current.reportUserUnavailable,
+          _ => current.reportSendFailed,
         },
       );
     } catch (e) {
-      if (mounted) setState(() => _error = socialErrorText(l10n, e));
+      if (mounted) setState(() => _error = (current) => socialErrorText(current, e));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -160,7 +159,7 @@ class _UserReportDialogState extends State<_UserReportDialog> {
               ),
               if (_error != null)
                 Text(
-                  _error!,
+                  _error!(l10n),
                   style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
             ],

@@ -67,7 +67,7 @@ class _FriendsSheetState extends State<FriendsSheet> {
   bool _loadFailed = false;
   bool _isAdding = false;
   String? _respondingId;
-  String? _errorMessage;
+  String Function(AppLocalizations)? _errorMessage;
   int _requestId = 0;
 
   SupabaseService get _service => widget.service ?? SupabaseService.instance;
@@ -138,11 +138,11 @@ class _FriendsSheetState extends State<FriendsSheet> {
     // Biçimce geçersiz kod gönderilmez (proposed/13 her denemeyi saatlik
     // sınıra sayar; canlıda da yalnızca "bulunamadı" döner).
     if (!isValidFriendCode(code)) {
-      setState(() => _errorMessage = l10n.friendsErrInvalidCode);
+      setState(() => _errorMessage = (current) => current.friendsErrInvalidCode);
       return;
     }
     if (_myCode != null && code == normalizeFriendCode(_myCode!)) {
-      setState(() => _errorMessage = l10n.friendsErrSelf);
+      setState(() => _errorMessage = (current) => current.friendsErrSelf);
       return;
     }
 
@@ -152,11 +152,11 @@ class _FriendsSheetState extends State<FriendsSheet> {
     });
 
     Map<String, dynamic>? result;
-    String? error;
+    String Function(AppLocalizations)? error;
     try {
       result = await _service.addFriendByCode(code);
     } catch (e) {
-      error = socialErrorText(l10n, e);
+      error = (current) => socialErrorText(current, e);
     }
 
     if (!mounted) return;
@@ -181,7 +181,7 @@ class _FriendsSheetState extends State<FriendsSheet> {
       );
       await _loadData();
     } else {
-      setState(() => _errorMessage = error ?? _addFailureText(l10n, result));
+      setState(() => _errorMessage = error ?? (current) => _addFailureText(current, result));
     }
   }
 
@@ -523,7 +523,7 @@ class _FriendsSheetState extends State<FriendsSheet> {
       if (_errorMessage != null) ...[
         const SizedBox(height: 8),
         Text(
-          _errorMessage!,
+          _errorMessage!(l10n),
           style: const TextStyle(color: Colors.red, fontSize: 13),
         ),
       ],

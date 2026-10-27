@@ -49,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isResending = false;
   int _resendSecondsLeft = 0;
   Timer? _resendTimer;
-  String? _errorMessage;
+  String Function(AppLocalizations)? _errorMessage;
   bool _showResendButton = false;
   // Kayıttan onay beklenerek dönüldü: bilgi kutusu ve yeniden gönder.
   String? _pendingVerificationEmail;
@@ -121,11 +121,10 @@ class _LoginScreenState extends State<LoginScreen> {
   /// null, kullanıcının vazgeçtiği anlamına gelir).
   Future<void> _signIn(
     Future<UserModel?> Function() attempt, {
-    String? nullResultMessage,
+    String Function(AppLocalizations)? nullResultMessage,
     bool offerResend = false,
   }) async {
     if (_isLoading) return;
-    final l10n = AppLocalizations.of(context)!;
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -152,7 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
       final code = SupabaseService.instance.parseAuthError(e);
       setState(() {
         _isLoading = false;
-        _errorMessage = authErrorText(l10n, code);
+        _errorMessage = (current) => authErrorText(current, code);
         // Supabase, "yanlış şifre" ile "e-posta henüz onaylanmadı"
         // durumlarını hesap keşfini önlemek için aynı genel hatayla
         // döndürebilir; iki durumda da yeniden gönder butonu gösterilir.
@@ -166,14 +165,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _handleLogin() async {
     if (_isLoading) return;
-    final l10n = AppLocalizations.of(context)!;
     final email = _emailController.text.trim();
     // Şifre trim'lenmez: kayıtta olduğu gibi gönderilir.
     final password = _passwordController.text;
 
     if (email.isEmpty || password.isEmpty) {
       setState(() {
-        _errorMessage = l10n.errFillFields;
+        _errorMessage = (current) => current.errFillFields;
         _showResendButton = false;
       });
       return;
@@ -181,7 +179,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     await _signIn(
       () => SupabaseService.instance.loginUser(email, password),
-      nullResultMessage: l10n.errInvalidCredentials,
+      nullResultMessage: (current) => current.errInvalidCredentials,
       offerResend: true,
     );
   }
@@ -412,7 +410,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   // Error Banner
                   if (_errorMessage != null) ...[
-                    AuthErrorBanner(message: _errorMessage!),
+                    AuthErrorBanner(message: _errorMessage!(l10n)),
                     if (_showResendButton) ...[
                       const SizedBox(height: 8),
                       _buildResendButton(l10n, prompt: false),

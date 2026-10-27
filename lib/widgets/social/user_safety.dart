@@ -296,10 +296,9 @@ class _FriendActionDialog extends StatefulWidget {
 
 class _FriendActionDialogState extends State<_FriendActionDialog> {
   bool _busy = false;
-  String? _error;
+  String Function(AppLocalizations)? _error;
   Future<void> _confirm() async {
     if (_busy) return;
-    final l10n = AppLocalizations.of(context)!;
     setState(() {
       _busy = true;
       _error = null;
@@ -312,12 +311,12 @@ class _FriendActionDialogState extends State<_FriendActionDialog> {
         return;
       }
       setState(
-        () => _error = response['code'] == 'limit_reached' || response['code'] == 'rate_limited'
-            ? l10n.friendsErrRateLimited
-            : l10n.friendActionFailed,
+        () => _error = (current) => response['code'] == 'limit_reached' || response['code'] == 'rate_limited'
+            ? current.friendsErrRateLimited
+            : current.friendActionFailed,
       );
     } catch (e) {
-      if (mounted) setState(() => _error = socialErrorText(l10n, e));
+      if (mounted) setState(() => _error = (current) => socialErrorText(current, e));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -340,7 +339,7 @@ class _FriendActionDialogState extends State<_FriendActionDialog> {
             if (_error != null)
               Padding(
                 padding: const EdgeInsets.only(top: 12),
-                child: Text(_error!, style: const TextStyle(color: Colors.red)),
+                child: Text(_error!(l10n), style: const TextStyle(color: Colors.red)),
               ),
           ],
         ),

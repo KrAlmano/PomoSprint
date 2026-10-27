@@ -30,7 +30,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   );
   final _form = GlobalKey<FormState>();
   bool _sending = false;
-  String? _error;
+  String Function(AppLocalizations)? _error;
 
   @override
   void dispose() {
@@ -41,7 +41,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Future<void> _send() async {
     if (_sending || !_form.currentState!.validate()) return;
     FocusScope.of(context).unfocus();
-    final l10n = AppLocalizations.of(context)!;
     final email = _email.text.trim();
     final isLocal =
         widget.localTestEnvironment ?? SupabaseService.instance.isLocalBackend;
@@ -64,8 +63,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       if (!mounted) return;
       setState(() {
         _sending = false;
-        _error = authErrorText(
-          l10n,
+        _error = (current) => authErrorText(
+          current,
           SupabaseService.instance.parseAuthError(e),
         );
       });
@@ -90,7 +89,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         ),
         const SizedBox(height: 24),
         if (_error != null) ...[
-          AuthErrorBanner(message: _error!),
+          AuthErrorBanner(message: _error!(l10n)),
           const SizedBox(height: 16),
         ],
         Form(

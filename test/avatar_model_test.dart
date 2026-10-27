@@ -140,7 +140,12 @@ void main() {
       expect(award.isOwned(const []), isFalse);
       expect(award.canAfford(100000), isFalse);
 
-      final explicit = AvatarCharacter.fromMap(const {'id': 'league_x', 'is_league_award': false});
+      final explicit = AvatarCharacter.fromMap(const {
+        'id': 'league_x',
+        'name_tr': 'Eski avatar',
+        'name_en': 'Legacy avatar',
+        'is_league_award': false,
+      });
       expect(explicit.isLeagueAward, isFalse, reason: 'sunucu değeri önceliklidir');
     });
 

@@ -95,7 +95,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _submitAttempted = false;
   bool _isLoading = false;
   bool _isVerificationSent = false;
-  String? _errorMessage;
+  String Function(AppLocalizations)? _errorMessage;
 
   String _selectedAvatarId = kDefaultAvatarId;
 
@@ -225,7 +225,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (!mounted) return;
       setState(() {
         _isLoading = false;
-        _errorMessage = authErrorText(l10n, SupabaseService.instance.parseAuthError(e));
+        _errorMessage = (current) => authErrorText(current, SupabaseService.instance.parseAuthError(e));
       });
     }
   }
@@ -317,7 +317,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         SizedBox(height: short ? 16 : 24),
 
         if (_errorMessage != null) ...[
-          AuthErrorBanner(message: _errorMessage!),
+          AuthErrorBanner(message: _errorMessage!(l10n)),
           const SizedBox(height: 16),
         ],
 

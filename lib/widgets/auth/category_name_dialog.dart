@@ -99,7 +99,7 @@ class CategoryNameDialog extends StatefulWidget {
 class _CategoryNameDialogState extends State<CategoryNameDialog> {
   late final TextEditingController _nameCtrl = TextEditingController(text: widget.initialName);
   late String _colorHex = _normalizeHex(widget.initialColorHex ?? kCategoryPalette.first);
-  String? _error;
+  String Function(AppLocalizations)? _error;
 
   static String _normalizeHex(String hex) => colorToHex(colorFromHex(hex));
 
@@ -119,7 +119,7 @@ class _CategoryNameDialogState extends State<CategoryNameDialog> {
     final name = _nameCtrl.text.trim();
     if (name.isEmpty) return;
     if (isCategoryNameTaken(name, widget.takenNames)) {
-      setState(() => _error = AppLocalizations.of(context)!.categoryNameExistsMsg);
+      setState(() => _error = (current) => current.categoryNameExistsMsg);
       return;
     }
     Navigator.pop<CategoryDialogResult>(context, (name: name, colorHex: _colorHex));
@@ -149,7 +149,7 @@ class _CategoryNameDialogState extends State<CategoryNameDialog> {
               if (_error != null) setState(() => _error = null);
             },
             onSubmitted: (_) => _submit(),
-            decoration: InputDecoration(hintText: widget.hintText, errorText: _error),
+            decoration: InputDecoration(hintText: widget.hintText, errorText: _error?.call(l10n)),
           ),
           if (widget.showColorPicker) ...[
             const SizedBox(height: 12),
