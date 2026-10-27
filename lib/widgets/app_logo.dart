@@ -13,6 +13,10 @@ class AppLogo extends StatelessWidget {
       'assets/icon/icon_source.png',
       width: size,
       height: size,
+      cacheWidth: (size * MediaQuery.devicePixelRatioOf(context)).ceil().clamp(
+        1,
+        1024,
+      ),
       fit: BoxFit.contain,
       excludeFromSemantics: true,
     ),

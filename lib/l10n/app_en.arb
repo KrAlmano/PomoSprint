@@ -1103,5 +1103,77 @@
   "legacyWeeklyDistTitle": "Today's Distribution",
   "weeklyEfficiencyCaption": "WEEKLY EFFICIENCY",
   "weeklySummaryTitle": "Weekly Summary",
-  "weeklyTrendCaption": "WEEKLY TREND"
+  "weeklyTrendCaption": "WEEKLY TREND",
+  "statsSessionTypesTitle": "Session types",
+  "statsNormalSessions": "Regular sessions",
+  "statsCompletedMarathons": "Completed marathons",
+  "statsCompletedExams": "Completed practice exams",
+  "statsExamCategory": "Practice exams",
+  "statsOpenExamDetails": "My practice exams, scores and insights",
+  "statsUnknownSessionTypes": "The older server does not yet distinguish regular sessions from Marathon for these records. Time totals are preserved.",
+  "statsExamTotalsInfo": "Total time includes Pomodoro, Marathon focus sessions and completed practice exams. Practice exam time is not distributed across subjects.",
+  "statsMarathonFocusCount": "{count} Marathon focus sessions",
+  "@statsMarathonFocusCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "statsFocusEquivalent": "{count} × 25-minute focus equivalents",
+  "@statsFocusEquivalent": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "statsCountsPending": "{count} sessions awaiting server confirmation",
+  "@statsCountsPending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "socialTakingExam": "Taking an exam",
+  "rankingTabGlobal": "Global",
+  "rankingGlobalResetIn": "Global leaderboard resets in",
+  "leagueCalendarMonthBody": "Focus and practice exam leagues have separate points. Both reset at 00:00 Istanbul time on the first day of each month. Daily study and streak tracking still use the 04:00 boundary.",
+  "leagueCalendarPreparingBody": "Monthly competition is being prepared. Official start: {date} (Istanbul). Promotion and award requirements apply when the room has enough active participants. Completed sessions and earned lifetime points are preserved.",
+  "@leagueCalendarPreparingBody": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "leagueCalendarPreparingGeneric": "Monthly competition is being prepared. There is no promotion, relegation or league award without enough active participants; your sessions are still saved.",
+  "leagueTargetTitle": "Your league target",
+  "leagueTargetCurrent": "This month: {target}",
+  "@leagueTargetCurrent": {
+    "placeholders": {
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "leagueTargetPending": "Next target: {target} · {date} (Istanbul)",
+  "@leagueTargetPending": {
+    "placeholders": {
+      "target": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "leagueTargetChange": "Change target",
+  "leagueTargetDialogTitle": "Choose your league target",
+  "leagueTargetPolicy": "Your focus and practice exam leagues match you with users sharing your target. Before your first session, the target changes immediately. A change during the month takes effect at 00:00 Istanbul time on the first day of the next month; your current points and room are preserved. The global view does not change your target or grant extra rewards.",
+  "leagueTargetSave": "Save target",
+  "leagueTargetSaveError": "Could not save the target. Check your connection and try again.",
+  "leagueTargetOther": "Other",
+  "leagueGlobalScopeBody": "This month’s focus points across all targets. Practice exam points have a separate league; the global view gives no additional reward."
 }

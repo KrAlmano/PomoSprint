@@ -2922,4 +2922,104 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get weeklyTrendCaption => 'WEEKLY TREND';
+
+  @override
+  String get statsSessionTypesTitle => 'Session types';
+
+  @override
+  String get statsNormalSessions => 'Regular sessions';
+
+  @override
+  String get statsCompletedMarathons => 'Completed marathons';
+
+  @override
+  String get statsCompletedExams => 'Completed practice exams';
+
+  @override
+  String get statsExamCategory => 'Practice exams';
+
+  @override
+  String get statsOpenExamDetails => 'My practice exams, scores and insights';
+
+  @override
+  String get statsUnknownSessionTypes =>
+      'The older server does not yet distinguish regular sessions from Marathon for these records. Time totals are preserved.';
+
+  @override
+  String get statsExamTotalsInfo =>
+      'Total time includes Pomodoro, Marathon focus sessions and completed practice exams. Practice exam time is not distributed across subjects.';
+
+  @override
+  String statsMarathonFocusCount(int count) {
+    return '$count Marathon focus sessions';
+  }
+
+  @override
+  String statsFocusEquivalent(int count) {
+    return '$count × 25-minute focus equivalents';
+  }
+
+  @override
+  String statsCountsPending(int count) {
+    return '$count sessions awaiting server confirmation';
+  }
+
+  @override
+  String get socialTakingExam => 'Taking an exam';
+
+  @override
+  String get rankingTabGlobal => 'Global';
+
+  @override
+  String get rankingGlobalResetIn => 'Global leaderboard resets in';
+
+  @override
+  String get leagueCalendarMonthBody =>
+      'Focus and practice exam leagues have separate points. Both reset at 00:00 Istanbul time on the first day of each month. Daily study and streak tracking still use the 04:00 boundary.';
+
+  @override
+  String leagueCalendarPreparingBody(String date) {
+    return 'Monthly competition is being prepared. Official start: $date (Istanbul). Promotion and award requirements apply when the room has enough active participants. Completed sessions and earned lifetime points are preserved.';
+  }
+
+  @override
+  String get leagueCalendarPreparingGeneric =>
+      'Monthly competition is being prepared. There is no promotion, relegation or league award without enough active participants; your sessions are still saved.';
+
+  @override
+  String get leagueTargetTitle => 'Your league target';
+
+  @override
+  String leagueTargetCurrent(String target) {
+    return 'This month: $target';
+  }
+
+  @override
+  String leagueTargetPending(String target, String date) {
+    return 'Next target: $target · $date (Istanbul)';
+  }
+
+  @override
+  String get leagueTargetChange => 'Change target';
+
+  @override
+  String get leagueTargetDialogTitle => 'Choose your league target';
+
+  @override
+  String get leagueTargetPolicy =>
+      'Your focus and practice exam leagues match you with users sharing your target. Before your first session, the target changes immediately. A change during the month takes effect at 00:00 Istanbul time on the first day of the next month; your current points and room are preserved. The global view does not change your target or grant extra rewards.';
+
+  @override
+  String get leagueTargetSave => 'Save target';
+
+  @override
+  String get leagueTargetSaveError =>
+      'Could not save the target. Check your connection and try again.';
+
+  @override
+  String get leagueTargetOther => 'Other';
+
+  @override
+  String get leagueGlobalScopeBody =>
+      'This month’s focus points across all targets. Practice exam points have a separate league; the global view gives no additional reward.';
 }

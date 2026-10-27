@@ -16,6 +16,11 @@ class LeagueRules {
     this.policyVersion = 0,
     this.competitionPhase = 'active',
     this.competitionStartsAt,
+    this.periodKind = 'legacy',
+    this.periodTimeZone = 'Europe/Istanbul',
+    this.resetHour = 4,
+    this.periodStart,
+    this.periodEnd,
     this.fromServer = false,
   });
 
@@ -42,9 +47,19 @@ class LeagueRules {
   final int policyVersion;
   final String competitionPhase;
   final DateTime? competitionStartsAt;
+  final String periodKind;
+  final String periodTimeZone;
+  final int resetHour;
+  final DateTime? periodStart;
+  final DateTime? periodEnd;
   final bool fromServer;
 
   bool get hasLaunchPolicy => policyVersion >= 1;
+  bool get isCalendarMonthly =>
+      policyVersion >= 2 &&
+      periodKind == 'calendar_month' &&
+      periodTimeZone == 'Europe/Istanbul' &&
+      resetHour == 0;
   bool get isCompetitionActive =>
       !hasLaunchPolicy || competitionPhase == 'active';
 
@@ -74,6 +89,15 @@ class LeagueRules {
       competitionStartsAt: DateTime.tryParse(
         config['competition_starts_at']?.toString() ?? '',
       ),
+      periodKind: config['period_kind']?.toString() ?? 'legacy',
+      periodTimeZone:
+          config['period_timezone']?.toString() ?? 'Europe/Istanbul',
+      resetHour:
+          config['reset_hour'] is num && (config['reset_hour'] as num).isFinite
+          ? (config['reset_hour'] as num).toInt().clamp(0, 23)
+          : 4,
+      periodStart: DateTime.tryParse(config['period_start']?.toString() ?? ''),
+      periodEnd: DateTime.tryParse(config['period_end']?.toString() ?? ''),
       fromServer:
           version > 0 ||
           const [
@@ -117,6 +141,11 @@ class LeagueRules {
       competitionStartsAt: row.containsKey('competition_starts_at')
           ? DateTime.tryParse(row['competition_starts_at']?.toString() ?? '')
           : base.competitionStartsAt,
+      periodKind: base.periodKind,
+      periodTimeZone: base.periodTimeZone,
+      resetHour: base.resetHour,
+      periodStart: base.periodStart,
+      periodEnd: base.periodEnd,
       fromServer: true,
     );
   }
@@ -141,6 +170,11 @@ class LeagueRules {
       other.policyVersion == policyVersion &&
       other.competitionPhase == competitionPhase &&
       other.competitionStartsAt == competitionStartsAt &&
+      other.periodKind == periodKind &&
+      other.periodTimeZone == periodTimeZone &&
+      other.resetHour == resetHour &&
+      other.periodStart == periodStart &&
+      other.periodEnd == periodEnd &&
       other.fromServer == fromServer;
 
   @override
@@ -156,6 +190,11 @@ class LeagueRules {
     policyVersion,
     competitionPhase,
     competitionStartsAt,
+    periodKind,
+    periodTimeZone,
+    resetHour,
+    periodStart,
+    periodEnd,
     fromServer,
   );
 

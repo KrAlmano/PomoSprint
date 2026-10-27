@@ -2872,4 +2872,105 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get weeklyTrendCaption => 'HAFTALIK TREND';
+
+  @override
+  String get statsSessionTypesTitle => 'Oturum türleri';
+
+  @override
+  String get statsNormalSessions => 'Normal seans';
+
+  @override
+  String get statsCompletedMarathons => 'Tamamlanan maraton';
+
+  @override
+  String get statsCompletedExams => 'Tamamlanan deneme';
+
+  @override
+  String get statsExamCategory => 'Deneme';
+
+  @override
+  String get statsOpenExamDetails => 'Denemelerim, netler ve içgörüler';
+
+  @override
+  String get statsUnknownSessionTypes =>
+      'Eski sunucu bu kayıtların normal seans ve Maraton ayrımını henüz iletmiyor. Süre toplamları korunur.';
+
+  @override
+  String get statsExamTotalsInfo =>
+      'Toplam süre, Pomodoro ve Maraton odakları ile tamamlanmış denemeleri içerir. Deneme süresi derslere paylaştırılmaz.';
+
+  @override
+  String statsMarathonFocusCount(int count) {
+    return '$count Maraton odağı';
+  }
+
+  @override
+  String statsFocusEquivalent(int count) {
+    return '$count × 25 dk odak eşdeğeri';
+  }
+
+  @override
+  String statsCountsPending(int count) {
+    return '$count seans sunucu onayı bekliyor';
+  }
+
+  @override
+  String get socialTakingExam => 'Denemede';
+
+  @override
+  String get rankingTabGlobal => 'Global';
+
+  @override
+  String get rankingGlobalResetIn =>
+      'Global sıralamanın sıfırlanmasına kalan süre';
+
+  @override
+  String get leagueCalendarMonthBody =>
+      'Normal lig ve deneme ligi ayrı puanlarla yarışır. Her ikisi de İstanbul saatiyle ayın 1’inde 00:00’da yenilenir. Günlük çalışma ve seri takibi 04:00 kuralıyla devam eder.';
+
+  @override
+  String leagueCalendarPreparingBody(String date) {
+    return 'Aylık yarışma için hazırlık sürüyor. Resmî başlangıç: $date (İstanbul). Odada yeterli aktif katılımcı olduğunda terfi ve ödül şartları uygulanır. Tamamladığın seanslar ve kazandığın toplam puan korunur.';
+  }
+
+  @override
+  String get leagueCalendarPreparingGeneric =>
+      'Aylık yarışma için hazırlık sürüyor. Yeterli aktif katılımcı olmadan terfi, düşme veya lig ödülü verilmez; seansların kaydolmaya devam eder.';
+
+  @override
+  String get leagueTargetTitle => 'Lig hedefin';
+
+  @override
+  String leagueTargetCurrent(String target) {
+    return 'Bu ay: $target';
+  }
+
+  @override
+  String leagueTargetPending(String target, String date) {
+    return 'Sonraki hedef: $target · $date (İstanbul)';
+  }
+
+  @override
+  String get leagueTargetChange => 'Hedefi değiştir';
+
+  @override
+  String get leagueTargetDialogTitle => 'Lig hedefini seç';
+
+  @override
+  String get leagueTargetPolicy =>
+      'Normal ligde ve deneme liginde aynı hedefteki kullanıcılarla eşleşirsin. İlk seansından önce hedef hemen değişir. Ay içinde değiştirdiğinde yeni hedef sonraki ayın 1’inde, İstanbul saatiyle 00:00’da uygulanır; bu ayki puanın ve odan korunur. Global görünüm hedefini değiştirmez ve ek ödül kazandırmaz.';
+
+  @override
+  String get leagueTargetSave => 'Hedefi kaydet';
+
+  @override
+  String get leagueTargetSaveError =>
+      'Hedef kaydedilemedi. Bağlantını kontrol edip tekrar dene.';
+
+  @override
+  String get leagueTargetOther => 'Diğer';
+
+  @override
+  String get leagueGlobalScopeBody =>
+      'Tüm hedeflerdeki kullanıcıların bu ay kazandığı normal odak puanları. Deneme puanları ayrı ligdedir; global görünüm ek ödül vermez.';
 }

@@ -4924,6 +4924,168 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'HAFTALIK TREND'**
   String get weeklyTrendCaption;
+
+  /// No description provided for @statsSessionTypesTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Oturum türleri'**
+  String get statsSessionTypesTitle;
+
+  /// No description provided for @statsNormalSessions.
+  ///
+  /// In tr, this message translates to:
+  /// **'Normal seans'**
+  String get statsNormalSessions;
+
+  /// No description provided for @statsCompletedMarathons.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tamamlanan maraton'**
+  String get statsCompletedMarathons;
+
+  /// No description provided for @statsCompletedExams.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tamamlanan deneme'**
+  String get statsCompletedExams;
+
+  /// No description provided for @statsExamCategory.
+  ///
+  /// In tr, this message translates to:
+  /// **'Deneme'**
+  String get statsExamCategory;
+
+  /// No description provided for @statsOpenExamDetails.
+  ///
+  /// In tr, this message translates to:
+  /// **'Denemelerim, netler ve içgörüler'**
+  String get statsOpenExamDetails;
+
+  /// No description provided for @statsUnknownSessionTypes.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eski sunucu bu kayıtların normal seans ve Maraton ayrımını henüz iletmiyor. Süre toplamları korunur.'**
+  String get statsUnknownSessionTypes;
+
+  /// No description provided for @statsExamTotalsInfo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Toplam süre, Pomodoro ve Maraton odakları ile tamamlanmış denemeleri içerir. Deneme süresi derslere paylaştırılmaz.'**
+  String get statsExamTotalsInfo;
+
+  /// No description provided for @statsMarathonFocusCount.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} Maraton odağı'**
+  String statsMarathonFocusCount(int count);
+
+  /// No description provided for @statsFocusEquivalent.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} × 25 dk odak eşdeğeri'**
+  String statsFocusEquivalent(int count);
+
+  /// No description provided for @statsCountsPending.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} seans sunucu onayı bekliyor'**
+  String statsCountsPending(int count);
+
+  /// No description provided for @socialTakingExam.
+  ///
+  /// In tr, this message translates to:
+  /// **'Denemede'**
+  String get socialTakingExam;
+
+  /// No description provided for @rankingTabGlobal.
+  ///
+  /// In tr, this message translates to:
+  /// **'Global'**
+  String get rankingTabGlobal;
+
+  /// No description provided for @rankingGlobalResetIn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Global sıralamanın sıfırlanmasına kalan süre'**
+  String get rankingGlobalResetIn;
+
+  /// No description provided for @leagueCalendarMonthBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Normal lig ve deneme ligi ayrı puanlarla yarışır. Her ikisi de İstanbul saatiyle ayın 1’inde 00:00’da yenilenir. Günlük çalışma ve seri takibi 04:00 kuralıyla devam eder.'**
+  String get leagueCalendarMonthBody;
+
+  /// No description provided for @leagueCalendarPreparingBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aylık yarışma için hazırlık sürüyor. Resmî başlangıç: {date} (İstanbul). Odada yeterli aktif katılımcı olduğunda terfi ve ödül şartları uygulanır. Tamamladığın seanslar ve kazandığın toplam puan korunur.'**
+  String leagueCalendarPreparingBody(String date);
+
+  /// No description provided for @leagueCalendarPreparingGeneric.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aylık yarışma için hazırlık sürüyor. Yeterli aktif katılımcı olmadan terfi, düşme veya lig ödülü verilmez; seansların kaydolmaya devam eder.'**
+  String get leagueCalendarPreparingGeneric;
+
+  /// No description provided for @leagueTargetTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lig hedefin'**
+  String get leagueTargetTitle;
+
+  /// No description provided for @leagueTargetCurrent.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu ay: {target}'**
+  String leagueTargetCurrent(String target);
+
+  /// No description provided for @leagueTargetPending.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sonraki hedef: {target} · {date} (İstanbul)'**
+  String leagueTargetPending(String target, String date);
+
+  /// No description provided for @leagueTargetChange.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedefi değiştir'**
+  String get leagueTargetChange;
+
+  /// No description provided for @leagueTargetDialogTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lig hedefini seç'**
+  String get leagueTargetDialogTitle;
+
+  /// No description provided for @leagueTargetPolicy.
+  ///
+  /// In tr, this message translates to:
+  /// **'Normal ligde ve deneme liginde aynı hedefteki kullanıcılarla eşleşirsin. İlk seansından önce hedef hemen değişir. Ay içinde değiştirdiğinde yeni hedef sonraki ayın 1’inde, İstanbul saatiyle 00:00’da uygulanır; bu ayki puanın ve odan korunur. Global görünüm hedefini değiştirmez ve ek ödül kazandırmaz.'**
+  String get leagueTargetPolicy;
+
+  /// No description provided for @leagueTargetSave.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedefi kaydet'**
+  String get leagueTargetSave;
+
+  /// No description provided for @leagueTargetSaveError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedef kaydedilemedi. Bağlantını kontrol edip tekrar dene.'**
+  String get leagueTargetSaveError;
+
+  /// No description provided for @leagueTargetOther.
+  ///
+  /// In tr, this message translates to:
+  /// **'Diğer'**
+  String get leagueTargetOther;
+
+  /// No description provided for @leagueGlobalScopeBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tüm hedeflerdeki kullanıcıların bu ay kazandığı normal odak puanları. Deneme puanları ayrı ligdedir; global görünüm ek ödül vermez.'**
+  String get leagueGlobalScopeBody;
 }
 
 class _AppLocalizationsDelegate

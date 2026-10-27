@@ -13,11 +13,13 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/avatar_model.dart';
 import '../models/category_model.dart';
+import '../models/competition_target.dart';
 import '../models/league_rules.dart';
 import '../models/registration_consent.dart';
 import '../models/study_session.dart';
 import '../models/user_model.dart';
 import '../utils/friend_code.dart';
+import '../utils/async_lock.dart';
 import '../utils/name_filter.dart';
 import '../utils/study_day.dart';
 import 'avatar_equip.dart';
@@ -26,12 +28,14 @@ import '../widgets/auth/legal_links.dart' show kLegalDocumentsVersion;
 import 'backend_config.dart';
 import 'hidden_users.dart';
 import 'language_service.dart';
+import 'exam_service.dart';
 import 'league_backend.dart';
 import 'lock_screen_timer.dart';
 import 'marathon_presence.dart';
 import 'notification_service.dart';
 import 'onboarding_categories.dart';
 import 'onboarding_draft.dart';
+import 'onboarding_segment_intent.dart';
 import 'platform_env.dart' if (dart.library.io) 'platform_env_io.dart';
 import 'server_clock.dart';
 import 'service_errors.dart';
@@ -58,6 +62,8 @@ export 'session_queue.dart'
 /// [AuthFailure] / [AuthErrorCode], diğerleri [ServiceException] /
 /// [ServiceErrorCode] ile ifade edilir; UI ARB ile yerelleştirir.
 class SupabaseService {
+  final OnboardingSegmentIntentStore _onboardingSegmentIntents = OnboardingSegmentIntentStore();
+  final AsyncLock _profileLoadLock = AsyncLock();
   SupabaseService._init() {
     _queue = SessionQueue(
       backend: _SupabaseQueueBackend(this),
@@ -1121,6 +1127,8 @@ class SupabaseService {
     }
     await step('gizlenenler', () => HiddenUsersStore.instance.forget(uid));
     await step('onboarding taslağı', () => OnboardingDraftStore.clear(uid));
+    await step('bekleyen onboarding hedefi', () => _onboardingSegmentIntents.retireOwner(uid));
+    await step('deneme günlüğü', () => ExamService.instance.persistence.retireOwner(uid));
     await step('tercihler', () async {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_dailyGoalMigratedKey(uid));
@@ -1154,6 +1162,8 @@ class SupabaseService {
     final authUser = _client.auth.currentUser;
     if (authUser == null) return null;
     final epoch = _userEpoch;
+    return _profileLoadLock.synchronized(() async {
+    if (!_isCurrentSession(authUser.id, epoch)) return null;
 
     final results = await Future.wait<Object?>([
       _ensureOwnProfile(authUser, nameHint: nameHint),
@@ -1166,6 +1176,23 @@ class SupabaseService {
     final unlocked = results[1] as List<String>;
     await _syncProfileTimeZone(authUser.id, epoch, profile);
     if (!_isCurrentSession(authUser.id, epoch)) return null;
+    final restoredSegment = await _onboardingSegmentIntents.replay(
+      authUser.id,
+      serverSegment: profile['user_segment'] as String?,
+      isCurrent: () => _isCurrentSession(authUser.id, epoch),
+      writeIfStillNull: (segment) async {
+        if (!_isCurrentSession(authUser.id, epoch)) return false;
+        final rows = await _client.from('profiles')
+            .update({'user_segment': segment})
+            .eq('id', authUser.id)
+            .isFilter('user_segment', null)
+            .select('user_segment')
+            .timeout(_requestTimeout);
+        return _isCurrentSession(authUser.id, epoch) && rows.isNotEmpty && rows.first['user_segment'] == segment;
+      },
+    );
+    if (!_isCurrentSession(authUser.id, epoch)) return null;
+    if (restoredSegment != null) profile['user_segment'] = restoredSegment;
 
     final user = UserModel.fromMap({
       ...profile,
@@ -1179,6 +1206,7 @@ class SupabaseService {
     if (!_avatarCatalogFresh) unawaited(refreshAvatarCatalog());
     unawaited(_afterUserLoaded(user));
     return user;
+    });
   }
 
   Future<void> _syncProfileTimeZone(
@@ -1504,10 +1532,9 @@ class SupabaseService {
   }
 
   /// Onboarding'in yazdığı hedefler; dışındaki değer (ör. "Diğer") null
-  /// yazılır. Canlıdaki profiles_user_segment_check yalnızca 'lgs', 'yks',
-  /// 'university', 'work'ü kabul eder; 'kpss' ve 'language' supabase/proposed/26
-  /// ile eklenir. 26 uygulanmadan reddedilirse [completeOnboarding] segmentsiz
-  /// tamamlar ([writeOnboardingProfileWithSegmentFallback]).
+  /// yazılır. Eski CHECK yeni hedefleri reddederse [completeOnboarding]
+  /// seçimi UID anahtarlı niyet kaydında korur. 26 KPSS/dil, 27 TUS desteği
+  /// geldikten sonraki profil yüklemesi bu tercihi bir kez yeniden dener.
   static const Set<String> validUserSegments = {
     'lgs',
     'yks',
@@ -1551,7 +1578,7 @@ class SupabaseService {
   }
 
   /// Hata, profiles_user_segment_check ihlali mi (23514)? Sunucu yeni hedefi
-  /// ('kpss', 'language'; proposed/26) henüz tanımıyor demektir.
+  /// ('kpss', 'language', 'tus'; proposed/26 ve 27) henüz tanımıyor demektir.
   @visibleForTesting
   static bool isUserSegmentCheckViolation(Object error) {
     final cause = error is ServiceException ? error.cause : error;
@@ -1563,14 +1590,15 @@ class SupabaseService {
 
   /// Onboarding profil güncellemesini [write] ile yazar ve yazılan değerleri
   /// döndürür. Sunucu segmenti CHECK ile reddederse (proposed/26 canlıda
-  /// değil) güncelleme segment null olarak bir kez daha yazılır: onboarding
-  /// tamamlanır, kullanıcı hata görmez (kategoriler bundan önce kuruldu).
+  /// değil) [onUnsupportedSegment] önce niyeti kalıcı kaydeder, sonra segment
+  /// null olarak bir kez daha yazılır. Onboarding tamamlanır; seçim kaybolmaz.
   /// Diğer hatalar olduğu gibi fırlatılır.
   @visibleForTesting
   static Future<Map<String, dynamic>> writeOnboardingProfileWithSegmentFallback(
     Map<String, dynamic> update,
-    Future<void> Function(Map<String, dynamic> values) write,
-  ) async {
+    Future<void> Function(Map<String, dynamic> values) write, {
+    Future<void> Function(String segment)? onUnsupportedSegment,
+  }) async {
     try {
       await write(update);
       return update;
@@ -1579,8 +1607,9 @@ class SupabaseService {
         rethrow;
       }
       debugPrint(
-        '[DATA] Sunucu segmenti tanımıyor (proposed/26 yok); onboarding segmentsiz tamamlanıyor.',
+        '[DATA] Sunucu hedefi henüz tanımıyor; seçim saklanıp uyumlu profil yüklemesinde yeniden denenecek.',
       );
+      await onUnsupportedSegment?.call(update['user_segment'] as String);
       final fallback = {...update, 'user_segment': null};
       await write(fallback);
       return fallback;
@@ -1618,9 +1647,13 @@ class SupabaseService {
       showInSocialFeed: showInSocialFeed,
       completedAt: completedAt,
     );
+    var usedFallback = false;
     final written = await writeOnboardingProfileWithSegmentFallback(update, (
       values,
     ) async {
+      if (!_isCurrentSession(authUser.id, epoch)) {
+        throw const ServiceException(ServiceErrorCode.notSignedIn);
+      }
       final rows = await _guard(
         () => _client
             .from('profiles')
@@ -1629,7 +1662,23 @@ class SupabaseService {
             .select('id'),
       );
       if (rows.isEmpty) throw const ServiceException(ServiceErrorCode.notFound);
+      if (!_isCurrentSession(authUser.id, epoch)) {
+        throw const ServiceException(ServiceErrorCode.notSignedIn);
+      }
+    }, onUnsupportedSegment: (segment) async {
+      usedFallback = true;
+      final saved = await _onboardingSegmentIntents.remember(
+        authUser.id, segment,
+        isCurrent: () => _isCurrentSession(authUser.id, epoch),
+      );
+      if (!saved) throw const ServiceException(ServiceErrorCode.server);
     });
+    if (!_isCurrentSession(authUser.id, epoch)) return categoriesResult;
+    if (!usedFallback) {
+      await _onboardingSegmentIntents.clear(authUser.id,
+        isCurrent: () => _isCurrentSession(authUser.id, epoch));
+    }
+    if (!_isCurrentSession(authUser.id, epoch)) return categoriesResult;
     _socialVisibleCache = showInSocialFeed;
     _socialVisibleCacheUid = authUser.id;
     _updateUserIfCurrent(
@@ -1926,30 +1975,41 @@ class SupabaseService {
   /// durumunda [ServiceException] fırlatır; boş liste "hiç seans yok" demektir.
   Future<List<StudySession>> fetchStudySessions({DateTime? since}) async {
     final uid = _requireUserId();
+    final epoch = _userEpoch;
     final sessions = <StudySession>[];
+    var legacy = false;
     for (var from = 0; ; from += _sessionsPageSize) {
-      final page = await _guard(() {
-        var query = _client
-            .from('study_sessions')
-            .select(_studySessionColumns)
-            .eq('user_id', uid);
-        if (since != null) {
-          query = query.gte('started_at', since.toUtc().toIso8601String());
+      Object? response;
+      if (!legacy) {
+        try {
+          response = await _client.rpc('get_my_study_sessions_v2', params: {
+            'p_since': since?.toUtc().toIso8601String(),
+            'p_limit': _sessionsPageSize,
+            'p_offset': from,
+          }).timeout(_requestTimeout);
+        } catch (error) {
+          if (!isMissingRpcError(error)) throw ServiceException.wrap(error);
+          legacy = true;
         }
-        return query
-            .order('started_at', ascending: false)
-            .order('id', ascending: true)
-            .range(from, from + _sessionsPageSize - 1);
-      });
-      try {
-        sessions.addAll(page.map(StudySession.fromJson));
-      } catch (e, st) {
-        Error.throwWithStackTrace(
-          ServiceException(ServiceErrorCode.server, e),
-          st,
-        );
       }
-      if (page.length < _sessionsPageSize) break;
+      if (legacy) {
+        response = await _guard(() {
+          var query = _client.from('study_sessions').select(_studySessionColumns).eq('user_id', uid);
+          if (since != null) query = query.gte('started_at', since.toUtc().toIso8601String());
+          return query.order('started_at', ascending: false).order('id', ascending: true)
+              .range(from, from + _sessionsPageSize - 1);
+        });
+      }
+      if (!_isCurrentSession(uid, epoch)) {
+        throw const ServiceException(ServiceErrorCode.notSignedIn);
+      }
+      if (response is! List) throw const ServiceException(ServiceErrorCode.server);
+      try {
+        sessions.addAll(response.map((row) => StudySession.fromJson(Map<String, dynamic>.from(row as Map))));
+      } catch (error, stack) {
+        Error.throwWithStackTrace(ServiceException(ServiceErrorCode.server, error), stack);
+      }
+      if (response.length < _sessionsPageSize) break;
     }
     return sessions;
   }
@@ -2052,6 +2112,37 @@ class SupabaseService {
           .timeout(_requestTimeout);
     } catch (e) {
       debugPrint('[SOCIAL] startStudySession hatası: $e');
+    }
+  }
+
+  /// Normal/Maraton odağı başlamadan sunucunun profil kilidi altında
+  /// rezervasyon yapar. İnternet yoksa normal yerel kuyruk çalışabilir;
+  /// bilinen çakışma veya yetki reddi başarıya çevrilmez.
+  Future<({bool allowed, bool reserved})> authorizeStudySessionStart({
+    required int durationMinutes,
+    required String categoryName,
+  }) async {
+    if (isDeviceSessionEnding) return (allowed: false, reserved: false);
+    if (!_isCloudActive) return (allowed: true, reserved: false);
+    final uid = _client.auth.currentUser?.id;
+    final epoch = _userEpoch;
+    if (uid == null) return (allowed: false, reserved: false);
+    try {
+      await _client.rpc('start_study_session', params: {
+        'p_duration_minutes': durationMinutes,
+        'p_category_name': categoryName,
+      }).timeout(const Duration(seconds: 5));
+      final current = _isCurrentSession(uid, epoch) && !isDeviceSessionEnding;
+      return (allowed: current, reserved: current);
+    } catch (error) {
+      if (!_isCurrentSession(uid, epoch) || isDeviceSessionEnding) {
+        return (allowed: false, reserved: false);
+      }
+      if (error is AuthException || (error is PostgrestException &&
+          (error.code == 'P0001' || error.code == '42501' || error.code == 'PGRST301'))) {
+        return (allowed: false, reserved: false);
+      }
+      return (allowed: true, reserved: false);
     }
   }
 
@@ -2267,6 +2358,28 @@ class SupabaseService {
   Future<List<Map<String, dynamic>>> getMonthlyRanking({int limit = 50}) async {
     _requireCloud();
     final pLimit = limit.clamp(1, _publicLeaderboardMaxLimit);
+    final rules = await getLeagueRules();
+    if (rules.isCalendarMonthly) {
+      final uid = _requireUserId();
+      final epoch = _userEpoch;
+      final response = await _guard(
+        () => _client.rpc('get_monthly_league_ranking', params: {
+          'p_kind': 'study',
+          'p_scope': 'global',
+        }),
+      );
+      if (!_isCurrentSession(uid, epoch)) {
+        throw const ServiceException(ServiceErrorCode.notSignedIn);
+      }
+      if (response is! Map || response['rows'] is! List) {
+        throw const ServiceException(ServiceErrorCode.server);
+      }
+      return _rows(response['rows']).take(pLimit).map((row) => {
+        ...row,
+        'total_points': row['points'],
+        'period_end': response['period_end'],
+      }).toList();
+    }
     return _rows(
       await _guard(
         () => _client.rpc(
@@ -2296,7 +2409,8 @@ class SupabaseService {
   /// Oturum sahibinin odası ve sunucunun hesapladığı dönem sonu uygunluğu.
   /// Yeni RPC yoksa mevcut get_my_league_ranking sözleşmesi kullanılır.
   Future<List<Map<String, dynamic>>> getLeagueRanking() async {
-    _requireUserId();
+    final uid = _requireUserId();
+    final epoch = _userEpoch;
     final rows = _rows(
       await _guard(
         () => fetchLeagueRankingResponse(
@@ -2304,6 +2418,9 @@ class SupabaseService {
         ),
       ),
     );
+    if (!_isCurrentSession(uid, epoch)) {
+      throw const ServiceException(ServiceErrorCode.notSignedIn);
+    }
     final config = rows
         .map((row) => row['league_config'])
         .whereType<Map>()
@@ -2318,6 +2435,40 @@ class SupabaseService {
       }
     }
     return rows;
+  }
+
+  Future<CompetitionTarget> getCompetitionTarget() async {
+    final uid = _requireUserId();
+    final epoch = _userEpoch;
+    final response = await _guard(() => _client.rpc('get_competition_target'));
+    if (!_isCurrentSession(uid, epoch)) {
+      throw const ServiceException(ServiceErrorCode.notSignedIn);
+    }
+    final target = CompetitionTarget.fromJson(response);
+    if (target == null) throw const ServiceException(ServiceErrorCode.server);
+    return target;
+  }
+
+  Future<CompetitionTarget> setCompetitionTarget(String segment) async {
+    final uid = _requireUserId();
+    final epoch = _userEpoch;
+    if (!CompetitionTarget.segments.contains(segment)) {
+      throw const ServiceException(ServiceErrorCode.server);
+    }
+    final response = await _guard(() => _client.rpc(
+      'set_competition_target', params: {'p_segment': segment},
+    ));
+    if (!_isCurrentSession(uid, epoch)) {
+      throw const ServiceException(ServiceErrorCode.notSignedIn);
+    }
+    final target = CompetitionTarget.fromJson(response);
+    if (target == null) throw const ServiceException(ServiceErrorCode.server);
+    // The target RPC committed. A later profile refresh failure does not turn
+    // that success into a failed edit or cause a duplicate target mutation.
+    try {
+      await fetchCurrentUserModel();
+    } catch (_) { /* the next profile refresh retries */ }
+    return target;
   }
 
   // Son okunan puan kuralları; seans sonucu bildirimi gibi eşzamanlı
