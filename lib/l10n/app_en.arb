@@ -491,8 +491,8 @@
   "onboardingGenericError": "Something went wrong, please try again: {error}",
   "onboardingAddCategoryTitle": "Add Category",
   "onboardingCategoryHint": "Category name",
-  "onboardingWelcomeTitle": "Welcome! 👋",
-  "onboardingWelcomeBody": "I'm your focus companion. Before we start, could you pick your birth year? We only ask to check the minimum age.",
+  "onboardingWelcomeTitle": "Welcome to PomoSprint",
+  "onboardingWelcomeBody": "Focus, track your study and progress with people sharing your goal. Let’s set up the app for you.",
   "onboardingSegmentTitle": "So, which journey are you on?",
   "onboardingSegmentBody": "What will we study together? Let me suggest some categories. If none fits, pick \"Other\".",
   "onboardingSegmentLgs": "🎓  LGS (Turkish high school entrance exam)",
@@ -845,11 +845,11 @@
   "onboardingGuideMarathonTitle": "Marathon",
   "onboardingGuideMarathonBody": "Use Start Marathon to plan 2, 3 or 4 sessions. Each break lasts 5 minutes. Tap I’m here within 1 minute after the break to continue; without confirmation, the marathon ends. Completed sessions keep their normal points. Finishing the whole plan adds +2/+3/+5 points for 25-minute sessions or +4/+6/+10 for 50-minute sessions, respectively.",
   "onboardingGuideReportsTitle": "Reports",
-  "onboardingGuideReportsBody": "See your daily, weekly and monthly study time, completed sessions and category breakdown. Track and change your daily goal. Your study day resets at 4:00 a.m.",
+  "onboardingGuideReportsBody": "Daily, weekly and monthly reports combine Pomodoro sessions, Marathon focus sessions and completed exams. Breaks and abandoned exams are excluded. The study day changes at 04:00; exam time appears in its own Exam row.",
   "onboardingGuideRankingTitle": "Ranking",
-  "onboardingGuideRankingBody": "After your first session that earns points, you join a suitable league room at your tier. Follow the League, Monthly and Friends rankings here. The tiers are Bronze, Silver, Gold, Sapphire and Diamond. Sessions and reports are saved during preparation; official 14-day competitions start once there are enough active participants. The ? in Ranking explains the current promotion and award requirements.",
+  "onboardingGuideRankingBody": "Study and exam leagues are separate and group people by their goal. Global rankings cover all goals. Periods renew at 00:00 Istanbul time on the first day of each month. Small groups may remain in preparation; the ? guide in Rankings explains promotion and reward conditions.",
   "onboardingGuideSocialTitle": "Social",
-  "onboardingGuideSocialBody": "Send a request using a friend code; once accepted, you can see each other’s status. Studying friends show as Focusing. Only friends taking a marathon break show as On break. A red dot means focus; a green dot means a break. Change your visibility in Profile.",
+  "onboardingGuideSocialBody": "Add friends by code and manage requests. Visible friends appear as Focusing, On break only during Marathon breaks, or Taking an exam. The open list refreshes periodically. Change visibility in Settings, hide users or block them.",
   "onboardingGuideProfileTitle": "Profile",
   "onboardingGuideProfileBody": "Tap your avatar at the top to open Profile. Manage categories, use earned sand to expand your avatar collection, and choose an avatar. You can also find language, theme, notification and visibility settings, help, privacy and account actions here.",
   "leagueInfoWhatBodyWithCapacity": "After your first completed session that earns points, you join a suitable existing room in the same tier and period. A room holds up to {capacity} people; a new room opens when it is full. Period rankings use points from sessions accepted by the server.",
@@ -922,5 +922,186 @@
     }
   },
   "leaguePreparationNoChanges": "Everyone stays in their current league during preparation; no promotion, demotion or league avatar awards are given.",
-  "leagueLaunchPreparingShort": "Preparation · Promotion, demotion and league awards have not started yet."
+  "leagueLaunchPreparingShort": "Preparation · Promotion, demotion and league awards have not started yet.",
+  "examTab": "Practice",
+  "examTitle": "Practice exams",
+  "examNew": "New practice exam",
+  "examHistory": "My practice exams",
+  "examLeague": "Practice league",
+  "examIntro": "Choose an exam and use its full time. You can add your scores afterwards.",
+  "examUnavailable": "Practice mode is coming soon",
+  "examUnavailableBody": "Practice mode is not enabled on this server yet. You can browse exams while regular study and Marathon remain available.",
+  "examCatalogFallback": "Showing offline exam information. A server connection is required to start.",
+  "examStart": "Start practice exam",
+  "examRulesTitle": "Before you start",
+  "examRulesBody": "Practice exams have no breaks or pauses. The timer continues while the app is closed. Abandoning before the full time earns no points or practice sand; the attempt stays in your history. Scores do not affect points or leagues.",
+  "examReady": "Start when you are ready",
+  "examNoPause": "No pauses or breaks",
+  "examRunning": "Practice exam in progress",
+  "examTimeRemaining": "Time remaining",
+  "examAbandon": "Abandon practice exam",
+  "examAbandonTitle": "Abandon this practice exam?",
+  "examAbandonBody": "This attempt will be saved as abandoned. It will not earn points, practice sand or study time.",
+  "examCompleted": "Practice exam completed",
+  "examAbandoned": "Abandoned",
+  "examPending": "Waiting for server confirmation",
+  "examPendingBody": "Your attempt is saved on this device. The same record will be retried when the connection returns.",
+  "examStartPending": "Waiting for start confirmation",
+  "examStartPendingBody": "The start request has not been confirmed yet. Retrying will not create another attempt.",
+  "examError": "Could not load practice exam data. Check your connection and try again.",
+  "examConflict": "Finish your current study session or practice exam first.",
+  "examRetry": "Try again",
+  "examEnterResults": "Enter your scores",
+  "examEditResults": "Edit your scores",
+  "examResultsTitle": "Results by subject",
+  "examResultsInfo": "Scores are for personal reports and insights; they do not affect points or sand.",
+  "examCorrect": "Correct",
+  "examWrong": "Wrong",
+  "examBlank": "Unanswered",
+  "examNet": "Net score",
+  "examSaveResults": "Save results",
+  "examResultsInvalid": "For each subject, correct, wrong and unanswered must add up to the question count. Enter non-negative whole numbers only.",
+  "examResultsSaved": "Your scores were saved.",
+  "examResultsSaveError": "Results could not be saved. Your entries were kept; you can try again.",
+  "examNoHistory": "No practice exams yet",
+  "examNoHistoryBody": "Started and abandoned practice exams appear here.",
+  "examPracticeSand": "Practice sand",
+  "examInsights": "Study time and scores",
+  "examInsightsEmpty": "At least two results for the same subject are needed for a comparison. Your study time and scores will appear together here.",
+  "examInsightsDisclaimer": "This comparison shows an association; it does not imply that study time alone caused a score change.",
+  "examLeagueEmpty": "You join the league after your first completed practice exam.",
+  "examLeaguePreparing": "Waiting for enough active users to start competition in this group.",
+  "examGlobal": "Global",
+  "examTargetGroup": "My target group",
+  "examRewardAvatars": "Practice league avatars",
+  "examRewardAvatarsPending": "Special artwork is being prepared. Unearned rewards are not shown as owned while artwork is pending.",
+  "examFinishedNoResults": "Scores have not been entered yet",
+  "examStartTime": "Started",
+  "examEndTime": "Finished",
+  "examDismiss": "Done",
+  "examLgsBreakInfo": "LGS has two separate sessions. The actual exam includes a 45-minute break between the verbal and quantitative sessions.",
+  "examLoadMore": "Show more",
+  "examNoAward": "No reward",
+  "examNetUnavailable": "—",
+  "examQueuedResults": "Your results are saved on this device and will be sent when the connection returns.",
+  "examTotalStudy": "Total study",
+  "examNoVerifiedDuration": "Study time is added only for completed practice exams confirmed by the server.",
+  "examStarting": "Starting…",
+  "examSaving": "Saving…",
+  "examAllGroups": "All exams",
+  "examQuestionsMinutes": "Questions: {questions} · Time: {minutes} min",
+  "@examQuestionsMinutes": {
+    "placeholders": {
+      "questions": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "examSubjectQuestions": "{questions} questions",
+  "@examSubjectQuestions": {
+    "placeholders": {
+      "questions": {
+        "type": "int"
+      }
+    }
+  },
+  "examNetRule": "Net = Correct − Wrong / {divisor}",
+  "@examNetRule": {
+    "placeholders": {
+      "divisor": {
+        "type": "int"
+      }
+    }
+  },
+  "examRewardSummary": "{points} points · {sand} practice sand",
+  "@examRewardSummary": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      },
+      "sand": {
+        "type": "int"
+      }
+    }
+  },
+  "examInsightsChange": "{subject}: {minutes} min of study. Your net score: {before} → {after}.",
+  "@examInsightsChange": {
+    "placeholders": {
+      "subject": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      },
+      "before": {
+        "type": "String"
+      },
+      "after": {
+        "type": "String"
+      }
+    }
+  },
+  "examResultsQuestionTotal": "Total {actual} / {expected}",
+  "@examResultsQuestionTotal": {
+    "placeholders": {
+      "actual": {
+        "type": "int"
+      },
+      "expected": {
+        "type": "int"
+      }
+    }
+  },
+  "examMonthlyReset": "Period ends: {date}",
+  "@examMonthlyReset": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "onboardingSegmentTus": "TUS (Medical Specialty Exam)",
+  "onboardingLanguageTitle": "Which language would you like to use?",
+  "onboardingLanguageBody": "You can change your language later in Settings.",
+  "onboardingGuideExamTitle": "Practice exams: experience exam timing",
+  "onboardingGuideExamBody": "Choose an exam to load its duration and question count. Practice exams have no breaks or pauses. Finishing the full time earns separate exam points and sand. Abandoned attempts stay in history without rewards or study-time credit.",
+  "onboardingGuideInsightsTitle": "Nets and study–net insights",
+  "onboardingGuideInsightsBody": "In My exams, enter and edit correct, wrong and blank answers per subject. Nets are personal reports and never change your points or league. When enough data is available, see study time alongside changes in your nets.",
+  "languageNativeTr": "Türkçe",
+  "languageNativeEn": "English",
+  "languageSettingsTitle": "App Language",
+  "categoriesSectionTitle": "MY CATEGORIES",
+  "editProfileAction": "Edit Profile",
+  "effHigh": "High",
+  "effNormal": "Normal",
+  "effVeryHigh": "Very High",
+  "legacyEmailReadonlyHint": "Email address cannot be changed for security.",
+  "heatmapLess": "Less",
+  "heatmapMore": "More",
+  "manageCategoriesTileSub": "Add, edit, reorder & archive categories",
+  "manageCategoriesTileTitle": "Manage Categories",
+  "monthIntensitySuffix": "Intensity",
+  "mostEfficientDayLabel": "Most Efficient Day",
+  "profileFullNameLabel": "Full Name",
+  "newWeekLabel": "New",
+  "noReportsDesc": "When you start the timer and complete your first Pomodoro session, your breakdown and reports will appear here.",
+  "noStudyThisDay": "No study this day",
+  "notificationsAndLockScreen": "Notifications & lock screen timer",
+  "preferencesSectionTitle": "Preferences",
+  "reportsWeeklyTab": "Weekly Focus",
+  "reportsMonthlyTab": "Monthly Tracking",
+  "reportsDailyTab": "Daily Focus",
+  "topSubjectsLabel": "Most Studied Subjects",
+  "topicComparisonTitle": "Topic Comparison",
+  "totalFocusLabel": "Total\nFocus",
+  "weekDayBreakdownTitle": "Day-by-Day Breakdown",
+  "weeklyAnalysisCaption": "WEEKLY ANALYSIS",
+  "legacyWeeklyDistSub": "Summary of today",
+  "legacyWeeklyDistTitle": "Today's Distribution",
+  "weeklyEfficiencyCaption": "WEEKLY EFFICIENCY",
+  "weeklySummaryTitle": "Weekly Summary",
+  "weeklyTrendCaption": "WEEKLY TREND"
 }

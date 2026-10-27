@@ -75,3 +75,23 @@ Kullanıcı talebiyle tek commit mesajı: **`chore: gece öncesi başlangıç no
 `.env`, `scripts/.env`, anahtar/sertifika/keystore dosyaları ve `.claude/settings.local.json` staging’e alınmayacak. Yerel ortam dosyalarının içerikleri bu belgeye yazılmadı. Ignore altındaki özel runtime/ham kanıtlar zorla eklenmeyecek. Commit öncesi `git diff --cached --name-only` ile dosya listesi ve staging’deki gerçek dosya içerikleri iki ayrı taramayla kontrol edildi: yasak dosya ve gerçek ayrıcalıklı sır bulunmadı. Kamuya açık yerel demo anon anahtarları ve açıkça sentetik test değerleri gerçek üretim sırrı sayılmıyor.
 
 Staging özeti: **575 dosya yolu; 105 değişiklik, 119 ekleme, 351 silme**. `git diff --cached --check`, önceden var olan üç Maraton SQL dosyasında ve pazarlama raporunda satır sonu boşlukları bildiriyor. SQL gövdelerinin kayıtlı parmak izini değiştirmemek ve bu checkpoint’i mevcut durumun kaydı olarak tutmak için bunlar normalleştirilmedi; bulgu işlevsel test sonucu değildir. Bu commit hazırlığında uygulama testleri yeniden çalıştırılmadı.
+
+
+## Gece çalışması — 27/28 Ekim 2026
+
+### Varsayımlar
+
+- İş yalnız `codex/gece-2026-10-27` dalında ve yerel servis/QA hesaplarıyla yapılır; canlı okuma/yazma, deploy ve push yapılmaz. `.env` içerikleri okunmaz.
+- Deneme yeni bir sekmedir; normal 25/50 ve Maraton akışı yerinde kalır. Eski sunucu deneme capability'si sunmuyorsa katalog incelenebilir, ödüllü deneme başlayamaz.
+- TUS için 11 ders önerisi gösterilir; mevcut ücretsiz 8 aktif kategori sınırı korunur. KPSS ve dil hedefleri de ayrı lig kategorilerini temsil eder. Yaş/veli izni kuralları değiştirilmez.
+- Vazgeçilen deneme tarihçe/durum olarak saklanır; tamamlanan deneme sayısına, toplam çalışma süresine, seri, puan ve kuma katılmaz. Tamamlanan deneme tek kez çalışma süresine ve sunucuda 04:00 çalışma gününe katılır.
+- Deneme ödülü katalogdan belirlenir: tam süreli her 5 dakika için 1 deneme puanı, her 25 dakika için 1 deneme kumu (tam sayı). Normal cüzdan/puanla birleşmez; oran daha sonra yalnız sunucu kataloğundan değişebilir.
+- Netler yalnız kullanıcı beyanı/kişisel rapordur; resmî sınav yerleştirme puanı değildir ve ekonomiyi değiştirmez. Resmî standart oturum süreleri uygulanır; kişiye özel ek süre hakkı uydurulmaz.
+- Az nüfuslu hedef liginde güvenli hazırlık/ödül yeterlilik politikası sunucu tarafından uygulanır; kategori karışımıyla oda doldurulmaz. Ay ortasında hedef değiştirmek o ayın lig kategorisini değiştirmez.
+- Yeni deneme ligi görselleri gelene kadar güvenli mevcut/generik yer tutucu kullanılır; eksik varlık yayınlanmaz ve hayalî kazanılmış avatar gösterilmez.
+- Native gerçek süre testleri ile kontrollü eski başlangıç/tarih fixture testleri ayrı raporlanır. Yeni hızlı üretim modu eklenmez.
+
+### İlerleme
+
+- **22:27 — kapsam kaydı, commit `7bcbb4a`:** `analiz/ISTEKLER.md` I-01…I-20, kabul ölçütleri ve gece sınırları eklendi. Öncesinde `flutter analyze` temiz; `flutter test --reporter expanded`: **1261 geçti, 5 atlandı, 0 hata** (49 sn). İlk stage listesi yalnız istek dosyası; sır ve denetçi dosyası yok. Başlangıç checkpoint'i `036fa60` değişmedi.
+- Alt ajan sahiplikleri: backend proposed paketleri/yerel SQL; yeni Deneme model-servis-ekran-testleri; site ve resmî sınav kaynakları. Kök ajan ortak onboarding/dil/shell/sosyal/rapor entegrasyonları, native ortam ve commit kontrollerini yürütür. `DENETIM.md` başlangıç okumasında D-xx bulgusu yok.

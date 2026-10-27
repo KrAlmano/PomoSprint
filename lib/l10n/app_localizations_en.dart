@@ -1518,11 +1518,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingCategoryHint => 'Category name';
 
   @override
-  String get onboardingWelcomeTitle => 'Welcome! 👋';
+  String get onboardingWelcomeTitle => 'Welcome to PomoSprint';
 
   @override
   String get onboardingWelcomeBody =>
-      'I\'m your focus companion. Before we start, could you pick your birth year? We only ask to check the minimum age.';
+      'Focus, track your study and progress with people sharing your goal. Let’s set up the app for you.';
 
   @override
   String get onboardingSegmentTitle => 'So, which journey are you on?';
@@ -2452,21 +2452,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingGuideReportsBody =>
-      'See your daily, weekly and monthly study time, completed sessions and category breakdown. Track and change your daily goal. Your study day resets at 4:00 a.m.';
+      'Daily, weekly and monthly reports combine Pomodoro sessions, Marathon focus sessions and completed exams. Breaks and abandoned exams are excluded. The study day changes at 04:00; exam time appears in its own Exam row.';
 
   @override
   String get onboardingGuideRankingTitle => 'Ranking';
 
   @override
   String get onboardingGuideRankingBody =>
-      'After your first session that earns points, you join a suitable league room at your tier. Follow the League, Monthly and Friends rankings here. The tiers are Bronze, Silver, Gold, Sapphire and Diamond. Sessions and reports are saved during preparation; official 14-day competitions start once there are enough active participants. The ? in Ranking explains the current promotion and award requirements.';
+      'Study and exam leagues are separate and group people by their goal. Global rankings cover all goals. Periods renew at 00:00 Istanbul time on the first day of each month. Small groups may remain in preparation; the ? guide in Rankings explains promotion and reward conditions.';
 
   @override
   String get onboardingGuideSocialTitle => 'Social';
 
   @override
   String get onboardingGuideSocialBody =>
-      'Send a request using a friend code; once accepted, you can see each other’s status. Studying friends show as Focusing. Only friends taking a marathon break show as On break. A red dot means focus; a green dot means a break. Change your visibility in Profile.';
+      'Add friends by code and manage requests. Visible friends appear as Focusing, On break only during Marathon breaks, or Taking an exam. The open list refreshes periodically. Change visibility in Settings, hide users or block them.';
 
   @override
   String get onboardingGuideProfileTitle => 'Profile';
@@ -2533,4 +2533,393 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get leagueLaunchPreparingShort =>
       'Preparation · Promotion, demotion and league awards have not started yet.';
+
+  @override
+  String get examTab => 'Practice';
+
+  @override
+  String get examTitle => 'Practice exams';
+
+  @override
+  String get examNew => 'New practice exam';
+
+  @override
+  String get examHistory => 'My practice exams';
+
+  @override
+  String get examLeague => 'Practice league';
+
+  @override
+  String get examIntro =>
+      'Choose an exam and use its full time. You can add your scores afterwards.';
+
+  @override
+  String get examUnavailable => 'Practice mode is coming soon';
+
+  @override
+  String get examUnavailableBody =>
+      'Practice mode is not enabled on this server yet. You can browse exams while regular study and Marathon remain available.';
+
+  @override
+  String get examCatalogFallback =>
+      'Showing offline exam information. A server connection is required to start.';
+
+  @override
+  String get examStart => 'Start practice exam';
+
+  @override
+  String get examRulesTitle => 'Before you start';
+
+  @override
+  String get examRulesBody =>
+      'Practice exams have no breaks or pauses. The timer continues while the app is closed. Abandoning before the full time earns no points or practice sand; the attempt stays in your history. Scores do not affect points or leagues.';
+
+  @override
+  String get examReady => 'Start when you are ready';
+
+  @override
+  String get examNoPause => 'No pauses or breaks';
+
+  @override
+  String get examRunning => 'Practice exam in progress';
+
+  @override
+  String get examTimeRemaining => 'Time remaining';
+
+  @override
+  String get examAbandon => 'Abandon practice exam';
+
+  @override
+  String get examAbandonTitle => 'Abandon this practice exam?';
+
+  @override
+  String get examAbandonBody =>
+      'This attempt will be saved as abandoned. It will not earn points, practice sand or study time.';
+
+  @override
+  String get examCompleted => 'Practice exam completed';
+
+  @override
+  String get examAbandoned => 'Abandoned';
+
+  @override
+  String get examPending => 'Waiting for server confirmation';
+
+  @override
+  String get examPendingBody =>
+      'Your attempt is saved on this device. The same record will be retried when the connection returns.';
+
+  @override
+  String get examStartPending => 'Waiting for start confirmation';
+
+  @override
+  String get examStartPendingBody =>
+      'The start request has not been confirmed yet. Retrying will not create another attempt.';
+
+  @override
+  String get examError =>
+      'Could not load practice exam data. Check your connection and try again.';
+
+  @override
+  String get examConflict =>
+      'Finish your current study session or practice exam first.';
+
+  @override
+  String get examRetry => 'Try again';
+
+  @override
+  String get examEnterResults => 'Enter your scores';
+
+  @override
+  String get examEditResults => 'Edit your scores';
+
+  @override
+  String get examResultsTitle => 'Results by subject';
+
+  @override
+  String get examResultsInfo =>
+      'Scores are for personal reports and insights; they do not affect points or sand.';
+
+  @override
+  String get examCorrect => 'Correct';
+
+  @override
+  String get examWrong => 'Wrong';
+
+  @override
+  String get examBlank => 'Unanswered';
+
+  @override
+  String get examNet => 'Net score';
+
+  @override
+  String get examSaveResults => 'Save results';
+
+  @override
+  String get examResultsInvalid =>
+      'For each subject, correct, wrong and unanswered must add up to the question count. Enter non-negative whole numbers only.';
+
+  @override
+  String get examResultsSaved => 'Your scores were saved.';
+
+  @override
+  String get examResultsSaveError =>
+      'Results could not be saved. Your entries were kept; you can try again.';
+
+  @override
+  String get examNoHistory => 'No practice exams yet';
+
+  @override
+  String get examNoHistoryBody =>
+      'Started and abandoned practice exams appear here.';
+
+  @override
+  String get examPracticeSand => 'Practice sand';
+
+  @override
+  String get examInsights => 'Study time and scores';
+
+  @override
+  String get examInsightsEmpty =>
+      'At least two results for the same subject are needed for a comparison. Your study time and scores will appear together here.';
+
+  @override
+  String get examInsightsDisclaimer =>
+      'This comparison shows an association; it does not imply that study time alone caused a score change.';
+
+  @override
+  String get examLeagueEmpty =>
+      'You join the league after your first completed practice exam.';
+
+  @override
+  String get examLeaguePreparing =>
+      'Waiting for enough active users to start competition in this group.';
+
+  @override
+  String get examGlobal => 'Global';
+
+  @override
+  String get examTargetGroup => 'My target group';
+
+  @override
+  String get examRewardAvatars => 'Practice league avatars';
+
+  @override
+  String get examRewardAvatarsPending =>
+      'Special artwork is being prepared. Unearned rewards are not shown as owned while artwork is pending.';
+
+  @override
+  String get examFinishedNoResults => 'Scores have not been entered yet';
+
+  @override
+  String get examStartTime => 'Started';
+
+  @override
+  String get examEndTime => 'Finished';
+
+  @override
+  String get examDismiss => 'Done';
+
+  @override
+  String get examLgsBreakInfo =>
+      'LGS has two separate sessions. The actual exam includes a 45-minute break between the verbal and quantitative sessions.';
+
+  @override
+  String get examLoadMore => 'Show more';
+
+  @override
+  String get examNoAward => 'No reward';
+
+  @override
+  String get examNetUnavailable => '—';
+
+  @override
+  String get examQueuedResults =>
+      'Your results are saved on this device and will be sent when the connection returns.';
+
+  @override
+  String get examTotalStudy => 'Total study';
+
+  @override
+  String get examNoVerifiedDuration =>
+      'Study time is added only for completed practice exams confirmed by the server.';
+
+  @override
+  String get examStarting => 'Starting…';
+
+  @override
+  String get examSaving => 'Saving…';
+
+  @override
+  String get examAllGroups => 'All exams';
+
+  @override
+  String examQuestionsMinutes(int questions, int minutes) {
+    return 'Questions: $questions · Time: $minutes min';
+  }
+
+  @override
+  String examSubjectQuestions(int questions) {
+    return '$questions questions';
+  }
+
+  @override
+  String examNetRule(int divisor) {
+    return 'Net = Correct − Wrong / $divisor';
+  }
+
+  @override
+  String examRewardSummary(int points, int sand) {
+    return '$points points · $sand practice sand';
+  }
+
+  @override
+  String examInsightsChange(
+    String subject,
+    int minutes,
+    String before,
+    String after,
+  ) {
+    return '$subject: $minutes min of study. Your net score: $before → $after.';
+  }
+
+  @override
+  String examResultsQuestionTotal(int actual, int expected) {
+    return 'Total $actual / $expected';
+  }
+
+  @override
+  String examMonthlyReset(String date) {
+    return 'Period ends: $date';
+  }
+
+  @override
+  String get onboardingSegmentTus => 'TUS (Medical Specialty Exam)';
+
+  @override
+  String get onboardingLanguageTitle => 'Which language would you like to use?';
+
+  @override
+  String get onboardingLanguageBody =>
+      'You can change your language later in Settings.';
+
+  @override
+  String get onboardingGuideExamTitle =>
+      'Practice exams: experience exam timing';
+
+  @override
+  String get onboardingGuideExamBody =>
+      'Choose an exam to load its duration and question count. Practice exams have no breaks or pauses. Finishing the full time earns separate exam points and sand. Abandoned attempts stay in history without rewards or study-time credit.';
+
+  @override
+  String get onboardingGuideInsightsTitle => 'Nets and study–net insights';
+
+  @override
+  String get onboardingGuideInsightsBody =>
+      'In My exams, enter and edit correct, wrong and blank answers per subject. Nets are personal reports and never change your points or league. When enough data is available, see study time alongside changes in your nets.';
+
+  @override
+  String get languageNativeTr => 'Türkçe';
+
+  @override
+  String get languageNativeEn => 'English';
+
+  @override
+  String get languageSettingsTitle => 'App Language';
+
+  @override
+  String get categoriesSectionTitle => 'MY CATEGORIES';
+
+  @override
+  String get editProfileAction => 'Edit Profile';
+
+  @override
+  String get effHigh => 'High';
+
+  @override
+  String get effNormal => 'Normal';
+
+  @override
+  String get effVeryHigh => 'Very High';
+
+  @override
+  String get legacyEmailReadonlyHint =>
+      'Email address cannot be changed for security.';
+
+  @override
+  String get heatmapLess => 'Less';
+
+  @override
+  String get heatmapMore => 'More';
+
+  @override
+  String get manageCategoriesTileSub =>
+      'Add, edit, reorder & archive categories';
+
+  @override
+  String get manageCategoriesTileTitle => 'Manage Categories';
+
+  @override
+  String get monthIntensitySuffix => 'Intensity';
+
+  @override
+  String get mostEfficientDayLabel => 'Most Efficient Day';
+
+  @override
+  String get profileFullNameLabel => 'Full Name';
+
+  @override
+  String get newWeekLabel => 'New';
+
+  @override
+  String get noReportsDesc =>
+      'When you start the timer and complete your first Pomodoro session, your breakdown and reports will appear here.';
+
+  @override
+  String get noStudyThisDay => 'No study this day';
+
+  @override
+  String get notificationsAndLockScreen => 'Notifications & lock screen timer';
+
+  @override
+  String get preferencesSectionTitle => 'Preferences';
+
+  @override
+  String get reportsWeeklyTab => 'Weekly Focus';
+
+  @override
+  String get reportsMonthlyTab => 'Monthly Tracking';
+
+  @override
+  String get reportsDailyTab => 'Daily Focus';
+
+  @override
+  String get topSubjectsLabel => 'Most Studied Subjects';
+
+  @override
+  String get topicComparisonTitle => 'Topic Comparison';
+
+  @override
+  String get totalFocusLabel => 'Total\nFocus';
+
+  @override
+  String get weekDayBreakdownTitle => 'Day-by-Day Breakdown';
+
+  @override
+  String get weeklyAnalysisCaption => 'WEEKLY ANALYSIS';
+
+  @override
+  String get legacyWeeklyDistSub => 'Summary of today';
+
+  @override
+  String get legacyWeeklyDistTitle => 'Today\'s Distribution';
+
+  @override
+  String get weeklyEfficiencyCaption => 'WEEKLY EFFICIENCY';
+
+  @override
+  String get weeklySummaryTitle => 'Weekly Summary';
+
+  @override
+  String get weeklyTrendCaption => 'WEEKLY TREND';
 }

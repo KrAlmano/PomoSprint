@@ -13,6 +13,7 @@ import '../theme.dart';
 import '../widgets/auth/account_texts.dart';
 import '../widgets/auth/auth_error_banner.dart';
 import '../widgets/auth/google_logo.dart';
+import '../widgets/app_logo.dart';
 import '../widgets/auth/language_switcher.dart';
 import '../widgets/auth/legal_links.dart';
 import 'register_screen.dart';
@@ -59,9 +60,11 @@ class _LoginScreenState extends State<LoginScreen> {
   // imzalanabilsin diye Sign in with Apple entitlement'ı olmadan derlenir
   // (ios/Runner/RunnerDebug.entitlements); orada Apple girişi 1000 hatası
   // verir. Release/Profile tam entitlement'la derlenir.
-  bool get _showAppleSignIn => !kIsWeb && !kDebugMode && defaultTargetPlatform == TargetPlatform.iOS;
+  bool get _showAppleSignIn =>
+      !kIsWeb && !kDebugMode && defaultTargetPlatform == TargetPlatform.iOS;
 
-  bool get _offerAppleOnAndroidHelp => !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+  bool get _offerAppleOnAndroidHelp =>
+      !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
 
   @override
   void initState() {
@@ -70,11 +73,15 @@ class _LoginScreenState extends State<LoginScreen> {
     _notice = service.takeSignOutNotice();
     service.signOutNotice.addListener(_onSignOutNotice);
     final pending = widget.pendingVerificationEmail;
-    if (pending != null && pending.trim().isNotEmpty) _applyPendingVerification(pending);
+    if (pending != null && pending.trim().isNotEmpty) {
+      _applyPendingVerification(pending);
+    }
   }
 
   void _onSignOutNotice() {
-    if (SupabaseService.instance.signOutNotice.value == null || !mounted) return;
+    if (SupabaseService.instance.signOutNotice.value == null || !mounted) {
+      return;
+    }
     final notice = SupabaseService.instance.takeSignOutNotice();
     if (notice != null) setState(() => _notice = notice);
   }
@@ -99,11 +106,13 @@ class _LoginScreenState extends State<LoginScreen> {
   void _showSnack(String message, {bool isError = false}) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? Colors.red : AppColors.primary,
-        behavior: SnackBarBehavior.floating,
-      ));
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: isError ? Colors.red : AppColors.primary,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
   }
 
   /// Tüm giriş yollarının ortak akışı. Başarıda yükleme durumu korunur;
@@ -147,8 +156,10 @@ class _LoginScreenState extends State<LoginScreen> {
         // Supabase, "yanlış şifre" ile "e-posta henüz onaylanmadı"
         // durumlarını hesap keşfini önlemek için aynı genel hatayla
         // döndürebilir; iki durumda da yeniden gönder butonu gösterilir.
-        _showResendButton = offerResend &&
-            (code == AuthErrorCode.invalidCredentials || code == AuthErrorCode.emailNotConfirmed);
+        _showResendButton =
+            offerResend &&
+            (code == AuthErrorCode.invalidCredentials ||
+                code == AuthErrorCode.emailNotConfirmed);
       });
     }
   }
@@ -175,9 +186,11 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Future<void> _handleGoogleSignIn() => _signIn(SupabaseService.instance.signInWithGoogle);
+  Future<void> _handleGoogleSignIn() =>
+      _signIn(SupabaseService.instance.signInWithGoogle);
 
-  Future<void> _handleAppleSignIn() => _signIn(SupabaseService.instance.signInWithApple);
+  Future<void> _handleAppleSignIn() =>
+      _signIn(SupabaseService.instance.signInWithApple);
 
   Future<void> _openRegister() async {
     final result = await Navigator.push<RegisterResult>(
@@ -241,9 +254,15 @@ class _LoginScreenState extends State<LoginScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         scrollable: true,
-        constraints: const BoxConstraints(minWidth: 280, maxWidth: ContentWidth.form),
+        constraints: const BoxConstraints(
+          minWidth: 280,
+          maxWidth: ContentWidth.form,
+        ),
         title: Text(l10n.appleOnAndroidTitle),
-        content: Text(l10n.appleOnAndroidBody, style: const TextStyle(fontSize: 14, height: 1.4)),
+        content: Text(
+          l10n.appleOnAndroidBody,
+          style: const TextStyle(fontSize: 14, height: 1.4),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -256,7 +275,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildResendButton(AppLocalizations l10n, {required bool prompt}) {
     return OutlinedButton.icon(
-      onPressed: (_isResending || _resendSecondsLeft > 0) ? null : _handleResendEmail,
+      onPressed: (_isResending || _resendSecondsLeft > 0)
+          ? null
+          : _handleResendEmail,
       icon: _isResending
           ? const SizedBox(
               width: 16,
@@ -279,16 +300,27 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _handleForgotPassword() => Navigator.of(context).push<void>(
-    MaterialPageRoute(builder: (_) => ForgotPasswordScreen(initialEmail: _emailController.text.trim())),
+    MaterialPageRoute(
+      builder: (_) =>
+          ForgotPasswordScreen(initialEmail: _emailController.text.trim()),
+    ),
   );
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final labelColor = isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant;
-    final fieldFill = isDark ? AppColors.darkSurfaceContainerHigh : AppColors.surfaceContainerHighest;
-    final labelStyle = TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: labelColor);
+    final labelColor = isDark
+        ? AppColors.darkOnSurfaceVariant
+        : AppColors.onSurfaceVariant;
+    final fieldFill = isDark
+        ? AppColors.darkSurfaceContainerHigh
+        : AppColors.surfaceContainerHighest;
+    final labelStyle = TextStyle(
+      fontSize: 13,
+      fontWeight: FontWeight.w600,
+      color: labelColor,
+    );
     // Koyu temada açık kırmızı (darkPrimary): küçük bağlantı metinleri koyu
     // zeminde okunur kalır (AppColors.primary orada 3:1'in altındaydı).
     final linkColor = Theme.of(context).colorScheme.primary;
@@ -300,8 +332,12 @@ class _LoginScreenState extends State<LoginScreen> {
     // Form tablette ortalanmış form genişliğinde kalır (kaydırma tüm
     // genişlikte çalışır); yatay telefonda klavye açıkken de kayar.
     final screen = Responsive.of(context);
-    final availableWidth = screen.width - MediaQuery.paddingOf(context).horizontal;
-    final horizontalPadding = math.max(28.0, (availableWidth - ContentWidth.form) / 2);
+    final availableWidth =
+        screen.width - MediaQuery.paddingOf(context).horizontal;
+    final horizontalPadding = math.max(
+      28.0,
+      (availableWidth - ContentWidth.form) / 2,
+    );
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
@@ -309,36 +345,23 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Center(
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
-            padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: screen.isShortHeight ? 12 : 24),
+            padding: EdgeInsets.symmetric(
+              horizontal: horizontalPadding,
+              vertical: screen.isShortHeight ? 12 : 24,
+            ),
             child: AutofillGroup(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   // Dil seçimi girişten önce de yapılabilir (varsayılan: cihaz dili).
-                  const Align(alignment: AlignmentDirectional.centerEnd, child: LanguageSwitcher()),
+                  const Align(
+                    alignment: AlignmentDirectional.centerEnd,
+                    child: LanguageSwitcher(),
+                  ),
                   SizedBox(height: screen.isShortHeight ? 4 : 8),
 
-                  // Logo & Header
-                  Container(
-                    width: 72,
-                    height: 72,
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryContainer,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.3),
-                          blurRadius: 16,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.timer_sharp,
-                      size: 38,
-                      color: Colors.white,
-                    ),
-                  ),
+                  // Uygulamanın mevcut marka görseli.
+                  const AppLogo(key: ValueKey('login-app-logo'), size: 72),
                   const SizedBox(height: 20),
 
                   Text(
@@ -346,7 +369,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                      color: isDark
+                          ? AppColors.darkOnSurface
+                          : AppColors.onSurface,
                       letterSpacing: -0.5,
                     ),
                   ),
@@ -372,9 +397,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
 
                   // Kayıttan onay beklenerek dönüldü.
-                  if (_pendingVerificationEmail != null && _errorMessage == null) ...[
+                  if (_pendingVerificationEmail != null &&
+                      _errorMessage == null) ...[
                     AuthInfoBanner(
-                      message: l10n.loginVerificationPendingInfo(_pendingVerificationEmail!),
+                      message: l10n.loginVerificationPendingInfo(
+                        _pendingVerificationEmail!,
+                      ),
                       icon: Icons.mark_email_unread_outlined,
                     ),
                     const SizedBox(height: 8),
@@ -405,7 +433,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         keyboardType: TextInputType.emailAddress,
                         textInputAction: TextInputAction.next,
                         autocorrect: false,
-                        autofillHints: const [AutofillHints.email, AutofillHints.username],
+                        autofillHints: const [
+                          AutofillHints.email,
+                          AutofillHints.username,
+                        ],
                         decoration: InputDecoration(
                           hintText: l10n.authEmailHint,
                           filled: true,
@@ -450,7 +481,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: _isLoading ? null : _handleForgotPassword,
                       child: Text(
                         l10n.forgotPassword,
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: linkColor),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: linkColor,
+                        ),
                       ),
                     ),
                   ),
@@ -474,7 +509,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           ? const SizedBox(
                               width: 24,
                               height: 24,
-                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2.5,
+                              ),
                             )
                           : Text(
                               l10n.loginBtn,
@@ -496,7 +534,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         child: Text(
                           l10n.orDivider,
-                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: labelColor),
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: labelColor,
+                          ),
                         ),
                       ),
                       Expanded(child: Divider(color: fieldFill)),
@@ -513,8 +555,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         onPressed: _isLoading ? null : _handleAppleSignIn,
                         text: l10n.authAppleSignInBtn,
                         height: 52,
-                        style: isDark ? SignInWithAppleButtonStyle.white : SignInWithAppleButtonStyle.black,
-                        borderRadius: const BorderRadius.all(Radius.circular(26)),
+                        style: isDark
+                            ? SignInWithAppleButtonStyle.white
+                            : SignInWithAppleButtonStyle.black,
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(26),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -534,12 +580,18 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: isDark ? const Color(0xFFE3E3E3) : const Color(0xFF1F1F1F),
+                          color: isDark
+                              ? const Color(0xFFE3E3E3)
+                              : const Color(0xFF1F1F1F),
                         ),
                       ),
                       style: OutlinedButton.styleFrom(
-                        backgroundColor: isDark ? const Color(0xFF131314) : const Color(0xFFF2F2F2),
-                        side: isDark ? const BorderSide(color: Color(0xFF8E918F)) : BorderSide.none,
+                        backgroundColor: isDark
+                            ? const Color(0xFF131314)
+                            : const Color(0xFFF2F2F2),
+                        side: isDark
+                            ? const BorderSide(color: Color(0xFF8E918F))
+                            : BorderSide.none,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(26),
                         ),
@@ -552,7 +604,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   // Google/Apple ilk girişte hesap oluşturur; Kullanım Şartları
                   // ve KVKK Aydınlatma Metni burada bildirilir (bağlantılı).
                   SocialSignInNotice(
-                    style: TextStyle(fontSize: 12, height: 1.4, color: labelColor),
+                    style: TextStyle(
+                      fontSize: 12,
+                      height: 1.4,
+                      color: labelColor,
+                    ),
                   ),
 
                   // Android'de Apple ile giriş yok: Apple ile açılmış hesaba
@@ -561,7 +617,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     TextButton.icon(
                       onPressed: _showAppleOnAndroidHelp,
                       icon: const Icon(Icons.help_outline_rounded, size: 18),
-                      label: Text(l10n.appleOnAndroidLink, textAlign: TextAlign.center),
+                      label: Text(
+                        l10n.appleOnAndroidLink,
+                        textAlign: TextAlign.center,
+                      ),
                       style: TextButton.styleFrom(foregroundColor: labelColor),
                     ),
 

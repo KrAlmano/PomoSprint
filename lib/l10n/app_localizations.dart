@@ -2573,13 +2573,13 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingWelcomeTitle.
   ///
   /// In tr, this message translates to:
-  /// **'Hoş geldin! 👋'**
+  /// **'PomoSprint’e hoş geldin'**
   String get onboardingWelcomeTitle;
 
   /// No description provided for @onboardingWelcomeBody.
   ///
   /// In tr, this message translates to:
-  /// **'Ben senin odaklanma arkadaşınım. Başlamadan önce doğum yılını seçer misin? Bunu yalnızca yaş sınırını kontrol etmek için soruyoruz.'**
+  /// **'Odaklan, çalışmalarını takip et ve hedefindeki arkadaşlarınla birlikte ilerle. Önce uygulamayı sana göre hazırlayalım.'**
   String get onboardingWelcomeBody;
 
   /// No description provided for @onboardingSegmentTitle.
@@ -4121,7 +4121,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingGuideReportsBody.
   ///
   /// In tr, this message translates to:
-  /// **'Günlük, haftalık ve aylık çalışma süreni, tamamlanan seanslarını ve kategori dağılımını burada görürsün. Günlük hedefini takip edebilir ve değiştirebilirsin. Çalışma günü saat 04.00’te yenilenir.'**
+  /// **'Günlük, haftalık ve aylık raporlar Pomodoro, Maraton odakları ve tamamlanmış denemelerin toplam çalışma süresini gösterir. Molalar ve vazgeçilen denemeler dahil değildir. Çalışma günü 04:00’da değişir; deneme süresi ayrı bir Deneme satırında görünür.'**
   String get onboardingGuideReportsBody;
 
   /// No description provided for @onboardingGuideRankingTitle.
@@ -4133,7 +4133,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingGuideRankingBody.
   ///
   /// In tr, this message translates to:
-  /// **'İlk puanlı seansını bitirince aynı kademedeki uygun bir lig odasına yerleşirsin. Lig, Aylık ve Arkadaşlar sıralamalarını buradan takip et. Bronz, Gümüş, Altın, Safir ve Elmas ligleri vardır. Hazırlık döneminde seanslar ve raporlar kaydolur; resmi 14 günlük yarışmalar aktif katılımcı sayısı yeterli olunca başlar. Güncel terfi ve ödül şartları Sıralama ekranındaki ? bölümündedir.'**
+  /// **'Normal ve deneme ligleri ayrıdır; kendi hedefindeki kişilerle yarışırsın. Global sıralama tüm hedefleri kapsar. Dönem İstanbul saatine göre ayın 1’inde 00:00’da yenilenir. Az katılımcılı gruplar hazırlıkta kalabilir; terfi ve ödül koşulları Sıralama’daki ? rehberindedir.'**
   String get onboardingGuideRankingBody;
 
   /// No description provided for @onboardingGuideSocialTitle.
@@ -4145,7 +4145,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingGuideSocialBody.
   ///
   /// In tr, this message translates to:
-  /// **'Arkadaş koduyla istek gönder; kabul edilince birbirinizin durumunu görebilirsiniz. Çalışan arkadaşların Odaklanıyor, yalnız Maraton molasına çıkanlar Molada olarak görünür. Kırmızı daire odağı, yeşil daire molayı gösterir. Görünürlük tercihini Profil’den değiştirebilirsin.'**
+  /// **'Arkadaş koduyla ekle ve isteklerini yönet. Görünür arkadaşların Odaklanıyor, yalnız Maraton molasında Molada, deneme sırasında Denemede olarak görünür. Liste açıkken düzenli yenilenir. Görünürlüğünü Ayarlar’dan değiştirebilir, kullanıcı gizleyebilir veya engelleyebilirsin.'**
   String get onboardingGuideSocialBody;
 
   /// No description provided for @onboardingGuideProfileTitle.
@@ -4235,6 +4235,695 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Hazırlık dönemi · Terfi, düşme ve lig ödülleri henüz başlamadı.'**
   String get leagueLaunchPreparingShort;
+
+  /// No description provided for @examTab.
+  ///
+  /// In tr, this message translates to:
+  /// **'Deneme'**
+  String get examTab;
+
+  /// No description provided for @examTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Denemeler'**
+  String get examTitle;
+
+  /// No description provided for @examNew.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni deneme'**
+  String get examNew;
+
+  /// No description provided for @examHistory.
+  ///
+  /// In tr, this message translates to:
+  /// **'Denemelerim'**
+  String get examHistory;
+
+  /// No description provided for @examLeague.
+  ///
+  /// In tr, this message translates to:
+  /// **'Deneme ligi'**
+  String get examLeague;
+
+  /// No description provided for @examIntro.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sınavını seç, gerçek süresinde çöz. Netlerini sonradan ekleyebilirsin.'**
+  String get examIntro;
+
+  /// No description provided for @examUnavailable.
+  ///
+  /// In tr, this message translates to:
+  /// **'Deneme modu yakında'**
+  String get examUnavailable;
+
+  /// No description provided for @examUnavailableBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu sunucuda deneme modu henüz etkin değil. Sınavları inceleyebilirsin; normal çalışma ve Maraton devam eder.'**
+  String get examUnavailableBody;
+
+  /// No description provided for @examCatalogFallback.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çevrimdışı sınav bilgileri gösteriliyor. Başlatmak için sunucu bağlantısı gerekir.'**
+  String get examCatalogFallback;
+
+  /// No description provided for @examStart.
+  ///
+  /// In tr, this message translates to:
+  /// **'Denemeyi başlat'**
+  String get examStart;
+
+  /// No description provided for @examRulesTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başlamadan önce'**
+  String get examRulesTitle;
+
+  /// No description provided for @examRulesBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Denemede mola ve duraklatma yoktur. Sayaç uygulama kapalıyken de ilerler. Tam süre dolmadan vazgeçersen puan ve deneme kumu kazanmazsın; denemen geçmişinde kalır. Netlerin puanını veya ligini etkilemez.'**
+  String get examRulesBody;
+
+  /// No description provided for @examReady.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hazır olduğunda başla'**
+  String get examReady;
+
+  /// No description provided for @examNoPause.
+  ///
+  /// In tr, this message translates to:
+  /// **'Duraklatma ve mola yok'**
+  String get examNoPause;
+
+  /// No description provided for @examRunning.
+  ///
+  /// In tr, this message translates to:
+  /// **'Deneme sürüyor'**
+  String get examRunning;
+
+  /// No description provided for @examTimeRemaining.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kalan süre'**
+  String get examTimeRemaining;
+
+  /// No description provided for @examAbandon.
+  ///
+  /// In tr, this message translates to:
+  /// **'Denemeden vazgeç'**
+  String get examAbandon;
+
+  /// No description provided for @examAbandonTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Denemeden vazgeçmek istiyor musun?'**
+  String get examAbandonTitle;
+
+  /// No description provided for @examAbandonBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu deneme vazgeçildi olarak saklanacak. Puan, deneme kumu ve çalışma süresi kazanılmayacak.'**
+  String get examAbandonBody;
+
+  /// No description provided for @examCompleted.
+  ///
+  /// In tr, this message translates to:
+  /// **'Deneme tamamlandı'**
+  String get examCompleted;
+
+  /// No description provided for @examAbandoned.
+  ///
+  /// In tr, this message translates to:
+  /// **'Vazgeçildi'**
+  String get examAbandoned;
+
+  /// No description provided for @examPending.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sunucu onayı bekleniyor'**
+  String get examPending;
+
+  /// No description provided for @examPendingBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Denemen bu cihazda saklandı. Bağlantı geldiğinde aynı kayıt tekrar gönderilecek.'**
+  String get examPendingBody;
+
+  /// No description provided for @examStartPending.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başlatma sonucu bekleniyor'**
+  String get examStartPending;
+
+  /// No description provided for @examStartPendingBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başlatma isteğinin sonucu henüz bilinmiyor. Tekrar denemek yeni bir deneme oluşturmaz.'**
+  String get examStartPendingBody;
+
+  /// No description provided for @examError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Deneme bilgileri alınamadı. Bağlantını kontrol edip tekrar dene.'**
+  String get examError;
+
+  /// No description provided for @examConflict.
+  ///
+  /// In tr, this message translates to:
+  /// **'Önce devam eden çalışma veya denemeni tamamla.'**
+  String get examConflict;
+
+  /// No description provided for @examRetry.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tekrar dene'**
+  String get examRetry;
+
+  /// No description provided for @examEnterResults.
+  ///
+  /// In tr, this message translates to:
+  /// **'Netlerini gir'**
+  String get examEnterResults;
+
+  /// No description provided for @examEditResults.
+  ///
+  /// In tr, this message translates to:
+  /// **'Netlerini düzenle'**
+  String get examEditResults;
+
+  /// No description provided for @examResultsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Derslere göre sonuçlar'**
+  String get examResultsTitle;
+
+  /// No description provided for @examResultsInfo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Netler kişisel rapor ve içgörü içindir; puan ve kuma etkisi yoktur.'**
+  String get examResultsInfo;
+
+  /// No description provided for @examCorrect.
+  ///
+  /// In tr, this message translates to:
+  /// **'Doğru'**
+  String get examCorrect;
+
+  /// No description provided for @examWrong.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yanlış'**
+  String get examWrong;
+
+  /// No description provided for @examBlank.
+  ///
+  /// In tr, this message translates to:
+  /// **'Boş'**
+  String get examBlank;
+
+  /// No description provided for @examNet.
+  ///
+  /// In tr, this message translates to:
+  /// **'Net'**
+  String get examNet;
+
+  /// No description provided for @examSaveResults.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sonuçları kaydet'**
+  String get examSaveResults;
+
+  /// No description provided for @examResultsInvalid.
+  ///
+  /// In tr, this message translates to:
+  /// **'Her ders için doğru, yanlış ve boş toplamı soru sayısına eşit olmalı. Yalnızca negatif olmayan tam sayılar gir.'**
+  String get examResultsInvalid;
+
+  /// No description provided for @examResultsSaved.
+  ///
+  /// In tr, this message translates to:
+  /// **'Netlerin kaydedildi.'**
+  String get examResultsSaved;
+
+  /// No description provided for @examResultsSaveError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sonuçlar kaydedilemedi. Girdilerin korundu; tekrar deneyebilirsin.'**
+  String get examResultsSaveError;
+
+  /// No description provided for @examNoHistory.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz denemen yok'**
+  String get examNoHistory;
+
+  /// No description provided for @examNoHistoryBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başlattığın ve vazgeçtiğin denemeler burada görünür.'**
+  String get examNoHistoryBody;
+
+  /// No description provided for @examPracticeSand.
+  ///
+  /// In tr, this message translates to:
+  /// **'Deneme kumu'**
+  String get examPracticeSand;
+
+  /// No description provided for @examInsights.
+  ///
+  /// In tr, this message translates to:
+  /// **'Süre ve netlerin'**
+  String get examInsights;
+
+  /// No description provided for @examInsightsEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Karşılaştırma için aynı dersin en az iki deneme sonucu gerekir. Çalışma sürenle netlerini burada birlikte göreceksin.'**
+  String get examInsightsEmpty;
+
+  /// No description provided for @examInsightsDisclaimer.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu karşılaştırma bir ilişki gösterir; net değişiminin tek nedeninin çalışma süresi olduğunu söylemez.'**
+  String get examInsightsDisclaimer;
+
+  /// No description provided for @examLeagueEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'İlk tamamlanmış denemenden sonra ligde yerini alırsın.'**
+  String get examLeagueEmpty;
+
+  /// No description provided for @examLeaguePreparing.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu grupta yarışma için yeterli aktif kullanıcı bekleniyor.'**
+  String get examLeaguePreparing;
+
+  /// No description provided for @examGlobal.
+  ///
+  /// In tr, this message translates to:
+  /// **'Global'**
+  String get examGlobal;
+
+  /// No description provided for @examTargetGroup.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hedef grubum'**
+  String get examTargetGroup;
+
+  /// No description provided for @examRewardAvatars.
+  ///
+  /// In tr, this message translates to:
+  /// **'Deneme ligi avatarları'**
+  String get examRewardAvatars;
+
+  /// No description provided for @examRewardAvatarsPending.
+  ///
+  /// In tr, this message translates to:
+  /// **'Özel görseller hazırlanıyor. Görsel hazır olmadan sahip olmadığın bir ödül gösterilmez.'**
+  String get examRewardAvatarsPending;
+
+  /// No description provided for @examFinishedNoResults.
+  ///
+  /// In tr, this message translates to:
+  /// **'Netler henüz girilmedi'**
+  String get examFinishedNoResults;
+
+  /// No description provided for @examStartTime.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başlangıç'**
+  String get examStartTime;
+
+  /// No description provided for @examEndTime.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bitiş'**
+  String get examEndTime;
+
+  /// No description provided for @examDismiss.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tamam'**
+  String get examDismiss;
+
+  /// No description provided for @examLgsBreakInfo.
+  ///
+  /// In tr, this message translates to:
+  /// **'LGS iki ayrı oturumdur. Gerçek sınavda sözel ve sayısal oturum arasında 45 dakika ara bulunur.'**
+  String get examLgsBreakInfo;
+
+  /// No description provided for @examLoadMore.
+  ///
+  /// In tr, this message translates to:
+  /// **'Daha fazla göster'**
+  String get examLoadMore;
+
+  /// No description provided for @examNoAward.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ödül yok'**
+  String get examNoAward;
+
+  /// No description provided for @examNetUnavailable.
+  ///
+  /// In tr, this message translates to:
+  /// **'—'**
+  String get examNetUnavailable;
+
+  /// No description provided for @examQueuedResults.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sonuçların bu cihazda saklandı. Bağlantı geldiğinde gönderilecek.'**
+  String get examQueuedResults;
+
+  /// No description provided for @examTotalStudy.
+  ///
+  /// In tr, this message translates to:
+  /// **'Toplam çalışma'**
+  String get examTotalStudy;
+
+  /// No description provided for @examNoVerifiedDuration.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çalışma süresi yalnızca sunucunun onayladığı tamamlanmış denemelere eklenir.'**
+  String get examNoVerifiedDuration;
+
+  /// No description provided for @examStarting.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başlatılıyor…'**
+  String get examStarting;
+
+  /// No description provided for @examSaving.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydediliyor…'**
+  String get examSaving;
+
+  /// No description provided for @examAllGroups.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tüm sınavlar'**
+  String get examAllGroups;
+
+  /// No description provided for @examQuestionsMinutes.
+  ///
+  /// In tr, this message translates to:
+  /// **'Soru: {questions} · Süre: {minutes} dk'**
+  String examQuestionsMinutes(int questions, int minutes);
+
+  /// No description provided for @examSubjectQuestions.
+  ///
+  /// In tr, this message translates to:
+  /// **'{questions} soru'**
+  String examSubjectQuestions(int questions);
+
+  /// No description provided for @examNetRule.
+  ///
+  /// In tr, this message translates to:
+  /// **'Net = Doğru − Yanlış / {divisor}'**
+  String examNetRule(int divisor);
+
+  /// No description provided for @examRewardSummary.
+  ///
+  /// In tr, this message translates to:
+  /// **'{points} puan · {sand} deneme kumu'**
+  String examRewardSummary(int points, int sand);
+
+  /// No description provided for @examInsightsChange.
+  ///
+  /// In tr, this message translates to:
+  /// **'{subject}: {minutes} dk çalışma. Netin {before} → {after}.'**
+  String examInsightsChange(
+    String subject,
+    int minutes,
+    String before,
+    String after,
+  );
+
+  /// No description provided for @examResultsQuestionTotal.
+  ///
+  /// In tr, this message translates to:
+  /// **'Toplam {actual} / {expected}'**
+  String examResultsQuestionTotal(int actual, int expected);
+
+  /// No description provided for @examMonthlyReset.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dönem bitişi: {date}'**
+  String examMonthlyReset(String date);
+
+  /// No description provided for @onboardingSegmentTus.
+  ///
+  /// In tr, this message translates to:
+  /// **'TUS (Tıpta Uzmanlık)'**
+  String get onboardingSegmentTus;
+
+  /// No description provided for @onboardingLanguageTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hangi dili kullanmak istersin?'**
+  String get onboardingLanguageTitle;
+
+  /// No description provided for @onboardingLanguageBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Dilini daha sonra Ayarlar’dan değiştirebilirsin.'**
+  String get onboardingLanguageBody;
+
+  /// No description provided for @onboardingGuideExamTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Deneme: sınav süresini deneyimle'**
+  String get onboardingGuideExamTitle;
+
+  /// No description provided for @onboardingGuideExamBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sınavını seç; soru sayısı ve süresi otomatik gelir. Denemede mola ve duraklatma yoktur. Tam süreyi tamamladığında ayrı deneme puanı ve kumu kazanırsın. Vazgeçersen kaydın geçmişte kalır, ödül ve çalışma süresi kazanmazsın.'**
+  String get onboardingGuideExamBody;
+
+  /// No description provided for @onboardingGuideInsightsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Netler ve süre–net içgörüleri'**
+  String get onboardingGuideInsightsTitle;
+
+  /// No description provided for @onboardingGuideInsightsBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Denemelerim’den ders ders doğru, yanlış ve boşlarını girip sonra düzenleyebilirsin. Netlerin yalnız kişisel raporlarındadır; puanını veya ligini değiştirmez. Yeterli veri oluştuğunda ders çalışma süreni netlerindeki değişimle birlikte görürsün.'**
+  String get onboardingGuideInsightsBody;
+
+  /// No description provided for @languageNativeTr.
+  ///
+  /// In tr, this message translates to:
+  /// **'Türkçe'**
+  String get languageNativeTr;
+
+  /// No description provided for @languageNativeEn.
+  ///
+  /// In tr, this message translates to:
+  /// **'English'**
+  String get languageNativeEn;
+
+  /// No description provided for @languageSettingsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Uygulama Dili'**
+  String get languageSettingsTitle;
+
+  /// No description provided for @categoriesSectionTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'KATEGORİLERİM'**
+  String get categoriesSectionTitle;
+
+  /// No description provided for @editProfileAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Profili Düzenle'**
+  String get editProfileAction;
+
+  /// No description provided for @effHigh.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yüksek'**
+  String get effHigh;
+
+  /// No description provided for @effNormal.
+  ///
+  /// In tr, this message translates to:
+  /// **'Normal'**
+  String get effNormal;
+
+  /// No description provided for @effVeryHigh.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çok Yüksek'**
+  String get effVeryHigh;
+
+  /// No description provided for @legacyEmailReadonlyHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'E-posta adresi güvenlik nedeniyle değiştirilemez.'**
+  String get legacyEmailReadonlyHint;
+
+  /// No description provided for @heatmapLess.
+  ///
+  /// In tr, this message translates to:
+  /// **'Az'**
+  String get heatmapLess;
+
+  /// No description provided for @heatmapMore.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çok'**
+  String get heatmapMore;
+
+  /// No description provided for @manageCategoriesTileSub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategori ekle, düzenle, sırala ve arşivle'**
+  String get manageCategoriesTileSub;
+
+  /// No description provided for @manageCategoriesTileTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kategorileri Yönet'**
+  String get manageCategoriesTileTitle;
+
+  /// No description provided for @monthIntensitySuffix.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yoğunluğu'**
+  String get monthIntensitySuffix;
+
+  /// No description provided for @mostEfficientDayLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'En Verimli Gün'**
+  String get mostEfficientDayLabel;
+
+  /// No description provided for @profileFullNameLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ad Soyad'**
+  String get profileFullNameLabel;
+
+  /// No description provided for @newWeekLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni'**
+  String get newWeekLabel;
+
+  /// No description provided for @noReportsDesc.
+  ///
+  /// In tr, this message translates to:
+  /// **'Zamanlayıcıyı başlatıp ilk Pomodoro seansını tamamladığında ders dağılımın ve raporların burada görünecek.'**
+  String get noReportsDesc;
+
+  /// No description provided for @noStudyThisDay.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu gün çalışma yok'**
+  String get noStudyThisDay;
+
+  /// No description provided for @notificationsAndLockScreen.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bildirimler ve kilit ekranı sayacı'**
+  String get notificationsAndLockScreen;
+
+  /// No description provided for @preferencesSectionTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tercihler'**
+  String get preferencesSectionTitle;
+
+  /// No description provided for @reportsWeeklyTab.
+  ///
+  /// In tr, this message translates to:
+  /// **'Haftalık Çalışma'**
+  String get reportsWeeklyTab;
+
+  /// No description provided for @reportsMonthlyTab.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aylık Takip'**
+  String get reportsMonthlyTab;
+
+  /// No description provided for @reportsDailyTab.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük Çalışma'**
+  String get reportsDailyTab;
+
+  /// No description provided for @topSubjectsLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'En Çok Çalışılan Dersler'**
+  String get topSubjectsLabel;
+
+  /// No description provided for @topicComparisonTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Konu Karşılaştırması'**
+  String get topicComparisonTitle;
+
+  /// No description provided for @totalFocusLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Toplam\nOdaklanma'**
+  String get totalFocusLabel;
+
+  /// No description provided for @weekDayBreakdownTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gün Gün Döküm'**
+  String get weekDayBreakdownTitle;
+
+  /// No description provided for @weeklyAnalysisCaption.
+  ///
+  /// In tr, this message translates to:
+  /// **'HAFTALIK ANALİZ'**
+  String get weeklyAnalysisCaption;
+
+  /// No description provided for @legacyWeeklyDistSub.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugünün özeti'**
+  String get legacyWeeklyDistSub;
+
+  /// No description provided for @legacyWeeklyDistTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bugünün Dağılımı'**
+  String get legacyWeeklyDistTitle;
+
+  /// No description provided for @weeklyEfficiencyCaption.
+  ///
+  /// In tr, this message translates to:
+  /// **'HAFTALIK VERİMLİLİK'**
+  String get weeklyEfficiencyCaption;
+
+  /// No description provided for @weeklySummaryTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Haftalık Özet'**
+  String get weeklySummaryTitle;
+
+  /// No description provided for @weeklyTrendCaption.
+  ///
+  /// In tr, this message translates to:
+  /// **'HAFTALIK TREND'**
+  String get weeklyTrendCaption;
 }
 
 class _AppLocalizationsDelegate

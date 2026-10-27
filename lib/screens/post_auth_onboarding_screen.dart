@@ -977,6 +977,13 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
         textColor,
       ),
       _optionButton(
+        l10n.onboardingSegmentTus,
+        _userSegment == 'tus',
+        () => _selectSegment('tus'),
+        isDark,
+        textColor,
+      ),
+      _optionButton(
         l10n.onboardingSegmentKpss,
         _userSegment == 'kpss',
         () => _selectSegment('kpss'),
@@ -1373,6 +1380,8 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
     final sections = [
       (l10n.onboardingGuidePomoTitle, l10n.onboardingGuidePomoBody),
       (l10n.onboardingGuideMarathonTitle, l10n.onboardingGuideMarathonBody),
+      (l10n.onboardingGuideExamTitle, l10n.onboardingGuideExamBody),
+      (l10n.onboardingGuideInsightsTitle, l10n.onboardingGuideInsightsBody),
       (l10n.onboardingGuideReportsTitle, l10n.onboardingGuideReportsBody),
       (l10n.onboardingGuideRankingTitle, l10n.onboardingGuideRankingBody),
       (l10n.onboardingGuideSocialTitle, l10n.onboardingGuideSocialBody),

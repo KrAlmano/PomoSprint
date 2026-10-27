@@ -836,8 +836,8 @@
   "onboardingGenericError": "Bir şeyler ters gitti, lütfen tekrar dene: {error}",
   "onboardingAddCategoryTitle": "Kategori Ekle",
   "onboardingCategoryHint": "Kategori adı",
-  "onboardingWelcomeTitle": "Hoş geldin! 👋",
-  "onboardingWelcomeBody": "Ben senin odaklanma arkadaşınım. Başlamadan önce doğum yılını seçer misin? Bunu yalnızca yaş sınırını kontrol etmek için soruyoruz.",
+  "onboardingWelcomeTitle": "PomoSprint’e hoş geldin",
+  "onboardingWelcomeBody": "Odaklan, çalışmalarını takip et ve hedefindeki arkadaşlarınla birlikte ilerle. Önce uygulamayı sana göre hazırlayalım.",
   "onboardingSegmentTitle": "Peki, hangi yolculuktasın?",
   "onboardingSegmentBody": "Beraber neye çalışacağız? Sana uygun kategorileri önereyim. Uymuyorsa \"Diğer\"i seç.",
   "onboardingSegmentLgs": "🎓  LGS",
@@ -1400,11 +1400,11 @@
   "onboardingGuideMarathonTitle": "Maraton",
   "onboardingGuideMarathonBody": "Maraton’u başlat düğmesinden 2, 3 veya 4 seans planla. Seanslar arasında 5 dakika mola verilir. Mola bitince 1 dakika içinde Buradayım’a dokunarak devam et; onay vermezsen Maraton biter. Bitirdiğin seansların normal puanları korunur. Planın tamamını bitirince 25 dakikalık seanslarda sırasıyla +2/+3/+5, 50 dakikalıklarda +4/+6/+10 ek puan kazanırsın.",
   "onboardingGuideReportsTitle": "Raporlar",
-  "onboardingGuideReportsBody": "Günlük, haftalık ve aylık çalışma süreni, tamamlanan seanslarını ve kategori dağılımını burada görürsün. Günlük hedefini takip edebilir ve değiştirebilirsin. Çalışma günü saat 04.00’te yenilenir.",
+  "onboardingGuideReportsBody": "Günlük, haftalık ve aylık raporlar Pomodoro, Maraton odakları ve tamamlanmış denemelerin toplam çalışma süresini gösterir. Molalar ve vazgeçilen denemeler dahil değildir. Çalışma günü 04:00’da değişir; deneme süresi ayrı bir Deneme satırında görünür.",
   "onboardingGuideRankingTitle": "Sıralama",
-  "onboardingGuideRankingBody": "İlk puanlı seansını bitirince aynı kademedeki uygun bir lig odasına yerleşirsin. Lig, Aylık ve Arkadaşlar sıralamalarını buradan takip et. Bronz, Gümüş, Altın, Safir ve Elmas ligleri vardır. Hazırlık döneminde seanslar ve raporlar kaydolur; resmi 14 günlük yarışmalar aktif katılımcı sayısı yeterli olunca başlar. Güncel terfi ve ödül şartları Sıralama ekranındaki ? bölümündedir.",
+  "onboardingGuideRankingBody": "Normal ve deneme ligleri ayrıdır; kendi hedefindeki kişilerle yarışırsın. Global sıralama tüm hedefleri kapsar. Dönem İstanbul saatine göre ayın 1’inde 00:00’da yenilenir. Az katılımcılı gruplar hazırlıkta kalabilir; terfi ve ödül koşulları Sıralama’daki ? rehberindedir.",
   "onboardingGuideSocialTitle": "Sosyal",
-  "onboardingGuideSocialBody": "Arkadaş koduyla istek gönder; kabul edilince birbirinizin durumunu görebilirsiniz. Çalışan arkadaşların Odaklanıyor, yalnız Maraton molasına çıkanlar Molada olarak görünür. Kırmızı daire odağı, yeşil daire molayı gösterir. Görünürlük tercihini Profil’den değiştirebilirsin.",
+  "onboardingGuideSocialBody": "Arkadaş koduyla ekle ve isteklerini yönet. Görünür arkadaşların Odaklanıyor, yalnız Maraton molasında Molada, deneme sırasında Denemede olarak görünür. Liste açıkken düzenli yenilenir. Görünürlüğünü Ayarlar’dan değiştirebilir, kullanıcı gizleyebilir veya engelleyebilirsin.",
   "onboardingGuideProfileTitle": "Profil",
   "onboardingGuideProfileBody": "Üstteki avatarına dokunarak Profil’i aç. Kategorilerini düzenle, kazandığın kumla avatar koleksiyonunu genişlet ve avatarını seç. Dil, tema, bildirim ve görünürlük ayarlarını; yardım, gizlilik ve hesap işlemlerini burada bulursun.",
   "leagueInfoWhatBodyWithCapacity": "İlk puanlı seansını tamamladığında aynı kademede ve aynı dönemdeki uygun mevcut odaya yerleşirsin. Her odada en fazla {capacity} kişi bulunur; oda doluysa yeni oda açılır. Dönem sırası sunucunun kabul ettiği seans puanlarına göre belirlenir.",
@@ -1477,5 +1477,186 @@
     }
   },
   "leaguePreparationNoChanges": "Hazırlık sırasında herkes mevcut liginde kalır; terfi, düşme ve lig avatar ödülü verilmez.",
-  "leagueLaunchPreparingShort": "Hazırlık dönemi · Terfi, düşme ve lig ödülleri henüz başlamadı."
+  "leagueLaunchPreparingShort": "Hazırlık dönemi · Terfi, düşme ve lig ödülleri henüz başlamadı.",
+  "examTab": "Deneme",
+  "examTitle": "Denemeler",
+  "examNew": "Yeni deneme",
+  "examHistory": "Denemelerim",
+  "examLeague": "Deneme ligi",
+  "examIntro": "Sınavını seç, gerçek süresinde çöz. Netlerini sonradan ekleyebilirsin.",
+  "examUnavailable": "Deneme modu yakında",
+  "examUnavailableBody": "Bu sunucuda deneme modu henüz etkin değil. Sınavları inceleyebilirsin; normal çalışma ve Maraton devam eder.",
+  "examCatalogFallback": "Çevrimdışı sınav bilgileri gösteriliyor. Başlatmak için sunucu bağlantısı gerekir.",
+  "examStart": "Denemeyi başlat",
+  "examRulesTitle": "Başlamadan önce",
+  "examRulesBody": "Denemede mola ve duraklatma yoktur. Sayaç uygulama kapalıyken de ilerler. Tam süre dolmadan vazgeçersen puan ve deneme kumu kazanmazsın; denemen geçmişinde kalır. Netlerin puanını veya ligini etkilemez.",
+  "examReady": "Hazır olduğunda başla",
+  "examNoPause": "Duraklatma ve mola yok",
+  "examRunning": "Deneme sürüyor",
+  "examTimeRemaining": "Kalan süre",
+  "examAbandon": "Denemeden vazgeç",
+  "examAbandonTitle": "Denemeden vazgeçmek istiyor musun?",
+  "examAbandonBody": "Bu deneme vazgeçildi olarak saklanacak. Puan, deneme kumu ve çalışma süresi kazanılmayacak.",
+  "examCompleted": "Deneme tamamlandı",
+  "examAbandoned": "Vazgeçildi",
+  "examPending": "Sunucu onayı bekleniyor",
+  "examPendingBody": "Denemen bu cihazda saklandı. Bağlantı geldiğinde aynı kayıt tekrar gönderilecek.",
+  "examStartPending": "Başlatma sonucu bekleniyor",
+  "examStartPendingBody": "Başlatma isteğinin sonucu henüz bilinmiyor. Tekrar denemek yeni bir deneme oluşturmaz.",
+  "examError": "Deneme bilgileri alınamadı. Bağlantını kontrol edip tekrar dene.",
+  "examConflict": "Önce devam eden çalışma veya denemeni tamamla.",
+  "examRetry": "Tekrar dene",
+  "examEnterResults": "Netlerini gir",
+  "examEditResults": "Netlerini düzenle",
+  "examResultsTitle": "Derslere göre sonuçlar",
+  "examResultsInfo": "Netler kişisel rapor ve içgörü içindir; puan ve kuma etkisi yoktur.",
+  "examCorrect": "Doğru",
+  "examWrong": "Yanlış",
+  "examBlank": "Boş",
+  "examNet": "Net",
+  "examSaveResults": "Sonuçları kaydet",
+  "examResultsInvalid": "Her ders için doğru, yanlış ve boş toplamı soru sayısına eşit olmalı. Yalnızca negatif olmayan tam sayılar gir.",
+  "examResultsSaved": "Netlerin kaydedildi.",
+  "examResultsSaveError": "Sonuçlar kaydedilemedi. Girdilerin korundu; tekrar deneyebilirsin.",
+  "examNoHistory": "Henüz denemen yok",
+  "examNoHistoryBody": "Başlattığın ve vazgeçtiğin denemeler burada görünür.",
+  "examPracticeSand": "Deneme kumu",
+  "examInsights": "Süre ve netlerin",
+  "examInsightsEmpty": "Karşılaştırma için aynı dersin en az iki deneme sonucu gerekir. Çalışma sürenle netlerini burada birlikte göreceksin.",
+  "examInsightsDisclaimer": "Bu karşılaştırma bir ilişki gösterir; net değişiminin tek nedeninin çalışma süresi olduğunu söylemez.",
+  "examLeagueEmpty": "İlk tamamlanmış denemenden sonra ligde yerini alırsın.",
+  "examLeaguePreparing": "Bu grupta yarışma için yeterli aktif kullanıcı bekleniyor.",
+  "examGlobal": "Global",
+  "examTargetGroup": "Hedef grubum",
+  "examRewardAvatars": "Deneme ligi avatarları",
+  "examRewardAvatarsPending": "Özel görseller hazırlanıyor. Görsel hazır olmadan sahip olmadığın bir ödül gösterilmez.",
+  "examFinishedNoResults": "Netler henüz girilmedi",
+  "examStartTime": "Başlangıç",
+  "examEndTime": "Bitiş",
+  "examDismiss": "Tamam",
+  "examLgsBreakInfo": "LGS iki ayrı oturumdur. Gerçek sınavda sözel ve sayısal oturum arasında 45 dakika ara bulunur.",
+  "examLoadMore": "Daha fazla göster",
+  "examNoAward": "Ödül yok",
+  "examNetUnavailable": "—",
+  "examQueuedResults": "Sonuçların bu cihazda saklandı. Bağlantı geldiğinde gönderilecek.",
+  "examTotalStudy": "Toplam çalışma",
+  "examNoVerifiedDuration": "Çalışma süresi yalnızca sunucunun onayladığı tamamlanmış denemelere eklenir.",
+  "examStarting": "Başlatılıyor…",
+  "examSaving": "Kaydediliyor…",
+  "examAllGroups": "Tüm sınavlar",
+  "examQuestionsMinutes": "Soru: {questions} · Süre: {minutes} dk",
+  "@examQuestionsMinutes": {
+    "placeholders": {
+      "questions": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "examSubjectQuestions": "{questions} soru",
+  "@examSubjectQuestions": {
+    "placeholders": {
+      "questions": {
+        "type": "int"
+      }
+    }
+  },
+  "examNetRule": "Net = Doğru − Yanlış / {divisor}",
+  "@examNetRule": {
+    "placeholders": {
+      "divisor": {
+        "type": "int"
+      }
+    }
+  },
+  "examRewardSummary": "{points} puan · {sand} deneme kumu",
+  "@examRewardSummary": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      },
+      "sand": {
+        "type": "int"
+      }
+    }
+  },
+  "examInsightsChange": "{subject}: {minutes} dk çalışma. Netin {before} → {after}.",
+  "@examInsightsChange": {
+    "placeholders": {
+      "subject": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      },
+      "before": {
+        "type": "String"
+      },
+      "after": {
+        "type": "String"
+      }
+    }
+  },
+  "examResultsQuestionTotal": "Toplam {actual} / {expected}",
+  "@examResultsQuestionTotal": {
+    "placeholders": {
+      "actual": {
+        "type": "int"
+      },
+      "expected": {
+        "type": "int"
+      }
+    }
+  },
+  "examMonthlyReset": "Dönem bitişi: {date}",
+  "@examMonthlyReset": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "onboardingSegmentTus": "TUS (Tıpta Uzmanlık)",
+  "onboardingLanguageTitle": "Hangi dili kullanmak istersin?",
+  "onboardingLanguageBody": "Dilini daha sonra Ayarlar’dan değiştirebilirsin.",
+  "onboardingGuideExamTitle": "Deneme: sınav süresini deneyimle",
+  "onboardingGuideExamBody": "Sınavını seç; soru sayısı ve süresi otomatik gelir. Denemede mola ve duraklatma yoktur. Tam süreyi tamamladığında ayrı deneme puanı ve kumu kazanırsın. Vazgeçersen kaydın geçmişte kalır, ödül ve çalışma süresi kazanmazsın.",
+  "onboardingGuideInsightsTitle": "Netler ve süre–net içgörüleri",
+  "onboardingGuideInsightsBody": "Denemelerim’den ders ders doğru, yanlış ve boşlarını girip sonra düzenleyebilirsin. Netlerin yalnız kişisel raporlarındadır; puanını veya ligini değiştirmez. Yeterli veri oluştuğunda ders çalışma süreni netlerindeki değişimle birlikte görürsün.",
+  "languageNativeTr": "Türkçe",
+  "languageNativeEn": "English",
+  "languageSettingsTitle": "Uygulama Dili",
+  "categoriesSectionTitle": "KATEGORİLERİM",
+  "editProfileAction": "Profili Düzenle",
+  "effHigh": "Yüksek",
+  "effNormal": "Normal",
+  "effVeryHigh": "Çok Yüksek",
+  "legacyEmailReadonlyHint": "E-posta adresi güvenlik nedeniyle değiştirilemez.",
+  "heatmapLess": "Az",
+  "heatmapMore": "Çok",
+  "manageCategoriesTileSub": "Kategori ekle, düzenle, sırala ve arşivle",
+  "manageCategoriesTileTitle": "Kategorileri Yönet",
+  "monthIntensitySuffix": "Yoğunluğu",
+  "mostEfficientDayLabel": "En Verimli Gün",
+  "profileFullNameLabel": "Ad Soyad",
+  "newWeekLabel": "Yeni",
+  "noReportsDesc": "Zamanlayıcıyı başlatıp ilk Pomodoro seansını tamamladığında ders dağılımın ve raporların burada görünecek.",
+  "noStudyThisDay": "Bu gün çalışma yok",
+  "notificationsAndLockScreen": "Bildirimler ve kilit ekranı sayacı",
+  "preferencesSectionTitle": "Tercihler",
+  "reportsWeeklyTab": "Haftalık Çalışma",
+  "reportsMonthlyTab": "Aylık Takip",
+  "reportsDailyTab": "Günlük Çalışma",
+  "topSubjectsLabel": "En Çok Çalışılan Dersler",
+  "topicComparisonTitle": "Konu Karşılaştırması",
+  "totalFocusLabel": "Toplam\nOdaklanma",
+  "weekDayBreakdownTitle": "Gün Gün Döküm",
+  "weeklyAnalysisCaption": "HAFTALIK ANALİZ",
+  "legacyWeeklyDistSub": "Bugünün özeti",
+  "legacyWeeklyDistTitle": "Bugünün Dağılımı",
+  "weeklyEfficiencyCaption": "HAFTALIK VERİMLİLİK",
+  "weeklySummaryTitle": "Haftalık Özet",
+  "weeklyTrendCaption": "HAFTALIK TREND"
 }

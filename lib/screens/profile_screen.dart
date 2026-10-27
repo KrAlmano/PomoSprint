@@ -401,7 +401,7 @@ class _ProfileScreenState extends State<ProfileScreen> with WidgetsBindingObserv
                           Expanded(
                             child: _buildLanguageTile(
                               flag: '🇹🇷',
-                              label: 'Türkçe',
+                              label: l10n.languageNativeTr,
                               isSelected: lang.isTurkish,
                               onTap: () => lang.setLanguage(AppLanguage.tr),
                             ),
@@ -410,7 +410,7 @@ class _ProfileScreenState extends State<ProfileScreen> with WidgetsBindingObserv
                           Expanded(
                             child: _buildLanguageTile(
                               flag: '🇬🇧',
-                              label: 'English',
+                              label: l10n.languageNativeEn,
                               isSelected: !lang.isTurkish,
                               onTap: () => lang.setLanguage(AppLanguage.en),
                             ),

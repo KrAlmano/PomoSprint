@@ -5,6 +5,7 @@ import '../models/user_model.dart';
 import '../screens/login_screen.dart';
 import '../screens/post_auth_onboarding_screen.dart';
 import '../services/supabase_service.dart';
+import '../widgets/auth/onboarding_welcome_gate.dart';
 import 'main_shell.dart';
 
 /// Uygulamanın TEK yönlendirme kapısı. SupabaseService.currentUser'a göre
@@ -29,7 +30,8 @@ class _AppGateState extends State<AppGate> {
   int _ownerRevision = 0;
   bool _closeAccountRoutesPending = false;
 
-  String? _ownerKey(UserModel? user) => user == null ? null : user.id ?? user.email.toLowerCase();
+  String? _ownerKey(UserModel? user) =>
+      user == null ? null : user.id ?? user.email.toLowerCase();
 
   @override
   void initState() {
@@ -54,7 +56,8 @@ class _AppGateState extends State<AppGate> {
     _lastOwnerKey = ownerKey;
     if (previousOwnerKey != ownerKey) _ownerRevision++;
     if (ownerKey == null) _bootCategories = const [];
-    if (previousOwnerKey != ownerKey && (previousOwnerKey != null || _closeAccountRoutesPending)) {
+    if (previousOwnerKey != ownerKey &&
+        (previousOwnerKey != null || _closeAccountRoutesPending)) {
       _closeAccountRoutesPending = true;
       final revision = _ownerRevision;
       // Profil, koleksiyon ve sheet'ler kökün üstünde ayrı route'lardır.
@@ -70,14 +73,18 @@ class _AppGateState extends State<AppGate> {
   Future<void> _onSignedIn(UserModel user) async {
     // Giriş akışında açılmış ekranlar (ör. kayıt) kapatılır.
     if (mounted) Navigator.of(context).popUntil((route) => route.isFirst);
-    if (!identical(_service.currentUser.value, user)) await _service.setCurrentUser(user);
+    if (!identical(_service.currentUser.value, user)) {
+      await _service.setCurrentUser(user);
+    }
   }
 
   Future<void> _onOnboardingCompleted() async {
     final user = _service.currentUser.value;
     if (user == null || user.onboardingCompletedAt != null) return;
     // Onboarding ekranı servisi güncellemediyse yerel değişiklik servise yazılır.
-    await _service.setCurrentUser(user.copyWith(onboardingCompletedAt: DateTime.now()));
+    await _service.setCurrentUser(
+      user.copyWith(onboardingCompletedAt: DateTime.now()),
+    );
   }
 
   @override
@@ -89,15 +96,22 @@ class _AppGateState extends State<AppGate> {
           return LoginScreen(onLoginSuccess: _onSignedIn);
         }
         if (user.onboardingCompletedAt == null) {
-          return PostAuthOnboardingScreen(
+          return OnboardingWelcomeGate(
             key: ValueKey(_ownerKey(user)),
-            onCompleted: _onOnboardingCompleted,
+            ownerId: _ownerKey(user)!,
+            onSignOut: _service.signOutFully,
+            child: PostAuthOnboardingScreen(
+              key: ValueKey(_ownerKey(user)),
+              onCompleted: _onOnboardingCompleted,
+            ),
           );
         }
         return MainNavigationShell(
           key: ValueKey(_ownerKey(user)),
           user: user,
-          initialCategories: user.email == _bootUserEmail ? _bootCategories : const [],
+          initialCategories: user.email == _bootUserEmail
+              ? _bootCategories
+              : const [],
         );
       },
     );

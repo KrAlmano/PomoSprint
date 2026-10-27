@@ -10,16 +10,59 @@ import '../widgets/auth/category_name_dialog.dart' show kCategoryPalette;
 /// hesabın varsayılan tohumu aynı tabloyu kullanır. 'kpss' ve 'language'
 /// sunucuda proposed/26 ile kabul edilir (bkz. SupabaseService.completeOnboarding).
 const Map<String, List<String>> kRecommendedCategoriesBySegment = {
-  'lgs': ['Matematik', 'Fen Bilimleri', 'Türkçe', 'T.C. İnkılap Tarihi', 'İngilizce', 'Din Kültürü'],
-  'yks': ['Matematik', 'Fizik', 'Kimya', 'Biyoloji', 'Türkçe', 'Tarih', 'Coğrafya', 'Felsefe', 'İngilizce'],
-  'kpss': ['Türkçe', 'Matematik', 'Tarih', 'Coğrafya', 'Vatandaşlık', 'Güncel Bilgiler', 'Eğitim Bilimleri'],
+  'lgs': [
+    'Matematik',
+    'Fen Bilimleri',
+    'Türkçe',
+    'T.C. İnkılap Tarihi',
+    'İngilizce',
+    'Din Kültürü',
+  ],
+  'yks': [
+    'Matematik',
+    'Fizik',
+    'Kimya',
+    'Biyoloji',
+    'Türkçe',
+    'Tarih',
+    'Coğrafya',
+    'Felsefe',
+    'İngilizce',
+  ],
+  'tus': [
+    'Anatomi',
+    'Fizyoloji, Histoloji ve Embriyoloji',
+    'Biyokimya',
+    'Mikrobiyoloji',
+    'Patoloji',
+    'Farmakoloji',
+    'Dahiliye',
+    'Pediatri',
+    'Genel Cerrahi',
+    'Kadın Hastalıkları ve Doğum',
+    'Küçük Stajlar',
+  ],
+  'kpss': [
+    'Türkçe',
+    'Matematik',
+    'Tarih',
+    'Coğrafya',
+    'Vatandaşlık',
+    'Güncel Bilgiler',
+    'Eğitim Bilimleri',
+  ],
   'language': ['Kelime', 'Okuma', 'Dilbilgisi', 'Dinleme', 'Yazma', 'Konuşma'],
   'university': ['Ders Çalışma', 'Ödev', 'Proje', 'Sınav Hazırlık'],
   'work': ['Derin Çalışma', 'Okuma', 'Öğrenme', 'Proje'],
 };
 
 /// Segment seçilmediğinde ya da "Diğer" seçildiğinde genel öneriler.
-const List<String> kGeneralCategoryRecommendations = ['Ders Çalışma', 'Okuma', 'Öğrenme', 'Proje'];
+const List<String> kGeneralCategoryRecommendations = [
+  'Ders Çalışma',
+  'Okuma',
+  'Öğrenme',
+  'Proje',
+];
 
 /// [segment] için öneriler (bilinmeyen/boş segment: genel öneriler).
 List<String> recommendedCategoryNames(String? segment) =>
@@ -34,7 +77,11 @@ bool isRecommendedCategoryName(String name) =>
 /// Segment seçilince otomatik seçili gelen öneriler: [segment]'in önerileri
 /// sırayla, [kept] (kullanıcının elle seçtikleri; korunur) ile aynı kategori
 /// olmayanlar ([categoryMatchKey]), toplam seçim [limit]'i aşmayacak kadar.
-List<String> autoSelectedCategoryNames(String? segment, {required Iterable<String> kept, required int limit}) {
+List<String> autoSelectedCategoryNames(
+  String? segment, {
+  required Iterable<String> kept,
+  required int limit,
+}) {
   final keptNames = kept.toList();
   final taken = {for (final name in keptNames) categoryMatchKey(name)};
   final picked = <String>[];
@@ -47,7 +94,10 @@ List<String> autoSelectedCategoryNames(String? segment, {required Iterable<Strin
 
 /// setup_onboarding_categories gövdesi: adlar kullanıcının dilinde, renkler
 /// paletten sırayla.
-List<Map<String, dynamic>> categorySeedPayload(Iterable<String> names, {required bool turkish}) {
+List<Map<String, dynamic>> categorySeedPayload(
+  Iterable<String> names, {
+  required bool turkish,
+}) {
   final list = names.toList();
   return [
     for (var i = 0; i < list.length; i++)
@@ -62,8 +112,14 @@ List<Map<String, dynamic>> categorySeedPayload(Iterable<String> names, {required
 /// Hiç kategorisi olmayan hesaba açılacak varsayılanlar: kullanıcının
 /// segmentinin ilk [count] önerisi, kullanıcının dilinde. Eskiden segment
 /// ve dil yok sayılıp herkese okul dersleri (Matematik, Fizik…) açılıyordu.
-List<Map<String, dynamic>> defaultCategorySeed({String? segment, required bool turkish, int count = 5}) =>
-    categorySeedPayload(recommendedCategoryNames(segment).take(count), turkish: turkish);
+List<Map<String, dynamic>> defaultCategorySeed({
+  String? segment,
+  required bool turkish,
+  int count = 5,
+}) => categorySeedPayload(
+  recommendedCategoryNames(segment).take(count),
+  turkish: turkish,
+);
 
 /// Onboarding kategorilerinin sunucudaki mevcut kategorilerle uzlaştırılması.
 @immutable
@@ -140,7 +196,8 @@ class OnboardingCategoriesResult {
   }
 
   @override
-  String toString() => 'OnboardingCategoriesResult(created: $created, restored: $restored, '
+  String toString() =>
+      'OnboardingCategoriesResult(created: $created, restored: $restored, '
       'skippedExisting: $skippedExisting, skippedLimit: $skippedLimit, skippedInvalid: $skippedInvalid, '
       'archived: $archived)';
 }
@@ -191,7 +248,10 @@ OnboardingCategoryPlan planOnboardingCategories({
     }
   }
 
-  final payload = [for (final item in unique) if (!available.contains(keyOf(item['name']))) item];
+  final payload = [
+    for (final item in unique)
+      if (!available.contains(keyOf(item['name']))) item,
+  ];
   // Aktif kalacaklar (arşivlenmeyen aktifler + arşivden açılacaklar) kendi
   // sunucu adlarıyla; renk/ikon geçerli bir değerle (proposed/23 doğrular,
   // mevcut kategoriye yazılmaz). Bkz. [OnboardingCategoryPlan.rpcPayload].
@@ -199,8 +259,13 @@ OnboardingCategoryPlan planOnboardingCategories({
   final unarchived = unarchiveIds.toSet();
   final keep = [
     for (final c in existing)
-      if ((!c.isArchived && !archived.contains(c.id)) || unarchived.contains(c.id))
-        {'name': c.name, 'color_hex': kCategoryPalette.first, 'icon_name': 'book'},
+      if ((!c.isArchived && !archived.contains(c.id)) ||
+          unarchived.contains(c.id))
+        {
+          'name': c.name,
+          'color_hex': kCategoryPalette.first,
+          'icon_name': 'book',
+        },
   ];
 
   return OnboardingCategoryPlan(
@@ -224,11 +289,18 @@ Future<OnboardingCategoriesResult?> reconcileOnboardingCategories({
   required Future<bool> Function() canArchive,
   required Future<void> Function(String id) archive,
   required Future<void> Function(String id) unarchive,
-  required Future<OnboardingCategoriesResult?> Function(List<Map<String, dynamic>> payload) setup,
+  required Future<OnboardingCategoriesResult?> Function(
+    List<Map<String, dynamic>> payload,
+  )
+  setup,
 }) async {
   final existing = await fetchAll();
   if (existing.isEmpty) return setup(requested);
-  final plan = planOnboardingCategories(requested: requested, existing: existing, canArchive: await canArchive());
+  final plan = planOnboardingCategories(
+    requested: requested,
+    existing: existing,
+    canArchive: await canArchive(),
+  );
   for (final id in plan.archiveIds) {
     await archive(id);
   }

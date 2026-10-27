@@ -6,6 +6,7 @@ import 'package:pomodoro/models/user_model.dart';
 import 'package:pomodoro/screens/login_screen.dart';
 import 'package:pomodoro/screens/post_auth_onboarding_screen.dart';
 import 'package:pomodoro/services/supabase_service.dart';
+import 'package:pomodoro/widgets/auth/onboarding_welcome_gate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 UserModel user(String id) =>
@@ -13,7 +14,12 @@ UserModel user(String id) =>
 
 void main() {
   final service = SupabaseService.instance;
-  setUp(() => SharedPreferences.setMockInitialValues({}));
+  setUp(
+    () => SharedPreferences.setMockInitialValues({
+      for (final uid in ['a', 'b', 'c'])
+        OnboardingWelcomeGate.keyFor(uid): true,
+    }),
+  );
   tearDown(() => service.currentUser.value = null);
 
   Future<GlobalKey<NavigatorState>> pumpGate(WidgetTester tester) async {

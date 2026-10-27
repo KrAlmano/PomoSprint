@@ -1124,6 +1124,7 @@ class SupabaseService {
     await step('tercihler', () async {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_dailyGoalMigratedKey(uid));
+      await prefs.remove('onboarding_welcome_uid_$uid');
       await prefs.remove('league_info_shown_$uid');
       await prefs.remove('saved_categories_uid_$uid');
       if (email != null && email.isNotEmpty) {
@@ -1510,6 +1511,7 @@ class SupabaseService {
   static const Set<String> validUserSegments = {
     'lgs',
     'yks',
+    'tus',
     'kpss',
     'language',
     'university',

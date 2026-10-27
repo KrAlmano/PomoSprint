@@ -92,5 +92,6 @@ flutter:
     # açık değerler (SUPABASE_URL, SUPABASE_ANON_KEY, SENTRY_DSN) koyun;
     # service role / Resend gibi sırlar yalnızca scripts/.env'de durmalı.
     - .env
+    - assets/icon/icon_source.png
     - assets/avatars/
     - assets/sand_timer.json

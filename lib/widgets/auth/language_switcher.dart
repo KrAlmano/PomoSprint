@@ -18,8 +18,12 @@ class LanguageSwitcher extends StatelessWidget {
     // Seçili dilim temanın secondaryContainer'ı yerine marka tonlarıyla
     // çizilir; koyu temada da metin okunur kalır (WCAG 4.5:1).
     final style = SegmentedButton.styleFrom(
-      selectedBackgroundColor: isDark ? AppColors.darkPrimaryContainer : AppColors.primaryFixed,
-      selectedForegroundColor: isDark ? AppColors.darkOnPrimaryContainer : AppColors.onPrimaryFixed,
+      selectedBackgroundColor: isDark
+          ? AppColors.darkPrimaryContainer
+          : AppColors.primaryFixed,
+      selectedForegroundColor: isDark
+          ? AppColors.darkOnPrimaryContainer
+          : AppColors.onPrimaryFixed,
       foregroundColor: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
     );
     return ListenableBuilder(
@@ -30,9 +34,17 @@ class LanguageSwitcher extends StatelessWidget {
         child: SegmentedButton<AppLanguage>(
           style: style,
           showSelectedIcon: false,
-          segments: const [
-            ButtonSegment(value: AppLanguage.tr, label: Text('TR'), tooltip: 'Türkçe'),
-            ButtonSegment(value: AppLanguage.en, label: Text('EN'), tooltip: 'English'),
+          segments: [
+            ButtonSegment(
+              value: AppLanguage.tr,
+              label: const Text('TR'),
+              tooltip: l10n.languageNativeTr,
+            ),
+            ButtonSegment(
+              value: AppLanguage.en,
+              label: const Text('EN'),
+              tooltip: l10n.languageNativeEn,
+            ),
           ],
           selected: {lang.currentLanguage},
           onSelectionChanged: (selection) => lang.setLanguage(selection.first),

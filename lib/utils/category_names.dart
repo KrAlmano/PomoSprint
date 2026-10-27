@@ -24,6 +24,21 @@ const List<(String tr, String en)> kKnownCategoryNames = [
   ('Okuma', 'Reading'),
   ('Öğrenme', 'Learning'),
   ('T.C. İnkılap Tarihi', 'Turkish Revolution History'),
+  // TUS çalışma kategorileri; sınavın resmî soru grupları ayrı katalogdadır.
+  ('Anatomi', 'Anatomy'),
+  (
+    'Fizyoloji, Histoloji ve Embriyoloji',
+    'Physiology, Histology and Embryology',
+  ),
+  ('Biyokimya', 'Biochemistry'),
+  ('Mikrobiyoloji', 'Microbiology'),
+  ('Patoloji', 'Pathology'),
+  ('Farmakoloji', 'Pharmacology'),
+  ('Dahiliye', 'Internal Medicine'),
+  ('Pediatri', 'Pediatrics'),
+  ('Genel Cerrahi', 'General Surgery'),
+  ('Kadın Hastalıkları ve Doğum', 'Obstetrics and Gynecology'),
+  ('Küçük Stajlar', 'Other Clinical Specialties'),
   // KPSS ve dil sınavı önerileri.
   ('Vatandaşlık', 'Citizenship'),
   ('Güncel Bilgiler', 'Current Affairs'),

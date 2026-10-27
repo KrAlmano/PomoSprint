@@ -1479,11 +1479,11 @@ class AppLocalizationsTr extends AppLocalizations {
   String get onboardingCategoryHint => 'Kategori adı';
 
   @override
-  String get onboardingWelcomeTitle => 'Hoş geldin! 👋';
+  String get onboardingWelcomeTitle => 'PomoSprint’e hoş geldin';
 
   @override
   String get onboardingWelcomeBody =>
-      'Ben senin odaklanma arkadaşınım. Başlamadan önce doğum yılını seçer misin? Bunu yalnızca yaş sınırını kontrol etmek için soruyoruz.';
+      'Odaklan, çalışmalarını takip et ve hedefindeki arkadaşlarınla birlikte ilerle. Önce uygulamayı sana göre hazırlayalım.';
 
   @override
   String get onboardingSegmentTitle => 'Peki, hangi yolculuktasın?';
@@ -2404,21 +2404,21 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get onboardingGuideReportsBody =>
-      'Günlük, haftalık ve aylık çalışma süreni, tamamlanan seanslarını ve kategori dağılımını burada görürsün. Günlük hedefini takip edebilir ve değiştirebilirsin. Çalışma günü saat 04.00’te yenilenir.';
+      'Günlük, haftalık ve aylık raporlar Pomodoro, Maraton odakları ve tamamlanmış denemelerin toplam çalışma süresini gösterir. Molalar ve vazgeçilen denemeler dahil değildir. Çalışma günü 04:00’da değişir; deneme süresi ayrı bir Deneme satırında görünür.';
 
   @override
   String get onboardingGuideRankingTitle => 'Sıralama';
 
   @override
   String get onboardingGuideRankingBody =>
-      'İlk puanlı seansını bitirince aynı kademedeki uygun bir lig odasına yerleşirsin. Lig, Aylık ve Arkadaşlar sıralamalarını buradan takip et. Bronz, Gümüş, Altın, Safir ve Elmas ligleri vardır. Hazırlık döneminde seanslar ve raporlar kaydolur; resmi 14 günlük yarışmalar aktif katılımcı sayısı yeterli olunca başlar. Güncel terfi ve ödül şartları Sıralama ekranındaki ? bölümündedir.';
+      'Normal ve deneme ligleri ayrıdır; kendi hedefindeki kişilerle yarışırsın. Global sıralama tüm hedefleri kapsar. Dönem İstanbul saatine göre ayın 1’inde 00:00’da yenilenir. Az katılımcılı gruplar hazırlıkta kalabilir; terfi ve ödül koşulları Sıralama’daki ? rehberindedir.';
 
   @override
   String get onboardingGuideSocialTitle => 'Sosyal';
 
   @override
   String get onboardingGuideSocialBody =>
-      'Arkadaş koduyla istek gönder; kabul edilince birbirinizin durumunu görebilirsiniz. Çalışan arkadaşların Odaklanıyor, yalnız Maraton molasına çıkanlar Molada olarak görünür. Kırmızı daire odağı, yeşil daire molayı gösterir. Görünürlük tercihini Profil’den değiştirebilirsin.';
+      'Arkadaş koduyla ekle ve isteklerini yönet. Görünür arkadaşların Odaklanıyor, yalnız Maraton molasında Molada, deneme sırasında Denemede olarak görünür. Liste açıkken düzenli yenilenir. Görünürlüğünü Ayarlar’dan değiştirebilir, kullanıcı gizleyebilir veya engelleyebilirsin.';
 
   @override
   String get onboardingGuideProfileTitle => 'Profil';
@@ -2485,4 +2485,391 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get leagueLaunchPreparingShort =>
       'Hazırlık dönemi · Terfi, düşme ve lig ödülleri henüz başlamadı.';
+
+  @override
+  String get examTab => 'Deneme';
+
+  @override
+  String get examTitle => 'Denemeler';
+
+  @override
+  String get examNew => 'Yeni deneme';
+
+  @override
+  String get examHistory => 'Denemelerim';
+
+  @override
+  String get examLeague => 'Deneme ligi';
+
+  @override
+  String get examIntro =>
+      'Sınavını seç, gerçek süresinde çöz. Netlerini sonradan ekleyebilirsin.';
+
+  @override
+  String get examUnavailable => 'Deneme modu yakında';
+
+  @override
+  String get examUnavailableBody =>
+      'Bu sunucuda deneme modu henüz etkin değil. Sınavları inceleyebilirsin; normal çalışma ve Maraton devam eder.';
+
+  @override
+  String get examCatalogFallback =>
+      'Çevrimdışı sınav bilgileri gösteriliyor. Başlatmak için sunucu bağlantısı gerekir.';
+
+  @override
+  String get examStart => 'Denemeyi başlat';
+
+  @override
+  String get examRulesTitle => 'Başlamadan önce';
+
+  @override
+  String get examRulesBody =>
+      'Denemede mola ve duraklatma yoktur. Sayaç uygulama kapalıyken de ilerler. Tam süre dolmadan vazgeçersen puan ve deneme kumu kazanmazsın; denemen geçmişinde kalır. Netlerin puanını veya ligini etkilemez.';
+
+  @override
+  String get examReady => 'Hazır olduğunda başla';
+
+  @override
+  String get examNoPause => 'Duraklatma ve mola yok';
+
+  @override
+  String get examRunning => 'Deneme sürüyor';
+
+  @override
+  String get examTimeRemaining => 'Kalan süre';
+
+  @override
+  String get examAbandon => 'Denemeden vazgeç';
+
+  @override
+  String get examAbandonTitle => 'Denemeden vazgeçmek istiyor musun?';
+
+  @override
+  String get examAbandonBody =>
+      'Bu deneme vazgeçildi olarak saklanacak. Puan, deneme kumu ve çalışma süresi kazanılmayacak.';
+
+  @override
+  String get examCompleted => 'Deneme tamamlandı';
+
+  @override
+  String get examAbandoned => 'Vazgeçildi';
+
+  @override
+  String get examPending => 'Sunucu onayı bekleniyor';
+
+  @override
+  String get examPendingBody =>
+      'Denemen bu cihazda saklandı. Bağlantı geldiğinde aynı kayıt tekrar gönderilecek.';
+
+  @override
+  String get examStartPending => 'Başlatma sonucu bekleniyor';
+
+  @override
+  String get examStartPendingBody =>
+      'Başlatma isteğinin sonucu henüz bilinmiyor. Tekrar denemek yeni bir deneme oluşturmaz.';
+
+  @override
+  String get examError =>
+      'Deneme bilgileri alınamadı. Bağlantını kontrol edip tekrar dene.';
+
+  @override
+  String get examConflict => 'Önce devam eden çalışma veya denemeni tamamla.';
+
+  @override
+  String get examRetry => 'Tekrar dene';
+
+  @override
+  String get examEnterResults => 'Netlerini gir';
+
+  @override
+  String get examEditResults => 'Netlerini düzenle';
+
+  @override
+  String get examResultsTitle => 'Derslere göre sonuçlar';
+
+  @override
+  String get examResultsInfo =>
+      'Netler kişisel rapor ve içgörü içindir; puan ve kuma etkisi yoktur.';
+
+  @override
+  String get examCorrect => 'Doğru';
+
+  @override
+  String get examWrong => 'Yanlış';
+
+  @override
+  String get examBlank => 'Boş';
+
+  @override
+  String get examNet => 'Net';
+
+  @override
+  String get examSaveResults => 'Sonuçları kaydet';
+
+  @override
+  String get examResultsInvalid =>
+      'Her ders için doğru, yanlış ve boş toplamı soru sayısına eşit olmalı. Yalnızca negatif olmayan tam sayılar gir.';
+
+  @override
+  String get examResultsSaved => 'Netlerin kaydedildi.';
+
+  @override
+  String get examResultsSaveError =>
+      'Sonuçlar kaydedilemedi. Girdilerin korundu; tekrar deneyebilirsin.';
+
+  @override
+  String get examNoHistory => 'Henüz denemen yok';
+
+  @override
+  String get examNoHistoryBody =>
+      'Başlattığın ve vazgeçtiğin denemeler burada görünür.';
+
+  @override
+  String get examPracticeSand => 'Deneme kumu';
+
+  @override
+  String get examInsights => 'Süre ve netlerin';
+
+  @override
+  String get examInsightsEmpty =>
+      'Karşılaştırma için aynı dersin en az iki deneme sonucu gerekir. Çalışma sürenle netlerini burada birlikte göreceksin.';
+
+  @override
+  String get examInsightsDisclaimer =>
+      'Bu karşılaştırma bir ilişki gösterir; net değişiminin tek nedeninin çalışma süresi olduğunu söylemez.';
+
+  @override
+  String get examLeagueEmpty =>
+      'İlk tamamlanmış denemenden sonra ligde yerini alırsın.';
+
+  @override
+  String get examLeaguePreparing =>
+      'Bu grupta yarışma için yeterli aktif kullanıcı bekleniyor.';
+
+  @override
+  String get examGlobal => 'Global';
+
+  @override
+  String get examTargetGroup => 'Hedef grubum';
+
+  @override
+  String get examRewardAvatars => 'Deneme ligi avatarları';
+
+  @override
+  String get examRewardAvatarsPending =>
+      'Özel görseller hazırlanıyor. Görsel hazır olmadan sahip olmadığın bir ödül gösterilmez.';
+
+  @override
+  String get examFinishedNoResults => 'Netler henüz girilmedi';
+
+  @override
+  String get examStartTime => 'Başlangıç';
+
+  @override
+  String get examEndTime => 'Bitiş';
+
+  @override
+  String get examDismiss => 'Tamam';
+
+  @override
+  String get examLgsBreakInfo =>
+      'LGS iki ayrı oturumdur. Gerçek sınavda sözel ve sayısal oturum arasında 45 dakika ara bulunur.';
+
+  @override
+  String get examLoadMore => 'Daha fazla göster';
+
+  @override
+  String get examNoAward => 'Ödül yok';
+
+  @override
+  String get examNetUnavailable => '—';
+
+  @override
+  String get examQueuedResults =>
+      'Sonuçların bu cihazda saklandı. Bağlantı geldiğinde gönderilecek.';
+
+  @override
+  String get examTotalStudy => 'Toplam çalışma';
+
+  @override
+  String get examNoVerifiedDuration =>
+      'Çalışma süresi yalnızca sunucunun onayladığı tamamlanmış denemelere eklenir.';
+
+  @override
+  String get examStarting => 'Başlatılıyor…';
+
+  @override
+  String get examSaving => 'Kaydediliyor…';
+
+  @override
+  String get examAllGroups => 'Tüm sınavlar';
+
+  @override
+  String examQuestionsMinutes(int questions, int minutes) {
+    return 'Soru: $questions · Süre: $minutes dk';
+  }
+
+  @override
+  String examSubjectQuestions(int questions) {
+    return '$questions soru';
+  }
+
+  @override
+  String examNetRule(int divisor) {
+    return 'Net = Doğru − Yanlış / $divisor';
+  }
+
+  @override
+  String examRewardSummary(int points, int sand) {
+    return '$points puan · $sand deneme kumu';
+  }
+
+  @override
+  String examInsightsChange(
+    String subject,
+    int minutes,
+    String before,
+    String after,
+  ) {
+    return '$subject: $minutes dk çalışma. Netin $before → $after.';
+  }
+
+  @override
+  String examResultsQuestionTotal(int actual, int expected) {
+    return 'Toplam $actual / $expected';
+  }
+
+  @override
+  String examMonthlyReset(String date) {
+    return 'Dönem bitişi: $date';
+  }
+
+  @override
+  String get onboardingSegmentTus => 'TUS (Tıpta Uzmanlık)';
+
+  @override
+  String get onboardingLanguageTitle => 'Hangi dili kullanmak istersin?';
+
+  @override
+  String get onboardingLanguageBody =>
+      'Dilini daha sonra Ayarlar’dan değiştirebilirsin.';
+
+  @override
+  String get onboardingGuideExamTitle => 'Deneme: sınav süresini deneyimle';
+
+  @override
+  String get onboardingGuideExamBody =>
+      'Sınavını seç; soru sayısı ve süresi otomatik gelir. Denemede mola ve duraklatma yoktur. Tam süreyi tamamladığında ayrı deneme puanı ve kumu kazanırsın. Vazgeçersen kaydın geçmişte kalır, ödül ve çalışma süresi kazanmazsın.';
+
+  @override
+  String get onboardingGuideInsightsTitle => 'Netler ve süre–net içgörüleri';
+
+  @override
+  String get onboardingGuideInsightsBody =>
+      'Denemelerim’den ders ders doğru, yanlış ve boşlarını girip sonra düzenleyebilirsin. Netlerin yalnız kişisel raporlarındadır; puanını veya ligini değiştirmez. Yeterli veri oluştuğunda ders çalışma süreni netlerindeki değişimle birlikte görürsün.';
+
+  @override
+  String get languageNativeTr => 'Türkçe';
+
+  @override
+  String get languageNativeEn => 'English';
+
+  @override
+  String get languageSettingsTitle => 'Uygulama Dili';
+
+  @override
+  String get categoriesSectionTitle => 'KATEGORİLERİM';
+
+  @override
+  String get editProfileAction => 'Profili Düzenle';
+
+  @override
+  String get effHigh => 'Yüksek';
+
+  @override
+  String get effNormal => 'Normal';
+
+  @override
+  String get effVeryHigh => 'Çok Yüksek';
+
+  @override
+  String get legacyEmailReadonlyHint =>
+      'E-posta adresi güvenlik nedeniyle değiştirilemez.';
+
+  @override
+  String get heatmapLess => 'Az';
+
+  @override
+  String get heatmapMore => 'Çok';
+
+  @override
+  String get manageCategoriesTileSub =>
+      'Kategori ekle, düzenle, sırala ve arşivle';
+
+  @override
+  String get manageCategoriesTileTitle => 'Kategorileri Yönet';
+
+  @override
+  String get monthIntensitySuffix => 'Yoğunluğu';
+
+  @override
+  String get mostEfficientDayLabel => 'En Verimli Gün';
+
+  @override
+  String get profileFullNameLabel => 'Ad Soyad';
+
+  @override
+  String get newWeekLabel => 'Yeni';
+
+  @override
+  String get noReportsDesc =>
+      'Zamanlayıcıyı başlatıp ilk Pomodoro seansını tamamladığında ders dağılımın ve raporların burada görünecek.';
+
+  @override
+  String get noStudyThisDay => 'Bu gün çalışma yok';
+
+  @override
+  String get notificationsAndLockScreen => 'Bildirimler ve kilit ekranı sayacı';
+
+  @override
+  String get preferencesSectionTitle => 'Tercihler';
+
+  @override
+  String get reportsWeeklyTab => 'Haftalık Çalışma';
+
+  @override
+  String get reportsMonthlyTab => 'Aylık Takip';
+
+  @override
+  String get reportsDailyTab => 'Günlük Çalışma';
+
+  @override
+  String get topSubjectsLabel => 'En Çok Çalışılan Dersler';
+
+  @override
+  String get topicComparisonTitle => 'Konu Karşılaştırması';
+
+  @override
+  String get totalFocusLabel => 'Toplam\nOdaklanma';
+
+  @override
+  String get weekDayBreakdownTitle => 'Gün Gün Döküm';
+
+  @override
+  String get weeklyAnalysisCaption => 'HAFTALIK ANALİZ';
+
+  @override
+  String get legacyWeeklyDistSub => 'Bugünün özeti';
+
+  @override
+  String get legacyWeeklyDistTitle => 'Bugünün Dağılımı';
+
+  @override
+  String get weeklyEfficiencyCaption => 'HAFTALIK VERİMLİLİK';
+
+  @override
+  String get weeklySummaryTitle => 'Haftalık Özet';
+
+  @override
+  String get weeklyTrendCaption => 'HAFTALIK TREND';
 }
