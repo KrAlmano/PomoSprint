@@ -330,3 +330,8 @@ Kapanış tekrarı da temiz: **1482 Flutter PASS / 5 isteğe bağlı PNG atlamas
 Temizlikte 7 yeniden üretilebilir derleme/ham medya klasörü kaldırıldı; diskte yaklaşık **6.95 GB** boş alan açıldı. Son unsigned iOS paketi ve Android APK `build/final_release_20261028/` altında yerel olarak korundu; Git'e alınmadı. Test veritabanları, yüklü normal uygulamalar ve kalıcı kanıtlar silinmedi. Eski 4 kayıt/önizleme yardımcı süreci kapatıldı; uygulamanın iki yerel API sağlık kontrolü HTTP200. [Temizlik ve korunanlar](kanit_son_kapilar_2026-10-28/compact-final/cleanup.json).
 
 Son gönderim kapsamı yalnız `codex/gece-2026-10-27` dalıdır. Ana dal `5f99f90` olarak korunur. Bu rapor ve site medyasıyla aynı commit kapanış paketidir; tam son commit kimliği Git dal geçmişinde ve kullanıcıya verilen sonuç mesajında bulunur.
+
+
+### GitHub yedeği doğrulandı
+
+B/site kontrol noktası **`635a89df7cd8bf45b6dc16e21e95e4210dc0a465`** uzak `codex/gece-2026-10-27` dalından okunarak doğrulandı. İlk toplu aktarım HTTP408, ikinci aktarım bağlantı kesilmesiyle başarısızdı; yayınlanmamış B paketi içerik değişmeden küçük commit’lere bölününce yedi kontrol noktası başarıyla ulaştı. [Aktarım kanıtı](kanit_son_kapilar_2026-10-28/compact-final/push-checkpoints.json) kayıtlıdır. Kapanış notu bu yedek üzerine ayrı küçük doküman commit’i olarak eklenir. Main `5f99f90` korunur; merge/force/deploy yok.

@@ -156,6 +156,11 @@
       "file": "summary.json",
       "bytes": 1288,
       "sha256": "cc7c4a2de632c9e8b29d9db583fee79e3350d9c237a9a096722506908af2effb"
+    },
+    {
+      "file": "push-checkpoints.json",
+      "bytes": 1709,
+      "sha256": "aaf079d139d8fdb3d3f0c5adcf7a5302017e4ad6ae0e4fc06f0539b9d1b639e6"
     }
   ]
 }

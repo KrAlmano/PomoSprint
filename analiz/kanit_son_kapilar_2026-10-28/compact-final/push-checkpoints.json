@@ -1,0 +1,61 @@
+{
+  "verified_at": "2026-10-28T20:00:50+03:00",
+  "branch": "codex/gece-2026-10-27",
+  "remote_head": "635a89df7cd8bf45b6dc16e21e95e4210dc0a465",
+  "checkpoints": [
+    {
+      "commit": "8cb3dc9e20ebc4bad0480e823deb069e1f95e7ff",
+      "exit_code": 0,
+      "remote_verified": true,
+      "seconds": 21.86,
+      "log": "8cb3dc9.log"
+    },
+    {
+      "commit": "641cc163fe1275878d5b5686497cc3c9397c598a",
+      "exit_code": 0,
+      "remote_verified": true,
+      "seconds": 2.65,
+      "log": "641cc16.log"
+    },
+    {
+      "commit": "9bd86cec80b0e7697d86d86379b5aa69e7b1d646",
+      "exit_code": 0,
+      "remote_verified": true,
+      "seconds": 23.01,
+      "log": "9bd86ce.log"
+    },
+    {
+      "commit": "ec7921ca63cf1070fe2a6d4d22c399ddbec5cb3f",
+      "exit_code": 0,
+      "remote_verified": true,
+      "seconds": 22.46,
+      "log": "ec7921c.log"
+    },
+    {
+      "commit": "5f6b6cc35e74bcf951684e3436e7278e3d397b97",
+      "exit_code": 0,
+      "remote_verified": true,
+      "seconds": 18.27,
+      "log": "5f6b6cc.log"
+    },
+    {
+      "commit": "a99388f0c385f975961824ac37ab991df7236cce",
+      "exit_code": 0,
+      "remote_verified": true,
+      "seconds": 14.24,
+      "log": "a99388f.log"
+    },
+    {
+      "commit": "635a89df7cd8bf45b6dc16e21e95e4210dc0a465",
+      "exit_code": 0,
+      "remote_verified": true,
+      "seconds": 22.89,
+      "log": "635a89d.log"
+    }
+  ],
+  "initial_bulk_failures": [
+    "HTTP408",
+    "HTTP1.1 connection reset"
+  ],
+  "resolution": "Only unpublished B commit was split into four native media evidence commits plus the remaining site/report commit. File bytes unchanged. Each phase audited and remote ref checked. No force/main/deploy."
+}

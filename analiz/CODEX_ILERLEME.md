@@ -506,3 +506,8 @@ Bir sonraki ajan: canlıya kurulum/deploy yapma;31kullanıcıkararıbekler. Sonn
 ### GitHub aktarım düzeltmesi
 
 İlk toplu HTTPS push HTTP408, HTTP/1.1+geçici100MBbuffer tekrarı connection-reset ile kesildi. Her ikisinden sonra uzakdal saltokunur kontrol edildi:4be1b9c kalmıştı. Hiçbir sır/büyüktekdosya problemi yok; native kayıtlardaki dörtMP4 toplam~64MB. Yayınlanmamış tek B commit’i ec23154 yerelobjesi korunarak, aynı bitleri taşıyan dört native medya arşivi ve kalan B/doküman commit’ine bölündü. Forcepush veya main değişikliği yok. İçerik ve kanıt hashleri değişmedi. Son aktarım sonucu GitHub dalından ayrıca doğrulanır.
+
+
+### GitHub yedeği doğrulandı
+
+B/site kontrol noktası **`635a89df7cd8bf45b6dc16e21e95e4210dc0a465`** uzak `codex/gece-2026-10-27` dalından okunarak doğrulandı. İlk toplu aktarım HTTP408, ikinci aktarım bağlantı kesilmesiyle başarısızdı; yayınlanmamış B paketi içerik değişmeden küçük commit’lere bölününce yedi kontrol noktası başarıyla ulaştı. [Aktarım kanıtı](kanit_son_kapilar_2026-10-28/compact-final/push-checkpoints.json) kayıtlıdır. Kapanış notu bu yedek üzerine ayrı küçük doküman commit’i olarak eklenir. Main `5f99f90` korunur; merge/force/deploy yok.
