@@ -377,3 +377,16 @@ Analiz temiz4,3sn; Flutter1416PASS/5isteğe bağlıPNG/0hata(61sn), Node164/164,
 - AndroidH1: `/tmp/pomosprint_android_first_use_h1.log` **1/1+aynıyerelparitePASS**. Kayıt/Mailpit/giriş/onboarding→gerçek25dk→günlük/haftalık/aylıkrapor→TUSbaşlat/erkenvazgeç akışı25:57sürdü; odak1503duvarsaniyesi,25dk/5normalpuan/20kum/seri1/tekolay. VazgeçilenTUSödülsüz. Arka plan koşusu05:12:04TR'de tamamlandı; `build/overnight_backend/first_use_android_final.json` bağımsız doğrulamasıdır.
 - Bekleyen yeniAndroidPNG'leri CRC/bütünlükten geçti. `extend_w_mixed_fixture.py` incelendi: yalnız sabitloopback,exactyerelQAowner,varsayılanROLLBACK,ayrıapplyvegeçmiştarihizinbayrakları; çalıştırılmadı. Kullanıcı özellikle commit istediğinden kaynak korunacak, geçici dosya diye silinmeyecek.
 - **31 uygulanmayacak ve31sonrasıMaraton testi yapılmayacak: kullanıcı kararı bekliyor.** Gece hazırlanan otomatik olmayan yerel applyyardımcısı çalıştırılmadı; kaldırılacak.
+
+### Sabah kapanışı — bekleyen kanıtlar commit'lendi (`889cab0`)
+
+- Kullanıcının1.maddesindeki dört öğe12dosya yolu olarak kaydedildi:ilerleme kaydı,9AndroidHekranı,1R75final ekranı ve kontrollüfixtureyardımcısı. `git diff --cached --name-only` incelendi; .env/anahtar/sertifika/keystore/yerelayar/DENETIM.md yok, sırdesenitaraması temiz.
+- Sabah ortak kapısı: `flutter analyze --no-pub` temiz5,29sn; `flutter test --no-pub --concurrency=4 --reporter=expanded` **1417PASS/5isteğe bağlıPNGskip/0hata**62,28sn; `cd scripts && npm test` **164/164PASS**0,54sn. Günlük ve sonuçlar `build/overnight_final_main/closing_checks/`.
+- Tamamlanan probe/SQL kanıtları arşivlendikten sonra yalnız bu projeye ait `66504EAE-D6FA-4877-98FB-6E7348BA57F5` ve `59F07F60-879F-49CF-9749-51F4BFE8E106` silindi. PomoSprintiOS18ana cihazı8D0ve tekPomoSprint_QA_API36korundu; başka projenin2CFHocamMacVarcihazına dokunulmadı. İşlem kaydı `build/overnight_final_main/cleanup/device_cleanup.json`.
+
+### Sabah kapanışı — iOS ve temizlik tamamlandı
+
+- İmzasız Release: Flutterrelease/no-codesignconfig17,14sn ve sabit9SwiftpinliXcodeRelease77,99sn çıkış0.55.029.553bayt,envasset0,imzayok,kaynak/Dartlock/pinler değişmedi. `build/overnight_final_main/ios_closing_unsigned_release.json` ve `analiz/QA_IOS_KAPANIS_2026-10-28.md`.
+- Normal `lib/main.dart` DEBUGuygulama yalnız8D0iOS18.6simülatörüne uninstall/eraseyapılmadan kuruldu/açıldı;PID72227yaşıyor,aynıowner/H18tamamlanmaişareti korundu,aktifseansyok. Gerçek normalPomo25:00ekranı görüldü. YerelQA127.0.0.1:54321/Sentrykapalı; canlıhesap/TestFlightkurulumu değildir.04:27eskiyanlışyolpostflighthatası korunur; tampaket yolu doğrulandı.
+- Son derleme ve ortak kapı bittikten sonra15kesingeçici/araçıktıyolu kaldırıldı; cachetemizliği sonrası13,52GiBekboşalan,142,12GiBtoplamboş. SwiftPMhedefi/JDK17/SDK/globalönbellekler,finalpaketler/kanıtlar ve istenenfixturekaynağı korundu. İki fazlaiOSsilindi,1PomoSprintiPhone+1Androidkaldı;HocamMacVar'a dokunulmadı.
+- **31 kullanıcı kararı bekliyor**: yeni yerel/canlıuygulama veya31sonrasıMaratontesti yok. Sonkontroller kaynak değişmeden1417/5/0Flutter,164/164Node,temizanalyze. Nihairapor denetçiSabahözetiyle ve29'un31Ekim23:59→1Kasım/Kasım→1Aralıkuyarısıyla güncellendi. Soncommit yalnız kapanışbelgelerini kaydeder; push/mainmergeyok.

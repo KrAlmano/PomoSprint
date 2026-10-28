@@ -1,16 +1,23 @@
-# Gece raporu — 28 Ekim 2026 — ARA RAPOR
+# Gece çalışması nihai raporu — 28 Ekim 2026
 
-**Bu belge 07:00 teslimi veya yayın onayı değildir.** 28 Ekim **04:25 Europe/Istanbul** itibarıyla doğrulanmış sonuçları toplar. Çalışma sürüyor; bekleyen koşular başarıya çevrilmedi. Ana ajan 07:00'da sonuçları, son commit'i ve temizlik kaydını yeniden güncelleyecek.
+**07:00 teslimi yapılamadı; etkin gece çalışması yaklaşık 04:27'de kullanım limiti nedeniyle kesildi.** Önceden başlatılmış Android testleri 05:12'de tamamlandı. Kullanıcının sabah yalnız kapanış işleri talebiyle 09:34'te yeniden başlandı; aşağıdaki kapanış işleri **09:59 Europe/Istanbul** itibarıyla tamamlandı. Yeni özellik eklenmedi. Bu rapor yerel doğrulamadır; mağaza/yayın onayı değildir.
 
-- Dal: `codex/gece-2026-10-27`; bu ara rapordaki HEAD: **`ffa5d5c`**.
-- Son ortak kaynak kapısı **42. tur**: analiz temiz; Flutter **1417 geçti / 5 isteğe bağlı PNG testi atlandı / 0 hata**, Node **164/164**. Parite aracının ayrı birim paketi **14/14**; native koşular bu sayılara dahil değil.
-- Gerçek süreli finaller: iOS 18 normal 25 ve normal 50; iOS 18 gerçek 25 + HTTP503 + farklı süreç; iOS 27 TUS 135 ve aynı hesapta ilk kullanım H27; iOS 18 H18 gerçek 25 dakika içinde 04:00 geçişi; Android 2×25 Maraton ve cevapsız mola V13.
+- Dal: `codex/gece-2026-10-27`; son kaydedilmiş gece HEAD'i **`6cca804`**, başlangıç `036fa60` sonrasında **33 commit**. `main` (`5f99f90`) değiştirilmedi, push yapılmadı. Sabah bekleyen dört öğe **`889cab0`** ile kaydedildi; son kapanış belgeleri bu raporun son commit kaydındadır.
+- Son başarılı **gece** ortak kaynak kapısı **42. tur**: analiz temiz; Flutter **1417 geçti / 5 isteğe bağlı PNG testi atlandı / 0 hata**, Node **164/164**. Parite aracının ayrı birim paketi **14/14**; native koşular bu sayılara dahil değil.
+- Gerçek süreli finaller: iOS 18 normal 25 ve normal 50; iOS 18 gerçek 25 + HTTP503 + farklı süreç; iOS 27 TUS 135 ve aynı hesapta ilk kullanım H27; iOS 18 H18 gerçek25 ve04:00 geçişi; Android2×25 Maraton/V13, doğal LGS Sözel75 ve aynı hesapta ilk kullanım AndroidH. Android finalleri önceden başlatılmış arka plan işleriyle 05:12'de tamamlandı.
 - Android **2×50 Maratonun 100 dakika/28 puan/40 kum/4 bonusu kaydedildi**, fakat özgün testin son yardımcı isteği eskimiş JWT nedeniyle başarısız. Aynı kayıtlar üzerinde ayrı **AC postflight 1/1 + parite PASS**; özgün S50 FAIL korunur.
-- **Bekleyenler:** Android H, Android LGS 75 finali, 31 sonrası doğal AB süreç senaryosu, 06:30 temizliği ve son kaynak kapısı. AB önceki iki koşusu test sürücüsü hatalarıyla FAIL kaldı; tamamlanmış kaydı değiştirmeyen ayrı verify postflight **1/1+parite PASS**, ayrıntılar aşağıda.
+- **Sabah kapanışı tamamlandı:** imzasız iOS Release ve normal uygulamanın iOS18.6'ya veriyi koruyan kurulumu/açılışı; iki fazla QA cihazı ve geçici derleme temizliği; temiz analiz, **1417/5/0 Flutter** ve **164/164 Node**. AB önceki iki FAIL korunur, ayrı verify 1/1+parite PASS. **31 kullanıcı kararı bekliyor; uygulanmadı ve 31 sonrası native test yapılmadı.**
 - **31 numaralı Maraton önerisi ana yerel QA'ya veya canlıya uygulanmadı.** İzole 96/96 kontrol ve içerilen 13/13 DRYRUN geçti. Katı 5+1 sınırının gecikmiş dürüst kullanıcıya etkisi ve duraklatılmış AFK açığı aşağıda açıkça ayrıldı.
 - **Canlı Supabase/Resend/site isteği, canlı SQL, push ve deploy yok.** Yerel başarı, fiziksel cihaz veya mağaza onayı değildir.
 
 Ayrıntılar: [istekler](ISTEKLER.md), [ilerleme/commit kaydı](CODEX_ILERLEME.md), [doğrulama matrisi](DOGRULAMA_MATRISI_2026-10-28.md), [native QA](QA_NATIVE_GECE_2026-10-28.md), [sunucu QA](QA_BACKEND_GECE_2026-10-28.md), [güvenlik](QA_GUVENLIK_GECE_2026-10-28.md), [ilk kullanım](QA_ILK_KULLANIM_2026-10-28.md), [Maraton kapanışı](QA_MARATON_KAPANIS_2026-10-28.md), [denetçi](DENETIM.md). `/tmp` günlükleri geçicidir; sonuçların kalıcı özeti bu belgeler ve sürümlü test kaynaklarıdır.
+
+## Çalışma ve kesinti zaman çizelgesi
+
+- **27 Ekim 22:26→28 Ekim yaklaşık 04:27:** etkin geliştirme, alt ajan incelemeleri ve test takibi yapıldı. iOS son derleme doğrulaması sırasında alt ajan kullanım sınırına takılınca etkin çalışma kesildi.
+- **Yaklaşık04:27→05:12:** daha önce başlatılmış Android R75 ve ilk kullanım H işleri arka planda devam etti; bunlar yeni etkin ajan çalışması değildir. Günlüklerde ikisi de PASS ile bitti.
+- **06:30/07:00:** planlanan temizlik ve nihai teslim yapılmadı. 07:00'ye kadar kesintisiz çalışıldığı veya zamanında teslim edildiği iddia edilmiyor.
+- **Sabah 09:34:** kullanıcının yalnız mevcut işleri kapatma yetkisiyle çalışma yeniden başladı. Yeni özellik eklenmiyor; 31'in uygulanması kullanıcı kararına bırakılıyor. Sabah kapanışı 09:59 itibarıyla aşağıdaki kanıtlarla tamamlandı.
 
 ## 1. Yapılanlar: değişiklikler ve commit'ler
 
@@ -34,24 +41,33 @@ Başlangıç kontrol noktası `036fa60`, önceki `5f99f90` sonrasında birikmiş
 | Uzun test sonu | S50'nin test token'ını güncel SDK oturumundan alma; aynı kurulumda ayrı AC doğrulaması | `1e2e8a9` |
 | Geçersiz plan açıklaması | TR/EN metin normal seans/puan/kumun korunduğunu, Maraton ek puanı olmadığını açıklar; gecikmeyi kesin neden diye sunmaz | `1cc6a05` |
 | Süreç testi doğruluğu | Sunucu–cihaz saat düzeltmesini doğru karşılaştırma; alt çizgili ekran adı düzeltmesi ve tamamlanmış kurtarmayı değiştirmeyen ayrı postflight | `8d2bf7a`, `ffa5d5c` |
+| Gece kanıt kontrol noktası | 17doküman,168gerçekPNG ve yanlış sınır yorumunun düzeltilmesi;186dosya yolu. Ürün/DB davranışı değişmedi | `6cca804` |
 
 Son metin değişikliği davranış veya RPC kuralını değiştirmedi. Tek widget testi iki dil ve dört ilk-odak yanıtını dolaşır; ilgili hedefli paket 12/12, son tam 42. kapı 1417/5 geçti. Normal sayaçlar 25/50 dakika, sınavlar standart katalog sürelerinde kaldı. Yeni kullanıcıya açık özellik olarak istenmeyen görsel/akış eklenmedi.
 
-Bu ara rapor ve devam eden sonuç belgeleri son HEAD sonrasında yeniden güncellenmektedir; commitlenmiş kaynakla sonradan gelen native kanıt aynı şey değildir. Son dosya/sır kontrolünü ve commit'i ana ajan yapacak.
+Android R75/H finalleri `6cca804` sonrasında geldi. Kapanışta bu iki ekran klasörü, ilerleme kaydı ve `extend_w_mixed_fixture.py` dahil dört öğe ana ajan tarafından incelendi;10PNG CRC ve yardımcı AST/kapsam kontrolleri geçti. Bu dört öğe **`889cab0`** ile 12 dosya yolu olarak commitlendi. Öncesinde son ortak kapı ve staged dosya/sır kontrolü temiz geçti. Fixture yeniden çalıştırılmadı.
 
-## 2. Yapılamayanlar ve yarım kalanlar
+## 2. Sabah kapanışı ve açık kalanlar
 
-1. **Gerçek süreli kalan koşular sürüyor.** Android LGS Sözel 75,03:29:56→04:44:56 İstanbul; başlangıç ve kapatılmış süreç kaydı var, final yok. Android H bekliyor. H18 tamamlandı: 1503 gerçek saniye ve 04:00 geçişi bağımsız doğrulandı. AB ilk geç-kabul ve kurtarma koşuları FAIL; tamamlanmış kurtarmayı değiştirmeyen ayrı postflight 04:22:42'de **1/1+parite PASS** verdi. 31 sonrası doğal koşu henüz yok. [Native kayıt](QA_NATIVE_GECE_2026-10-28.md).
-2. **31 ana QA'ya uygulanmadı.** Android R75 ve ardından Android H doğal finalleri bitmeden çalışan şema değiştirilmeyecek. İzole test başarısı canlıya veya çalışan native ortama kurulduğu anlamına gelmez. Sonradan uygulanırsa hangi native koşunun hangi şemada geçtiği ayrıca yazılacak.
-3. **D-07 ürün kararı açık.** Katı 5+1 kuralında bağlantısı uzun süre kesilen dürüst kullanıcının normal seansı/puanı/kumu kalır, Maraton devamı ve bonusu kaybolabilir. TR/EN açıklama hazırdır; kuralın kendisini uygulama kararı açıklamadan ayrıdır. Duraklatılmış AFK açığı 31 ile kapanmaz.
-4. **Safari kısmi doğrulandı.** 03:45–03:53 ve 04:16–04:18 yerel masaüstü TR/EN sayfalar, görseller, SSS ve oynat/duraklat etiketleri incelendi. Video karelerinin ilerlemesi/otomatik oynatma ve mobil dar ekran etkileşimi doğrulanmadı. Koordinat eylemleri `noWindowsAvailable`, Responsive Design Mode devre dışı; önceki `cgWindowNotFound` kayıtları korunur. Chrome kullanılmadı. [Safari raporu](QA_SAFARI_2026-10-28.md).
-5. **Canlı kurulum ve mağaza yayını yapılmadı.** SQL 27–31 proposed dosyaları var; 27–30 yalnız yerel QA'da, 31 yalnız izole klonda sınandı. Canlı hash/ACL/RLS/cron, Resend teslimi, signing/provisioning/TestFlight, Apple/Google girişleri ve fiziksel cihazlar ayrı işlerdir.
-6. **Operasyonel açıklar kaldı.** Gerçek Sentry alarmı/semboller ve otomatik HTTP500 yakalama, hosted staging ayrımı, genel API abuse/fatura koruması ve Maraton kill switch'i tamamlandı sayılmıyor. Normal geçmiş-tarihli offline ödül politikası ve anon waitlist onay/limit açığı ayrıca karar/iyileştirme gerektiriyor.
-7. **Deneme avatarları ve resmî bilgiler bekliyor.** Deneme ligindeki 15 ödül slotu gerçek görsel gelmeden `NULL`; hayalî ödül gösterilmiyor. Geliştirici/veri sorumlusu adı, adres ve gönderici kimliği kullanıcıdan son aşamada alınacak.
-8. **06:30 temizliği henüz uygulanmadı.** Bir iOS 18.6 ve bir Android QA ortamı bırakma; bu geceki fazla QA cihazlarını/geçici derlemeleri kaldırma planı var. Başka projenin korunan cihazı ve aktif JDK17/SwiftPM cache'i korunacak. [Plan](QA_TEMIZLIK_PLANI_2026-10-28.md).
-9. **Saat dilimi değişince geçmiş gün politikası açık.** Rapor güncel profil diliminde yeniden gruplanır; lig olayının kabul günü sabit kalır. Kabul edilmiş geçmiş varken seyahat sonrası rapor/seri/lig tutarlılığı uçtan uca sınanmadı. Bu I-15/I-19 sınırı, 04:00 aritmetiği testlerinden ayrı [inceleme raporunda](QA_SAAT_DILIMI_SINIRI_2026-10-28.md) belgelendi; ürün veya geçmiş tarihler değiştirilmedi.
+| Kapanış işi | Bu rapor hazırlanırken durum | Tamamlanma kanıtı |
+|---|---|---|
+| Son iOS paket doğrulaması | **TAMAMLANDI** | [iOS kapanışı](QA_IOS_KAPANIS_2026-10-28.md): Flutter Release config 17,14 sn + pinleri koruyan Xcode Release 77,99 sn, çıkış0;55.029.553 bayt imzasız uygulama.9Swift pini/Dart lock/kaynak aynı, boş envasset. |
+| Normal iOS uygulama kurulumu/açılışı | **TAMAMLANDI** | `8D0…` iOS18.6'ya normal `lib/main.dart` DEBUG paketi uninstall/erase olmadan kuruldu. PID72227 canlı, gerçek Pomo25:00 ekranı, aynı hesap/H18 tamamlanma işareti korunmuş. [Sonuç](../build/overnight_final_main/ios_normal_main_install_smoke.json). Yerel QA54321, Sentry kapalı. |
+| Normal Android main kurulumu/runtime | **Bu kapanışın kapsamı dışında** | Kullanıcı sabah yalnız normal iOS kurulumunu istedi. Android main release/debug derleme/statik sonuçları var; ayrıca Android runtime/normal paket kurulumu yapıldığı iddia edilmez. Gece R75/H native sonuçları ayrı başarıdır. |
+| Fazla QA cihazları | **TAMAMLANDI** | [Cihaz kaydı](../build/overnight_final_main/cleanup/device_cleanup.json): `66504…` ve `59F07…` silindi. PomoSprint için yalnız `8D0…` iPhone18.6 ve `PomoSprint_QA_API36` kaldı. Başka projenin `2CFDB…` HocamMacVar cihazı ve runtime'lar korundu. |
+| Geçici derleme/cache temizliği | **TAMAMLANDI** | [Temizlik sonucu](../build/overnight_final_main/cleanup/build_cleanup.json), [ayrıntılı liste](QA_TEMIZLIK_PLANI_2026-10-28.md):15yeniden üretilebilir yol kaldırıldı; cache ölçümünde13,52GiB ek boş alan, son142,12GiB. Son paketler/kanıtlar, SwiftPMhedefi/JDK17/globalSDK ve istenenfixturekaynağı korundu. |
+| Son ortak test kapısı | **TAMAMLANDI** | Analyze temiz5,29sn; Flutter **1417 geçti/5 isteğe bağlı PNG atlandı/0 hata**,62,28sn; Node **164/164**,0,54sn. [Günlükler/sonuç](../build/overnight_final_main/closing_checks/results.json). Sonrasında ürün kaynakları değişmedi; yalnız rapor/temizlik yapıldı. |
+| Bekleyen dört öğe | **COMMITLENDİ — `889cab0`** | İlerleme kaydı,9AndroidH+1R75PNG ve kontrollüfixtureyardımcısı:12dosya.10PNGCRC10/10, PythonAST/güvenli kapsam kontrolü; araç çalıştırılmadı. |
+| Son sır/stage kontrolü ve kapanış kaydı | **Son commit kaydında** | Yalnız ilgili kapanış belgeleri kaydedilir; `.env`, anahtar/sertifika/keystore, yerel ayarlar ve DENETIM.md eklenmez. Son hash `git log -1` ile, kullanıcı yanıtında da verilir. `main`e merge/push yok. |
 
-İlk r25/r135 denemeleri, Flutter'ın test sonunda uygulamayı kaldırması nedeniyle kalıcı işaretlerini kaybetti. Bu başarısız koşular ürünün veri sildiği diye yorumlanmadı. Yeni, veriyi koruyan koşular ayrı kayıttır. Android bağlantı/tıklama hataları, yanlış test SQL'i ve S50 yardımcı JWT hatası da son başarılarla silinmedi.
+- **31 kullanıcı kararı bekliyor.** Ana yerel QA'ya veya canlıya uygulanmadı; 31 sonrası native AB koşusu yapılmadı. İzole96/96 ve13DRYRUN bu iki eksiği kapatmaz. Sabah yalnız kapanış yapılıyor; paket veya özellik sessizce etkinleştirilmeyecek.
+- **D-07 açık:** katı5+1 politikasında uzun bağlantı gecikmesi normal bitmiş seans/puan/kumu korur, Maraton devamı/bonusunu düşürebilir. Açıklayıcı TR/EN metin hazır. Duraklatılmış AFK açığı31 ile kapanmaz.
+- **Safari kısmi:** 04:18'e kadar yerel masaüstü TR/EN, görseller, SSS ve oynat/duraklat etiketleri incelendi; video kare ilerlemesi/autoplay ve mobil dar ekran etkileşimi doğrulanmadı. Chrome kullanılmadı. [Safari raporu](QA_SAFARI_2026-10-28.md).
+- **Canlı ve mağaza ayrı:** 27–30 yalnız yerel QA'da;31 yalnız izole klonda sınandı. Canlı güncel hash/ACL/RLS/cron, gerçek Resend teslimi, signing/provisioning/TestFlight, Apple/Google girişi ve fiziksel cihazlar bu raporla tamamlanmaz.
+- **Operasyon/ürün kararları:** Sentry alarmı/semboller ve HTTP500 yakalama, hosted staging, genel API abuse/fatura koruması, Maraton kill switch'i, normal geçmiş-tarihli offline ödül ve anon waitlist onay/limit konusu açık. Deneme ligi15avatar slotu ve resmî geliştirici/adres/gönderen bilgileri bekliyor.
+- **Saat dilimi geçmiş politikası:** rapor güncel profil diliminde yeniden gruplanır, lig olayının kabul günü sabit kalır. Karma geçmişle seyahat tutarlılığı karar/test boşluğudur; tarih/ödül yeniden yazılmadı. [İnceleme](QA_SAAT_DILIMI_SINIRI_2026-10-28.md).
+
+Android R75 ve H **bekleyen test değildir**: gerçek günlükler ve bağımsız kanıtları aşağıda başarı olarak eklendi. İlk r25/r135 uninstall denemeleri, S50 eski yardımcı JWT'si ve iki AB test sürücüsü FAIL'i ise korunur; sonraki ayrı başarılar bunları geçmişten silmez.
 
 ## 3. Varsayımlar ve ürün politikaları
 
@@ -76,15 +92,19 @@ Kullanıcının açık kararları varsayım değildir: lig ayı ayın 1'i İstan
 
 | Kontrol | Doğrulanmış sonuç | Kanıt / sınır |
 |---|---|---|
-|42. tur analiz|Temiz, 8,2 sn|[Günlük](/tmp/pomosprint_checkpoint_42_analyze.log); HEAD `ffa5d5c` ile kaydedilen kaynak.|
-|42. tur Flutter|1417 geçti /5 isteğe bağlı PNG atlandı /0 hata; 1:59|[Günlük](/tmp/pomosprint_checkpoint_42_tests.log). Kayıt 3, onboarding 1, sayaç 1 PNG üreticisi isteğe bağlı; native testler bu toplama girmez.|
-|42. tur Node|164/164|[Günlük](/tmp/pomosprint_checkpoint_42_node.log); site/kaynak sözleşmeleri, Safari sonucu değil.|
+|Sabah kapanışı analiz|Temiz,5,29sn|[Günlük](../build/overnight_final_main/closing_checks/analyze.log).|
+|Sabah kapanışı Flutter|1417 geçti/5 isteğe bağlı PNG atlandı/0hata;62,28sn|[Günlük](../build/overnight_final_main/closing_checks/flutter_test.log).|
+|Sabah kapanışı Node|164/164;0,54sn|[Günlük](../build/overnight_final_main/closing_checks/node_test.log).|
+|Son iOS Release+normal kurulum|İmzasız55.029.553bayt Release; normal DEBUGiOS18.6kurulum/açılış/veri koruma PASS|[iOS kapanış raporu](QA_IOS_KAPANIS_2026-10-28.md). Yerel QA, fiziksel cihaz/TestFlight değildir.|
+|Gece42. tur analiz|Temiz, 8,2 sn|[Günlük](/tmp/pomosprint_checkpoint_42_analyze.log); HEAD `ffa5d5c` ile kaydedilen kaynak.|
+|Gece42. tur Flutter|1417 geçti /5 isteğe bağlı PNG atlandı /0 hata; 1:59|[Günlük](/tmp/pomosprint_checkpoint_42_tests.log). Kayıt 3, onboarding 1, sayaç 1 PNG üreticisi isteğe bağlı; native testler bu toplama girmez.|
+|Gece42. tur Node|164/164|[Günlük](/tmp/pomosprint_checkpoint_42_node.log); site/kaynak sözleşmeleri, Safari sonucu değil.|
 |Ayrı parite araç testi|14/14|[Günlük](/tmp/pomosprint_checkpoint_39_parity.log). Eski referanslar korunur; 31 için açık üçüncü mod vardır. Ana QA'ya 31 kurulduğunu kanıtlamaz.|
-|iOS release|İmzasız derleme geçti; `.app`55,0 MB|[Günlük](/tmp/pomosprint_release_ios_20261028.log). Arm64 ve TimerWidget mevcut; mağaza indirme boyutu/cihaz imzası değildir.|
+|Önceki iOS release|İmzasız derleme geçti; `.app`55,0 MB|[Günlük](/tmp/pomosprint_release_ios_20261028.log). Arm64 ve TimerWidget mevcut; mağaza indirme boyutu/cihaz imzası veya sabah son paket doğrulaması değildir.|
 |Önceki Android release|İzole APK geçti; 54.167.363 bayt|[Manifest](../build/overnight_release_android/manifest.json); `ccb89da` arşivi+reviewed Gradle guard yaması. Bu tarihsel QA ikilisi son ürün kaynağının yerine geçmez.|
-|Normal Android release/debug|`lib/main.dart`, ürün kaynağı `1cc6a05`; release 54.167.363, debug 128.223.167 bayt; derleme/statik doğrulama PASS|[Release doğrulama](../build/overnight_final_main/android_release_verification.json), [debug doğrulama](../build/overnight_final_main/android_debug_verification.json). İkisi de mevcut debug imzasıyla eşleşir; integration_test yok, boş `.env`, yalnız yerel API. **Henüz kurulum/runtime testi yapılmadı**; R75/H verisi korunuyor.|
+|Normal Android release/debug|`lib/main.dart`, ürün kaynağı `1cc6a05`; release 54.167.363, debug 128.223.167 bayt; derleme/statik doğrulama PASS|[Release doğrulama](../build/overnight_final_main/android_release_verification.json), [debug doğrulama](../build/overnight_final_main/android_debug_verification.json). İkisi de mevcut debug imzasıyla eşleşir; integration_test yok, boş `.env`, yalnız yerel API. Android normal main kurulum/runtime bu kapanışta talep edilmedi; başarı iddia edilmiyor. R75/H finalleri tamamlandı, verileri korunuyor.|
 
-Android APK'nın SHA-256 değeri `54f1968b0995b24f5f321b8f6609610fbcbc5855901d241b08d946609bc31897`. Önceki başarısız derlemeler saklandı: ilkinde iç lint görevi AAB sanılıyordu; daha sonra `--no-pub` QA komutu release plugin kaydını yenilemedi. Standart `--pub` ile kilitli bağımlılıklar değişmeden derlendi. Bu ikinci hata ürün bağımlılığı kusuru diye sunulmaz. Önceki izole APK farklı debug anahtarı taşıdığından mevcut native veri üstüne kurulmadı. Son normal main derlemeleri ise mevcut debug imzasını doğruladı; veri koruma için yine R75/H bitmeden kurulmadı. Sonraki `8d2bf7a`/`ffa5d5c` yalnız QA sürücüsüdür; ürün kaynağı değişmedi. Release manifestinde yerel HTTP izni yoktur; loopback ağ yapılandırmalı normal debug ikilisi yerel çalıştırma adayıdır, henüz runtime başarısı değildir.
+Android APK'nın SHA-256 değeri `54f1968b0995b24f5f321b8f6609610fbcbc5855901d241b08d946609bc31897`. Önceki başarısız derlemeler saklandı: ilkinde iç lint görevi AAB sanılıyordu; daha sonra `--no-pub` QA komutu release plugin kaydını yenilemedi. Standart `--pub` ile kilitli bağımlılıklar değişmeden derlendi. Bu ikinci hata ürün bağımlılığı kusuru diye sunulmaz. Önceki izole APK farklı debug anahtarı taşıdığından mevcut native veri üstüne kurulmadı. Son normal main derlemeleri ise mevcut debug imzasını doğruladı; gece R75/H bitmeden kurulmadı. Android normal main kurulum/runtime sabah kapanışının kapsamına eklenmedi. Sonraki `8d2bf7a`/`ffa5d5c` yalnız QA sürücüsüdür; ürün kaynağı değişmedi. Release manifestinde yerel HTTP izni yoktur; loopback ağ yapılandırmalı normal debug ikilisi yerel çalıştırma adayıdır, henüz runtime başarısı değildir.
 
 ### F/S: yerel sunucu ve yardımcı araçlar
 
@@ -124,7 +144,9 @@ Kaynaklar: [backend](QA_BACKEND_GECE_2026-10-28.md), [güvenlik](QA_GUVENLIK_GEC
 |iOS 27 H ilk kullanım|1/1+parite; aynı yeni hesapta UI kayıt→Mailpit→giriş→TUS rehber→gerçek 25→rapor→TUS başlat/erken ret/vazgeçme; 1503 duvar sn|25 dk/5 puan/20 kum/1 seri; Deneme ödülü 0, fixture yok. `crossed_04_boundary=false`. [Final](../build/overnight_backend/first_use_ios27_final.json).|
 |iOS 18 H ilk kullanım / gerçek 04:00|1/1+parite; 1503 duvar sn, 03:44:57–04:09:57 İstanbul; 25 dk/5 puan/20 kum/1 seri/tek kayıt/tek olay|[Bağımsız final](../build/overnight_backend/first_use_ios18_final.json): başlangıç çalışma günü 27 Ekim, 28 Ekim günlük0 ve haftalık/aylık25. Hedef saat veya fixture değil; normal 25 dakikadır, Deneme/ay/seyahat kanıtı değildir.|
 |AB önceki şema: geç kabul + kurtarma|İki ayrı **FAIL**: ham sunucu/cihaz zamanı eşitliği yaklaşık130ms farkla; ardından tamamlanmış kurtarma ekran adındaki alt çizgi nedeniyle host400|[İlk FAIL](/tmp/pomosprint_ios27_ab_before_break.log), [kurtarma FAIL](/tmp/pomosprint_ios27_ab_before_recovery.log). Korunan kayıt: tek25dk/5puan/20kum, onaysız gate, ikinci odak yok. Ayrı [verify](/tmp/pomosprint_ios27_ab_before_verify.log) **1/1+parite PASS**: PID15773→19986, aynı owner, tek25dk/5puan/20kum, boş timer/kuyruk/ret, aynı gate; tamamlanmış proof değişmedi. Özgün iki FAIL korunur; doğal bekleyiş tekrarı değildir.|
-|Android LGS 75 / Android H / 31 sonrası AB|LGS başlangıcı 03:29:56, hedef 04:44:56; Android H ve 31 sonrası AB finalleri bekliyor|Başlangıç/ara kontrol final değildir. 31 ana QA'ya bu Android doğal koşuları bitmeden uygulanmayacak.|
+|Android LGS Sözel75|Final **1/1+parite PASS**, doğal4500sn;03:29:56→04:44:56, farklı süreçte aynı Deneme/UUID/tarihler;75ortak dakika/15Deneme puanı/3Deneme kumu/seri1, normal ekonomi0|[Günlük](/tmp/pomosprint_android_r75_resume_01.log), [bağımsız final](../build/overnight_backend/real75_final_verified.json). Tek tamamlanan Deneme/lig olayı,27Ekim başlangıç çalışma günü; doğal Deneme04:00 geçişi. Ay/DST/seyahat veya tüm sınav kataloğu kanıtı değildir.|
+|Android H ilk kullanım|**1/1+parite PASS**; tüm test25:57, odak1503duvar saniyesi/25dk. Aynı UI kayıtlı hesap, Mailpit/onboarding, normal25/5puan/20kum/seri1, gün/hafta/ay rapor ve erkenTUSvazgeçme|[Günlük](/tmp/pomosprint_android_first_use_h1.log), [bağımsız final](../build/overnight_backend/first_use_android_final.json).04:46:37→05:11:37TR;28Ekim çalışma günü, Deneme ödülü0; fixture yok.04:00 sınırını geçmez.|
+|31 sonrası native AB|**YAPILMADI; kullanıcı kararı bekliyor**|31 anaQA/canlıya uygulanmadı. Önceki şema ABverify veya izole96/96 sonucu bunun yerine sayılmaz.|
 |iOS/Android O2 ve AA|O2 net/yatay/kayıt/haftalık rapor; iOS 18 AA ve Android AA ayrı 1/1+parite, Profil TR/EN ve pozitif içgörü|O2'de 2×165 dk, AA'da 355 dk geçmiş kontrollü. AA 25 ilişkili dakika ve 19,25→27,50/19.25→27.50 cümlesi/uyarısı; doğal bekleyiş değildir.|
 |iOS 18 Z|İki senaryo 2/2+parite: gelen arkadaş isteği kabul/ret; 500 kum avatar alma/kuşanma ve duplicate ücret yok|Finansman 25 tarihli normal RPC kaydıyla 625 dk/500 kum; doğrudan bakiye ataması yok, 625 dk beklenmedi.|
 
@@ -139,9 +161,9 @@ Başarısız eski koşular ayrı durur: r25/r135 uninstall marker kaybı, Androi
 | İstek | B/W/F kanıtı | N kanıtı ve açık kalan sınır |
 |---|---|---|
 |I-16 hedef/Global aylık lig|Kategori/owner/kind ayrımı, 26→25+1 kapasite, kontrollü terfi/düşme/ödül, aktif rezervasyonda sonraki ay, Global 46/46 exact-owner ve ekonomi değişmezliği|iOS 18 X change+ayrı process resume her biri 1/1+parite: YKS oda/puan korunur,TUS sonraki ay; iki Global görünüm sabit. Doğal ay kapanışı, canlı cron/nüfus ve Android X yolu bekler.|
-|I-17 onboarding rehberi|TR/EN açık seçim, owner kapısı, küçük/yatay/2× yazı, tercih koruma/tek kaydetme; yaş/13 altı regresyonları|iOS 27 yedi hedef, Android yedi hedef ayrı koşular; H27 ve H18 aynı UI kayıtlı hesapla ayrı ilk gerçek kullanım; H18 doğal04:00 geçişi de doğrulandı. Android H bekler. Native turlar yetişkin yıl kullanır; veli/assistive-tech kapsamı tamamlanmış sayılmaz.|
+|I-17 onboarding rehberi|TR/EN açık seçim, owner kapısı, küçük/yatay/2× yazı, tercih koruma/tek kaydetme; yaş/13 altı regresyonları|iOS 27 yedi hedef, Android yedi hedef ayrı koşular; H27 ve H18 aynı UI kayıtlı hesapla ayrı ilk gerçek kullanım; H18 doğal04:00 geçişi de doğrulandı. AndroidH de arka plan koşusunda tamamlandı; doğal odak25, tüm test25:57. Native turlar yetişkin yıl kullanır; veli/assistive-tech kapsamı tamamlanmış sayılmaz.|
 |I-18 dil|ARB/placeholder, dar görünür metin taraması, sunucu adları, açık hata/diyaloglar, net virgül/nokta, bildirimde değişmeyen bitiş; yeni Maraton açıklaması iki dil/dört yanıt|O2 iki platform; AA iOS 18 ve Android'de Profil'den TR/EN ve içgörü/uyarı. Q dil servisiyle değişir, gerçek Profil yolu diye sayılmaz. Her hata/erişilebilirlik kombinasyonu tüketilmedi.|
-|I-19 ortak süre/ayrı ekonomi|340 dk model fixture'ı; gerçek seans/Maraton planı/Deneme/25 dk eşdeğeri ayrı; 04:00/TZ/DST; UUID/outbox; net-ekonomi ayrımı; eksik/201 kayıt geçmişi|R25/R50/TUS 135 gerçek finaller; W doğal 25+karma rapor; S25/V13 ve S50+ayrı AC; H27/H18. H18 normal25 gerçek04:00 geçişini kanıtlar. Doğal Deneme04:00/ay kapanışı, Android LGS/H ve 31 sonrası AB bekler; kabul edilmiş geçmişle saat dilimi seyahati politika/test boşluğudur.|
+|I-19 ortak süre/ayrı ekonomi|340 dk model fixture'ı; gerçek seans/Maraton planı/Deneme/25 dk eşdeğeri ayrı; 04:00/TZ/DST; UUID/outbox; net-ekonomi ayrımı; eksik/201 kayıt geçmişi|R25/R50/TUS 135 gerçek finaller; W doğal 25+karma rapor; S25/V13 ve S50+ayrı AC; H27/H18. H18 normal25 gerçek04:00 geçişini kanıtlar. Android LGS75 doğal Deneme04:00 geçişini, AndroidH aynı hesap ilk kullanımını doğruladı. Doğal ay kapanışı yok;31 sonrası AB kullanıcı kararı nedeniyle yapılmadı; kabul edilmiş geçmişle saat dilimi seyahati politika/test boşluğudur.|
 
 Birim testte tarih değiştirmek, native cihaz saatinin değiştirildiği veya doğal ay/DST geçişinin beklendiği anlamına gelmez. Fiziksel cihaz kapsamı bu gecede kapatılmadı.
 
@@ -157,11 +179,13 @@ Birim testte tarih değiştirmek, native cihaz saatinin değiştirildiği veya d
 |Bağımsız|[30 DRYRUN](../supabase/proposed/30_session_start_atomic_dryrun.sql)|[30 ileri](../supabase/proposed/30_session_start_atomic.sql)|[30 down](../supabase/proposed/30_session_start_atomic_down.sql)|Normal başlangıç kota/UUID atomikliği.|
 |Ayrı karar|[31 DRYRUN](../supabase/proposed/31_marathon_completion_anchor_dryrun.sql)|[31 ileri](../supabase/proposed/31_marathon_completion_anchor.sql)|[31 down](../supabase/proposed/31_marathon_completion_anchor_down.sql)|Duraklatılmamış geç ilk/ara odak için kabul edilmiş son+300/+360.|
 
+**29 zamanlaması:** paket, uygulandığı ayı izleyen ayın1'i **00:00 Europe/Istanbul** anında etkinleşir. **31 Ekim 23:59'dan önce** uygulanırsa hedef **1 Kasım 2026**; Kasım içinde uygulanırsa **1 Aralık 2026** olur. O zamana kadar eski 14 günlük lig sürer. Takvim tarihi kurulum yapılmış gibi yazılmamalı; bu gece/sabah canlı uygulama yapılmadı.
+
 DRYRUN sonundaki **`DRYRUN_RESULT` hatası bilinçli rollback** sonucudur; önceki bütün Txx değerleri `true` olmalıdır. `\echo`/`\quit` korumaları ve SQL Editor uygulaması [kurulum rehberinde](../supabase/proposed/NIGHT_20261028_README.md) açıklanır. [API sözleşmesi](../supabase/proposed/EXAM_API_CONTRACT.md) ayrı tutulur.
 
 27–29 bağımlı zincirinde geri sıra 29→28→27; 30 kendi down'ıyla döner. 29 işlenmiş sonuç/aktivasyon/bekleyen tercih, 28 Deneme/cüzdan, 27 TUS profili varsa veri kaybını önlemek için geri almayı reddeder; veriler silinerek zorlanmaz. 31 kuruluysa önce 31 geri alınır. 31 down mevcut seans, makbuz ve geçersizlik kararını geri yazmaz; yalnız gelecek çağrıları eski fonksiyona döndürür.
 
-**31/D-07 karar noktası:** Katı sınır seçilirse uzun ağ gecikmesinde dürüst kullanıcının da yalnız Maraton devamı/bonusu sona erebilir; normal bitmiş odak korunur. Daha toleranslı offline politika seçilecekse güvenilir server start/pause/resume modeli ayrıca tasarlanmalıdır. Bu geceki mesaj değişikliği bu kararın veya duraklatılmış açığın çözüldüğü anlamına gelmez. 31'in ana QA'ya kurulması Android R75 ve Android H doğal finalleri bitmeden yapılmayacak; sonraki parite açıkça üçüncü moda geçmelidir.
+**31/D-07 karar noktası:** Katı sınır seçilirse uzun ağ gecikmesinde dürüst kullanıcının da yalnız Maraton devamı/bonusu sona erebilir; normal bitmiş odak korunur. Daha toleranslı offline politika seçilecekse güvenilir server start/pause/resume modeli ayrıca tasarlanmalıdır. Bu geceki mesaj değişikliği bu kararın veya duraklatılmış açığın çözüldüğü anlamına gelmez. 31 ana QA'ya veya canlıya kurulmadı; Android finallerinin bitmiş olması uygulama yetkisi değildir. **Kullanıcı D-07 kararından sonra** ayrı değerlendirilir; olası gelecekteki31 sonrası native/parite sonucu ayrıca kaydedilmelidir.
 
 ## 6. Deploy bekleyen site değişiklikleri
 
@@ -175,7 +199,7 @@ Son Node 164/164, gerçek Safari sonucu değildir. Safari'de 03:45–03:53 ve 04
 
 ## 7. Denetçi bulgularının son durumu
 
-Son okunan bağımsız tur **04:18**, denetlenen commit `8d2bf7a`. [DENETIM.md](DENETIM.md) değiştirilmedi. Denetçi notları son kaynak kapısı ve native sonuçlardan ayrı delildir.
+Son okunan bağımsız commit turu **04:48**, `ffa5d5c`/`6cca804`; ayrıca **07:18 sabah özeti ve09:40 düzeltmesi** okundu. [DENETIM.md](DENETIM.md) değiştirilmedi. Denetçi notları son kaynak kapısı ve native sonuçlardan ayrı delildir.
 
 | Bulgu | Durum | Açıklama |
 |---|---|---|
@@ -185,19 +209,18 @@ Son okunan bağımsız tur **04:18**, denetlenen commit `8d2bf7a`. [DENETIM.md](
 |D-04 TUS/AYT kategori eşlemesi|Çözüldü|`901e129`; SQL/JSON/Dart eşitliği, alias/çift sayım testleri.|
 |D-05 Süresi dolmuş aktif Deneme|Çözüldü|`901e129`; aynı kuralla tek tamamlanma, DRYRUN.|
 |D-06 Yeni site için yayın sırası|Kabul edildi, deploy bekler|Sunucu 27–29 ve yeni uygulama yayını tamamlanmadan site yayımlanmaz.|
-|D-07 Katı Maraton sınırında bağlantı gecikmesi|Sabah ürün kararı açık|31 normal seans/puan/kumu korur; süreyi aşan planın ek puanı ve devamı sona erebilir. Neden uydurmayan açıklama `1cc6a05` ile hazır; 31 henüz uygulanmadı.|
+|D-07 Katı Maraton sınırında bağlantı gecikmesi|Kullanıcı kararı bekliyor|31 normal seans/puan/kumu korur; süreyi aşan planın ek puanı ve devamı sona erebilir. Neden uydurmayan açıklama `1cc6a05` ile hazır; 31 henüz uygulanmadı.|
 
-Duraklatılmış Maraton AFK açığı ayrı ve açık kalır. Normal geçmiş-tarihli offline ödül ve anon waitlist riskleri de 41/41 güvenlik paketinin yeşil olmasıyla kapanmış sayılmaz. Bağımsız denetçinin04:18 notu `8d2bf7a` için yeni bulgu olmadığını söyler; daha sonraki `ffa5d5c` veya bütün native sonuçları denetlediği anlamına gelmez.
+Duraklatılmış Maraton AFK açığı ayrı ve açık kalır. Normal geçmiş-tarihli offline ödül ve anon waitlist riskleri de 41/41 güvenlik paketinin yeşil olmasıyla kapanmış sayılmaz. Denetçi04:48 turunda yeni bulgu bildirmedi;09:40 düzeltmesinde AndroidH/R75 finallerini PASS olarak düzeltti ve etkin çalışmanın yaklaşık 04:27'de kesildiğini arka plan işlerinden ayırdı. Native koşuları kendisi yeniden çalıştırmadı; sabah yeni kurulum/temizlik/son kapı henüz onun tarafından doğrulanmış sayılmaz.
 
-## 8. Sabah kullanıcının yapması gerekenler
+## 8. Kullanıcı kararı ve yayın için sonraki adımlar
 
-1. **07:00 nihai raporunu oku.** Özellikle H18/Android H, LGS 75, AB, 31'in gerçek yerel kurulum durumu, son kapı ve temizlik sonucuna bak. Bu ara raporu uygulamanın bütünü için yayın onayı sayma.
-2. **D-07 için katı sınır/offline politikasını seç.** Normal tamamlanan odak ve ödülü korunur; Maraton bonusu/devamı için katı 5+1 etkisini kabul edip etmediğini belirle. Duraklatılmış AFK açığının tam çözümü ayrı server start/pause/resume tasarımıdır.
-3. **27→28→29, bağımsız 30 ve ayrı 31 paketlerini incele.** Güncel canlı ön koşullar ve her DRYRUN sonrasında SQL Editor uygulaması ayrı yapılır. Guard'ı kaldırıp bilinmeyen şemaya zorla uygulama yoktur. Deneme ödül oranı ve normal offline ödül politikasını da kesinleştir.
-4. **Deneme ligi avatarları ve resmî bilgileri sağla.**15 boş slot için gerçek görsel, geliştirici/veri sorumlusu/adres/gönderici bilgileri tamamlanmalı; mevcut testler bunları uydurmuyor.
-5. **Safari'de son görsel kontrolü yap.** Dar ekran, menü/SSS, TR/EN linkler, lig açıklamaları ve videolar; sonra D-06 sırasına uygun ayrı deploy kararı.
-6. **Fiziksel iOS/Android turunu planla.** Force-kill, kilit ekranı, izin reddi, Doze/düşük bellek, gerçek bildirim/Canlı Etkinlik, Apple/Google giriş ve mağaza imzası/TestFlight.
-7. **Operasyonel yayın kontrollerini kapat.** Canlı Sentry alarmı/semboller, HTTP500, staging/production ayrımı, kill switch, kota/backup/izleme ve gerçek mail teslimi.
-8. **06:30 temizliğini kontrol et.** Bir iOS 18.6 ve bir Android ortamı, gerekli kanıt/regresyonlar ve aktif bağımlılıklar korunsun. Silinen/kalanlar nihai raporda tek tek belirtilecek.
+1. **31/D-07 kararını ver.** Katı5+1 kuralının uzun offline gecikmede Maraton bonusunu/devamını bitirme etkisi açık. Normal tamamlanan odak ve ödülü korunur; duraklatılmış AFK için ayrı güvenilir sunucu defteri gerekir. Karar verilmeden31 uygulanmaz;31 sonrası native test yapılmış sayılmaz.
+2. **Sunucu sırasını incele:**27→28→29; bağımsız30;31 yalnız karardan sonra. Her pakette önce güncel canlı ön koşul/hash ve DRYRUN, sonra kullanıcı SQL Editor uygulaması.29 için31Ekim23:59/1Kasım etkinleşme tarihine dikkat et. Toplu db push/reset veya guard kaldırma yok.
+3. **Deneme ligi görselleri ve resmî bilgileri tamamla:**15boş avatar slotu, geliştirici/veri sorumlusu/adres/gönderen kimliği son aşamada kullanıcıdan alınacak.
+4. **D-06 yayın sırasını koru:**27–29 canlı doğrulama/uygulama→yeni uygulama sürümü→site deploy'u. Site bu raporla yayımlanmadı; Safari mobil/video hareketi açık kısmı ayrıca kontrol edilir.
+5. **Fiziksel iOS/Android ve operasyon turunu planla:**kilit/force-kill/izin reddi/Doze/düşük bellek, gerçek bildirim/Canlı Etkinlik, Google/Apple girişleri, imza/TestFlight; Sentry alarm/semboller, gerçek posta teslimi, staging/kota/backup/izleme.
 
-**07:00 final alanı henüz doldurulmadı:** son HEAD ve kapı; kalan doğal süre/04:00/AB sonuçları; 31'in hangi ortamda kurulduğu; Safari; dosya/cihaz temizliği; açık maddeler. Sonuçlar gelmeden bu bölüm tamamlandı sayılmayacak.
+### Sabah kapanışının son kaydı — 09:59 Europe/Istanbul
+
+Bekleyen dört öğe `889cab0` içinde kaydedildi. İmzasız iOS Release, normal iOS18.6 uygulama kurulumu/açılışı, iki fazla QA cihazı ve15geçici/araçıktı yolunun temizliği tamamlandı. Aynı hesap ve kayıtlar korundu; yerel QA kurulumu kullanılıyor. Son ortak kapı temizdir: analyze,1417/5/0Flutter,164/164Node. Son ürün kodu değişmedi; bu rapor ve ilgili kapanış belgeleri son commit'te saklanır.31kullanıcı kararı bekliyor; uygulanmadı/sonrası test yapılmadı. Push, main merge veya canlı değişiklik yok.

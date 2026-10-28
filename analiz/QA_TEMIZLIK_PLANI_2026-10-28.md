@@ -1,6 +1,6 @@
 # Gece QA temizlik planı — 28 Ekim 2026
 
-**Durum: yalnız envanter ve plan; hiçbir dosya, cihaz veya veri silinmedi.**
+**Güncel durum: sabah kapanışında uygulandı.** Aşağıdaki ilk bölümler gece hazırlanmış tarihsel plandır; gerçek silme/koruma sonucu en sondaki “Sabah gerçekleştirilen temizlik” bölümündedir.
 İlk ölçüm 28 Ekim 00:05–00:07 Europe/Istanbul civarında alındı; aşağıdaki
 03:29 güncellemesi daha yenidir. Saat 06:30'da
 root yeniden kontrol ederek uygulayabilir; devam eden test varsa ertelenir.
@@ -385,3 +385,35 @@ belirlenen `extend_w_mixed_fixture.py` **izlenmeyen, tek kullanımlık** adaydı
 root `w` sonucu/manifestini koruduktan sonra karar verir. Üretilmiş ARB/Dart
 çeviri dosyaları uygulamanın normal build akışının parçasıdır, bu kapsamda
 silinmez. Kaynakta işlev kaldıran bir “temizlik” değişikliği yapılmadı.
+
+
+## Sabah gerçekleştirilen temizlik — 28 Ekim 2026
+
+06:30 planı kullanım limiti kesintisi nedeniyle zamanında uygulanmadı; kullanıcı sabah yalnız kapanışı tamamlama yetkisi verdi. Gerçek native finaller ve iOS kurulum/derleme işleri bittikten sonra işlemler tamamlandı.
+
+- Silinen iki QA cihazı: `66504EAE-D6FA-4877-98FB-6E7348BA57F5` (Shortflows18.6) ve `59F07F60-879F-49CF-9749-51F4BFE8E106` (iPhone17/iOS27). Kapanmış probe/marker/SQL kanıtları korundu.
+- Korunanlar: PomoSprint QA iPhone16(18.6) `8D0EFF44-5AF3-42E6-9F59-92CDFF8C9E5C`, tek Android AVD `PomoSprint_QA_API36`, başka projenin `HocamMacVar · iPhone17` cihazı `2CFDB5C8-6CA6-457C-8A6E-864B1849C681`. Runtime/SDK/global Gradle/pub/Docker veri hacimleri silinmedi.
+- Son normal iOS uygulaması veri korunarak kuruldu/açıldı; imzasızRelease ve sonAndroidAPK'ları `build/overnight_final_main/` altında saklandı. `build/overnight_backend/`, native ekranlar, hammedya ve başarılı/başarısız günlükler korundu. SwiftPM `build/ios/SourcePackages` hedefinin inode ve üst dizin içeriği değişmedi; aktif JDK17 yerinde.
+- Kullanıcı özellikle commit istediğinden `extend_w_mixed_fixture.py` incelenerek `889cab0` içinde saklandı; önceki plandaki silme adayı kararı bu yeni talimatla geçersizdir. Yardımcı yeniden çalıştırılmadı.31'i uygulayabilecek hiç çalıştırılmamış geçici Python yardımcısı kaldırıldı;31uygulanmadı/testedilmedi.
+
+Gerçekten kaldırılan yeniden üretilebilir yollar:
+
+- `.dart_tool/flutter_build`
+- `build/app/intermediates`
+- `build/ios/Debug-iphonesimulator`
+- `build/ios/iphonesimulator`
+- `build/test_cache`
+- `build/unit_test_assets`
+- `build/jni`
+- `build/.cxx`
+- `build/app/kotlin`
+- `build/app/tmp`
+- `build/app/outputs`
+- `/tmp/pomosprint-release-android-20261028-ewzefjzo`
+- `/tmp/pomosprint-final-main-20261028-vgcv2fgh`
+- `/tmp/pomosprint_jdk21.tar.gz`
+- `/tmp/pomosprint_jdk21`
+
+Bu15yolun temizliğinde dosya sistemindeki kullanılabilir alan **13.52GiB arttı**. Ölçüm cihazlar silindikten sonra başlayıp cache/geçici derleme temizliğinden sonra biter; cihaz silmenin kazancı buna eklenip tahmin edilmedi. Son ölçüm142,12GiB boş alan. APFS paylaşımı nedeniyle `du` tahmini ile serbest alan farkı aynı olmak zorunda değildir.
+
+Kanıtlar: `build/overnight_final_main/cleanup/device_cleanup.json`, `build_inventory_before.json`, `build_cleanup.json`. Temizlik sonrasında ürün kaynakları veya kullanıcı verileri değiştirilmedi; anlamlı regresyonlar korundu.
