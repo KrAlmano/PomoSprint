@@ -1281,3 +1281,77 @@ Sentry hata/breadcrumb/transaction verisinde iç içe credential, e-posta, URL q
 ### Açık güvenlik ve yayın işleri
 
 `analiz/QA_GUVENLIK_GECE_2026-10-28.md` normal offline geçmiş-tarihli ödülün sunucu makbuzu olmadan alınabildiğini ve waitlist consent/abuse sınırını belgeler. Deneme aynı açıkla ödül üretmez. Normal offline politikayı sessizce değiştirmek dürüst kullanıcının ödülünü kesebileceğinden kullanıcı kararı bekler; bu rapor bunu çözülmüş saymaz. Apple/Google gerçek cihaz girişi, fiziksel bildirim/CanlıEtkinlik, mağaza hesapları ve veri sorumlusu/gönderen kimliği hâlâ kullanıcı/cihaz gerektirir. Yerel testlerin geçmesi bu işleri tamamlamaz.
+
+
+## 40. A/B doğrulaması, DUS ve güncel ödüller — 28 Ekim 2026
+
+Bu bölüm, §39'dan sonraki güncel devam noktasıdır. Proje kökü `/Users/almano/Desktop/Projects/Pomodoro`, çalışma dalı `codex/gece-2026-10-27` olarak kalır. Kullanıcı yalnızca bu dala normal push yetkisi verdi; `main`'e push, merge, force push ve canlı deploy yetkisi yoktur. Kök `.env` ve `scripts/.env` açılmadı. 31 kurulmadı; karar kullanıcıya aittir. [Ana rapor](analiz/DOGRULAMA_RAPORU_2026-10-28.md), [ilerleme kaydı](analiz/CODEX_ILERLEME.md) ve [güncel DUS raporu](analiz/QA_DUS_ISTEMCI_2026-10-28.md) birlikte okunmalıdır.
+
+### Kod ve test kontrol noktaları
+
+- `4be1b9c`: A doğrulamasını ve 173 taşınabilir kanıt dosyasını içerir; bu hash GitHub'a gönderildi. Yedi eski katalog snapshot'ı, yeni gerçek 75 dk testi, iki platform/iki dil, 14 OS-offline-reconnect türü ve rapor/lig/sosyal/eski backend kontrolleri bu faza aittir. Önceki iki net düzeltmesi `11ea62c` ve `8446eff` ile kaydedildi.
+- `8cb3dc9`: DUS, ortak ödül tablosu, AYT erken bitişi/test seçimi ve özel başlık/not alanlarını içerir. İstemci, sunucu, anlamlı regresyonlar ve native kanıtlar bu kontrol noktasındadır. İlk 32 politikasındaki TYT 150/AYT 175 değerleri, son kullanıcı kararıyla değişti. O fazın kayıtları ve kanıtları tarihsel olarak korunur.
+- Son geniş kontrolde analiz temizdi; Flutter 1476 PASS ve yalnızca 5 isteğe bağlı PNG üreticisi atlaması, Node 172/172 sonucu alındı. [Kontrol/paket özeti](analiz/kanit_son_kapilar_2026-10-28/packages_and_gate1.json) arşivdedir. Sonraki site ve kapanış commit'leri `git log` ile ana raporun kapanış kaydından izlenir.
+
+### DUS ve Deneme muhasebesi
+
+| Sınav | Dakika | Kum | Deneme puanı |
+|---|---:|---:|---:|
+| LGS Sözel | 75 | 60 | 15 |
+| LGS Sayısal | 80 | 70 | 16 |
+| YDT | 120 | 95 | 24 |
+| TUS Temel | 135 | 110 | 27 |
+| TUS Klinik | 135 | 110 | 27 |
+| DUS | 150 | 120 | 30 |
+| TYT | 165 | 130 | 33 |
+| AYT | 180 | 145 | 36 |
+
+Kum kuralı, dakika × 0,8 değerinin en yakın 5 katına yuvarlanmasıdır; LGS Sayısal için 70 açık kullanıcı istisnasıdır. Her tam 5 dk için 1 puan verilir. Erken AYT kumu `floor(snapshot_full_coins × gerçek_saniye / planned_seconds)` ile, puanı ise tam puanı aşmayacak şekilde `floor(gerçek_saniye/300)` ile hesaplanır. Yeni 90 dk sonucu 72/18'dir. 1–59 sn için 0 verilir; diğer türler erken bitirilemez. Eski active/completed snapshot'ları ve earned alanları yeni tablodan yeniden hesaplanmaz. Yeni tanımlarda `reward_policy_version=2` bulunur. Normal ve Deneme cüzdanları ile ligleri ayrıdır.
+
+DUS'un resmî 150 dk/120 soru, 40 Temel + 80 Klinik ve 16 ders yapısı [ÖSYM kaynağıyla](analiz/SINAV_KAYNAKLARI_2026-10-28.md) doğrulandı. Ders dağılımı yaklaşık kapsamı gösterir. İstemcide `dus_catalog.dart` ders-kategori yapısının, `exam_reward_policy.dart` ise ödül fallback'inin tek kaynağıdır. Sunucudan gelen açık 0 değeri veya eski ödül snapshot'ı bu fallback ile ezilmez. Onboarding'de TUS'un yanına DUS eklenir. 16 ders önerisi, reddedilmiş hedefi UID'ye bağlı saklama/yeniden yazma ve kategori/global lig davranışı korunur. Diğer eski hedefler silinmedi; dört sınav ailesi YKS/LGS/TUS/DUS'tur.
+
+### Güvenli ayrıntılar ve süre
+
+AYT'de 1–4 test seçilir; yalnızca seçilen derslerin sonuçları gösterilir. Doğru/yanlış değişince boş otomatik hesaplanır ve elle de düzenlenebilir. Tüm tamamlanmış denemelerde isteğe bağlı, 120 Unicode-scalar sınırında başlık ve 2000 karakterlik not vardır. Seçim, özel metin ve değişen netler tek atomik Save ile kaydedilir; metadata-only kayıt da geçerlidir. Net/metadata kaydı yeni ödül üretmez. Eski RPC de yeni kapsamı aşamaz; sonucu dolu bir modül sessizce kaldırılmaz. Revision ve kayıp ACK tekrarlarına karşı korumalar vardır.
+
+Bekleyen erken bitiş, sunucunun kabulü gelmeden kesin süre/ödül olarak gösterilmez. Sunucunun kabul anı esastır; offline istek deadline sonrasında ulaşırsa tam süre sonucuna dönüşebilir. `ends_at`/definition planlanan 180 dk olarak kalır; `finished_at`/elapsed/report/overlap gerçek bitişi kullanır. Erken bitiş, kalan 180 dk boyunca normal seansı engellemez. Journal v2 ile taslak ve gönderilecek işlem birbirinden ayrılır. Bozuk veya bilinmeyen eski ham veri silinmez. Uzun metnin autosave sonrasında aynı uygulamanın okuyucusunu bozması, UI/service/persistence sınırlarıyla düzeltildi. Kişisel metin telemetriye gönderilmez.
+
+### Proposed ve yerel ortamlar
+
+Yeni paket açılmadı: 27 segment constraint'ine DUS, 28'e DUS kataloğu, 29'a segment/target listeleri ve 32'ye yeni ödül/AYT/ayrıntı sözleşmesi eklendi. 30 bağımsız kota düzeltmesidir. İleri/down/DRYRUN/JSON dosyaları güncellendi; temiz kopyada 27 → 28 → 29 → 30 → 32 zinciri kuruldu. 31 hariç tutuldu. Veri oluşmuş bir 32 kurulumunda tam down işlemi veri kaybettirecekse güvenli biçimde reddedilir.
+
+- Önceki A: `postgres`, API 54321. Yeni kaynaklarla aynı kurulum olduğu varsayılmaz.
+- DUS review: `pomosprint_review32_dus`, API 54351/REST 54352/Auth 54353. iOS host 54359, Android host 54369.
+- DUS site: `pomosprint_site32_dus`, API 54361/REST 54362/Auth 54363. iOS medya host 54379.
+- Eski `pomosprint_review32_final`/`pomosprint_site32_final` verileriyle korundu. Eski yedi kişilik site örneğinin yalnızca geçici durumları ve iki aktif TYT'si public RPC ile 0 ödülle kapatıldı. Bakiye/geçmiş/net/arkadaşlık hash'leri korundu; eski çalışmaya ait gateway/container'lar durduruldu.
+
+Araçlar yalnızca açıkça belirtilen review/site sabit profillerini kabul eder; hosted URL veya genel DB override yoktur. Auth auto-confirm kullanılır; welcome tetikleyicisi kapalıdır. Gerçek e-posta gönderilmez. Oracle, `verify_reports_and_exams.py --profile review|site` ile actual/planned/0 dk/snapshot muhasebesini yapar. Varsayılan, eski main A yoludur. Eski 27–30 kaynak paritesi ile yeni DUS referansını karıştırma.
+
+DUS SQL 128/128, altyapı 36/36 ve oracle 34/34 sonucu alındı. 17 gerçek kontrollü QA hesabı 712/712, peer RLS 3/3 kontrolden geçti. Android DUS resmî start/abort TR/EN 14 SQL, yeni AYT tablosu 17 SQL; iOS resmî DUS 14 SQL + 56 oracle; iOS doğal 2 × 60 sn kontrollü DUS 18 SQL + 94 oracle PASS sonucu verdi. Kısa katalog 60 sn/0 ödüldür; sonunda 9000 sn, 30/120 değerleri birebir geri yüklendi. Pozitif 150 dk/120 kum için doğal süre boyunca bekleme iddiası yoktur. Kanıtlar [DUS sunucu](analiz/kanit_dus_2026-10-28/INDEX.md) ve [DUS native](analiz/kanit_dus_native_2026-10-28/INDEX.md) arşivlerindedir.
+
+### Site, derleme ve devam sınırı
+
+Site mevcut yapıyı korur: TR/EN ayrı 30 ekran ve 4 video, tek 540 × 1170 web ölçüsü, aynı 09:41 saati, iPhone/iOS 18.6 ve aynı Deniz hesabı kullanılır. Güncel kurgu örneği 455 dk/29 normal puan/80 kum/66 deneme puanı/260 kum/seri 2 ve 6 insan adlı arkadaştan oluşur; UID ca271e26-fc2c-44b6-b88f-9537f809639c'dir. Eski 300 kumlu çekim yerine 30 + 4 medya yeniden üretildi. Kullanılmayan 27 eski public medya çıkarıldı. Videolar gerçek zamanlıdır; imleç gerçek dokunma kaydından gelir. Kaynak packet SHA/PTS/DTS 4/4, 20 kare görsel QA ve 30 görselin gerçek incelemesi tamamlandı.
+
+Safari 72/72 ve manuel 4 video/FAQ/menü/dil/3 genişlik kontrolleri geçti; 3 gerçek CUA JPEG viewport kanıtı vardır. Chrome, browser access host unavailable nedeniyle çalıştırılamadı; kişisel Chrome sekmelerine girilmedi. Kesin ilk-paint film kaydı yoktur; CSS/okunurluk regresyonu ve gerçek viewport incelemesi vardır. [Medya listesi](landing/screenshots/README.md), [Safari raporu](analiz/ekran_site_2026-10-28/browser/SAFARI_MANUEL_2026-10-28.md) ve [yerel güvenli QA kurulumu](tool/site_qa/README.md) ilgili kaynaklardır.
+
+İmzasız iOS release 55,1 MB ve Android universal release APK 99.289.757 bayt olarak derlendi. Bunlar App Store/Play indirme boyutu veya imza/dağıtım onayı değildir. Normal `lib/main.dart`, iki QA cihazında 25:00 ile açıldı ve yerel API kullanır. Native test sonrası `--no-pub` release denemelerinde devplugin registrant hatası çıktı; normal release üretimiyle çözüldü. Üretilen Java dosyası elle değiştirilmedi. Aynı checkout'ta Flutter build/test/pub/analyze işlemlerini sırayla çalıştır.
+
+Canlı SQL/site/SMTP/Sentry yapılandırması yapılmadı. Fiziksel cihaz/OAuth/bildirim teslimi, mağaza imzalama, yasal/gönderen kimliği ve §33'teki açık operasyonel kararlar ayrı kalır. Yerel testlerin PASS sonucu, genel mağaza yayın onayı değildir.
+
+
+### §40 ek: son Deneme arayüzü ve yeni çekim
+
+Kullanıcının son isteğiyle uzun giriş/ders listeleri kaldırıldı. Yeni/Geçmiş/Lig kısa sekmeleri, tek net kuralı kutusu, soru/süre etiketleri ve daha küçük katalog kartları kullanılır. İş kuralları değişmedi. `exam-tab-*` ve `exam-filter-*` anahtarları eski uzun yazı bulucularının yerini alır. Hedefli40test ve14dosya analizi geçti; genel turdaki5eski lig etiket bulucusu da aynı doğrulamalar korunarak yeniKey'e geçirildi.
+
+Yeni çekim için önceki DUS site veritabanı `pomosprint_site32_dus_pre_ui` adına veri kaybı olmadan arşivlendi; OID ve74tablonun hashleri aynı kaldı. Aktif `pomosprint_site32_dus` yeniden boş kuruldu. Güncel run `site-oct28-ui`, DenizUID `ca271e26-fc2c-44b6-b88f-9537f809639c`; eski `site-oct28-dus` manifesti arşiv verisini anlatır. Yeni30görsel/4video iki dilde gerçek uygulamadan tekrar çekildi, hesap değerleri455/29/80/66/260/seri2olarak korundu. Kanıtlar `analiz/kanit_deneme_ui_2026-10-28` ve güncel medya manifestlerindedir.
+
+
+### §40 nihai kontrol noktası
+
+Sade Deneme arayüzü `641cc16`: 19 kaynak/test dosyası, 40 hedefli regresyon ve son tam turda **1482 Flutter PASS / 5 isteğe bağlı PNG atlaması**, analiz temiz, Node **172/172**. Son Android TR/EN AYT turu ayrıca native PASS, SQL21/21, DUS parite5/5. Beş eski lig metin bulucusu sabit anahtara geçti; asıl beklentiler gevşetilmedi. Özgün başarısız log saklanır.
+
+Normal `lib/main.dart` son UI ile iki cihaza yeniden kuruldu; 25:00 görüntüsü ve iOS Deneme ekranı ayrıca incelendi. iOS yerel54361, Android yerel54351 kullanır. Son Android universal release99.289.837 bayt, iOS unsigned55,1MB; mağaza indirme boyutu/gerçek imza kanıtı değildir. Son kapılar [compact-final](analiz/kanit_son_kapilar_2026-10-28/compact-final/README.md) arşivindedir. Safari son72/72 ve50gözlem; Chrome ve kesin ilk-paint doğrulanmadı. Son30görsel/4video kullanılır; eski300kum ve önceki DUSUI çekimleri tarihsel kalır.
+
+
+Kapanış ikinci kapısı da1482/172temizdir. Geçici build/rawmedia temizliği~6.95GBalan açtı. `build/final_release_20261028` içindeki son paketler yereldir, Gitdışıdır; kalıcı deliller analiz/ altında. iOS18.6/AndroidAPI36QAcihazları ve HocamMacVar kişiselcihazı korundu. review/siteAPIHTTP200;kurulu uygulamalar yerelortamdadır. Son gönderim yalnız çalışma dalına; canlıya kurulum sonraki kullanıcı kararıdır.

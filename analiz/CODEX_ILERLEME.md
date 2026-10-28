@@ -452,3 +452,57 @@ Taşınabilir kanıtlar `analiz/kanit_dogrulama_2026-10-28/INDEX.json`: özgün 
 ### Kullanıcının A sonrasında eklediği kapsam
 
 Net otomatik boş/Kaydet akışı tekrar onaylandı (A2 hazır). Site QA adları yerine insan adları istendi; B planı Deniz ve6uydurma arkadaşla zaten uyumlu. Kullanıcı Deneme kumu hedeflerini LGS Sözel60/TYT150/AYT175 belirledi; önceki +5 önerisi uygulanmadı. AYT erken bitirme, dört çözülen test grubunun seçimi, doğru/yanlış ve deneme adı/notu eklenecek. Erken bitirmede süreye orantılı kum veya tam175 tercihi soruldu; resmî2026ÖSYM dağılımı araştırılıyor. Yeni32tasarımı /tmp'da; kaynak/mainlocal/canlı henüz değiştirilmedi. A kanıtları mevcut27–30politikasının dondurulmuş doğru sonuçlarıdır; geriye dönük ödül değişmez.
+
+
+### A sonrası ekler ve DUS — 28 Ekim gündüz devamı (aktif)
+
+A kontrol noktası `4be1b9c` aynı özel dala başarıyla push edildi. A2 düzeltmeleri ve173 dosya kanıtı bu commit'te donduruludur. Sonrasında başlık/not, AYT modül seçimi ve erken bitiş öneri32 kaynakları eklendi. İlk32 (LGS60/TYT150/AYT175) izole SQL104/104; istemci113 regresyon; iOS a2/Android a3 native PASS, bağımsızSQL21/21. Uzun taslak kendi journal'ını okunamaz yapıyordu: UI rune120/2000,serviceguard ve persistence roundtrip doğrulamasıyla düzeltildi. Telemetry özel metin filtresi7/7. [İlk32 raporu](QA_DENEME_EKLERI_2026-10-28.md) ve native/sunucu kanıtları tarihsel ilk ödül politikasını gösterir; aşağıdaki yeni kararla karıştırılmaz.
+
+Kullanıcı bunun ardından DUS ve bütün8tür için tek ödül tablosu istedi: LGS Sözel75dk60kum15puan; LGS Sayısal80dk70kum16puan (açık istisna);YDT120dk95kum24puan;TUS Temel/Klinik135dk110kum27puan;DUS150dk120kum30puan;TYT165dk130kum33puan;AYT180dk145kum36puan. AYT erkenkum floor(145×elapsed/10800),puan min(36,floor(elapsed/300));90dk72/18. Eski aktif/bitmiş snapshotlar değiştirilmez.31 yok; yeni paket numarası açılmadı:27/28/29/32 aynı kaynak paketleri güncellendi,30 aynı kaldı.
+
+Resmî DUS2 kılavuzu ÖSYM'den indirildi:150dk §1.3/PDF4;netD−Y/4 PDF27;Tablo1 basılı40/PDF43.16ders/120soru görsel ve Poppler ile doğrulandı; kapsam yaklaşık, gelecekte kesin dağılım vaadi yok. [Kaynak belgesi](SINAV_KAYNAKLARI_2026-10-28.md) güncellendi.
+
+Yeni sabit DB'ler: `pomosprint_review32_dus` (API54351/REST54352/Auth54353), `pomosprint_site32_dus` (54361/54362/54363). Eski main/postgres A ve iki önceki32 DB silinmedi/değiştirilmedi. Eski B örneğinin ikiTYT'si0ödülle publicabandon,4presence publiccancel;bakiyeler ve6observerhistory dahil eski kayıtlar/hashler korunur. Eski ownedAPI'ler DBsilmeden durdurulup yeniDUSDB'lere geçildi. Yeni review128/128SQL,36infra ve8fullreward/legacy koruma;review/site parite5/5. Oracle eski19+yeni15=34/34;gerçek17kontrollüreviewowner712/712 veRLS3/3. [DUS sunucu kanıtı](kanit_dus_2026-10-28/INDEX.md).
+
+İstemci: DUS onboarding/16kategori/UIDpendinglegacyuyumu/lighedefi/All-YKS-LGS-TUS-DUS filtre/TR-EN ve teködülmodeli eklendi. Önceki7statusbarMissing görsel bulgusu root'un aynıPNG'leri doğrudan incelemesiyle geri çekildi; gerçekten bulunan EN“Unanswered” kelime bölünmesi/eşalan hizası düzeltildi.164ilgilitestPASS/16dosyaanaliztemiz. AndroidDUSofficialstart-abandonTR/EN+SQL14/14 ve yeniAYTAH+SQL17/17PASS; [istemciDUSraporu](QA_DUS_ISTEMCI_2026-10-28.md). iOSofficialDUS iki dilde150dk/120soru/16alan gerçekstart→abandon0ödülPASS (`/tmp/pomosprint_dus_ios_official_a1.log`).
+
+Aktif root koşusu: `/tmp/pomosprint_run_dus_short.py`, exec78555; `build/verification_20261028/dus/ios/short-a1/`. Yalnız reviewDUS kataloğu geçici60sn/0puan/0kum. fcntllock+0activeguard;finallyexactrestore veparite zorunlu. Kaynağı değiştirme/kataloğa başka süreçten yazma; bu doğal60snakışını standart150dk ödülü gibi sunma. Henüz final sonucu yok.
+
+Bilkçekim30TR/ENPNG+4gerçekzamanlıvideoPASS;paketleyici çalıştı,27kullanılmayan eskiwebmedyası0refkontrolüyle kaldırıldı. Node172/172PASS. Ancak ilkBverisi eskiTYT150ödüllü (300examkum) olduğundan kullanıcısonkararıyla **superseded**, nihaiBkanıtı değildir. Güncel siteJSON/HTML/SSS8türveDUS/yeniödüllerle güncellendi. Yeni yedisadecekurguowner `site-oct28-dus` demo fixture'ı yeni emptyDUSsiteDB'de kuruldu:Deniz,455toplamdk,29normalpuan/80kum,66exam/260examkum,seri2,6insanadlıarkadaş. Eski300kumluveri değiştirilmedi. YeniBçekimi henüz yapılacak; source `integration_test/ag_capture_site_dataset_test.dart`, sitehost54379shotdir `build/native_site_media/site-oct28-dus/screenshots`. Yeni recorder/capture out `build/native_site_media/site-oct28-dus-a1`; yeni fixturemanifest `build/verification_20261028/site_demo_site-oct28-dus.json`.
+
+Kalan root işleri: DUSshort sonucu/restore; gerekirse iOSyeniAYTsonkontrol; güncelB30+4yenidençek/paketle/gerçekgörselvideoQA; Safari ve ayrılmışChromeQA375/1024/1440;README/AGENTS/PROJE_DEVIR/nihairapor;imzasıziOSrelease+normalappsimkurulum/Androidderleme;fullanalyze/Flutter/Node kapıları;anlamlıcommitlerveyalnızyetkilidalpushları. Canlı/deploy/main/force yok. A dışındakiyeniişlerhenüzcommitlenmedi.
+
+
+### Son UI isteği sonrası devam noktası
+
+DUS/ayrıntı kodu `8cb3dc9` commit'indedir (226dosya); henüz origin'e gönderilmedi, önceki sonpush`4be1b9c`.
+Son kullanıcı isteği: Deneme ekranındaki metinleri kısalt, kutulara al, genel4yanlış/1doğru açıklaması kullan. LGS3yanlış istisnası korundu. YeniUI40seçilitest/14dosyaanalyzePASS; nativeAGyeni tabKey'leriyle30TR/ENgörsel+4gerçekzamanlıvideoyu tekrarçekti, nativeexit0/recorder0. Güncelrun`site-oct28-ui`,owner`ca271e26-fc2c-44b6-b88f-9537f809639c`; sourcecapturehash23b82a419aac39a13e9986414220bba0f46505e22b1bd77c4962a74f2f41a03d. Paketleyici çalıştı, currentlandingassetsaynıdatepathlerde yenilendi.
+
+Eski DUSsiteDB`pomosprint_site32_dus_pre_ui` olarak korunur;2exam0ödülleabandon/4presencecancel,para/geçmişkorundu. YeniemptyaynıadlısiteDB aynıDUSparitesiylekuruldu;API54361sabit. ReviewDB/mainAkorundu. SonDUSshorttestPASS veexact9000s30/120restore dahaönceteyitli; artıkgeçicikatalogyok.
+
+SonUIgenelfullgate3analyze/Node/partialsPASS; Flutteryalnız5eskiligmetinbulucusunedeniyleFAIL. `test/league_refresh_regression_test.dart` beşfinder yeni`exam-tab-league`Key'inegeçirildi;asılassertionlarkorundu, dosya9/9PASS. Sonfullgateyenidenkoşulacak. AndroidAHcompactUIsonnativekoşusunu verify_native_matrix yürütüyor;rootaynıcheckout'taFlutterbaşlatmayacakbitişhaberi gelene kadar. UIsonrasıimzasıziOSrelease55.1MBveAndroidrelease~99.3MBbaşarıylaüretildi;normalappkurulumusonUIiletekrarlanacak.
+
+Sarayfinal72currentUI/ca27PASS;4videomanualsonkontrolsite_b_finalize'da. Chromebrowserhostunavailable;kişiseltabsdokunulmadı. Gerçek3CuaJPEGheroaynıHTML/CSSkanıtıolarakkorunuyor. Video+15ENQAverify_db_reports'ta;TR15görselPASS,dosyalarhashli. SonB/UIcommit/push,README/devir/anaRaporfinalhashleri,normalmainappsmoke,geçiciderlemetemizliğivefinalcleanstatus hâlâroot'ta.
+
+
+### 28 Ekim 18:10 — son UI tamam, kapanış arşivi
+
+`641cc16` 19 dosyalı sade Deneme arayüzü commit’i oluşturuldu. TR/EN net kuralı, kısa sekmeler, dar/yatay/2× yazı düzeni ve güncel sabit test bulucuları dahil. Ana kod `8cb3dc9` DUS/32 kontrol noktası üzerinde. Normal iOS/Android main.dart yeniden kuruldu; iki25:00 ana ekranı ve iOS yeni Deneme ekranı gerçekten görüldü. İlk iOS splash karesi başarı gibi kullanılmadı; settled kare ayrı alındı.
+
+Son UI tam kapısı1482PASS/5PNGskip, analiz0,Node172/172,partials0. AndroidAH yeniowner81969919-cd0a-40f6-8ef9-dc1dd77f638d TR5sn/EN6sn,0ödül,revision1,rapor1→2,nativePASS,SQL21/21,parite5/5. Kanıtlar `kanit_deneme_ui_2026-10-28/android/` ve `kanit_son_kapilar_2026-10-28/compact-final/` altındadır. Eski5bulucu FAIL ve9/9düzeltme ayrı korundu.
+
+Safari son72/72 ve50manuelgözlem, dört güncelvideoda oynatma/duraklatma/döngü geçti. Chrome ortam engelli; kişisel sekmeler okunmadı.30görsel/4video/4poster hashleri ve196kanıt girdisi denetlendi; yalnız UI README manifest hash’i bayattı, düzeltildi.228göreli link/201medya referansı eksiksiz. Dokümanlardaki eski56gözlem/video boyutları ve hazırlanıyor cümleleri güncellendi. Site, ana README ve devir raporu güncel.
+
+Kapanış ikinci tamkapı, gereksiz derleme temizliği ve yetkili dal push’u sıradaki son işlemlerdir; bunlar tamamlanmadan yapılmış sayılmaz. Canlı/Main/merge/force/31 yok.
+
+
+### Nihai kapanış — 2026-10-28T18:11:16+03:00
+
+İkinci tam kapı da1482PASS/5opsiyonelPNGskip,Node172/172,analyze0,partials0. Kaynaklar `641cc16` sonrası değişmedi; site/doküman/kanıt arşivi kapanış commit'ine alındı. Yedi derleme/geçici medya klasörü temizlendi; gerçek boş alan artışı6,946,496,512bayt (~6.95GB). Son unsignediOS ve99.289.837baytAPK `build/final_release_20261028` içinde yerel tutulur;push edilmez. 4eskihost/preview süreci kapandı; review54351/site54361HTTP200,kişiselcihaz veveritabanlarıkorundu.
+
+Bir sonraki ajan: canlıya kurulum/deploy yapma;31kullanıcıkararıbekler. Sonnormaluygulama yerelbackend'e bağlıdır;varsayılandüzflutterrun canlıkök.env'e dönebilir. Gerçekpushdurumunu `git status -sb` ve `git log -3` ile doğrula. Chrome ve gerçekcihaz/yayınkonuları ayrı sınırdır.
+
+
+### GitHub aktarım düzeltmesi
+
+İlk toplu HTTPS push HTTP408, HTTP/1.1+geçici100MBbuffer tekrarı connection-reset ile kesildi. Her ikisinden sonra uzakdal saltokunur kontrol edildi:4be1b9c kalmıştı. Hiçbir sır/büyüktekdosya problemi yok; native kayıtlardaki dörtMP4 toplam~64MB. Yayınlanmamış tek B commit’i ec23154 yerelobjesi korunarak, aynı bitleri taşıyan dört native medya arşivi ve kalan B/doküman commit’ine bölündü. Forcepush veya main değişikliği yok. İçerik ve kanıt hashleri değişmedi. Son aktarım sonucu GitHub dalından ayrıca doğrulanır.

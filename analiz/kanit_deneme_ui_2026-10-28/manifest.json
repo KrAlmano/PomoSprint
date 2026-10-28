@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "scope": "Compact ExamScreen UI; selected checks only",
+  "artifacts": [
+    {
+      "file": "flutter-selected-final.log",
+      "kind": "final PASS40 selected tests",
+      "sha256": "13f271be1f192985331fcbfa42ff269fc31e901f5c31cbff61e0221741018b62",
+      "bytes": 4833,
+      "source_basename": "pomosprint_compact_exam_ui_final.log",
+      "source_sha256": "bcd1014c87fb6298ad2a3309a7524282245ade2ea6469a43d608ac3e3f1500af",
+      "normalization": "Removed only the absolute repository path prefix for portability."
+    },
+    {
+      "file": "analyze-final.log",
+      "kind": "final PASS14 source files",
+      "sha256": "654532b3e9bd4befd689e863bf53159a1387d4a3ed51f62ee1ca6aa7ce48db7f",
+      "bytes": 456,
+      "source_basename": "pomosprint_compact_exam_ui_analyze_final.log",
+      "source_sha256": "654532b3e9bd4befd689e863bf53159a1387d4a3ed51f62ee1ca6aa7ce48db7f",
+      "normalization": "Removed only the absolute repository path prefix for portability."
+    },
+    {
+      "file": "summary.json",
+      "sha256": "c8c211313f303d192a32a99ac2b972e86f9a3571a89e6b54d711a860e278d6a3",
+      "bytes": 1600
+    },
+    {
+      "file": "README.md",
+      "sha256": "89836158b167f9ee6567dedeabb390b3af25d572c19952ca963acbe1b08893c8",
+      "bytes": 2056
+    },
+    {
+      "file": "analyze_14.log",
+      "kind": "Additional root-supplied evidence; hash inventory only, no new result inferred",
+      "sha256": "654532b3e9bd4befd689e863bf53159a1387d4a3ed51f62ee1ca6aa7ce48db7f",
+      "bytes": 456
+    },
+    {
+      "file": "site32_dus_pre_ui_archive.json",
+      "kind": "Additional root-supplied evidence; hash inventory only, no new result inferred",
+      "sha256": "adedc65d88465606758496d0b40b931cd09371ebc16b52e1b2e3bfd6ed77bd26",
+      "bytes": 21296
+    },
+    {
+      "file": "site32_dus_pre_ui_transition.json",
+      "kind": "Additional root-supplied evidence; hash inventory only, no new result inferred",
+      "sha256": "4f86d80e389a95f0324f741553c5b317425c1cc8fadf375d029ccecc55101f96",
+      "bytes": 2721
+    },
+    {
+      "file": "site_demo_site-oct28-dus_pre_ui_cleanup.json",
+      "kind": "Additional root-supplied evidence; hash inventory only, no new result inferred",
+      "sha256": "11f12d090497ae2b43dc5a069ccee8e60dc702a51f6a1725d7543cdbf58e1f8b",
+      "bytes": 6320
+    },
+    {
+      "file": "source_summary.json",
+      "kind": "Additional root-supplied evidence; hash inventory only, no new result inferred",
+      "sha256": "d04fcee193233ef7bdbb7bbe7a5ae4a9b62a1faf9ac28147a0789f9ec3150856",
+      "bytes": 1472
+    },
+    {
+      "file": "targeted_40.log",
+      "kind": "Additional root-supplied evidence; hash inventory only, no new result inferred",
+      "sha256": "bcd1014c87fb6298ad2a3309a7524282245ade2ea6469a43d608ac3e3f1500af",
+      "bytes": 6473
+    }
+  ],
+  "final_sources": [
+    {
+      "file": "lib/screens/exam_screen.dart",
+      "sha256": "1b90bffa79b084af39f8cda39fb9e2e36eb98ba90a1fa6c82458fe0e63910b28",
+      "bytes": 36443
+    },
+    {
+      "file": "lib/l10n/app_tr.arb",
+      "sha256": "de6e88302b0b3ec35d49da096ee2215183083c58e51ca286fc7b77aacd65ea6e",
+      "bytes": 80990
+    },
+    {
+      "file": "lib/l10n/app_en.arb",
+      "sha256": "4410321adfee4aef143288aa386f315f1cbbae5de551db67c185a064d67af779",
+      "bytes": 70586
+    },
+    {
+      "file": "lib/l10n/app_localizations.dart",
+      "sha256": "c4cef25dda37a1f8a132229767ff904c2e27a6a0b6badefe37de7fc52a977648",
+      "bytes": 177093
+    },
+    {
+      "file": "lib/l10n/app_localizations_tr.dart",
+      "sha256": "8cdf9a0a46338eae88f130dea909a78bc0d1b9ffad2a0ed2ac059803efba8bf8",
+      "bytes": 91837
+    },
+    {
+      "file": "lib/l10n/app_localizations_en.dart",
+      "sha256": "9eef18b5b2bf4088484c4f951f7731f2e3994cd881567624f013e5cfcba9df0f",
+      "bytes": 91012
+    },
+    {
+      "file": "test/exam_compact_ui_test.dart",
+      "sha256": "be05884c9519515a6a3306a62d1c439264d115c1e3a494ad0620a4da5dbdd4da",
+      "bytes": 6678
+    },
+    {
+      "file": "test/exam_details_widget_test.dart",
+      "sha256": "a93e2634a3aac94a2c78b24913280dd0ba0df29724ef1cc8847e59484bc468cb",
+      "bytes": 22585
+    },
+    {
+      "file": "test/exam_insights_loading_test.dart",
+      "sha256": "a00e8e536434d8cffb6250abf4e6f8cb71b59c2c88a544150c439daada8dec5e",
+      "bytes": 7211
+    },
+    {
+      "file": "test/dus_exam_test.dart",
+      "sha256": "8366b9f9fdc122b21ddcf34458872f358239614d559c7d2cd7b1ae3094a5a9ce",
+      "bytes": 5884
+    },
+    {
+      "file": "integration_test/aa_exam_insights_test.dart",
+      "sha256": "0aa785b4f81504fd5a2b2cb4833c7781b9c7d013536c5abd470c63d4304d981e",
+      "bytes": 10080
+    },
+    {
+      "file": "integration_test/ad_verify_reports_exams_test.dart",
+      "sha256": "956413e5a6e7770dd5a9f74cbfd7f1c4c9c99aeaba72804933d3a8c7a6013166",
+      "bytes": 36763
+    },
+    {
+      "file": "integration_test/af_verification_leagues_social_test.dart",
+      "sha256": "c8a2b5fe34fa7e58b1c0dc021f975314b58e5ce5f88622cea96bedbcfa43fceb",
+      "bytes": 26821
+    },
+    {
+      "file": "integration_test/ag_capture_site_dataset_test.dart",
+      "sha256": "23b82a419aac39a13e9986414220bba0f46505e22b1bd77c4962a74f2f41a03d",
+      "bytes": 31028
+    },
+    {
+      "file": "integration_test/ah_exam_details_early_test.dart",
+      "sha256": "9cfd0fe43cca91d3ca1c761b3957591e9e72a7a83f253b3d7a81fdeddd0b8b3f",
+      "bytes": 16639
+    },
+    {
+      "file": "integration_test/ai_dus_native_test.dart",
+      "sha256": "888f4fdd79536de13288a849c2e929d6a176303afb257e053a69cf7e7b6b2e84",
+      "bytes": 14477
+    },
+    {
+      "file": "integration_test/h_first_use_journey_test.dart",
+      "sha256": "8de9f28aad3c357f054d36904eade34433b11aeee314b9d8cd40b156acbd60c8",
+      "bytes": 26259
+    },
+    {
+      "file": "integration_test/o_exam_release_journey_test.dart",
+      "sha256": "223328932a8eb401a8098f6cb8d5680a14cfa3d68a82172a8e2487c3ef3e76ad",
+      "bytes": 21453
+    },
+    {
+      "file": "integration_test/x_league_target_journey_test.dart",
+      "sha256": "7cde3b27533d4131183873dd6f9167009adedb9acd78b17b41c6e4ca67408c4c",
+      "bytes": 14691
+    }
+  ]
+}

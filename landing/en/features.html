@@ -23,7 +23,7 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="stylesheet" href="/css/fonts.css?v=20261003">
-  <link rel="stylesheet" href="/css/style.css?v=20261028a">
+  <link rel="stylesheet" href="/css/style.css?v=20261028b">
   <script src="/js/boot.js?v=20261028a"></script>
   <!-- /partial:head -->
 </head>
@@ -60,178 +60,122 @@
 <section class="section features-flow">
 <div class="container">
 <div class="feature-media-flow">
-<article class="feature-row reverse" id="timer">
-<div class="feature-row-text"><span class="eyebrow">Focus</span>
-<h2>Timer and Pomodoro</h2>
-<p>Choose a subject and 25 or 50 minutes. After 3-2-1, the hourglass starts. Elapsed time stays correct when the app is closed or the screen is locked.</p>
-<ul>
-<li>25 minutes earns 5 points; 50 minutes earns 12. Each rewarded session earns 20 grains of sand.</li>
-<li>One pause is allowed; using it reduces session points by 20%.</li>
-<li>Notifications are optional. The study day and daily streak change at 04:00.</li>
-</ul>
-</div>
-<div class="feature-row-media">
-<figure class="media-figure">
-<div class="phone phone-real">
-<div class="phone-screen phone-screen-real"><img class="shot-image" src="/screenshots/timer-20261028-tr.png" alt="Current timer screen with five navigation tabs; captured in Turkish using a local sample account" width="604" height="1311" loading="lazy" decoding="async">
-</div>
-</div>
-<figcaption class="media-caption">Current timer · captured in Turkish using a local sample account</figcaption>
-</figure>
-</div>
+<article class="feature-row reverse" id="timer" data-feature="timer">
+  <div class="feature-row-text"><span class="eyebrow">Focus</span><h2>Timer and Pomodoro</h2><p>Choose a category and 25 or 50 minutes. After 3-2-1, focus with the hourglass. Elapsed time stays correct when the screen is locked or the app is closed.</p>
+<p>Take your own break after a single Pomodoro. Session-end notifications depend on your permissions and preference.</p>
+<ul><li>25 minutes earns 5 base points; 50 minutes earns 12; each rewarded session earns 20 grains of sand</li><li>One pause is allowed; using it reduces base session points by 20%</li><li>Study days and daily streaks change at 04:00 in your selected timezone</li></ul></div>
+  <div class="feature-row-media"><figure class="media-figure">
+  <div class="phone phone-real"><div class="phone-screen phone-screen-real"><img class="shot-image" src="/screenshots/20261028/timer-en.png" alt="Deniz’s Pomo screen with 25/50-minute choices, categories and the current five tabs" width="540" height="1170" loading="lazy" decoding="async">
+<video class="shot-video" data-demo-video data-src="/videos/20261028/timer-en.mp4" autoplay muted loop playsinline preload="none" poster="/videos/20261028/timer-en.webp" role="button" tabindex="0" aria-label="Real-time silent app recording of the timer" aria-describedby="feature-timer-en-caption">
+  <a href="/screenshots/20261028/timer-en.png">Open the screenshot</a>
+</video></div></div>
+  <figcaption class="media-caption" id="feature-timer-en-caption">Timer · 25/50 minutes · silent loop; tap to pause</figcaption>
+</figure></div>
 </article>
-<article class="feature-row" id="marathon">
-<div class="feature-row-text"><span class="eyebrow">Marathon</span>
-<h2>Plan a short series of Pomodoros</h2>
-<p>Choose 2, 3 or 4 sessions of 25 or 50 minutes. Five-minute breaks separate your sessions.</p>
-<ul>
-<li>At the end of each break, confirm “I’m here” within one minute. Otherwise the plan ends.</li>
-<li>Finished sessions keep their regular points if you leave.</li>
-<li>Full-plan bonuses: +2/+3/+5 for 25-minute sessions; +4/+6/+10 for 50-minute sessions.</li>
-<li>Starting a plan and confirming after a break require internet.</li>
-</ul>
-</div>
-<div class="feature-row-media">
-<figure class="media-figure">
-<div class="phone phone-real">
-<div class="phone-screen phone-screen-real"><img class="shot-image" src="/screenshots/marathon.webp" alt="Plan a short series of Pomodoros" width="540" height="1170" loading="lazy" decoding="async">
-</div>
-</div>
-<figcaption class="media-caption">Marathon planning</figcaption>
-</figure>
-</div>
+
+<article class="feature-row" id="marathon" data-feature="marathon">
+  <div class="feature-row-text"><span class="eyebrow">Marathon</span><h2>Bring today’s focus into one plan</h2><p>Choose 2, 3 or 4 Pomodoros of 25 or 50 minutes. Progress through completed sessions and take a five-minute break between them.</p>
+<p>When a break ends, confirm “I’m here” within one minute. Starting and confirming after a break require internet. If you cannot continue, completed sessions keep their regular points.</p>
+<ul><li>A completed plan of 2/3/4 × 25-minute sessions earns +2/+3/+5 bonus points</li><li>A completed plan of 2/3/4 × 50-minute sessions earns +4/+6/+10 bonus points</li></ul></div>
+  <div class="feature-row-media"><figure class="media-figure">
+  <div class="phone phone-real"><div class="phone-screen phone-screen-real"><img class="shot-image" src="/screenshots/20261028/marathon-plan-en.png" alt="Marathon planner with 2, 3 and 4 sessions and 25/50-minute choices" width="540" height="1170" loading="lazy" decoding="async">
+<video class="shot-video" data-demo-video data-src="/videos/20261028/marathon-en.mp4" autoplay muted loop playsinline preload="none" poster="/videos/20261028/marathon-en.webp" role="button" tabindex="0" aria-label="Real-time silent app recording of Marathon planning" aria-describedby="feature-marathon-plan-en-caption">
+  <a href="/screenshots/20261028/marathon-plan-en.png">Open the screenshot</a>
+</video></div></div>
+  <figcaption class="media-caption" id="feature-marathon-plan-en-caption">Marathon plan · 2, 3 or 4 sessions · silent loop; tap to pause</figcaption>
+</figure></div>
 </article>
-<article class="feature-row reverse" id="mock-exams">
-          <div class="feature-row-text">
-            <span class="eyebrow">Mock exams</span>
-<h2>Keep the rhythm of your exam</h2>
-<p>Select TYT, AYT, YDT, LGS Verbal/Numerical, or TUS Basic/Clinical. The question count and duration are provided for that exam. LGS sessions are offered separately.</p>
-<p>The timer starts after 3-2-1. No pauses or breaks are available. Starting requires internet; elapsed time is preserved if the app closes.</p>
-<ul>
-<li>An abandoned attempt remains in your history but earns no points or sand.</li>
-<li>In My mock exams, see the date, start and end time, duration and result status.</li>
-<li>Enter correct, incorrect and blank answers by subject. Edit them later if needed.</li>
-<li>Net scores are personal records; they never change league points or sand.</li>
-</ul>
-          </div>
-          <div class="feature-row-media">
-            <figure class="media-figure">
-              <div class="phone phone-real">
-                <div class="phone-screen phone-screen-real">
-                  <img class="shot-image" src="/screenshots/exam-running-20261028-en.png" alt="English practice-exam screen: a full-duration TYT countdown with no pause option" width="604" height="1311" loading="lazy" decoding="async">
-                </div>
-              </div>
-              <figcaption class="media-caption">Real English app capture using a local sample account: a full-duration TYT countdown</figcaption>
-            </figure>
-          </div>
-        </article>
-<article class="feature-text-panel" id="insights"><span class="eyebrow">Time and net scores</span>
-<h2>How does your study time relate to your exam results?</h2>
-<p>See changes in your subject net scores alongside the time you spent studying that subject. Insights require comparable attempts and enough data; a single result is not treated as proof of cause and effect.</p>
-<p>Your total study time includes Pomodoro, Marathon and completed mock exams. Mock exam time remains a separate “Mock exam” category and is not assigned to individual subjects.</p>
+
+<article class="feature-row feature-row-group reverse" id="practice" data-feature="practice">
+  <div class="feature-row-text"><span class="eyebrow">Mock exams</span><h2>Keep your exam rhythm</h2><p>Choose TYT, AYT, YDT, LGS Verbal, LGS Quantitative, TUS Basic, TUS Clinical or DUS. Question count and duration are provided. The two LGS sessions are separate mock exams.</p>
+<p>After the 3-2-1 countdown, solve without pauses or breaks. Internet is required to start; elapsed time remains correct when the screen is locked or the app is closed.</p>
+<p>When you have finished AYT, choose “I’ve finished the exam” before time runs out. Your actual study time is recorded; this is separate from abandoning an attempt.</p>
+<table class="exam-reward-table"><caption>Sand earned for a full completed mock exam</caption><thead><tr><th scope="col">Mock exam</th><th scope="col">Sand</th></tr></thead><tbody><tr data-exam-reward="lgs_verbal"><th scope="row">LGS Verbal</th><td>60</td></tr><tr data-exam-reward="lgs_quantitative"><th scope="row">LGS Quantitative</th><td>70</td></tr><tr data-exam-reward="ydt"><th scope="row">YDT</th><td>95</td></tr><tr data-exam-reward="tus_basic"><th scope="row">TUS Basic</th><td>110</td></tr><tr data-exam-reward="tus_clinical"><th scope="row">TUS Clinical</th><td>110</td></tr><tr data-exam-reward="dus"><th scope="row">DUS</th><td>120</td></tr><tr data-exam-reward="tyt"><th scope="row">TYT</th><td>130</td></tr><tr data-exam-reward="ayt"><th scope="row">AYT</th><td>145</td></tr></tbody></table>
+<p>Full-duration rewards are fixed in multiples of 5 as listed; question count and the net scores you enter do not change the reward. Finishing AYT early earns sand and points in proportion to completed time. For example, 90 minutes of AYT earns 72 sand and 18 points.</p>
+<ul><li>Completed exams earn separate mock exam points and sand</li><li>An abandoned attempt remains in history and earns no points, sand or study time</li><li>A running mock exam prevents starting a normal Pomodoro or Marathon</li></ul></div>
+  <div class="feature-row-media feature-gallery" data-gallery-size="2"><figure class="media-figure">
+  <div class="phone phone-real"><div class="phone-screen phone-screen-real"><img class="shot-image" src="/screenshots/20261028/exam-catalog-en.png" alt="TYT, AYT, YDT, LGS, TUS and DUS mock exams with their duration and question counts" width="540" height="1170" loading="lazy" decoding="async"></div></div>
+  <figcaption class="media-caption" id="feature-exam-catalog-en-caption">Mock exam catalog</figcaption>
+</figure><figure class="media-figure">
+  <div class="phone phone-real"><div class="phone-screen phone-screen-real"><img class="shot-image" src="/screenshots/20261028/exam-running-en.png" alt="An active mock exam countdown without pause or break controls" width="540" height="1170" loading="lazy" decoding="async"></div></div>
+  <figcaption class="media-caption" id="feature-exam-running-en-caption">An active mock exam</figcaption>
+</figure></div>
 </article>
-<article class="feature-row reverse" id="reports">
-<div class="feature-row-text"><span class="eyebrow">Reports</span>
-<h2>See today’s effort</h2>
-<p>See total study time, your daily goal and time by subject. Net scores and mock attempts have their own report.</p>
-<ul>
-<li>Review daily, weekly and monthly totals.</li>
-<li>Follow your study calendar and compare periods without counting sessions twice.</li>
-</ul>
-</div>
-<div class="feature-row-media">
-<figure class="media-figure">
-<div class="phone phone-real">
-<div class="phone-screen phone-screen-real"><img class="shot-image" src="/screenshots/reports.webp" alt="See today’s effort" width="540" height="1170" loading="lazy" decoding="async">
-</div>
-</div>
-<figcaption class="media-caption">Daily study report</figcaption>
-</figure>
-</div>
+
+<article class="feature-row feature-row-group" id="my-exams" data-feature="my-exams">
+  <div class="feature-row-text"><span class="eyebrow">My exams</span><h2>Record your result and keep improving</h2><p>Find your completed attempts, dates and status in My exams. Enter correct and wrong answers to calculate unanswered questions automatically, or edit unanswered counts yourself.</p>
+<p>Add a name and note to your attempt. For AYT, first choose the tests you completed: Turkish Language and Literature–Social Sciences-1, Social Sciences-2, Mathematics and Science. Each test has 40 questions; enter correct and wrong counts for the subjects within it.</p>
+<p>Save only the subjects you have entered and finish the others later. Negative values and totals above the question count are rejected. Offline entries are kept on your device with a clear sending status.</p>
+<ul><li>YKS, TUS and DUS: correct − wrong/4; LGS: correct − wrong/3</li><li>Decimal net scores use commas in Turkish and dots in English</li><li>Entering or editing net scores never changes points, sand or rankings</li></ul></div>
+  <div class="feature-row-media feature-gallery" data-gallery-size="2"><figure class="media-figure">
+  <div class="phone phone-real"><div class="phone-screen phone-screen-real"><img class="shot-image" src="/screenshots/20261028/exam-history-en.png" alt="Deniz’s completed TYT attempts and subject results in My exams" width="540" height="1170" loading="lazy" decoding="async"></div></div>
+  <figcaption class="media-caption" id="feature-exam-history-en-caption">My exams</figcaption>
+</figure><figure class="media-figure">
+  <div class="phone phone-real"><div class="phone-screen phone-screen-real"><img class="shot-image" src="/screenshots/20261028/exam-results-en.png" alt="TYT result entry with correct, wrong and automatically calculated, editable unanswered counts" width="540" height="1170" loading="lazy" decoding="async"></div></div>
+  <figcaption class="media-caption" id="feature-exam-results-en-caption">Correct, wrong, unanswered and net</figcaption>
+</figure></div>
 </article>
-<article class="feature-row" id="weekly">
-<div class="feature-row-text"><span class="eyebrow">Weekly study</span>
-<h2>Your week at a glance</h2>
-<p>Review Monday through Sunday, your daily time and the subjects you focused on.</p>
-</div>
-<div class="feature-row-media">
-<figure class="media-figure">
-<div class="phone phone-real">
-<div class="phone-screen phone-screen-real"><img class="shot-image" src="/screenshots/weekly.webp" alt="Your week at a glance" width="540" height="1170" loading="lazy" decoding="async">
-</div>
-</div>
-<figcaption class="media-caption">Weekly report</figcaption>
-</figure>
-</div>
+
+<article class="feature-row reverse" id="insights" data-feature="insights">
+  <div class="feature-row-text"><span class="eyebrow">Time and net scores</span><h2>See study time alongside changes in net scores</h2><p>When there are enough comparable attempts in the last three weeks, compare a subject’s net score changes with time spent in related study categories.</p>
+<p>Your scores and insights are personal. Missing data is not invented, and correlation is not proof of cause. Mock exam time is never divided among subjects.</p></div>
+  <div class="feature-row-media"><figure class="media-figure">
+  <div class="phone phone-real"><div class="phone-screen phone-screen-real"><img class="shot-image" src="/screenshots/20261028/exam-insights-en.png" alt="A personal insight comparing related Physics study time with changes between two TYT net scores" width="540" height="1170" loading="lazy" decoding="async"></div></div>
+  <figcaption class="media-caption" id="feature-exam-insights-en-caption">Personal time–net insights</figcaption>
+</figure></div>
 </article>
-<article class="feature-row reverse" id="monthly">
-<div class="feature-row-text"><span class="eyebrow">Monthly study</span>
-<h2>Build a habit day by day</h2>
-<p>A study calendar shows the days you worked and your accumulated effort. Compare this month with the previous one.</p>
-</div>
-<div class="feature-row-media">
-<figure class="media-figure">
-<div class="phone phone-real">
-<div class="phone-screen phone-screen-real"><img class="shot-image" src="/screenshots/monthly.webp" alt="Build a habit day by day" width="540" height="1170" loading="lazy" decoding="async">
-</div>
-</div>
-<figcaption class="media-caption">Monthly study calendar</figcaption>
-</figure>
-</div>
+
+<article class="feature-row" id="reports" data-feature="reports">
+  <div class="feature-row-text"><span class="eyebrow">Daily study</span><h2>See today’s effort in one total</h2><p>Pomodoro, Marathon and completed mock exams all contribute to study time. Track your daily goal, session-type counts, category minutes and percentages together.</p>
+<p>Mock exam time has its own row. Abandoned attempts do not count toward study time or completed exam totals.</p>
+<ul><li>Adjust your daily goal from the same screen</li><li>Study days and streaks change at 04:00 in your selected timezone</li></ul></div>
+  <div class="feature-row-media"><figure class="media-figure">
+  <div class="phone phone-real"><div class="phone-screen phone-screen-real"><img class="shot-image" src="/screenshots/20261028/reports-daily-en.png" alt="Daily report combining study time from Pomodoro, Marathon and completed mock exams" width="540" height="1170" loading="lazy" decoding="async"></div></div>
+  <figcaption class="media-caption" id="feature-reports-daily-en-caption">Daily study</figcaption>
+</figure></div>
 </article>
-<article class="feature-row" id="friends">
-<div class="feature-row-text"><span class="eyebrow">Together</span>
-<h2>Focus with your friends</h2>
-<p>Share your friend code or send a request using a friend’s code. Requests can be accepted or declined.</p>
-<ul>
-<li>See “Focusing”, “On a break” and “Taking a mock exam”.</li>
-<li>“On a break” is only used for Marathon breaks.</li>
-<li>Choose whether to appear in the live list and public rankings from your profile. Blocking and privacy preferences are respected.</li>
-</ul>
-</div>
-<div class="feature-row-media">
-<figure class="media-figure">
-<div class="phone phone-real">
-<div class="phone-screen phone-screen-real"><img class="shot-image" src="/screenshots/social-20261028-en.png" alt="English social screen with sample accounts focusing, on a Marathon break and taking an exam" width="604" height="1311" loading="lazy" decoding="async">
-</div>
-</div>
-<figcaption class="media-caption">Real app capture · English interface with local sample accounts</figcaption>
-</figure>
-</div>
+
+<article class="feature-row feature-row-group reverse" id="weekly-monthly" data-feature="weekly-monthly">
+  <div class="feature-row-text"><span class="eyebrow">A wider view</span><h2>Follow your week and month</h2><p>See study time by day in the weekly chart and your routine in the monthly calendar. Review totals across Pomodoro, Marathon and completed mock exams.</p>
+<p>Mock exam time stays separate in category distribution, so time is never counted twice. Report study days change at 04:00; monthly league periods change at 00:00 Istanbul time.</p></div>
+  <div class="feature-row-media feature-gallery" data-gallery-size="2"><figure class="media-figure">
+  <div class="phone phone-real"><div class="phone-screen phone-screen-real"><img class="shot-image" src="/screenshots/20261028/reports-weekly-en.png" alt="Weekly report with study time by day and category distribution" width="540" height="1170" loading="lazy" decoding="async"></div></div>
+  <figcaption class="media-caption" id="feature-reports-weekly-en-caption">Weekly study</figcaption>
+</figure><figure class="media-figure">
+  <div class="phone phone-real"><div class="phone-screen phone-screen-real"><img class="shot-image" src="/screenshots/20261028/reports-monthly-en.png" alt="Monthly report with the study calendar and daily study totals" width="540" height="1170" loading="lazy" decoding="async"></div></div>
+  <figcaption class="media-caption" id="feature-reports-monthly-en-caption">Monthly study</figcaption>
+</figure></div>
 </article>
-<article class="feature-row reverse" id="leagues">
-<div class="feature-row-text"><span class="eyebrow">Leagues</span>
-<h2>A shared goal, a little friendly competition</h2>
-<p>Compete in a monthly league with people who share your study goal, and see your place in the global ranking.</p>
-<ol class="league-ladder" aria-label="League tiers, from first to highest">
-<li><img src="/avatars/league_bronze_monthly.webp" alt="" width="44" height="44" loading="lazy"><span>Bronze League</span>
-</li>
-<li><img src="/avatars/league_silver_monthly.webp" alt="" width="44" height="44" loading="lazy"><span>Silver League</span>
-</li>
-<li><img src="/avatars/league_gold_monthly.webp" alt="" width="44" height="44" loading="lazy"><span>Gold League</span>
-</li>
-<li><img src="/avatars/league_sapphire_monthly.webp" alt="" width="44" height="44" loading="lazy"><span>Sapphire League</span>
-</li>
-<li><img src="/avatars/league_diamond_monthly.webp" alt="" width="44" height="44" loading="lazy"><span>Diamond League</span>
-</li>
-</ol>
-<details class="league-details">
-<summary>Detailed rules</summary>
-<p>Pomodoro and mock exam leagues are separate. LGS, YKS, TUS and other study goals have their own groups; global rankings bring all goals together. Rooms hold up to 25 people. A preparation state is shown until there is enough participation.</p>
-<p>Both leagues reset at 00:00 on the first day of each month, Istanbul time. Study days and daily streaks continue to change at 04:00. If you change your goal mid-month, you keep your points; the new goal group applies next month.</p>
-<p>Promotion and awards require the period’s activity conditions. The app explains the current rules. Bronze League has no relegation.</p>
-<p>Only server-verified, full-duration mock exams earn separate mock exam points and sand. Entered net scores never affect rewards or rankings.</p>
-</details>
-</div>
-<div class="feature-row-media">
-<figure class="media-figure">
-<div class="phone phone-real">
-<div class="phone-screen phone-screen-real"><img class="shot-image" src="/screenshots/league-target-20261028-tr.png" alt="Turkish monthly league screen from a local sample account: YKS this month, TUS next month and the preparation period" width="604" height="1311" loading="lazy" decoding="async">
-</div>
-</div>
-<figcaption class="media-caption">Real league screen · captured in Turkish with a local sample account; goal changes apply next month</figcaption>
-</figure>
-</div>
+
+<article class="feature-row feature-row-group" id="leagues" data-feature="leagues">
+  <div class="feature-row-text"><span class="eyebrow">Monthly leagues</span><h2>Compete within your goal, find your global place</h2><p>LGS, YKS, TUS, DUS and other goals compete in their own categories. Your category room holds up to 25 people; the global ranking brings all goals together.</p>
+<p>Monthly leagues reset at 00:00 on the first day of each month, Istanbul time. A mid-month goal change keeps your points and applies to your new group next month.</p>
+<ul><li>The normal league uses Pomodoro and Marathon points only</li><li>A preparation state appears until there are enough active participants</li><li>Current activity requirements for promotion and awards are explained in the app</li></ul><ol class="league-ladder" aria-label="League tiers"><li><img src="/avatars/league_bronze_monthly.webp" alt="" width="44" height="44" loading="lazy"><span>Bronze League</span></li><li><img src="/avatars/league_silver_monthly.webp" alt="" width="44" height="44" loading="lazy"><span>Silver League</span></li><li><img src="/avatars/league_gold_monthly.webp" alt="" width="44" height="44" loading="lazy"><span>Gold League</span></li><li><img src="/avatars/league_sapphire_monthly.webp" alt="" width="44" height="44" loading="lazy"><span>Sapphire League</span></li><li><img src="/avatars/league_diamond_monthly.webp" alt="" width="44" height="44" loading="lazy"><span>Diamond League</span></li></ol><details class="league-details"><summary>Detailed league rules</summary><p>A room stays in preparation until enough active people participate. Promotion and league awards require the period’s activity conditions; see the app’s information button for current rules. Bronze League has no relegation.</p></details></div>
+  <div class="feature-row-media feature-gallery" data-gallery-size="2"><figure class="media-figure">
+  <div class="phone phone-real"><div class="phone-screen phone-screen-real"><img class="shot-image" src="/screenshots/20261028/league-category-en.png" alt="Deniz’s study-goal room and ranking in the monthly normal league" width="540" height="1170" loading="lazy" decoding="async"></div></div>
+  <figcaption class="media-caption" id="feature-league-category-en-caption">A room for your study goal</figcaption>
+</figure><figure class="media-figure">
+  <div class="phone phone-real"><div class="phone-screen phone-screen-real"><img class="shot-image" src="/screenshots/20261028/league-global-en.png" alt="The monthly normal league global ranking across all study goals" width="540" height="1170" loading="lazy" decoding="async"></div></div>
+  <figcaption class="media-caption" id="feature-league-global-en-caption">Global ranking across study goals</figcaption>
+</figure></div>
+</article>
+
+<article class="feature-row reverse" id="exam-league" data-feature="exam-league">
+  <div class="feature-row-text"><span class="eyebrow">A separate competition</span><h2>A league for your mock exam effort</h2><p>Completed mock exams verified by the server earn mock exam league points and separate exam sand. They do not affect normal league points or normal sand.</p>
+<p>The mock exam league also has study-goal and global views, with a new period at 00:00 on the first of each month, Istanbul time. Entered net scores never affect rankings.</p></div>
+  <div class="feature-row-media"><figure class="media-figure">
+  <div class="phone phone-real"><div class="phone-screen phone-screen-real"><img class="shot-image" src="/screenshots/20261028/league-exam-en.png" alt="Monthly mock exam league and points kept separate from the normal league" width="540" height="1170" loading="lazy" decoding="async"></div></div>
+  <figcaption class="media-caption" id="feature-league-exam-en-caption">Separate mock exam league</figcaption>
+</figure></div>
+</article>
+
+<article class="feature-row" id="friends" data-feature="friends">
+  <div class="feature-row-text"><span class="eyebrow">Study together</span><h2>See what your friends are doing now</h2><p>Send and accept requests with friend codes. See friends as “Focusing”, “On a break” during Marathon breaks, or “Taking a mock exam”.</p>
+<p>Manage live-list visibility from your profile. Blocking and visibility choices are respected; subject scores and personal insights are not shared.</p></div>
+  <div class="feature-row-media"><figure class="media-figure">
+  <div class="phone phone-real"><div class="phone-screen phone-screen-real"><img class="shot-image" src="/screenshots/20261028/social-en.png" alt="Deniz’s six sample friends shown as Focusing, On a break and Taking a mock exam" width="540" height="1170" loading="lazy" decoding="async"></div></div>
+  <figcaption class="media-caption" id="feature-social-en-caption">Friends’ live statuses</figcaption>
+</figure></div>
 </article>
 </div>
 <section class="feature-support">
@@ -245,7 +189,7 @@
 </article>
 <article class="support-card">
 <h3>Subjects and goals</h3>
-<p>Choose LGS, YKS, TUS, KPSS, language, university or work. Manage up to eight active study categories and set a daily goal.</p>
+<p>Choose LGS, YKS, TUS, DUS, KPSS, language, university or work. Manage up to eight active study categories and set a daily goal.</p>
 </article>
 <article class="support-card">
 <h3>Language and theme</h3>
@@ -267,14 +211,56 @@
 </section>
 </div>
 </section>
-<section class="section orbit-section">
+<section class="section orbit-section" id="collection">
 <div class="container">
-<div class="section-head"><span class="eyebrow">Collection</span>
-<h2>Turn your sand into characters</h2>
-<p>Discover 42 available characters: 7 starters, 4 unlocked for 200 sand each, 21 special avatars for 500 sand each, and 10 earned league awards. League awards cannot be bought. Mock exam league awards have a separate collection area; new artwork will be added when ready.</p>
-</div>
-</div>
-</section>
+<div class="section-head" data-reveal><span class="eyebrow">Collection</span><h2>Turn your sand into characters</h2><p>Discover 42 available characters: 7 starters, 4 unlocked for 200 sand each, 21 special avatars for 500 sand each, and 10 earned league awards. League awards cannot be bought. Mock exam league award artwork will appear separately when ready.</p></div>
+<div class="collection-preview-grid"><figure class="media-figure">
+  <div class="phone phone-real"><div class="phone-screen phone-screen-real"><img class="shot-image" src="/screenshots/20261028/avatar-collection-en.png" alt="A collection of starter characters, sand-unlocked avatars and earned league awards" width="540" height="1170" loading="lazy" decoding="async"></div></div>
+  <figcaption class="media-caption" id="feature-avatar-collection-en-caption">Avatar collection</figcaption>
+</figure>
+<div class="hg-orbit" data-reveal aria-hidden="true">
+          <div class="orbit-ring"></div>
+          <div class="orbit-track ot-a1">
+            <img class="orbit-avatar" src="/avatars/league_bronze_monthly.webp" alt="" width="56" height="56" loading="lazy" decoding="async">
+          </div>
+          <div class="orbit-track ot-a2">
+            <img class="orbit-avatar" src="/avatars/league_silver_monthly.webp" alt="" width="56" height="56" loading="lazy" decoding="async">
+          </div>
+          <div class="orbit-track ot-a3">
+            <img class="orbit-avatar" src="/avatars/league_gold_monthly.webp" alt="" width="56" height="56" loading="lazy" decoding="async">
+          </div>
+          <div class="orbit-track ot-a4">
+            <img class="orbit-avatar" src="/avatars/league_sapphire_monthly.webp" alt="" width="56" height="56" loading="lazy" decoding="async">
+          </div>
+          <div class="orbit-track ot-a5">
+            <img class="orbit-avatar" src="/avatars/league_diamond_monthly.webp" alt="" width="56" height="56" loading="lazy" decoding="async">
+          </div>
+          <div class="orbit-hg">
+            <svg viewBox="0 0 220 300">
+              <defs>
+                <clipPath id="ohClipTop">
+                  <path d="M69 46 L151 46 C151 90 128 116 112 140 L108 140 C92 116 69 90 69 46 Z"/>
+                </clipPath>
+                <clipPath id="ohClipBottom">
+                  <path d="M108 160 L112 160 C128 184 151 210 151 254 L69 254 C69 210 92 184 108 160 Z"/>
+                </clipPath>
+              </defs>
+              <path class="hg-glass" d="M62 38 L158 38 C158 88 132 118 116 142 L116 158 C132 182 158 212 158 262 L62 262 C62 212 88 182 104 158 L104 142 C88 118 62 88 62 38 Z"/>
+              <g clip-path="url(#ohClipTop)">
+                <path class="oh-sand-top" d="M 56 48 Q 110 60 164 48 L 164 162 L 56 162 Z"/>
+              </g>
+              <line class="oh-stream" x1="110" y1="156" x2="110" y2="248"/>
+              <g clip-path="url(#ohClipBottom)">
+                <path class="oh-sand-pile" d="M 58 154 L 162 154 L 162 254 L 58 254 Z"/>
+              </g>
+              <rect class="hg-cap" x="42" y="16" width="136" height="18" rx="9"/>
+              <rect class="hg-cap" x="42" y="266" width="136" height="18" rx="9"/>
+              <rect class="hg-post" x="46" y="26" width="9" height="248" rx="4.5"/>
+              <rect class="hg-post" x="165" y="26" width="9" height="248" rx="4.5"/>
+            </svg>
+          </div>
+        </div></div>
+</div></section>
 <section class="section section-deep cta-section">
 <div class="container">
 <h2>All in one app</h2>

@@ -27,7 +27,7 @@ function mediaPage({ reduced = false, observerSupported = true, playOutcome } = 
     },
     pause() { pauses += 1; },
   });
-  video.setAttribute("data-src", "/videos/timer-demo-20261008d.mp4");
+  video.setAttribute("data-src", "/videos/20261028/timer-tr.mp4");
   video.setAttribute("aria-label", "Pomo kaydı");
   Object.defineProperty(video, "src", {
     get: () => src,
@@ -90,7 +90,7 @@ test("video ancak yeterince görünürken yüklenir ve sessiz döngüde başlar"
   assert.equal(page.loads(), 1);
   assert.equal(page.plays(), 1);
   assert.deepEqual(page.playSettings, [[true, true, true, true]]);
-  assert.equal(page.video.src, "/videos/timer-demo-20261008d.mp4");
+  assert.equal(page.video.src, "/videos/20261028/timer-tr.mp4");
 });
 
 test("ekran veya sekme dışında durur; geri dönünce aynı konumdan sürer", () => {
@@ -225,7 +225,8 @@ test("tıklama veya klavye ile duraklatılan kayıt ekran/sekme dönüşünde ot
 });
 
 test("gerçek görüntü oranı iç ekrandadır; kayıtlar sessiz döngü ve statik fallback sunar", () => {
-  for (const [name, count] of [["features.html", 2], ["index.html", 1]]) {
+  for (const [name, count] of [["features.html", 2], ["index.html", 1], ["en/features.html", 2], ["en/index.html", 1]]) {
+    const locale = name.startsWith("en/") ? "en" : "tr";
     const html = fs.readFileSync(path.join(REPO, "landing", name), "utf8");
     const videos = [...html.matchAll(/<video\b([^>]*)>([\s\S]*?)<\/video>/g)];
     assert.equal(videos.length, count, name);
@@ -235,10 +236,10 @@ test("gerçek görüntü oranı iç ekrandadır; kayıtlar sessiz döngü ve sta
       assert.match(attrs, /role="button"/);
       assert.match(attrs, /tabindex="0"/);
       assert.match(attrs, /preload="none"/);
-      assert.match(attrs, /data-src="\/videos\/(?:timer|marathon)-demo-20261008d\.mp4\?v=20261028"/);
-      assert.match(attrs, /poster="\/videos\/(?:timer|marathon)-demo-20261008d\.webp\?v=20261028"/);
+      assert.match(attrs, new RegExp(`data-src="/videos/20261028/(?:timer|marathon)-${locale}\\.mp4"`));
+      assert.match(attrs, new RegExp(`poster="/videos/20261028/(?:timer|marathon)-${locale}\\.webp"`));
       assert.doesNotMatch(content, /<source\b[^>]*\bsrc=/);
-      const fallback = content.match(/href="(\/screenshots\/[a-z0-9-]+\.(?:webp|png))"/);
+      const fallback = content.match(/href="(\/screenshots\/20261028\/[a-z0-9-]+\.png)"/);
       assert.ok(fallback, "video has a real screenshot fallback link");
       assert.ok(fs.existsSync(path.join(REPO, "landing", fallback[1])), "fallback asset exists");
     }
@@ -254,11 +255,11 @@ test("gerçek görüntü oranı iç ekrandadır; kayıtlar sessiz döngü ve sta
   const html = fs.readFileSync(path.join(REPO, "landing/features.html"), "utf8");
   const marathon = html.match(/<article\b[^>]*\bid="maraton"[^>]*>[\s\S]*?<\/article>/)[0];
   assert.match(marathon, /<span class="eyebrow">Maraton<\/span>/);
-  assert.match(marathon, /2, 3 ya da 4 Pomodoro/);
-  assert.match(marathon, /5 dakikalık mola/);
+  assert.match(marathon, /2, 3 veya 4 Pomodoro/);
+  assert.match(marathon, /5 dakika mola/);
   assert.match(marathon, /1 dakika içinde “Buradayım”/);
-  assert.match(marathon, /onay vermezsen plan sonlanır/);
-  assert.match(marathon, /internet bağlantısı gerekir/);
+  assert.match(marathon, /tamamladığın seanslar normal puanlarıyla korunur/);
+  assert.match(marathon, /Başlangıç ve mola sonrası onay internet ister/);
   assert.doesNotMatch(marathon, /önizleme|Önizleme/);
   const home = fs.readFileSync(path.join(REPO, "landing/index.html"), "utf8");
   assert.match(home, /href="\/features#maraton"/);

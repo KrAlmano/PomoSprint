@@ -1,0 +1,5 @@
+PASS isolated32 schema
+PASS isolated32 migrations
+PASS isolated32 catalog
+PASS isolated32 mail_trigger
+PASS isolated32 policy

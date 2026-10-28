@@ -1,0 +1,20 @@
+{
+  "status": "NOT_VERIFIED",
+  "reason": "The browser access host is unavailable",
+  "attempts": [
+    {
+      "tool": "cua.listBrowsers",
+      "result": "The browser access host is unavailable"
+    },
+    {
+      "tool": "cua.createBrowserTab",
+      "browser": "chrome",
+      "sessionName": "PomoSprint QA",
+      "url": "http://127.0.0.1:8798/__qa",
+      "result": "The browser access host is unavailable"
+    }
+  ],
+  "existing_chrome_tabs_accessed": false,
+  "fallback_to_existing_chrome": false,
+  "safari_evidence": "safari_final_72.json"
+}

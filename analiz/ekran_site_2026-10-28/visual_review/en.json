@@ -1,0 +1,320 @@
+{
+  "scope": "Yalnızca güncel 15 EN PNG görseli; her dosya view_image ile açılıp image(result.image_url) ile gerçekten incelendi. DB, servis veya ürün kodu değiştirilmedi.",
+  "capture_run": "site-oct28-ui",
+  "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+  "fixture_manifest_sha256": "a17631c5f976c9ff049a28cdce86f6b163ccedb85594f87fd155e138f3d769c2",
+  "inspected_at_utc": "2026-10-28T14:52:34.534772+00:00",
+  "all15_opened": true,
+  "files_unchanged_during_review": true,
+  "critical_visual_defects": 0,
+  "counts": {
+    "WARNING": 6,
+    "PASS": 9
+  },
+  "resolved_previous_finding": "Unanswered tek satır ve üç giriş aynı hizada; yeni New/History/League kutuları ve 4/3 net bilgi alanı açık.",
+  "visible_key_values": {
+    "normal_points": 29,
+    "normal_sand": 80,
+    "streak": 2,
+    "tyt_history_sand": 130,
+    "practice_league_sand": 260,
+    "physics_related_minutes": 75,
+    "physics_net_from": 1.75,
+    "physics_net_to": 4.75
+  },
+  "not_proven": [
+    "Save/RPC kayıt başarısı ve yalnız etikette görünen değerlerin DB hesabı",
+    "Anlık durum değişimi ve animasyon",
+    "DUS doğal tamamlanması veya 16 alanın tam formu",
+    "Aylık toplam dakika/takvim günleri ve ayrı haftalık toplam, bu kadrajlarda yok"
+  ],
+  "files": [
+    {
+      "file": "build/native_site_media/site-oct28-ui/screenshots/e2e-site-20261028-en-avatar-collection.png",
+      "sha256": "698404d42b406a4d89a7e907fa3cf82f6007c4157d6ce4d77f46ed7f3b7732a7",
+      "dimensions": [
+        604,
+        1311
+      ],
+      "opened_with_view_image_and_emitted_image": true,
+      "status": "WARNING",
+      "time_visible": "09:41",
+      "five_bottom_tabs_visible": false,
+      "tabs_exception": "Standalone back-navigation page",
+      "keyboard_visible": false,
+      "toast_or_snackbar_visible": false,
+      "observations_tr": [
+        "Kum 80; İngilizce avatar adları ve seçili Classic Hourglass görülüyor.",
+        "Choose Your Charac... başlığı üç noktayla kısalıyor. En alttaki kartlar normal kaydırma sınırında."
+      ]
+    },
+    {
+      "file": "build/native_site_media/site-oct28-ui/screenshots/e2e-site-20261028-en-exam-catalog.png",
+      "sha256": "c68cf30ecc3ce8a81642e96ea3db0bd9acb660091929bbe7c357b15a90ce9f1f",
+      "dimensions": [
+        604,
+        1311
+      ],
+      "opened_with_view_image_and_emitted_image": true,
+      "status": "PASS",
+      "time_visible": "09:41",
+      "five_bottom_tabs_visible": true,
+      "tabs_exception": null,
+      "keyboard_visible": false,
+      "toast_or_snackbar_visible": false,
+      "observations_tr": [
+        "New / History / League seçenekleri ayrı, hizalı kutularda. Bilgi kutusunda YKS/TUS/DUS için 4, LGS için 3 yanlışın 1 doğruyu götürdüğü açık.",
+        "AYT 160 soru / 180 min / 4 tests; DUS 120 soru / 150 min kartları ve başlat düğmeleri okunuyor. DUS filtresi aynı satıra sığıyor; üstte 29 puan / 80 kum."
+      ]
+    },
+    {
+      "file": "build/native_site_media/site-oct28-ui/screenshots/e2e-site-20261028-en-exam-history.png",
+      "sha256": "7cdcf9fe457803e13d42dc769842f72fec7bc7c103668035e77c4b9a74a256e7",
+      "dimensions": [
+        604,
+        1311
+      ],
+      "opened_with_view_image_and_emitted_image": true,
+      "status": "PASS",
+      "time_visible": "09:41",
+      "five_bottom_tabs_visible": true,
+      "tabs_exception": null,
+      "keyboard_visible": false,
+      "toast_or_snackbar_visible": false,
+      "observations_tr": [
+        "New / History / League kutuları hizalı; History seçili. İlk görünen kayıt TYT 02, altta TYT 01; görünür alanda terk edilmiş kayıt yok.",
+        "TYT 02 için 165 min, 33 points ve 130 practice sand açık. Results by subject ve Edit details and scores İngilizce. Alttaki kartın devamı normal kaydırma alanında."
+      ]
+    },
+    {
+      "file": "build/native_site_media/site-oct28-ui/screenshots/e2e-site-20261028-en-exam-insights.png",
+      "sha256": "c17785029cdcae20ec4a3c718136420b6127004b5353ca79a72d93e49981793b",
+      "dimensions": [
+        604,
+        1311
+      ],
+      "opened_with_view_image_and_emitted_image": true,
+      "status": "PASS",
+      "time_visible": "09:41",
+      "five_bottom_tabs_visible": true,
+      "tabs_exception": null,
+      "keyboard_visible": false,
+      "toast_or_snackbar_visible": false,
+      "observations_tr": [
+        "Physics satırında 75 min ve 1.75 → 4.75; diğer derslerin İngilizce içgörüleri okunuyor.",
+        "Karşılaştırmanın tek başına nedensellik göstermediği açıklaması görünür. Üstte 29 puan / 80 kum; bilgi kartları kesilmeden hizalı."
+      ]
+    },
+    {
+      "file": "build/native_site_media/site-oct28-ui/screenshots/e2e-site-20261028-en-exam-results.png",
+      "sha256": "138518a85cdf74855f49b907509dbcbb164f52c8fbeb8aad5a76d9198f7d7420",
+      "dimensions": [
+        604,
+        1311
+      ],
+      "opened_with_view_image_and_emitted_image": true,
+      "status": "PASS",
+      "time_visible": "09:41",
+      "five_bottom_tabs_visible": false,
+      "tabs_exception": "Modal partly covers underlying navigation",
+      "keyboard_visible": false,
+      "toast_or_snackbar_visible": false,
+      "observations_tr": [
+        "Başlık, açıklama ve Net = Correct − Wrong / 4 metni İngilizce. Unanswered tek satır, üç sayı alanı aynı hizada.",
+        "Turkish 30/4/6 ve net 29.00; Basic Mathematics 26/5/9 ve net 24.75. Save results gri; bu görüntü Save/RPC başarısını kanıtlamıyor."
+      ]
+    },
+    {
+      "file": "build/native_site_media/site-oct28-ui/screenshots/e2e-site-20261028-en-exam-running.png",
+      "sha256": "ab0972d3d5e13cb3e8b6422563ca061427f5bae8cab06a041a84ce8225974504",
+      "dimensions": [
+        604,
+        1311
+      ],
+      "opened_with_view_image_and_emitted_image": true,
+      "status": "PASS",
+      "time_visible": "09:41",
+      "five_bottom_tabs_visible": true,
+      "tabs_exception": null,
+      "keyboard_visible": false,
+      "toast_or_snackbar_visible": false,
+      "observations_tr": [
+        "TYT, Practice exam in progress, 02:44:55, No pauses or breaks ve Abandon practice exam okunuyor.",
+        "Altta kutulu New / History / League ve 4/3 net kuralı bulunuyor. Alt kartın devamı normal kaydırma sınırında; sayaç veya başlık taşmıyor."
+      ]
+    },
+    {
+      "file": "build/native_site_media/site-oct28-ui/screenshots/e2e-site-20261028-en-league-category.png",
+      "sha256": "b83e4249fdf8b0272ec82f87951b8571cbf7205926e6abb92941f8cb391581d5",
+      "dimensions": [
+        604,
+        1311
+      ],
+      "opened_with_view_image_and_emitted_image": true,
+      "status": "PASS",
+      "time_visible": "09:41",
+      "five_bottom_tabs_visible": true,
+      "tabs_exception": null,
+      "keyboard_visible": false,
+      "toast_or_snackbar_visible": false,
+      "observations_tr": [
+        "Bronze League ve hazırlık açıklaması İngilizce. YKS hedefi, Change target ve kalan süre görünür.",
+        "Deniz 29 pts / #2 / You; Ece 36 pts / #1; Mert 24 pts / #3. İnsan adları ve avatarlar hizalı."
+      ]
+    },
+    {
+      "file": "build/native_site_media/site-oct28-ui/screenshots/e2e-site-20261028-en-league-exam.png",
+      "sha256": "2d0a7b23d392cf015fecd54cba4b7f974c8ddb15ca4a8b7c4c89fe24524081b6",
+      "dimensions": [
+        604,
+        1311
+      ],
+      "opened_with_view_image_and_emitted_image": true,
+      "status": "WARNING",
+      "time_visible": "09:41",
+      "five_bottom_tabs_visible": true,
+      "tabs_exception": null,
+      "keyboard_visible": false,
+      "toast_or_snackbar_visible": false,
+      "observations_tr": [
+        "Kutulu League seçili; My target group / Global seçenekleri, Bronze League, Practice sand: 260 ve Deniz 66 puan okunuyor.",
+        "Dönem sonu Nov 1, 2026. Special artwork is being prepared geçici içerik metni hâlâ görünür; bu sunum uyarısıdır."
+      ]
+    },
+    {
+      "file": "build/native_site_media/site-oct28-ui/screenshots/e2e-site-20261028-en-league-global.png",
+      "sha256": "03bbf5c3c2d7085d400ac222ccc06bed6d27db0ca3b4ef6b93a655ba1285ae98",
+      "dimensions": [
+        604,
+        1311
+      ],
+      "opened_with_view_image_and_emitted_image": true,
+      "status": "PASS",
+      "time_visible": "09:41",
+      "five_bottom_tabs_visible": true,
+      "tabs_exception": null,
+      "keyboard_visible": false,
+      "toast_or_snackbar_visible": false,
+      "observations_tr": [
+        "Global seçili; tüm hedefler ve ayrı Deneme ligi hakkında İngilizce açıklama okunuyor.",
+        "Deniz / Ece / Mert podyumu; Arda ve Ada için 10 pts satırları görünür. QA etiketi veya e-posta gösterilmiyor."
+      ]
+    },
+    {
+      "file": "build/native_site_media/site-oct28-ui/screenshots/e2e-site-20261028-en-marathon-plan.png",
+      "sha256": "55b9d428dc04260a87b6ac427058d99c6cc6f30066f3ec4aa6413a873134abae",
+      "dimensions": [
+        604,
+        1311
+      ],
+      "opened_with_view_image_and_emitted_image": true,
+      "status": "PASS",
+      "time_visible": "09:41",
+      "five_bottom_tabs_visible": true,
+      "tabs_exception": null,
+      "keyboard_visible": false,
+      "toast_or_snackbar_visible": false,
+      "observations_tr": [
+        "3 seans / 25 m seçili; 75 min focus, about 85 min with breaks ve 3 extra points okunuyor.",
+        "Mola sonrası 1 dakika içinde I’m here açıklaması ve Start Marathon düğmesi sığıyor. Modal altında beş sekme görünür; klavye yok."
+      ]
+    },
+    {
+      "file": "build/native_site_media/site-oct28-ui/screenshots/e2e-site-20261028-en-reports-daily.png",
+      "sha256": "b258ebab2e7f01c5694c4f972539258a09e4cef78ce0dd9639ed73089becfeba",
+      "dimensions": [
+        604,
+        1311
+      ],
+      "opened_with_view_image_and_emitted_image": true,
+      "status": "WARNING",
+      "time_visible": "09:41",
+      "five_bottom_tabs_visible": true,
+      "tabs_exception": null,
+      "keyboard_visible": false,
+      "toast_or_snackbar_visible": false,
+      "observations_tr": [
+        "Daily Goal 4h 50m / 5h ve Efficiency Score 96% görünüyor. Regular sessions: 2; completed marathons: 1; completed practice exams: 1; 2 Marathon focus sessions.",
+        "Yatay rapor sekmesindeki Monthly Tracking etiketinin sağ ucu kadraj dışında; aşağıdaki içerik normal kaydırma alanı."
+      ]
+    },
+    {
+      "file": "build/native_site_media/site-oct28-ui/screenshots/e2e-site-20261028-en-reports-monthly.png",
+      "sha256": "5963f5ad111e86abc097a5e4c328d246b4092410809d523d8f43b622e2aa2024",
+      "dimensions": [
+        604,
+        1311
+      ],
+      "opened_with_view_image_and_emitted_image": true,
+      "status": "WARNING",
+      "time_visible": "09:41",
+      "five_bottom_tabs_visible": true,
+      "tabs_exception": null,
+      "keyboard_visible": false,
+      "toast_or_snackbar_visible": false,
+      "observations_tr": [
+        "Regular sessions: 2; completed marathons: 1; completed practice exams: 2; 2 Marathon focus sessions ve 5 × 25-minute focus equivalents okunuyor.",
+        "Sürenin ortak, deneme süresinin derslere dağıtılmadığı açıklaması ve October Intensity / 2026 görünür. Monthly Tracking sağ uçta kısalıyor; aylık toplam dakika ve takvim günleri kadrajda yok."
+      ]
+    },
+    {
+      "file": "build/native_site_media/site-oct28-ui/screenshots/e2e-site-20261028-en-reports-weekly.png",
+      "sha256": "4a0ded74baf77d918a0fb4aa813029e5564c28c6fc37e590dd6255fd4a009ea1",
+      "dimensions": [
+        604,
+        1311
+      ],
+      "opened_with_view_image_and_emitted_image": true,
+      "status": "WARNING",
+      "time_visible": "09:41",
+      "five_bottom_tabs_visible": true,
+      "tabs_exception": null,
+      "keyboard_visible": false,
+      "toast_or_snackbar_visible": false,
+      "observations_tr": [
+        "28 Oct seçili gün için 4h 50m; Weekly Efficiency 21%; Weekly Goal 35h görünüyor. Grafik ve İngilizce günler hizalı.",
+        "Monthly Tracking etiketinin sağ ucu kadraj dışında. 4h 50m seçili gün süresidir; ayrı haftalık toplam bu karede görünmüyor. Dynamic Island metni örtmüyor."
+      ]
+    },
+    {
+      "file": "build/native_site_media/site-oct28-ui/screenshots/e2e-site-20261028-en-social.png",
+      "sha256": "4db3fd1fb226f4f94a3fc13358710b8cf0c62014106a1dc2c039552b6e03339e",
+      "dimensions": [
+        604,
+        1311
+      ],
+      "opened_with_view_image_and_emitted_image": true,
+      "status": "PASS",
+      "time_visible": "09:41",
+      "five_bottom_tabs_visible": true,
+      "tabs_exception": null,
+      "keyboard_visible": false,
+      "toast_or_snackbar_visible": false,
+      "observations_tr": [
+        "Altı insan adı görünür: Can, Arda, Ece, Ada, Mert, Duru. Ece/Mert Focusing ve kırmızı; Arda/Ada On break ve yeşil; Can/Duru Taking an exam ve kırmızı.",
+        "Durum noktaları ve üç nokta menüleri hizalı; altı kart da tam görülüyor. Statik görüntü, anlık güncelleme veya animasyon davranışını kanıtlamaz."
+      ]
+    },
+    {
+      "file": "build/native_site_media/site-oct28-ui/screenshots/e2e-site-20261028-en-timer.png",
+      "sha256": "1c029e2f4cd1b2194e80b427d8c003a6cab7d2cf6284678c3f48b4bafcb33f74",
+      "dimensions": [
+        604,
+        1311
+      ],
+      "opened_with_view_image_and_emitted_image": true,
+      "status": "WARNING",
+      "time_visible": "09:41",
+      "five_bottom_tabs_visible": true,
+      "tabs_exception": null,
+      "keyboard_visible": false,
+      "toast_or_snackbar_visible": false,
+      "observations_tr": [
+        "29 puan / 80 kum; Physics, 25:00, 25/50 min, Start Marathon, 1/1 Pause Credit Available ve Start görülüyor.",
+        "Seri 2 simgesi metriklerin yanında çok küçük; görünür ama okunurluğu düşük. Mavi kum saati ve bütün ana düğmeler sığıyor; test rozeti yok."
+      ]
+    }
+  ],
+  "screenshot_manifest_sha256": "a87af338d634ae880b1d987b2eb8f2ab942a5b00d6494c30a74defcd441559ba",
+  "source_hashes_match_current_manifest": true
+}

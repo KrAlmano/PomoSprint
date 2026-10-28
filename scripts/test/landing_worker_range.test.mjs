@@ -4,7 +4,7 @@ import fs from "node:fs";
 import { test } from "node:test";
 import worker from "../../landing/worker.js";
 
-const paths = ["/videos/timer-20261008.mp4", "/videos/marathon-20261008.mp4", "/videos/timer-demo-20261008d.mp4", "/videos/marathon-demo-20261008d.mp4"];
+const paths = ["/videos/20261028/timer-tr.mp4", "/videos/20261028/timer-en.mp4", "/videos/20261028/marathon-tr.mp4", "/videos/20261028/marathon-en.mp4"];
 const videos = new Map(paths.map((name) => [name, new Uint8Array(fs.readFileSync(new URL(`../../landing${name}`, import.meta.url)))]));
 const assetHeaders = {
   "Content-Type": "video/mp4",
@@ -54,9 +54,9 @@ for (const path of paths) {
 }
 
 test("güncel native video cache sürümü Range yanıtını ve byte konumunu değiştirmez", async () => {
-  for (const path of paths.filter((value) => value.includes("-demo-"))) {
-    await checkRange(`${path}?v=20261028`, "bytes=0-1", 0, 1);
-    await checkRange(`${path}?v=20261028`, "bytes=512-1023", 512, 1023);
+  for (const path of paths) {
+    await checkRange(`${path}?v=20261028b`, "bytes=0-1", 0, 1);
+    await checkRange(`${path}?v=20261028b`, "bytes=512-1023", 512, 1023);
   }
 });
 

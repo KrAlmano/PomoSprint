@@ -1,0 +1,76 @@
+{
+  "status": "PASS",
+  "created_at": "2026-10-28T14:18:21.782953+00:00",
+  "scope": "Local site-only cleanup, preserved database rename and empty replacement; no production/main/review row writes",
+  "archive_database": "pomosprint_site32_dus_pre_ui",
+  "active_database": "pomosprint_site32_dus",
+  "old_oid": 62359,
+  "archive_same_oid": true,
+  "archive_74_table_hashes_equal": true,
+  "cleanup": {
+    "abandoned": 2,
+    "presences_cancelled": 4,
+    "reward": 0,
+    "live_after": 0,
+    "history_and_balances_unchanged": true
+  },
+  "new_empty_bootstrap": {
+    "passed": 23,
+    "total": 23,
+    "zero_users": true,
+    "zero_profiles": true,
+    "zero_attempts": true,
+    "zero_study_sessions": true
+  },
+  "health": {
+    "scope": "isolated32 local QA",
+    "database": "pomosprint_site32_dus",
+    "port": 54361
+  },
+  "gateway_pid": 2693,
+  "http_catalog": {
+    "count": 8,
+    "coins": {
+      "lgs_verbal": 60,
+      "lgs_quantitative": 70,
+      "ydt": 95,
+      "tus_basic": 110,
+      "tus_clinical": 110,
+      "dus": 120,
+      "tyt": 130,
+      "ayt": 145
+    },
+    "reward_policy_version": 2,
+    "DUS": {
+      "seconds": 9000,
+      "questions": 120,
+      "subjects": 16,
+      "points": 30
+    },
+    "capabilities": {
+      "exam_details": true,
+      "ayt_early_finish": true,
+      "ayt_modules_version": 1
+    }
+  },
+  "parity": {
+    "returncode": 0,
+    "stdout": "PASS isolated32 schema\nPASS isolated32 migrations\nPASS isolated32 catalog\nPASS isolated32 mail_trigger\nPASS isolated32 policy"
+  },
+  "31_installed": false,
+  "evidence": {
+    "build/verification_20261028/site_demo_site-oct28-dus_pre_ui_cleanup.json": "11f12d090497ae2b43dc5a069ccee8e60dc702a51f6a1725d7543cdbf58e1f8b",
+    "build/verification_20261028/site32_dus_pre_ui_archive.json": "adedc65d88465606758496d0b40b931cd09371ebc16b52e1b2e3bfd6ed77bd26",
+    "build/site32_dus_bootstrap/20261028T141735Z-fdedc2a8/results.json": "5cc79e015544411b534a9acb587006f6f6971e01949457dd9e8270ef9ba2e4fe"
+  },
+  "source_sha256": {
+    "supabase/proposed/27_tus_segment.sql": "9bd539da18f402b09ca8416dab485a8956a686c42847517862cc3552c958d7fd",
+    "supabase/proposed/28_exam_core.sql": "6d721fb66672679458951992e73f6e5472741a9b6a67cb71f5e47dcc81c416ce",
+    "supabase/proposed/29_monthly_competitions.sql": "408da466d17267bea6dbbd0527fc57e57399cc84289bde607f9ffdc92cc88a1f",
+    "supabase/proposed/30_session_start_atomic.sql": "c10d8235eb6f6f22372f8ebddb473b7ace186e2504e741705c01b1c15e4c7d73",
+    "supabase/proposed/32_exam_details_early_finish.sql": "5380d2cf015875259cd6e1fef99e42c6623a3cb2209d0b76117d94a2f1184fe2"
+  },
+  "main_review_stack_untouched": true,
+  "no_accounts_deleted": true,
+  "no_database_dropped": true
+}

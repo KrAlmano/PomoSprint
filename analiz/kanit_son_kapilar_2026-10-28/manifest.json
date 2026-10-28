@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "files": [
+    {
+      "file": "ios_unsigned_release.log",
+      "bytes": 355,
+      "sha256": "7182e718250d72b186115f4a62e962af167d36a52f84db756bc4f3f0f1f14c07"
+    },
+    {
+      "file": "ios-normal-main.png",
+      "bytes": 244691,
+      "sha256": "da0c6eb0e01b0f1f70908c0f8ea08240222dbd36eb462ecce9ef9d2268d1160a"
+    },
+    {
+      "file": "packages_and_gate1.json",
+      "bytes": 1075,
+      "sha256": "ef6da83c7232f725c38bad0f2c0225a59f7e1ab2f6f855bb2da7d2be824fb13f"
+    },
+    {
+      "file": "android_normal_run.log",
+      "bytes": 3220,
+      "sha256": "cd77e9c2b983e6371b50ab0c69a9336b43bcb7803bd4b0e47f95411b388d5df0"
+    },
+    {
+      "file": "android_release_pass_a3.log",
+      "bytes": 138,
+      "sha256": "a7f5b474d2269d7d678c646b1356952fc044425da07ece2d7c8e4dbaf3ec6178"
+    },
+    {
+      "file": "gate1-node.log",
+      "bytes": 16485,
+      "sha256": "f481d7e361478eba81e206452ae3a43efb1812233df8d8c4b80fe213ce781393"
+    },
+    {
+      "file": "gate1-flutter.log",
+      "bytes": 271807,
+      "sha256": "9cfeb5cb81d3ad1cc025370a339719b1e411f6f277e223ed961ca149c514d332"
+    },
+    {
+      "file": "gate1-analyze.log",
+      "bytes": 96,
+      "sha256": "74ca0be78f5d52a18845c0d9a9db858323a5b29fb6126963b07facc82761e517"
+    },
+    {
+      "file": "android_release_fail_a2.log",
+      "bytes": 1478,
+      "sha256": "438a85cfce188dc0b49dcfac945c043a161f6026e892f70dea4d5dc0ec3b9a4a"
+    },
+    {
+      "file": "ios_normal_sim_build.log",
+      "bytes": 229,
+      "sha256": "752f612cdf4b3764c79aa2956c627a09e0b9388710a1f669f8b9ea2d43ea860d"
+    },
+    {
+      "file": "android_release_fail_a1.log",
+      "bytes": 1481,
+      "sha256": "d2c85a3ce809f86677a99f3bd19714d772c49a6ef0fb77d0641158dcdd68d039"
+    },
+    {
+      "file": "android-normal-main.png",
+      "bytes": 143833,
+      "sha256": "6879a3cd78bb835ecd39f13007c71f87b9966ccd768b4239859a2600ebf6d569"
+    },
+    {
+      "file": "gate1-summary.json",
+      "bytes": 533,
+      "sha256": "2e9e1b4bc98fa23fb98d599bb1facf5e0c46a50997b16d610f99e713d64a3ded"
+    },
+    {
+      "file": "gate1-partials.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

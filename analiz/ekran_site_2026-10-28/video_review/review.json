@@ -1,0 +1,146 @@
+{
+  "reviewed_at_utc": "2026-10-28T14:53:12.426274+00:00",
+  "capture_run": "site-oct28-ui-a1",
+  "scope": "Video QA only; all 20 current extracted frames opened with view_image and emitted with image. No product/source video/manifest/DB/service writes.",
+  "status": "PASS_WITH_EDITORIAL_NOTES",
+  "video_count": 4,
+  "opened_png_count": 20,
+  "technical_pass_count": 4,
+  "independent_packet_proof_pass_count": 4,
+  "source_manifest_unchanged": true,
+  "owner_provenance": {
+    "current_owner": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+    "current_fixture_sha_matches": true,
+    "previous_owners_absent_from_manifest": true
+  },
+  "editorial_notes": [
+    "Both timer clips show the normal pause-credit-limit snackbar in the middle sample; it covers the main control area.",
+    "Both Marathon clips show the expected start confirmation snackbar.",
+    "Last sampled Start button is readable, with slight transition softness.",
+    "These UI demos do not prove completion of a full 25/50-minute session or Marathon."
+  ],
+  "clips": [
+    {
+      "video": "20261028/timer-tr.mp4",
+      "technical_pass": true,
+      "source_event_log_matches_all_taps": true,
+      "all_tap_coordinates_and_timestamps_match": true,
+      "tap_count": 8,
+      "encoding_duration_delta_seconds": -0.031607999999998526,
+      "encoding_duration_within_one_frame": true,
+      "packet_copy_independent_pass": true,
+      "visual_frames_opened": [
+        "first",
+        "middle",
+        "last",
+        "tap",
+        "tap_after"
+      ],
+      "visual_observations": {
+        "locale": "tr",
+        "time": "09:41",
+        "five_tabs_visible": true,
+        "normal_points": 29,
+        "normal_sand": 80,
+        "no_test_label_visible": true,
+        "no_5_or_10_second_mode_visible": true,
+        "tap_button": "50 minute duration selector",
+        "tap_after_selection_observed": "50:00 and selected 50-minute button",
+        "middle_snackbar": "Pause credit limit information covers the main control area",
+        "last_frame_note": "Start button readable; slight transition softness."
+      }
+    },
+    {
+      "video": "20261028/marathon-tr.mp4",
+      "technical_pass": true,
+      "source_event_log_matches_all_taps": true,
+      "all_tap_coordinates_and_timestamps_match": true,
+      "tap_count": 9,
+      "encoding_duration_delta_seconds": -0.006617000000002093,
+      "encoding_duration_within_one_frame": true,
+      "packet_copy_independent_pass": true,
+      "visual_frames_opened": [
+        "first",
+        "middle",
+        "last",
+        "tap",
+        "tap_after"
+      ],
+      "visual_observations": {
+        "locale": "tr",
+        "time": "09:41",
+        "five_tabs_visible": true,
+        "normal_points": 29,
+        "normal_sand": 80,
+        "no_test_label_visible": true,
+        "no_5_or_10_second_mode_visible": true,
+        "tap_button": "4-session selector",
+        "tap_after_selection_observed": "4 sessions, 100 minutes, about 115 minutes with breaks and +5 bonus",
+        "middle_snackbar": "Expected marathon-start success message",
+        "last_frame_note": "Start button readable; slight transition softness."
+      }
+    },
+    {
+      "video": "20261028/timer-en.mp4",
+      "technical_pass": true,
+      "source_event_log_matches_all_taps": true,
+      "all_tap_coordinates_and_timestamps_match": true,
+      "tap_count": 8,
+      "encoding_duration_delta_seconds": -0.005482000000000653,
+      "encoding_duration_within_one_frame": true,
+      "packet_copy_independent_pass": true,
+      "visual_frames_opened": [
+        "first",
+        "middle",
+        "last",
+        "tap",
+        "tap_after"
+      ],
+      "visual_observations": {
+        "locale": "en",
+        "time": "09:41",
+        "five_tabs_visible": true,
+        "normal_points": 29,
+        "normal_sand": 80,
+        "no_test_label_visible": true,
+        "no_5_or_10_second_mode_visible": true,
+        "tap_button": "50 minute duration selector",
+        "tap_after_selection_observed": "50:00 and selected 50-minute button",
+        "middle_snackbar": "Pause credit limit information covers the main control area",
+        "last_frame_note": "Start button readable; slight transition softness."
+      }
+    },
+    {
+      "video": "20261028/marathon-en.mp4",
+      "technical_pass": true,
+      "source_event_log_matches_all_taps": true,
+      "all_tap_coordinates_and_timestamps_match": true,
+      "tap_count": 9,
+      "encoding_duration_delta_seconds": -0.0008659999999984791,
+      "encoding_duration_within_one_frame": true,
+      "packet_copy_independent_pass": true,
+      "visual_frames_opened": [
+        "first",
+        "middle",
+        "last",
+        "tap",
+        "tap_after"
+      ],
+      "visual_observations": {
+        "locale": "en",
+        "time": "09:41",
+        "five_tabs_visible": true,
+        "normal_points": 29,
+        "normal_sand": 80,
+        "no_test_label_visible": true,
+        "no_5_or_10_second_mode_visible": true,
+        "tap_button": "4-session selector",
+        "tap_after_selection_observed": "4 sessions, 100 minutes, about 115 minutes with breaks and +5 bonus",
+        "middle_snackbar": "Expected marathon-start success message",
+        "last_frame_note": "Start button readable; slight transition softness."
+      }
+    }
+  ],
+  "technical_and_png_hash_file": "technical_checks.json",
+  "raw_52229976_bytes_copied": false
+}

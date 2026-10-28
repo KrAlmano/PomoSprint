@@ -1,0 +1,40 @@
+{
+  "status": "PASS",
+  "scope": "Compact ExamScreen UI only; no backend, timing or reward changes",
+  "tests": {
+    "selected_flutter": 40,
+    "log": "/tmp/pomosprint_compact_exam_ui_final.log",
+    "layouts": [
+      "320x740 scale1 TR/EN",
+      "320x740 scale2 TR/EN",
+      "740x320 scale2 TR/EN"
+    ],
+    "checks": [
+      "equal48px tabs",
+      "minimum44px interactive controls",
+      "wrapped family filters",
+      "one net-rules info card",
+      "metadata/chip no overflow",
+      "start rules remain mandatory",
+      "legacy/new capability form regressions"
+    ]
+  },
+  "harness_updates": [
+    "aa_exam_insights_test.dart",
+    "ad_verify_reports_exams_test.dart",
+    "af_verification_leagues_social_test.dart",
+    "ag_capture_site_dataset_test.dart",
+    "ah_exam_details_early_test.dart",
+    "ai_dus_native_test.dart",
+    "h_first_use_journey_test.dart",
+    "o_exam_release_journey_test.dart",
+    "x_league_target_journey_test.dart"
+  ],
+  "hashes": {
+    "lib/screens/exam_screen.dart": "1b90bffa79b084af39f8cda39fb9e2e36eb98ba90a1fa6c82458fe0e63910b28",
+    "test/exam_compact_ui_test.dart": "be05884c9519515a6a3306a62d1c439264d115c1e3a494ad0620a4da5dbdd4da",
+    "lib/l10n/app_tr.arb": "de6e88302b0b3ec35d49da096ee2215183083c58e51ca286fc7b77aacd65ea6e",
+    "lib/l10n/app_en.arb": "4410321adfee4aef143288aa386f315f1cbbae5de551db67c185a064d67af779"
+  },
+  "native": "not run by this task; root coordinates current capture and final gate"
+}

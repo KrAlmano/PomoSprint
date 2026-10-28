@@ -1,0 +1,4352 @@
+{
+  "schema_version": 1,
+  "exported_at": "2026-10-28T14:36:43.278Z",
+  "evidence_scope": "Actual read-only browser layout/resource measurements; final B acceptance and product interactions are not inferred",
+  "source": {
+    "origin": "http://127.0.0.1:8798",
+    "path": "/__qa",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6.2 Safari/605.1.15",
+    "outer_viewport": {
+      "width": 1440,
+      "height": 843,
+      "device_pixel_ratio": 2
+    }
+  },
+  "summary": {
+    "status": "COMPLETE",
+    "runtime_executed": true,
+    "matrix_complete": true,
+    "all_readonly_cases_passed": true,
+    "interaction_checks": "PENDING_CUA",
+    "exact_first_paint": "NOT_PROVEN_BY_THIS_PROXY",
+    "completed_cases": 72,
+    "failed_cases": 0,
+    "measurements": "Read-only same-origin iframe layout/resources; no product interactions",
+    "first_paint_limit": "Earliest-heading rAF proxy; exact Paint Timing may be unsupported in Safari",
+    "started_at": "2026-10-28T14:35:45.361Z",
+    "completed_at": "2026-10-28T14:36:38.054Z",
+    "failures": []
+  },
+  "cases": [
+    {
+      "page": "/404",
+      "file": "404.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 375,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 80,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Bu sayfa kumda kayboldu",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 351,
+          "top": 247,
+          "bottom": 279
+        },
+        "viewport": {
+          "width": 375,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 81
+        }
+      ],
+      "checked_resources": 11,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/confirmed?lang=tr",
+      "file": "confirmed.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 375,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 64,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "E-posta Onayı",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 45,
+          "right": 330,
+          "top": 433,
+          "bottom": 462
+        },
+        "viewport": {
+          "width": 375,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 64
+        }
+      ],
+      "checked_resources": 1,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/confirmed?lang=en",
+      "file": "confirmed.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 375,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 33,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Email Confirmation",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 45,
+          "right": 330,
+          "top": 433,
+          "bottom": 462
+        },
+        "viewport": {
+          "width": 375,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 34
+        }
+      ],
+      "checked_resources": 1,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/destek",
+      "file": "destek.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 375,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 69,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "PomoSprint Destek",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 351,
+          "top": 184,
+          "bottom": 222
+        },
+        "viewport": {
+          "width": 375,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 70
+        }
+      ],
+      "checked_resources": 11,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/en/delete-account",
+      "file": "en/delete-account.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 375,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 66,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Delete Your PomoSprint Account",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 351,
+          "top": 184,
+          "bottom": 260
+        },
+        "viewport": {
+          "width": 375,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 67
+        }
+      ],
+      "checked_resources": 10,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/en/faq",
+      "file": "en/faq.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 375,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 140,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "PomoSprint: Frequently Asked Questions",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 351,
+          "top": 137,
+          "bottom": 251
+        },
+        "viewport": {
+          "width": 375,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 140
+        }
+      ],
+      "checked_resources": 9,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/en/features",
+      "file": "en/features.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 375,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "orbit-track ot-a4",
+          "left": -10,
+          "right": 386,
+          "width": 396
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "orbit-track ot-a5",
+          "left": -7,
+          "right": 382,
+          "width": 388
+        }
+      ],
+      "first_heading_frame": {
+        "sampledAt": 93,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "PomoSprint: study time and progress together",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 351,
+          "top": 184,
+          "bottom": 298
+        },
+        "viewport": {
+          "width": 375,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 95
+        }
+      ],
+      "checked_resources": 35,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": [
+        {
+          "directive": "img-src",
+          "blocked": "data"
+        }
+      ]
+    },
+    {
+      "page": "/en/",
+      "file": "en/index.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 375,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "hp-field",
+          "left": -9976,
+          "right": -9975,
+          "width": 1
+        },
+        {
+          "tag": "LABEL",
+          "id": "",
+          "className": "",
+          "left": -9976,
+          "right": -9931,
+          "width": 45
+        },
+        {
+          "tag": "INPUT",
+          "id": "notify-website",
+          "className": "",
+          "left": -9976,
+          "right": -9729,
+          "width": 247
+        }
+      ],
+      "first_heading_frame": {
+        "sampledAt": 126,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "PomoSprint: study together with Pomodoro",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 351,
+          "top": 174,
+          "bottom": 312
+        },
+        "viewport": {
+          "width": 375,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 127
+        }
+      ],
+      "checked_resources": 17,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": [
+        {
+          "directive": "img-src",
+          "blocked": "data"
+        }
+      ]
+    },
+    {
+      "page": "/en/kvkk",
+      "file": "en/kvkk.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 375,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 65,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "KVKK Privacy Notice",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 351,
+          "top": 184,
+          "bottom": 222
+        },
+        "viewport": {
+          "width": 375,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 66
+        }
+      ],
+      "checked_resources": 10,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/en/privacy",
+      "file": "en/privacy.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 375,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 58,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Privacy Policy",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 351,
+          "top": 184,
+          "bottom": 222
+        },
+        "viewport": {
+          "width": 375,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 58
+        }
+      ],
+      "checked_resources": 10,
+      "broken_resources": [],
+      "skipped_external_targets": [
+        {
+          "kind": "link",
+          "url": "https://supabase.com/privacy",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://sentry.io/privacy/",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://policies.google.com/privacy",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://www.apple.com/legal/privacy/",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://resend.com/legal/privacy-policy",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://www.cloudflare.com/privacypolicy/",
+          "reason": "external/non-static target not followed"
+        }
+      ],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/en/support",
+      "file": "en/support.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 375,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 41,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "PomoSprint Support",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 351,
+          "top": 184,
+          "bottom": 222
+        },
+        "viewport": {
+          "width": 375,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 41
+        }
+      ],
+      "checked_resources": 11,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/en/terms",
+      "file": "en/terms.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 375,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 55,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Terms of Use",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 351,
+          "top": 184,
+          "bottom": 222
+        },
+        "viewport": {
+          "width": 375,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 55
+        }
+      ],
+      "checked_resources": 10,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/faq",
+      "file": "faq.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 375,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 55,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "PomoSprint: Sıkça Sorulan Sorular",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 351,
+          "top": 137,
+          "bottom": 213
+        },
+        "viewport": {
+          "width": 375,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 55
+        }
+      ],
+      "checked_resources": 10,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/features",
+      "file": "features.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 375,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "orbit-track ot-a4",
+          "left": -10,
+          "right": 386,
+          "width": 396
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "orbit-track ot-a5",
+          "left": -7,
+          "right": 381,
+          "width": 388
+        }
+      ],
+      "first_heading_frame": {
+        "sampledAt": 89,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "PomoSprint: çalışmanı ve gelişimini birlikte gör",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 351,
+          "top": 184,
+          "bottom": 298
+        },
+        "viewport": {
+          "width": 375,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 89
+        }
+      ],
+      "checked_resources": 36,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": [
+        {
+          "directive": "img-src",
+          "blocked": "data"
+        }
+      ]
+    },
+    {
+      "page": "/hesap-silme",
+      "file": "hesap-silme.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 375,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 71.00000000000001,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "PomoSprint Hesabını Silme",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 351,
+          "top": 184,
+          "bottom": 260
+        },
+        "viewport": {
+          "width": 375,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 71.00000000000001
+        }
+      ],
+      "checked_resources": 11,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/",
+      "file": "index.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 375,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "hp-field",
+          "left": -9976,
+          "right": -9975,
+          "width": 1
+        },
+        {
+          "tag": "LABEL",
+          "id": "",
+          "className": "",
+          "left": -9976,
+          "right": -9941,
+          "width": 35
+        },
+        {
+          "tag": "INPUT",
+          "id": "notify-website",
+          "className": "",
+          "left": -9976,
+          "right": -9729,
+          "width": 247
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "marquee-track",
+          "left": 24,
+          "right": 2200,
+          "width": 2176
+        },
+        {
+          "tag": "IMG",
+          "id": "",
+          "className": "m-avatar",
+          "left": 364,
+          "right": 418,
+          "width": 54
+        },
+        {
+          "tag": "IMG",
+          "id": "",
+          "className": "m-avatar",
+          "left": 432,
+          "right": 486,
+          "width": 54
+        },
+        {
+          "tag": "IMG",
+          "id": "",
+          "className": "m-avatar",
+          "left": 500,
+          "right": 554,
+          "width": 54
+        },
+        {
+          "tag": "IMG",
+          "id": "",
+          "className": "m-avatar",
+          "left": 568,
+          "right": 622,
+          "width": 54
+        },
+        {
+          "tag": "IMG",
+          "id": "",
+          "className": "m-avatar",
+          "left": 636,
+          "right": 690,
+          "width": 54
+        },
+        {
+          "tag": "IMG",
+          "id": "",
+          "className": "m-avatar",
+          "left": 704,
+          "right": 758,
+          "width": 54
+        },
+        {
+          "tag": "IMG",
+          "id": "",
+          "className": "m-avatar",
+          "left": 772,
+          "right": 826,
+          "width": 54
+        },
+        {
+          "tag": "IMG",
+          "id": "",
+          "className": "m-avatar",
+          "left": 840,
+          "right": 894,
+          "width": 54
+        },
+        {
+          "tag": "IMG",
+          "id": "",
+          "className": "m-avatar",
+          "left": 908,
+          "right": 962,
+          "width": 54
+        },
+        {
+          "tag": "IMG",
+          "id": "",
+          "className": "m-avatar",
+          "left": 976,
+          "right": 1030,
+          "width": 54
+        },
+        {
+          "tag": "IMG",
+          "id": "",
+          "className": "m-avatar",
+          "left": 1044,
+          "right": 1098,
+          "width": 54
+        }
+      ],
+      "first_heading_frame": {
+        "sampledAt": 110,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "PomoSprint: birlikte Pomodoro ile ders çalış",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 351,
+          "top": 174,
+          "bottom": 312
+        },
+        "viewport": {
+          "width": 375,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 111
+        }
+      ],
+      "checked_resources": 34,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": [
+        {
+          "directive": "img-src",
+          "blocked": "data"
+        }
+      ]
+    },
+    {
+      "page": "/kvkk",
+      "file": "kvkk.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 375,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 59.00000000000001,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "KVKK Aydınlatma Metni",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 351,
+          "top": 184,
+          "bottom": 260
+        },
+        "viewport": {
+          "width": 375,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 59.00000000000001
+        }
+      ],
+      "checked_resources": 11,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/pomodoro-nedir",
+      "file": "pomodoro-nedir.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 375,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 94,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Bir domates zamanlayıcının dünyayı değiştiren fikri",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 351,
+          "top": 184,
+          "bottom": 336
+        },
+        "viewport": {
+          "width": 375,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 94
+        }
+      ],
+      "checked_resources": 10,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": [
+        {
+          "directive": "img-src",
+          "blocked": "data"
+        }
+      ]
+    },
+    {
+      "page": "/privacy",
+      "file": "privacy.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 375,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 64,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Gizlilik Politikası",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 351,
+          "top": 184,
+          "bottom": 222
+        },
+        "viewport": {
+          "width": 375,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 64
+        }
+      ],
+      "checked_resources": 11,
+      "broken_resources": [],
+      "skipped_external_targets": [
+        {
+          "kind": "link",
+          "url": "https://supabase.com/privacy",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://sentry.io/privacy/",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://policies.google.com/privacy",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://www.apple.com/legal/privacy/",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://resend.com/legal/privacy-policy",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://www.cloudflare.com/privacypolicy/",
+          "reason": "external/non-static target not followed"
+        }
+      ],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/reset-password?lang=tr",
+      "file": "reset-password.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 375,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 37,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Bağlantı Geçersiz",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 45,
+          "right": 330,
+          "top": 488,
+          "bottom": 517
+        },
+        "viewport": {
+          "width": 375,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 37
+        }
+      ],
+      "checked_resources": 1,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/reset-password?lang=en",
+      "file": "reset-password.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 375,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 83,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Invalid Link",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 45,
+          "right": 330,
+          "top": 488,
+          "bottom": 517
+        },
+        "viewport": {
+          "width": 375,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 83
+        }
+      ],
+      "checked_resources": 1,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/terms",
+      "file": "terms.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 375,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 175.00000000000003,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Kullanım Şartları",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 351,
+          "top": 184,
+          "bottom": 222
+        },
+        "viewport": {
+          "width": 375,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 176
+        }
+      ],
+      "checked_resources": 11,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/unsubscribe?lang=tr",
+      "file": "unsubscribe.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 375,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 41,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Bağlantı Eksik",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 45,
+          "right": 330,
+          "top": 475,
+          "bottom": 504
+        },
+        "viewport": {
+          "width": 375,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 41
+        }
+      ],
+      "checked_resources": 1,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/unsubscribe?lang=en",
+      "file": "unsubscribe.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 375,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 28,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Incomplete Link",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 45,
+          "right": 330,
+          "top": 475,
+          "bottom": 504
+        },
+        "viewport": {
+          "width": 375,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 28
+        }
+      ],
+      "checked_resources": 1,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/404",
+      "file": "404.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 1024,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 38,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Bu sayfa kumda kayboldu",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 1000,
+          "top": 295,
+          "bottom": 341
+        },
+        "viewport": {
+          "width": 1024,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 38
+        }
+      ],
+      "checked_resources": 11,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/confirmed?lang=tr",
+      "file": "confirmed.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 1024,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 31,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "E-posta Onayı",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 331,
+          "right": 693,
+          "top": 443,
+          "bottom": 478
+        },
+        "viewport": {
+          "width": 1024,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 32
+        }
+      ],
+      "checked_resources": 1,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/confirmed?lang=en",
+      "file": "confirmed.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 1024,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 25,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Email Confirmation",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 331,
+          "right": 693,
+          "top": 443,
+          "bottom": 478
+        },
+        "viewport": {
+          "width": 1024,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 25
+        }
+      ],
+      "checked_resources": 1,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/destek",
+      "file": "destek.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 1024,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 52.00000000000001,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "PomoSprint Destek",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 1000,
+          "top": 184,
+          "bottom": 239
+        },
+        "viewport": {
+          "width": 1024,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 53
+        }
+      ],
+      "checked_resources": 11,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/en/delete-account",
+      "file": "en/delete-account.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 1024,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 56,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Delete Your PomoSprint Account",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 1000,
+          "top": 184,
+          "bottom": 239
+        },
+        "viewport": {
+          "width": 1024,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 56
+        }
+      ],
+      "checked_resources": 10,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/en/faq",
+      "file": "en/faq.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 1024,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 54,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "PomoSprint: Frequently Asked Questions",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 1000,
+          "top": 137,
+          "bottom": 192
+        },
+        "viewport": {
+          "width": 1024,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 54
+        }
+      ],
+      "checked_resources": 9,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/en/features",
+      "file": "en/features.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 1024,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "feature-row-media",
+          "left": 650,
+          "right": 1064,
+          "width": 414
+        },
+        {
+          "tag": "FIGURE",
+          "id": "",
+          "className": "media-figure",
+          "left": 650,
+          "right": 1064,
+          "width": 414
+        },
+        {
+          "tag": "FIGCAPTION",
+          "id": "feature-marathon-plan-en-caption",
+          "className": "media-caption",
+          "left": 667,
+          "right": 1047,
+          "width": 380
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "feature-row-media feature-gallery",
+          "left": -40,
+          "right": 501,
+          "width": 541
+        },
+        {
+          "tag": "FIGURE",
+          "id": "",
+          "className": "media-figure",
+          "left": -40,
+          "right": 219,
+          "width": 259
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "phone phone-real",
+          "left": -20,
+          "right": 200,
+          "width": 220
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "phone-screen phone-screen-real",
+          "left": -12,
+          "right": 192,
+          "width": 204
+        },
+        {
+          "tag": "IMG",
+          "id": "",
+          "className": "shot-image",
+          "left": -12,
+          "right": 192,
+          "width": 204
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "feature-row-media feature-gallery",
+          "left": 524,
+          "right": 1064,
+          "width": 541
+        },
+        {
+          "tag": "FIGURE",
+          "id": "",
+          "className": "media-figure",
+          "left": 805,
+          "right": 1064,
+          "width": 259
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "phone phone-real",
+          "left": 824,
+          "right": 1044,
+          "width": 220
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "phone-screen phone-screen-real",
+          "left": 832,
+          "right": 1036,
+          "width": 204
+        },
+        {
+          "tag": "IMG",
+          "id": "",
+          "className": "shot-image",
+          "left": 832,
+          "right": 1036,
+          "width": 204
+        },
+        {
+          "tag": "FIGCAPTION",
+          "id": "feature-exam-results-en-caption",
+          "className": "media-caption",
+          "left": 826,
+          "right": 1043,
+          "width": 217
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "feature-row-media",
+          "left": -40,
+          "right": 466,
+          "width": 506
+        }
+      ],
+      "first_heading_frame": {
+        "sampledAt": 75,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "PomoSprint: study time and progress together",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 1000,
+          "top": 184,
+          "bottom": 239
+        },
+        "viewport": {
+          "width": 1024,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 77
+        }
+      ],
+      "checked_resources": 35,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": [
+        {
+          "directive": "img-src",
+          "blocked": "data"
+        }
+      ]
+    },
+    {
+      "page": "/en/",
+      "file": "en/index.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 1024,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "feature-row-text",
+          "left": -32,
+          "right": 474,
+          "width": 506
+        },
+        {
+          "tag": "SPAN",
+          "id": "",
+          "className": "eyebrow",
+          "left": -32,
+          "right": 80,
+          "width": 112
+        },
+        {
+          "tag": "H2",
+          "id": "",
+          "className": "",
+          "left": -32,
+          "right": 474,
+          "width": 506
+        },
+        {
+          "tag": "P",
+          "id": "",
+          "className": "",
+          "left": -32,
+          "right": 474,
+          "width": 506
+        },
+        {
+          "tag": "P",
+          "id": "",
+          "className": "",
+          "left": -32,
+          "right": 474,
+          "width": 506
+        },
+        {
+          "tag": "P",
+          "id": "",
+          "className": "spotlight-action",
+          "left": -32,
+          "right": 474,
+          "width": 506
+        },
+        {
+          "tag": "A",
+          "id": "",
+          "className": "btn btn-primary",
+          "left": -32,
+          "right": 160,
+          "width": 192
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "feature-row-media",
+          "left": 650,
+          "right": 1064,
+          "width": 414
+        },
+        {
+          "tag": "FIGURE",
+          "id": "",
+          "className": "media-figure",
+          "left": 650,
+          "right": 1064,
+          "width": 414
+        },
+        {
+          "tag": "FIGCAPTION",
+          "id": "feature-marathon-plan-en-caption",
+          "className": "media-caption",
+          "left": 667,
+          "right": 1047,
+          "width": 380
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "feature-row-text",
+          "left": 642,
+          "right": 1056,
+          "width": 414
+        },
+        {
+          "tag": "H2",
+          "id": "",
+          "className": "",
+          "left": 642,
+          "right": 1056,
+          "width": 414
+        },
+        {
+          "tag": "P",
+          "id": "",
+          "className": "",
+          "left": 642,
+          "right": 1056,
+          "width": 414
+        },
+        {
+          "tag": "P",
+          "id": "",
+          "className": "",
+          "left": 642,
+          "right": 1056,
+          "width": 414
+        },
+        {
+          "tag": "P",
+          "id": "",
+          "className": "spotlight-action",
+          "left": 642,
+          "right": 1056,
+          "width": 414
+        }
+      ],
+      "first_heading_frame": {
+        "sampledAt": 63,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "PomoSprint: study together with Pomodoro",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 511.1875,
+          "top": 206,
+          "bottom": 389
+        },
+        "viewport": {
+          "width": 1024,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 64
+        }
+      ],
+      "checked_resources": 17,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": [
+        {
+          "directive": "img-src",
+          "blocked": "data"
+        }
+      ]
+    },
+    {
+      "page": "/en/kvkk",
+      "file": "en/kvkk.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 1024,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 59.00000000000001,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "KVKK Privacy Notice",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 1000,
+          "top": 184,
+          "bottom": 239
+        },
+        "viewport": {
+          "width": 1024,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 59.00000000000001
+        }
+      ],
+      "checked_resources": 10,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/en/privacy",
+      "file": "en/privacy.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 1024,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 68,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Privacy Policy",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 1000,
+          "top": 184,
+          "bottom": 239
+        },
+        "viewport": {
+          "width": 1024,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 69
+        }
+      ],
+      "checked_resources": 10,
+      "broken_resources": [],
+      "skipped_external_targets": [
+        {
+          "kind": "link",
+          "url": "https://supabase.com/privacy",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://sentry.io/privacy/",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://policies.google.com/privacy",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://www.apple.com/legal/privacy/",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://resend.com/legal/privacy-policy",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://www.cloudflare.com/privacypolicy/",
+          "reason": "external/non-static target not followed"
+        }
+      ],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/en/support",
+      "file": "en/support.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 1024,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 45,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "PomoSprint Support",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 1000,
+          "top": 184,
+          "bottom": 239
+        },
+        "viewport": {
+          "width": 1024,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 45
+        }
+      ],
+      "checked_resources": 11,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/en/terms",
+      "file": "en/terms.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 1024,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 53,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Terms of Use",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 1000,
+          "top": 184,
+          "bottom": 239
+        },
+        "viewport": {
+          "width": 1024,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 53
+        }
+      ],
+      "checked_resources": 10,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/faq",
+      "file": "faq.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 1024,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 53,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "PomoSprint: Sıkça Sorulan Sorular",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 1000,
+          "top": 137,
+          "bottom": 192
+        },
+        "viewport": {
+          "width": 1024,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 54
+        }
+      ],
+      "checked_resources": 10,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/features",
+      "file": "features.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 1024,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "feature-row-media",
+          "left": 650,
+          "right": 1064,
+          "width": 414
+        },
+        {
+          "tag": "FIGURE",
+          "id": "",
+          "className": "media-figure",
+          "left": 650,
+          "right": 1064,
+          "width": 414
+        },
+        {
+          "tag": "FIGCAPTION",
+          "id": "feature-marathon-plan-tr-caption",
+          "className": "media-caption",
+          "left": 650,
+          "right": 1064,
+          "width": 414
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "feature-row-media feature-gallery",
+          "left": -40,
+          "right": 501,
+          "width": 541
+        },
+        {
+          "tag": "FIGURE",
+          "id": "",
+          "className": "media-figure",
+          "left": -40,
+          "right": 219,
+          "width": 259
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "phone phone-real",
+          "left": -20,
+          "right": 200,
+          "width": 220
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "phone-screen phone-screen-real",
+          "left": -12,
+          "right": 192,
+          "width": 204
+        },
+        {
+          "tag": "IMG",
+          "id": "",
+          "className": "shot-image",
+          "left": -12,
+          "right": 192,
+          "width": 204
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "feature-row-media feature-gallery",
+          "left": 524,
+          "right": 1064,
+          "width": 541
+        },
+        {
+          "tag": "FIGURE",
+          "id": "",
+          "className": "media-figure",
+          "left": 805,
+          "right": 1064,
+          "width": 259
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "phone phone-real",
+          "left": 824,
+          "right": 1044,
+          "width": 220
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "phone-screen phone-screen-real",
+          "left": 832,
+          "right": 1036,
+          "width": 204
+        },
+        {
+          "tag": "IMG",
+          "id": "",
+          "className": "shot-image",
+          "left": 832,
+          "right": 1036,
+          "width": 204
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "feature-row-media",
+          "left": -40,
+          "right": 466,
+          "width": 506
+        },
+        {
+          "tag": "FIGURE",
+          "id": "",
+          "className": "media-figure",
+          "left": -40,
+          "right": 466,
+          "width": 506
+        }
+      ],
+      "first_heading_frame": {
+        "sampledAt": 86,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "PomoSprint: çalışmanı ve gelişimini birlikte gör",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 1000,
+          "top": 184,
+          "bottom": 239
+        },
+        "viewport": {
+          "width": 1024,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 87.00000000000001
+        }
+      ],
+      "checked_resources": 36,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": [
+        {
+          "directive": "img-src",
+          "blocked": "data"
+        }
+      ]
+    },
+    {
+      "page": "/hesap-silme",
+      "file": "hesap-silme.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 1024,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 68,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "PomoSprint Hesabını Silme",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 1000,
+          "top": 184,
+          "bottom": 239
+        },
+        "viewport": {
+          "width": 1024,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 68
+        }
+      ],
+      "checked_resources": 11,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/",
+      "file": "index.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 1024,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "feature-row-text",
+          "left": -32,
+          "right": 474,
+          "width": 506
+        },
+        {
+          "tag": "SPAN",
+          "id": "",
+          "className": "eyebrow",
+          "left": -32,
+          "right": 69,
+          "width": 101
+        },
+        {
+          "tag": "H2",
+          "id": "",
+          "className": "",
+          "left": -32,
+          "right": 474,
+          "width": 506
+        },
+        {
+          "tag": "P",
+          "id": "",
+          "className": "",
+          "left": -32,
+          "right": 474,
+          "width": 506
+        },
+        {
+          "tag": "P",
+          "id": "",
+          "className": "",
+          "left": -32,
+          "right": 474,
+          "width": 506
+        },
+        {
+          "tag": "P",
+          "id": "",
+          "className": "spotlight-action",
+          "left": -32,
+          "right": 474,
+          "width": 506
+        },
+        {
+          "tag": "A",
+          "id": "",
+          "className": "btn btn-primary",
+          "left": -32,
+          "right": 152,
+          "width": 184
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "feature-row-media",
+          "left": 650,
+          "right": 1064,
+          "width": 414
+        },
+        {
+          "tag": "FIGURE",
+          "id": "",
+          "className": "media-figure",
+          "left": 650,
+          "right": 1064,
+          "width": 414
+        },
+        {
+          "tag": "FIGCAPTION",
+          "id": "feature-marathon-plan-tr-caption",
+          "className": "media-caption",
+          "left": 650,
+          "right": 1064,
+          "width": 414
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "feature-row-text",
+          "left": 642,
+          "right": 1056,
+          "width": 414
+        },
+        {
+          "tag": "H2",
+          "id": "",
+          "className": "",
+          "left": 642,
+          "right": 1056,
+          "width": 414
+        },
+        {
+          "tag": "P",
+          "id": "",
+          "className": "",
+          "left": 642,
+          "right": 1056,
+          "width": 414
+        },
+        {
+          "tag": "P",
+          "id": "",
+          "className": "",
+          "left": 642,
+          "right": 1056,
+          "width": 414
+        },
+        {
+          "tag": "P",
+          "id": "",
+          "className": "spotlight-action",
+          "left": 642,
+          "right": 1056,
+          "width": 414
+        }
+      ],
+      "first_heading_frame": {
+        "sampledAt": 61,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "PomoSprint: birlikte Pomodoro ile ders çalış",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 511.1875,
+          "top": 206,
+          "bottom": 389
+        },
+        "viewport": {
+          "width": 1024,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 61
+        }
+      ],
+      "checked_resources": 34,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": [
+        {
+          "directive": "img-src",
+          "blocked": "data"
+        }
+      ]
+    },
+    {
+      "page": "/kvkk",
+      "file": "kvkk.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 1024,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 56,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "KVKK Aydınlatma Metni",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 1000,
+          "top": 184,
+          "bottom": 239
+        },
+        "viewport": {
+          "width": 1024,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 56
+        }
+      ],
+      "checked_resources": 11,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/pomodoro-nedir",
+      "file": "pomodoro-nedir.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 1024,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "feature-row-text",
+          "left": 642,
+          "right": 1056,
+          "width": 414
+        },
+        {
+          "tag": "H2",
+          "id": "",
+          "className": "",
+          "left": 642,
+          "right": 1056,
+          "width": 414
+        },
+        {
+          "tag": "P",
+          "id": "",
+          "className": "",
+          "left": 642,
+          "right": 1056,
+          "width": 414
+        },
+        {
+          "tag": "UL",
+          "id": "",
+          "className": "",
+          "left": 642,
+          "right": 1056,
+          "width": 414
+        },
+        {
+          "tag": "LI",
+          "id": "",
+          "className": "",
+          "left": 642,
+          "right": 1056,
+          "width": 414
+        },
+        {
+          "tag": "LI",
+          "id": "",
+          "className": "",
+          "left": 642,
+          "right": 1056,
+          "width": 414
+        },
+        {
+          "tag": "LI",
+          "id": "",
+          "className": "",
+          "left": 642,
+          "right": 1056,
+          "width": 414
+        },
+        {
+          "tag": "LI",
+          "id": "",
+          "className": "",
+          "left": 642,
+          "right": 1056,
+          "width": 414
+        },
+        {
+          "tag": "P",
+          "id": "",
+          "className": "rule-note",
+          "left": 642,
+          "right": 1056,
+          "width": 414
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "feature-row-media",
+          "left": -40,
+          "right": 466,
+          "width": 506
+        }
+      ],
+      "first_heading_frame": {
+        "sampledAt": 74,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Bir domates zamanlayıcının dünyayı değiştiren fikri",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 1000,
+          "top": 184,
+          "bottom": 294
+        },
+        "viewport": {
+          "width": 1024,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 75
+        }
+      ],
+      "checked_resources": 10,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": [
+        {
+          "directive": "img-src",
+          "blocked": "data"
+        }
+      ]
+    },
+    {
+      "page": "/privacy",
+      "file": "privacy.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 1024,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 65,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Gizlilik Politikası",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 1000,
+          "top": 184,
+          "bottom": 239
+        },
+        "viewport": {
+          "width": 1024,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 65
+        }
+      ],
+      "checked_resources": 11,
+      "broken_resources": [],
+      "skipped_external_targets": [
+        {
+          "kind": "link",
+          "url": "https://supabase.com/privacy",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://sentry.io/privacy/",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://policies.google.com/privacy",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://www.apple.com/legal/privacy/",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://resend.com/legal/privacy-policy",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://www.cloudflare.com/privacypolicy/",
+          "reason": "external/non-static target not followed"
+        }
+      ],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/reset-password?lang=tr",
+      "file": "reset-password.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 1024,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 30,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Bağlantı Geçersiz",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 331,
+          "right": 693,
+          "top": 498,
+          "bottom": 533
+        },
+        "viewport": {
+          "width": 1024,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 31
+        }
+      ],
+      "checked_resources": 1,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/reset-password?lang=en",
+      "file": "reset-password.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 1024,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 33,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Invalid Link",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 331,
+          "right": 693,
+          "top": 485,
+          "bottom": 520
+        },
+        "viewport": {
+          "width": 1024,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 33
+        }
+      ],
+      "checked_resources": 1,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/terms",
+      "file": "terms.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 1024,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 50,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Kullanım Şartları",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 24,
+          "right": 1000,
+          "top": 184,
+          "bottom": 239
+        },
+        "viewport": {
+          "width": 1024,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 50
+        }
+      ],
+      "checked_resources": 11,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/unsubscribe?lang=tr",
+      "file": "unsubscribe.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 1024,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 32,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Bağlantı Eksik",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 331,
+          "right": 693,
+          "top": 472,
+          "bottom": 507
+        },
+        "viewport": {
+          "width": 1024,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 32
+        }
+      ],
+      "checked_resources": 1,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/unsubscribe?lang=en",
+      "file": "unsubscribe.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 1024,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 44,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Incomplete Link",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 331,
+          "right": 693,
+          "top": 485,
+          "bottom": 520
+        },
+        "viewport": {
+          "width": 1024,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 44
+        }
+      ],
+      "checked_resources": 1,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/404",
+      "file": "404.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 1440,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 36.00000000000001,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Bu sayfa kumda kayboldu",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 124,
+          "right": 1316,
+          "top": 295,
+          "bottom": 341
+        },
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 36.00000000000001
+        }
+      ],
+      "checked_resources": 11,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/confirmed?lang=tr",
+      "file": "confirmed.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 1440,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 50,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "E-posta Onayı",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 539,
+          "right": 901,
+          "top": 443,
+          "bottom": 478
+        },
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 50
+        }
+      ],
+      "checked_resources": 1,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/confirmed?lang=en",
+      "file": "confirmed.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 1440,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 44,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Email Confirmation",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 539,
+          "right": 901,
+          "top": 443,
+          "bottom": 478
+        },
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 44
+        }
+      ],
+      "checked_resources": 1,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/destek",
+      "file": "destek.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 1440,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 46,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "PomoSprint Destek",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 124,
+          "right": 1316,
+          "top": 184,
+          "bottom": 239
+        },
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 46
+        }
+      ],
+      "checked_resources": 11,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/en/delete-account",
+      "file": "en/delete-account.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 1440,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 50,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Delete Your PomoSprint Account",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 124,
+          "right": 1316,
+          "top": 184,
+          "bottom": 239
+        },
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 50
+        }
+      ],
+      "checked_resources": 10,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/en/faq",
+      "file": "en/faq.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 1440,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 36.00000000000001,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "PomoSprint: Frequently Asked Questions",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 124,
+          "right": 1316,
+          "top": 137,
+          "bottom": 192
+        },
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 36.00000000000001
+        }
+      ],
+      "checked_resources": 9,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/en/features",
+      "file": "en/features.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 1440,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 80,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "PomoSprint: study time and progress together",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 124,
+          "right": 1316,
+          "top": 184,
+          "bottom": 239
+        },
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 81
+        }
+      ],
+      "checked_resources": 35,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": [
+        {
+          "directive": "img-src",
+          "blocked": "data"
+        }
+      ]
+    },
+    {
+      "page": "/en/",
+      "file": "en/index.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 1440,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "hp-field",
+          "left": -9876,
+          "right": -9875,
+          "width": 1
+        },
+        {
+          "tag": "LABEL",
+          "id": "",
+          "className": "",
+          "left": -9876,
+          "right": -9831,
+          "width": 45
+        },
+        {
+          "tag": "INPUT",
+          "id": "notify-website",
+          "className": "",
+          "left": -9876,
+          "right": -9629,
+          "width": 247
+        }
+      ],
+      "first_heading_frame": {
+        "sampledAt": 77,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "PomoSprint: study together with Pomodoro",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 124,
+          "right": 724.59375,
+          "top": 280,
+          "bottom": 520
+        },
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 78
+        }
+      ],
+      "checked_resources": 17,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": [
+        {
+          "directive": "img-src",
+          "blocked": "data"
+        }
+      ]
+    },
+    {
+      "page": "/en/kvkk",
+      "file": "en/kvkk.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 1440,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 68,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "KVKK Privacy Notice",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 124,
+          "right": 1316,
+          "top": 184,
+          "bottom": 239
+        },
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 68
+        }
+      ],
+      "checked_resources": 10,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/en/privacy",
+      "file": "en/privacy.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 1440,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 92,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Privacy Policy",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 124,
+          "right": 1316,
+          "top": 184,
+          "bottom": 239
+        },
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 92
+        }
+      ],
+      "checked_resources": 10,
+      "broken_resources": [],
+      "skipped_external_targets": [
+        {
+          "kind": "link",
+          "url": "https://supabase.com/privacy",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://sentry.io/privacy/",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://policies.google.com/privacy",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://www.apple.com/legal/privacy/",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://resend.com/legal/privacy-policy",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://www.cloudflare.com/privacypolicy/",
+          "reason": "external/non-static target not followed"
+        }
+      ],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/en/support",
+      "file": "en/support.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 1440,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 43,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "PomoSprint Support",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 124,
+          "right": 1316,
+          "top": 184,
+          "bottom": 239
+        },
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 43
+        }
+      ],
+      "checked_resources": 11,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/en/terms",
+      "file": "en/terms.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 1440,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 53,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Terms of Use",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 124,
+          "right": 1316,
+          "top": 184,
+          "bottom": 239
+        },
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 53
+        }
+      ],
+      "checked_resources": 10,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/faq",
+      "file": "faq.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 1440,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 44,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "PomoSprint: Sıkça Sorulan Sorular",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 124,
+          "right": 1316,
+          "top": 137,
+          "bottom": 192
+        },
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 45
+        }
+      ],
+      "checked_resources": 10,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/features",
+      "file": "features.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 1440,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 98,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "PomoSprint: çalışmanı ve gelişimini birlikte gör",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 124,
+          "right": 1316,
+          "top": 184,
+          "bottom": 239
+        },
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 99
+        }
+      ],
+      "checked_resources": 36,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": [
+        {
+          "directive": "img-src",
+          "blocked": "data"
+        }
+      ]
+    },
+    {
+      "page": "/hesap-silme",
+      "file": "hesap-silme.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 1440,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 53,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "PomoSprint Hesabını Silme",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 124,
+          "right": 1316,
+          "top": 184,
+          "bottom": 239
+        },
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 53
+        }
+      ],
+      "checked_resources": 11,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/",
+      "file": "index.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 1440,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "hp-field",
+          "left": -9876,
+          "right": -9875,
+          "width": 1
+        },
+        {
+          "tag": "LABEL",
+          "id": "",
+          "className": "",
+          "left": -9876,
+          "right": -9841,
+          "width": 35
+        },
+        {
+          "tag": "INPUT",
+          "id": "notify-website",
+          "className": "",
+          "left": -9876,
+          "right": -9629,
+          "width": 247
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "marquee-track",
+          "left": 142,
+          "right": 2894,
+          "width": 2752
+        },
+        {
+          "tag": "IMG",
+          "id": "",
+          "className": "m-avatar",
+          "left": 1432,
+          "right": 1500,
+          "width": 68
+        },
+        {
+          "tag": "IMG",
+          "id": "",
+          "className": "m-avatar",
+          "left": 1518,
+          "right": 1586,
+          "width": 68
+        },
+        {
+          "tag": "IMG",
+          "id": "",
+          "className": "m-avatar",
+          "left": 1604,
+          "right": 1672,
+          "width": 68
+        },
+        {
+          "tag": "IMG",
+          "id": "",
+          "className": "m-avatar",
+          "left": 1690,
+          "right": 1758,
+          "width": 68
+        },
+        {
+          "tag": "IMG",
+          "id": "",
+          "className": "m-avatar",
+          "left": 1776,
+          "right": 1844,
+          "width": 68
+        },
+        {
+          "tag": "IMG",
+          "id": "",
+          "className": "m-avatar",
+          "left": 1862,
+          "right": 1930,
+          "width": 68
+        },
+        {
+          "tag": "IMG",
+          "id": "",
+          "className": "m-avatar",
+          "left": 1948,
+          "right": 2016,
+          "width": 68
+        },
+        {
+          "tag": "IMG",
+          "id": "",
+          "className": "m-avatar",
+          "left": 2034,
+          "right": 2102,
+          "width": 68
+        },
+        {
+          "tag": "IMG",
+          "id": "",
+          "className": "m-avatar",
+          "left": 2120,
+          "right": 2188,
+          "width": 68
+        },
+        {
+          "tag": "IMG",
+          "id": "",
+          "className": "m-avatar",
+          "left": 2206,
+          "right": 2274,
+          "width": 68
+        },
+        {
+          "tag": "IMG",
+          "id": "",
+          "className": "m-avatar",
+          "left": 2292,
+          "right": 2360,
+          "width": 68
+        }
+      ],
+      "first_heading_frame": {
+        "sampledAt": 81,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "PomoSprint: birlikte Pomodoro ile ders çalış",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 124,
+          "right": 724.59375,
+          "top": 279,
+          "bottom": 519
+        },
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 82
+        }
+      ],
+      "checked_resources": 34,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": [
+        {
+          "directive": "img-src",
+          "blocked": "data"
+        }
+      ]
+    },
+    {
+      "page": "/kvkk",
+      "file": "kvkk.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 1440,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 97,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "KVKK Aydınlatma Metni",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 124,
+          "right": 1316,
+          "top": 184,
+          "bottom": 239
+        },
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 97
+        }
+      ],
+      "checked_resources": 11,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/pomodoro-nedir",
+      "file": "pomodoro-nedir.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 1440,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 72.00000000000001,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Bir domates zamanlayıcının dünyayı değiştiren fikri",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 124,
+          "right": 1316,
+          "top": 184,
+          "bottom": 239
+        },
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 73
+        }
+      ],
+      "checked_resources": 10,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": [
+        {
+          "directive": "img-src",
+          "blocked": "data"
+        }
+      ]
+    },
+    {
+      "page": "/privacy",
+      "file": "privacy.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 1440,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 56,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Gizlilik Politikası",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 124,
+          "right": 1316,
+          "top": 184,
+          "bottom": 239
+        },
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 56
+        }
+      ],
+      "checked_resources": 11,
+      "broken_resources": [],
+      "skipped_external_targets": [
+        {
+          "kind": "link",
+          "url": "https://supabase.com/privacy",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://sentry.io/privacy/",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://policies.google.com/privacy",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://www.apple.com/legal/privacy/",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://resend.com/legal/privacy-policy",
+          "reason": "external/non-static target not followed"
+        },
+        {
+          "kind": "link",
+          "url": "https://www.cloudflare.com/privacypolicy/",
+          "reason": "external/non-static target not followed"
+        }
+      ],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/reset-password?lang=tr",
+      "file": "reset-password.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 1440,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 26.000000000000004,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Bağlantı Geçersiz",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 539,
+          "right": 901,
+          "top": 498,
+          "bottom": 533
+        },
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 26.000000000000004
+        }
+      ],
+      "checked_resources": 1,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/reset-password?lang=en",
+      "file": "reset-password.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 1440,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 30,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Invalid Link",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 539,
+          "right": 901,
+          "top": 485,
+          "bottom": 520
+        },
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 31
+        }
+      ],
+      "checked_resources": 1,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/terms",
+      "file": "terms.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 1440,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 52.00000000000001,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Kullanım Şartları",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 124,
+          "right": 1316,
+          "top": 184,
+          "bottom": 239
+        },
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 52.00000000000001
+        }
+      ],
+      "checked_resources": 11,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/unsubscribe?lang=tr",
+      "file": "unsubscribe.html",
+      "expected_locale": "tr",
+      "actual_locale": "tr",
+      "width": 1440,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 56,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Bağlantı Eksik",
+        "documentLanguage": "tr",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 539,
+          "right": 901,
+          "top": 472,
+          "bottom": 507
+        },
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 56
+        }
+      ],
+      "checked_resources": 1,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    },
+    {
+      "page": "/unsubscribe?lang=en",
+      "file": "unsubscribe.html",
+      "expected_locale": "en",
+      "actual_locale": "en",
+      "width": 1440,
+      "height": 1000,
+      "result": "PASS",
+      "failures": [],
+      "warnings": [],
+      "overflow_px": 0,
+      "overflow_candidates": [],
+      "first_heading_frame": {
+        "sampledAt": 73,
+        "sampleKind": "earliest available heading animation frame; first-paint proxy",
+        "text": "Incomplete Link",
+        "documentLanguage": "en",
+        "visible": true,
+        "hiddenAncestors": [],
+        "rect": {
+          "left": 539,
+          "right": 901,
+          "top": 485,
+          "bottom": 520
+        },
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        },
+        "stylesheetsReady": true
+      },
+      "paint_entries": [
+        {
+          "name": "first-contentful-paint",
+          "at": 73
+        }
+      ],
+      "checked_resources": 1,
+      "broken_resources": [],
+      "skipped_external_targets": [],
+      "browser_resource_errors": [],
+      "runtime_errors": [],
+      "csp_blocks": []
+    }
+  ]
+}

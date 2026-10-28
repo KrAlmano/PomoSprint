@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PomoSprint: Arkadaşlarla Pomodoro ve Ders Çalışma Uygulaması</title>
-  <meta name="description" content="LGS, YKS ve TUS için Pomodoro, Maraton ve deneme sürelerini takip et. Arkadaşlarınla çalış, aylık liglerde yarış; çalışma sürenin netlerinle ilişkisini gör.">
+  <meta name="description" content="LGS, YKS, TUS ve DUS için Pomodoro, Maraton ve deneme sürelerini takip et. Arkadaşlarınla çalış, aylık liglerde yarış; çalışma sürenin netlerinle ilişkisini gör.">
   <link rel="canonical" href="https://pomosprint.app/">
   <link rel="alternate" hreflang="tr" href="https://pomosprint.app/">
   <link rel="alternate" hreflang="en" href="https://pomosprint.app/en/">
@@ -12,7 +12,7 @@
   <meta property="og:site_name" content="PomoSprint">
   <meta property="og:locale" content="tr_TR">
   <meta property="og:title" content="PomoSprint: Arkadaşlarla Pomodoro ve Ders Çalışma Uygulaması">
-  <meta property="og:description" content="Pomodoro, Maraton, LGS/YKS/TUS denemeleri, süre–net takibi ve aylık hedef ligleri. Arkadaşlarınla birlikte çalış.">
+  <meta property="og:description" content="Pomodoro, Maraton, LGS/YKS/TUS/DUS denemeleri, süre–net takibi ve aylık hedef ligleri. Arkadaşlarınla birlikte çalış.">
   <meta property="og:url" content="https://pomosprint.app/">
   <meta property="og:image" content="https://pomosprint.app/og-image.png">
   <meta property="og:image:width" content="1200">
@@ -29,7 +29,7 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="stylesheet" href="/css/fonts.css?v=20261003">
-  <link rel="stylesheet" href="/css/style.css?v=20261028a">
+  <link rel="stylesheet" href="/css/style.css?v=20261028b">
   <script src="/js/boot.js?v=20261028a"></script>
   <!-- /partial:head -->
   <script type="application/ld+json">
@@ -96,7 +96,7 @@
     <section class="hero">
       <div class="container hero-inner">
         <div class="hero-text">
-          <span class="hero-chip" data-hero>LGS’den YKS’ye ve TUS’a, arkadaşlarınla birlikte çalış</span>
+          <span class="hero-chip" data-hero>LGS, YKS, TUS ve DUS için birlikte çalış</span>
           <h1 data-hero-title>PomoSprint: <span class="hl">birlikte</span> Pomodoro ile ders çalış</h1>
           <p class="hero-sub" data-hero>
             Çalıştığın süre netine nasıl yansıyor? Pomodoro ve Maraton ile odağını koru;
@@ -162,78 +162,30 @@
     </section>
 
     <!-- ============ GERÇEK UYGULAMA EKRANLARI ============ -->
-    <section class="section app-showcase" id="ekranlar">
-      <div class="container">
-        <div class="section-head" data-reveal>
-          <span class="eyebrow">Uygulamaya göz at</span>
-          <h2>Odaklan, gelişimini gör, birlikte çalış</h2>
-          <p>Sade bir sayaç, anlaşılır raporlar ve aynı anda odaklanan arkadaşların. Her şey tek yerde.</p>
-        </div>
-        <div class="app-screen-grid" data-reveal-group>
-          <figure class="app-screen-card">
-            <div class="phone phone-real">
-              <div class="phone-screen phone-screen-real">
-                <img class="shot-image" src="/screenshots/timer-20261028-tr.png" alt="Güncel Pomo ekranı: kum saati, kategoriler, Maraton düğmesi, 25/50 dakika seçimi ve Deneme dahil beş sekme" width="604" height="1311" loading="lazy" decoding="async">
-              </div>
-            </div>
-            <figcaption><h3>Kumu akıt: sayacını başlat</h3><p>Çalışacağın kategoriyi ve süreni seç. Geri kalan zamanı odaklanmaya ayır.</p></figcaption>
-          </figure>
-          <figure class="app-screen-card">
-            <div class="phone phone-real">
-              <div class="phone-screen phone-screen-real">
-                <img class="shot-image" src="/screenshots/reports.webp" alt="Raporlar ekranı: günlük çalışma süresi, hedef ilerlemesi ve kategorilere göre çalışma dağılımı" width="540" height="1170" loading="lazy" decoding="async">
-              </div>
-            </div>
-            <figcaption><h3>Emeğini gör</h3><p>Pomodoro, Maraton ve tamamlanan denemelerle toplam emeğini gör; netlerini ayrıca takip et.</p></figcaption>
-          </figure>
-          <figure class="app-screen-card">
-            <div class="phone phone-real">
-              <div class="phone-screen phone-screen-real">
-                <img class="shot-image" src="/screenshots/social-20261028-tr.png" alt="Yerel örnek hesaplarla sosyal ekran: Odaklanıyor, Molada ve Denemede durumları" width="604" height="1311" loading="lazy" decoding="async">
-              </div>
-            </div>
-            <figcaption><h3>Birlikte odaklan</h3><p>Arkadaşlarını ekle, kimin odaklandığını gör. Çalışırken birbirinize eşlik edin.</p></figcaption>
-          </figure>
-        </div>
-        <p class="media-caption">Örnek hesaplarla alınmış gerçek uygulama görüntüleri. Uygulama yayın hazırlığında.</p>
-        <p class="section-more"><a class="btn btn-primary" href="/features">Tüm ekranları ve özellikleri keşfet</a></p>
-      </div>
-    </section>
-
-    <!-- ============ MARATON ============ -->
-    <section class="section section-deep marathon-spotlight" id="maraton">
-      <div class="container">
-        <article class="feature-row marathon-spotlight-row">
-          <div class="feature-row-text">
-            <span class="eyebrow">Maraton</span>
-            <h2>Bugünkü odağını tek bir plana bağla</h2>
-            <p>2, 3 ya da 4 Pomodoro seç; her biri 25 ya da 50 dakika sürsün.
-              Seanslar arasında 5 dakikalık mola ver, mola bitince 1 dakika içinde
-              “Buradayım” diyerek sonraki odağına geç.</p>
-            <ul>
-              <li>Planın tamamını bitirince ek puan kazan</li>
-              <li>Ayrılman gerekirse tamamladığın seanslar normal puanlarıyla kayıtta kalır</li>
-              <li>Maraton'u başlatmak ve mola sonrası onay için internet bağlantısı gerekir</li>
-            </ul>
-            <p class="spotlight-action"><a class="btn btn-primary" href="/features#maraton">Maraton'u keşfet</a></p>
-          </div>
-          <div class="feature-row-media">
-            <figure class="media-figure">
-              <div class="phone phone-real">
-                <div class="phone-screen phone-screen-real">
-                  <img class="shot-image" src="/videos/marathon-demo-20261008d.webp?v=20261028" alt="Maraton planlama penceresinde 2, 3 veya 4 seans ve 25 ya da 50 dakikalık odak süresi seçimi" width="540" height="1170" loading="lazy" decoding="async">
-                  <video class="shot-video" data-demo-video data-src="/videos/marathon-demo-20261008d.mp4?v=20261028" autoplay muted loop playsinline preload="none" poster="/videos/marathon-demo-20261008d.webp?v=20261028" role="button" tabindex="0" aria-label="Maraton planlama ve seans sayısı seçiminin sessiz uygulama kaydı" aria-describedby="home-marathon-caption">
-                    <a href="/screenshots/marathon.webp">Maraton ekran görüntüsünü aç</a>
-                  </video>
-                </div>
-              </div>
-              <figcaption class="media-caption" id="home-marathon-caption">Gerçek uygulamada Maraton planlaması · sessiz ve döngüde</figcaption>
-            </figure>
-          </div>
-        </article>
-      </div>
-    </section>
-
+    <section class="section app-showcase" id="ekranlar"><div class="container">
+<div class="section-head" data-reveal><span class="eyebrow">Uygulamaya göz at</span><h2>Odaklan, gelişimini gör, birlikte çalış</h2><p>Sayaç, raporlar ve arkadaşların: sade bir akışta çalışmana yer aç.</p></div>
+<div class="app-screen-grid" data-reveal-group><figure class="app-screen-card"><div class="phone phone-real"><div class="phone-screen phone-screen-real"><img class="shot-image" src="/screenshots/20261028/timer-tr.png" alt="Deniz’in Pomo ekranında 25/50 dakika seçimi, kategoriler ve güncel beş sekme" width="540" height="1170" loading="lazy" decoding="async"></div></div><figcaption><h3>Sayacını başlat</h3><p>Kategorini ve 25 ya da 50 dakikanı seç. Odağın için geri sayım başlasın.</p></figcaption></figure><figure class="app-screen-card"><div class="phone phone-real"><div class="phone-screen phone-screen-real"><img class="shot-image" src="/screenshots/20261028/reports-daily-tr.png" alt="Günlük raporda Pomodoro, Maraton ve tamamlanan denemelerin ortak çalışma süresi" width="540" height="1170" loading="lazy" decoding="async"></div></div><figcaption><h3>Emeğini gör</h3><p>Pomodoro, Maraton ve tamamlanan denemelerin çalışma süresini birlikte takip et.</p></figcaption></figure><figure class="app-screen-card"><div class="phone phone-real"><div class="phone-screen phone-screen-real"><img class="shot-image" src="/screenshots/20261028/social-tr.png" alt="Deniz’in altı örnek arkadaşında Odaklanıyor, Molada ve Denemede durumları" width="540" height="1170" loading="lazy" decoding="async"></div></div><figcaption><h3>Birlikte odaklan</h3><p>Arkadaşlarının Odaklanıyor, Molada ve Denemede durumlarını gör.</p></figcaption></figure></div>
+<p class="media-caption">Gerçek uygulamadan yerel, kurgusal örnek hesapla alınan görüntüler. Uygulama yayın hazırlığında.</p><p class="section-more"><a class="btn btn-primary" href="/features">Tüm ekranları ve özellikleri keşfet</a></p>
+</div></section>
+<section class="section section-deep marathon-spotlight"><div class="container"><article class="feature-row" id="maraton" data-feature="maraton">
+  <div class="feature-row-text"><span class="eyebrow">Maraton</span><h2>Bugünkü odağını tek bir plana bağla</h2><p>2, 3 ya da 4 Pomodoro seç; her biri 25 ya da 50 dakika sürsün. Seanslar arasında 5 dakika mola ver, mola bitince 1 dakika içinde “Buradayım” diyerek devam et.</p>
+<p>Planı bitirince ek puan kazan. Ayrılman gerekirse tamamladığın seanslar normal puanlarıyla korunur.</p><p class="spotlight-action"><a class="btn btn-primary" href="/features#maraton">Maraton’u keşfet</a></p></div>
+  <div class="feature-row-media"><figure class="media-figure">
+  <div class="phone phone-real"><div class="phone-screen phone-screen-real"><img class="shot-image" src="/screenshots/20261028/marathon-plan-tr.png" alt="Maraton planlama penceresinde 2, 3 ve 4 seans ile 25/50 dakika seçimi" width="540" height="1170" loading="lazy" decoding="async">
+<video class="shot-video" data-demo-video data-src="/videos/20261028/marathon-tr.mp4" autoplay muted loop playsinline preload="none" poster="/videos/20261028/marathon-tr.webp" role="button" tabindex="0" aria-label="Maraton planlamasının gerçek zamanlı sessiz uygulama kaydı" aria-describedby="feature-marathon-plan-tr-caption">
+  <a href="/screenshots/20261028/marathon-plan-tr.png">Ekran görüntüsünü aç</a>
+</video></div></div>
+  <figcaption class="media-caption" id="feature-marathon-plan-tr-caption">Maraton planı · 2, 3 veya 4 seans · sessiz ve döngüde; duraklatmak için dokun</figcaption>
+</figure></div>
+</article></div></section>
+<section class="section exam-spotlight"><div class="container"><article class="feature-row reverse" id="deneme" data-feature="deneme">
+  <div class="feature-row-text"><span class="eyebrow">Deneme</span><h2>Sınavına kendi ritminde hazırlan</h2><p>TYT, AYT, YDT, LGS Sözel/Sayısal, TUS Temel/Klinik ve DUS: sınavını seç, 3-2-1’den sonra molasız çöz.</p>
+<p>Denemelerim’de ders netlerini sonradan gir ve düzenle. Yeterli veri biriktiğinde net değişimini çalışma sürenle birlikte incele. Deneme puanı ve ligi normal ligden ayrıdır.</p><p class="spotlight-action"><a class="btn btn-primary" href="/features#deneme">Deneme akışını keşfet</a></p></div>
+  <div class="feature-row-media"><figure class="media-figure">
+  <div class="phone phone-real"><div class="phone-screen phone-screen-real"><img class="shot-image" src="/screenshots/20261028/exam-catalog-tr.png" alt="TYT, AYT, YDT, LGS, TUS ve DUS denemelerinin süre ve soru bilgileriyle seçimi" width="540" height="1170" loading="lazy" decoding="async"></div></div>
+  <figcaption class="media-caption" id="feature-exam-catalog-tr-caption">Deneme kataloğu</figcaption>
+</figure></div>
+</article></div></section>
     <!-- ============ ÖNE ÇIKAN ÖZELLİKLER ============ -->
     <section class="section section-deep">
       <div class="container">
@@ -262,7 +214,7 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
             </div>
             <h3>Lig Sistemi</h3>
-            <p>Kendi hedefindeki arkadaşlarla aylık liglerde yarış, global sıralamada yerini gör. Pomodoro ve deneme puanları ayrı liglerde değerlendirilir.</p>
+            <p>Kendi hedefinde ve globalde yerini gör. Normal lig ile deneme ligi ayrıdır; dönem İstanbul saatine göre ayın 1’inde 00:00’da yenilenir.</p>
           </article>
           <article class="feature-card">
             <div class="feature-icon">
@@ -298,7 +250,7 @@
               <span class="step-num">2</span>
             </div>
             <h3>Kategorilerini Belirle</h3>
-            <p>Dilini ve hedefini seç: LGS, YKS, TUS, KPSS, dil, üniversite ya da iş. Derslerini düzenle, günlük hedefini belirle.</p>
+            <p>Dilini ve hedefini seç: LGS, YKS, TUS, DUS, KPSS, dil, üniversite ya da iş. Derslerini düzenle, günlük hedefini belirle.</p>
           </div>
           <div class="step">
             <div class="step-bubble">

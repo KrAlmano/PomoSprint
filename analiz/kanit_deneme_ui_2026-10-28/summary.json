@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "scope": "Compact ExamScreen UI only",
+  "status": "PASS",
+  "selected_tests": 40,
+  "selected_test_files": [
+    "test/exam_compact_ui_test.dart",
+    "test/exam_details_widget_test.dart",
+    "test/exam_insights_loading_test.dart",
+    "test/dus_exam_test.dart",
+    "test/exam_localization_audit_test.dart",
+    "test/localization_completeness_test.dart"
+  ],
+  "analysis_file_count": 14,
+  "logs": {
+    "flutter": "flutter-selected-final.log",
+    "analysis": "analyze-final.log"
+  },
+  "six_layout_cases": [
+    "TR320x740@1x",
+    "TR320x740@2x",
+    "TR740x320@2x",
+    "EN320x740@1x",
+    "EN320x740@2x",
+    "EN740x320@2x"
+  ],
+  "checks": [
+    "equal48pt tabs",
+    "minimum44pt controls",
+    "wrapped filters and no overflow",
+    "one net rule box",
+    "question/duration metadata",
+    "single start CTA with unchanged mandatory rules dialog",
+    "existing details/offline/owner/capability regressions",
+    "TR/EN key parity and localization audit"
+  ],
+  "development_corrections": [
+    "An initial English2x metadata overflow was fixed by constraining the text width.",
+    "Tab heights were made equal at48pt.",
+    "The filter-wrap test was corrected to measure positions relative to its Wrap instead of after separate scrolling."
+  ],
+  "not_claimed": [
+    "No full-project PASS is inferred from40 selected tests.",
+    "No new native run or database verification was performed by this evidence step.",
+    "No backend, timing or reward change."
+  ],
+  "source_summary_sha256": "d04fcee193233ef7bdbb7bbe7a5ae4a9b62a1faf9ac28147a0789f9ec3150856"
+}

@@ -1,0 +1,20 @@
+{
+  "recorded_at": "2026-10-28T14:32:48.824818+00:00",
+  "purpose": "Final compact UI Safari re-verification source fingerprint",
+  "demo_owner": {
+    "id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+    "display_name": "Deniz"
+  },
+  "sources": {
+    "landing/index.html": "e2929da7a4081f72c52b0d3ffb2c9c8c75d2e6a7f3ed7e92cd4504126737285d",
+    "landing/features.html": "015ad8809f764a08451e8faa70ce93eb574bcfe4e5cfcd4a8161639ad36106e1",
+    "landing/faq.html": "483537112846f81eec910c1338746874b38b651d763491358ff399b184c1981f",
+    "landing/en/index.html": "3ce08fbd80a7131d5b3dbc5807a8ee16e3b3548a29826c0fcaf3bc4bdebcf754",
+    "landing/en/features.html": "27a3ba81c29d7b831f6342680cea1cce324492a5cd724a21edff1638e1459531",
+    "landing/en/faq.html": "240290290ba66d0ab7b47edcac4f421afb0e75c487d92827b4cdbfa3c7c5867b",
+    "landing/css/style.css": "60161ccc6d526b0433528fdb254059c6ee0da744dc3d2713cc32a02f6ca7c477",
+    "landing/js/main.js": "b762fa94e1d216de598612daf266897acdaab373c13eca09adb1222d9a9d9d52",
+    "landing/screenshots/manifest-20261028.json": "a87af338d634ae880b1d987b2eb8f2ab942a5b00d6494c30a74defcd441559ba",
+    "landing/videos/manifest-20261028.json": "62da708727b50b90dee83d65f25c44fb3f79a54d62909e57e69db960bd61f29c"
+  }
+}

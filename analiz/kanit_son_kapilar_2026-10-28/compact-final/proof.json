@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "source_commit": "641cc16",
+  "source_scope": "Current compact UI; no source changes after native/release validation",
+  "generated_at": "2026-10-28T15:08:20.601136+00:00",
+  "gate": {
+    "flutter_pass": 1482,
+    "optional_png_skipped": 5,
+    "analyze_exit": 0,
+    "node_pass": 172,
+    "partials_exit": 0
+  },
+  "ios_unsigned_release": {
+    "exit": 0,
+    "reported_uncompressed_MB": 55.1
+  },
+  "normal_apps": {
+    "entrypoint": "lib/main.dart",
+    "no_e2e_defines": true,
+    "ios": {
+      "backend": "local site 54361",
+      "timer": "25:00",
+      "normal_main_screenshot": "ios-normal-main-settled.png",
+      "compact_exam_screenshot": "ios-normal-exam.png",
+      "observed": "CUA Simulator accessibility and screenshot: New/History/League, single net rule box, five filters, AYT160/180 and DUS120/150."
+    },
+    "android": {
+      "backend": "local review 54351",
+      "timer": "25:00",
+      "normal_main_screenshot": "android-normal-main.png",
+      "pid_observed": true
+    }
+  },
+  "initial_finder_failure": "Five obsolete text finders failed; only finders changed to stable exam-tab-league key. Original failure retained; file9/9 and final full1482 PASS.",
+  "limits": [
+    "No physical device or store upload",
+    "Only local QA backends",
+    "31 not installed or tested after installation",
+    "Initial iOS snapshot captured launch splash; settled and exam snapshots validate the loaded app separately."
+  ],
+  "source_sha256": {
+    "lib/screens/exam_screen.dart": "1b90bffa79b084af39f8cda39fb9e2e36eb98ba90a1fa6c82458fe0e63910b28",
+    "lib/l10n/app_tr.arb": "de6e88302b0b3ec35d49da096ee2215183083c58e51ca286fc7b77aacd65ea6e",
+    "lib/l10n/app_en.arb": "4410321adfee4aef143288aa386f315f1cbbae5de551db67c185a064d67af779",
+    "integration_test/ah_exam_details_early_test.dart": "9cfd0fe43cca91d3ca1c761b3957591e9e72a7a83f253b3d7a81fdeddd0b8b3f",
+    "integration_test/ag_capture_site_dataset_test.dart": "23b82a419aac39a13e9986414220bba0f46505e22b1bd77c4962a74f2f41a03d",
+    "test/league_refresh_regression_test.dart": "9d9c56cbebd846453eb1ef827f94000de0c5100994d5899be7fac6a3d4e338c3"
+  },
+  "android_release": {
+    "exit": 0,
+    "bytes": 99289837,
+    "sha256": "a8cf4085fece07875077d846567509a16fa9278e9dc039cfb6f19bdda3b67c8b",
+    "scope": "Universal release APK build; not Play Store AAB/signing approval"
+  }
+}

@@ -2301,3 +2301,49 @@ html.nav-lock { overflow: hidden; }
 .app-screen-card .phone { max-width: 290px; }
 .lb-empty { text-align: center; color: var(--ink-soft); padding: 24px; }
 @media (max-width: 960px) { .app-screen-grid { grid-template-columns: 1fr; } .app-screen-card .phone { max-width: 320px; } .feature-text-panel { padding: 24px; } }
+
+
+/* 28 October B draft: grouped native screens; existing phone frame preserved. */
+.feature-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  align-items: start;
+  width: 100%;
+}
+.feature-gallery .media-figure { min-width: 0; gap: 14px; }
+.feature-gallery .phone { width: min(100%, 220px); border-radius: 32px; }
+.feature-gallery .phone-screen { border-radius: 24px; }
+.feature-gallery .media-caption { font-size: 0.8rem; }
+.collection-preview-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 32px;
+  align-items: center;
+}
+.collection-preview-grid .hg-orbit { width: min(100%, 480px); margin: 30px auto; }
+@media (max-width: 960px) {
+  .feature-gallery { max-width: 520px; margin-inline: auto; }
+  .collection-preview-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 420px) {
+  .feature-gallery { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .feature-gallery .phone { width: min(260px, 72vw); }
+}
+
+/* Grouped pairs need a useful screen width before the ordinary tablet row. */
+.feature-row.feature-row-group { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: 36px; }
+.feature-row.feature-row-group.reverse { grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); }
+@media (max-width: 960px) {
+  .feature-row.feature-row-group,
+  .feature-row.feature-row-group.reverse { grid-template-columns: minmax(0, 1fr); }
+  .feature-row-group.reverse .feature-row-text { order: 1; }
+  .feature-row-group.reverse .feature-row-media { order: 2; }
+}
+
+/* Shared exam rewards are readable without adding a separate feature panel. */
+.exam-reward-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: .9rem; }
+.exam-reward-table caption { text-align: left; font-weight: 800; margin-bottom: 8px; color: var(--ink); }
+.exam-reward-table th, .exam-reward-table td { border-bottom: 1px solid var(--line); padding: 8px 10px; text-align: left; }
+.exam-reward-table th { font-weight: 700; }
+.exam-reward-table td:last-child, .exam-reward-table th:last-child { text-align: right; font-variant-numeric: tabular-nums; }

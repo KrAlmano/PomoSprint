@@ -1,0 +1,21 @@
+[MEDIA_EVENT] {"kind": "scene_start", "scene": "timer", "at": "2026-10-28T14:24:15.454064Z"}
+[MEDIA_EVENT] {"kind": "tap", "scene": "timer", "at": "2026-10-28T14:24:16.638045Z", "x": 279.5, "y": 618.0, "width": 393.0, "height": 852.0}
+[MEDIA_EVENT] {"kind": "tap", "scene": "timer", "at": "2026-10-28T14:24:17.588365Z", "x": 113.5, "y": 618.0, "width": 393.0, "height": 852.0}
+[MEDIA_EVENT] {"kind": "tap", "scene": "timer", "at": "2026-10-28T14:24:18.542142Z", "x": 213.84184455871582, "y": 438.0, "width": 393.0, "height": 852.0}
+[MEDIA_EVENT] {"kind": "tap", "scene": "timer", "at": "2026-10-28T14:24:19.473216Z", "x": 196.5, "y": 708.0, "width": 393.0, "height": 852.0}
+[MEDIA_EVENT] {"kind": "tap", "scene": "timer", "at": "2026-10-28T14:24:24.908230Z", "x": 196.5, "y": 708.0, "width": 393.0, "height": 852.0}
+[MEDIA_EVENT] {"kind": "tap", "scene": "timer", "at": "2026-10-28T14:24:28.902761Z", "x": 196.5, "y": 708.0, "width": 393.0, "height": 852.0}
+[MEDIA_EVENT] {"kind": "tap", "scene": "timer", "at": "2026-10-28T14:24:34.297587Z", "x": 207.5, "y": 722.0, "width": 393.0, "height": 852.0}
+[MEDIA_EVENT] {"kind": "tap", "scene": "timer", "at": "2026-10-28T14:24:35.378107Z", "x": 296.74462890625, "y": 504.5, "width": 393.0, "height": 852.0}
+[MEDIA_EVENT] {"kind": "scene_end", "scene": "timer", "at": "2026-10-28T14:24:40.292879Z"}
+[MEDIA_EVENT] {"kind": "scene_start", "scene": "marathon", "at": "2026-10-28T14:24:40.293352Z"}
+[MEDIA_EVENT] {"kind": "tap", "scene": "marathon", "at": "2026-10-28T14:24:41.472201Z", "x": 172.5, "y": 568.0, "width": 393.0, "height": 852.0}
+[MEDIA_EVENT] {"kind": "tap", "scene": "marathon", "at": "2026-10-28T14:24:42.539682Z", "x": 86.83333333333334, "y": 242.0, "width": 393.0, "height": 852.0}
+[MEDIA_EVENT] {"kind": "tap", "scene": "marathon", "at": "2026-10-28T14:24:43.489119Z", "x": 196.50000000000003, "y": 242.0, "width": 393.0, "height": 852.0}
+[MEDIA_EVENT] {"kind": "tap", "scene": "marathon", "at": "2026-10-28T14:24:44.456931Z", "x": 306.1666666666667, "y": 242.0, "width": 393.0, "height": 852.0}
+[MEDIA_EVENT] {"kind": "tap", "scene": "marathon", "at": "2026-10-28T14:24:45.406893Z", "x": 280.75, "y": 338.0, "width": 393.0, "height": 852.0}
+[MEDIA_EVENT] {"kind": "tap", "scene": "marathon", "at": "2026-10-28T14:24:46.339268Z", "x": 112.25, "y": 338.0, "width": 393.0, "height": 852.0}
+[MEDIA_EVENT] {"kind": "tap", "scene": "marathon", "at": "2026-10-28T14:24:47.272854Z", "x": 196.5, "y": 695.0, "width": 393.0, "height": 852.0}
+[MEDIA_EVENT] {"kind": "tap", "scene": "marathon", "at": "2026-10-28T14:24:56.361376Z", "x": 196.5, "y": 722.0, "width": 393.0, "height": 852.0}
+[MEDIA_EVENT] {"kind": "tap", "scene": "marathon", "at": "2026-10-28T14:24:57.456904Z", "x": 267.4957046508789, "y": 504.5, "width": 393.0, "height": 852.0}
+[MEDIA_EVENT] {"kind": "scene_end", "scene": "marathon", "at": "2026-10-28T14:25:02.294218Z"}

@@ -1,0 +1,21 @@
+00:00 +0: loading integration_test/ah_exam_details_early_test.dart
+Running Gradle task 'assembleDebug'...                             27.9s
+✓ Built build/app/outputs/flutter-apk/app-debug.apk
+Installing build/app/outputs/flutter-apk/app-debug.apk...           3.5s
+00:00 +0: isolated32 AYT early finish, atomic details, history and reports TR EN
+supabase.supabase_flutter: INFO: ***** Supabase init completed ***** 
+[INIT] Supabase bağlandı.
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+[E2E] ekran görüntüsü: build/verification_20261028/dus/android/screenshots/e2e-ah32-running-tr.png
+[E2E] ekran görüntüsü: build/verification_20261028/dus/android/screenshots/e2e-ah32-details-tr.png
+[E2E] ekran görüntüsü: build/verification_20261028/dus/android/screenshots/e2e-ah32-history-tr.png
+[E2E] ekran görüntüsü: build/verification_20261028/dus/android/screenshots/e2e-ah32-report-tr.png
+[AH32] tr actual=5s planned=10800s credited=0m revision=1 subjects=2 modules=80/160 duplicate=PASS reportCount=1
+[E2E] ekran görüntüsü: build/verification_20261028/dus/android/screenshots/e2e-ah32-running-en.png
+[E2E] ekran görüntüsü: build/verification_20261028/dus/android/screenshots/e2e-ah32-details-en.png
+[E2E] ekran görüntüsü: build/verification_20261028/dus/android/screenshots/e2e-ah32-history-en.png
+[E2E] ekran görüntüsü: build/verification_20261028/dus/android/screenshots/e2e-ah32-report-en.png
+[AH32] en actual=6s planned=10800s credited=0m revision=1 subjects=2 modules=80/160 duplicate=PASS reportCount=2
+[AH32] normal focus overlap released; reset only unfinished QA focus; PASS
+01:22 +1: (tearDownAll)
+01:22 +1: All tests passed!

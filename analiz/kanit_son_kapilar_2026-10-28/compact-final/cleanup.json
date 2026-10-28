@@ -1,0 +1,71 @@
+{
+  "timestamp": "2026-10-28T15:10:43.239317+00:00",
+  "removed_regenerable_builds": [
+    {
+      "path": "build/app",
+      "logical_bytes": 2860733511
+    },
+    {
+      "path": "build/ios",
+      "logical_bytes": 3201548965
+    },
+    {
+      "path": "build/overnight_final_main",
+      "logical_bytes": 475469445
+    },
+    {
+      "path": "build/overnight_release_android",
+      "logical_bytes": 54270216
+    },
+    {
+      "path": "build/native_site_media",
+      "logical_bytes": 382028972
+    },
+    {
+      "path": "build/test_cache",
+      "logical_bytes": 101050496
+    },
+    {
+      "path": "build/unit_test_assets",
+      "logical_bytes": 27247031
+    }
+  ],
+  "free_bytes_before": 118036267008,
+  "free_bytes_after": 124982763520,
+  "preserved_release_artifacts": {
+    "directory": "build/final_release_20261028",
+    "apk_bytes": 99289837,
+    "apk_sha256": "a8cf4085fece07875077d846567509a16fa9278e9dc039cfb6f19bdda3b67c8b",
+    "ios": "Runner.app unsigned device release"
+  },
+  "stopped_owned_capture_processes": [
+    {
+      "pid": 3292,
+      "owned_command": "tool/local_supabase/e2e/sim/exam32_host.py"
+    },
+    {
+      "pid": 65532,
+      "owned_command": "tool/local_supabase/e2e/sim/exam32_host.py"
+    },
+    {
+      "pid": 65561,
+      "owned_command": "tool/local_supabase/e2e/sim/exam32_host.py"
+    },
+    {
+      "pid": 56290,
+      "owned_command": "/tmp/pomosprint_preview_range_20261028.py"
+    }
+  ],
+  "preserved_local_app_API_health": {
+    "54351": 200,
+    "54361": 200
+  },
+  "preserved": [
+    "all QA database data and older snapshots",
+    "one QA iPhone16(18.6), one QA Android API36",
+    "HocamMacVar · iPhone17",
+    "installed normal applications",
+    "portable evidence in analiz/",
+    "current local Safari QA preview"
+  ]
+}

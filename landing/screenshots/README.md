@@ -1,16 +1,52 @@
-# Gerçek native ekranlar — 28 Ekim 2026
+# Güncel uygulama medyası — 28 Ekim2026
 
-Bu dosyalar izole yerel örnek hesaplarla çalışan iOS uygulamasından alınmıştır. PNG verileri kırpılmadan, yeniden boyutlandırılmadan ve yeniden kodlanmadan kopyalandı. Hesap adları QA örnekleridir; gerçek kullanıcı sayısı veya pazarlama referansı değildir. Sosyal ekranın bu karesinde yedi kişi görünür; sekiz kişinin aynı anda göründüğü iddia edilmez.
+Bu set tek iOS18.6 cihazından, **PomoSprint QA iPhone16 (18.6)** simülatöründen alındı. Uygulama güncel beş sekmelidir. Durum çubuğu09:41, pil100%, Wi-Fi3/hat4 olarak simctl ile sabitlendi ve çekim sonunda geri alındı. Bütün web görselleri **540×1170**; kullanılan iPhone çerçevesi iki dilde aynıdır.
 
-| Varlık | Kaynak | Boyut | SHA-256 |
-|---|---|---|---|
-| `timer-20261028-tr.png` | `analiz/ekran_gece_2026-10-28/e2e-sayac-yks.png` | 604×1311 | `fd3c205fa0bc3802fddcfaaa48a244bd5dd614ae755a2bd2fba128759ccb6420` |
-| `social-20261028-tr.png` | `analiz/ekran_gece_2026-10-28/e2e-eight-social-tr-top.png` | 604×1311 | `28ada037a08cd106c4b238d3165f8aeba9bfcb1cece0c1193d35fe5d5415d31d` |
-| `social-20261028-en.png` | `analiz/ekran_gece_2026-10-28/e2e-eight-social-en-top.png` | 604×1311 | `ee776f301e0dfa7b8a10ce6e925c9c715da480468e43afc4bdc7eb123f8c12e7` |
-| `exam-catalog-20261028-tr.png` | `analiz/ekran_gece_2026-10-28/e2e-exam-catalog-tr.png` | 604×1311 | `9ed4c7bb092c053fd4b9e3581cf35e77469c320abffe2ee4047c177cef0515ff` |
-| `exam-running-20261028-en.png` | `analiz/ekran_gece_2026-10-28/ios18-fixture/e2e-exam-running-en.png` | 604×1311 | `419d621133beebe8095dbdd812edecda6ff6bf35354bbdcd7d1f365fa62945dd` |
-| `league-target-20261028-tr.png` | `analiz/ekran_gece_2026-10-28/ios18-league/e2e-league-target-change.png` | 604×1311 | `0d53a21d86e2a3b54c986581f19f2178a12300b907a899978b38bc008906eebd` |
+Tek kurgu hesap **Deniz**, UID `ca271e26-fc2c-44b6-b88f-9537f809639c`, yalnız `pomosprint_site32_dus` yerel veritabanında. Türkçe/İngilizce için hesap veya veri değiştirilmedi. Altı kurgu arkadaş: Ece,Mert,Ada,Arda,Duru,Can. Gerçek kullanıcı veya kullanım sayısı iddiası değildir.
 
-Lig karesi iOS 18.6 uygulamasından, kontrollü yerel QA hesabıyla alındı. YKS hedefinin mevcut ayda korunmasını, TUS hedefinin sonraki aya ertelenmesini ve hazırlık durumunu gösterir. Türkçe ve İngilizce Özellikler sayfaları aynı değişmemiş kareyi kullanır; İngilizce sayfanın alt yazısı ekran dilinin Türkçe olduğunu açıklar. Sayılar gerçek kullanıcı topluluğu veya pazarlama başarısı iddiası değildir.
+Kontrollü geçmiş455 toplam dakika:125 Pomodoro/Maraton+330 Deneme;normal29puan/80kum,Deneme66puan/260kum,seri2. İki TYT130’ar kum verir. Fizik75 ilgili çalışma dakikası ve1,75→4,75 net içerir. Bu geçmiş tarihli kurulum455 dakika doğal beklenmiş sayılmaz. Odak/mola arkadaş varlığı yalnız gösterim için yenilendi; doğal Maraton AFK kontrolünün kanıtı değildir.
 
-Kullanılmayan `exam-history-20261028-en.png` yayın varlıklarından çıkarıldı. Orijinal kanıt `analiz/ekran_gece_2026-10-28/e2e-exam-abandoned-history.png` altında korunur (SHA-256: `20d3ca084068c8aba8a2746d866f89c5038a8c4917beea8e6b1ed3908181e041`). Aktif EN Deneme satırı `exam-running-20261028-en.png` kullanır.
+## 30 ekran (15×2 dil)
+
+| Sahne | Türkçe | English |
+|---|---|---|
+|timer|[PNG](20261028/timer-tr.png)|[PNG](20261028/timer-en.png)|
+|marathon-plan|[PNG](20261028/marathon-plan-tr.png)|[PNG](20261028/marathon-plan-en.png)|
+|exam-catalog|[PNG](20261028/exam-catalog-tr.png)|[PNG](20261028/exam-catalog-en.png)|
+|exam-running|[PNG](20261028/exam-running-tr.png)|[PNG](20261028/exam-running-en.png)|
+|exam-history|[PNG](20261028/exam-history-tr.png)|[PNG](20261028/exam-history-en.png)|
+|exam-results|[PNG](20261028/exam-results-tr.png)|[PNG](20261028/exam-results-en.png)|
+|exam-insights|[PNG](20261028/exam-insights-tr.png)|[PNG](20261028/exam-insights-en.png)|
+|reports-daily|[PNG](20261028/reports-daily-tr.png)|[PNG](20261028/reports-daily-en.png)|
+|reports-weekly|[PNG](20261028/reports-weekly-tr.png)|[PNG](20261028/reports-weekly-en.png)|
+|reports-monthly|[PNG](20261028/reports-monthly-tr.png)|[PNG](20261028/reports-monthly-en.png)|
+|league-category|[PNG](20261028/league-category-tr.png)|[PNG](20261028/league-category-en.png)|
+|league-global|[PNG](20261028/league-global-tr.png)|[PNG](20261028/league-global-en.png)|
+|league-exam|[PNG](20261028/league-exam-tr.png)|[PNG](20261028/league-exam-en.png)|
+|social|[PNG](20261028/social-tr.png)|[PNG](20261028/social-en.png)|
+|avatar-collection|[PNG](20261028/avatar-collection-tr.png)|[PNG](20261028/avatar-collection-en.png)|
+
+## Kaynak ve dönüşüm
+
+Ham cihaz1179×2556; native screenshot yardımcısı yüksekliği1311’e ölçekleyerek604×1311 PNG üretir. Bu gerçek kaynak PNG baytları `analiz/ekran_site_2026-10-28/native/` altında korunur. Web türevi Lanczos ile en/boy oranı korunarak540×1170’e küçültülür ve gerektiğinde ince merkezî padding uygulanır. Ekran içeriği yeniden çizilmez,kırpılmaz veya esnetilmez.
+
+[Fotoğraf manifesti](manifest-20261028.json) dosya/hash/ölçü/dil/owner ve gerçek kaynak yolunu taşır. [Video manifesti](../videos/manifest-20261028.json) gerçek kayıt ve dokunma/PTS kanıtlarını taşır. Kaynak cihaz videosu1178×2556’dır; encoder aynı540×1170 web boyutunu üretir.
+
+## Videolar
+
+| Video | Dil | Süre | Boyut |
+|---|---|---:|---:|
+|[timer](../videos/20261028/timer-tr.mp4)|tr|24.791667sn|216213 bayt|
+|[marathon](../videos/20261028/marathon-tr.mp4)|tr|21.958333sn|203877 bayt|
+|[timer](../videos/20261028/timer-en.mp4)|en|24.833333sn|202975 bayt|
+|[marathon](../videos/20261028/marathon-en.mp4)|en|22.000000sn|224919 bayt|
+
+Dört video gerçek zamanlıdır; hızlandırma yoktur. Sessiz H264/yuv420p/24fps,her biri256KiB altında. Otomatik,sessiz,döngüde,playsinline oynar; reduced-motion ve kullanıcı duraklatması korunur. Beyaz imleç/tıklama halkası yalnız gerçek native dokunma koordinat/zaman kayıtlarından türetilmiştir. Sayaç25/50dk,Maraton5dk+1dk kuralları değiştirilmedi; demo odakları tamamlanmadan UI’den iptal edilir ve ödül üretmez. En sonda tek165dkTYT başlatılıp iki dilde çekilir ve0ödülle vazgeçilir; geçmiş satırı silinmez.
+
+## Kontroller
+
+30 native görsel iki ajan tarafından tek tek incelendi. Yeni ödüller/diller/isimler/durum çubuğu ve hizalar doğrulandı. EN Unanswered başlık bölünmesi düzeltildi ve set yeniden çekildi. Sitenin30PNG/4MP4/4poster boyut/hash/locale/eksik-kullanılmayan medya testleri korunur. [Video görsel/packet QA](../../analiz/ekran_site_2026-10-28/video_review/README.md) ve [Safari manuel QA](../../analiz/ekran_site_2026-10-28/browser/SAFARI_MANUEL_2026-10-28.md).
+
+Küçük sunum sınırları raporlarda açık: kaydırılabilen aylık sekme etiketi dar kadrajda kısalabilir; koleksiyon başlığı ellipsis kullanır; video ortasında gerçek pause/start bilgi snackbar’ları görünür. Kaydırma kadrajı dışında kalan aylık/haftalık toplamlar yalnız fotoğraftan doğrulanmış sayılmaz; native rapor testleri ve bağımsız SQL ayrı kanıttır.
+
+Eski8/27Ekim karışık dil/boyut seti ve27 kullanılmayan public medya dosyası kaldırıldı. Yeni set henüz canlıya deploy edilmedi.

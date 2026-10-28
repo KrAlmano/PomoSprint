@@ -1,0 +1,814 @@
+{
+  "status": "PASS",
+  "created_at": "2026-10-28T14:17:28.687442+00:00",
+  "scope": "Fixed local QA database rename; original OID and every user-data table hash retained; no rows deleted",
+  "source": "pomosprint_site32_dus",
+  "archive": "pomosprint_site32_dus_pre_ui",
+  "source_oid": 62359,
+  "cluster_admin_guard": {
+    "role": "supabase_admin",
+    "super": true,
+    "source_oid": "62359"
+  },
+  "initial_guard_rejected": "postgres is not superuser; initial guard stopped before writes, then fixed local supabase_admin verified",
+  "source_connections_before": 0,
+  "terminated_backends": 0,
+  "before_meta": {
+    "user": "postgres",
+    "databases": [
+      {
+        "oid": "61425",
+        "name": "pomosprint_review32_dus",
+        "owner": "postgres"
+      },
+      {
+        "oid": "62359",
+        "name": "pomosprint_site32_dus",
+        "owner": "postgres"
+      },
+      {
+        "oid": "5",
+        "name": "postgres",
+        "owner": "postgres"
+      }
+    ],
+    "is_superuser": false,
+    "source_connections": 0
+  },
+  "after_meta": {
+    "user": "postgres",
+    "databases": [
+      {
+        "oid": "61425",
+        "name": "pomosprint_review32_dus",
+        "owner": "postgres"
+      },
+      {
+        "oid": "62359",
+        "name": "pomosprint_site32_dus_pre_ui",
+        "owner": "postgres"
+      },
+      {
+        "oid": "5",
+        "name": "postgres",
+        "owner": "postgres"
+      }
+    ],
+    "is_superuser": false,
+    "source_connections": 0
+  },
+  "before_fingerprint": {
+    "tables": [
+      {
+        "hash": "ccd7210115deedd507df7b223fa0b3fc",
+        "name": "auth.audit_log_entries",
+        "count": 46
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.custom_oauth_providers",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.flow_state",
+        "count": 0
+      },
+      {
+        "hash": "d677ae85d20fbc68c261d2da3ab2e2b1",
+        "name": "auth.identities",
+        "count": 7
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.instances",
+        "count": 0
+      },
+      {
+        "hash": "991cd0afc260f1adf1aaf656ee479c43",
+        "name": "auth.mfa_amr_claims",
+        "count": 37
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.mfa_challenges",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.mfa_factors",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.mfa_recovery_code_sets",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.mfa_recovery_codes",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.oauth_authorizations",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.oauth_client_states",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.oauth_clients",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.oauth_consents",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.one_time_tokens",
+        "count": 0
+      },
+      {
+        "hash": "be61c453180f1a1dc079861c071ecdff",
+        "name": "auth.refresh_tokens",
+        "count": 38
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.saml_providers",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.saml_relay_states",
+        "count": 0
+      },
+      {
+        "hash": "6efbfc749c2707934b8f14762432637d",
+        "name": "auth.schema_migrations",
+        "count": 82
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.scim_tokens",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.scim_users",
+        "count": 0
+      },
+      {
+        "hash": "e528a065dee6b79f10c447ead82fa4b7",
+        "name": "auth.sessions",
+        "count": 37
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.sso_domains",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.sso_providers",
+        "count": 0
+      },
+      {
+        "hash": "73ac6a413e1334cc66c8d6dca6f9f398",
+        "name": "auth.users",
+        "count": 7
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.webauthn_challenges",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.webauthn_credentials",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "net._http_response",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "net.http_request_queue",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "ops.proposed24_social_feed_reset",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "public.activity_feed",
+        "count": 0
+      },
+      {
+        "hash": "a528ff0d0d48bc3325f8177e3966e123",
+        "name": "public.app_config",
+        "count": 14
+      },
+      {
+        "hash": "6c157bae3d93a60081a0de3aa531a560",
+        "name": "public.avatar_unlocks",
+        "count": 49
+      },
+      {
+        "hash": "fd8b4593275423a6f1d6d5c8cd464c72",
+        "name": "public.avatars",
+        "count": 48
+      },
+      {
+        "hash": "08f8eb3c2af4990059beb8a3d8a95ef4",
+        "name": "public.blocked_name_terms",
+        "count": 23
+      },
+      {
+        "hash": "1b4596e9aca9524cbb5c1cb3f428d196",
+        "name": "public.categories",
+        "count": 21
+      },
+      {
+        "hash": "bcf2a3abb4c75e10db332cf9de16c552",
+        "name": "public.competition_avatar_rewards",
+        "count": 30
+      },
+      {
+        "hash": "cc28ecf9c1f87c264405fef1f18931fd",
+        "name": "public.competition_events",
+        "count": 17
+      },
+      {
+        "hash": "b8cc87e33534c021db9d323f87872680",
+        "name": "public.competition_install_backup",
+        "count": 8
+      },
+      {
+        "hash": "b638b954618b6459cc65808b60f57785",
+        "name": "public.competition_memberships",
+        "count": 8
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "public.competition_periods",
+        "count": 0
+      },
+      {
+        "hash": "2ecd588d33bb1fceafcf850712552a16",
+        "name": "public.competition_policy",
+        "count": 1
+      },
+      {
+        "hash": "174b9df9e192d4e1d59c248466fa8032",
+        "name": "public.competition_profiles",
+        "count": 8
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "public.competition_results",
+        "count": 0
+      },
+      {
+        "hash": "9369f2f825bf9d50f587abafd755be5c",
+        "name": "public.competition_rooms",
+        "count": 2
+      },
+      {
+        "hash": "12b77a2d193094fd1526e85822730b79",
+        "name": "public.competition_target_history",
+        "count": 7
+      },
+      {
+        "hash": "8bd244656ee24d57c4ef5670022344bb",
+        "name": "public.consents",
+        "count": 21
+      },
+      {
+        "hash": "704265bdd37150bb6337ef87670d1523",
+        "name": "public.exam_attempts",
+        "count": 5
+      },
+      {
+        "hash": "8b5f67e8ddcad7c240ee1acb7873b290",
+        "name": "public.exam_catalog",
+        "count": 8
+      },
+      {
+        "hash": "d32b3464b51473ee38143562e15a4007",
+        "name": "public.exam_extension_32_backup",
+        "count": 31
+      },
+      {
+        "hash": "81891c7c458efd49a3b06309acdf80c3",
+        "name": "public.exam_extension_policy",
+        "count": 1
+      },
+      {
+        "hash": "85d519fc2df5c62a866f21c65a284c6d",
+        "name": "public.exam_install_backup",
+        "count": 2
+      },
+      {
+        "hash": "31da82c1ecebf295fb5fa0ddb0da044d",
+        "name": "public.exam_subject_results",
+        "count": 18
+      },
+      {
+        "hash": "cd5f8772a5b37bc7a02be36ecc0fa967",
+        "name": "public.exam_wallets",
+        "count": 1
+      },
+      {
+        "hash": "4b58163d2d21ecb0ea42aa117f671c1e",
+        "name": "public.friend_code_attempts",
+        "count": 1
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "public.friend_code_rotations",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "public.friend_request_rejections",
+        "count": 0
+      },
+      {
+        "hash": "4ec6a7ac423dfd2d8e35fd202a73f89f",
+        "name": "public.friendships",
+        "count": 12
+      },
+      {
+        "hash": "d59bca2d837435c3372632c27acace4e",
+        "name": "public.league_competition_state",
+        "count": 1
+      },
+      {
+        "hash": "2ceb43abd35e4c9f428495d7773ab213",
+        "name": "public.league_memberships",
+        "count": 7
+      },
+      {
+        "hash": "ce8d99cd8d53971d8fab597a1a19c4a8",
+        "name": "public.leagues",
+        "count": 1
+      },
+      {
+        "hash": "af0ec35838ff3184a7874e7d5dbed244",
+        "name": "public.marathon_presence_gates",
+        "count": 3
+      },
+      {
+        "hash": "d4303b64ffa69fa0af25126475e708fa",
+        "name": "public.marathon_presence_settings",
+        "count": 1
+      },
+      {
+        "hash": "dd41f7110ce14a943303bb3ddf40c760",
+        "name": "public.marathon_run_sessions",
+        "count": 4
+      },
+      {
+        "hash": "675e4d12251ee97683fa64cab4350e75",
+        "name": "public.marathon_runs",
+        "count": 3
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "public.marketing_subscribers",
+        "count": 0
+      },
+      {
+        "hash": "0c1561d8316126118606cff61d518540",
+        "name": "public.profiles",
+        "count": 7
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "public.session_starts",
+        "count": 0
+      },
+      {
+        "hash": "99a820f833d9352e3a8da1f5450c095c",
+        "name": "public.study_sessions",
+        "count": 15
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "public.user_blocks",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "public.user_reports",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "public.waitlist",
+        "count": 0
+      },
+      {
+        "hash": "b6aebbdc0834e7a79d78b62bd13e80be",
+        "name": "supabase_migrations.schema_migrations",
+        "count": 23
+      },
+      {
+        "hash": "f83f37e0f429c9e5899916162024ebaa",
+        "name": "supabase_migrations.seed_files",
+        "count": 1
+      }
+    ],
+    "sha256": "a2291eb80769e514eb4d21e39dbad74c250700d694466528df7b2a95beee9c88"
+  },
+  "after_fingerprint": {
+    "tables": [
+      {
+        "hash": "ccd7210115deedd507df7b223fa0b3fc",
+        "name": "auth.audit_log_entries",
+        "count": 46
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.custom_oauth_providers",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.flow_state",
+        "count": 0
+      },
+      {
+        "hash": "d677ae85d20fbc68c261d2da3ab2e2b1",
+        "name": "auth.identities",
+        "count": 7
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.instances",
+        "count": 0
+      },
+      {
+        "hash": "991cd0afc260f1adf1aaf656ee479c43",
+        "name": "auth.mfa_amr_claims",
+        "count": 37
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.mfa_challenges",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.mfa_factors",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.mfa_recovery_code_sets",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.mfa_recovery_codes",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.oauth_authorizations",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.oauth_client_states",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.oauth_clients",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.oauth_consents",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.one_time_tokens",
+        "count": 0
+      },
+      {
+        "hash": "be61c453180f1a1dc079861c071ecdff",
+        "name": "auth.refresh_tokens",
+        "count": 38
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.saml_providers",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.saml_relay_states",
+        "count": 0
+      },
+      {
+        "hash": "6efbfc749c2707934b8f14762432637d",
+        "name": "auth.schema_migrations",
+        "count": 82
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.scim_tokens",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.scim_users",
+        "count": 0
+      },
+      {
+        "hash": "e528a065dee6b79f10c447ead82fa4b7",
+        "name": "auth.sessions",
+        "count": 37
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.sso_domains",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.sso_providers",
+        "count": 0
+      },
+      {
+        "hash": "73ac6a413e1334cc66c8d6dca6f9f398",
+        "name": "auth.users",
+        "count": 7
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.webauthn_challenges",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "auth.webauthn_credentials",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "net._http_response",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "net.http_request_queue",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "ops.proposed24_social_feed_reset",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "public.activity_feed",
+        "count": 0
+      },
+      {
+        "hash": "a528ff0d0d48bc3325f8177e3966e123",
+        "name": "public.app_config",
+        "count": 14
+      },
+      {
+        "hash": "6c157bae3d93a60081a0de3aa531a560",
+        "name": "public.avatar_unlocks",
+        "count": 49
+      },
+      {
+        "hash": "fd8b4593275423a6f1d6d5c8cd464c72",
+        "name": "public.avatars",
+        "count": 48
+      },
+      {
+        "hash": "08f8eb3c2af4990059beb8a3d8a95ef4",
+        "name": "public.blocked_name_terms",
+        "count": 23
+      },
+      {
+        "hash": "1b4596e9aca9524cbb5c1cb3f428d196",
+        "name": "public.categories",
+        "count": 21
+      },
+      {
+        "hash": "bcf2a3abb4c75e10db332cf9de16c552",
+        "name": "public.competition_avatar_rewards",
+        "count": 30
+      },
+      {
+        "hash": "cc28ecf9c1f87c264405fef1f18931fd",
+        "name": "public.competition_events",
+        "count": 17
+      },
+      {
+        "hash": "b8cc87e33534c021db9d323f87872680",
+        "name": "public.competition_install_backup",
+        "count": 8
+      },
+      {
+        "hash": "b638b954618b6459cc65808b60f57785",
+        "name": "public.competition_memberships",
+        "count": 8
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "public.competition_periods",
+        "count": 0
+      },
+      {
+        "hash": "2ecd588d33bb1fceafcf850712552a16",
+        "name": "public.competition_policy",
+        "count": 1
+      },
+      {
+        "hash": "174b9df9e192d4e1d59c248466fa8032",
+        "name": "public.competition_profiles",
+        "count": 8
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "public.competition_results",
+        "count": 0
+      },
+      {
+        "hash": "9369f2f825bf9d50f587abafd755be5c",
+        "name": "public.competition_rooms",
+        "count": 2
+      },
+      {
+        "hash": "12b77a2d193094fd1526e85822730b79",
+        "name": "public.competition_target_history",
+        "count": 7
+      },
+      {
+        "hash": "8bd244656ee24d57c4ef5670022344bb",
+        "name": "public.consents",
+        "count": 21
+      },
+      {
+        "hash": "704265bdd37150bb6337ef87670d1523",
+        "name": "public.exam_attempts",
+        "count": 5
+      },
+      {
+        "hash": "8b5f67e8ddcad7c240ee1acb7873b290",
+        "name": "public.exam_catalog",
+        "count": 8
+      },
+      {
+        "hash": "d32b3464b51473ee38143562e15a4007",
+        "name": "public.exam_extension_32_backup",
+        "count": 31
+      },
+      {
+        "hash": "81891c7c458efd49a3b06309acdf80c3",
+        "name": "public.exam_extension_policy",
+        "count": 1
+      },
+      {
+        "hash": "85d519fc2df5c62a866f21c65a284c6d",
+        "name": "public.exam_install_backup",
+        "count": 2
+      },
+      {
+        "hash": "31da82c1ecebf295fb5fa0ddb0da044d",
+        "name": "public.exam_subject_results",
+        "count": 18
+      },
+      {
+        "hash": "cd5f8772a5b37bc7a02be36ecc0fa967",
+        "name": "public.exam_wallets",
+        "count": 1
+      },
+      {
+        "hash": "4b58163d2d21ecb0ea42aa117f671c1e",
+        "name": "public.friend_code_attempts",
+        "count": 1
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "public.friend_code_rotations",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "public.friend_request_rejections",
+        "count": 0
+      },
+      {
+        "hash": "4ec6a7ac423dfd2d8e35fd202a73f89f",
+        "name": "public.friendships",
+        "count": 12
+      },
+      {
+        "hash": "d59bca2d837435c3372632c27acace4e",
+        "name": "public.league_competition_state",
+        "count": 1
+      },
+      {
+        "hash": "2ceb43abd35e4c9f428495d7773ab213",
+        "name": "public.league_memberships",
+        "count": 7
+      },
+      {
+        "hash": "ce8d99cd8d53971d8fab597a1a19c4a8",
+        "name": "public.leagues",
+        "count": 1
+      },
+      {
+        "hash": "af0ec35838ff3184a7874e7d5dbed244",
+        "name": "public.marathon_presence_gates",
+        "count": 3
+      },
+      {
+        "hash": "d4303b64ffa69fa0af25126475e708fa",
+        "name": "public.marathon_presence_settings",
+        "count": 1
+      },
+      {
+        "hash": "dd41f7110ce14a943303bb3ddf40c760",
+        "name": "public.marathon_run_sessions",
+        "count": 4
+      },
+      {
+        "hash": "675e4d12251ee97683fa64cab4350e75",
+        "name": "public.marathon_runs",
+        "count": 3
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "public.marketing_subscribers",
+        "count": 0
+      },
+      {
+        "hash": "0c1561d8316126118606cff61d518540",
+        "name": "public.profiles",
+        "count": 7
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "public.session_starts",
+        "count": 0
+      },
+      {
+        "hash": "99a820f833d9352e3a8da1f5450c095c",
+        "name": "public.study_sessions",
+        "count": 15
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "public.user_blocks",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "public.user_reports",
+        "count": 0
+      },
+      {
+        "hash": "d41d8cd98f00b204e9800998ecf8427e",
+        "name": "public.waitlist",
+        "count": 0
+      },
+      {
+        "hash": "b6aebbdc0834e7a79d78b62bd13e80be",
+        "name": "supabase_migrations.schema_migrations",
+        "count": 23
+      },
+      {
+        "hash": "f83f37e0f429c9e5899916162024ebaa",
+        "name": "supabase_migrations.seed_files",
+        "count": 1
+      }
+    ],
+    "sha256": "a2291eb80769e514eb4d21e39dbad74c250700d694466528df7b2a95beee9c88"
+  },
+  "same_oid": true,
+  "data_hashes_unchanged": true,
+  "cleanup_evidence": "build/verification_20261028/site_demo_site-oct28-dus_pre_ui_cleanup.json",
+  "main_or_review_mutated": false
+}

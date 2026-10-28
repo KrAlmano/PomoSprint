@@ -1,0 +1,22 @@
+{
+  "analyze": {
+    "exit_code": 0,
+    "seconds": 8.91,
+    "log": "build/verification_20261028/gate_DUS_B_final_1/analyze.log"
+  },
+  "flutter": {
+    "exit_code": 0,
+    "seconds": 125.57,
+    "log": "build/verification_20261028/gate_DUS_B_final_1/flutter.log"
+  },
+  "node": {
+    "exit_code": 0,
+    "seconds": 0.63,
+    "log": "build/verification_20261028/gate_DUS_B_final_1/node.log"
+  },
+  "partials": {
+    "exit_code": 0,
+    "seconds": 0.04,
+    "log": "build/verification_20261028/gate_DUS_B_final_1/partials.log"
+  }
+}

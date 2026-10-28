@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-28T13:33:10.165342+00:00",
+  "transfer": "Raw CUA JPEG bytes encoded to base64 in CUA runtime; pasted with documented App.paste into local QA helper; signature/10MiB/name validation; Blob download; filesystem copy only",
+  "network_upload": false,
+  "raw_bytes_logged": false,
+  "images": [
+    {
+      "path": "safari-cua-tr-home-375.jpg",
+      "bytes": 241507,
+      "sha256": "f44623fd2ac6aa5c3b1071d340893a154d3e4f71286162db70622d9f91d627c5",
+      "format": "JPEG",
+      "dimensions": [
+        2648,
+        1898
+      ],
+      "preview_width_css_px": 375,
+      "locale": "tr",
+      "captured_at_approx_utc": "2026-10-28T13:30:54Z",
+      "source": "Unmodified bytes from documented CUA Safari App.getScreenshot({emit:false})",
+      "source_window_uuid": "6D09DD83-D232-4BDC-B3F6-A6A6E339A5B8",
+      "page": "http://127.0.0.1:8798/__qa",
+      "product_iframe_page": "/",
+      "scope": "Safari responsive-design QA iframe viewport; includes browser chrome, not a pure full-page capture",
+      "byte_identical_to_cua_sha256": true,
+      "transformations": []
+    },
+    {
+      "path": "safari-cua-tr-home-1024.jpg",
+      "bytes": 348445,
+      "sha256": "b979ce77de959ecd7e195913bf8df7dd359339f97740e6f0d15359f50b5b4544",
+      "format": "JPEG",
+      "dimensions": [
+        2648,
+        1898
+      ],
+      "preview_width_css_px": 1024,
+      "locale": "tr",
+      "captured_at_approx_utc": "2026-10-28T13:31:13Z",
+      "source": "Unmodified bytes from documented CUA Safari App.getScreenshot({emit:false})",
+      "source_window_uuid": "6D09DD83-D232-4BDC-B3F6-A6A6E339A5B8",
+      "page": "http://127.0.0.1:8798/__qa",
+      "product_iframe_page": "/",
+      "scope": "Safari responsive-design QA iframe viewport; includes browser chrome, not a pure full-page capture",
+      "byte_identical_to_cua_sha256": true,
+      "transformations": []
+    },
+    {
+      "path": "safari-cua-en-home-1440.jpg",
+      "bytes": 385970,
+      "sha256": "7588da56a431c7e0b77039bb72eaa0186a4a478c17fdf544c1bd57f83738b4be",
+      "format": "JPEG",
+      "dimensions": [
+        2648,
+        1898
+      ],
+      "preview_width_css_px": 1440,
+      "locale": "en",
+      "captured_at_approx_utc": "2026-10-28T13:31:36Z",
+      "source": "Unmodified bytes from documented CUA Safari App.getScreenshot({emit:false})",
+      "source_window_uuid": "6D09DD83-D232-4BDC-B3F6-A6A6E339A5B8",
+      "page": "http://127.0.0.1:8798/__qa",
+      "product_iframe_page": "/en/",
+      "scope": "Safari responsive-design QA iframe viewport; includes browser chrome, not a pure full-page capture",
+      "byte_identical_to_cua_sha256": true,
+      "transformations": []
+    }
+  ],
+  "current_compact_ui_revalidation": {
+    "at": "2026-10-28T14:54:36.165184+00:00",
+    "current_demo_owner": {
+      "id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "display_name": "Deniz"
+    },
+    "matrix_sha256": "674da386de4f342d25e2feb908ef91cbfe64cff9ec4f599f1b1588e1783666c4",
+    "unchanged_html_css_js": {
+      "landing/index.html": "e2929da7a4081f72c52b0d3ffb2c9c8c75d2e6a7f3ed7e92cd4504126737285d",
+      "landing/features.html": "015ad8809f764a08451e8faa70ce93eb574bcfe4e5cfcd4a8161639ad36106e1",
+      "landing/faq.html": "483537112846f81eec910c1338746874b38b651d763491358ff399b184c1981f",
+      "landing/en/index.html": "3ce08fbd80a7131d5b3dbc5807a8ee16e3b3548a29826c0fcaf3bc4bdebcf754",
+      "landing/en/features.html": "27a3ba81c29d7b831f6342680cea1cce324492a5cd724a21edff1638e1459531",
+      "landing/en/faq.html": "240290290ba66d0ab7b47edcac4f421afb0e75c487d92827b4cdbfa3c7c5867b",
+      "landing/css/style.css": "60161ccc6d526b0433528fdb254059c6ee0da744dc3d2713cc32a02f6ca7c477",
+      "landing/js/main.js": "b762fa94e1d216de598612daf266897acdaab373c13eca09adb1222d9a9d9d52"
+    },
+    "scope": "The retained JPEGs predate compact exam UI media. They remain evidence of unchanged website hero/layout only. New native media is verified by current 72-case matrix and manual video samples, not by these hero JPEGs."
+  }
+}

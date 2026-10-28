@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "scope": "Read-only samples during real manual Safari product interactions; no automatic PASS claim",
+  "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6.2 Safari/605.1.15",
+  "samples": [
+    {
+      "status": "OBSERVED_ONLY",
+      "at": "2026-10-28T13:14:57.284Z",
+      "page": "/en/features",
+      "viewport": {
+        "width": 375,
+        "height": 1000
+      },
+      "language": "en",
+      "videos": [
+        {
+          "source": "/videos/20261028/timer-en.mp4",
+          "current_time": 14.165917916694895,
+          "duration": 24.833,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": true,
+          "hidden": false,
+          "label": "Real-time silent app recording of the timer. Pause recording",
+          "bounds": {
+            "top": 114,
+            "bottom": 643,
+            "width": 244,
+            "height": 529
+          }
+        },
+        {
+          "source": "/videos/20261028/marathon-en.mp4",
+          "current_time": 0,
+          "duration": null,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 0,
+          "visible": false,
+          "hidden": false,
+          "label": "Real-time silent app recording of Marathon planning. Pause recording",
+          "bounds": {
+            "top": 1389,
+            "bottom": 1918,
+            "width": 244,
+            "height": 529
+          }
+        }
+      ]
+    },
+    {
+      "status": "OBSERVED_ONLY",
+      "at": "2026-10-28T13:15:46.413Z",
+      "page": "/en/features",
+      "viewport": {
+        "width": 375,
+        "height": 1000
+      },
+      "language": "en",
+      "videos": [
+        {
+          "source": "/videos/20261028/timer-en.mp4",
+          "current_time": 14.189535334,
+          "duration": 24.833,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": true,
+          "hidden": false,
+          "label": "Real-time silent app recording of the timer. Play recording",
+          "bounds": {
+            "top": 114,
+            "bottom": 643,
+            "width": 244,
+            "height": 529
+          }
+        },
+        {
+          "source": "/videos/20261028/marathon-en.mp4",
+          "current_time": 0,
+          "duration": null,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 0,
+          "visible": false,
+          "hidden": false,
+          "label": "Real-time silent app recording of Marathon planning. Pause recording",
+          "bounds": {
+            "top": 1389,
+            "bottom": 1918,
+            "width": 244,
+            "height": 529
+          }
+        }
+      ]
+    },
+    {
+      "status": "OBSERVED_ONLY",
+      "at": "2026-10-28T13:15:54.609Z",
+      "page": "/en/features",
+      "viewport": {
+        "width": 375,
+        "height": 1000
+      },
+      "language": "en",
+      "videos": [
+        {
+          "source": "/videos/20261028/timer-en.mp4",
+          "current_time": 19.28279508399166,
+          "duration": 24.833,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": true,
+          "hidden": false,
+          "label": "Real-time silent app recording of the timer. Pause recording",
+          "bounds": {
+            "top": 114,
+            "bottom": 643,
+            "width": 244,
+            "height": 529
+          }
+        },
+        {
+          "source": "/videos/20261028/marathon-en.mp4",
+          "current_time": 0,
+          "duration": null,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 0,
+          "visible": false,
+          "hidden": false,
+          "label": "Real-time silent app recording of Marathon planning. Pause recording",
+          "bounds": {
+            "top": 1389,
+            "bottom": 1918,
+            "width": 244,
+            "height": 529
+          }
+        }
+      ]
+    }
+  ]
+}

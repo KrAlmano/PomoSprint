@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import vm from "node:vm";
@@ -14,7 +13,7 @@ for (const lang of ["tr", "en"]) {
   assert.match(html,new RegExp(`<html lang="${lang}">`));
   assert.match(html.match(/<title>([^<]+)<\/title>/)[1],/PomoSprint.*Pomodoro/);
   assert.match(html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/)[1],/PomoSprint/);
-  assert.match(html,/LGS.*YKS.*TUS/);
+  assert.match(html,/LGS.*YKS.*TUS.*DUS/);
   assert.match(html,lang==="tr"?/Çalıştığın süre netine nasıl yansıyor/:/How does your study time relate/);
   assert.doesNotMatch(html,/hg-backdrop|hg-past-hero/);
   assert.match(html,/hreflang="tr"/); assert.match(html,/hreflang="en"/);
@@ -28,7 +27,7 @@ for (const lang of ["tr", "en"]) {
  });
  test(`${lang}: aylık lig, kişisel net ve açılır kurallar`,()=>{
   const html=read(base+"features.html");assert.match(html,/00:00/);assert.match(html,/04:00/);assert.match(html,/class="league-ladder"/);assert.match(html,/<details class="league-details">/);
-  assert.match(html,lang==="tr"?/Netler kişisel takibindir/:/Net scores are personal records/);assert.doesNotMatch(html,/14 günlük|14-day|14 daily/);
+  assert.match(html,lang==="tr"?/Netlerin ve içgörülerin kişiseldir/:/Net scores and insights (?:are|remain) personal/);assert.doesNotMatch(html,/14 günlük|14-day|14 daily/);
  });
  test(`${lang}: SSS görünür cevapları ve JSON-LD aynı`,()=>{
   const html=read(base+"faq.html"),data=JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
@@ -80,57 +79,65 @@ test("Lig merdiveni her iki dilde dengeli beş sütunda kalır", () => {
   }
 });
 
-test("Güncel native görseller tam PNG boyutlarında ve doğru arayüz diliyle kullanılır", () => {
-  for (const file of ["timer-20261028-tr.png", "social-20261028-tr.png", "social-20261028-en.png", "exam-catalog-20261028-tr.png", "exam-running-20261028-en.png", "league-target-20261028-tr.png"]) {
-    const image = fs.readFileSync(path.join(REPO, "landing/screenshots", file));
-    assert.equal(image.subarray(1, 4).toString(), "PNG");
-    assert.equal(image.readUInt32BE(16), 604);
-    assert.equal(image.readUInt32BE(20), 1311);
-  }
+test("Güncel native ekranlar her sayfanın kendi diliyle ve ortak telefon oranıyla sunulur", () => {
   for (const lang of ["tr", "en"]) {
+    const base = lang === "tr" ? "landing/" : "landing/en/";
     for (const page of ["index.html", "features.html"]) {
-      const html = read(`landing/${lang === "en" ? "en/" : ""}${page}`);
-      assert.match(html, new RegExp(`src="/screenshots/social-20261028-${lang}\\.png"[^>]*width="604" height="1311"`));
-      assert.match(html, lang === "tr" ? /örnek hesaplarla/ : /local sample accounts/);
-      assert.doesNotMatch(html, /src="\/screenshots\/(?:social|timer)\.webp"/);
-      assert.match(html, /(?:src|href)="\/screenshots\/timer-20261028-tr\.png"/);
+      const html = read(base + page);
+      const media = [...html.matchAll(/<img\b[^>]*src="(\/screenshots\/[^"]+)"[^>]*>/g)];
+      assert.ok(media.length > 0);
+      for (const [tag, source] of media) {
+        assert.match(source, new RegExp(`^/screenshots/20261028/[a-z-]+-${lang}\\.png$`));
+        assert.match(tag, /width="540" height="1170"/);
+        assert.match(tag, /alt="[^"]+"/);
+      }
+      assert.doesNotMatch(html, /captured in Turkish|Türkçe ekran|20261008|604" height="1311/);
     }
   }
 });
 
-test("Deneme feature satırları gerçek TR katalog ve EN çalışan sayaç görüntüsünü açık örnek hesabıyla sunar", () => {
-  for (const [lang, id, asset] of [
-    ["tr", "deneme", "exam-catalog-20261028-tr.png"],
-    ["en", "mock-exams", "exam-running-20261028-en.png"],
-  ]) {
-    const html = read(`landing/${lang === "en" ? "en/" : ""}features.html`);
-    const row = html.match(new RegExp(`<article class="feature-row reverse" id="${id}">([\\s\\S]*?)</article>`))[1];
-    assert.match(row, /class="feature-row-text"/);
-    assert.match(row, /class="feature-row-media"/);
-    assert.ok(row.includes(`/screenshots/${asset}`));
-    assert.match(row, lang === "tr" ? /Yerel örnek hesapla/ : /local sample account/);
-    if (lang === "en") assert.match(row, /full-duration TYT countdown/);
+test("Deneme açıklamaları iki dilde bütün türleri, erken AYT bitişini ve özel sonuçları kapsar", () => {
+  for (const [lang, id] of [["tr", "deneme"], ["en", "practice"]]) {
+    const base = lang === "tr" ? "landing/" : "landing/en/";
+    const html = read(base + "features.html");
+    const row = html.match(new RegExp(`<article[^>]+id="${id}"[^>]*>([\\s\\S]*?)</article>`))[1];
+    for (const kind of ["TYT", "AYT", "YDT", "LGS", "TUS", "DUS"]) assert.ok(row.includes(kind));
+    assert.match(row, /3-2-1/);
+    assert.match(row, lang === "tr" ? /Sınavı bitirdim/ : /I’ve finished the exam/);
+    assert.match(row, lang === "tr" ? /gerçek süre/ : /actual study time/);
+    assert.ok(row.includes(`/screenshots/20261028/exam-catalog-${lang}.png`));
+    assert.ok(row.includes(`/screenshots/20261028/exam-running-${lang}.png`));
+    assert.match(html, lang === "tr" ? /Her test 40 sorudur/ : /Each test has 40 questions/);
+    assert.match(html, lang === "tr" ? /Denemene bir ad ve not ekle/ : /Add a name and note/);
+    assert.match(html, lang === "tr" ? /puanı, kumu ve sıralamayı değiştirmez/ : /never changes points, sand or rankings/);
   }
 });
 
-test("Lig satırları kaynakla aynı gerçek kareyi, ekran dilini ve örnek hesabı açıklayarak kullanır", () => {
-  const asset = "league-target-20261028-tr.png";
-  const bytes = fs.readFileSync(path.join(REPO, "landing/screenshots", asset));
-  const sha256 = createHash("sha256").update(bytes).digest("hex");
-  assert.equal(sha256, "0d53a21d86e2a3b54c986581f19f2178a12300b907a899978b38bc008906eebd");
-  const manifest = read("landing/screenshots/README.md");
-  assert.match(manifest, /ios18-league\/e2e-league-target-change\.png/);
-  assert.ok(manifest.includes(sha256));
-  for (const [lang, id] of [["tr", "lig"], ["en", "leagues"]]) {
-    const base = `landing/${lang === "en" ? "en/" : ""}`;
-    const html = read(`${base}features.html`);
-    const row = html.match(new RegExp(`<article class="feature-row reverse" id="${id}">([\\s\\S]*?)</article>`))[1];
-    assert.equal([...row.matchAll(new RegExp(asset.replaceAll(".", "\\."), "g"))].length, 1);
-    assert.match(row, /width="604" height="1311"/);
-    assert.doesNotMatch(row, /screenshots\/ranking\.webp/);
-    assert.match(row, lang === "tr" ? /Yerel örnek hesapla gerçek lig ekranı/ : /captured in Turkish with a local sample account/);
-    assert.match(row, lang === "tr" ? /hedef değişikliği sonraki ay uygulanır/ : /goal changes apply next month/);
-    assert.ok(!read(`${base}index.html`).includes(asset), "ana sayfaya yeni lig görseli eklenmez");
+test("Kategori, global ve deneme ligi ayrı güncel native karelerle sunulur", () => {
+  for (const lang of ["tr", "en"]) {
+    const base = lang === "tr" ? "landing/" : "landing/en/";
+    const html = read(base + "features.html");
+    for (const scene of ["league-category", "league-global", "league-exam"]) {
+      assert.equal([...html.matchAll(new RegExp(`src="/screenshots/20261028/${scene}-${lang}\\.png"`, "g"))].length, 1);
+    }
+    assert.match(html, lang === "tr" ? /sonraki ay geçerli olur/ : /applies to your new group next month/);
+    assert.match(html, /00:00/);
+    assert.doesNotMatch(html, /league-target-20261028|ranking\.webp/);
   }
-  assert.equal(fs.existsSync(path.join(REPO, "landing/screenshots/exam-history-20261028-en.png")), false);
+});
+
+const examSand = {lgs_verbal:60, lgs_quantitative:70, ydt:95, tus_basic:110, tus_clinical:110, dus:120, tyt:130, ayt:145};
+test("TR/EN full exam sand table uses the same eight-exam server catalog", () => {
+  const catalog = JSON.parse(read("supabase/proposed/exam_catalog_32.json"));
+  const server = Object.fromEntries(catalog.exams.map(exam => [exam.id, exam.reward_coins]));
+  assert.deepEqual(server, examSand);
+  for (const locale of ["tr", "en"]) {
+    const prefix = locale === "tr" ? "landing/" : "landing/en/";
+    const html = read(prefix + "features.html");
+    const rows = [...html.matchAll(/<tr data-exam-reward="([a-z_]+)"><th scope="row">[^<]+<\/th><td>(\d+)<\/td><\/tr>/g)];
+    assert.equal(rows.length, 8);
+    assert.deepEqual(Object.fromEntries(rows.map(row => [row[1], Number(row[2])])), examSand);
+    assert.match(html, locale === "tr" ? /90 dakika AYT: 72 kum ve 18 puan/ : /90 minutes of AYT earns 72 sand and 18 points/);
+    for (const page of ["index.html", "features.html", "faq.html"]) assert.match(read(prefix + page), /DUS/);
+  }
 });

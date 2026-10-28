@@ -23,7 +23,7 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="stylesheet" href="/css/fonts.css?v=20261003">
-  <link rel="stylesheet" href="/css/style.css?v=20261028a">
+  <link rel="stylesheet" href="/css/style.css?v=20261028b">
   <script src="/js/boot.js?v=20261028a"></script>
   <!-- /partial:head -->
   <script type="application/ld+json">
@@ -68,7 +68,7 @@
       "name": "Which study goals can I choose?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Choose LGS, YKS, TUS, KPSS, language, university or work. TUS includes basic and clinical medicine subjects. Manage up to eight active study categories and change their names, colours and order."
+        "text": "Choose LGS, YKS, TUS, DUS, KPSS, language, university or work. You can plan TUS and DUS preparation with the relevant subjects. Manage up to eight active study categories and change their names, colours and order."
       }
     },
     {
@@ -84,7 +84,7 @@
       "name": "Can I pause a mock exam?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "No. Choose TYT, AYT, YDT, LGS Verbal/Numerical or TUS Basic/Clinical. Question count and time are provided. After the countdown, the timer runs without pauses or breaks. The two LGS sessions are separate mock exams. An abandoned attempt stays in your history and earns no rewards."
+        "text": "No. Choose TYT, AYT, YDT, LGS Verbal, LGS Quantitative, TUS Basic, TUS Clinical or DUS. Question count and duration are provided. After the 3-2-1 countdown, solve without pauses or breaks. The two LGS sessions are separate mock exams. When you finish AYT before time runs out, choose “I’ve finished the exam” to record your actual study time. An abandoned attempt remains marked as abandoned in My exams and earns no points, sand or study time."
       }
     },
     {
@@ -92,7 +92,7 @@
       "name": "Do net scores affect points, sand or leagues?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "No. Correct, incorrect and blank answers are personal records that you may edit later. Net scores use correct minus incorrect/4 for YKS and TUS, and correct minus incorrect/3 for LGS. Only server-timed, fully completed mock exams earn mock exam points and separate mock exam sand."
+        "text": "No. Correct and wrong answers calculate unanswered counts automatically, and you can still edit unanswered counts. Save only the subjects you have entered and fill in or edit the others later. Negative values and totals above the question count are rejected. Net scores use correct − wrong/4 for YKS, TUS and DUS, and correct − wrong/3 for LGS; the English interface uses decimal dots. Scores are personal records and never change points, sand or leagues. You can add a name and note to an attempt. For AYT, first choose one or more of the four tests you completed, then enter results for their subjects. The server verifies rewards; entering net scores earns no rewards. Full-duration rewards are 60 sand for LGS Verbal, 70 for LGS Quantitative, 95 for YDT, 110 each for TUS Basic and Clinical, 120 for DUS, 130 for TYT and 145 for AYT. Early AYT rewards are proportional to actual time: 90 minutes earns 72 sand and 18 points."
       }
     },
     {
@@ -145,7 +145,7 @@
     }
   ]
 }
-  </script>
+</script>
 </head>
 <body data-page="en-faq">
   <!-- partial:header -->
@@ -211,7 +211,7 @@
 <div class="faq-item"><button class="faq-q" type="button" aria-expanded="false" aria-controls="faq-a-5" id="faq-q-5"><span>Which study goals can I choose?</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
 <div class="faq-a" id="faq-a-5" role="region" aria-labelledby="faq-q-5">
 <div class="faq-a-inner">
-<p>Choose LGS, YKS, TUS, KPSS, language, university or work. TUS includes basic and clinical medicine subjects. Manage up to eight active study categories and change their names, colours and order.</p>
+<p>Choose LGS, YKS, TUS, DUS, KPSS, language, university or work. You can plan TUS and DUS preparation with the relevant subjects. Manage up to eight active study categories and change their names, colours and order.</p>
 </div>
 </div>
 </div>
@@ -225,14 +225,14 @@
 <div class="faq-item"><button class="faq-q" type="button" aria-expanded="false" aria-controls="faq-a-7" id="faq-q-7"><span>Can I pause a mock exam?</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
 <div class="faq-a" id="faq-a-7" role="region" aria-labelledby="faq-q-7">
 <div class="faq-a-inner">
-<p>No. Choose TYT, AYT, YDT, LGS Verbal/Numerical or TUS Basic/Clinical. Question count and time are provided. After the countdown, the timer runs without pauses or breaks. The two LGS sessions are separate mock exams. An abandoned attempt stays in your history and earns no rewards.</p>
+<p>No. Choose TYT, AYT, YDT, LGS Verbal, LGS Quantitative, TUS Basic, TUS Clinical or DUS. Question count and duration are provided. After the 3-2-1 countdown, solve without pauses or breaks. The two LGS sessions are separate mock exams. When you finish AYT before time runs out, choose “I’ve finished the exam” to record your actual study time. An abandoned attempt remains marked as abandoned in My exams and earns no points, sand or study time.</p>
 </div>
 </div>
 </div>
 <div class="faq-item"><button class="faq-q" type="button" aria-expanded="false" aria-controls="faq-a-8" id="faq-q-8"><span>Do net scores affect points, sand or leagues?</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
 <div class="faq-a" id="faq-a-8" role="region" aria-labelledby="faq-q-8">
 <div class="faq-a-inner">
-<p>No. Correct, incorrect and blank answers are personal records that you may edit later. Net scores use correct minus incorrect/4 for YKS and TUS, and correct minus incorrect/3 for LGS. Only server-timed, fully completed mock exams earn mock exam points and separate mock exam sand.</p>
+<p>No. Correct and wrong answers calculate unanswered counts automatically, and you can still edit unanswered counts. Save only the subjects you have entered and fill in or edit the others later. Negative values and totals above the question count are rejected. Net scores use correct − wrong/4 for YKS, TUS and DUS, and correct − wrong/3 for LGS; the English interface uses decimal dots. Scores are personal records and never change points, sand or leagues. You can add a name and note to an attempt. For AYT, first choose one or more of the four tests you completed, then enter results for their subjects. The server verifies rewards; entering net scores earns no rewards. Full-duration rewards are 60 sand for LGS Verbal, 70 for LGS Quantitative, 95 for YDT, 110 each for TUS Basic and Clinical, 120 for DUS, 130 for TYT and 145 for AYT. Early AYT rewards are proportional to actual time: 90 minutes earns 72 sand and 18 points.</p>
 </div>
 </div>
 </div>

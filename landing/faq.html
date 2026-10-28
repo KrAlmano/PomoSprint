@@ -23,7 +23,7 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="stylesheet" href="/css/fonts.css?v=20261003">
-  <link rel="stylesheet" href="/css/style.css?v=20261028a">
+  <link rel="stylesheet" href="/css/style.css?v=20261028b">
   <script src="/js/boot.js?v=20261028a"></script>
   <!-- /partial:head -->
   <script type="application/ld+json">
@@ -68,7 +68,7 @@
       "name": "Hangi hedefleri ve dersleri seçebilirim?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "LGS, YKS, TUS, KPSS, dil, üniversite veya iş hedefini seçebilirsin. TUS için temel tıp ve klinik dersler bulunur. Aynı anda en fazla 8 aktif kategoriyi yönetebilir; adını, rengini ve sırasını değiştirebilirsin."
+        "text": "LGS, YKS, TUS, DUS, KPSS, dil, üniversite veya iş hedefini seçebilirsin. TUS ve DUS hazırlığını uygun derslerle planlayabilirsin. Aynı anda en fazla 8 aktif kategoriyi yönetebilir; adını, rengini ve sırasını değiştirebilirsin."
       }
     },
     {
@@ -84,7 +84,7 @@
       "name": "Deneme modunda mola veya duraklatma var mı?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Hayır. TYT, AYT, YDT, LGS Sözel/Sayısal veya TUS Temel/Klinik oturumunu seçersin; soru sayısı ve süre hazır gelir. Geri sayımdan sonra kesintisiz çözersin. LGS’nin iki oturumu ayrı deneme olarak sunulur. Erken bıraktığın deneme geçmişte görünür, ödül kazandırmaz."
+        "text": "Hayır. TYT, AYT, YDT, LGS Sözel, LGS Sayısal, TUS Temel, TUS Klinik veya DUS oturumunu seçersin; soru sayısı ve süre hazır gelir. 3-2-1 geri sayımından sonra kesintisiz çözersin. LGS’nin iki oturumu ayrı denemedir. AYT bittiğinde süre dolmadan “Sınavı bitirdim” diyerek gerçek çalışma süreni kaydedebilirsin. Vazgeçtiğin deneme Denemelerim’de “vazgeçildi” olarak kalır; puan, kum veya çalışma süresi kazandırmaz."
       }
     },
     {
@@ -92,7 +92,7 @@
       "name": "Netler puanımı, kumumu veya ligimi etkiler mi?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Hayır. Doğru, yanlış ve boş sayıların kişisel takibindir; sonra da düzenleyebilirsin. YKS ve TUS neti doğru − yanlış/4, LGS neti doğru − yanlış/3 olarak hesaplanır. Deneme puanı ve kumu yalnız sunucunun ölçtüğü tam süreli tamamlanmış denemeden gelir; normal kumdan ayrıdır."
+        "text": "Hayır. Doğru ve yanlışı girince boş sayısı otomatik hesaplanır; istersen elle değiştirebilirsin. Yalnız doldurduğun dersleri kaydedip diğerlerini sonra tamamlayabilir, netlerini sonradan düzeltebilirsin. Negatif değerler ve soru sayısını aşan toplamlar kabul edilmez. YKS, TUS ve DUS neti doğru − yanlış/4, LGS neti doğru − yanlış/3’tür; Türkçe arayüzde ondalıklar virgülle görünür. Netler kişisel kaydındır, puanı, kumu ve ligi değiştirmez. Denemeye bir ad ve not ekleyebilirsin. AYT’de önce çözdüğün dört testten birini veya birkaçını seçer, sonra ilgili derslerin sonuçlarını girersin. Ödülleri sunucu doğrular; net girişi ödül kazandırmaz. Tam süre ödülleri: LGS Sözel 60, LGS Sayısal 70, YDT 95, TUS Temel ve Klinik 110’ar, DUS 120, TYT 130, AYT 145 kum. Erken biten AYT’nin ödülü gerçek süreye orantılıdır; 90 dakika 72 kum ve 18 puandır."
       }
     },
     {
@@ -145,7 +145,7 @@
     }
   ]
 }
-  </script>
+</script>
 </head>
 <body data-page="faq">
   <!-- partial:header -->
@@ -211,7 +211,7 @@
 <div class="faq-item"><button class="faq-q" type="button" aria-expanded="false" aria-controls="faq-a-5" id="faq-q-5"><span>Hangi hedefleri ve dersleri seçebilirim?</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
 <div class="faq-a" id="faq-a-5" role="region" aria-labelledby="faq-q-5">
 <div class="faq-a-inner">
-<p>LGS, YKS, TUS, KPSS, dil, üniversite veya iş hedefini seçebilirsin. TUS için temel tıp ve klinik dersler bulunur. Aynı anda en fazla 8 aktif kategoriyi yönetebilir; adını, rengini ve sırasını değiştirebilirsin.</p>
+<p>LGS, YKS, TUS, DUS, KPSS, dil, üniversite veya iş hedefini seçebilirsin. TUS ve DUS hazırlığını uygun derslerle planlayabilirsin. Aynı anda en fazla 8 aktif kategoriyi yönetebilir; adını, rengini ve sırasını değiştirebilirsin.</p>
 </div>
 </div>
 </div>
@@ -225,14 +225,14 @@
 <div class="faq-item"><button class="faq-q" type="button" aria-expanded="false" aria-controls="faq-a-7" id="faq-q-7"><span>Deneme modunda mola veya duraklatma var mı?</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
 <div class="faq-a" id="faq-a-7" role="region" aria-labelledby="faq-q-7">
 <div class="faq-a-inner">
-<p>Hayır. TYT, AYT, YDT, LGS Sözel/Sayısal veya TUS Temel/Klinik oturumunu seçersin; soru sayısı ve süre hazır gelir. Geri sayımdan sonra kesintisiz çözersin. LGS’nin iki oturumu ayrı deneme olarak sunulur. Erken bıraktığın deneme geçmişte görünür, ödül kazandırmaz.</p>
+<p>Hayır. TYT, AYT, YDT, LGS Sözel, LGS Sayısal, TUS Temel, TUS Klinik veya DUS oturumunu seçersin; soru sayısı ve süre hazır gelir. 3-2-1 geri sayımından sonra kesintisiz çözersin. LGS’nin iki oturumu ayrı denemedir. AYT bittiğinde süre dolmadan “Sınavı bitirdim” diyerek gerçek çalışma süreni kaydedebilirsin. Vazgeçtiğin deneme Denemelerim’de “vazgeçildi” olarak kalır; puan, kum veya çalışma süresi kazandırmaz.</p>
 </div>
 </div>
 </div>
 <div class="faq-item"><button class="faq-q" type="button" aria-expanded="false" aria-controls="faq-a-8" id="faq-q-8"><span>Netler puanımı, kumumu veya ligimi etkiler mi?</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
 <div class="faq-a" id="faq-a-8" role="region" aria-labelledby="faq-q-8">
 <div class="faq-a-inner">
-<p>Hayır. Doğru, yanlış ve boş sayıların kişisel takibindir; sonra da düzenleyebilirsin. YKS ve TUS neti doğru − yanlış/4, LGS neti doğru − yanlış/3 olarak hesaplanır. Deneme puanı ve kumu yalnız sunucunun ölçtüğü tam süreli tamamlanmış denemeden gelir; normal kumdan ayrıdır.</p>
+<p>Hayır. Doğru ve yanlışı girince boş sayısı otomatik hesaplanır; istersen elle değiştirebilirsin. Yalnız doldurduğun dersleri kaydedip diğerlerini sonra tamamlayabilir, netlerini sonradan düzeltebilirsin. Negatif değerler ve soru sayısını aşan toplamlar kabul edilmez. YKS, TUS ve DUS neti doğru − yanlış/4, LGS neti doğru − yanlış/3’tür; Türkçe arayüzde ondalıklar virgülle görünür. Netler kişisel kaydındır, puanı, kumu ve ligi değiştirmez. Denemeye bir ad ve not ekleyebilirsin. AYT’de önce çözdüğün dört testten birini veya birkaçını seçer, sonra ilgili derslerin sonuçlarını girersin. Ödülleri sunucu doğrular; net girişi ödül kazandırmaz. Tam süre ödülleri: LGS Sözel 60, LGS Sayısal 70, YDT 95, TUS Temel ve Klinik 110’ar, DUS 120, TYT 130, AYT 145 kum. Erken biten AYT’nin ödülü gerçek süreye orantılıdır; 90 dakika 72 kum ve 18 puandır.</p>
 </div>
 </div>
 </div>

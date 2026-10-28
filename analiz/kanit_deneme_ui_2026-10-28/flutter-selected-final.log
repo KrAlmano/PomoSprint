@@ -1,0 +1,42 @@
+00:00 +0: loading test/exam_compact_ui_test.dart
+00:00 +0: test/exam_insights_loading_test.dart: failed first study history read never presents zero minutes as a verified insight
+00:00 +1: test/exam_insights_loading_test.dart: failed first study history read never presents zero minutes as a verified insight
+00:00 +2: test/exam_insights_loading_test.dart: failed first study history read never presents zero minutes as a verified insight
+00:00 +3: test/exam_insights_loading_test.dart: failed first study history read never presents zero minutes as a verified insight
+00:00 +4: test/exam_insights_loading_test.dart: failed first study history read never presents zero minutes as a verified insight
+00:01 +5: test/exam_details_widget_test.dart: AYT selects modules before scores and saves one atomic patch (tr)
+00:01 +6: test/exam_details_widget_test.dart: AYT selects modules before scores and saves one atomic patch (tr)
+00:01 +7: test/exam_details_widget_test.dart: AYT selects modules before scores and saves one atomic patch (tr)
+00:01 +8: test/exam_details_widget_test.dart: AYT selects modules before scores and saves one atomic patch (tr)
+00:01 +9: test/exam_details_widget_test.dart: AYT selects modules before scores and saves one atomic patch (tr)
+00:01 +10: test/exam_details_widget_test.dart: AYT selects modules before scores and saves one atomic patch (tr)
+00:01 +11: test/exam_details_widget_test.dart: AYT selects modules before scores and saves one atomic patch (tr)
+00:01 +12: test/exam_compact_ui_test.dart: compact exam catalog tr 320pt large text
+00:02 +13: test/exam_localization_audit_test.dart: a visible results-save error changes language with its dialog
+00:02 +14: test/exam_localization_audit_test.dart: a visible results-save error changes language with its dialog
+00:02 +15: test/exam_localization_audit_test.dart: a visible results-save error changes language with its dialog
+00:02 +16: test/exam_localization_audit_test.dart: a visible results-save error changes language with its dialog
+00:02 +17: test/exam_localization_audit_test.dart: a visible results-save error changes language with its dialog
+00:02 +18: test/exam_details_widget_test.dart: metadata-only applies to every completed exam with unchanged score (tr)
+00:02 +19: test/exam_details_widget_test.dart: metadata-only applies to every completed exam with unchanged score (tr)
+00:02 +20: test/exam_details_widget_test.dart: metadata-only applies to every completed exam with unchanged score (tr)
+00:02 +21: test/exam_details_widget_test.dart: metadata-only applies to every completed exam with unchanged score (tr)
+00:03 +22: test/exam_details_widget_test.dart: metadata-only applies to every completed exam with unchanged score (tr)
+00:03 +23: test/exam_details_widget_test.dart: metadata-only applies to every completed exam with unchanged score (tr)
+00:03 +24: test/exam_details_widget_test.dart: metadata-only applies to every completed exam with unchanged score (tr)
+00:04 +25: test/exam_details_widget_test.dart: early finish waits for server offline and exposes exact pending language (tr)
+00:04 +26: test/exam_details_widget_test.dart: AYT selects modules before scores and saves one atomic patch (en)
+00:04 +27: test/exam_details_widget_test.dart: metadata-only applies to every completed exam with unchanged score (en)
+00:05 +28: test/exam_details_widget_test.dart: early finish waits for server offline and exposes exact pending language (en)
+00:05 +29: test/exam_details_widget_test.dart: offline draft reopens then immutable queued form remains disabled until retry
+00:06 +30: test/exam_details_widget_test.dart: stale revision requires explicit review and preserves typed note
+00:06 +31: test/exam_details_widget_test.dart: legacy capabilities hide new controls while preserving original score entry
+00:06 +32: test/exam_details_widget_test.dart: owner change dismisses private form and never persists under the new owner
+00:06 +33: test/exam_details_widget_test.dart: accepted early completion opens module form and keeps actual/planned times distinct
+00:06 +34: test/exam_details_widget_test.dart: module and details form fits narrow portrait and landscape at double text scale
+00:06 +35: test/exam_details_widget_test.dart: oversized paste is visible and safe across autosave and cold reopen (tr)
+00:06 +36: test/exam_details_widget_test.dart: oversized paste is visible and safe across autosave and cold reopen (en)
+00:06 +37: test/exam_details_widget_test.dart: catalog explains net rules once without repeating the long introduction
+00:07 +38: test/exam_details_widget_test.dart: older readable long draft stays editable and reports its length error accurately
+00:07 +39: test/exam_details_widget_test.dart: TR EN answer labels remain single line with aligned input tops on narrow screens
+00:07 +40: All tests passed!

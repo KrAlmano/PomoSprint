@@ -1,0 +1,124 @@
+{
+  "status": "PASS",
+  "owner": "81969919-cd0a-40f6-8ef9-dc1dd77f638d",
+  "email": "e2e-sim-exam32-compact-android-final@pomosprint.local",
+  "checks": [
+    {
+      "name": "exactly two completed attempts",
+      "pass": true
+    },
+    {
+      "name": "tr actual natural seconds",
+      "pass": true
+    },
+    {
+      "name": "tr unchanged planned 180min",
+      "pass": true
+    },
+    {
+      "name": "tr natural timestamps",
+      "pass": true
+    },
+    {
+      "name": "tr reward based on actual",
+      "pass": true
+    },
+    {
+      "name": "tr metadata revision once",
+      "pass": true
+    },
+    {
+      "name": "tr two selected modules",
+      "pass": true
+    },
+    {
+      "name": "tr exact title and note",
+      "pass": true
+    },
+    {
+      "name": "tr partial auto-blank scores",
+      "pass": true
+    },
+    {
+      "name": "en actual natural seconds",
+      "pass": true
+    },
+    {
+      "name": "en unchanged planned 180min",
+      "pass": true
+    },
+    {
+      "name": "en natural timestamps",
+      "pass": true
+    },
+    {
+      "name": "en reward based on actual",
+      "pass": true
+    },
+    {
+      "name": "en metadata revision once",
+      "pass": true
+    },
+    {
+      "name": "en two selected modules",
+      "pass": true
+    },
+    {
+      "name": "en exact title and note",
+      "pass": true
+    },
+    {
+      "name": "en partial auto-blank scores",
+      "pass": true
+    },
+    {
+      "name": "profile actual minute total",
+      "pass": true
+    },
+    {
+      "name": "normal wallet unaffected",
+      "pass": true
+    },
+    {
+      "name": "exam wallet equals actual rewards",
+      "pass": true
+    },
+    {
+      "name": "zero credited minutes no streak",
+      "pass": true
+    }
+  ],
+  "profile": {
+    "coins": 0,
+    "streak": 0,
+    "exam_coins": 0,
+    "exam_points": 0,
+    "total_minutes": 0,
+    "lifetime_points": 0,
+    "normal_completed": 0
+  },
+  "attempts": [
+    {
+      "id": "54b21cee-3f61-43c0-8e15-066e19c6d11c",
+      "actual_seconds": 5,
+      "planned_seconds": 10800,
+      "credited_minutes": 0,
+      "points": 0,
+      "coins": 0,
+      "revision": 1,
+      "subject_count": 2
+    },
+    {
+      "id": "d9c2414d-7568-4891-98f5-8e2b5beb4c85",
+      "actual_seconds": 6,
+      "planned_seconds": 10800,
+      "credited_minutes": 0,
+      "points": 0,
+      "coins": 0,
+      "revision": 1,
+      "subject_count": 2
+    }
+  ],
+  "database": "pomosprint_review32_dus",
+  "read_only": true
+}

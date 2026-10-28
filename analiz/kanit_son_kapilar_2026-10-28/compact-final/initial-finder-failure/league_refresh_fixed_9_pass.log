@@ -1,0 +1,11 @@
+00:00 +0: loading test/league_refresh_regression_test.dart
+00:00 +0: open ranking reloads a finished period once and refreshes target
+00:00 +1: pull refresh reloads the visible exam league wallet
+00:00 +2: open exam league reloads once when its period has ended
+00:00 +3: hidden ranking does not fetch or poll until shown
+00:00 +4: elapsed countdown calls once only while visible
+00:00 +5: exam league pauses hidden refresh and reloads on foreground return
+00:00 +6: foreground rollover bypasses a still-fresh ranking cache
+00:01 +7: unavailable league clears loading and ignores the previous reply
+00:01 +8: unavailable league also clears a previous load error
+00:01 +9: All tests passed!

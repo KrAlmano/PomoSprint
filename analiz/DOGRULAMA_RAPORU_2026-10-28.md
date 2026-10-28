@@ -1,6 +1,6 @@
 # Uygulama, veritabanı ve site doğrulaması — 28 Ekim 2026
 
-**A doğrulaması tamamlandı; B site güncellemesi sürüyor.** Bu rapor yeni A/B talebinin sonuçlarını toplar. Çalışılan depo `/Users/almano/Desktop/Projects/Pomodoro`, dal `codex/gece-2026-10-27`. Canlı Supabase/Resend/siteye işlem veya deploy yapılmadı; main değiştirilmedi. Kök `.env` agent tarafından açılmadı/değiştirilmedi. Bütün hesaplar ve veriler yerel, uydurmadır.
+**A, yeni DUS/ödül akışları ve Safari site doğrulaması tamamlandı. Chrome doğrulaması ortam engeli nedeniyle yapılamadı.** Bu rapor yeni A/B talebinin sonuçlarını toplar. Çalışılan depo `/Users/almano/Desktop/Projects/Pomodoro`, dal `codex/gece-2026-10-27`. Canlı Supabase/Resend/siteye işlem veya deploy yapılmadı; main değiştirilmedi. Kök `.env` agent tarafından açılmadı/değiştirilmedi. Bütün hesaplar ve veriler yerel, uydurmadır.
 
 Ana yerel sunucuda 27–30 paketleri doğrulandı. **31 uygulanmadı; kullanıcı kararı bekliyor. 31 sonrası Maraton testi yapılmadı.** Kısa sınav pencerelerinin sonunda resmî yedi katalog satırı birebir geri yüklendi; özgün gerçek75 kaydı değişmedi; son parite exit0.
 
@@ -8,7 +8,7 @@ Ana yerel sunucuda 27–30 paketleri doğrulandı. **31 uygulanmadı; kullanıc�
 
 - Başlangıç: `fb70839ecd36ce314da5389928ef01fa5e40ce00`; mevcut36commit yalnız çalışma dalına push edildi. Temiz ağaçla984yol ve yeni bloblar incelendi: yasaklı dosya ve50MB üstü blob yok; en büyük1.355.247bayt.
 - İki ürün düzeltmesi: `11ea62c` kısmi/offline net journal; `8446eff` otomatik ve elle boş/negatif/toplam doğrulaması. Her biri ayrı tam analiz/Flutter/Node kapısından geçti.
-- A sonu push: kontrol ve commit hazırlanıyor. B sonu ve kapanış yedekleri sonra kaydedilecek. Main push/merge/force push/deploy yok.
+- A sonu: `4be1b9c` (418dosya) temiz ağaç ve dosya/blob kontrolüyle aynı dala push edildi. Yeni DUS/ayrıntı kodu `8cb3dc9` (226dosya) olarak kaydedildi. Son Deneme arayüzü `641cc16` (19 dosya) commit’indedir. Site, taşınabilir kanıtlar ve devir belgesi bu raporun son commit’iyle aynı dalda izlenir; son push hash’i kullanıcıya kapanış mesajında bildirilir. Main push/merge/force push/deploy yok.
 - Dal: https://github.com/KrAlmano/PomoSprint/tree/codex/gece-2026-10-27
 
 ## Kanıtın kapsamı
@@ -224,16 +224,109 @@ Xcode'un ürettiği nested SwiftPM kilit dosyası, çalışmaya ait yedek/hash k
 
 ## B. Site önce/sonra
 
-B henüz uygulanmadı. Hazır tasarım/çekim araçları önce A yedeğinden sonra kullanılacak. Hedef: tek iOS18.6/09:41 cihazı ve aynı Deniz demo hesabı;15sahne×TR/EN, dört gerçek zamanlı video,540×1170 ortak web boyutu ve mevcut telefon çerçevesi; Deneme/aylık kategori+global/TUS içerik eşliği; eski kullanılmayan medya temizliği.
+| Alan | Önce | Sonra |
+|---|---|---|
+| Ekranlar | Eski 4 sekme ve iki farklı ölçü/dil seti | Tek QA iPhone 16 / iOS 18.6; saat 09:41; aynı Deniz hesabı; TR/EN için 15'er sahne, toplam 30 PNG (540 × 1170) |
+| Veriler | Boş hesap; QA Deneme/Odak/Mola adları | Kurgu Deniz hesabı; normal 29 puan / 80 kum, seri 2, toplam 455 dk; deneme 66 puan / 260 kum; insan adları kullanan 6 arkadaş |
+| Özellikler | TR/EN arasında bölüm farkı; eksik Deneme bölümü | Aynı bölüm/konu sayıları; 8 deneme türü, dört sınav ailesi (YKS/LGS/TUS/DUS); net, başlık, not, AYT erken bitirme; aylık kategori ve global sıralama |
+| Videolar | Eski arayüz/dil; elle oynatma katmanı | TR/EN için uygulamadan alınmış 4 gerçek video; sessiz ve otomatik döngü; gerçek dokunmaları gösteren imleç; hız değiştirilmedi |
+| Dosyalar | Karışık veya kullanılmayan medya | Hiçbir yerde referansı bulunmayan 27 eski public medya dosyası kaldırıldı; yeni manifestler boyut, dil, hash ve kaynağı doğruluyor |
+| Yerel QA | Geçici HTTP kurulumu | Tekrar kullanılabilir [güvenli önizleme](../tool/site_qa/README.md); canlı API, form veya Auth bağlantısı yok |
 
-Safari'nin geçici `cgWindowNotFound` erişim hatası kullanıcı Mac'i görünür bırakınca çözüldü. Yalnız yerel önizleme sekmesi ayrı test penceresine taşındı; kişisel Chrome sekmeleri okunmadı/değiştirilmedi. Mevcut site tabanında Safari iframe ölçüm matrisi72/72 geçti; bu sonuç yeni B dosyalarının final kontrolü değildir. B sonrası tekrar ve gerçek görsel/video etkileşimleri bekliyor.
+Güncel bilgiler [medya rehberinde](../landing/screenshots/README.md), [fotoğraf manifestinde](../landing/screenshots/manifest-20261028.json) ve [video manifestinde](../landing/videos/manifest-20261028.json) bulunuyor. Ham PNG kaynakları (604 × 1311) ve uygulamadan kaydedilmiş video bölümleri (1178 × 2556) korunuyor. Web için hazırlanan 540 × 1170 türevlerde orantılı ölçekleme ve ince kenar boşluğu kullanılıyor; ekran içeriği üretilmiyor, kırpılmıyor veya esnetilmiyor. Kaynak MP4'ler, özgün MOV kaydının paket SHA/PTS/DTS değerleriyle eşleşiyor. Tam MOV kayıtları ve derleme dosyaları commit'e alınmıyor.
 
-## Kapanışta kalanlar
+İlk B çekiminde TYT 150 kum / deneme cüzdanı 300 kum politikası kullanılıyordu. Son kullanıcı kararından sonra boş bir DUS site veritabanında 7 yeni hesap oluşturuldu; 30 görsel ve 4 video **yeniden çekildi**. Aradaki DUS çekimi `site-oct28-dus` idi. Son Deneme arayüzü isteğinde bu veritabanı `pomosprint_site32_dus_pre_ui` adıyla korunup yeni boş yerel kopyada `site-oct28-ui` çekimi yapıldı. Son hesap sahibi kimliği `ca271e26-fc2c-44b6-b88f-9537f809639c`; eski 4328 kimlikli hesabın ödülleri değiştirilmedi. Tarihsel verilerle oluşturulan 455 dk'lık test verisi, 455 dk boyunca doğal süreyle beklenmiş olduğunun kanıtı değildir.
 
-A tamam; B medya, yerel tarayıcı kontrolleri, README/kurulum/devir güncellemesi, son normal derlemeler ve B/kapanış push'ları henüz bekliyor. 31, fiziksel cihaz ve ertelenmiş yayın operasyonları bu çalışma ile kendiliğinden tamamlanmış sayılmaz.
+| Kontrol | Beklenen | Uygulamada/sitede görünen | Veritabanında | Sonuç | Kanıt |
+|---|---|---|---|---|---|
+| Tek veri/dil/cihaz | Aynı hesap; iki gerçek dil | 30 görsel / 4 video; güncel 5 sekme | Boş kurulan DUS site veritabanında yalnızca 7 kurgu hesap | GEÇTİ | [Manifest](../landing/screenshots/manifest-20261028.json) |
+| 30 görselin incelenmesi | Doğru dil, saat ve veri; klavye veya geçici bildirim yok | 15 TR + 15 EN görsel tek tek açıldı; EN “Unanswered” hizası düzeltildi | TYT 130 kum; deneme cüzdanı 260 kum; normal 29 puan / 80 kum; seri 2 tutarlı | GEÇTİ | [TR](ekran_site_2026-10-28/visual_review/tr.json), [EN](ekran_site_2026-10-28/visual_review/en.json) |
+| 4 videonun teknik ve görsel kontrolü | 540 × 1170, 24 fps, h264, sessiz, ≤256 KiB | İlk/orta/son/dokunma anlarından 20 kare; imleç 50 dk / 4 seans hedefleriyle eşleşiyor | Ödül doğurmayan arayüz iptalleri; eski ödüller korundu | GEÇTİ | [Video QA](ekran_site_2026-10-28/video_review/README.md) |
+| Kaynak videonun gerçek zamanlı olması | Stream copy; hız değişikliği yok | Kaynak paketleri ve sabit PTS/DTS farkı 4/4 videoda doğrulandı | — | GEÇTİ | [Teknik kontrol](ekran_site_2026-10-28/video_review/technical_checks.json) |
+| Safari: 375/1024/1440 | 24 yerel TR/EN sayfa; 404 veya taşma yok | 72/72 PASS, 0 uyarı | Canlı API kapalı; veritabanına yazılmadı | GEÇTİ | [72 kontrol matrisi](ekran_site_2026-10-28/browser/safari_final_72.json) |
+| Safari manuel kontrol | Son turda dört video; menü/SSS/dil aynı kaynakların önceki turunda | 4 videoda `currentTime` ilerledi; duraklatma/devam, sessiz oynatma, döngü ve sayacın başa dönmesi gözlendi | DB/API/form işlemi yok | GEÇTİ | [Manuel rapor](ekran_site_2026-10-28/browser/SAFARI_MANUEL_2026-10-28.md), [50 örnek](ekran_site_2026-10-28/browser/safari_manual_final.json) |
+| Gerçek site görüntüsü | Tarayıcı görüntü alanından kanıt | 375/1024/1440 genişliklerinde 3 gerçek CUA JPEG; birebir aynı dosyayı doğrulayan SHA değerleri | — | GEÇTİ | [375](ekran_site_2026-10-28/browser/safari-cua-tr-home-375.jpg), [1024](ekran_site_2026-10-28/browser/safari-cua-tr-home-1024.jpg), [1440](ekran_site_2026-10-28/browser/safari-cua-en-home-1440.jpg) |
+| Hero başlığının okunurluğu | Başlığın ilk çizimde gizlenmemesi | 375/1024/1440 görselleri ve CSS regresyonu PASS; kesin ilk çizim karesi kaydı yok | — | SINIRLI | [Manuel kapsam](ekran_site_2026-10-28/browser/SAFARI_MANUEL_2026-10-28.md) |
+| Chrome | Ayrı QA oturumunda gerçek kontrol | “Browser access host unavailable”; iki API çağrısı başarısız | Kişisel Chrome'a erişilmedi | KALDI—ORTAM | [Engel kaydı](ekran_site_2026-10-28/browser/chrome_unavailable.json) |
+| Node / statik medya | Boyut, dil, hash, kullanım, Range ve erişilebilirlik | 172/172 PASS | Ağ bağlantısı kullanmayan mock testleri | GEÇTİ | [Son Node sonucu](kanit_son_kapilar_2026-10-28/gate1-node.log) |
 
-## Doğrulama sonrasında gelen ek istekler
+Üç küçük sunum uyarısı kaldı: kaydırılabilir rapor sekmelerinin son etiketinin dar kadrajda kısalması, koleksiyon başlığının üç noktayla kısaltılması ve Deneme liginde özel avatarların hazırlandığını belirten mevcut metin. Videoların ortasında normal duraklatma/başlatma bilgi bildirimleri görünüyor. Bunlar veri veya çökme hatası değil. Görüntü kadrajında bulunmayan aylık/haftalık toplamlar fotoğraflardan doğrulanmış sayılmadı; bu değerler ayrı uygulama ve SQL kanıtlarına dayanıyor.
 
-- Kullanıcı doğru/yanlış girip tek Kaydet ile kayıt ister; otomatik/elle boş, kısmi veya bütün derslerin tek gönderimi A2 kapsamında hazır ve iki platformda doğrulandı. TYT Türkçe40/Matematik40; Sosyal20 ve Fen20 alt ders kotalarıyla tutulur, toplam120soru.
-- Kullanıcı yeni hedefleri LGS Sözel60, TYT150, AYT175 Deneme kumu olarak belirledi. Henüz uygulanmadı. AYT için erken bitirme, çözülen dört test grubunu seçme ve deneme adı/notu da istendi; resmî dağılım araştırılıyor. Erken bitirmede ödülün süreye oranlanması veya tam175 olması kullanıcıya soruldu. Ayrı32önerisi planlanıyor;31'e bağımlı olmayacak. Bu A raporundaki3/6kum gibi değerler mevcut politikadaki özgün kayıtların doğru sonuçlarıdır; geçmiş/aktif snapshot geriye dönük değiştirilmeyecek.
-- Sitedeki QA Deneme/Odak/Mola adları yeni aynı-hesap çekiminde uydurma insan adlarıyla değişecek (Deniz, Ece, Mert, Ada, Arda, Duru, Can). Gerçek kullanıcı hesaplarına dokunulmaz.
+## DUS ve son Deneme ödül kararı
+
+Kullanıcının son tablosu, önceki 150/175 kararının yerini aldı. 32 numaralı paket yalnızca yeni başlatılan denemelerde kaydedilen ödül değerlerini etkiliyor; daha önce başlamış veya tamamlanmış kayıtların ödülleri korunuyor.
+
+| Sınav | Dakika | Kum | Deneme puanı |
+|---|---:|---:|---:|
+| LGS Sözel | 75 | 60 | 15 |
+| LGS Sayısal | 80 | 70 | 16 |
+| YDT | 120 | 95 | 24 |
+| TUS Temel | 135 | 110 | 27 |
+| TUS Klinik | 135 | 110 | 27 |
+| DUS | 150 | 120 | 30 |
+| TYT | 165 | 130 | 33 |
+| AYT | 180 | 145 | 36 |
+
+Kum hesabının temeli, dakika × 0,8 değerinin en yakın 5'in katına yuvarlanmasıdır. LGS Sayısal için 70 kum, kullanıcının açıkça belirlediği istisnadır. AYT erken bitirmede kum `floor(snapshot_fullcoins × elapsed / planned)`, puan ise `min(snapshot_fullpoints, floor(elapsed / 300))` olarak hesaplanır. Yeni ödül tablosuyla 90 dk → 72 kum / 18 puan; 1–59 sn → 0; tam süre → 145 kum / 36 puandır. Diğer 7 türde (DUS dahil) erken bitirme reddedilir. Deneme ekonomisi normal ekonomiden ayrıdır; net, başlık veya not kaydetmek ikinci kez ödül üretmez.
+
+Resmî kaynak: [ÖSYM 2026-DUS 2 kılavuzu](https://dokuman.osym.gov.tr/web/2026/9/basvuru-kilavuzu-e1esxj-16163038.pdf). §1.3 / PDF sayfa 4 süreyi 150 dk; PDF sayfa 27 net hesabını D−Y/4 olarak veriyor. Basılı sayfa 40 / PDF sayfa 43, Tablo 1'de toplam 120 soru (40 + 80) bulunuyor. 16 alanın standart kotaları yaklaşık kapsamı gösteriyor. [Araştırma/kaynaklar](SINAV_KAYNAKLARI_2026-10-28.md) ile PDF SHA/boyut kaydı korunuyor. DUS tanımı, onboarding'de 16 ders önerisi, UID bekleyen eski kayıtlarla uyum, lig hedefi, filtreler ve TR/EN metinleri eklendi; diğer mevcut hedefler silinmedi.
+
+| Kontrol | Beklenen | Uygulamada görünen | Veritabanında | Sonuç | Kanıt |
+|---|---|---|---|---|---|
+| 27 → 28 → 29 → 30 → 32 | Boş yerel kurulum; 31 yok | Güncel 8 türden oluşan katalog | Review/site ortamları veri kopyalanmadan kuruldu; 128/128 SQL, DRYRUN, geri alma ve başlangıç değerleri kontrolü | GEÇTİ | [DUS sunucu arşivi](kanit_dus_2026-10-28/INDEX.md) |
+| 8 tam ödül / sürüm 2 | Tabloyla birebir eşleşme | Tek istemci yedek tablosu; sunucunun kabul ettiği kayıt öncelikli | 8 tam ödül; politika 2; normal cüzdan değişmiyor | GEÇTİ | [Sunucu](kanit_dus_2026-10-28/INDEX.md), [istemci](QA_DUS_ISTEMCI_2026-10-28.md) |
+| AYT: 90 dk / 1 sn / tam süre | 72/18, 0, 145/36 | Uygulamadaki kısa denemede planlanan 180 dk yerine gerçekten geçen süre kullanıldı | 128 SQL kontrolünde sınırlar, tekrar çağrılar ve eski 7/175 kum başlangıç değerlerinin korunması doğrulandı | GEÇTİ | Aynı sunucu arşivi |
+| DUS onboarding / eski kayıt uyumu | Seçim kaybolmuyor; 16 ders | DUS'ta UID bekleyen kayıtlar için TUS ile aynı akış; TR/EN ve filtreler | `dus` hedefi; kategori ve global sıralama; ay ortasındaki değişiklik sonraki ay geçerli | GEÇTİ | [164 istemci regresyonu](QA_DUS_ISTEMCI_2026-10-28.md) |
+| Android DUS | 150 dk / 120 soru / 16 alan; erken bitirme yok | TR/EN: başlat → gerçek 3 sn → vazgeç | 14/14 SQL, 0 ödül | GEÇTİ | [Android uygulama kanıtı](kanit_dus_native_2026-10-28/android/INDEX.md) |
+| Android AYT | Güncel 8 türün tablosuyla güvenli ayrıntı işlemleri | TR/EN: erken bitirme, net, başlık/not, tekrar gönderim, rapor ve normal başlatma | 17/17 SQL; son parite 5/5 | GEÇTİ | Aynı Android arşivi |
+| iOS DUS resmî bilgileri | 150 dk / 120 soru / 16 alan; erken bitirme yok | TR/EN: gerçek başlatma → vazgeç | 14/14 SQL + 56 bağımsız doğrulama, 0 ödül | GEÇTİ | [iOS uygulama kanıtı](kanit_dus_native_2026-10-28/ios/INDEX.md) |
+| iOS DUS kısa sürenin doğal tamamlanması | İzole ortamda 60 sn / 0 ödüllü başlangıç kaydı | TR/EN: 60 sn; 16 alanlı form, 2 net, başlık, not ve tekrar gönderim; rapor 1 → 2 dk | 18/18 SQL + 94 bağımsız doğrulama; gerçek 2 dk, seri 1, cüzdan 0; 9000 sn / 30 puan / 120 kum kataloğu birebir geri yüklendi | GEÇTİ | Aynı iOS arşivi |
+| Bağımsız doğrulayıcı / RLS | Gerçek ve planlanan süre, sıfır ödül ve başlangıç değerleri doğru | Gerçek kaydı bağımsız okuyor | 34/34 birim testi; 17 hesapta 712/712; başka hesap üzerinden RLS kontrolü 3/3 | GEÇTİ | [DUS doğrulayıcısı](kanit_dus_2026-10-28/INDEX.md) |
+| Özel ayrıntılar / güvenlik | Yalnızca kayıt sahibine erişim; kapsam, revizyon ve kuyruk koruması | Yalnızca başlık/not veya kısmi net kaydı; çevrimdışı değişmez istek zarfı; hesap değişimi koruması | Eski RPC'nin kapsamı sınırlı; veri kaybı oluşturacak geri alma reddediliyor | GEÇTİ | [32 fazı](QA_DENEME_EKLERI_2026-10-28.md), [DUS raporu](QA_DUS_ISTEMCI_2026-10-28.md) |
+
+60 sn'lik kısa DUS kontrolü, standart 150 dk / 120 kum ödülünün doğal süre boyunca beklenerek doğrulandığı anlamına gelmiyor. Ödül tablosu, pozitif ödül üreten SQL test verileriyle ayrıca kanıtlandı. Önceki 32 fazının 104 SQL, 113 istemci ve iOS/Android için 21'er SQL sonucu tarihsel kanıt olarak korunuyor; güncel DUS 128 SQL / 164 istemci matrisiyle karıştırılmamalı.
+
+## Bulunan ve düzeltilen yeni hatalar
+
+- Aşırı uzun başlık/notların otomatik kaydı, yerel işlem günlüğünü okuyan kodla çelişiyor ve ilgili hesaba ait kayıtların açılmasını engelliyordu. Arayüze 120/2000 Unicode scalar değeri sınırı, servis kontrolü ve diske yazılan verinin tekrar okunabilir kalmasını doğrulayan koruma eklendi. Eski ham veriler silinmiyor.
+- Hesap değişiminde formun aynı ekranı iki kez kapatması ve 320 px genişlikte, 2× yazı ölçeğinde taşması düzeltildi.
+- İngilizce “Unanswered” sözcüğü ortadan bölünüyor ve üçüncü giriş alanını aşağı kaydırıyordu. Tek satırda ölçekleme ve eşit sütun hizası eklendi; 30 görsel yeniden çekildi.
+- Eski “tam süreyi kullan” giriş metni AYT erken bitirme özelliğiyle çelişiyordu. Desteklenen özelliğe uygun TR/EN metni eklendi.
+- Bu çalışmadaki iki Android release FAIL sonucu, `--no-pub` kullanıldığında yenilenmeyen geliştirme eklentisi kaydında `IntegrationTestPlugin` bulunamamasından kaynaklandı. Normal release üretim yapılandırmasıyla a3 denemesi başarılı oldu; üretilen Java dosyası elle yamalanmadı. Aynı çalışma kopyasındaki Flutter işleri sırayla çalıştırılıyor.
+
+Bu özellikler ve düzeltmeler `8cb3dc9`, sade Deneme arayüzü `641cc16` commit’indedir. Site/kanıt/devir değişiklikleri bu raporun bulunduğu son commit’tedir; dal adresi yukarıdadır.
+
+## Derleme, son kapı ve kalan sınırlar
+
+- iOS imzasız cihaz release derlemesi: PASS. `Runner.app` 55,1 MB (sıkıştırılmamış paket). Bu sonuç fiziksel cihaz veya TestFlight doğrulaması değil.
+- Son arayüz Android release APK: PASS. Universal APK 99.289.837 bayt (önceki paket 99.289.757 bayttı). Bu ölçü Play/App Store indirme paketinin boyutu veya mağaza AAB/imza onayı değil; derleme dosyası push edilmiyor.
+- Normal `lib/main.dart`, iOS QA cihazına kuruldu ve açıldı. Android'de normal debug uygulaması çalıştı; işlem kimliği (PID) görüldü. İki ana ekran da 25:00 gösteriyor; 5/10 sn modu veya test yazısı yok. Ortamlar bilinçli olarak YEREL site/review API'lerine bağlı; canlı kişisel hesap kullanılmıyor.
+- Son kapı 1: `flutter analyze` temiz; Flutter 1476 PASS / isteğe bağlı 5 PNG kontrolü atlandı / 0 FAIL; Node 172/172; `partial-sync` 0. [Kapı ve paket kanıtları](kanit_son_kapilar_2026-10-28/packages_and_gate1.json).
+- Chrome, ortam engeli nedeniyle doğrulanamadı; kesin ilk çizim filmi kaydedilmedi. Safari için tarayıcı görüntü alanından alınmış gerçek JPEG'ler, 72 kontrol matrisi ve manuel video örnekleri bulunuyor.
+- 31 numaralı paket kullanıcı kararını bekliyor; kurulmadı ve paket sonrası Maraton testi yapılmadı. Canlı ortamda SQL/Edge/site işlemi, main'e merge/push, force push veya plan/ücret yükseltmesi yapılmadı.
+- Fiziksel cihaz, gerçek Apple/Google girişi, bildirim teslimi, imzalama, ertelenmiş yasal/gönderen kimliği bilgileri ve daha önce belgelenmiş operasyonel güvenlik kararları ayrı işler olarak duruyor. Bu rapordan bütün mağaza yayın koşullarının tamamlandığı sonucu çıkarılmamalı.
+
+
+## Son arayüz ve kapanış doğrulaması
+
+Kullanıcının son ekran isteği uygulandı: uzun giriş ve ders listeleri kaldırıldı; eşit boyda **Yeni / Geçmiş / Lig** sekmeleri, tek net kuralı kutusu ve soru/süre etiketli küçük kartlar kullanılıyor. İngilizce karşılıkları da güncel. LGS’nin **3 yanlış**, YKS/TUS/DUS’un **4 yanlış** kuralı açıkça ayrıldı. Sunucu, süre ve ödül kuralları bu görsel düzenlemede değiştirilmedi.
+
+| Kontrol | Sonuç | Kanıt |
+|---|---|---|
+| TR/EN; dar ekran, 2× yazı ve yatay düzen | 40 seçili test, 14 dosya analizi PASS | [UI kanıtı](kanit_deneme_ui_2026-10-28/README.md) |
+| Eski lig yenileme bulucuları | 5 metin bulucu sabit anahtara geçirildi; özgün doğrulamalar korundu; dosya 9/9 PASS | [Özgün hata ve düzeltme](kanit_son_kapilar_2026-10-28/compact-final/initial-finder-failure/) |
+| Android son UI, TR/EN erken AYT | Native PASS; SQL 21/21; DUS katalog paritesi 5/5. Gerçek 5/6 saniye ve 0 ödül; çift gönderim tek kayıt | [Native kanıt](kanit_deneme_ui_2026-10-28/android/proof.json) |
+| Normal iOS uygulaması | `lib/main.dart` kuruldu; 25:00 ana ekranı ve yeni Deneme ekranı CUA ile açıldı | [Yeni ekran](kanit_son_kapilar_2026-10-28/compact-final/ios-normal-exam.png) |
+| Normal Android uygulaması | `lib/main.dart` açıldı, işlem kimliği ve 25:00 ana ekranı doğrulandı | [Ana ekran](kanit_son_kapilar_2026-10-28/compact-final/android-normal-main.png) |
+| Son UI genel regresyonu | **1482 PASS**, yalnız 5 isteğe bağlı PNG atlaması; analiz temiz; **172/172 Node**; partial eşliği temiz | [Kapı/paket özeti](kanit_son_kapilar_2026-10-28/compact-final/proof.json) |
+
+Normal uygulamalar test entrypoint’i veya hızlandırma define’ı kullanmaz. iOS yerel site API 54361’e, Android yerel review API 54351’e bağlıdır; kişisel hesabınla canlı sunucuda deneme yerine bu ortamın örnek hesaplarını kullan. iOS ilk açılış karesi splash’tır; yükleme sonrası ana ekran ve Deneme karesi ayrı korunmuştur.
+
+Son cihaz envanteri: **bir PomoSprint QA iPhone 16 (18.6), bir PomoSprint_QA_API36**. `HocamMacVar · iPhone 17` korunur, kişisel cihaza dokunulmadı. Gereksiz derleme temizliği ve kapanış tekrarı aşağıdaki kayıtta ayrıca bulunur. 31 hâlâ kullanıcı kararı bekliyor; bu sonuçlar kurulmamış paketi doğrulamaz.
+
+
+Kapanış tekrarı da temiz: **1482 Flutter PASS / 5 isteğe bağlı PNG atlaması**, **172 Node PASS**, analiz ve ortak parça kontrolü başarılı. [Ham kapanış sonuçları](kanit_son_kapilar_2026-10-28/compact-final/closing-gate/summary.json).
+
+Temizlikte 7 yeniden üretilebilir derleme/ham medya klasörü kaldırıldı; diskte yaklaşık **6.95 GB** boş alan açıldı. Son unsigned iOS paketi ve Android APK `build/final_release_20261028/` altında yerel olarak korundu; Git'e alınmadı. Test veritabanları, yüklü normal uygulamalar ve kalıcı kanıtlar silinmedi. Eski 4 kayıt/önizleme yardımcı süreci kapatıldı; uygulamanın iki yerel API sağlık kontrolü HTTP200. [Temizlik ve korunanlar](kanit_son_kapilar_2026-10-28/compact-final/cleanup.json).
+
+Son gönderim kapsamı yalnız `codex/gece-2026-10-27` dalıdır. Ana dal `5f99f90` olarak korunur. Bu rapor ve site medyasıyla aynı commit kapanış paketidir; tam son commit kimliği Git dal geçmişinde ve kullanıcıya verilen sonuç mesajında bulunur.

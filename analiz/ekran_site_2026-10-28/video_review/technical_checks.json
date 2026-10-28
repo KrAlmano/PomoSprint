@@ -1,0 +1,331 @@
+{
+  "manifest_sha256": "62da708727b50b90dee83d65f25c44fb3f79a54d62909e57e69db960bd61f29c",
+  "capture_run": "site-oct28-ui",
+  "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+  "technical": [
+    {
+      "file": "landing/videos/20261028/timer-tr.mp4",
+      "sha256": "b3045be2a377c0f9aed189d5693b00d1057205a67bc8a53eea7246c095f29016",
+      "manifest_hash_matches": true,
+      "width": 540,
+      "height": 1170,
+      "fps": "24/1",
+      "codec": "h264",
+      "pix_fmt": "yuv420p",
+      "audio_streams": 0,
+      "bytes": 216213,
+      "duration": 24.791667,
+      "frames": 595,
+      "start_time": 0.041016,
+      "technical_pass": true,
+      "images": {
+        "first": {
+          "path": "analiz/ekran_site_2026-10-28/video_review/timer-tr-first.png",
+          "frame_index": 0,
+          "approx_seconds": 0.0,
+          "sha256": "7dcec9aa840bfc2515ff6fc0afa9f5f0302f4b53feee61358748c9ca17de5c08",
+          "bytes": 124517
+        },
+        "middle": {
+          "path": "analiz/ekran_site_2026-10-28/video_review/timer-tr-middle.png",
+          "frame_index": 297,
+          "approx_seconds": 12.375,
+          "sha256": "0e7e38e77c5c97d06d9d765643e05b1508ea82477d34cf00a6b1e2a406b73c19",
+          "bytes": 154186
+        },
+        "last": {
+          "path": "analiz/ekran_site_2026-10-28/video_review/timer-tr-last.png",
+          "frame_index": 594,
+          "approx_seconds": 24.75,
+          "sha256": "ec8b0e319efc034014da9de237c78b6f845375c95e5047e1d6db30cec3f4013e",
+          "bytes": 137204
+        },
+        "tap": {
+          "path": "analiz/ekran_site_2026-10-28/video_review/timer-tr-tap.png",
+          "frame_index": 31,
+          "approx_seconds": 1.2916666666666667,
+          "sha256": "c19626bfe7e452325286f03afe52e04b3164703b135c3c720c78357aa170b7a2",
+          "bytes": 126368
+        },
+        "tap_after": {
+          "path": "analiz/ekran_site_2026-10-28/video_review/timer-tr-tap-after.png",
+          "requested_seconds": 1.784577,
+          "sha256": "3281b6f7fbd530f28db3aa40cdd54223843f1105b4a306c207108894c5f30598",
+          "bytes": 128744
+        }
+      },
+      "tap": {
+        "at": "2026-10-28T14:22:35.888803+00:00",
+        "seconds_in_scene": 1.184577,
+        "logical": {
+          "x": 279.5,
+          "y": 618.0,
+          "width": 393.0,
+          "height": 852.0
+        },
+        "video_x": 384.0458015267175,
+        "video_y": 848.661971830986
+      },
+      "tap_target_seconds": 1.284577,
+      "tap_scaled_png_xy": [
+        307.23664122137404,
+        678.9295774647888
+      ],
+      "packet_copy": {
+        "raw_source_sha_matches": true,
+        "native_sha_matches": true,
+        "packet_count": 1288,
+        "declared_packet_count": 1288,
+        "payload_hashes_equal_to_raw_slice": true,
+        "pts_shift_constant_matches": true,
+        "dts_shift_constant_matches": true,
+        "actual_first_pts_shift": "-139.210000",
+        "declared_shift": "-139.21"
+      },
+      "speed_flag": false
+    },
+    {
+      "file": "landing/videos/20261028/marathon-tr.mp4",
+      "sha256": "ea6b65817ee068a149ccea40d7b29e9e8f5eca9edd077f632fe74f2b98e50ae7",
+      "manifest_hash_matches": true,
+      "width": 540,
+      "height": 1170,
+      "fps": "24/1",
+      "codec": "h264",
+      "pix_fmt": "yuv420p",
+      "audio_streams": 0,
+      "bytes": 203877,
+      "duration": 21.958333,
+      "frames": 527,
+      "start_time": 0.0,
+      "technical_pass": true,
+      "images": {
+        "first": {
+          "path": "analiz/ekran_site_2026-10-28/video_review/marathon-tr-first.png",
+          "frame_index": 0,
+          "approx_seconds": 0.0,
+          "sha256": "540e7fd7059b6a8ce33b82059998165bb9c1f3a784af7b8884b46fe8abfc3ef9",
+          "bytes": 124911
+        },
+        "middle": {
+          "path": "analiz/ekran_site_2026-10-28/video_review/marathon-tr-middle.png",
+          "frame_index": 263,
+          "approx_seconds": 10.958333333333334,
+          "sha256": "3ded11b007e2abe19460d814deecc0729f947b8967c66e9aa32165ea86a10813",
+          "bytes": 125952
+        },
+        "last": {
+          "path": "analiz/ekran_site_2026-10-28/video_review/marathon-tr-last.png",
+          "frame_index": 526,
+          "approx_seconds": 21.916666666666668,
+          "sha256": "1addf1c09c3e96e38b76d8fb5b5750e7d3420ddd9e665fca2a072a03ec406b26",
+          "bytes": 132436
+        },
+        "tap": {
+          "path": "analiz/ekran_site_2026-10-28/video_review/marathon-tr-tap.png",
+          "frame_index": 102,
+          "approx_seconds": 4.25,
+          "sha256": "69b6d87a20fc2d43c38e68a5621fedf36218766d89d96dd09e9f79e2bea7531c",
+          "bytes": 160301
+        },
+        "tap_after": {
+          "path": "analiz/ekran_site_2026-10-28/video_review/marathon-tr-tap-after.png",
+          "requested_seconds": 4.757414,
+          "sha256": "172a8fea9dc2c5c4040a8bf9ddc6f53f8d9d02f2cf622879e5d3a37ea4b43783",
+          "bytes": 165308
+        }
+      },
+      "tap": {
+        "at": "2026-10-28T14:23:03.685353+00:00",
+        "seconds_in_scene": 4.157414,
+        "logical": {
+          "x": 306.1666666666667,
+          "y": 242.0,
+          "width": 393.0,
+          "height": 852.0
+        },
+        "video_x": 420.68702290076334,
+        "video_y": 332.32394366197184
+      },
+      "tap_target_seconds": 4.257414,
+      "tap_scaled_png_xy": [
+        336.5496183206107,
+        265.85915492957747
+      ],
+      "packet_copy": {
+        "raw_source_sha_matches": true,
+        "native_sha_matches": true,
+        "packet_count": 1263,
+        "declared_packet_count": 1263,
+        "payload_hashes_equal_to_raw_slice": true,
+        "pts_shift_constant_matches": true,
+        "dts_shift_constant_matches": true,
+        "actual_first_pts_shift": "-164.000000",
+        "declared_shift": "-164.0"
+      },
+      "speed_flag": false
+    },
+    {
+      "file": "landing/videos/20261028/timer-en.mp4",
+      "sha256": "933da782b4ef851b8db50ba2b2c10fff65e04ddce6ccc3250aab43a612359455",
+      "manifest_hash_matches": true,
+      "width": 540,
+      "height": 1170,
+      "fps": "24/1",
+      "codec": "h264",
+      "pix_fmt": "yuv420p",
+      "audio_streams": 0,
+      "bytes": 202975,
+      "duration": 24.833333,
+      "frames": 596,
+      "start_time": 0.041016,
+      "technical_pass": true,
+      "images": {
+        "first": {
+          "path": "analiz/ekran_site_2026-10-28/video_review/timer-en-first.png",
+          "frame_index": 0,
+          "approx_seconds": 0.0,
+          "sha256": "070681c1d8801ccd159d666aa14388797b98dd026a15b7addd34ce4bacd7afe8",
+          "bytes": 125345
+        },
+        "middle": {
+          "path": "analiz/ekran_site_2026-10-28/video_review/timer-en-middle.png",
+          "frame_index": 298,
+          "approx_seconds": 12.416666666666666,
+          "sha256": "0eeb74c70ea68f6b0d60b7ff4117ced3184d0cbe026bc80fcb90f59f0798d3ea",
+          "bytes": 142988
+        },
+        "last": {
+          "path": "analiz/ekran_site_2026-10-28/video_review/timer-en-last.png",
+          "frame_index": 595,
+          "approx_seconds": 24.791666666666668,
+          "sha256": "ff8f99790cbf30480cc462e2062227d32717fe573fb372ea6ff7a7a07846cc61",
+          "bytes": 135362
+        },
+        "tap": {
+          "path": "analiz/ekran_site_2026-10-28/video_review/timer-en-tap.png",
+          "frame_index": 31,
+          "approx_seconds": 1.2916666666666667,
+          "sha256": "9027918d78ab7246e762d43d42cf95af488b4ca942c1e393dd0162753aadef37",
+          "bytes": 127417
+        },
+        "tap_after": {
+          "path": "analiz/ekran_site_2026-10-28/video_review/timer-en-tap-after.png",
+          "requested_seconds": 1.7839809999999998,
+          "sha256": "87853264ae75f55983baaca23db0f7d9a561a8371af7919d47e83afc4a5c8b06",
+          "bytes": 129251
+        }
+      },
+      "tap": {
+        "at": "2026-10-28T14:24:16.638045+00:00",
+        "seconds_in_scene": 1.183981,
+        "logical": {
+          "x": 279.5,
+          "y": 618.0,
+          "width": 393.0,
+          "height": 852.0
+        },
+        "video_x": 384.0458015267175,
+        "video_y": 848.661971830986
+      },
+      "tap_target_seconds": 1.283981,
+      "tap_scaled_png_xy": [
+        307.23664122137404,
+        678.9295774647888
+      ],
+      "packet_copy": {
+        "raw_source_sha_matches": true,
+        "native_sha_matches": true,
+        "packet_count": 873,
+        "declared_packet_count": 873,
+        "payload_hashes_equal_to_raw_slice": true,
+        "pts_shift_constant_matches": true,
+        "dts_shift_constant_matches": true,
+        "actual_first_pts_shift": "-239.951666",
+        "declared_shift": "-239.951666"
+      },
+      "speed_flag": false
+    },
+    {
+      "file": "landing/videos/20261028/marathon-en.mp4",
+      "sha256": "5c2eda5bd4006d65a805aeaf1a2a8792a91ab6db2e7c80f39d00381472973510",
+      "manifest_hash_matches": true,
+      "width": 540,
+      "height": 1170,
+      "fps": "24/1",
+      "codec": "h264",
+      "pix_fmt": "yuv420p",
+      "audio_streams": 0,
+      "bytes": 224919,
+      "duration": 22.0,
+      "frames": 528,
+      "start_time": 0.0,
+      "technical_pass": true,
+      "images": {
+        "first": {
+          "path": "analiz/ekran_site_2026-10-28/video_review/marathon-en-first.png",
+          "frame_index": 0,
+          "approx_seconds": 0.0,
+          "sha256": "6936f9c330797968b600ebf14fb6a217f1e7200b173b96829287293f69e3da2a",
+          "bytes": 125559
+        },
+        "middle": {
+          "path": "analiz/ekran_site_2026-10-28/video_review/marathon-en-middle.png",
+          "frame_index": 264,
+          "approx_seconds": 11.0,
+          "sha256": "0a8bbf0bf944055bd14a30976c24badb72998b115a79f84df2c7d5098ddfcfe1",
+          "bytes": 137977
+        },
+        "last": {
+          "path": "analiz/ekran_site_2026-10-28/video_review/marathon-en-last.png",
+          "frame_index": 527,
+          "approx_seconds": 21.958333333333332,
+          "sha256": "e051c7ee941554495f888629cd2753233a0a16d6d52bc9597fa38792e270a94e",
+          "bytes": 134550
+        },
+        "tap": {
+          "path": "analiz/ekran_site_2026-10-28/video_review/marathon-en-tap.png",
+          "frame_index": 102,
+          "approx_seconds": 4.25,
+          "sha256": "d25a6131becc4a34d9c64d00209efac133b8c7ec3ee045f65f73db95e14f577c",
+          "bytes": 165938
+        },
+        "tap_after": {
+          "path": "analiz/ekran_site_2026-10-28/video_review/marathon-en-tap-after.png",
+          "requested_seconds": 4.763579,
+          "sha256": "08229ce9d541ea6192ec8f3ced8a3fe1cbeeb3b895a8e6a4b472ae6af0a73a23",
+          "bytes": 168316
+        }
+      },
+      "tap": {
+        "at": "2026-10-28T14:24:44.456931+00:00",
+        "seconds_in_scene": 4.163579,
+        "logical": {
+          "x": 306.1666666666667,
+          "y": 242.0,
+          "width": 393.0,
+          "height": 852.0
+        },
+        "video_x": 420.68702290076334,
+        "video_y": 332.32394366197184
+      },
+      "tap_target_seconds": 4.263579,
+      "tap_scaled_png_xy": [
+        336.5496183206107,
+        265.85915492957747
+      ],
+      "packet_copy": {
+        "raw_source_sha_matches": true,
+        "native_sha_matches": true,
+        "packet_count": 554,
+        "declared_packet_count": 554,
+        "payload_hashes_equal_to_raw_slice": true,
+        "pts_shift_constant_matches": true,
+        "dts_shift_constant_matches": true,
+        "actual_first_pts_shift": "-264.768334",
+        "declared_shift": "-264.76833400000004"
+      },
+      "speed_flag": false
+    }
+  ]
+}

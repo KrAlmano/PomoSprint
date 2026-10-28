@@ -1,0 +1,1382 @@
+{
+  "schema_version": 1,
+  "scope": "Read-only samples during real manual Safari product interactions; no automatic PASS claim",
+  "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6.2 Safari/605.1.15",
+  "samples": [
+    {
+      "status": "OBSERVED_ONLY",
+      "at": "2026-10-28T14:36:54.862Z",
+      "page": "/features",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "tr",
+      "videos": [
+        {
+          "source": "/videos/20261028/timer-tr.mp4",
+          "current_time": 0,
+          "duration": null,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 0,
+          "visible": true,
+          "hidden": false,
+          "label": "Sayacın gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 421,
+            "bottom": 950,
+            "width": 244,
+            "height": 529
+          }
+        },
+        {
+          "source": "/videos/20261028/marathon-tr.mp4",
+          "current_time": 0,
+          "duration": null,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 0,
+          "visible": false,
+          "hidden": false,
+          "label": "Maraton planlamasının gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 1137,
+            "bottom": 1665,
+            "width": 244,
+            "height": 529
+          }
+        }
+      ],
+      "sample_mode": "read_only_interval_during_manual_browsing"
+    },
+    {
+      "status": "OBSERVED_ONLY",
+      "at": "2026-10-28T14:36:59.901Z",
+      "page": "/features",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "tr",
+      "videos": [
+        {
+          "source": "/videos/20261028/timer-tr.mp4",
+          "current_time": 2.2587450830008344,
+          "duration": 24.833,
+          "paused": false,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": true,
+          "hidden": false,
+          "label": "Sayacın gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 112,
+            "bottom": 641,
+            "width": 244,
+            "height": 529
+          }
+        },
+        {
+          "source": "/videos/20261028/marathon-tr.mp4",
+          "current_time": 0,
+          "duration": null,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 0,
+          "visible": true,
+          "hidden": false,
+          "label": "Maraton planlamasının gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 829,
+            "bottom": 1358,
+            "width": 244,
+            "height": 529
+          }
+        }
+      ],
+      "sample_mode": "read_only_interval_during_manual_browsing"
+    },
+    {
+      "status": "OBSERVED_ONLY",
+      "at": "2026-10-28T14:37:04.941Z",
+      "page": "/features",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "tr",
+      "videos": [
+        {
+          "source": "/videos/20261028/timer-tr.mp4",
+          "current_time": 7.298408082641403,
+          "duration": 24.833,
+          "paused": false,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": true,
+          "hidden": false,
+          "label": "Sayacın gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 112,
+            "bottom": 641,
+            "width": 244,
+            "height": 529
+          }
+        },
+        {
+          "source": "/videos/20261028/marathon-tr.mp4",
+          "current_time": 0,
+          "duration": null,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 0,
+          "visible": true,
+          "hidden": false,
+          "label": "Maraton planlamasının gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 829,
+            "bottom": 1358,
+            "width": 244,
+            "height": 529
+          }
+        }
+      ],
+      "sample_mode": "read_only_interval_during_manual_browsing"
+    },
+    {
+      "status": "OBSERVED_ONLY",
+      "at": "2026-10-28T14:37:09.982Z",
+      "page": "/features",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "tr",
+      "videos": [
+        {
+          "source": "/videos/20261028/timer-tr.mp4",
+          "current_time": 12.33972612467403,
+          "duration": 24.833,
+          "paused": false,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": true,
+          "hidden": false,
+          "label": "Sayacın gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 112,
+            "bottom": 641,
+            "width": 244,
+            "height": 529
+          }
+        },
+        {
+          "source": "/videos/20261028/marathon-tr.mp4",
+          "current_time": 0,
+          "duration": null,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 0,
+          "visible": true,
+          "hidden": false,
+          "label": "Maraton planlamasının gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 829,
+            "bottom": 1358,
+            "width": 244,
+            "height": 529
+          }
+        }
+      ],
+      "sample_mode": "read_only_interval_during_manual_browsing"
+    },
+    {
+      "status": "OBSERVED_ONLY",
+      "at": "2026-10-28T14:37:15.021Z",
+      "page": "/features",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "tr",
+      "videos": [
+        {
+          "source": "/videos/20261028/timer-tr.mp4",
+          "current_time": 12.84173441634884,
+          "duration": 24.833,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": true,
+          "hidden": false,
+          "label": "Sayacın gerçek zamanlı sessiz uygulama kaydı. Kaydı oynat",
+          "bounds": {
+            "top": 112,
+            "bottom": 641,
+            "width": 244,
+            "height": 529
+          }
+        },
+        {
+          "source": "/videos/20261028/marathon-tr.mp4",
+          "current_time": 0,
+          "duration": null,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 0,
+          "visible": true,
+          "hidden": false,
+          "label": "Maraton planlamasının gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 829,
+            "bottom": 1358,
+            "width": 244,
+            "height": 529
+          }
+        }
+      ],
+      "sample_mode": "read_only_interval_during_manual_browsing"
+    },
+    {
+      "status": "OBSERVED_ONLY",
+      "at": "2026-10-28T14:37:20.061Z",
+      "page": "/features",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "tr",
+      "videos": [
+        {
+          "source": "/videos/20261028/timer-tr.mp4",
+          "current_time": 14.601970708027318,
+          "duration": 24.833,
+          "paused": false,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": true,
+          "hidden": false,
+          "label": "Sayacın gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 112,
+            "bottom": 641,
+            "width": 244,
+            "height": 529
+          }
+        },
+        {
+          "source": "/videos/20261028/marathon-tr.mp4",
+          "current_time": 0,
+          "duration": null,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 0,
+          "visible": true,
+          "hidden": false,
+          "label": "Maraton planlamasının gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 829,
+            "bottom": 1358,
+            "width": 244,
+            "height": 529
+          }
+        }
+      ],
+      "sample_mode": "read_only_interval_during_manual_browsing"
+    },
+    {
+      "status": "OBSERVED_ONLY",
+      "at": "2026-10-28T14:37:25.103Z",
+      "page": "/features",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "tr",
+      "videos": [
+        {
+          "source": "/videos/20261028/timer-tr.mp4",
+          "current_time": 19.6443656253423,
+          "duration": 24.833,
+          "paused": false,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": true,
+          "hidden": false,
+          "label": "Sayacın gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 112,
+            "bottom": 641,
+            "width": 244,
+            "height": 529
+          }
+        },
+        {
+          "source": "/videos/20261028/marathon-tr.mp4",
+          "current_time": 0,
+          "duration": null,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 0,
+          "visible": true,
+          "hidden": false,
+          "label": "Maraton planlamasının gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 829,
+            "bottom": 1358,
+            "width": 244,
+            "height": 529
+          }
+        }
+      ],
+      "sample_mode": "read_only_interval_during_manual_browsing"
+    },
+    {
+      "status": "OBSERVED_ONLY",
+      "at": "2026-10-28T14:37:30.142Z",
+      "page": "/features",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "tr",
+      "videos": [
+        {
+          "source": "/videos/20261028/timer-tr.mp4",
+          "current_time": 23.674721582991868,
+          "duration": 24.833,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": false,
+          "hidden": false,
+          "label": "Sayacın gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": -711,
+            "bottom": -182,
+            "width": 244,
+            "height": 529
+          }
+        },
+        {
+          "source": "/videos/20261028/marathon-tr.mp4",
+          "current_time": 0.7890497919810084,
+          "duration": 21.959,
+          "paused": false,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": true,
+          "hidden": false,
+          "label": "Maraton planlamasının gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 4,
+            "bottom": 533,
+            "width": 244,
+            "height": 529
+          }
+        }
+      ],
+      "sample_mode": "read_only_interval_during_manual_browsing"
+    },
+    {
+      "status": "OBSERVED_ONLY",
+      "at": "2026-10-28T14:37:56.376Z",
+      "page": "/features",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "tr",
+      "videos": [
+        {
+          "source": "/videos/20261028/timer-tr.mp4",
+          "current_time": 23.674721582991868,
+          "duration": 24.833,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": false,
+          "hidden": false,
+          "label": "Sayacın gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": -711,
+            "bottom": -182,
+            "width": 244,
+            "height": 529
+          }
+        },
+        {
+          "source": "/videos/20261028/marathon-tr.mp4",
+          "current_time": 4.613967041666266,
+          "duration": 21.959,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": true,
+          "hidden": false,
+          "label": "Maraton planlamasının gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 4,
+            "bottom": 533,
+            "width": 244,
+            "height": 529
+          }
+        }
+      ],
+      "sample_mode": "read_only_interval_during_manual_browsing"
+    },
+    {
+      "status": "OBSERVED_ONLY",
+      "at": "2026-10-28T14:38:01.413Z",
+      "page": "/features",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "tr",
+      "videos": [
+        {
+          "source": "/videos/20261028/timer-tr.mp4",
+          "current_time": 23.674721582991868,
+          "duration": 24.833,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": false,
+          "hidden": false,
+          "label": "Sayacın gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": -711,
+            "bottom": -182,
+            "width": 244,
+            "height": 529
+          }
+        },
+        {
+          "source": "/videos/20261028/marathon-tr.mp4",
+          "current_time": 12.271749834006728,
+          "duration": 21.959,
+          "paused": false,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": true,
+          "hidden": false,
+          "label": "Maraton planlamasının gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 4,
+            "bottom": 533,
+            "width": 244,
+            "height": 529
+          }
+        }
+      ],
+      "sample_mode": "read_only_interval_during_manual_browsing"
+    },
+    {
+      "status": "OBSERVED_ONLY",
+      "at": "2026-10-28T14:38:06.453Z",
+      "page": "/features",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "tr",
+      "videos": [
+        {
+          "source": "/videos/20261028/timer-tr.mp4",
+          "current_time": 23.674721582991868,
+          "duration": 24.833,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": false,
+          "hidden": false,
+          "label": "Sayacın gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": -711,
+            "bottom": -182,
+            "width": 244,
+            "height": 529
+          }
+        },
+        {
+          "source": "/videos/20261028/marathon-tr.mp4",
+          "current_time": 17.311017208968114,
+          "duration": 21.959,
+          "paused": false,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": true,
+          "hidden": false,
+          "label": "Maraton planlamasının gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 4,
+            "bottom": 533,
+            "width": 244,
+            "height": 529
+          }
+        }
+      ],
+      "sample_mode": "read_only_interval_during_manual_browsing"
+    },
+    {
+      "status": "OBSERVED_ONLY",
+      "at": "2026-10-28T14:38:11.494Z",
+      "page": "/features",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "tr",
+      "videos": [
+        {
+          "source": "/videos/20261028/timer-tr.mp4",
+          "current_time": 23.674721582991868,
+          "duration": 24.833,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": false,
+          "hidden": false,
+          "label": "Sayacın gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": -711,
+            "bottom": -182,
+            "width": 244,
+            "height": 529
+          }
+        },
+        {
+          "source": "/videos/20261028/marathon-tr.mp4",
+          "current_time": 0.38349816731447095,
+          "duration": 21.959,
+          "paused": false,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": true,
+          "hidden": false,
+          "label": "Maraton planlamasının gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 4,
+            "bottom": 533,
+            "width": 244,
+            "height": 529
+          }
+        }
+      ],
+      "sample_mode": "read_only_interval_during_manual_browsing"
+    },
+    {
+      "status": "OBSERVED_ONLY",
+      "at": "2026-10-28T14:38:16.533Z",
+      "page": "/features",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "tr",
+      "videos": [
+        {
+          "source": "/videos/20261028/timer-tr.mp4",
+          "current_time": 23.674721582991868,
+          "duration": 24.833,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": false,
+          "hidden": false,
+          "label": "Sayacın gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": -711,
+            "bottom": -182,
+            "width": 244,
+            "height": 529
+          }
+        },
+        {
+          "source": "/videos/20261028/marathon-tr.mp4",
+          "current_time": 5.4228735419667515,
+          "duration": 21.959,
+          "paused": false,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": true,
+          "hidden": false,
+          "label": "Maraton planlamasının gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 4,
+            "bottom": 533,
+            "width": 244,
+            "height": 529
+          }
+        }
+      ],
+      "sample_mode": "read_only_interval_during_manual_browsing"
+    },
+    {
+      "status": "OBSERVED_ONLY",
+      "at": "2026-10-28T14:38:21.573Z",
+      "page": "/features",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "tr",
+      "videos": [
+        {
+          "source": "/videos/20261028/timer-tr.mp4",
+          "current_time": 23.674721582991868,
+          "duration": 24.833,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": false,
+          "hidden": false,
+          "label": "Sayacın gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": -711,
+            "bottom": -182,
+            "width": 244,
+            "height": 529
+          }
+        },
+        {
+          "source": "/videos/20261028/marathon-tr.mp4",
+          "current_time": 10.462789541635964,
+          "duration": 21.959,
+          "paused": false,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": true,
+          "hidden": false,
+          "label": "Maraton planlamasının gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 4,
+            "bottom": 533,
+            "width": 244,
+            "height": 529
+          }
+        }
+      ],
+      "sample_mode": "read_only_interval_during_manual_browsing"
+    },
+    {
+      "status": "OBSERVED_ONLY",
+      "at": "2026-10-28T14:38:26.613Z",
+      "page": "/features",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "tr",
+      "videos": [
+        {
+          "source": "/videos/20261028/timer-tr.mp4",
+          "current_time": 23.674721582991868,
+          "duration": 24.833,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": false,
+          "hidden": false,
+          "label": "Sayacın gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": -711,
+            "bottom": -182,
+            "width": 244,
+            "height": 529
+          }
+        },
+        {
+          "source": "/videos/20261028/marathon-tr.mp4",
+          "current_time": 15.502852791626312,
+          "duration": 21.959,
+          "paused": false,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": true,
+          "hidden": false,
+          "label": "Maraton planlamasının gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 4,
+            "bottom": 533,
+            "width": 244,
+            "height": 529
+          }
+        }
+      ],
+      "sample_mode": "read_only_interval_during_manual_browsing"
+    },
+    {
+      "status": "OBSERVED_ONLY",
+      "at": "2026-10-28T14:38:31.653Z",
+      "page": "/features",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "tr",
+      "videos": [
+        {
+          "source": "/videos/20261028/timer-tr.mp4",
+          "current_time": 23.674721582991868,
+          "duration": 24.833,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": false,
+          "hidden": false,
+          "label": "Sayacın gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": -711,
+            "bottom": -182,
+            "width": 244,
+            "height": 529
+          }
+        },
+        {
+          "source": "/videos/20261028/marathon-tr.mp4",
+          "current_time": 20.54289166700254,
+          "duration": 21.959,
+          "paused": false,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": true,
+          "hidden": false,
+          "label": "Maraton planlamasının gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 4,
+            "bottom": 533,
+            "width": 244,
+            "height": 529
+          }
+        }
+      ],
+      "sample_mode": "read_only_interval_during_manual_browsing"
+    },
+    {
+      "status": "OBSERVED_ONLY",
+      "at": "2026-10-28T14:38:36.693Z",
+      "page": "/features",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "tr",
+      "videos": [
+        {
+          "source": "/videos/20261028/timer-tr.mp4",
+          "current_time": 23.674721582991868,
+          "duration": 24.833,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": false,
+          "hidden": false,
+          "label": "Sayacın gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": -711,
+            "bottom": -182,
+            "width": 244,
+            "height": 529
+          }
+        },
+        {
+          "source": "/videos/20261028/marathon-tr.mp4",
+          "current_time": 3.613259041313294,
+          "duration": 21.959,
+          "paused": false,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": true,
+          "hidden": false,
+          "label": "Maraton planlamasının gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 4,
+            "bottom": 533,
+            "width": 244,
+            "height": 529
+          }
+        }
+      ],
+      "sample_mode": "read_only_interval_during_manual_browsing"
+    },
+    {
+      "status": "OBSERVED_ONLY",
+      "at": "2026-10-28T14:38:41.733Z",
+      "page": "/features",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "tr",
+      "videos": [
+        {
+          "source": "/videos/20261028/timer-tr.mp4",
+          "current_time": 23.674721582991868,
+          "duration": 24.833,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": false,
+          "hidden": false,
+          "label": "Sayacın gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": -711,
+            "bottom": -182,
+            "width": 244,
+            "height": 529
+          }
+        },
+        {
+          "source": "/videos/20261028/marathon-tr.mp4",
+          "current_time": 8.653659125336487,
+          "duration": 21.959,
+          "paused": false,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": true,
+          "hidden": false,
+          "label": "Maraton planlamasının gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 4,
+            "bottom": 533,
+            "width": 244,
+            "height": 529
+          }
+        }
+      ],
+      "sample_mode": "read_only_interval_during_manual_browsing"
+    },
+    {
+      "status": "OBSERVED_ONLY",
+      "at": "2026-10-28T14:38:46.773Z",
+      "page": "/features",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "tr",
+      "videos": [
+        {
+          "source": "/videos/20261028/timer-tr.mp4",
+          "current_time": 23.674721582991868,
+          "duration": 24.833,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": false,
+          "hidden": false,
+          "label": "Sayacın gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": -711,
+            "bottom": -182,
+            "width": 244,
+            "height": 529
+          }
+        },
+        {
+          "source": "/videos/20261028/marathon-tr.mp4",
+          "current_time": 13.694138083661654,
+          "duration": 21.959,
+          "paused": false,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": true,
+          "hidden": false,
+          "label": "Maraton planlamasının gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 4,
+            "bottom": 533,
+            "width": 244,
+            "height": 529
+          }
+        }
+      ],
+      "sample_mode": "read_only_interval_during_manual_browsing"
+    },
+    {
+      "status": "OBSERVED_ONLY",
+      "at": "2026-10-28T14:38:51.813Z",
+      "page": "/features",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "tr",
+      "videos": [
+        {
+          "source": "/videos/20261028/timer-tr.mp4",
+          "current_time": 23.674721582991868,
+          "duration": 24.833,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": false,
+          "hidden": false,
+          "label": "Sayacın gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": -711,
+            "bottom": -182,
+            "width": 244,
+            "height": 529
+          }
+        },
+        {
+          "source": "/videos/20261028/marathon-tr.mp4",
+          "current_time": 18.73381554200321,
+          "duration": 21.959,
+          "paused": false,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": true,
+          "hidden": false,
+          "label": "Maraton planlamasının gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 4,
+            "bottom": 533,
+            "width": 244,
+            "height": 529
+          }
+        }
+      ],
+      "sample_mode": "read_only_interval_during_manual_browsing"
+    },
+    {
+      "status": "OBSERVED_ONLY",
+      "at": "2026-10-28T14:38:56.852Z",
+      "page": "/features",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "tr",
+      "videos": [
+        {
+          "source": "/videos/20261028/timer-tr.mp4",
+          "current_time": 23.674721582991868,
+          "duration": 24.833,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": false,
+          "hidden": false,
+          "label": "Sayacın gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": -711,
+            "bottom": -182,
+            "width": 244,
+            "height": 529
+          }
+        },
+        {
+          "source": "/videos/20261028/marathon-tr.mp4",
+          "current_time": 1.8042101256834466,
+          "duration": 21.959,
+          "paused": false,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": true,
+          "hidden": false,
+          "label": "Maraton planlamasının gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 4,
+            "bottom": 533,
+            "width": 244,
+            "height": 529
+          }
+        }
+      ],
+      "sample_mode": "read_only_interval_during_manual_browsing"
+    },
+    {
+      "status": "OBSERVED_ONLY",
+      "at": "2026-10-28T14:39:01.898Z",
+      "page": "/features",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "tr",
+      "videos": [
+        {
+          "source": "/videos/20261028/timer-tr.mp4",
+          "current_time": 23.674721582991868,
+          "duration": 24.833,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": false,
+          "hidden": false,
+          "label": "Sayacın gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": -711,
+            "bottom": -182,
+            "width": 244,
+            "height": 529
+          }
+        },
+        {
+          "source": "/videos/20261028/marathon-tr.mp4",
+          "current_time": 6.8497827506746285,
+          "duration": 21.959,
+          "paused": false,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": true,
+          "hidden": false,
+          "label": "Maraton planlamasının gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 4,
+            "bottom": 533,
+            "width": 244,
+            "height": 529
+          }
+        }
+      ],
+      "sample_mode": "read_only_interval_during_manual_browsing"
+    },
+    {
+      "status": "OBSERVED_ONLY",
+      "at": "2026-10-28T14:39:06.933Z",
+      "page": "/features",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "tr",
+      "videos": [
+        {
+          "source": "/videos/20261028/timer-tr.mp4",
+          "current_time": 23.674721582991868,
+          "duration": 24.833,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": false,
+          "hidden": false,
+          "label": "Sayacın gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": -711,
+            "bottom": -182,
+            "width": 244,
+            "height": 529
+          }
+        },
+        {
+          "source": "/videos/20261028/marathon-tr.mp4",
+          "current_time": 11.822494208671067,
+          "duration": 21.959,
+          "paused": false,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": true,
+          "hidden": false,
+          "label": "Maraton planlamasının gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 4,
+            "bottom": 533,
+            "width": 244,
+            "height": 529
+          }
+        }
+      ],
+      "sample_mode": "read_only_interval_during_manual_browsing"
+    },
+    {
+      "status": "OBSERVED_ONLY",
+      "at": "2026-10-28T14:41:28.444Z",
+      "page": "/features",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "tr",
+      "videos": [
+        {
+          "source": "/videos/20261028/timer-tr.mp4",
+          "current_time": 23.674721582991868,
+          "duration": 24.833,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": false,
+          "hidden": false,
+          "label": "Sayacın gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": -711,
+            "bottom": -182,
+            "width": 244,
+            "height": 529
+          }
+        },
+        {
+          "source": "/videos/20261028/marathon-tr.mp4",
+          "current_time": 12.883447292372463,
+          "duration": 21.959,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": true,
+          "hidden": false,
+          "label": "Maraton planlamasının gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 4,
+            "bottom": 533,
+            "width": 244,
+            "height": 529
+          }
+        }
+      ],
+      "sample_mode": "read_only_interval_during_manual_browsing"
+    },
+    {
+      "status": "OBSERVED_ONLY",
+      "at": "2026-10-28T14:51:48.480Z",
+      "page": "/features",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "language": "tr",
+      "videos": [
+        {
+          "source": "/videos/20261028/timer-tr.mp4",
+          "current_time": 23.674721582991868,
+          "duration": 24.833,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": false,
+          "hidden": false,
+          "label": "Sayacın gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": -627,
+            "bottom": -98,
+            "width": 244,
+            "height": 529
+          }
+        },
+        {
+          "source": "/videos/20261028/marathon-tr.mp4",
+          "current_time": 13.67096283298809,
+          "duration": 21.959,
+          "paused": true,
+          "ended": false,
+          "muted": true,
+          "loop": true,
+          "autoplay": false,
+          "plays_inline": true,
+          "ready_state": 4,
+          "visible": true,
+          "hidden": false,
+          "label": "Maraton planlamasının gerçek zamanlı sessiz uygulama kaydı. Kaydı duraklat",
+          "bounds": {
+            "top": 88,
+            "bottom": 617,
+            "width": 244,
+            "height": 529
+          }
+        }
+      ],
+      "sample_mode": "read_only_interval_during_manual_browsing"
+    }
+  ]
+}

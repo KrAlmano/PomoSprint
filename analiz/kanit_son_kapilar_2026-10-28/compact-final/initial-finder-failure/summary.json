@@ -1,0 +1,22 @@
+{
+  "analyze": {
+    "exit_code": 0,
+    "seconds": 9.18,
+    "log": "build/verification_20261028/gate_compact_ui_3/analyze.log"
+  },
+  "flutter": {
+    "exit_code": 1,
+    "seconds": 133.41,
+    "log": "build/verification_20261028/gate_compact_ui_3/flutter.log"
+  },
+  "node": {
+    "exit_code": 0,
+    "seconds": 0.64,
+    "log": "build/verification_20261028/gate_compact_ui_3/node.log"
+  },
+  "partials": {
+    "exit_code": 0,
+    "seconds": 0.04,
+    "log": "build/verification_20261028/gate_compact_ui_3/partials.log"
+  }
+}

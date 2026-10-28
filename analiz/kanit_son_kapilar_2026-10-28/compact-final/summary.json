@@ -1,0 +1,58 @@
+{
+  "started_at": "2026-10-28T15:03:03.040047+00:00",
+  "scope": "Current compact UI; normal main.dart local QA app; no E2E defines; full regression gates",
+  "commands": {
+    "ios_normal_build": {
+      "exit_code": 0,
+      "seconds": 79.43,
+      "log": "ios_normal_build.log"
+    },
+    "ios_install": {
+      "exit_code": 0,
+      "seconds": 7.71,
+      "log": "ios_install.log"
+    },
+    "ios_launch": {
+      "exit_code": 0,
+      "seconds": 1.03,
+      "log": "ios_launch.log"
+    },
+    "ios_screenshot": {
+      "exit_code": 0,
+      "seconds": 1.08,
+      "log": "ios_screenshot.log"
+    },
+    "android_normal_run": {
+      "exit_code": 0,
+      "seconds": 31.23,
+      "log": "android_normal_run.log"
+    },
+    "android_pid": {
+      "exit_code": 0,
+      "seconds": 0.08,
+      "log": "android_pid.log"
+    },
+    "analyze": {
+      "exit_code": 0,
+      "seconds": 7.47,
+      "log": "analyze.log"
+    },
+    "flutter": {
+      "exit_code": 0,
+      "seconds": 124.61,
+      "log": "flutter.log"
+    },
+    "node": {
+      "exit_code": 0,
+      "seconds": 0.57,
+      "log": "node.log"
+    },
+    "partials": {
+      "exit_code": 0,
+      "seconds": 0.08,
+      "log": "partials.log"
+    }
+  },
+  "completed_at": "2026-10-28T15:07:23.599257+00:00",
+  "status": "PASS"
+}

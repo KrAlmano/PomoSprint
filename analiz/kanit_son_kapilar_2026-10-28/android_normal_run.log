@@ -1,0 +1,22 @@
+Launching lib/main.dart on sdk gphone64 arm64 in debug mode...
+Running Gradle task 'assembleDebug'...                             29.1s
+✓ Built build/app/outputs/flutter-apk/app-debug.apk
+Installing build/app/outputs/flutter-apk/app-debug.apk...        2,620ms
+I/FlutterActivityAndFragmentDelegate(11511): If you are attempting to set --enable-dart-profiling via Intent extras to launch a Flutter component outside of using the Flutter CLI, note that support for setting engine flags on Android via Intent will soon be dropped; see https://github.com/flutter/flutter/issues/180686 for more information on this breaking change. To migrate, set --enable-dart-profiling or any other flags specified via Intent extras on the command line instead or see https://github.com/flutter/flutter/blob/main/docs/engine/Flutter-Android-Engine-Flags.md for alternative methods.
+D/FlutterJNI(11511): Beginning load of flutter...
+D/FlutterJNI(11511): flutter (null) was loaded normally!
+I/flutter (11511): [IMPORTANT:flutter/shell/platform/android/android_context_gl_impeller.cc(104)] Using the Impeller rendering backend (OpenGLES).
+D/nativeloader(11511): Load /data/app/~~v3Bteo3o_l-ZmH0QaNhosQ==/com.pomosprint.app-xvjLAxt-6LHcRnHN6JzQRQ==/base.apk!/lib/arm64-v8a/libdartjni.so using class loader ns clns-9 (caller=/data/app/~~v3Bteo3o_l-ZmH0QaNhosQ==/com.pomosprint.app-xvjLAxt-6LHcRnHN6JzQRQ==/base.apk!classes8.dex): ok
+Syncing files to device sdk gphone64 arm64...                   
+I/.pomosprint.app(11511): hiddenapi: Accessing hidden method Landroid/view/accessibility/AccessibilityNodeInfo;->getSourceNodeId()J (runtime_flags=0, domain=platform, api=unsupported,test-api) from Lio/flutter/view/AccessibilityViewEmbedder$ReflectionAccessors; (domain=app) using reflection: allowed
+I/.pomosprint.app(11511): hiddenapi: Accessing hidden method Landroid/view/accessibility/AccessibilityRecord;->getSourceNodeId()J (runtime_flags=0, domain=platform, api=unsupported) from Lio/flutter/view/AccessibilityViewEmbedder$ReflectionAccessors; (domain=app) using reflection: allowed
+I/.pomosprint.app(11511): hiddenapi: Accessing hidden field Landroid/view/accessibility/AccessibilityNodeInfo;->mChildNodeIds:Landroid/util/LongArray; (runtime_flags=0, domain=platform, api=unsupported) from Lio/flutter/view/AccessibilityViewEmbedder$ReflectionAccessors; (domain=app) using reflection: allowed
+I/.pomosprint.app(11511): hiddenapi: Accessing hidden method Landroid/util/LongArray;->get(I)J (runtime_flags=0, domain=platform, api=unsupported) from Lio/flutter/view/AccessibilityViewEmbedder$ReflectionAccessors; (domain=app) using reflection: allowed
+D/FlutterRenderer(11511): Width is zero. 0,0
+D/CompatChangeReporter(11511): Compat change id reported: 377864165; UID 10217; state: ENABLED
+W/HWUI    (11511): Unknown dataspace 0
+I/WindowExtensionsImpl(11511): Initializing Window Extensions, vendor API level=9, activity embedding enabled=true
+D/FlutterRenderer(11511): Width is zero. 0,0
+D/FlutterJNI(11511): Sending viewport metrics to the engine.
+I/.pomosprint.app(11511): Compiler allocated 5111KB to compile void android.view.ViewRootImpl.performTraversals()
+Syncing files to device sdk gphone64 arm64...                      522ms

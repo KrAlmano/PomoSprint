@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "scope": "Post compact UI packages, normal app and closing gates",
+  "artifacts": [
+    {
+      "file": "README.md",
+      "bytes": 1231,
+      "sha256": "06284b6ee48f263d333ab8e01235fc5ff32422249eb5fbb604888e5c647ea248"
+    },
+    {
+      "file": "analyze.log",
+      "bytes": 96,
+      "sha256": "54a77aed978710d5153202328d4a7acc21e4df8f997cdde59fcc2895caa13af8"
+    },
+    {
+      "file": "android-normal-main.png",
+      "bytes": 145229,
+      "sha256": "83b4c5f57a414e7a7e228fed1ce48be4714f0b8cec05f206fefc2c165edcb9c7"
+    },
+    {
+      "file": "android_normal_run.log",
+      "bytes": 1457,
+      "sha256": "0df3af6a1825b622c4b7ee628c6f45aa9c79ea9a9ca863a06ba840f319f1087f"
+    },
+    {
+      "file": "android_pid.log",
+      "bytes": 6,
+      "sha256": "f7211b728d5de779d2846e134d5091f5098753218aa490795fd80fbcc7e7ec46"
+    },
+    {
+      "file": "android_release.log",
+      "bytes": 415,
+      "sha256": "2172610b0bea9ee9add3f00ac87ff0a335ad448ee39f16dce0b36dea8f34dd94"
+    },
+    {
+      "file": "cleanup.json",
+      "bytes": 1785,
+      "sha256": "3ab0329fc2835b4202d576b41756e5941eaabd34925600fb0e4914616aea5d7f"
+    },
+    {
+      "file": "closing-gate/analyze.log",
+      "bytes": 96,
+      "sha256": "82896eb0593012c47f9ec5205119a96b5d40c6dbbbd2938f8ed7973a931b21e9"
+    },
+    {
+      "file": "closing-gate/flutter.log",
+      "bytes": 208463,
+      "sha256": "e99c9ff3a7cb9732185089af983c1982165e817b9074e96a80956defcd7f3751"
+    },
+    {
+      "file": "closing-gate/node.log",
+      "bytes": 16485,
+      "sha256": "c790c101c44f44d66a915cf7c50f12acae9f85543b778e81cb242be3c5e42dc7"
+    },
+    {
+      "file": "closing-gate/partials.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "closing-gate/summary.json",
+      "bytes": 530,
+      "sha256": "be4cb4c9a1118bad6e261812eff454cb11c4addc169fc9c0c397dff789a55a05"
+    },
+    {
+      "file": "device-inventory.json",
+      "bytes": 589,
+      "sha256": "a17af382e8a5c2886b7a94fc61a13c4ff41866fecde475d6f541e223f4a7cee9"
+    },
+    {
+      "file": "flutter.log",
+      "bytes": 209431,
+      "sha256": "b88010807d15b1c74f817e199356db29b5561bd4cd8580aaf4942730f30d7f03"
+    },
+    {
+      "file": "initial-finder-failure/flutter.log",
+      "bytes": 221710,
+      "sha256": "eb22219293eb58d50bbeb87299f4c5879b1daabb390f2e8a14b0d7d2152b3ab4"
+    },
+    {
+      "file": "initial-finder-failure/league_refresh_finder_fix.json",
+      "bytes": 841,
+      "sha256": "1a1a214ef58a35cbc3ec7bbc95ddde7a79c718e20209027452748da5520e4e01"
+    },
+    {
+      "file": "initial-finder-failure/league_refresh_fixed_9_pass.log",
+      "bytes": 690,
+      "sha256": "24dbcff084cdf6cdf23a358863299d14fd982f4979c49379c911b053a1709405"
+    },
+    {
+      "file": "initial-finder-failure/league_refresh_regression_test.before_tab_fix.dart.txt",
+      "bytes": 12036,
+      "sha256": "5e439a6b8c9ed3bb234c113a3b823ff30895e6e0d487afece7d30227b9acb856"
+    },
+    {
+      "file": "initial-finder-failure/summary.json",
+      "bytes": 529,
+      "sha256": "4adc266431a54f1649274aeb3774811d13bfa5801a5de0f626edca92d97afbbc"
+    },
+    {
+      "file": "ios-normal-exam.png",
+      "bytes": 285851,
+      "sha256": "0479f636ec8b7ff31e17426008f8f988645918ae8751fa0302da30e5a1aa4f90"
+    },
+    {
+      "file": "ios-normal-main-settled.png",
+      "bytes": 244463,
+      "sha256": "aaa8f4e7e46a8939ef0f9ff529350ed497ae45190ab1c131f2637a5c1ac03b8b"
+    },
+    {
+      "file": "ios-normal-main.png",
+      "bytes": 454760,
+      "sha256": "a5bdc4eb861ec3af20172f8efdf09cf4b4a2e6681cfd7247b1cf47af86b26d54"
+    },
+    {
+      "file": "ios_install.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "ios_launch.log",
+      "bytes": 26,
+      "sha256": "5399c6d7d5653b41e8fcb5e28dc5947af7a08006c430326ff424c2d2266a4bd0"
+    },
+    {
+      "file": "ios_normal_build.log",
+      "bytes": 229,
+      "sha256": "395490cb9bc88d95d5cd55256d0f9dc714ea6e03dc33dcd66450046031e925ea"
+    },
+    {
+      "file": "ios_release.log",
+      "bytes": 355,
+      "sha256": "975f7e9d471819418dd28e22d7b09095b5281443c1d7744aa9eb67b58cfa5961"
+    },
+    {
+      "file": "ios_screenshot.log",
+      "bytes": 235,
+      "sha256": "9066864b4e380c952286ee290d4177e11827a8e2409700149f2688993113965b"
+    },
+    {
+      "file": "node.log",
+      "bytes": 16493,
+      "sha256": "90bde7ec061d286b6fc143d3183c56b6b5567aee35bdc10ec6c085edcd0923bc"
+    },
+    {
+      "file": "partials.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "proof.json",
+      "bytes": 2402,
+      "sha256": "d47ef1a2de7ecb95075acdf9eaf1245869e195a4da5716b990114c43de00ad0e"
+    },
+    {
+      "file": "summary.json",
+      "bytes": 1288,
+      "sha256": "cc7c4a2de632c9e8b29d9db583fee79e3350d9c237a9a096722506908af2effb"
+    }
+  ]
+}

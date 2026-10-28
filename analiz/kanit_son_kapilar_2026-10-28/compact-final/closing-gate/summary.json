@@ -1,0 +1,27 @@
+{
+  "started_at": "2026-10-28T15:08:03.481994+00:00",
+  "commands": {
+    "analyze": {
+      "exit_code": 0,
+      "seconds": 7.0,
+      "log": "analyze.log"
+    },
+    "flutter": {
+      "exit_code": 0,
+      "seconds": 118.26,
+      "log": "flutter.log"
+    },
+    "node": {
+      "exit_code": 0,
+      "seconds": 0.56,
+      "log": "node.log"
+    },
+    "partials": {
+      "exit_code": 0,
+      "seconds": 0.04,
+      "log": "partials.log"
+    }
+  },
+  "status": "PASS",
+  "completed_at": "2026-10-28T15:10:09.343840+00:00"
+}

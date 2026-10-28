@@ -1,0 +1,12 @@
+{
+  "platform": "android",
+  "mode": "ayt",
+  "run": "compact-android-final",
+  "source": "integration_test/ah_exam_details_early_test.dart",
+  "api_port": 54351,
+  "host_port": 54369,
+  "started_at": "2026-10-28T15:00:06.819749+00:00",
+  "log": "<TMP>/pomosprint_compact_android_final.log",
+  "native_exit_code": 0,
+  "finished_at": "2026-10-28T15:02:10.701095+00:00"
+}

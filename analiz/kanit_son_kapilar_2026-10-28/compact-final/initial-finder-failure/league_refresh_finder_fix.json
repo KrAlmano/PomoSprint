@@ -1,0 +1,15 @@
+{
+  "source": "test/league_refresh_regression_test.dart",
+  "snapshot": "build/verification_20261028/gate_compact_ui_3/league_refresh_regression_test.before_tab_fix.dart.txt",
+  "source_sha256_before": "5e439a6b8c9ed3bb234c113a3b823ff30895e6e0d487afece7d30227b9acb856",
+  "source_sha256_after": "9d9c56cbebd846453eb1ef827f94000de0c5100994d5899be7fac6a3d4e338c3",
+  "finder_replacements": 5,
+  "assertions_changed": false,
+  "tests_run_by_this_step": true,
+  "targeted_tests_passed": 9,
+  "exit_code": 0,
+  "targeted_log": "league_refresh_fixed_9_pass.log",
+  "targeted_log_source_sha256": "fb7878215338fe403f88ddd83694616cb9e1b652eafaa51f7b150c604816451c",
+  "targeted_log_sha256": "24dbcff084cdf6cdf23a358863299d14fd982f4979c49379c911b053a1709405",
+  "scope": "All 9 tests in league_refresh_regression_test.dart; not a full-project gate"
+}

@@ -1,0 +1,625 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-28",
+  "device": {
+    "name": "PomoSprint QA iPhone 16 (18.6)",
+    "ios": "18.6",
+    "udid": "8D0EFF44-5AF3-42E6-9F59-92CDFF8C9E5C"
+  },
+  "status_bar": {
+    "time": "09:41",
+    "battery_level": 100,
+    "wifi_bars": 3,
+    "cellular_bars": 4,
+    "verified_by": "root visual review and native override"
+  },
+  "demo_owner": {
+    "id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+    "display_name": "Deniz"
+  },
+  "fixture_manifest_sha256": "a17631c5f976c9ff049a28cdce86f6b163ccedb85594f87fd155e138f3d769c2",
+  "native_log_sha256": "abb2b29be157b8227f730f8fb1a1a39dff11cbb9e750b999a9619b66b74bbf38",
+  "capture_scope": "Real current native app with fictional isolated local data; no elapsed-time test claim",
+  "scenes": [
+    {
+      "scene": "timer",
+      "locale": "tr",
+      "file": "20261028/timer-tr.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "f03c795e98da6cd865ea508f593877a7f73d8426e79c67341fa3e95fcf65a7d3",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:21:44.920585Z",
+      "visible_locale_anchor": "MARATONU BAŞLAT",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/timer-tr.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "e693444b123398654392be6adc7d956f300864283dc6d09d30be32532c68e6f1",
+        "locale": "tr"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    },
+    {
+      "scene": "marathon-plan",
+      "locale": "tr",
+      "file": "20261028/marathon-plan-tr.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "513cb085d71c59e3cc18730e0db0e6b95d55dab093fb8624d5c3ba6c0bc11fad",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:21:49.286243Z",
+      "visible_locale_anchor": "Kaç seans yapmak istiyorsunuz?",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/marathon-plan-tr.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "79cea27fa03597e1b59abaafb421889977cc730c6a00e45d71c4cb36557401cc",
+        "locale": "tr"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    },
+    {
+      "scene": "exam-catalog",
+      "locale": "tr",
+      "file": "20261028/exam-catalog-tr.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "11ddc8ef594091768fb5919d90df1de2fe7f3bff95336ca325e94a4c62eabf0b",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:21:54.159288Z",
+      "visible_locale_anchor": "Denemeler",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/exam-catalog-tr.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "5329311b30955116e470cee91570227982e121659a63cacde9387d48fdf436cb",
+        "locale": "tr"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    },
+    {
+      "scene": "exam-running",
+      "locale": "tr",
+      "file": "20261028/exam-running-tr.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "63b95455799e5c3d7e7f953fdea1e21c4b03da5e194c7036201e514c93102279",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:25:12.836696Z",
+      "visible_locale_anchor": "Deneme sürüyor",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/exam-running-tr.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "0f918636cbb3198e7c57fb9de5ddeee68f88a9500fa0054f58161d818e28a2d2",
+        "locale": "tr"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    },
+    {
+      "scene": "exam-history",
+      "locale": "tr",
+      "file": "20261028/exam-history-tr.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "032d5352a6960ee5128489eb297c0b6746e8aefa4b50620ad4a5e9e9aad6f532",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:21:56.856736Z",
+      "visible_locale_anchor": "Geçmiş",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/exam-history-tr.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "db9f697987bdfe20d30d5ab5f4a3cb497c7e4823f58da6ce864a984020346f2b",
+        "locale": "tr"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    },
+    {
+      "scene": "exam-results",
+      "locale": "tr",
+      "file": "20261028/exam-results-tr.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "355ec0c603c3468ba022b7d27b57b179e15763215ff65e9fd5f1fa5d22af0fee",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:21:59.155012Z",
+      "visible_locale_anchor": "Deneme ayrıntıları ve netler",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/exam-results-tr.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "6156540512b8862e0e88fd5c81b21ae13ff53db6f355599e8357740efac7900a",
+        "locale": "tr"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    },
+    {
+      "scene": "exam-insights",
+      "locale": "tr",
+      "file": "20261028/exam-insights-tr.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "d58c3241721e562e33cc3efa3e79ef896834b8a10b45a9635b5aebae9ead91d4",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:22:02.206109Z",
+      "visible_locale_anchor": "İlişkili çalışma kategorilerinde 75 dk; Fizik neti: 1,75 → 4,75.",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/exam-insights-tr.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "a137ea88e1f65f9f8a569b1998d1f10ab324d729513e78ee1e9527927c8192b8",
+        "locale": "tr"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    },
+    {
+      "scene": "reports-daily",
+      "locale": "tr",
+      "file": "20261028/reports-daily-tr.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "5288962eb5c722ba663180332a59240c47ed0296b09dfb5b31125ea4c97b743a",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:22:10.405958Z",
+      "visible_locale_anchor": "Günlük Çalışma",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/reports-daily-tr.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "c7e0c8801c984c8a382279fe1e1b9f41716441198d54257d49d71bc968b38958",
+        "locale": "tr"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    },
+    {
+      "scene": "reports-weekly",
+      "locale": "tr",
+      "file": "20261028/reports-weekly-tr.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "a421605a36fef1c9be276a1e6ce3739cbcc39139e3ae1abb6387c6b9ff6f9b48",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:22:13.522687Z",
+      "visible_locale_anchor": "Haftalık Çalışma",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/reports-weekly-tr.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "3d4f776a02a66669ae66941a49768fc4d1db8f5c5d554ceaa861d8b65310a372",
+        "locale": "tr"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    },
+    {
+      "scene": "reports-monthly",
+      "locale": "tr",
+      "file": "20261028/reports-monthly-tr.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "88f8feb0bda53e4c1dd5bef85e235430c3b58015897358a0988d362c3be5a089",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:22:16.675268Z",
+      "visible_locale_anchor": "Aylık Takip",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/reports-monthly-tr.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "58d91bd6ea9ba37965a15de536ace8b617343ff1d0425b1f560bdd82db2808c6",
+        "locale": "tr"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    },
+    {
+      "scene": "league-category",
+      "locale": "tr",
+      "file": "20261028/league-category-tr.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "5dbaa347b1c166f757ade82cba8b91d1f8a3baa8616ce95be25b3bf631a4519e",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:22:20.476729Z",
+      "visible_locale_anchor": "Lig",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/league-category-tr.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "539aa399c7b593e9f54d2ca229592803bde429e8921ded22d20e6b0460f9a3c2",
+        "locale": "tr"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    },
+    {
+      "scene": "league-global",
+      "locale": "tr",
+      "file": "20261028/league-global-tr.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "046b77a48cdc1b332733226ad539713d5f0da8f87e4e96086818f26b1343b529",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:22:23.239729Z",
+      "visible_locale_anchor": "Global",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/league-global-tr.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "fb336e57359540d893b4af3ff889425e25126af5a73113c5d3e3899b7b05f230",
+        "locale": "tr"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    },
+    {
+      "scene": "league-exam",
+      "locale": "tr",
+      "file": "20261028/league-exam-tr.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "d238002de9bf8b3d0c25679f070e07b63ce92b0d2d91f0b1df90eda5fed59e99",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:22:06.240895Z",
+      "visible_locale_anchor": "Lig",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/league-exam-tr.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "188ddcec8ddb385f6d260716993a5f7991596e12dfe07f0b0777cb53ce7e3b1e",
+        "locale": "tr"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    },
+    {
+      "scene": "social",
+      "locale": "tr",
+      "file": "20261028/social-tr.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "bdf0469cf4670774a81984c303c90e289f38728e992ca90e582a633a42254d6b",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:22:26.076617Z",
+      "visible_locale_anchor": "Arkadaşların",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/social-tr.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "fd114f43ed66c2a3f4d33dc82d17a019f177fb3be63976b118ee1428c4a876d7",
+        "locale": "tr"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    },
+    {
+      "scene": "avatar-collection",
+      "locale": "tr",
+      "file": "20261028/avatar-collection-tr.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "8395cbbc072fb23e957384e6b62152261847a418312623dde5a8ff06783db404",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:22:30.076166Z",
+      "visible_locale_anchor": "Karakterini Seç",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/avatar-collection-tr.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "f4e129c17f8a1823234686753cb8972e7650b9ad2801ce45959dce92d3c1af13",
+        "locale": "tr"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    },
+    {
+      "scene": "timer",
+      "locale": "en",
+      "file": "20261028/timer-en.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "3f5d52b135c1cf23ff130e19cbdf18246163e6b42c01bc53539c468f86827b3a",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:23:26.607061Z",
+      "visible_locale_anchor": "START MARATHON",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/timer-en.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "1c029e2f4cd1b2194e80b427d8c003a6cab7d2cf6284678c3f48b4bafcb33f74",
+        "locale": "en"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    },
+    {
+      "scene": "marathon-plan",
+      "locale": "en",
+      "file": "20261028/marathon-plan-en.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "fd5c347d87daea3d54ab7d0408316506a239f04664ff5846aecad5eee82e0c42",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:23:30.821950Z",
+      "visible_locale_anchor": "How many sessions would you like?",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/marathon-plan-en.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "55b9d428dc04260a87b6ac427058d99c6cc6f30066f3ec4aa6413a873134abae",
+        "locale": "en"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    },
+    {
+      "scene": "exam-catalog",
+      "locale": "en",
+      "file": "20261028/exam-catalog-en.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "a6b8a52fe0c4c1f22368c4de31b3d553708dbe71858f899add71dbffeb62596b",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:23:35.622803Z",
+      "visible_locale_anchor": "Practice exams",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/exam-catalog-en.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "c68cf30ecc3ce8a81642e96ea3db0bd9acb660091929bbe7c357b15a90ce9f1f",
+        "locale": "en"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    },
+    {
+      "scene": "exam-running",
+      "locale": "en",
+      "file": "20261028/exam-running-en.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "e93f9e5180bed0640dd6484d6620a24e481930b79f78f306a650ef430bffdad7",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:25:17.723158Z",
+      "visible_locale_anchor": "Practice exam in progress",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/exam-running-en.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "ab0972d3d5e13cb3e8b6422563ca061427f5bae8cab06a041a84ce8225974504",
+        "locale": "en"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    },
+    {
+      "scene": "exam-history",
+      "locale": "en",
+      "file": "20261028/exam-history-en.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "5efd17a4a4b5fa7cf0970301fbe572fdc65ecec7220c928b49fee9b26143bec9",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:23:38.206659Z",
+      "visible_locale_anchor": "History",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/exam-history-en.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "7cdcf9fe457803e13d42dc769842f72fec7bc7c103668035e77c4b9a74a256e7",
+        "locale": "en"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    },
+    {
+      "scene": "exam-results",
+      "locale": "en",
+      "file": "20261028/exam-results-en.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "f353feb937a52746ab6c1fa6d00551e0d8571ba2130107d5b7863084f668fb3f",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:23:40.536321Z",
+      "visible_locale_anchor": "Practice exam details and scores",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/exam-results-en.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "138518a85cdf74855f49b907509dbcbb164f52c8fbeb8aad5a76d9198f7d7420",
+        "locale": "en"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    },
+    {
+      "scene": "exam-insights",
+      "locale": "en",
+      "file": "20261028/exam-insights-en.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "275e364f8107cc747762c4e3ecaa595cf7dc3e2a05b2f889d87179f2cc50229b",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:23:43.488510Z",
+      "visible_locale_anchor": "In related study categories: 75 min; Physics net score: 1.75 → 4.75.",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/exam-insights-en.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "c17785029cdcae20ec4a3c718136420b6127004b5353ca79a72d93e49981793b",
+        "locale": "en"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    },
+    {
+      "scene": "reports-daily",
+      "locale": "en",
+      "file": "20261028/reports-daily-en.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "f8505f7654347822ff30818a67af8bbce1af465fe3e14102d3e822566e8d711c",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:23:51.622577Z",
+      "visible_locale_anchor": "Daily Focus",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/reports-daily-en.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "b258ebab2e7f01c5694c4f972539258a09e4cef78ce0dd9639ed73089becfeba",
+        "locale": "en"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    },
+    {
+      "scene": "reports-weekly",
+      "locale": "en",
+      "file": "20261028/reports-weekly-en.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "4779ab326e139a52b84b118fff011ad461f3d6c1716b12e85f4734812feeb167",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:23:54.720604Z",
+      "visible_locale_anchor": "Weekly Focus",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/reports-weekly-en.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "4a0ded74baf77d918a0fb4aa813029e5564c28c6fc37e590dd6255fd4a009ea1",
+        "locale": "en"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    },
+    {
+      "scene": "reports-monthly",
+      "locale": "en",
+      "file": "20261028/reports-monthly-en.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "5e10cbc8677baf92ac53a7c0d0db437c665f4ae12939df93b701a21656b7189f",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:23:57.822244Z",
+      "visible_locale_anchor": "Monthly Tracking",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/reports-monthly-en.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "5963f5ad111e86abc097a5e4c328d246b4092410809d523d8f43b622e2aa2024",
+        "locale": "en"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    },
+    {
+      "scene": "league-category",
+      "locale": "en",
+      "file": "20261028/league-category-en.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "43ba25a72e3dd23a0af96c88d9392b077540a3dece6582d6cd984d68b2119f37",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:24:01.509054Z",
+      "visible_locale_anchor": "League",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/league-category-en.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "b83e4249fdf8b0272ec82f87951b8571cbf7205926e6abb92941f8cb391581d5",
+        "locale": "en"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    },
+    {
+      "scene": "league-global",
+      "locale": "en",
+      "file": "20261028/league-global-en.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "7224dfc2da0d89b2f21ae70db5174c41928f86d4dbc3cd9aa0387ced88375181",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:24:04.323877Z",
+      "visible_locale_anchor": "Global",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/league-global-en.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "03bbf5c3c2d7085d400ac222ccc06bed6d27db0ca3b4ef6b93a655ba1285ae98",
+        "locale": "en"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    },
+    {
+      "scene": "league-exam",
+      "locale": "en",
+      "file": "20261028/league-exam-en.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "a812dbc969aaed092891c49688c5535a3db1cb1c4b577568449e9d12715547bb",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:23:47.489330Z",
+      "visible_locale_anchor": "League",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/league-exam-en.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "2d0a7b23d392cf015fecd54cba4b7f974c8ddb15ca4a8b7c4c89fe24524081b6",
+        "locale": "en"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    },
+    {
+      "scene": "social",
+      "locale": "en",
+      "file": "20261028/social-en.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "54c16ac0ddd5786ae8771938c6292230f8d13ec220b3cc3bebadcc800bd285e6",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:24:07.118179Z",
+      "visible_locale_anchor": "Your Friends",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/social-en.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "4db3fd1fb226f4f94a3fc13358710b8cf0c62014106a1dc2c039552b6e03339e",
+        "locale": "en"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    },
+    {
+      "scene": "avatar-collection",
+      "locale": "en",
+      "file": "20261028/avatar-collection-en.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "47dd76a0c3496da277a13704af45c5b58e43b96cb38b87a58de2710e83e9a1ef",
+      "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+      "status_bar_time": "09:41",
+      "captured_at": "2026-10-28T14:24:10.889266Z",
+      "visible_locale_anchor": "Choose Your Character",
+      "source": {
+        "path": "analiz/ekran_site_2026-10-28/native/avatar-collection-en.png",
+        "width": 604,
+        "height": 1311,
+        "sha256": "698404d42b406a4d89a7e907fa3cf82f6007c4157d6ce4d77f46ed7f3b7732a7",
+        "locale": "en"
+      },
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+    }
+  ]
+}

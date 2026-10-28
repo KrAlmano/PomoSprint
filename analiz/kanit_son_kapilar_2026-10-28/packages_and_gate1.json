@@ -1,0 +1,34 @@
+{
+  "scope": "Local QA compilation and main.dart debug smoke; no store upload or physical device run",
+  "feature_commit": "8cb3dc9",
+  "ios_unsigned_release": {
+    "exit_code": 0,
+    "bundle_reported_MB": 55.1
+  },
+  "android_release": {
+    "exit_code": 0,
+    "bytes": 99289757,
+    "sha256": "d7a5eab9957985ac797e87815767014c8be643f577e53ae389ccf9b28368ead4",
+    "kind": "universal APK; not a signed store AAB validation"
+  },
+  "ios_normal_main": {
+    "installed": true,
+    "pid_at_launch": 87784,
+    "backend": "site54361",
+    "duration_on_screen": "25:00"
+  },
+  "android_normal_main": {
+    "launched": true,
+    "pid_observed": 11511,
+    "backend": "review54351",
+    "duration_on_screen": "25:00"
+  },
+  "gate1": {
+    "analyze": "PASS",
+    "flutter_pass": 1476,
+    "optional_png_skips": 5,
+    "node_pass": 172,
+    "partials": "PASS"
+  },
+  "release_retries": "Initial --no-pub builds used dev plugin registration; normal release generation without --no-pub succeeded. Serialize Flutter commands in the same checkout; no generated Java manual patch."
+}

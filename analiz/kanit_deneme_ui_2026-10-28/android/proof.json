@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "platform": "Android",
+  "device": "emulator-5554",
+  "run": "compact-android-final",
+  "database": "pomosprint_review32_dus",
+  "owner": "81969919-cd0a-40f6-8ef9-dc1dd77f638d",
+  "native_test_cases": 1,
+  "locales": [
+    "tr",
+    "en"
+  ],
+  "sql_checks_passed": 21,
+  "catalog_parity_checks_passed": 5,
+  "actual_seconds": [
+    5,
+    6
+  ],
+  "planned_seconds": [
+    10800,
+    10800
+  ],
+  "credited_minutes": [
+    0,
+    0
+  ],
+  "awards": "zero; both real early attempts lasted less than one minute",
+  "scenarios": [
+    "server-accepted early AYT",
+    "two selected modules and two subject scores",
+    "automatic blank counts",
+    "atomic title/note/net save revision1",
+    "idempotent duplicate save and duplicate early request",
+    "reopen details/history",
+    "report completed count1 then2",
+    "normal focus unblocked then explicit incomplete QA reset"
+  ],
+  "screenshots": 8,
+  "visual_review": {
+    "viewed_individually": [
+      "screenshots/e2e-ah32-running-tr.png",
+      "screenshots/e2e-ah32-history-en.png"
+    ],
+    "observations": [
+      "TR compact tabs and net info fit the Android screen; active exam disables new start.",
+      "EN History shows actual6seconds versus planned180minutes and one saved metadata revision; a normal save-success snackbar is visible."
+    ],
+    "not_claimed": "No independent visual review of the remaining six screenshots; this native test is not a real180minute completion."
+  },
+  "preservation": "Previous eight host screenshots were copied byte-for-byte to build/verification_20261028/compact_android_final/before before this run. Earlier account rows were not edited.",
+  "source_hash_scope": "Hashes of frozen source files recorded after the native run, not a binary extraction.",
+  "source_hashes": {
+    "lib/screens/exam_screen.dart": "1b90bffa79b084af39f8cda39fb9e2e36eb98ba90a1fa6c82458fe0e63910b28",
+    "lib/l10n/app_tr.arb": "de6e88302b0b3ec35d49da096ee2215183083c58e51ca286fc7b77aacd65ea6e",
+    "lib/l10n/app_en.arb": "4410321adfee4aef143288aa386f315f1cbbae5de551db67c185a064d67af779",
+    "integration_test/ah_exam_details_early_test.dart": "9cfd0fe43cca91d3ca1c761b3957591e9e72a7a83f253b3d7a81fdeddd0b8b3f"
+  },
+  "limits": [
+    "This does not claim a full-project test pass.",
+    "No physical device or production database was used.",
+    "No wipe, uninstall or new emulator was used."
+  ]
+}

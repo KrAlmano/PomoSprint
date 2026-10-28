@@ -5,10 +5,10 @@
 // _headers kuralları ASSETS yanıtlarına uygulanır; Range yanıtında bu
 // başlıkların tamamı korunur. Diğer varlıklar akış halinde aynen geçirilir.
 const RANGE_VIDEOS = new Set([
-  "/videos/timer-20261008.mp4",
-  "/videos/marathon-20261008.mp4",
-  "/videos/timer-demo-20261008d.mp4",
-  "/videos/marathon-demo-20261008d.mp4",
+  "/videos/20261028/timer-tr.mp4",
+  "/videos/20261028/timer-en.mp4",
+  "/videos/20261028/marathon-tr.mp4",
+  "/videos/20261028/marathon-en.mp4",
 ]);
 const MAX_RANGE_VIDEO_BYTES = 256 * 1024;
 

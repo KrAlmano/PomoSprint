@@ -1,0 +1,42 @@
+00:00 +0: loading /Users/almano/Desktop/Projects/Pomodoro/test/exam_compact_ui_test.dart
+00:00 +0: /Users/almano/Desktop/Projects/Pomodoro/test/exam_insights_loading_test.dart: failed first study history read never presents zero minutes as a verified insight
+00:00 +1: /Users/almano/Desktop/Projects/Pomodoro/test/exam_insights_loading_test.dart: failed first study history read never presents zero minutes as a verified insight
+00:00 +2: /Users/almano/Desktop/Projects/Pomodoro/test/exam_insights_loading_test.dart: failed first study history read never presents zero minutes as a verified insight
+00:00 +3: /Users/almano/Desktop/Projects/Pomodoro/test/exam_insights_loading_test.dart: failed first study history read never presents zero minutes as a verified insight
+00:00 +4: /Users/almano/Desktop/Projects/Pomodoro/test/exam_insights_loading_test.dart: failed first study history read never presents zero minutes as a verified insight
+00:01 +5: /Users/almano/Desktop/Projects/Pomodoro/test/exam_details_widget_test.dart: AYT selects modules before scores and saves one atomic patch (tr)
+00:01 +6: /Users/almano/Desktop/Projects/Pomodoro/test/exam_details_widget_test.dart: AYT selects modules before scores and saves one atomic patch (tr)
+00:01 +7: /Users/almano/Desktop/Projects/Pomodoro/test/exam_details_widget_test.dart: AYT selects modules before scores and saves one atomic patch (tr)
+00:01 +8: /Users/almano/Desktop/Projects/Pomodoro/test/exam_details_widget_test.dart: AYT selects modules before scores and saves one atomic patch (tr)
+00:01 +9: /Users/almano/Desktop/Projects/Pomodoro/test/exam_details_widget_test.dart: AYT selects modules before scores and saves one atomic patch (tr)
+00:01 +10: /Users/almano/Desktop/Projects/Pomodoro/test/exam_details_widget_test.dart: AYT selects modules before scores and saves one atomic patch (tr)
+00:01 +11: /Users/almano/Desktop/Projects/Pomodoro/test/exam_details_widget_test.dart: AYT selects modules before scores and saves one atomic patch (tr)
+00:01 +12: /Users/almano/Desktop/Projects/Pomodoro/test/exam_compact_ui_test.dart: compact exam catalog tr 320pt large text
+00:02 +13: /Users/almano/Desktop/Projects/Pomodoro/test/exam_localization_audit_test.dart: a visible results-save error changes language with its dialog
+00:02 +14: /Users/almano/Desktop/Projects/Pomodoro/test/exam_localization_audit_test.dart: a visible results-save error changes language with its dialog
+00:02 +15: /Users/almano/Desktop/Projects/Pomodoro/test/exam_localization_audit_test.dart: a visible results-save error changes language with its dialog
+00:02 +16: /Users/almano/Desktop/Projects/Pomodoro/test/exam_localization_audit_test.dart: a visible results-save error changes language with its dialog
+00:02 +17: /Users/almano/Desktop/Projects/Pomodoro/test/exam_localization_audit_test.dart: a visible results-save error changes language with its dialog
+00:02 +18: /Users/almano/Desktop/Projects/Pomodoro/test/exam_details_widget_test.dart: metadata-only applies to every completed exam with unchanged score (tr)
+00:02 +19: /Users/almano/Desktop/Projects/Pomodoro/test/exam_details_widget_test.dart: metadata-only applies to every completed exam with unchanged score (tr)
+00:02 +20: /Users/almano/Desktop/Projects/Pomodoro/test/exam_details_widget_test.dart: metadata-only applies to every completed exam with unchanged score (tr)
+00:02 +21: /Users/almano/Desktop/Projects/Pomodoro/test/exam_details_widget_test.dart: metadata-only applies to every completed exam with unchanged score (tr)
+00:03 +22: /Users/almano/Desktop/Projects/Pomodoro/test/exam_details_widget_test.dart: metadata-only applies to every completed exam with unchanged score (tr)
+00:03 +23: /Users/almano/Desktop/Projects/Pomodoro/test/exam_details_widget_test.dart: metadata-only applies to every completed exam with unchanged score (tr)
+00:03 +24: /Users/almano/Desktop/Projects/Pomodoro/test/exam_details_widget_test.dart: metadata-only applies to every completed exam with unchanged score (tr)
+00:04 +25: /Users/almano/Desktop/Projects/Pomodoro/test/exam_details_widget_test.dart: early finish waits for server offline and exposes exact pending language (tr)
+00:04 +26: /Users/almano/Desktop/Projects/Pomodoro/test/exam_details_widget_test.dart: AYT selects modules before scores and saves one atomic patch (en)
+00:04 +27: /Users/almano/Desktop/Projects/Pomodoro/test/exam_details_widget_test.dart: metadata-only applies to every completed exam with unchanged score (en)
+00:05 +28: /Users/almano/Desktop/Projects/Pomodoro/test/exam_details_widget_test.dart: early finish waits for server offline and exposes exact pending language (en)
+00:05 +29: /Users/almano/Desktop/Projects/Pomodoro/test/exam_details_widget_test.dart: offline draft reopens then immutable queued form remains disabled until retry
+00:06 +30: /Users/almano/Desktop/Projects/Pomodoro/test/exam_details_widget_test.dart: stale revision requires explicit review and preserves typed note
+00:06 +31: /Users/almano/Desktop/Projects/Pomodoro/test/exam_details_widget_test.dart: legacy capabilities hide new controls while preserving original score entry
+00:06 +32: /Users/almano/Desktop/Projects/Pomodoro/test/exam_details_widget_test.dart: owner change dismisses private form and never persists under the new owner
+00:06 +33: /Users/almano/Desktop/Projects/Pomodoro/test/exam_details_widget_test.dart: accepted early completion opens module form and keeps actual/planned times distinct
+00:06 +34: /Users/almano/Desktop/Projects/Pomodoro/test/exam_details_widget_test.dart: module and details form fits narrow portrait and landscape at double text scale
+00:06 +35: /Users/almano/Desktop/Projects/Pomodoro/test/exam_details_widget_test.dart: oversized paste is visible and safe across autosave and cold reopen (tr)
+00:06 +36: /Users/almano/Desktop/Projects/Pomodoro/test/exam_details_widget_test.dart: oversized paste is visible and safe across autosave and cold reopen (en)
+00:06 +37: /Users/almano/Desktop/Projects/Pomodoro/test/exam_details_widget_test.dart: catalog explains net rules once without repeating the long introduction
+00:07 +38: /Users/almano/Desktop/Projects/Pomodoro/test/exam_details_widget_test.dart: older readable long draft stays editable and reports its length error accurately
+00:07 +39: /Users/almano/Desktop/Projects/Pomodoro/test/exam_details_widget_test.dart: TR EN answer labels remain single line with aligned input tops on narrow screens
+00:07 +40: All tests passed!
