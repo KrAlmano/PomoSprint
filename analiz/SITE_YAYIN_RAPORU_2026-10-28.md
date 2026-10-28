@@ -40,3 +40,8 @@ Kullanıcının “canlı site eski, Deneme ekranları yok; tüm siteyi güncell
 ## Kapsam sınırı
 
 Site, yayın hazırlığındaki uygulamayı tanıtır. Yeni sunucu paketleri ve 31 bu işlemde kurulmadı. Uygulamanın mağaza yayını, gerçek cihaz denemesi, yasal kimlik/gönderen bilgileri ve daha önce belgelenmiş operasyon işleri ayrıca kalır. Gerçek e-posta/form gönderimi veya kullanıcı hesabı değişikliği yapılmadı. Git yalnız `codex/gece-2026-10-27` dalındadır; main/merge/force yok.
+
+
+## Son çerçeve ve bekleyen düzeltmeler
+
+Dynamic Island çerçevesi `1a3af92` kaynağından `23462be5-023f-4be4-9509-86b24a618e21` sürümüne yayımlandı; gönderim kullanıcının yeni deploy-onayı talimatından önceydi. Kullanıcının tespit ettiği weeklyENgömülüada simülatörden yenidençekilerek düzeltildi; üçAuthyardımcı sayfanınCSSsürümü dec ileeşitlendi. **Bu soniki düzeltme onaybekliyor, yenidenyayınlanmadı.** [Kaynak/çekim/testkanıtı](iphone_cerceve_2026-10-28/README.md).

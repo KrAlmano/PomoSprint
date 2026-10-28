@@ -518,3 +518,12 @@ B/site kontrol noktası **`635a89df7cd8bf45b6dc16e21e95e4210dc0a465`** uzak `cod
 Son kullanıcı isteği web yayınını yetkilendirdi. Cloudflare dryrun veNode172temiz; mevcutWorker’a86değişmişasset yüklendi. Aktifsürüm e1bb6541-5794-4241-ab5e-66ded59a9298; önceki840fd4f1. Canlı20HTML+111statik,156/156HTTP geçti. İlk20hamHTMLhash farkı yalnızmevcutWebAnalyticsbeacon/tekLF enjeksiyonu; ilkFAILkanıtları saklandı ve sınırınormalizasyonlaaçıklandı. Destek/Apple/duraklatma/hesapsilme/ENSEO/gizlilikverienvanteri tutarlılığı1a58014'te düzeltildi. YeniDBpaketi/31/mobiledeploymentyok. Safari canlıgörsel turu ayrı kaydediliyor.
 
 Canlı Safari turu tamam:18/18 sayfa/genişlik,4video oynama+pause/resume,menü/dil/SSS.3gerçekJPEG saklandı. Konsol/ilk-paint/Chrome doğrulanmadı. Son durumda yeniDeneme/DUS tanıtımı gerçektenpomosprint.app üzerinde; eski“deployyok”notları bu webyayını için tarihsel kaldı.
+
+
+### Dynamic Island çerçevesi ve deploy onay sınırı
+
+`1a3af92` ortakCSS ile tüm40sitegösterimine iPhone/DynamicIslandçerçevesi ve cCSSsürümü eklendi. Node172/partial/dryrunve2temsiliSafariincelemesiPASS. Çerçeveyayınisteği, kullanıcıyenidenonayistemedenönce gönderilmişti; sonuç23462be5-023f-4be4-9509-86b24a618e21. **Bundan sonrakiherdeploy için kullanıcıonayıalınacak.**
+
+KullanıcıweeklyENgörselindeeskidençizilmişadaolduğunubuldu. AynıyerelDenizhesabında İngilizcehaftalıkrapor doğrudansimctl ile tekrarçekildi;ham1179×2556→native604×1311→web540×1170;düzboyama/kırpma yok. Capturemetaeskihashleriyenisiniayırıyor,30PNGadamerkezianaliziPASS.3authyardımcıHTMLCSSa→c. Node172/172,partials0;buiki düzeltmehenüzdeployedilmedi.
+
+AyrıaktifistekKPSS:resmî2026kılavuzlarıincelendi;3GY-GKdüzeyi120soru130dk,9alan40soru(İstatistik60dk,diğerleri50dk),netD-Y/4. AGS/ÖABTKPSSalanınakarıştırılmayacak. Uygulama/sunucuajanlarıplanladı;webfixpushbitince uygulama yazımı başlayacak.

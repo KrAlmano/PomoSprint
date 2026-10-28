@@ -1,0 +1,11 @@
+{
+  "device": "8D0EFF44-5AF3-42E6-9F59-92CDFF8C9E5C",
+  "owner": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+  "locale": "en",
+  "screen": "reports-weekly",
+  "captured_at": "2026-10-28T22:43:47.088286+03:00",
+  "method": "xcrun simctl io screenshot; original system output, no painted mask removal",
+  "override_cleared": true,
+  "status_bar_time": "09:41",
+  "visual_observation": "Cua confirmed09:41 before direct simctl capture; Cua hardware mask is not the exported source."
+}

@@ -1,0 +1,161 @@
+{
+  "scope": "Read-only pixel check of expected island center; not OCR or general visual quality proof",
+  "crop_540x1170": [
+    230,
+    25,
+    80,
+    20
+  ],
+  "images": [
+    {
+      "file": "avatar-collection-en.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    },
+    {
+      "file": "avatar-collection-tr.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    },
+    {
+      "file": "exam-catalog-en.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    },
+    {
+      "file": "exam-catalog-tr.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    },
+    {
+      "file": "exam-history-en.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    },
+    {
+      "file": "exam-history-tr.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    },
+    {
+      "file": "exam-insights-en.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    },
+    {
+      "file": "exam-insights-tr.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    },
+    {
+      "file": "exam-results-en.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    },
+    {
+      "file": "exam-results-tr.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    },
+    {
+      "file": "exam-running-en.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    },
+    {
+      "file": "exam-running-tr.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    },
+    {
+      "file": "league-category-en.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    },
+    {
+      "file": "league-category-tr.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    },
+    {
+      "file": "league-exam-en.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    },
+    {
+      "file": "league-exam-tr.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    },
+    {
+      "file": "league-global-en.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    },
+    {
+      "file": "league-global-tr.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    },
+    {
+      "file": "marathon-plan-en.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    },
+    {
+      "file": "marathon-plan-tr.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    },
+    {
+      "file": "reports-daily-en.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    },
+    {
+      "file": "reports-daily-tr.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    },
+    {
+      "file": "reports-monthly-en.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    },
+    {
+      "file": "reports-monthly-tr.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    },
+    {
+      "file": "reports-weekly-en.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    },
+    {
+      "file": "reports-weekly-tr.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    },
+    {
+      "file": "social-en.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    },
+    {
+      "file": "social-tr.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    },
+    {
+      "file": "timer-en.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    },
+    {
+      "file": "timer-tr.png",
+      "dark_fraction_in_island_center": 0.0,
+      "no_baked_island": true
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "scope": "Website phone frame only; application code and media bytes unchanged",
+  "css_sha256": "b96cc588dda1baacc3f74dbe33bef93c55f40f73eed6cbac6f9660533eb196f7",
+  "placements": {
+    "index.html": 5,
+    "features.html": 15,
+    "en/index.html": 5,
+    "en/features.html": 15
+  },
+  "original_screenshot_count": 30,
+  "unique_video_count": 4,
+  "css_cache_version": "20261028c",
+  "node_tests_passed": 172,
+  "partials": "PASS",
+  "dry_run": "PASS",
+  "visual_check": "PASS: two representative Safari375px cases, recorded separately",
+  "frame_deployment": {
+    "version": "23462be5-023f-4be4-9509-86b24a618e21",
+    "source_commit": "1a3af92",
+    "request_sent_before_user_requested_confirmation": true
+  },
+  "followup_corrections": {
+    "weekly_en_recaptured_without_hardware_mask": true,
+    "three_helper_pages_css_version": "20261028c",
+    "deployment": "NOT DEPLOYED; explicit user confirmation required"
+  }
+}

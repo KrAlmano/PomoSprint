@@ -1,0 +1,68 @@
+{
+  "check": "Dynamic Island frame — two representative Safari visual checks",
+  "css_cache_version": "20261028c",
+  "scope": "Local preview only, http://127.0.0.1:8798/__qa; no production deploy performed by this agent",
+  "screenshots": [
+    {
+      "file": "iphone-frame-c-tr-timer-375.jpg",
+      "bytes": 258926,
+      "sha256": "18ca5ebb047b47b1b67629c6605a09d9bb8535f8c70f859ee9db856cdf17696b",
+      "scene": "TR Özellikler — sayaç videosu",
+      "viewport_css_px": {
+        "width": 375,
+        "height": 844
+      },
+      "captured_utc": "2026-10-28T19:36:00Z",
+      "time_precision": "minute",
+      "source": "Unmodified CUA Safari getScreenshot JPEG bytes; local QA UI download; byte/hash equality verified",
+      "status": "PASS"
+    },
+    {
+      "file": "iphone-frame-c-tr-gallery-375.jpg",
+      "bytes": 264786,
+      "sha256": "525e71e1dd91001e81fb9914c1bd6b89f05f763a9b41f7e2b4b6c310b25fe29e",
+      "scene": "TR ana sayfa — sosyal ekran galerisi",
+      "viewport_css_px": {
+        "width": 375,
+        "height": 844
+      },
+      "captured_utc": "2026-10-28T19:37:00Z",
+      "time_precision": "minute",
+      "source": "Unmodified CUA Safari getScreenshot JPEG bytes; local QA UI download; byte/hash equality verified",
+      "status": "PASS"
+    }
+  ],
+  "sources_at_evidence_packaging": [
+    {
+      "path": "landing/css/style.css",
+      "bytes": 58833,
+      "sha256": "b96cc588dda1baacc3f74dbe33bef93c55f40f73eed6cbac6f9660533eb196f7"
+    },
+    {
+      "path": "landing/features.html",
+      "bytes": 34575,
+      "sha256": "6826f2cc996e5621d7abc79be2e68c22e84e7964de01ce840bcfa00dab0cd96f"
+    },
+    {
+      "path": "landing/index.html",
+      "bytes": 31036,
+      "sha256": "d93873af6f0a0da49607e31b437e0a74f36e4f4fc09fff8d6121d0d4195bdaa2"
+    },
+    {
+      "path": "landing/videos/20261028/timer-tr.mp4",
+      "bytes": 216213,
+      "sha256": "b3045be2a377c0f9aed189d5693b00d1057205a67bc8a53eea7246c095f29016"
+    },
+    {
+      "path": "landing/screenshots/20261028/social-tr.png",
+      "bytes": 142656,
+      "sha256": "bdf0469cf4670774a81984c303c90e289f38728e992ca90e582a633a42254d6b"
+    }
+  ],
+  "source_time_note": "Screenshot source was observed after reload with c; packaging hashes recorded shortly afterward. Root handles later weekly-en asset recapture separately.",
+  "limitations": [
+    "Not a full 40-frame visual inspection or 72-case run.",
+    "Window captures include Safari chrome and the QA iframe, not a cropped full-page export.",
+    "Existing weekly-en island duplication is outside these two observed scenes; root is correcting it separately."
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "status": "recaptured",
+  "old_hashes": {
+    "web": "4779ab326e139a52b84b118fff011ad461f3d6c1716b12e85f4734812feeb167",
+    "source": "4a0ded74baf77d918a0fb4aa813029e5564c28c6fc37e590dd6255fd4a009ea1"
+  },
+  "new_web_sha256": "8759d28f386c8f491f657177abee5de92be3b8c8c2c1adde7b0e92dd909f7c85",
+  "new_native_sha256": "8aeeb0e8712073152f4a7457a9a29b5022cc3aeffebf38c63c11e01054467403",
+  "native_dimensions": [
+    604,
+    1311
+  ],
+  "web_dimensions": [
+    540,
+    1170
+  ],
+  "data_unchanged": {
+    "owner": "ca271e26-fc2c-44b6-b88f-9537f809639c",
+    "points": 29,
+    "sand": 80,
+    "selected_day": "28 Oct",
+    "duration": "4h 50m",
+    "efficiency": "21%",
+    "goal": "35h"
+  },
+  "no_ui_painting": true,
+  "not_deployed": true
+}

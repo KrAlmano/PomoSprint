@@ -316,5 +316,8 @@
     }
   ],
   "screenshot_manifest_sha256": "a87af338d634ae880b1d987b2eb8f2ab942a5b00d6494c30a74defcd441559ba",
-  "source_hashes_match_current_manifest": true
+  "source_hashes_match_current_manifest": true,
+  "superseded_scenes": {
+    "reports-weekly": "Later same-owner hardware-free recapture: analiz/iphone_cerceve_2026-10-28/weekly-recapture/capture.json"
+  }
 }

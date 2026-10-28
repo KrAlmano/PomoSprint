@@ -487,19 +487,29 @@
       "file": "20261028/reports-weekly-en.png",
       "width": 540,
       "height": 1170,
-      "sha256": "4779ab326e139a52b84b118fff011ad461f3d6c1716b12e85f4734812feeb167",
+      "sha256": "8759d28f386c8f491f657177abee5de92be3b8c8c2c1adde7b0e92dd909f7c85",
       "owner_id": "ca271e26-fc2c-44b6-b88f-9537f809639c",
       "status_bar_time": "09:41",
-      "captured_at": "2026-10-28T14:23:54.720604Z",
+      "captured_at": "2026-10-28T22:43:47.088286+03:00",
       "visible_locale_anchor": "Weekly Focus",
       "source": {
         "path": "analiz/ekran_site_2026-10-28/native/reports-weekly-en.png",
         "width": 604,
         "height": 1311,
-        "sha256": "4a0ded74baf77d918a0fb4aa813029e5564c28c6fc37e590dd6255fd4a009ea1",
+        "sha256": "8aeeb0e8712073152f4a7457a9a29b5022cc3aeffebf38c63c11e01054467403",
         "locale": "en"
       },
-      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing"
+      "transform": "Aspect-preserving Lanczos resize with minimal centered padding; no crop or UI editing",
+      "recapture": {
+        "reason": "Remove baked-in hardware island by recapturing via simctl, not painting over the screenshot",
+        "capture_record": "analiz/iphone_cerceve_2026-10-28/weekly-recapture/capture.json",
+        "raw_source": "analiz/iphone_cerceve_2026-10-28/weekly-recapture/reports-weekly-en-raw.png",
+        "superseded_sha256": {
+          "web": "4779ab326e139a52b84b118fff011ad461f3d6c1716b12e85f4734812feeb167",
+          "source": "4a0ded74baf77d918a0fb4aa813029e5564c28c6fc37e590dd6255fd4a009ea1"
+        },
+        "source_method": "simctl PNG → sips1311 → aspect-preserving Lanczos540x1170"
+      }
     },
     {
       "scene": "reports-monthly",
