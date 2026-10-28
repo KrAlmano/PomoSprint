@@ -67,7 +67,7 @@ if [[ -n "${E2E_MARATHON_PROBE_MODE:-}" ]]; then
   case "$E2E_MARATHON_PROBE_MODE" in start|resume) ;; *) echo "HATA: geçersiz Maraton süreç aşaması." >&2; exit 2 ;; esac
   EXTRA_DEFINES+=("--dart-define=E2E_MARATHON_PROBE_MODE=$E2E_MARATHON_PROBE_MODE")
   if [[ -n "${E2E_MARATHON_PROBE_EXPECT:-}" ]]; then
-    case "$E2E_MARATHON_PROBE_EXPECT" in focus|break|expired|late_rejected) ;; *) echo "HATA: geçersiz Maraton süreç beklentisi." >&2; exit 2 ;; esac
+    case "$E2E_MARATHON_PROBE_EXPECT" in focus|break|expired|recovered_expired|late_rejected) ;; *) echo "HATA: geçersiz Maraton süreç beklentisi." >&2; exit 2 ;; esac
     EXTRA_DEFINES+=("--dart-define=E2E_MARATHON_PROBE_EXPECT=$E2E_MARATHON_PROBE_EXPECT")
   fi
 fi

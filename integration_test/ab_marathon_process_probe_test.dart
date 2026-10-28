@@ -1,5 +1,6 @@
 // Real process-boundary probe, no shortened clocks or historical fixtures.
 // start -> OS terminate/shutdown -> resume (focus|break|expired expectation).
+// recovered_expired preserves the separately failed baseline break assertion.
 // Always retain the same installation with --no-uninstall and E2E_RUN_ID.
 import 'dart:convert';
 import 'dart:io' show pid;
@@ -55,6 +56,48 @@ Future<Map<String, dynamic>?> _gate(String owner, String run) => E2eHost.row(
   'from public.marathon_presence_gates where user_id=${sqlText(owner)} '
   'and marathon_uuid=${sqlText(run)}',
 );
+
+Duration _expectDeviceGate(
+  ActiveTimerSession saved,
+  Map<String, dynamic> gate, {
+  Duration? measuredCorrection,
+}) {
+  final serverBegin = DateTime.parse(
+    gate['break_started_at'] as String,
+  ).toUtc();
+  final serverEnd = DateTime.parse(gate['break_ends_at'] as String).toUtc();
+  final serverDeadline = DateTime.parse(
+    gate['confirmation_deadline'] as String,
+  ).toUtc();
+  final deviceEnd = saved.marathon!.breakEndsAt!.toUtc();
+  final deviceDeadline = saved.marathon!.presenceDeadline!.toUtc();
+  expect(serverEnd.difference(serverBegin), const Duration(seconds: 300));
+  expect(serverDeadline.difference(serverEnd), const Duration(seconds: 60));
+  expect(deviceDeadline.difference(deviceEnd), const Duration(seconds: 60));
+  // SessionSubmitSuccess intentionally subtracts the measured server/device
+  // correction from both timestamps. Exact raw SQL/device equality is wrong.
+  final correction = serverEnd.difference(deviceEnd);
+  expect(
+    serverDeadline.difference(deviceDeadline),
+    correction,
+    reason: 'Both persisted endpoints must have the exact same correction',
+  );
+  expect(
+    correction.inMicroseconds.abs(),
+    lessThan(5000000),
+    reason:
+        'The real-duration probes permit at most five seconds of clock skew',
+  );
+  if (measuredCorrection != null) {
+    expect(
+      (correction - measuredCorrection).inMicroseconds.abs(),
+      lessThan(5000000),
+      reason:
+          'Receipt conversion must agree with the measured clock correction',
+    );
+  }
+  return correction;
+}
 
 Future<void> _guardBeforeStart(SharedPreferences prefs) async {
   expect(
@@ -308,6 +351,43 @@ Future<void> _resume(WidgetTester tester, SharedPreferences prefs) async {
         reason: 'Wait past 300+60 seconds and the clock tolerance',
       );
     }
+  } else if (_expected == 'recovered_expired') {
+    // Only recover the known, retained baseline run. Do not turn an arbitrary
+    // missing marker or a new first-acceptance attempt into a passing result.
+    expect(_run, 'night-ab-before31');
+    expect(proof['stage'], 'same_focus_resumed');
+    expect(proof['completion_verified'], isFalse);
+    expect(proof['uses_historical_fixture'], isFalse);
+    expect(proof['gate'], isNull);
+    expect(preGate, isNotNull);
+    expect(before.marathon!.completedSessions, 1);
+    expect(before.marathon!.isOnBreak, isTrue);
+    expect(preGate!['next_session_index'], 2);
+    expect(preGate['previous_client_uuid'], proof['client_uuid']);
+    expect(preGate['confirmed_at'], isNull);
+    expect(preGate['next_client_uuid'], isNull);
+    final begin = DateTime.parse(preGate['break_started_at'] as String).toUtc();
+    final deadline = DateTime.parse(
+      preGate['confirmation_deadline'] as String,
+    ).toUtc();
+    expect(
+      begin.isAfter(end.add(const Duration(seconds: 360))),
+      isTrue,
+      reason: 'This recovery is for the already accepted, late baseline gate',
+    );
+    expect(
+      resumeAt.isBefore(deadline.add(const Duration(seconds: 5))),
+      isFalse,
+      reason:
+          'Wait until the actual server gate is expired including clock tolerance',
+    );
+    final correction = _expectDeviceGate(before, preGate);
+    // Observe the existing row/credit before launch, then compare again after
+    // expiry. Nothing is inserted, backdated, or re-credited by the probe.
+    await _oneAcceptedFocus(owner, proof);
+    proof['recovery_from_stage'] = proof['stage'];
+    proof['recovery_observed_gate'] = Map<String, dynamic>.from(preGate);
+    proof['recovery_observed_clock_correction_us'] = correction.inMicroseconds;
   } else {
     expect(
       proof['gate'],
@@ -368,7 +448,6 @@ Future<void> _resume(WidgetTester tester, SharedPreferences prefs) async {
     _expectOriginal(restored, proof);
     final gate = (await _gate(owner, run))!;
     final begin = DateTime.parse(gate['break_started_at'] as String);
-    final breakEnd = DateTime.parse(gate['break_ends_at'] as String);
     final deadline = DateTime.parse(gate['confirmation_deadline'] as String);
     expect(
       begin.isBefore(resumeAt.subtract(const Duration(seconds: 5))),
@@ -378,10 +457,12 @@ Future<void> _resume(WidgetTester tester, SharedPreferences prefs) async {
       begin.isAfter(DateTime.now().toUtc().add(const Duration(seconds: 5))),
       isFalse,
     );
-    expect(breakEnd.difference(begin), const Duration(seconds: 300));
-    expect(deadline.difference(breakEnd), const Duration(seconds: 60));
-    expect(restored.marathon!.breakEndsAt!.toUtc(), breakEnd);
-    expect(restored.marathon!.presenceDeadline!.toUtc(), deadline);
+    _expectDeviceGate(
+      restored,
+      gate,
+      measuredCorrection:
+          SupabaseService.instance.serverClockOffset ?? Duration.zero,
+    );
     expect(gate['next_session_index'], 2);
     expect(gate['previous_client_uuid'], proof['client_uuid']);
     expect(gate['confirmed_at'], isNull);
@@ -428,7 +509,9 @@ Future<void> _resume(WidgetTester tester, SharedPreferences prefs) async {
     expect(await SupabaseService.instance.getPendingSessions(), isEmpty);
     expect(await SupabaseService.instance.getRejectedSessions(), isEmpty);
     proof['completion_verified'] = true;
-    proof['stage'] = 'expired_without_second_focus';
+    proof['stage'] = _expected == 'recovered_expired'
+        ? 'recovered_failed_break_assertion_then_expired'
+        : 'expired_without_second_focus';
   }
   proof['last_pid'] = pid;
   proof['last_resumed_at'] = resumeAt.toIso8601String();
@@ -464,6 +547,7 @@ void main() {
             'focus',
             'break',
             'expired',
+            'recovered_expired',
             'late_rejected',
           }.contains(_expected),
           isTrue,
