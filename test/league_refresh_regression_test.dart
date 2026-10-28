@@ -115,7 +115,7 @@ void main() {
     final service = ExamService(backend: backend);
     await tester.pumpWidget(app(ExamScreen(service: service)));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Deneme ligi'));
+    await tester.tap(find.byKey(const ValueKey('exam-tab-league')));
     await tester.pumpAndSettle();
     expect(loads, 1);
     wallet = 17;
@@ -156,7 +156,7 @@ void main() {
     final service = ExamService(backend: backend);
     await tester.pumpWidget(app(ExamScreen(service: service)));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Deneme ligi'));
+    await tester.tap(find.byKey(const ValueKey('exam-tab-league')));
     await tester.pumpAndSettle();
     expect(loads, 2);
     await tester.pump(const Duration(seconds: 10));
@@ -253,7 +253,7 @@ void main() {
       final service = ExamService(backend: backend);
       await tester.pumpWidget(app(ExamScreen(service: service)));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Deneme ligi'));
+      await tester.tap(find.byKey(const ValueKey('exam-tab-league')));
       await tester.pumpAndSettle();
       expect(loads, 1);
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
@@ -321,7 +321,7 @@ void main() {
       final service = ExamService(backend: backend);
       await tester.pumpWidget(app(ExamScreen(service: service)));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Deneme ligi'));
+      await tester.tap(find.byKey(const ValueKey('exam-tab-league')));
       await tester.pump();
       expect(loads, 1);
       expect(find.byType(LinearProgressIndicator), findsOneWidget);
@@ -356,7 +356,7 @@ void main() {
     final service = ExamService(backend: backend);
     await tester.pumpWidget(app(ExamScreen(service: service)));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Deneme ligi'));
+    await tester.tap(find.byKey(const ValueKey('exam-tab-league')));
     await tester.pumpAndSettle();
     expect(find.text('Tekrar dene'), findsOneWidget);
     backend.featureAvailable = false;

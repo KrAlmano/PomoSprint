@@ -3093,4 +3093,23 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get onboardingSegmentDus => 'DUS (Diş Hekimliğinde Uzmanlık)';
+
+  @override
+  String get examTabNew => 'Yeni';
+
+  @override
+  String get examTabHistory => 'Geçmiş';
+
+  @override
+  String get examTabLeague => 'Lig';
+
+  @override
+  String get examFilterAll => 'Tümü';
+
+  @override
+  String get examNetInfo =>
+      'YKS, TUS ve DUS: 4 yanlış 1 doğruyu; LGS: 3 yanlış 1 doğruyu götürür. Netlerin bu kurala göre hesaplanır.';
+
+  @override
+  String get examAytTestCount => '4 test';
 }

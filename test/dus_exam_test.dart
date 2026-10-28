@@ -136,7 +136,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      final expected = [l10n.examAllGroups, 'YKS', 'LGS', 'TUS', 'DUS'];
+      final expected = [l10n.examFilterAll, 'YKS', 'LGS', 'TUS', 'DUS'];
       final filters = tester
           .widgetList<ChoiceChip>(find.byType(ChoiceChip))
           .map((c) => (c.label as Text).data)

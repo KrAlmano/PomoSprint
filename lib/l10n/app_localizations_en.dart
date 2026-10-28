@@ -3138,4 +3138,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingSegmentDus => 'DUS (Dental Specialty Exam)';
+
+  @override
+  String get examTabNew => 'New';
+
+  @override
+  String get examTabHistory => 'History';
+
+  @override
+  String get examTabLeague => 'League';
+
+  @override
+  String get examFilterAll => 'All';
+
+  @override
+  String get examNetInfo =>
+      'YKS, TUS and DUS: 4 wrong answers cancel 1 correct answer; LGS: 3 cancel 1. Your net scores follow this rule.';
+
+  @override
+  String get examAytTestCount => '4 tests';
 }

@@ -311,7 +311,7 @@ void main() {
           tester,
           find.byKey(const ValueKey('exam-countdown')),
         );
-        await tapOn(tester, find.widgetWithText(ChoiceChip, en.examHistory));
+        await tapOn(tester, find.byKey(const ValueKey('exam-tab-history')));
         await pumpUntil(tester, find.text(en.examAbandoned));
         expect(find.text(en.examNoAward), findsOneWidget);
         expect(find.text(en.examEnterResults), findsNothing);
@@ -392,7 +392,7 @@ void main() {
       expect(attempt.durationSeconds, 9900);
       final before = await _economy(owner);
       await _language(tester, english: true);
-      await tapOn(tester, find.widgetWithText(ChoiceChip, en.examHistory));
+      await tapOn(tester, find.byKey(const ValueKey('exam-tab-history')));
       final edit = find.text(en.examEditResults);
       await tapOn(tester, edit.first);
       await pumpUntil(

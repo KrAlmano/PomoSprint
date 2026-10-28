@@ -199,7 +199,7 @@ Future<void> _catalog(WidgetTester tester) async {
     () => ExamService.instance.catalog.available,
     reason: 'local exam catalogue available',
   );
-  await tapOn(tester, find.widgetWithText(ChoiceChip, _l10n.examNew));
+  await tapOn(tester, find.byKey(const ValueKey('exam-tab-new')));
 }
 
 Future<void> _field(
@@ -258,9 +258,14 @@ Future<ExamAttempt> _start(
   expect(
     find.descendant(
       of: card,
-      matching: find.text(
-        _l10n.examQuestionsMinutes(exam.totalQuestions, seconds ~/ 60),
-      ),
+      matching: find.text(_l10n.examSubjectQuestions(exam.totalQuestions)),
+    ),
+    findsOneWidget,
+  );
+  expect(
+    find.descendant(
+      of: card,
+      matching: find.text('${seconds ~/ 60} ${_l10n.minutesUnit}'),
     ),
     findsOneWidget,
   );
@@ -313,7 +318,7 @@ Future<void> _abandon(
   await pumpUntil(tester, find.text(_l10n.examAbandonTitle));
   await tapOn(tester, find.widgetWithText(FilledButton, _l10n.examAbandon));
   await pumpUntilGone(tester, find.byKey(const ValueKey('exam-countdown')));
-  await tapOn(tester, find.widgetWithText(ChoiceChip, _l10n.examHistory));
+  await tapOn(tester, find.byKey(const ValueKey('exam-tab-history')));
   expect(find.text(_l10n.examAbandoned), findsWidgets);
   expect(find.text(_l10n.examNoAward), findsWidgets);
   final row = (await E2eHost.row(

@@ -204,7 +204,7 @@ Future<void> _verifyViews(
   expect(await _databaseState(owner), expectedState);
 
   await _tab(tester, 4);
-  await tapOn(tester, find.widgetWithText(ChoiceChip, trL10n.examLeague));
+  await tapOn(tester, find.byKey(const ValueKey('exam-tab-league')));
   await _expectExamPoints(tester, examPoints);
   await tapOn(tester, find.widgetWithText(ChoiceChip, trL10n.examGlobal));
   await _expectExamPoints(tester, examPoints);

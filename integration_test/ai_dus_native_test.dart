@@ -117,7 +117,7 @@ Future<void> finishShort(
   expect(done.reportMinutes, 1);
   expect(done.definition!.fullRewardPoints, 0);
   expect(done.definition!.fullRewardCoins, 0);
-  await tapOn(tester, find.widgetWithText(ChoiceChip, l10n.examHistory));
+  await tapOn(tester, find.byKey(const ValueKey('exam-tab-history')));
   await tapOn(
     tester,
     find.widgetWithText(TextButton, l10n.examDetailsEdit).first,
@@ -300,7 +300,7 @@ void main() {
             ExamRewardPolicy.byExam[other.id]!.sand,
           );
         }
-        await tapOn(tester, find.widgetWithText(ChoiceChip, l10n.examNew));
+        await tapOn(tester, find.byKey(const ValueKey('exam-tab-new')));
         await tapOn(tester, find.widgetWithText(ChoiceChip, 'DUS'));
         expect(find.byKey(const ValueKey('exam-start-tyt')), findsNothing);
         await E2eHost.screenshot(
@@ -364,7 +364,7 @@ void main() {
         expect(saved.pointsEarned, 0);
         expect(saved.examCoinsEarned, 0);
         expect(saved.reportMinutes, 0);
-        await tapOn(tester, find.widgetWithText(ChoiceChip, l10n.examHistory));
+        await tapOn(tester, find.byKey(const ValueKey('exam-tab-history')));
         await E2eHost.screenshot(tester, 'e2e-dus-abandoned-$code');
         final proof = (await E2eHost.row(
           'select a.status,a.elapsed_seconds,a.points_earned,a.exam_coins_earned,p.total_minutes,p.lifetime_points,p.coins from public.exam_attempts a join public.profiles p on p.id=a.user_id where a.id=${sqlText(attempt.id)} and a.user_id=${sqlText(account.id)}',

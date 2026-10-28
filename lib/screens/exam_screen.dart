@@ -309,33 +309,13 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
               children: [
                 Text(
                   l10n.examTitle,
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  _service.catalog.capabilities.aytEarlyFinish
-                      ? l10n.examIntroEarly
-                      : l10n.examIntro,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 if (active != null) _activeCard(active, l10n),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    for (var i = 0; i < 3; i++)
-                      ChoiceChip(
-                        label: Text(
-                          [l10n.examNew, l10n.examHistory, l10n.examLeague][i],
-                        ),
-                        selected: _tab == i,
-                        onSelected: (_) {
-                          setState(() => _tab = i);
-                          if (i == 1) unawaited(_loadStudies());
-                        },
-                      ),
-                  ],
-                ),
+                _tabs(l10n),
                 const SizedBox(height: 16),
                 if (_service.errorCode != null)
                   Padding(
@@ -365,7 +345,126 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
   }
 
   bool get _turkish => Localizations.localeOf(context).languageCode == 'tr';
+
+  Widget _tabs(AppLocalizations l10n) {
+    final colors = Theme.of(context).colorScheme;
+    final labels = [l10n.examTabNew, l10n.examTabHistory, l10n.examTabLeague];
+    const ids = ['new', 'history', 'league'];
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: SizedBox(
+        height: 48,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (var i = 0; i < labels.length; i++) ...[
+              if (i != 0) const SizedBox(width: 4),
+              Expanded(
+                child: Semantics(
+                  button: true,
+                  selected: _tab == i,
+                  child: Material(
+                    color: _tab == i ? colors.primary : Colors.transparent,
+                    borderRadius: BorderRadius.circular(12),
+                    child: InkWell(
+                      key: ValueKey('exam-tab-${ids[i]}'),
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () {
+                        setState(() => _tab = i);
+                        if (i == 1) unawaited(_loadStudies());
+                      },
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(minHeight: 48),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 10,
+                          ),
+                          child: Center(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                labels[i],
+                                maxLines: 1,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  color: _tab == i
+                                      ? colors.onPrimary
+                                      : colors.onSurfaceVariant,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _metadata(IconData icon, String text) {
+    final colors = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: colors.onSurfaceVariant),
+          const SizedBox(width: 5),
+          Flexible(
+            child: Text(
+              text,
+              style: TextStyle(fontSize: 12, color: colors.onSurfaceVariant),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   List<Widget> _catalog(AppLocalizations l10n) => [
+    Container(
+      key: const ValueKey('exam-net-info'),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Theme.of(
+          context,
+        ).colorScheme.primaryContainer.withValues(alpha: .35),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.info_outline_rounded,
+            size: 18,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          const SizedBox(width: 9),
+          Expanded(
+            child: Text(
+              l10n.examNetInfo,
+              style: const TextStyle(fontSize: 13, height: 1.4),
+            ),
+          ),
+        ],
+      ),
+    ),
+    const SizedBox(height: 12),
     if (!_service.catalog.available)
       Card(
         child: Padding(
@@ -389,10 +488,15 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
         ),
       ),
     Wrap(
-      spacing: 8,
+      spacing: 6,
+      runSpacing: 4,
       children: [
         ChoiceChip(
-          label: Text(l10n.examAllGroups),
+          key: const ValueKey('exam-filter-all'),
+          label: Text(l10n.examFilterAll),
+          showCheckmark: false,
+          visualDensity: const VisualDensity(horizontal: -2, vertical: -1),
+          materialTapTargetSize: MaterialTapTargetSize.padded,
           selected: _group == null,
           onSelected: (_) => setState(() => _group = null),
         ),
@@ -400,7 +504,11 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
           (group) => _service.catalog.exams.any((e) => e.segment == group),
         ))
           ChoiceChip(
+            key: ValueKey('exam-filter-$group'),
             label: Text(group.toUpperCase()),
+            showCheckmark: false,
+            visualDensity: const VisualDensity(horizontal: -2, vertical: -1),
+            materialTapTargetSize: MaterialTapTargetSize.padded,
             selected: _group == group,
             onSelected: (_) => setState(() => _group = group),
           ),
@@ -410,6 +518,13 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
       (e) => _group == null || e.segment == _group,
     ))
       Card(
+        key: ValueKey('exam-card-${exam.id}'),
+        margin: const EdgeInsets.only(top: 10),
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -417,25 +532,31 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
             children: [
               Text(
                 exam.name(_turkish),
-                style: Theme.of(context).textTheme.titleLarge,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
               ),
-              const SizedBox(height: 6),
-              Text(
-                l10n.examQuestionsMinutes(
-                  exam.totalQuestions,
-                  exam.durationSeconds ~/ 60,
-                ),
-              ),
-              Text(l10n.examNetRule(exam.wrongAnswerDivisor)),
               const SizedBox(height: 8),
-              Text(exam.subjects.map((s) => s.name(_turkish)).join(' · ')),
-              if (exam.segment == 'lgs') ...[
-                const SizedBox(height: 8),
-                Text(l10n.examLgsBreakInfo),
-              ],
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: [
+                  _metadata(
+                    Icons.description_outlined,
+                    l10n.examSubjectQuestions(exam.totalQuestions),
+                  ),
+                  _metadata(
+                    Icons.schedule_rounded,
+                    '${exam.durationSeconds ~/ 60} ${l10n.minutesUnit}',
+                  ),
+                  if (exam.id == 'ayt')
+                    _metadata(Icons.layers_outlined, l10n.examAytTestCount),
+                ],
+              ),
               const SizedBox(height: 12),
               FilledButton(
                 key: ValueKey('exam-start-${exam.id}'),
+                style: FilledButton.styleFrom(minimumSize: const Size(0, 48)),
                 onPressed:
                     _service.catalog.available &&
                         !_starting &&

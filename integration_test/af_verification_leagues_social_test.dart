@@ -572,7 +572,7 @@ Future<void> _examView(
 ) async {
   await _tab(tester, 4);
   await pumpUntil(tester, find.byType(ExamScreen));
-  await tapOn(tester, find.widgetWithText(ChoiceChip, _text.examLeague));
+  await tapOn(tester, find.byKey(const ValueKey('exam-tab-league')));
   await tapOn(
     tester,
     find.widgetWithText(

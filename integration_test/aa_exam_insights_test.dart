@@ -220,7 +220,7 @@ void main() {
         () => ExamService.instance.attempts.length == 2,
         reason: 'same-owner completed exam history',
       );
-      await tapOn(tester, find.widgetWithText(ChoiceChip, trL10n.examHistory));
+      await tapOn(tester, find.byKey(const ValueKey('exam-tab-history')));
       const trParagraph =
           'İlişkili çalışma kategorilerinde 25 dk; Türkçe neti: 19,25 → 27,50.';
       expect(

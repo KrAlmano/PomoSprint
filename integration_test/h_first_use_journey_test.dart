@@ -634,7 +634,7 @@ void main() {
           {'id': attempt.id},
         ],
       );
-      await tapOn(tester, find.widgetWithText(ChoiceChip, trL10n.examHistory));
+      await tapOn(tester, find.byKey(const ValueKey('exam-tab-history')));
       await pumpUntil(tester, find.text(trL10n.examAbandoned));
       expect(find.text(trL10n.examNoAward), findsOneWidget);
       await E2eHost.screenshot(tester, 'e2e-first-use-tus-abandoned');

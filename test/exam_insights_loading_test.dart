@@ -86,7 +86,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      await tester.tap(find.widgetWithText(ChoiceChip, tr.examHistory));
+      await tester.tap(find.byKey(const ValueKey('exam-tab-history')));
       await tester.pumpAndSettle();
 
       expect(
@@ -123,7 +123,7 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(reads, 1);
-      await tester.tap(find.widgetWithText(ChoiceChip, tr.examHistory));
+      await tester.tap(find.byKey(const ValueKey('exam-tab-history')));
       await tester.pumpAndSettle();
       expect(reads, 2);
       expect(
@@ -167,7 +167,7 @@ void main() {
 
       await tester.pumpWidget(_app(service, load));
       await tester.pumpAndSettle();
-      await tester.tap(find.widgetWithText(ChoiceChip, tr.examHistory));
+      await tester.tap(find.byKey(const ValueKey('exam-tab-history')));
       await tester.pumpAndSettle();
       expect(
         find.text(tr.examInsightsChange('Fizik', 50, '3,00', '6,00')),

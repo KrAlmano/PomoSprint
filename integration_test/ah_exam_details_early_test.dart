@@ -210,7 +210,7 @@ void main() {
         }
         expect(examService.supportsDetails, isTrue);
         expect(examService.catalog.capabilities.aytEarlyFinish, isTrue);
-        final newChip = find.widgetWithText(ChoiceChip, _l10n.examNew);
+        final newChip = find.byKey(const ValueKey('exam-tab-new'));
         await tapOn(tester, newChip);
         await tapOn(tester, find.byKey(const ValueKey('exam-start-ayt')));
         await pumpUntil(tester, find.text(_l10n.examRulesTitle));

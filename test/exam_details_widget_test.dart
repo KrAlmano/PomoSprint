@@ -492,7 +492,7 @@ void main() {
     );
   }
   testWidgets(
-    'intro mentions early AYT only when the server exposes that capability',
+    'catalog explains net rules once without repeating the long introduction',
     (tester) async {
       prepare();
       addTearDown(tester.view.reset);
@@ -506,14 +506,9 @@ void main() {
             app(Scaffold(body: ExamScreen(service: service)), language),
           );
           await tester.pumpAndSettle();
-          expect(
-            find.text(enabled ? l10n.examIntroEarly : l10n.examIntro),
-            findsOneWidget,
-          );
-          expect(
-            find.text(enabled ? l10n.examIntro : l10n.examIntroEarly),
-            findsNothing,
-          );
+          expect(find.text(l10n.examNetInfo), findsOneWidget);
+          expect(find.text(l10n.examIntro), findsNothing);
+          expect(find.text(l10n.examIntroEarly), findsNothing);
           await tester.pumpWidget(const SizedBox.shrink());
           await tester.pumpAndSettle();
         }

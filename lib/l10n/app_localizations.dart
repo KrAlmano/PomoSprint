@@ -5278,6 +5278,42 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'DUS (Diş Hekimliğinde Uzmanlık)'**
   String get onboardingSegmentDus;
+
+  /// No description provided for @examTabNew.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni'**
+  String get examTabNew;
+
+  /// No description provided for @examTabHistory.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçmiş'**
+  String get examTabHistory;
+
+  /// No description provided for @examTabLeague.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lig'**
+  String get examTabLeague;
+
+  /// No description provided for @examFilterAll.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tümü'**
+  String get examFilterAll;
+
+  /// No description provided for @examNetInfo.
+  ///
+  /// In tr, this message translates to:
+  /// **'YKS, TUS ve DUS: 4 yanlış 1 doğruyu; LGS: 3 yanlış 1 doğruyu götürür. Netlerin bu kurala göre hesaplanır.'**
+  String get examNetInfo;
+
+  /// No description provided for @examAytTestCount.
+  ///
+  /// In tr, this message translates to:
+  /// **'4 test'**
+  String get examAytTestCount;
 }
 
 class _AppLocalizationsDelegate
