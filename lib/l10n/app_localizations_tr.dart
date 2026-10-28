@@ -2349,7 +2349,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get marathonStoppedInvalid =>
-      'Pomodoro kaydedildi. Maraton doğrulaması tamamlanamadığı için plan durduruldu; kayıtların korundu.';
+      'Maraton doğrulanamadığı için durduruldu. Tamamlanan seansların ve bu seanslardan kazanılan normal puan ile kum korunur. Bu plan için ek Maraton puanı verilmez.';
 
   @override
   String get marathonPlanTitle => 'Maratonunu planla';

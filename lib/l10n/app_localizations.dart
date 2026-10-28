@@ -4030,7 +4030,7 @@ abstract class AppLocalizations {
   /// No description provided for @marathonStoppedInvalid.
   ///
   /// In tr, this message translates to:
-  /// **'Pomodoro kaydedildi. Maraton doğrulaması tamamlanamadığı için plan durduruldu; kayıtların korundu.'**
+  /// **'Maraton doğrulanamadığı için durduruldu. Tamamlanan seansların ve bu seanslardan kazanılan normal puan ile kum korunur. Bu plan için ek Maraton puanı verilmez.'**
   String get marathonStoppedInvalid;
 
   /// No description provided for @marathonPlanTitle.

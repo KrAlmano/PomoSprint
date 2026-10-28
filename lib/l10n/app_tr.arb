@@ -1364,7 +1364,7 @@
       }
     }
   },
-  "marathonStoppedInvalid": "Pomodoro kaydedildi. Maraton doğrulaması tamamlanamadığı için plan durduruldu; kayıtların korundu.",
+  "marathonStoppedInvalid": "Maraton doğrulanamadığı için durduruldu. Tamamlanan seansların ve bu seanslardan kazanılan normal puan ile kum korunur. Bu plan için ek Maraton puanı verilmez.",
   "marathonPlanTitle": "Maratonunu planla",
   "marathonDurationLabel": "Pomodoro süresi",
   "marathonStartingWelcome": "Maraton başlıyor. İyi çalışmalar!",

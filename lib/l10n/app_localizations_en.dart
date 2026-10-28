@@ -2390,7 +2390,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get marathonStoppedInvalid =>
-      'Your Pomodoro was saved. The marathon stopped because its verification could not be completed; your sessions were kept.';
+      'The marathon stopped because it could not be verified. Completed sessions and their regular point and sand rewards are kept. No marathon bonus is awarded for this plan.';
 
   @override
   String get marathonPlanTitle => 'Plan your marathon';
