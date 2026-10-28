@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PomoSprint Features: Pomodoro, Mock Exams and Progress</title>
-  <meta name="description" content="Explore Pomodoro, Marathon, LGS/YKS/TUS/DUS mock exams, study-time insights, monthly leagues and focusing with friends.">
+  <meta name="description" content="Explore Pomodoro, Marathon, LGS/YKS/TUS/DUS/KPSS mock exams, study-time insights, monthly leagues and focusing with friends.">
   <link rel="canonical" href="https://pomosprint.app/en/features">
   <link rel="alternate" hreflang="tr" href="https://pomosprint.app/features">
   <link rel="alternate" hreflang="en" href="https://pomosprint.app/en/features">
@@ -12,7 +12,7 @@
   <meta property="og:site_name" content="PomoSprint">
   <meta property="og:locale" content="en_GB">
   <meta property="og:title" content="PomoSprint Features: Pomodoro, Mock Exams and Progress">
-  <meta property="og:description" content="Explore Pomodoro, Marathon, LGS/YKS/TUS/DUS mock exams, study-time insights, monthly leagues and focusing with friends.">
+  <meta property="og:description" content="Explore Pomodoro, Marathon, LGS/YKS/TUS/DUS/KPSS mock exams, study-time insights, monthly leagues and focusing with friends.">
   <meta property="og:url" content="https://pomosprint.app/en/features">
   <meta property="og:image" content="https://pomosprint.app/og-image.png">
   <meta name="twitter:card" content="summary_large_image">
@@ -87,11 +87,16 @@
 </article>
 
 <article class="feature-row feature-row-group reverse" id="practice" data-feature="practice">
-  <div class="feature-row-text"><span class="eyebrow">Mock exams</span><h2>Keep your exam rhythm</h2><p>Choose TYT, AYT, YDT, LGS Verbal, LGS Quantitative, TUS Basic, TUS Clinical or DUS. Question count and duration are provided. The two LGS sessions are separate mock exams.</p>
+  <div class="feature-row-text"><span class="eyebrow">Mock exams</span><h2>Keep your exam rhythm</h2><p>Choose TYT, AYT, YDT, LGS Verbal, LGS Quantitative, TUS Basic, TUS Clinical, DUS or KPSS. Question count and duration are provided. The two LGS sessions are separate mock exams.</p>
 <p>After the 3-2-1 countdown, solve without pauses or breaks. Internet is required to start; elapsed time remains correct when the screen is locked or the app is closed.</p>
 <p>When you have finished AYT, choose “I’ve finished the exam” before time runs out. Your actual study time is recorded; this is separate from abandoning an attempt.</p>
 <table class="exam-reward-table"><caption>Sand earned for a full completed mock exam</caption><thead><tr><th scope="col">Mock exam</th><th scope="col">Sand</th></tr></thead><tbody><tr data-exam-reward="lgs_verbal"><th scope="row">LGS Verbal</th><td>60</td></tr><tr data-exam-reward="lgs_quantitative"><th scope="row">LGS Quantitative</th><td>70</td></tr><tr data-exam-reward="ydt"><th scope="row">YDT</th><td>95</td></tr><tr data-exam-reward="tus_basic"><th scope="row">TUS Basic</th><td>110</td></tr><tr data-exam-reward="tus_clinical"><th scope="row">TUS Clinical</th><td>110</td></tr><tr data-exam-reward="dus"><th scope="row">DUS</th><td>120</td></tr><tr data-exam-reward="tyt"><th scope="row">TYT</th><td>130</td></tr><tr data-exam-reward="ayt"><th scope="row">AYT</th><td>145</td></tr></tbody></table>
 <p>Full-duration rewards are fixed in multiples of 5 as listed; question count and the net scores you enter do not change the reward. Finishing AYT early earns sand and points in proportion to completed time. For example, 90 minutes of AYT earns 72 sand and 18 points.</p>
+<details class="league-details" data-kpss-catalog><summary>KPSS sessions and rewards</summary>
+<p>General Ability–General Knowledge (GY–GK) is a single 130-minute session with 120 questions (60 + 60) for Bachelor’s, Associate Degree and Secondary Education.</p>
+<p>Field Knowledge includes nine separate exams with 40 questions each: Business Administration, Accounting, Law, Public Administration, Economics, Public Finance, International Relations, Labour Economics and Industrial Relations, and Statistics. Statistics lasts 60 minutes; each of the other eight fields lasts 50 minutes.</p>
+<table class="exam-reward-table"><caption>KPSS full-duration rewards</caption><thead><tr><th scope="col">Session</th><th scope="col">Reward</th></tr></thead><tbody><tr data-kpss-group="gygk"><th scope="row">GY–GK · 130 min</th><td>105 sand · 26 points</td></tr><tr data-kpss-group="field"><th scope="row">Field Knowledge · 50 min</th><td>40 sand · 10 points</td></tr><tr data-kpss-group="statistics"><th scope="row">Statistics · 60 min</th><td>50 sand · 12 points</td></tr></tbody></table>
+</details>
 <ul><li>Completed exams earn separate mock exam points and sand</li><li>An abandoned attempt remains in history and earns no points, sand or study time</li><li>A running mock exam prevents starting a normal Pomodoro or Marathon</li></ul></div>
   <div class="feature-row-media feature-gallery" data-gallery-size="2"><figure class="media-figure">
   <div class="phone phone-real"><div class="phone-screen phone-screen-real"><img class="shot-image" src="/screenshots/20261028/exam-catalog-en.png" alt="TYT, AYT, YDT, LGS, TUS and DUS mock exams with their duration and question counts" width="540" height="1170" loading="lazy" decoding="async"></div></div>
@@ -106,7 +111,7 @@
   <div class="feature-row-text"><span class="eyebrow">My exams</span><h2>Record your result and keep improving</h2><p>Find your completed attempts, dates and status in My exams. Enter correct and wrong answers to calculate unanswered questions automatically, or edit unanswered counts yourself.</p>
 <p>Add a name and note to your attempt. For AYT, first choose the tests you completed: Turkish Language and Literature–Social Sciences-1, Social Sciences-2, Mathematics and Science. Each test has 40 questions; enter correct and wrong counts for the subjects within it.</p>
 <p>Save only the subjects you have entered and finish the others later. Negative values and totals above the question count are rejected. Offline entries are kept on your device with a clear sending status.</p>
-<ul><li>YKS, TUS and DUS: correct − wrong/4; LGS: correct − wrong/3</li><li>Decimal net scores use commas in Turkish and dots in English</li><li>Entering or editing net scores never changes points, sand or rankings</li></ul></div>
+<ul><li>YKS, TUS, DUS and KPSS: correct − wrong/4; LGS: correct − wrong/3</li><li>Decimal net scores use commas in Turkish and dots in English</li><li>Entering or editing net scores never changes points, sand or rankings</li></ul></div>
   <div class="feature-row-media feature-gallery" data-gallery-size="2"><figure class="media-figure">
   <div class="phone phone-real"><div class="phone-screen phone-screen-real"><img class="shot-image" src="/screenshots/20261028/exam-history-en.png" alt="Deniz’s completed TYT attempts and subject results in My exams" width="540" height="1170" loading="lazy" decoding="async"></div></div>
   <figcaption class="media-caption" id="feature-exam-history-en-caption">My exams</figcaption>
@@ -148,7 +153,7 @@
 </article>
 
 <article class="feature-row feature-row-group" id="leagues" data-feature="leagues">
-  <div class="feature-row-text"><span class="eyebrow">Monthly leagues</span><h2>Compete within your goal, find your global place</h2><p>LGS, YKS, TUS, DUS and other goals compete in their own categories. Your category room holds up to 25 people; the global ranking brings all goals together.</p>
+  <div class="feature-row-text"><span class="eyebrow">Monthly leagues</span><h2>Compete within your goal, find your global place</h2><p>LGS, YKS, TUS, DUS, KPSS and other goals compete in their own categories. Your category room holds up to 25 people; the global ranking brings all goals together.</p>
 <p>Monthly leagues reset at 00:00 on the first day of each month, Istanbul time. A mid-month goal change keeps your points and applies to your new group next month.</p>
 <ul><li>The normal league uses Pomodoro and Marathon points only</li><li>A preparation state appears until there are enough active participants</li><li>Current activity requirements for promotion and awards are explained in the app</li></ul><ol class="league-ladder" aria-label="League tiers"><li><img src="/avatars/league_bronze_monthly.webp" alt="" width="44" height="44" loading="lazy"><span>Bronze League</span></li><li><img src="/avatars/league_silver_monthly.webp" alt="" width="44" height="44" loading="lazy"><span>Silver League</span></li><li><img src="/avatars/league_gold_monthly.webp" alt="" width="44" height="44" loading="lazy"><span>Gold League</span></li><li><img src="/avatars/league_sapphire_monthly.webp" alt="" width="44" height="44" loading="lazy"><span>Sapphire League</span></li><li><img src="/avatars/league_diamond_monthly.webp" alt="" width="44" height="44" loading="lazy"><span>Diamond League</span></li></ol><details class="league-details"><summary>Detailed league rules</summary><p>A room stays in preparation until enough active people participate. Promotion and league awards require the period’s activity conditions; see the app’s information button for current rules. Bronze League has no relegation.</p></details></div>
   <div class="feature-row-media feature-gallery" data-gallery-size="2"><figure class="media-figure">

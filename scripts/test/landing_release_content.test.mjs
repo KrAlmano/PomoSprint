@@ -13,7 +13,7 @@ for (const lang of ["tr", "en"]) {
   assert.match(html,new RegExp(`<html lang="${lang}">`));
   assert.match(html.match(/<title>([^<]+)<\/title>/)[1],/PomoSprint.*Pomodoro/);
   assert.match(html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/)[1],/PomoSprint/);
-  assert.match(html,/LGS.*YKS.*TUS.*DUS/);
+  assert.match(html,/LGS.*YKS.*TUS.*DUS.*KPSS/);
   assert.match(html,lang==="tr"?/Çalıştığın süre netine nasıl yansıyor/:/How does your study time relate/);
   assert.doesNotMatch(html,/hg-backdrop|hg-past-hero/);
   assert.match(html,/hreflang="tr"/); assert.match(html,/hreflang="en"/);
@@ -101,7 +101,7 @@ test("Deneme açıklamaları iki dilde bütün türleri, erken AYT bitişini ve 
     const base = lang === "tr" ? "landing/" : "landing/en/";
     const html = read(base + "features.html");
     const row = html.match(new RegExp(`<article[^>]+id="${id}"[^>]*>([\\s\\S]*?)</article>`))[1];
-    for (const kind of ["TYT", "AYT", "YDT", "LGS", "TUS", "DUS"]) assert.ok(row.includes(kind));
+    for (const kind of ["TYT", "AYT", "YDT", "LGS", "TUS", "DUS", "KPSS"]) assert.ok(row.includes(kind));
     assert.match(row, /3-2-1/);
     assert.match(row, lang === "tr" ? /Sınavı bitirdim/ : /I’ve finished the exam/);
     assert.match(row, lang === "tr" ? /gerçek süre/ : /actual study time/);
@@ -127,9 +127,9 @@ test("Kategori, global ve deneme ligi ayrı güncel native karelerle sunulur", (
 });
 
 const examSand = {lgs_verbal:60, lgs_quantitative:70, ydt:95, tus_basic:110, tus_clinical:110, dus:120, tyt:130, ayt:145};
-test("TR/EN full exam sand table uses the same eight-exam server catalog", () => {
+test("TR/EN existing eight-exam sand table stays aligned with the server catalog", () => {
   const catalog = JSON.parse(read("supabase/proposed/exam_catalog_32.json"));
-  const server = Object.fromEntries(catalog.exams.map(exam => [exam.id, exam.reward_coins]));
+  const server = Object.fromEntries(catalog.exams.filter(exam => exam.group !== "kpss").map(exam => [exam.id, exam.reward_coins]));
   assert.deepEqual(server, examSand);
   for (const locale of ["tr", "en"]) {
     const prefix = locale === "tr" ? "landing/" : "landing/en/";
@@ -139,5 +139,57 @@ test("TR/EN full exam sand table uses the same eight-exam server catalog", () =>
     assert.deepEqual(Object.fromEntries(rows.map(row => [row[1], Number(row[2])])), examSand);
     assert.match(html, locale === "tr" ? /90 dakika AYT: 72 kum ve 18 puan/ : /90 minutes of AYT earns 72 sand and 18 points/);
     for (const page of ["index.html", "features.html", "faq.html"]) assert.match(read(prefix + page), /DUS/);
+  }
+});
+
+test("TR/EN KPSS copy and grouped rewards match all twelve sessions without claiming new media", () => {
+  const catalog = JSON.parse(read("supabase/proposed/exam_catalog_32.json"));
+  const exams = catalog.exams.filter(exam => exam.group === "kpss");
+  assert.equal(exams.length, 12);
+  const grouped = {
+    gygk: exams.filter(exam => /_gygk$/.test(exam.id)),
+    field: exams.filter(exam => exam.id.startsWith("kpss_field_") && exam.id !== "kpss_field_statistics"),
+    statistics: exams.filter(exam => exam.id === "kpss_field_statistics"),
+  };
+  assert.deepEqual(Object.fromEntries(Object.entries(grouped).map(([key, entries]) => [key, entries.length])), {gygk: 3, field: 8, statistics: 1});
+  const expected = {gygk: [130, 105, 26], field: [50, 40, 10], statistics: [60, 50, 12]};
+  for (const [key, entries] of Object.entries(grouped)) {
+    for (const exam of entries) {
+      assert.deepEqual([exam.duration_seconds / 60, exam.reward_coins, exam.reward_points], expected[key]);
+      assert.equal(exam.total_questions, key === "gygk" ? 120 : 40);
+      assert.equal(exam.wrong_answer_divisor, 4);
+      if (key === "gygk") assert.deepEqual(exam.subjects.map(subject => subject.question_count), [60, 60]);
+    }
+  }
+  for (const locale of ["tr", "en"]) {
+    const prefix = locale === "tr" ? "landing/" : "landing/en/";
+    const html = read(prefix + "features.html");
+    const details = html.match(/<details class="league-details" data-kpss-catalog>([\s\S]*?)<\/details>/)[1];
+    const rows = [...details.matchAll(/<tr data-kpss-group="([a-z]+)"><th scope="row">([^<]+)<\/th><td>([^<]+)<\/td><\/tr>/g)];
+    assert.equal(rows.length, 3);
+    for (const [, key, label, reward] of rows) {
+      assert.deepEqual([...label.matchAll(/\d+/g), ...reward.matchAll(/\d+/g)].map(match => Number(match[0])), expected[key]);
+    }
+    for (const exam of grouped.gygk) {
+      const qualification = locale === "tr" ? exam.name_tr.split(" · ")[0].replace("KPSS ", "") : exam.name_en.split(" · ")[0].replace("KPSS ", "");
+      assert.ok(details.includes(qualification), qualification);
+    }
+    for (const exam of [...grouped.field, ...grouped.statistics]) assert.ok(details.includes(exam.subjects[0][`name_${locale}`]), exam.id);
+    assert.match(details, /60 \+ 60/);
+    assert.doesNotMatch(details, /ÖABT|\bAGS\b|<img|<video|database|migration|veritabanı/i);
+    assert.match(html, locale === "tr" ? /YKS, TUS, DUS ve KPSS: doğru − yanlış\/4/ : /YKS, TUS, DUS and KPSS: correct − wrong\/4/);
+    const screenshotTags = html.match(/<img\b[^>]*src="\/screenshots\/[^>]+>/g);
+    assert.ok(screenshotTags.length > 0);
+    for (const tag of screenshotTags) assert.doesNotMatch(tag, /KPSS|kpss/);
+    for (const page of ["index.html", "features.html", "faq.html"]) {
+      const source = read(prefix + page);
+      assert.match(source.match(/<meta name="description" content="([^"]+)"/)[1], /KPSS/);
+      assert.match(source.match(/<meta property="og:description" content="([^"]+)"/)[1], /KPSS/);
+    }
+    const faq = read(prefix + "faq.html");
+    assert.match(faq, locale === "tr" ? /KPSS neti doğru − yanlış\/4/ : /wrong\/4 for YKS, TUS, DUS and KPSS/);
+    assert.match(faq, /105/);
+    assert.match(faq, /26/);
+    assert.doesNotMatch(faq, /ÖABT|\bAGS\b/);
   }
 });
