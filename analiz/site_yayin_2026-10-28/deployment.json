@@ -1,0 +1,40 @@
+{
+  "before": {
+    "id": "373ec157-1ac5-4b2d-8649-87a55b10bf8a",
+    "source": "wrangler",
+    "strategy": "percentage",
+    "versions": [
+      {
+        "version_id": "840fd4f1-0779-493a-ad5b-e41fcd27a3c3",
+        "percentage": 100
+      }
+    ],
+    "created_on": "2026-10-08T12:18:12.580905Z"
+  },
+  "after": {
+    "id": "fb90ad37-4a17-4b85-abe9-cea1311b97f8",
+    "source": "wrangler",
+    "strategy": "percentage",
+    "versions": [
+      {
+        "version_id": "e1bb6541-5794-4241-ab5e-66ded59a9298",
+        "percentage": 100
+      }
+    ],
+    "created_on": "2026-10-28T18:19:31.985188Z"
+  },
+  "source_commit": "1a58014",
+  "worker": "pomosprint-website",
+  "domains": [
+    "pomosprint.app",
+    "www.pomosprint.app"
+  ],
+  "flags": [
+    "--keep-vars"
+  ],
+  "uploaded_new_or_changed_assets": 86,
+  "bindings": [
+    "ASSETS"
+  ],
+  "database_changes": false
+}

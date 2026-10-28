@@ -1,5 +1,7 @@
 # PomoSprint
 
+> **28 Ekim site yayını:** Güncel Deneme/DUS tanıtımı ve uygulama ekranları [pomosprint.app](https://pomosprint.app) üzerinde yayımlandı. [Yayın ve canlı doğrulama raporu](analiz/SITE_YAYIN_RAPORU_2026-10-28.md). Mobil uygulama/Supabase paketleri bu dağıtımla canlıya alınmadı.
+
 PomoSprint, iOS ve Android için odaklanma ve sınava hazırlık uygulamasıdır. Gerçek 25/50 dakikalık Pomodoro, 2/3/4 seanslık Maraton, Deneme, günlük/haftalık/aylık raporlar, hedefe göre ligler, avatarlar ve arkadaş durumlarını bir araya getirir. Puan, kum ve lig sonuçları sunucuda hesaplanır; istemcinin girdiği netler ödül üretmez.
 
 ## Dal ve güncel durum

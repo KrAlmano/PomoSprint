@@ -511,3 +511,10 @@ Bir sonraki ajan: canlıya kurulum/deploy yapma;31kullanıcıkararıbekler. Sonn
 ### GitHub yedeği doğrulandı
 
 B/site kontrol noktası **`635a89df7cd8bf45b6dc16e21e95e4210dc0a465`** uzak `codex/gece-2026-10-27` dalından okunarak doğrulandı. İlk toplu aktarım HTTP408, ikinci aktarım bağlantı kesilmesiyle başarısızdı; yayınlanmamış B paketi içerik değişmeden küçük commit’lere bölününce yedi kontrol noktası başarıyla ulaştı. [Aktarım kanıtı](kanit_son_kapilar_2026-10-28/compact-final/push-checkpoints.json) kayıtlıdır. Kapanış notu bu yedek üzerine ayrı küçük doküman commit’i olarak eklenir. Main `5f99f90` korunur; merge/force/deploy yok.
+
+
+### 28 Ekim — canlı web sitesi yenilendi
+
+Son kullanıcı isteği web yayınını yetkilendirdi. Cloudflare dryrun veNode172temiz; mevcutWorker’a86değişmişasset yüklendi. Aktifsürüm e1bb6541-5794-4241-ab5e-66ded59a9298; önceki840fd4f1. Canlı20HTML+111statik,156/156HTTP geçti. İlk20hamHTMLhash farkı yalnızmevcutWebAnalyticsbeacon/tekLF enjeksiyonu; ilkFAILkanıtları saklandı ve sınırınormalizasyonlaaçıklandı. Destek/Apple/duraklatma/hesapsilme/ENSEO/gizlilikverienvanteri tutarlılığı1a58014'te düzeltildi. YeniDBpaketi/31/mobiledeploymentyok. Safari canlıgörsel turu ayrı kaydediliyor.
+
+Canlı Safari turu tamam:18/18 sayfa/genişlik,4video oynama+pause/resume,menü/dil/SSS.3gerçekJPEG saklandı. Konsol/ilk-paint/Chrome doğrulanmadı. Son durumda yeniDeneme/DUS tanıtımı gerçektenpomosprint.app üzerinde; eski“deployyok”notları bu webyayını için tarihsel kaldı.

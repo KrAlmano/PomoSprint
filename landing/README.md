@@ -4,6 +4,8 @@ Bu klasör PomoSprint'in statik pazarlama, destek, yasal ve Auth yardımcı sayf
 
 ## Durum ve doğruluk
 
+Son canlı sürüm `e1bb6541-5794-4241-ab5e-66ded59a9298`; 28 Ekim 2026’da kullanıcı yetkisiyle yayımlandı. [Yayın raporu](../analiz/SITE_YAYIN_RAPORU_2026-10-28.md). Önceki yalnız yerel/GitHub doğrulama kayıtları tarihsel kanıttır.
+
 28 Ekim B çalışmasının HTML/CSS, son Deneme arayüzünden alınan 30 ekran ve 4 videosu bu dalda hazırdır. Safari 72/72 ve dört videonun manuel kontrolü geçti; Chrome ortam engeli nedeniyle doğrulanamadı. Güncel site ve medya için gerçek sonuçlar [nihai doğrulama raporunda](../analiz/DOGRULAMA_RAPORU_2026-10-28.md), ilerleme [CODEX_ILERLEME](../analiz/CODEX_ILERLEME.md), kaynak/çıktı görseller [ekran listesinde](screenshots/README.md) tutulur. Eski 8/27 Ekim dosya ve tarayıcı sayıları yeni B paketinin kanıtı olarak taşınmaz.
 
 Site, son kullanıcı isteğiyle yeni uygulamanın yayın öncesi tanıtımını içerir. Bu tanıtımın yayımlanması uygulamanın mağazalarda veya yeni sunucu paketlerinin canlıda olduğu anlamına gelmez. Uygulama yayını için 27 TUS/DUS → 28 Deneme → 29 aylık lig ve 32 paketleri ayrıca değerlendirilir. Bağımsız 30 başlangıç kotası ayrı değerlendirilir. **31 kullanıcı kararı bekliyor; bu doğrulama ortamına kurulmaz.** Yeni SQL'in canlıya uygulanmadığı durumda web metnini güncellemek uygulamadaki özelliği canlıya açmaz.

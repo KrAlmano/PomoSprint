@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "worker_version": "e1bb6541-5794-4241-ab5e-66ded59a9298",
+  "saved_at": "2026-10-28T18:25:43.273123+00:00",
+  "files": [
+    {
+      "file": "live-tr-home-375.jpg",
+      "bytes": 285039,
+      "sha256": "92667e2dd9975aa70e238ee52dfc064221f6c1aeb2089f431461cc92a86ddc26",
+      "source_url": "https://pomosprint.app/",
+      "rdm_width": 375,
+      "source": "Byte-identical CUA App.getScreenshot screenshot of the directly opened production page, transferred through local-only helper",
+      "format": "JPEG",
+      "includes_browser_chrome": true
+    },
+    {
+      "file": "live-en-features-1024.jpg",
+      "bytes": 444400,
+      "sha256": "06810034284fa9324cd62ebfe78b3213c85d66acca963682ae31350964ae69de",
+      "source_url": "https://pomosprint.app/en/features",
+      "rdm_width": 1024,
+      "source": "Byte-identical CUA App.getScreenshot screenshot of the directly opened production page, transferred through local-only helper",
+      "format": "JPEG",
+      "includes_browser_chrome": true
+    },
+    {
+      "file": "live-en-home-1440.jpg",
+      "bytes": 369100,
+      "sha256": "471eff757e9750c98d0bfddfcd0056304acaadacd30671e41b0eb2917be908fe",
+      "source_url": "https://pomosprint.app/en/",
+      "rdm_width": 1440,
+      "source": "Byte-identical CUA App.getScreenshot screenshot of the directly opened production page, transferred through local-only helper",
+      "format": "JPEG",
+      "includes_browser_chrome": true
+    }
+  ]
+}

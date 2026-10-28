@@ -1,0 +1,2318 @@
+{
+  "checked_at": "2026-10-28T21:23:55.328335+03:00",
+  "source_commit": "1a58014",
+  "worker_version": "e1bb6541-5794-4241-ab5e-66ded59a9298",
+  "html_pages": 20,
+  "public_resource_requests": 131,
+  "cases": 156,
+  "passed": 156,
+  "failed": 0,
+  "rows": [
+    {
+      "path": "/kvkk",
+      "status": 200,
+      "bytes": 24573,
+      "sha256": "bb3de74cb8dfb72f56c33c968999388af97c46e97a2cffc37a41a42e0ab5aaf4",
+      "source_sha256": "ce626ef3a2506949ff963e97ff33b96d71bd12406cefecb0b616cde829901883",
+      "normalized_sha256": "ce626ef3a2506949ff963e97ff33b96d71bd12406cefecb0b616cde829901883",
+      "cloudflare_beacon_count": 1,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true,
+        "exactly_one_platform_beacon": true,
+        "csp": true,
+        "html_type": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/favicon.ico",
+      "status": 200,
+      "bytes": 4359,
+      "sha256": "f0f69ff854dfbea66b6d94b7097c04eda40bd191c2d33a5d880ceacedf6522f8",
+      "source_sha256": "f0f69ff854dfbea66b6d94b7097c04eda40bd191c2d33a5d880ceacedf6522f8",
+      "normalized_sha256": "f0f69ff854dfbea66b6d94b7097c04eda40bd191c2d33a5d880ceacedf6522f8",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/favicon.svg",
+      "status": 200,
+      "bytes": 302,
+      "sha256": "b276a9d41622971fcac8f798aeebe98972798d1b4321cd2e478f28ebe05e8ac6",
+      "source_sha256": "b276a9d41622971fcac8f798aeebe98972798d1b4321cd2e478f28ebe05e8ac6",
+      "normalized_sha256": "b276a9d41622971fcac8f798aeebe98972798d1b4321cd2e478f28ebe05e8ac6",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/apple-touch-icon.png",
+      "status": 200,
+      "bytes": 1768,
+      "sha256": "625ec11387e7749e97fdf93a6f1c0e7f8e18eb3a1dc15d0267f66f6c276226c4",
+      "source_sha256": "625ec11387e7749e97fdf93a6f1c0e7f8e18eb3a1dc15d0267f66f6c276226c4",
+      "normalized_sha256": "625ec11387e7749e97fdf93a6f1c0e7f8e18eb3a1dc15d0267f66f6c276226c4",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/css/fonts.css",
+      "status": 200,
+      "bytes": 6651,
+      "sha256": "168fc83bfa06c3e2f403821f87e4b36be74662341ae8672838a7d4b7de0d64dc",
+      "source_sha256": "168fc83bfa06c3e2f403821f87e4b36be74662341ae8672838a7d4b7de0d64dc",
+      "normalized_sha256": "168fc83bfa06c3e2f403821f87e4b36be74662341ae8672838a7d4b7de0d64dc",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/css/style.css",
+      "status": 200,
+      "bytes": 58425,
+      "sha256": "60161ccc6d526b0433528fdb254059c6ee0da744dc3d2713cc32a02f6ca7c477",
+      "source_sha256": "60161ccc6d526b0433528fdb254059c6ee0da744dc3d2713cc32a02f6ca7c477",
+      "normalized_sha256": "60161ccc6d526b0433528fdb254059c6ee0da744dc3d2713cc32a02f6ca7c477",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/js/boot.js",
+      "status": 200,
+      "bytes": 164,
+      "sha256": "23fccd10d6cbcddd14e520d0d058232371da6a5c62906586af5a5a809aaa7798",
+      "source_sha256": "23fccd10d6cbcddd14e520d0d058232371da6a5c62906586af5a5a809aaa7798",
+      "normalized_sha256": "23fccd10d6cbcddd14e520d0d058232371da6a5c62906586af5a5a809aaa7798",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/vendor/gsap-3.13.0/gsap.min.js",
+      "status": 200,
+      "bytes": 72435,
+      "sha256": "96c01b81f44a3290e2b4532f55e2c9534b2adc43273a19f3756b2cb41f0fd0b6",
+      "source_sha256": "96c01b81f44a3290e2b4532f55e2c9534b2adc43273a19f3756b2cb41f0fd0b6",
+      "normalized_sha256": "96c01b81f44a3290e2b4532f55e2c9534b2adc43273a19f3756b2cb41f0fd0b6",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/vendor/gsap-3.13.0/ScrollTrigger.min.js",
+      "status": 200,
+      "bytes": 44157,
+      "sha256": "308219390e5e3b84cda0c481e70caa9820883ae10bda44e6e9a149a81aac4b3f",
+      "source_sha256": "308219390e5e3b84cda0c481e70caa9820883ae10bda44e6e9a149a81aac4b3f",
+      "normalized_sha256": "308219390e5e3b84cda0c481e70caa9820883ae10bda44e6e9a149a81aac4b3f",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/js/main.js",
+      "status": 200,
+      "bytes": 28048,
+      "sha256": "b762fa94e1d216de598612daf266897acdaab373c13eca09adb1222d9a9d9d52",
+      "source_sha256": "b762fa94e1d216de598612daf266897acdaab373c13eca09adb1222d9a9d9d52",
+      "normalized_sha256": "b762fa94e1d216de598612daf266897acdaab373c13eca09adb1222d9a9d9d52",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/",
+      "status": 200,
+      "bytes": 31403,
+      "sha256": "d21a8c717402701ce869a84deb44f1b87f61552e0a4ead301c343f245f5ee674",
+      "source_sha256": "e2929da7a4081f72c52b0d3ffb2c9c8c75d2e6a7f3ed7e92cd4504126737285d",
+      "normalized_sha256": "e2929da7a4081f72c52b0d3ffb2c9c8c75d2e6a7f3ed7e92cd4504126737285d",
+      "cloudflare_beacon_count": 1,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true,
+        "exactly_one_platform_beacon": true,
+        "csp": true,
+        "html_type": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/avatar_2_glasses.webp",
+      "status": 200,
+      "bytes": 2114,
+      "sha256": "406fee4309f3be62e3dafa3fdf69be843b265ae69f241ecad2504e8bf8951d91",
+      "source_sha256": "406fee4309f3be62e3dafa3fdf69be843b265ae69f241ecad2504e8bf8951d91",
+      "normalized_sha256": "406fee4309f3be62e3dafa3fdf69be843b265ae69f241ecad2504e8bf8951d91",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/avatar_5_flower.webp",
+      "status": 200,
+      "bytes": 2914,
+      "sha256": "d7c6efa59b17c87cdbb77e5d6f3b61916b7dcf68387b02514bbebb7676fa8547",
+      "source_sha256": "d7c6efa59b17c87cdbb77e5d6f3b61916b7dcf68387b02514bbebb7676fa8547",
+      "normalized_sha256": "d7c6efa59b17c87cdbb77e5d6f3b61916b7dcf68387b02514bbebb7676fa8547",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/avatar_7_scholar.webp",
+      "status": 200,
+      "bytes": 2320,
+      "sha256": "135a412e3f43054e2c1de9b9004d455c7c41fbd83aee8b58710d15acbd338d3a",
+      "source_sha256": "135a412e3f43054e2c1de9b9004d455c7c41fbd83aee8b58710d15acbd338d3a",
+      "normalized_sha256": "135a412e3f43054e2c1de9b9004d455c7c41fbd83aee8b58710d15acbd338d3a",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/avatar_1_gamer.webp",
+      "status": 200,
+      "bytes": 2068,
+      "sha256": "875b683f1ee9e0042bde6dcd6a956046c80cdd74b94bc58f6448eab222e30386",
+      "source_sha256": "875b683f1ee9e0042bde6dcd6a956046c80cdd74b94bc58f6448eab222e30386",
+      "normalized_sha256": "875b683f1ee9e0042bde6dcd6a956046c80cdd74b94bc58f6448eab222e30386",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/timer-tr.png",
+      "status": 200,
+      "bytes": 130393,
+      "sha256": "f03c795e98da6cd865ea508f593877a7f73d8426e79c67341fa3e95fcf65a7d3",
+      "source_sha256": "f03c795e98da6cd865ea508f593877a7f73d8426e79c67341fa3e95fcf65a7d3",
+      "normalized_sha256": "f03c795e98da6cd865ea508f593877a7f73d8426e79c67341fa3e95fcf65a7d3",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/reports-daily-tr.png",
+      "status": 200,
+      "bytes": 171830,
+      "sha256": "5288962eb5c722ba663180332a59240c47ed0296b09dfb5b31125ea4c97b743a",
+      "source_sha256": "5288962eb5c722ba663180332a59240c47ed0296b09dfb5b31125ea4c97b743a",
+      "normalized_sha256": "5288962eb5c722ba663180332a59240c47ed0296b09dfb5b31125ea4c97b743a",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/social-tr.png",
+      "status": 200,
+      "bytes": 142656,
+      "sha256": "bdf0469cf4670774a81984c303c90e289f38728e992ca90e582a633a42254d6b",
+      "source_sha256": "bdf0469cf4670774a81984c303c90e289f38728e992ca90e582a633a42254d6b",
+      "normalized_sha256": "bdf0469cf4670774a81984c303c90e289f38728e992ca90e582a633a42254d6b",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/marathon-plan-tr.png",
+      "status": 200,
+      "bytes": 177136,
+      "sha256": "513cb085d71c59e3cc18730e0db0e6b95d55dab093fb8624d5c3ba6c0bc11fad",
+      "source_sha256": "513cb085d71c59e3cc18730e0db0e6b95d55dab093fb8624d5c3ba6c0bc11fad",
+      "normalized_sha256": "513cb085d71c59e3cc18730e0db0e6b95d55dab093fb8624d5c3ba6c0bc11fad",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/videos/20261028/marathon-tr.mp4",
+      "status": 200,
+      "bytes": 203877,
+      "sha256": "ea6b65817ee068a149ccea40d7b29e9e8f5eca9edd077f632fe74f2b98e50ae7",
+      "source_sha256": "ea6b65817ee068a149ccea40d7b29e9e8f5eca9edd077f632fe74f2b98e50ae7",
+      "normalized_sha256": "ea6b65817ee068a149ccea40d7b29e9e8f5eca9edd077f632fe74f2b98e50ae7",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/videos/20261028/marathon-tr.webp",
+      "status": 200,
+      "bytes": 34318,
+      "sha256": "0f8c366cdd7b40004c86b3c9966a566337e72f5a6d8d3be163a6e8f260e1d5cf",
+      "source_sha256": "0f8c366cdd7b40004c86b3c9966a566337e72f5a6d8d3be163a6e8f260e1d5cf",
+      "normalized_sha256": "0f8c366cdd7b40004c86b3c9966a566337e72f5a6d8d3be163a6e8f260e1d5cf",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/exam-catalog-tr.png",
+      "status": 200,
+      "bytes": 159873,
+      "sha256": "11ddc8ef594091768fb5919d90df1de2fe7f3bff95336ca325e94a4c62eabf0b",
+      "source_sha256": "11ddc8ef594091768fb5919d90df1de2fe7f3bff95336ca325e94a4c62eabf0b",
+      "normalized_sha256": "11ddc8ef594091768fb5919d90df1de2fe7f3bff95336ca325e94a4c62eabf0b",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/avatar_3_gentleman.webp",
+      "status": 200,
+      "bytes": 2054,
+      "sha256": "0ca1dc5921ef08c0f2ccfbc43f7477e7c1eac9941a15d097c21a5b0d2e88c9a3",
+      "source_sha256": "0ca1dc5921ef08c0f2ccfbc43f7477e7c1eac9941a15d097c21a5b0d2e88c9a3",
+      "normalized_sha256": "0ca1dc5921ef08c0f2ccfbc43f7477e7c1eac9941a15d097c21a5b0d2e88c9a3",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/avatar_4_bowtie.webp",
+      "status": 200,
+      "bytes": 2512,
+      "sha256": "1e3aa5ddf35ff713f2b74c34dda1706baf4930dae32f2b239040278bb61f54e6",
+      "source_sha256": "1e3aa5ddf35ff713f2b74c34dda1706baf4930dae32f2b239040278bb61f54e6",
+      "normalized_sha256": "1e3aa5ddf35ff713f2b74c34dda1706baf4930dae32f2b239040278bb61f54e6",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/avatar_6_cool.webp",
+      "status": 200,
+      "bytes": 2380,
+      "sha256": "e31fc6e9a309a3733fc92070069d519e38eb962e989b6736ff0dc5d03fb96e20",
+      "source_sha256": "e31fc6e9a309a3733fc92070069d519e38eb962e989b6736ff0dc5d03fb96e20",
+      "normalized_sha256": "e31fc6e9a309a3733fc92070069d519e38eb962e989b6736ff0dc5d03fb96e20",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/avatar_8_striped.webp",
+      "status": 200,
+      "bytes": 1390,
+      "sha256": "6db9044ad100fa42f621a7f6bf15f4d730ad24f503ddf17614859ff854702c14",
+      "source_sha256": "6db9044ad100fa42f621a7f6bf15f4d730ad24f503ddf17614859ff854702c14",
+      "normalized_sha256": "6db9044ad100fa42f621a7f6bf15f4d730ad24f503ddf17614859ff854702c14",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/avatar_9_viking.webp",
+      "status": 200,
+      "bytes": 2214,
+      "sha256": "11ca6825f310ff79777403e1a9afbf781ad9c92eb664667bd861b5bfcd200c7c",
+      "source_sha256": "11ca6825f310ff79777403e1a9afbf781ad9c92eb664667bd861b5bfcd200c7c",
+      "normalized_sha256": "11ca6825f310ff79777403e1a9afbf781ad9c92eb664667bd861b5bfcd200c7c",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/avatar_10_dentist.webp",
+      "status": 200,
+      "bytes": 2878,
+      "sha256": "6d317f4abc7b7fc492d561fc6563410b44129a8e0ece18cdd81139e6548752d6",
+      "source_sha256": "6d317f4abc7b7fc492d561fc6563410b44129a8e0ece18cdd81139e6548752d6",
+      "normalized_sha256": "6d317f4abc7b7fc492d561fc6563410b44129a8e0ece18cdd81139e6548752d6",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/avatar_11_doctor.webp",
+      "status": 200,
+      "bytes": 2354,
+      "sha256": "d7d4d307f25ef2d791446de832247b9c83476934512a0123952d736d07337820",
+      "source_sha256": "d7d4d307f25ef2d791446de832247b9c83476934512a0123952d736d07337820",
+      "normalized_sha256": "d7d4d307f25ef2d791446de832247b9c83476934512a0123952d736d07337820",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/avatar_12_builder.webp",
+      "status": 200,
+      "bytes": 1750,
+      "sha256": "76cbc4ddc8dc2a896ea44c3008670be96e2e1f05294172f4f5d943f52704970e",
+      "source_sha256": "76cbc4ddc8dc2a896ea44c3008670be96e2e1f05294172f4f5d943f52704970e",
+      "normalized_sha256": "76cbc4ddc8dc2a896ea44c3008670be96e2e1f05294172f4f5d943f52704970e",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/avatar_13_pilot.webp",
+      "status": 200,
+      "bytes": 2112,
+      "sha256": "aeafef09fd8cf8722311d5846492758215daf8ac83f40b55f7ef418e1d94ca16",
+      "source_sha256": "aeafef09fd8cf8722311d5846492758215daf8ac83f40b55f7ef418e1d94ca16",
+      "normalized_sha256": "aeafef09fd8cf8722311d5846492758215daf8ac83f40b55f7ef418e1d94ca16",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/avatar_14_teacher.webp",
+      "status": 200,
+      "bytes": 2778,
+      "sha256": "f9e5a8191256397d91444fc19c61458fca4f1aabfb4a5c7117cd206ff29070f6",
+      "source_sha256": "f9e5a8191256397d91444fc19c61458fca4f1aabfb4a5c7117cd206ff29070f6",
+      "normalized_sha256": "f9e5a8191256397d91444fc19c61458fca4f1aabfb4a5c7117cd206ff29070f6",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/avatar_15_athlete.webp",
+      "status": 200,
+      "bytes": 2546,
+      "sha256": "9b4d61389f2fa02d5dba409cfda2b9b22b87bf06c32591c6f32b9400f7bdd603",
+      "source_sha256": "9b4d61389f2fa02d5dba409cfda2b9b22b87bf06c32591c6f32b9400f7bdd603",
+      "normalized_sha256": "9b4d61389f2fa02d5dba409cfda2b9b22b87bf06c32591c6f32b9400f7bdd603",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/avatar_16_basic.webp",
+      "status": 200,
+      "bytes": 2028,
+      "sha256": "3006357082cea3a8b644fa52d1935043ad7bf53857b1d1ba1da3c4f8c36bad16",
+      "source_sha256": "3006357082cea3a8b644fa52d1935043ad7bf53857b1d1ba1da3c4f8c36bad16",
+      "normalized_sha256": "3006357082cea3a8b644fa52d1935043ad7bf53857b1d1ba1da3c4f8c36bad16",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/js/config.js",
+      "status": 200,
+      "bytes": 2820,
+      "sha256": "ec12de54db8df3421979a5dc1026b0b07d467baf079d4cdfdf4412d7cb7709a1",
+      "source_sha256": "ec12de54db8df3421979a5dc1026b0b07d467baf079d4cdfdf4412d7cb7709a1",
+      "normalized_sha256": "ec12de54db8df3421979a5dc1026b0b07d467baf079d4cdfdf4412d7cb7709a1",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/unsubscribe",
+      "status": 200,
+      "bytes": 3765,
+      "sha256": "39ff198957e7b7ba31a995a06cb8de65316d22d59f5bd00c55dc615f401c52bf",
+      "source_sha256": "4145347cb4e6564d5a1a90979d8dda36ce83fddc1d68ef16efe761f0af96c3f6",
+      "normalized_sha256": "4145347cb4e6564d5a1a90979d8dda36ce83fddc1d68ef16efe761f0af96c3f6",
+      "cloudflare_beacon_count": 1,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true,
+        "exactly_one_platform_beacon": true,
+        "csp": true,
+        "html_type": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/css/auth.css",
+      "status": 200,
+      "bytes": 3579,
+      "sha256": "deee44daf5e6d33653869cc2fa861d25342dc213c3a10ccd0755b136cde94f30",
+      "source_sha256": "deee44daf5e6d33653869cc2fa861d25342dc213c3a10ccd0755b136cde94f30",
+      "normalized_sha256": "deee44daf5e6d33653869cc2fa861d25342dc213c3a10ccd0755b136cde94f30",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/js/auth-i18n.js",
+      "status": 200,
+      "bytes": 1763,
+      "sha256": "820d470fdd4942dea4cb054465d70524da9674c8873ce18722fbc79d02b33d35",
+      "source_sha256": "820d470fdd4942dea4cb054465d70524da9674c8873ce18722fbc79d02b33d35",
+      "normalized_sha256": "820d470fdd4942dea4cb054465d70524da9674c8873ce18722fbc79d02b33d35",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/js/unsubscribe.js",
+      "status": 200,
+      "bytes": 6823,
+      "sha256": "f855d0840fcca6f347fec200385d807429488524323c92a543abe45a815d1849",
+      "source_sha256": "f855d0840fcca6f347fec200385d807429488524323c92a543abe45a815d1849",
+      "normalized_sha256": "f855d0840fcca6f347fec200385d807429488524323c92a543abe45a815d1849",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/destek",
+      "status": 200,
+      "bytes": 12736,
+      "sha256": "08bd4c0a3aac156290ae2de497f470bb8eda810a3cc6b222526698b73c5e6866",
+      "source_sha256": "084901d71c21ff89fe147d9d10bbed723165cf8fa3f606a4229c4c159043e638",
+      "normalized_sha256": "084901d71c21ff89fe147d9d10bbed723165cf8fa3f606a4229c4c159043e638",
+      "cloudflare_beacon_count": 1,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true,
+        "exactly_one_platform_beacon": true,
+        "csp": true,
+        "html_type": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/terms",
+      "status": 200,
+      "bytes": 20051,
+      "sha256": "e89e5ac7949f618af07b3e1a95f7b76ca927f4c6b2bf33503f3aad0410fea787",
+      "source_sha256": "bc4bd578c9f4ca9faa246c651ab2c482e02de61f73d750ebec77a8ada19e8642",
+      "normalized_sha256": "bc4bd578c9f4ca9faa246c651ab2c482e02de61f73d750ebec77a8ada19e8642",
+      "cloudflare_beacon_count": 1,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true,
+        "exactly_one_platform_beacon": true,
+        "csp": true,
+        "html_type": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/confirmed",
+      "status": 200,
+      "bytes": 3446,
+      "sha256": "910cd8c01d81ab85c8ccb7b85c2a166e1526a53fd0267641c664b9976893f331",
+      "source_sha256": "f545b0034e32563f43a77752e07cf96c20414c4fdc9ea367bd1c06aa50d3ddec",
+      "normalized_sha256": "f545b0034e32563f43a77752e07cf96c20414c4fdc9ea367bd1c06aa50d3ddec",
+      "cloudflare_beacon_count": 1,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true,
+        "exactly_one_platform_beacon": true,
+        "csp": true,
+        "html_type": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/js/confirmed.js",
+      "status": 200,
+      "bytes": 4048,
+      "sha256": "85ce6c51ecdcd04c1fe33422189a7d884372e8ed7851a1978c682ebfc24a2ec1",
+      "source_sha256": "85ce6c51ecdcd04c1fe33422189a7d884372e8ed7851a1978c682ebfc24a2ec1",
+      "normalized_sha256": "85ce6c51ecdcd04c1fe33422189a7d884372e8ed7851a1978c682ebfc24a2ec1",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/reset-password",
+      "status": 200,
+      "bytes": 4609,
+      "sha256": "cbc2eb432ff6e4009c47e0edf4616a7cb0742f1e7c96ecb8e6a14b6299810481",
+      "source_sha256": "3a6381ae10314f4ad86ac7332b8880f6fd3c2814555136c29e63a9dd815ebe17",
+      "normalized_sha256": "3a6381ae10314f4ad86ac7332b8880f6fd3c2814555136c29e63a9dd815ebe17",
+      "cloudflare_beacon_count": 1,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true,
+        "exactly_one_platform_beacon": true,
+        "csp": true,
+        "html_type": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/js/reset-password.js",
+      "status": 200,
+      "bytes": 12528,
+      "sha256": "d3d3b2a7c8688cfd65c4b1ce486d5cb7358ca565264cfb969aa58e72d51af05a",
+      "source_sha256": "d3d3b2a7c8688cfd65c4b1ce486d5cb7358ca565264cfb969aa58e72d51af05a",
+      "normalized_sha256": "d3d3b2a7c8688cfd65c4b1ce486d5cb7358ca565264cfb969aa58e72d51af05a",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/hesap-silme",
+      "status": 200,
+      "bytes": 18512,
+      "sha256": "09b81a56f650aef7463be694f07c85e145c310c29c93bbdb9e501545104eb4d3",
+      "source_sha256": "000e0635cd1041205511d78513e4fe9ef3b2ed484a563457989f48a84f4cb923",
+      "normalized_sha256": "000e0635cd1041205511d78513e4fe9ef3b2ed484a563457989f48a84f4cb923",
+      "cloudflare_beacon_count": 1,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true,
+        "exactly_one_platform_beacon": true,
+        "csp": true,
+        "html_type": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/features",
+      "status": 200,
+      "bytes": 34942,
+      "sha256": "6ec9254fe4e20e9f8c89395bf4fdf386d9a6137e6f98b6a71cd90f12bd6f38a9",
+      "source_sha256": "015ad8809f764a08451e8faa70ce93eb574bcfe4e5cfcd4a8161639ad36106e1",
+      "normalized_sha256": "015ad8809f764a08451e8faa70ce93eb574bcfe4e5cfcd4a8161639ad36106e1",
+      "cloudflare_beacon_count": 1,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true,
+        "exactly_one_platform_beacon": true,
+        "csp": true,
+        "html_type": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/videos/20261028/timer-tr.mp4",
+      "status": 200,
+      "bytes": 216213,
+      "sha256": "b3045be2a377c0f9aed189d5693b00d1057205a67bc8a53eea7246c095f29016",
+      "source_sha256": "b3045be2a377c0f9aed189d5693b00d1057205a67bc8a53eea7246c095f29016",
+      "normalized_sha256": "b3045be2a377c0f9aed189d5693b00d1057205a67bc8a53eea7246c095f29016",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/videos/20261028/timer-tr.webp",
+      "status": 200,
+      "bytes": 22316,
+      "sha256": "dd157d143d52cd074d19f3c5d0033f6e14c6b663937462160b8eac9091274933",
+      "source_sha256": "dd157d143d52cd074d19f3c5d0033f6e14c6b663937462160b8eac9091274933",
+      "normalized_sha256": "dd157d143d52cd074d19f3c5d0033f6e14c6b663937462160b8eac9091274933",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/exam-running-tr.png",
+      "status": 200,
+      "bytes": 169014,
+      "sha256": "63b95455799e5c3d7e7f953fdea1e21c4b03da5e194c7036201e514c93102279",
+      "source_sha256": "63b95455799e5c3d7e7f953fdea1e21c4b03da5e194c7036201e514c93102279",
+      "normalized_sha256": "63b95455799e5c3d7e7f953fdea1e21c4b03da5e194c7036201e514c93102279",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/exam-history-tr.png",
+      "status": 200,
+      "bytes": 174261,
+      "sha256": "032d5352a6960ee5128489eb297c0b6746e8aefa4b50620ad4a5e9e9aad6f532",
+      "source_sha256": "032d5352a6960ee5128489eb297c0b6746e8aefa4b50620ad4a5e9e9aad6f532",
+      "normalized_sha256": "032d5352a6960ee5128489eb297c0b6746e8aefa4b50620ad4a5e9e9aad6f532",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/exam-results-tr.png",
+      "status": 200,
+      "bytes": 146962,
+      "sha256": "355ec0c603c3468ba022b7d27b57b179e15763215ff65e9fd5f1fa5d22af0fee",
+      "source_sha256": "355ec0c603c3468ba022b7d27b57b179e15763215ff65e9fd5f1fa5d22af0fee",
+      "normalized_sha256": "355ec0c603c3468ba022b7d27b57b179e15763215ff65e9fd5f1fa5d22af0fee",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/exam-insights-tr.png",
+      "status": 200,
+      "bytes": 218338,
+      "sha256": "d58c3241721e562e33cc3efa3e79ef896834b8a10b45a9635b5aebae9ead91d4",
+      "source_sha256": "d58c3241721e562e33cc3efa3e79ef896834b8a10b45a9635b5aebae9ead91d4",
+      "normalized_sha256": "d58c3241721e562e33cc3efa3e79ef896834b8a10b45a9635b5aebae9ead91d4",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/reports-weekly-tr.png",
+      "status": 200,
+      "bytes": 135212,
+      "sha256": "a421605a36fef1c9be276a1e6ce3739cbcc39139e3ae1abb6387c6b9ff6f9b48",
+      "source_sha256": "a421605a36fef1c9be276a1e6ce3739cbcc39139e3ae1abb6387c6b9ff6f9b48",
+      "normalized_sha256": "a421605a36fef1c9be276a1e6ce3739cbcc39139e3ae1abb6387c6b9ff6f9b48",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/reports-monthly-tr.png",
+      "status": 200,
+      "bytes": 176628,
+      "sha256": "88f8feb0bda53e4c1dd5bef85e235430c3b58015897358a0988d362c3be5a089",
+      "source_sha256": "88f8feb0bda53e4c1dd5bef85e235430c3b58015897358a0988d362c3be5a089",
+      "normalized_sha256": "88f8feb0bda53e4c1dd5bef85e235430c3b58015897358a0988d362c3be5a089",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/league_bronze_monthly.webp",
+      "status": 200,
+      "bytes": 2400,
+      "sha256": "20bbf21efe8e82acb99c41be36e490c0b2b123a033f09600ba39358a019edc18",
+      "source_sha256": "20bbf21efe8e82acb99c41be36e490c0b2b123a033f09600ba39358a019edc18",
+      "normalized_sha256": "20bbf21efe8e82acb99c41be36e490c0b2b123a033f09600ba39358a019edc18",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/league_silver_monthly.webp",
+      "status": 200,
+      "bytes": 2344,
+      "sha256": "e56009960a65fd06e57f166512b9c2777c014d8010e1e85f5723daee8fd600fd",
+      "source_sha256": "e56009960a65fd06e57f166512b9c2777c014d8010e1e85f5723daee8fd600fd",
+      "normalized_sha256": "e56009960a65fd06e57f166512b9c2777c014d8010e1e85f5723daee8fd600fd",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/league_gold_monthly.webp",
+      "status": 200,
+      "bytes": 2272,
+      "sha256": "90f10ff43e46ae4a5a1efa1473db4979cb3fc3771673c909b2ba5c3d2e7b81ca",
+      "source_sha256": "90f10ff43e46ae4a5a1efa1473db4979cb3fc3771673c909b2ba5c3d2e7b81ca",
+      "normalized_sha256": "90f10ff43e46ae4a5a1efa1473db4979cb3fc3771673c909b2ba5c3d2e7b81ca",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/league_sapphire_monthly.webp",
+      "status": 200,
+      "bytes": 2724,
+      "sha256": "f0e44b9af0f05a924745e92c1486be37d71a05312e363981b74c973f87b135a8",
+      "source_sha256": "f0e44b9af0f05a924745e92c1486be37d71a05312e363981b74c973f87b135a8",
+      "normalized_sha256": "f0e44b9af0f05a924745e92c1486be37d71a05312e363981b74c973f87b135a8",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/league_diamond_monthly.webp",
+      "status": 200,
+      "bytes": 3684,
+      "sha256": "96691ac31fb0cf6a9d81d9a923f97ff32bf5597fe70b38114655bc5ad81c108b",
+      "source_sha256": "96691ac31fb0cf6a9d81d9a923f97ff32bf5597fe70b38114655bc5ad81c108b",
+      "normalized_sha256": "96691ac31fb0cf6a9d81d9a923f97ff32bf5597fe70b38114655bc5ad81c108b",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/league-category-tr.png",
+      "status": 200,
+      "bytes": 201211,
+      "sha256": "5dbaa347b1c166f757ade82cba8b91d1f8a3baa8616ce95be25b3bf631a4519e",
+      "source_sha256": "5dbaa347b1c166f757ade82cba8b91d1f8a3baa8616ce95be25b3bf631a4519e",
+      "normalized_sha256": "5dbaa347b1c166f757ade82cba8b91d1f8a3baa8616ce95be25b3bf631a4519e",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/league-global-tr.png",
+      "status": 200,
+      "bytes": 240320,
+      "sha256": "046b77a48cdc1b332733226ad539713d5f0da8f87e4e96086818f26b1343b529",
+      "source_sha256": "046b77a48cdc1b332733226ad539713d5f0da8f87e4e96086818f26b1343b529",
+      "normalized_sha256": "046b77a48cdc1b332733226ad539713d5f0da8f87e4e96086818f26b1343b529",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/league-exam-tr.png",
+      "status": 200,
+      "bytes": 155589,
+      "sha256": "d238002de9bf8b3d0c25679f070e07b63ce92b0d2d91f0b1df90eda5fed59e99",
+      "source_sha256": "d238002de9bf8b3d0c25679f070e07b63ce92b0d2d91f0b1df90eda5fed59e99",
+      "normalized_sha256": "d238002de9bf8b3d0c25679f070e07b63ce92b0d2d91f0b1df90eda5fed59e99",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/avatar-collection-tr.png",
+      "status": 200,
+      "bytes": 217398,
+      "sha256": "8395cbbc072fb23e957384e6b62152261847a418312623dde5a8ff06783db404",
+      "source_sha256": "8395cbbc072fb23e957384e6b62152261847a418312623dde5a8ff06783db404",
+      "normalized_sha256": "8395cbbc072fb23e957384e6b62152261847a418312623dde5a8ff06783db404",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/faq",
+      "status": 200,
+      "bytes": 23834,
+      "sha256": "edec8b25bea59b90b158b6c9c989c5270d74c3bae8320e5920d40a7c2f2a9018",
+      "source_sha256": "483537112846f81eec910c1338746874b38b651d763491358ff399b184c1981f",
+      "normalized_sha256": "483537112846f81eec910c1338746874b38b651d763491358ff399b184c1981f",
+      "cloudflare_beacon_count": 1,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true,
+        "exactly_one_platform_beacon": true,
+        "csp": true,
+        "html_type": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/privacy",
+      "status": 200,
+      "bytes": 32855,
+      "sha256": "596027aecbb2c42337909102a0acb803d8ea634bf4e2701dfa84431fa3693ce7",
+      "source_sha256": "09dcf0b88d767cd04c5e7f2faa456f455b1c66729103706ec7acbe12b3150a51",
+      "normalized_sha256": "09dcf0b88d767cd04c5e7f2faa456f455b1c66729103706ec7acbe12b3150a51",
+      "cloudflare_beacon_count": 1,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true,
+        "exactly_one_platform_beacon": true,
+        "csp": true,
+        "html_type": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/pomodoro-nedir",
+      "status": 200,
+      "bytes": 23091,
+      "sha256": "a64d9e2745494f1af599f6b1caf44e5c6e55df32f6a473ba3f50962edb59bff7",
+      "source_sha256": "41d12ce77a8200fb6cc474ee2253044bec8311a05fdb9a4c5e2d04375ff38930",
+      "normalized_sha256": "41d12ce77a8200fb6cc474ee2253044bec8311a05fdb9a4c5e2d04375ff38930",
+      "cloudflare_beacon_count": 1,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true,
+        "exactly_one_platform_beacon": true,
+        "csp": true,
+        "html_type": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/en/kvkk",
+      "status": 200,
+      "bytes": 23923,
+      "sha256": "3861beb6189afaa8de504b09f6ae0971cfde66df28e1354b5547128a89de3b12",
+      "source_sha256": "e91a727719e1c3ac5cc2bc17959edd151d8e8f274105d52a9a55a0e1284c24c5",
+      "normalized_sha256": "e91a727719e1c3ac5cc2bc17959edd151d8e8f274105d52a9a55a0e1284c24c5",
+      "cloudflare_beacon_count": 1,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true,
+        "exactly_one_platform_beacon": true,
+        "csp": true,
+        "html_type": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/en/",
+      "status": 200,
+      "bytes": 21310,
+      "sha256": "50eb8fdd5e7403c9d7c059af798e76b5d3b822202d4c136eb63c39f4ede1cb71",
+      "source_sha256": "1d9ff671d628a71585848f4de3be5f3e779dc7db6ab54b5eefe65fbff09aeec0",
+      "normalized_sha256": "1d9ff671d628a71585848f4de3be5f3e779dc7db6ab54b5eefe65fbff09aeec0",
+      "cloudflare_beacon_count": 1,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true,
+        "exactly_one_platform_beacon": true,
+        "csp": true,
+        "html_type": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/timer-en.png",
+      "status": 200,
+      "bytes": 132559,
+      "sha256": "3f5d52b135c1cf23ff130e19cbdf18246163e6b42c01bc53539c468f86827b3a",
+      "source_sha256": "3f5d52b135c1cf23ff130e19cbdf18246163e6b42c01bc53539c468f86827b3a",
+      "normalized_sha256": "3f5d52b135c1cf23ff130e19cbdf18246163e6b42c01bc53539c468f86827b3a",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/reports-daily-en.png",
+      "status": 200,
+      "bytes": 176542,
+      "sha256": "f8505f7654347822ff30818a67af8bbce1af465fe3e14102d3e822566e8d711c",
+      "source_sha256": "f8505f7654347822ff30818a67af8bbce1af465fe3e14102d3e822566e8d711c",
+      "normalized_sha256": "f8505f7654347822ff30818a67af8bbce1af465fe3e14102d3e822566e8d711c",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/social-en.png",
+      "status": 200,
+      "bytes": 142860,
+      "sha256": "54c16ac0ddd5786ae8771938c6292230f8d13ec220b3cc3bebadcc800bd285e6",
+      "source_sha256": "54c16ac0ddd5786ae8771938c6292230f8d13ec220b3cc3bebadcc800bd285e6",
+      "normalized_sha256": "54c16ac0ddd5786ae8771938c6292230f8d13ec220b3cc3bebadcc800bd285e6",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/marathon-plan-en.png",
+      "status": 200,
+      "bytes": 178974,
+      "sha256": "fd5c347d87daea3d54ab7d0408316506a239f04664ff5846aecad5eee82e0c42",
+      "source_sha256": "fd5c347d87daea3d54ab7d0408316506a239f04664ff5846aecad5eee82e0c42",
+      "normalized_sha256": "fd5c347d87daea3d54ab7d0408316506a239f04664ff5846aecad5eee82e0c42",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/videos/20261028/marathon-en.mp4",
+      "status": 200,
+      "bytes": 224919,
+      "sha256": "5c2eda5bd4006d65a805aeaf1a2a8792a91ab6db2e7c80f39d00381472973510",
+      "source_sha256": "5c2eda5bd4006d65a805aeaf1a2a8792a91ab6db2e7c80f39d00381472973510",
+      "normalized_sha256": "5c2eda5bd4006d65a805aeaf1a2a8792a91ab6db2e7c80f39d00381472973510",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/videos/20261028/marathon-en.webp",
+      "status": 200,
+      "bytes": 34002,
+      "sha256": "986bf7be7763a66a9f350cdb1bff3d7cf80d03ddda02a3c921c979c64a61bfd7",
+      "source_sha256": "986bf7be7763a66a9f350cdb1bff3d7cf80d03ddda02a3c921c979c64a61bfd7",
+      "normalized_sha256": "986bf7be7763a66a9f350cdb1bff3d7cf80d03ddda02a3c921c979c64a61bfd7",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/exam-catalog-en.png",
+      "status": 200,
+      "bytes": 167416,
+      "sha256": "a6b8a52fe0c4c1f22368c4de31b3d553708dbe71858f899add71dbffeb62596b",
+      "source_sha256": "a6b8a52fe0c4c1f22368c4de31b3d553708dbe71858f899add71dbffeb62596b",
+      "normalized_sha256": "a6b8a52fe0c4c1f22368c4de31b3d553708dbe71858f899add71dbffeb62596b",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/en/delete-account",
+      "status": 200,
+      "bytes": 17927,
+      "sha256": "4a7258026a877e922c8bc69771140c0034e3a358e7f8510b8a4569e1d8b4d708",
+      "source_sha256": "21e32b322449e268cc71045bf5816264485acd73cf6cff84be7f66997d5a6ab9",
+      "normalized_sha256": "21e32b322449e268cc71045bf5816264485acd73cf6cff84be7f66997d5a6ab9",
+      "cloudflare_beacon_count": 1,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true,
+        "exactly_one_platform_beacon": true,
+        "csp": true,
+        "html_type": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/en/support",
+      "status": 200,
+      "bytes": 12368,
+      "sha256": "659088ca827f1a72737835792963e6a93f0543392381e636d8de0ef7869a28ca",
+      "source_sha256": "ff6dae781c987036d82e36ae40c68ec5243d2da6ae614f8c97e4c34cefc45e28",
+      "normalized_sha256": "ff6dae781c987036d82e36ae40c68ec5243d2da6ae614f8c97e4c34cefc45e28",
+      "cloudflare_beacon_count": 1,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true,
+        "exactly_one_platform_beacon": true,
+        "csp": true,
+        "html_type": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/en/terms",
+      "status": 200,
+      "bytes": 19084,
+      "sha256": "580265b5709fd55c0e1c1a3ec083337810a0f23ae61811663618630fc2b41945",
+      "source_sha256": "b985b442829945a02bb150577dcb53517b747dccf69853a76aee109363a502c7",
+      "normalized_sha256": "b985b442829945a02bb150577dcb53517b747dccf69853a76aee109363a502c7",
+      "cloudflare_beacon_count": 1,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true,
+        "exactly_one_platform_beacon": true,
+        "csp": true,
+        "html_type": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/en/features",
+      "status": 200,
+      "bytes": 28067,
+      "sha256": "56734315d52c30df99d0a45b0fb65c967b5f606efd36bc48d153d8751a97a9b1",
+      "source_sha256": "80de8120f2852d35b98e116861d4444bae8fad38f64276471f64ab2516e09152",
+      "normalized_sha256": "80de8120f2852d35b98e116861d4444bae8fad38f64276471f64ab2516e09152",
+      "cloudflare_beacon_count": 1,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true,
+        "exactly_one_platform_beacon": true,
+        "csp": true,
+        "html_type": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/videos/20261028/timer-en.mp4",
+      "status": 200,
+      "bytes": 202975,
+      "sha256": "933da782b4ef851b8db50ba2b2c10fff65e04ddce6ccc3250aab43a612359455",
+      "source_sha256": "933da782b4ef851b8db50ba2b2c10fff65e04ddce6ccc3250aab43a612359455",
+      "normalized_sha256": "933da782b4ef851b8db50ba2b2c10fff65e04ddce6ccc3250aab43a612359455",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/videos/20261028/timer-en.webp",
+      "status": 200,
+      "bytes": 22780,
+      "sha256": "2f4a4b0cfc6ae7eec219a9b29bbf46ebd8bc5653e28871d365ef6ddd858a8191",
+      "source_sha256": "2f4a4b0cfc6ae7eec219a9b29bbf46ebd8bc5653e28871d365ef6ddd858a8191",
+      "normalized_sha256": "2f4a4b0cfc6ae7eec219a9b29bbf46ebd8bc5653e28871d365ef6ddd858a8191",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/exam-running-en.png",
+      "status": 200,
+      "bytes": 174841,
+      "sha256": "e93f9e5180bed0640dd6484d6620a24e481930b79f78f306a650ef430bffdad7",
+      "source_sha256": "e93f9e5180bed0640dd6484d6620a24e481930b79f78f306a650ef430bffdad7",
+      "normalized_sha256": "e93f9e5180bed0640dd6484d6620a24e481930b79f78f306a650ef430bffdad7",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/exam-history-en.png",
+      "status": 200,
+      "bytes": 185988,
+      "sha256": "5efd17a4a4b5fa7cf0970301fbe572fdc65ecec7220c928b49fee9b26143bec9",
+      "source_sha256": "5efd17a4a4b5fa7cf0970301fbe572fdc65ecec7220c928b49fee9b26143bec9",
+      "normalized_sha256": "5efd17a4a4b5fa7cf0970301fbe572fdc65ecec7220c928b49fee9b26143bec9",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/exam-results-en.png",
+      "status": 200,
+      "bytes": 164021,
+      "sha256": "f353feb937a52746ab6c1fa6d00551e0d8571ba2130107d5b7863084f668fb3f",
+      "source_sha256": "f353feb937a52746ab6c1fa6d00551e0d8571ba2130107d5b7863084f668fb3f",
+      "normalized_sha256": "f353feb937a52746ab6c1fa6d00551e0d8571ba2130107d5b7863084f668fb3f",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/exam-insights-en.png",
+      "status": 200,
+      "bytes": 230649,
+      "sha256": "275e364f8107cc747762c4e3ecaa595cf7dc3e2a05b2f889d87179f2cc50229b",
+      "source_sha256": "275e364f8107cc747762c4e3ecaa595cf7dc3e2a05b2f889d87179f2cc50229b",
+      "normalized_sha256": "275e364f8107cc747762c4e3ecaa595cf7dc3e2a05b2f889d87179f2cc50229b",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/reports-weekly-en.png",
+      "status": 200,
+      "bytes": 135804,
+      "sha256": "4779ab326e139a52b84b118fff011ad461f3d6c1716b12e85f4734812feeb167",
+      "source_sha256": "4779ab326e139a52b84b118fff011ad461f3d6c1716b12e85f4734812feeb167",
+      "normalized_sha256": "4779ab326e139a52b84b118fff011ad461f3d6c1716b12e85f4734812feeb167",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/reports-monthly-en.png",
+      "status": 200,
+      "bytes": 194818,
+      "sha256": "5e10cbc8677baf92ac53a7c0d0db437c665f4ae12939df93b701a21656b7189f",
+      "source_sha256": "5e10cbc8677baf92ac53a7c0d0db437c665f4ae12939df93b701a21656b7189f",
+      "normalized_sha256": "5e10cbc8677baf92ac53a7c0d0db437c665f4ae12939df93b701a21656b7189f",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/league-category-en.png",
+      "status": 200,
+      "bytes": 212797,
+      "sha256": "43ba25a72e3dd23a0af96c88d9392b077540a3dece6582d6cd984d68b2119f37",
+      "source_sha256": "43ba25a72e3dd23a0af96c88d9392b077540a3dece6582d6cd984d68b2119f37",
+      "normalized_sha256": "43ba25a72e3dd23a0af96c88d9392b077540a3dece6582d6cd984d68b2119f37",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/league-global-en.png",
+      "status": 200,
+      "bytes": 235012,
+      "sha256": "7224dfc2da0d89b2f21ae70db5174c41928f86d4dbc3cd9aa0387ced88375181",
+      "source_sha256": "7224dfc2da0d89b2f21ae70db5174c41928f86d4dbc3cd9aa0387ced88375181",
+      "normalized_sha256": "7224dfc2da0d89b2f21ae70db5174c41928f86d4dbc3cd9aa0387ced88375181",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/league-exam-en.png",
+      "status": 200,
+      "bytes": 170548,
+      "sha256": "a812dbc969aaed092891c49688c5535a3db1cb1c4b577568449e9d12715547bb",
+      "source_sha256": "a812dbc969aaed092891c49688c5535a3db1cb1c4b577568449e9d12715547bb",
+      "normalized_sha256": "a812dbc969aaed092891c49688c5535a3db1cb1c4b577568449e9d12715547bb",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/20261028/avatar-collection-en.png",
+      "status": 200,
+      "bytes": 220176,
+      "sha256": "47dd76a0c3496da277a13704af45c5b58e43b96cb38b87a58de2710e83e9a1ef",
+      "source_sha256": "47dd76a0c3496da277a13704af45c5b58e43b96cb38b87a58de2710e83e9a1ef",
+      "normalized_sha256": "47dd76a0c3496da277a13704af45c5b58e43b96cb38b87a58de2710e83e9a1ef",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/en/faq",
+      "status": 200,
+      "bytes": 22811,
+      "sha256": "65fb20443c00da47739dd5e89c2906d44985972a50689d8041bc23fcb851acc8",
+      "source_sha256": "240290290ba66d0ab7b47edcac4f421afb0e75c487d92827b4cdbfa3c7c5867b",
+      "normalized_sha256": "240290290ba66d0ab7b47edcac4f421afb0e75c487d92827b4cdbfa3c7c5867b",
+      "cloudflare_beacon_count": 1,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true,
+        "exactly_one_platform_beacon": true,
+        "csp": true,
+        "html_type": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/en/privacy",
+      "status": 200,
+      "bytes": 31276,
+      "sha256": "66e9e274ec2d04f1c2a183bc73be6ca29cbd5c7e435634f94d38f59dcc9e557b",
+      "source_sha256": "959c911a48b614ae31bf3d10021bac0bf7ea31eead71027757dcb636d3d15dff",
+      "normalized_sha256": "959c911a48b614ae31bf3d10021bac0bf7ea31eead71027757dcb636d3d15dff",
+      "cloudflare_beacon_count": 1,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true,
+        "exactly_one_platform_beacon": true,
+        "csp": true,
+        "html_type": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/og-image.png",
+      "status": 200,
+      "bytes": 237721,
+      "sha256": "afd6b7ee0393b38754db8eb211c72481dcebe76cfebbf09d52ff9f5aeec7bc2d",
+      "source_sha256": "afd6b7ee0393b38754db8eb211c72481dcebe76cfebbf09d52ff9f5aeec7bc2d",
+      "normalized_sha256": "afd6b7ee0393b38754db8eb211c72481dcebe76cfebbf09d52ff9f5aeec7bc2d",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/sitemap.xml",
+      "status": 200,
+      "bytes": 4581,
+      "sha256": "8fdd743db796ae2514aa39c3205408db965aaa09364c998c0b638a19b9f17547",
+      "source_sha256": "8fdd743db796ae2514aa39c3205408db965aaa09364c998c0b638a19b9f17547",
+      "normalized_sha256": "8fdd743db796ae2514aa39c3205408db965aaa09364c998c0b638a19b9f17547",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/robots.txt",
+      "status": 200,
+      "bytes": 68,
+      "sha256": "dcae543660c1f307e66393808fb2a271182ed5e9567aeaae7ad141f8a2255a03",
+      "source_sha256": "dcae543660c1f307e66393808fb2a271182ed5e9567aeaae7ad141f8a2255a03",
+      "normalized_sha256": "dcae543660c1f307e66393808fb2a271182ed5e9567aeaae7ad141f8a2255a03",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/screenshots/manifest-20261028.json",
+      "status": 200,
+      "bytes": 24783,
+      "sha256": "a87af338d634ae880b1d987b2eb8f2ab942a5b00d6494c30a74defcd441559ba",
+      "source_sha256": "a87af338d634ae880b1d987b2eb8f2ab942a5b00d6494c30a74defcd441559ba",
+      "normalized_sha256": "a87af338d634ae880b1d987b2eb8f2ab942a5b00d6494c30a74defcd441559ba",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/videos/manifest-20261028.json",
+      "status": 200,
+      "bytes": 20197,
+      "sha256": "62da708727b50b90dee83d65f25c44fb3f79a54d62909e57e69db960bd61f29c",
+      "source_sha256": "62da708727b50b90dee83d65f25c44fb3f79a54d62909e57e69db960bd61f29c",
+      "normalized_sha256": "62da708727b50b90dee83d65f25c44fb3f79a54d62909e57e69db960bd61f29c",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/special_desert_princess.webp",
+      "status": 200,
+      "bytes": 4374,
+      "sha256": "28b7038996290fe1006c3b8d633d5c6befd9e62e9dd1046745cd863ec2b05730",
+      "source_sha256": "28b7038996290fe1006c3b8d633d5c6befd9e62e9dd1046745cd863ec2b05730",
+      "normalized_sha256": "28b7038996290fe1006c3b8d633d5c6befd9e62e9dd1046745cd863ec2b05730",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/special_pirate_captain.webp",
+      "status": 200,
+      "bytes": 3812,
+      "sha256": "56a1a959197048f81eae024118cd1ee73ffe2bae9ee596460c653cfa1b191848",
+      "source_sha256": "56a1a959197048f81eae024118cd1ee73ffe2bae9ee596460c653cfa1b191848",
+      "normalized_sha256": "56a1a959197048f81eae024118cd1ee73ffe2bae9ee596460c653cfa1b191848",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/special_samurai.webp",
+      "status": 200,
+      "bytes": 3600,
+      "sha256": "5a949b29d23de42a31128212789df173cf6acf930b1671fdb7dab9c72bf26b89",
+      "source_sha256": "5a949b29d23de42a31128212789df173cf6acf930b1671fdb7dab9c72bf26b89",
+      "normalized_sha256": "5a949b29d23de42a31128212789df173cf6acf930b1671fdb7dab9c72bf26b89",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/league_gold_weekly.webp",
+      "status": 200,
+      "bytes": 2166,
+      "sha256": "ab0941b414e9684d2ebd51a723d8c7e80572e5d46671b1dc5223e6852f4293cf",
+      "source_sha256": "ab0941b414e9684d2ebd51a723d8c7e80572e5d46671b1dc5223e6852f4293cf",
+      "normalized_sha256": "ab0941b414e9684d2ebd51a723d8c7e80572e5d46671b1dc5223e6852f4293cf",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/league_sapphire_weekly.webp",
+      "status": 200,
+      "bytes": 2146,
+      "sha256": "e2b607539292a1811f57070ae643fb6d9d7720b72dc6b330fc6f088a0bf058bb",
+      "source_sha256": "e2b607539292a1811f57070ae643fb6d9d7720b72dc6b330fc6f088a0bf058bb",
+      "normalized_sha256": "e2b607539292a1811f57070ae643fb6d9d7720b72dc6b330fc6f088a0bf058bb",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/special_vampire_lord.webp",
+      "status": 200,
+      "bytes": 4646,
+      "sha256": "1c1aa95151d36df7b88f22f5b80dac4e1a9b8b0374693c07704668fe9b7aecd3",
+      "source_sha256": "1c1aa95151d36df7b88f22f5b80dac4e1a9b8b0374693c07704668fe9b7aecd3",
+      "normalized_sha256": "1c1aa95151d36df7b88f22f5b80dac4e1a9b8b0374693c07704668fe9b7aecd3",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/league_bronze_weekly.webp",
+      "status": 200,
+      "bytes": 1764,
+      "sha256": "1d93764b65b6fc86f9d696a74ae3e28dfab202ae13b2ffe5f1d21c34d75e37d8",
+      "source_sha256": "1d93764b65b6fc86f9d696a74ae3e28dfab202ae13b2ffe5f1d21c34d75e37d8",
+      "normalized_sha256": "1d93764b65b6fc86f9d696a74ae3e28dfab202ae13b2ffe5f1d21c34d75e37d8",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/special_forest_fairy.webp",
+      "status": 200,
+      "bytes": 3380,
+      "sha256": "e03708735bc790cdf70f9d09cdf0608a3a5644af4cb733f3244b6175dd2dae5d",
+      "source_sha256": "e03708735bc790cdf70f9d09cdf0608a3a5644af4cb733f3244b6175dd2dae5d",
+      "normalized_sha256": "e03708735bc790cdf70f9d09cdf0608a3a5644af4cb733f3244b6175dd2dae5d",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/special_astronaut.webp",
+      "status": 200,
+      "bytes": 3118,
+      "sha256": "3226cf3a259238058df3c367c2c5a9f2312f838751315f3a3d1bf1fc05f3e4de",
+      "source_sha256": "3226cf3a259238058df3c367c2c5a9f2312f838751315f3a3d1bf1fc05f3e4de",
+      "normalized_sha256": "3226cf3a259238058df3c367c2c5a9f2312f838751315f3a3d1bf1fc05f3e4de",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/special_detective.webp",
+      "status": 200,
+      "bytes": 3514,
+      "sha256": "3780ca45834d6348e0ea670586157fb3d72a4e5cb9ecd7591d601e0806423d67",
+      "source_sha256": "3780ca45834d6348e0ea670586157fb3d72a4e5cb9ecd7591d601e0806423d67",
+      "normalized_sha256": "3780ca45834d6348e0ea670586157fb3d72a4e5cb9ecd7591d601e0806423d67",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/special_flame_spirit.webp",
+      "status": 200,
+      "bytes": 4236,
+      "sha256": "0811d8a22e361081998fe4bdda20250a130cb34705170328acaa5c2801886e53",
+      "source_sha256": "0811d8a22e361081998fe4bdda20250a130cb34705170328acaa5c2801886e53",
+      "normalized_sha256": "0811d8a22e361081998fe4bdda20250a130cb34705170328acaa5c2801886e53",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/special_crystal_princess.webp",
+      "status": 200,
+      "bytes": 2818,
+      "sha256": "f875671b9783b142e0236f1b21d7f7368c0a1bab4671e895391b66341575052f",
+      "source_sha256": "f875671b9783b142e0236f1b21d7f7368c0a1bab4671e895391b66341575052f",
+      "normalized_sha256": "f875671b9783b142e0236f1b21d7f7368c0a1bab4671e895391b66341575052f",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/special_star_wizard.webp",
+      "status": 200,
+      "bytes": 3454,
+      "sha256": "aab79bd6bf806e46fea821c1475442f45c6d329189349aa47e398bd69568a3ee",
+      "source_sha256": "aab79bd6bf806e46fea821c1475442f45c6d329189349aa47e398bd69568a3ee",
+      "normalized_sha256": "aab79bd6bf806e46fea821c1475442f45c6d329189349aa47e398bd69568a3ee",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/league_silver_weekly.webp",
+      "status": 200,
+      "bytes": 1888,
+      "sha256": "1ff67941afb46364a6e2983f86de12aec4a2df7ee10ed6cab5edd616e40bcc7b",
+      "source_sha256": "1ff67941afb46364a6e2983f86de12aec4a2df7ee10ed6cab5edd616e40bcc7b",
+      "normalized_sha256": "1ff67941afb46364a6e2983f86de12aec4a2df7ee10ed6cab5edd616e40bcc7b",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/special_steampunk_pilot.webp",
+      "status": 200,
+      "bytes": 3870,
+      "sha256": "1182313b89390df8cdbe28bcdae8547d89384fa07b6841eefaa663607e2c240a",
+      "source_sha256": "1182313b89390df8cdbe28bcdae8547d89384fa07b6841eefaa663607e2c240a",
+      "normalized_sha256": "1182313b89390df8cdbe28bcdae8547d89384fa07b6841eefaa663607e2c240a",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/special_cyber_robot.webp",
+      "status": 200,
+      "bytes": 4534,
+      "sha256": "26a08a235616bb4f97a545df4a0b7f5c71371b6d11be7141e48771d278a81662",
+      "source_sha256": "26a08a235616bb4f97a545df4a0b7f5c71371b6d11be7141e48771d278a81662",
+      "normalized_sha256": "26a08a235616bb4f97a545df4a0b7f5c71371b6d11be7141e48771d278a81662",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/special_shadow_queen.webp",
+      "status": 200,
+      "bytes": 4080,
+      "sha256": "9cf05804d86261bd616fb851aabbf2e804a6b4530522937523241fbbaab50e07",
+      "source_sha256": "9cf05804d86261bd616fb851aabbf2e804a6b4530522937523241fbbaab50e07",
+      "normalized_sha256": "9cf05804d86261bd616fb851aabbf2e804a6b4530522937523241fbbaab50e07",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/special_pharaoh.webp",
+      "status": 200,
+      "bytes": 4946,
+      "sha256": "c2dbc0871883cb8ac0d8fa34e6b4d0c50e594297ad7e694238a2010e235c60db",
+      "source_sha256": "c2dbc0871883cb8ac0d8fa34e6b4d0c50e594297ad7e694238a2010e235c60db",
+      "normalized_sha256": "c2dbc0871883cb8ac0d8fa34e6b4d0c50e594297ad7e694238a2010e235c60db",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/special_potion_master.webp",
+      "status": 200,
+      "bytes": 3174,
+      "sha256": "568af0a82a641022ce0c297b26e3e0036f5f0f0442bc3a9e71cab26e730605d5",
+      "source_sha256": "568af0a82a641022ce0c297b26e3e0036f5f0f0442bc3a9e71cab26e730605d5",
+      "normalized_sha256": "568af0a82a641022ce0c297b26e3e0036f5f0f0442bc3a9e71cab26e730605d5",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/special_archaeologist.webp",
+      "status": 200,
+      "bytes": 3278,
+      "sha256": "e6e9e406618804a441b5753972685838ad5e0d082dec2575fc365545d004825e",
+      "source_sha256": "e6e9e406618804a441b5753972685838ad5e0d082dec2575fc365545d004825e",
+      "normalized_sha256": "e6e9e406618804a441b5753972685838ad5e0d082dec2575fc365545d004825e",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/special_light_knight.webp",
+      "status": 200,
+      "bytes": 3590,
+      "sha256": "4f45023dc2d82215b745b277e2b36b76bc4fc5608f013b459448b7d7553fca35",
+      "source_sha256": "4f45023dc2d82215b745b277e2b36b76bc4fc5608f013b459448b7d7553fca35",
+      "normalized_sha256": "4f45023dc2d82215b745b277e2b36b76bc4fc5608f013b459448b7d7553fca35",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/special_zen_master.webp",
+      "status": 200,
+      "bytes": 3176,
+      "sha256": "8889ea3192a7ef69d557075c8501a1ca327da8ba0159dfde08f38adb8feb1407",
+      "source_sha256": "8889ea3192a7ef69d557075c8501a1ca327da8ba0159dfde08f38adb8feb1407",
+      "normalized_sha256": "8889ea3192a7ef69d557075c8501a1ca327da8ba0159dfde08f38adb8feb1407",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/special_celestial_king.webp",
+      "status": 200,
+      "bytes": 4880,
+      "sha256": "872a2095bd6d55589a1a950ff39e817a6b2a0c23aacb6d44da911a0bac678dca",
+      "source_sha256": "872a2095bd6d55589a1a950ff39e817a6b2a0c23aacb6d44da911a0bac678dca",
+      "normalized_sha256": "872a2095bd6d55589a1a950ff39e817a6b2a0c23aacb6d44da911a0bac678dca",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/league_diamond_weekly.webp",
+      "status": 200,
+      "bytes": 2532,
+      "sha256": "8c751a0a28b3673f883b4d06a0ea3537ef4c7cbc1105e198211632f9fce8ca21",
+      "source_sha256": "8c751a0a28b3673f883b4d06a0ea3537ef4c7cbc1105e198211632f9fce8ca21",
+      "normalized_sha256": "8c751a0a28b3673f883b4d06a0ea3537ef4c7cbc1105e198211632f9fce8ca21",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/special_cowboy.webp",
+      "status": 200,
+      "bytes": 4128,
+      "sha256": "cbca1ae1705724c5230496ffaa893bdb51a84e52d1101bcd7b89f8316d2140b4",
+      "source_sha256": "cbca1ae1705724c5230496ffaa893bdb51a84e52d1101bcd7b89f8316d2140b4",
+      "normalized_sha256": "cbca1ae1705724c5230496ffaa893bdb51a84e52d1101bcd7b89f8316d2140b4",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/avatars/special_gold_miner.webp",
+      "status": 200,
+      "bytes": 3310,
+      "sha256": "ded8b6ed9a07b38bbc2a721c4a4eb89025441aeb291f3f0eac5ce3f155763d19",
+      "source_sha256": "ded8b6ed9a07b38bbc2a721c4a4eb89025441aeb291f3f0eac5ce3f155763d19",
+      "normalized_sha256": "ded8b6ed9a07b38bbc2a721c4a4eb89025441aeb291f3f0eac5ce3f155763d19",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/fonts/nunito-v32-italic-latin-ext.woff2",
+      "status": 200,
+      "bytes": 16820,
+      "sha256": "57ed36330679a0895590b797e198c0d68a3a4d1debc904516543eebeb13de411",
+      "source_sha256": "57ed36330679a0895590b797e198c0d68a3a4d1debc904516543eebeb13de411",
+      "normalized_sha256": "57ed36330679a0895590b797e198c0d68a3a4d1debc904516543eebeb13de411",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/fonts/nunito-v32-latin-ext.woff2",
+      "status": 200,
+      "bytes": 35464,
+      "sha256": "511ce967375fd2d924483d798f1086a533259fc675181f62944ec1176fe8786d",
+      "source_sha256": "511ce967375fd2d924483d798f1086a533259fc675181f62944ec1176fe8786d",
+      "normalized_sha256": "511ce967375fd2d924483d798f1086a533259fc675181f62944ec1176fe8786d",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/fonts/baloo2-v23-latin-ext.woff2",
+      "status": 200,
+      "bytes": 27520,
+      "sha256": "77f82a2cdec619cea53db60cf87ff74a195304e589617fbb3bbdf5c566669ee1",
+      "source_sha256": "77f82a2cdec619cea53db60cf87ff74a195304e589617fbb3bbdf5c566669ee1",
+      "normalized_sha256": "77f82a2cdec619cea53db60cf87ff74a195304e589617fbb3bbdf5c566669ee1",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/fonts/nunito-v32-italic-latin.woff2",
+      "status": 200,
+      "bytes": 17132,
+      "sha256": "bfb6c290069d6502c6c9a55fee8737cb6b30ade52359b66f5bd298ef636791f3",
+      "source_sha256": "bfb6c290069d6502c6c9a55fee8737cb6b30ade52359b66f5bd298ef636791f3",
+      "normalized_sha256": "bfb6c290069d6502c6c9a55fee8737cb6b30ade52359b66f5bd298ef636791f3",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/fonts/nunito-v32-latin.woff2",
+      "status": 200,
+      "bytes": 39152,
+      "sha256": "20fc9b6fc618e7c3c68d3ac750a2a5dfbceb8521675458d2cea580b5693e4798",
+      "source_sha256": "20fc9b6fc618e7c3c68d3ac750a2a5dfbceb8521675458d2cea580b5693e4798",
+      "normalized_sha256": "20fc9b6fc618e7c3c68d3ac750a2a5dfbceb8521675458d2cea580b5693e4798",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/fonts/baloo2-v23-latin.woff2",
+      "status": 200,
+      "bytes": 33056,
+      "sha256": "2e9420db49d01d76a7b8a38ef22ec9c45305d9f15fafa370389b7bf467658fc3",
+      "source_sha256": "2e9420db49d01d76a7b8a38ef22ec9c45305d9f15fafa370389b7bf467658fc3",
+      "normalized_sha256": "2e9420db49d01d76a7b8a38ef22ec9c45305d9f15fafa370389b7bf467658fc3",
+      "cloudflare_beacon_count": 0,
+      "checks": {
+        "http200": true,
+        "body_matches_source": true,
+        "nosniff": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/.env",
+      "kind": "private-or-unknown",
+      "checks": {
+        "http404": true
+      },
+      "status": 404,
+      "ok": true
+    },
+    {
+      "path": "/wrangler.jsonc",
+      "kind": "private-or-unknown",
+      "checks": {
+        "http404": true
+      },
+      "status": 404,
+      "ok": true
+    },
+    {
+      "path": "/worker.js",
+      "kind": "private-or-unknown",
+      "checks": {
+        "http404": true
+      },
+      "status": 404,
+      "ok": true
+    },
+    {
+      "path": "/README.md",
+      "kind": "private-or-unknown",
+      "checks": {
+        "http404": true
+      },
+      "status": 404,
+      "ok": true
+    },
+    {
+      "path": "/_partials/header.html",
+      "kind": "private-or-unknown",
+      "checks": {
+        "http404": true
+      },
+      "status": 404,
+      "ok": true
+    },
+    {
+      "path": "/tools/sync_partials.py",
+      "kind": "private-or-unknown",
+      "checks": {
+        "http404": true
+      },
+      "status": 404,
+      "ok": true
+    },
+    {
+      "path": "/does-not-exist-pomosprint-check",
+      "kind": "private-or-unknown",
+      "checks": {
+        "http404": true
+      },
+      "status": 404,
+      "ok": true
+    },
+    {
+      "path": "/videos/20261028/timer-tr.mp4",
+      "kind": "range",
+      "range": "bytes=0-31",
+      "status": 206,
+      "checks": {
+        "status": true,
+        "body": true,
+        "content_range": true,
+        "csp": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/videos/20261028/timer-tr.mp4",
+      "kind": "range",
+      "range": "bytes=-32",
+      "status": 206,
+      "checks": {
+        "status": true,
+        "body": true,
+        "content_range": true,
+        "csp": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/videos/20261028/timer-tr.mp4",
+      "kind": "range",
+      "range": "bytes=999999-",
+      "status": 416,
+      "checks": {
+        "status": true,
+        "body": true,
+        "content_range": true,
+        "csp": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/videos/20261028/timer-en.mp4",
+      "kind": "range",
+      "range": "bytes=0-31",
+      "status": 206,
+      "checks": {
+        "status": true,
+        "body": true,
+        "content_range": true,
+        "csp": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/videos/20261028/timer-en.mp4",
+      "kind": "range",
+      "range": "bytes=-32",
+      "status": 206,
+      "checks": {
+        "status": true,
+        "body": true,
+        "content_range": true,
+        "csp": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/videos/20261028/timer-en.mp4",
+      "kind": "range",
+      "range": "bytes=999999-",
+      "status": 416,
+      "checks": {
+        "status": true,
+        "body": true,
+        "content_range": true,
+        "csp": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/videos/20261028/marathon-tr.mp4",
+      "kind": "range",
+      "range": "bytes=0-31",
+      "status": 206,
+      "checks": {
+        "status": true,
+        "body": true,
+        "content_range": true,
+        "csp": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/videos/20261028/marathon-tr.mp4",
+      "kind": "range",
+      "range": "bytes=-32",
+      "status": 206,
+      "checks": {
+        "status": true,
+        "body": true,
+        "content_range": true,
+        "csp": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/videos/20261028/marathon-tr.mp4",
+      "kind": "range",
+      "range": "bytes=999999-",
+      "status": 416,
+      "checks": {
+        "status": true,
+        "body": true,
+        "content_range": true,
+        "csp": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/videos/20261028/marathon-en.mp4",
+      "kind": "range",
+      "range": "bytes=0-31",
+      "status": 206,
+      "checks": {
+        "status": true,
+        "body": true,
+        "content_range": true,
+        "csp": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/videos/20261028/marathon-en.mp4",
+      "kind": "range",
+      "range": "bytes=-32",
+      "status": 206,
+      "checks": {
+        "status": true,
+        "body": true,
+        "content_range": true,
+        "csp": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/videos/20261028/marathon-en.mp4",
+      "kind": "range",
+      "range": "bytes=999999-",
+      "status": 416,
+      "checks": {
+        "status": true,
+        "body": true,
+        "content_range": true,
+        "csp": true
+      },
+      "ok": true
+    },
+    {
+      "path": "http://pomosprint.app/features?qa=1",
+      "kind": "redirect",
+      "status": 301,
+      "checks": {
+        "status301": true,
+        "target": true
+      },
+      "ok": true
+    },
+    {
+      "path": "https://www.pomosprint.app/features?qa=1",
+      "kind": "redirect",
+      "status": 301,
+      "checks": {
+        "status301": true,
+        "target": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/",
+      "kind": "current-content",
+      "checks": {
+        "id=\"deneme\"": true,
+        "DUS": true,
+        "exam-catalog-tr.png": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/features",
+      "kind": "current-content",
+      "checks": {
+        "exam-results-tr.png": true,
+        "Denemelerim": true,
+        "72 kum": true,
+        "DUS": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/en/",
+      "kind": "current-content",
+      "checks": {
+        "id=\"practice\"": true,
+        "DUS": true,
+        "exam-catalog-en.png": true
+      },
+      "ok": true
+    },
+    {
+      "path": "/en/features",
+      "kind": "current-content",
+      "checks": {
+        "exam-results-en.png": true,
+        "72 sand": true,
+        "DUS": true
+      },
+      "ok": true
+    }
+  ],
+  "scope": "GET/read-only checks; no forms, account or database mutation. HTML comparison removes exactly one observed Cloudflare Web Analytics script and its inserted newline; raw first comparison is retained."
+}

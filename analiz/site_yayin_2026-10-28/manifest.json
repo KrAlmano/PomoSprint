@@ -1,0 +1,71 @@
+{
+  "worker_version": "e1bb6541-5794-4241-ab5e-66ded59a9298",
+  "source_commit": "1a58014",
+  "artifacts": [
+    {
+      "path": "deployment.json",
+      "bytes": 876,
+      "sha256": "70edd35cac82ecabd7752657d73b7a9c1d58da22346839b83a26c9d795e543b4"
+    },
+    {
+      "path": "live_http.json",
+      "bytes": 78643,
+      "sha256": "867584aadbe87f3aa5f2228baa3300ed04bf641140d449c4af5c19b79b56137e"
+    },
+    {
+      "path": "live_http_beacon_only_comparison.json",
+      "bytes": 78659,
+      "sha256": "fff53e0895991270ed50f442fccbb97725f34097a67646f3a3e14c3ff8e47a9a"
+    },
+    {
+      "path": "live_http_raw_comparison.json",
+      "bytes": 45316,
+      "sha256": "5b4ce5c56aa82d2630adb492720c295534a9f0acda7e31b5dc4a5c98c2621922"
+    },
+    {
+      "path": "node-tests-final.log",
+      "bytes": 16498,
+      "sha256": "17fcb6ec6eae64830d48be5f7e9201f69f8191c680325fb28cbd9af7d1b4e120"
+    },
+    {
+      "path": "node-tests.log",
+      "bytes": 16509,
+      "sha256": "c6ade705ff15fdd98583230d30142af9afa2c2b9f61f6ceef63b8fcf1fe5cfcb"
+    },
+    {
+      "path": "safari/README.md",
+      "bytes": 2795,
+      "sha256": "17e0a90848d8677a228bd8df7b219ccfe9694b03181da51e3d05824fb6e4867a"
+    },
+    {
+      "path": "safari/live-en-features-1024.jpg",
+      "bytes": 444400,
+      "sha256": "06810034284fa9324cd62ebfe78b3213c85d66acca963682ae31350964ae69de"
+    },
+    {
+      "path": "safari/live-en-home-1440.jpg",
+      "bytes": 369100,
+      "sha256": "471eff757e9750c98d0bfddfcd0056304acaadacd30671e41b0eb2917be908fe"
+    },
+    {
+      "path": "safari/live-tr-home-375.jpg",
+      "bytes": 285039,
+      "sha256": "92667e2dd9975aa70e238ee52dfc064221f6c1aeb2089f431461cc92a86ddc26"
+    },
+    {
+      "path": "safari/live_visual_checks.json",
+      "bytes": 9111,
+      "sha256": "c4fdd0c51a1942e3ff4c67cfd712fa9b030469c0fceb47141226667218130fe6"
+    },
+    {
+      "path": "safari/screenshots.json",
+      "bytes": 1476,
+      "sha256": "421a3cd085d7464ebd2feb96d0c3731dc121be3d969905faf17951a4f072809a"
+    },
+    {
+      "path": "verify_published_site.py.txt",
+      "bytes": 5803,
+      "sha256": "8c45198e748d501443c8d8d57d1cbc73dd3088e4df7866047a44bda69ff944e6"
+    }
+  ]
+}

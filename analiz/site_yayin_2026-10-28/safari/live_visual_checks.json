@@ -1,0 +1,193 @@
+{
+  "schema_version": 1,
+  "worker_version": "e1bb6541-5794-4241-ab5e-66ded59a9298",
+  "observed_at": "2026-10-28T18:26:28.560657+00:00",
+  "scope": "Actual CUA Safari smoke checks after publication; not the prior local 72-case matrix",
+  "window_uuid": "6D09DD83-D232-4BDC-B3F6-A6A6E339A5B8",
+  "production_opened_directly": true,
+  "iframe_used_for_production": false,
+  "unique_page_width_cases": 18,
+  "cases": [
+    {
+      "url": "https://pomosprint.app/",
+      "rdm_width_css_px": 375,
+      "observed_at": "2026-10-28T18:21:22.382Z",
+      "method": "Direct production page in Safari RDM; visible heading and selected page content inspected through CUA screenshot",
+      "result": "PASS",
+      "scope": "Visual smoke check, not exhaustive full-page or automated layout measurement"
+    },
+    {
+      "url": "https://pomosprint.app/en/",
+      "rdm_width_css_px": 375,
+      "observed_at": "2026-10-28T18:21:38.861Z",
+      "method": "Direct production page in Safari RDM; visible heading and selected page content inspected through CUA screenshot",
+      "result": "PASS",
+      "scope": "Visual smoke check, not exhaustive full-page or automated layout measurement"
+    },
+    {
+      "url": "https://pomosprint.app/features",
+      "rdm_width_css_px": 375,
+      "observed_at": "2026-10-28T18:21:41.211Z",
+      "method": "Direct production page in Safari RDM; visible heading and selected page content inspected through CUA screenshot",
+      "result": "PASS",
+      "scope": "Visual smoke check, not exhaustive full-page or automated layout measurement"
+    },
+    {
+      "url": "https://pomosprint.app/en/features",
+      "rdm_width_css_px": 375,
+      "observed_at": "2026-10-28T18:21:50.051Z",
+      "method": "Direct production page in Safari RDM; visible heading and selected page content inspected through CUA screenshot",
+      "result": "PASS",
+      "scope": "Visual smoke check, not exhaustive full-page or automated layout measurement"
+    },
+    {
+      "url": "https://pomosprint.app/faq",
+      "rdm_width_css_px": 375,
+      "observed_at": "2026-10-28T18:22:01.427Z",
+      "method": "Direct production page in Safari RDM; visible heading and selected page content inspected through CUA screenshot",
+      "result": "PASS",
+      "scope": "Visual smoke check, not exhaustive full-page or automated layout measurement"
+    },
+    {
+      "url": "https://pomosprint.app/en/faq",
+      "rdm_width_css_px": 375,
+      "observed_at": "2026-10-28T18:22:05.437Z",
+      "method": "Direct production page in Safari RDM; visible heading and selected page content inspected through CUA screenshot",
+      "result": "PASS",
+      "scope": "Visual smoke check, not exhaustive full-page or automated layout measurement"
+    },
+    {
+      "url": "https://pomosprint.app/",
+      "rdm_width_css_px": 1024,
+      "observed_at": "2026-10-28T18:22:13.979Z",
+      "method": "Direct production page in Safari RDM; visible heading and selected page content inspected through CUA screenshot",
+      "result": "PASS",
+      "scope": "Visual smoke check, not exhaustive full-page or automated layout measurement"
+    },
+    {
+      "url": "https://pomosprint.app/en/",
+      "rdm_width_css_px": 1024,
+      "observed_at": "2026-10-28T18:22:15.760Z",
+      "method": "Direct production page in Safari RDM; visible heading and selected page content inspected through CUA screenshot",
+      "result": "PASS",
+      "scope": "Visual smoke check, not exhaustive full-page or automated layout measurement"
+    },
+    {
+      "url": "https://pomosprint.app/features",
+      "rdm_width_css_px": 1024,
+      "observed_at": "2026-10-28T18:22:28.279Z",
+      "method": "Direct production page in Safari RDM; visible heading and selected page content inspected through CUA screenshot",
+      "result": "PASS",
+      "scope": "Visual smoke check, not exhaustive full-page or automated layout measurement"
+    },
+    {
+      "url": "https://pomosprint.app/en/features",
+      "rdm_width_css_px": 1024,
+      "observed_at": "2026-10-28T18:22:32.004Z",
+      "method": "Direct production page in Safari RDM; visible heading and selected page content inspected through CUA screenshot",
+      "result": "PASS",
+      "scope": "Visual smoke check, not exhaustive full-page or automated layout measurement"
+    },
+    {
+      "url": "https://pomosprint.app/faq",
+      "rdm_width_css_px": 1024,
+      "observed_at": "2026-10-28T18:22:44.918Z",
+      "method": "Direct production page in Safari RDM; visible heading and selected page content inspected through CUA screenshot",
+      "result": "PASS",
+      "scope": "Visual smoke check, not exhaustive full-page or automated layout measurement"
+    },
+    {
+      "url": "https://pomosprint.app/en/faq",
+      "rdm_width_css_px": 1024,
+      "observed_at": "2026-10-28T18:22:48.939Z",
+      "method": "Direct production page in Safari RDM; visible heading and selected page content inspected through CUA screenshot",
+      "result": "PASS",
+      "scope": "Visual smoke check, not exhaustive full-page or automated layout measurement"
+    },
+    {
+      "url": "https://pomosprint.app/",
+      "rdm_width_css_px": 1440,
+      "observed_at": "2026-10-28T18:23:02.347Z",
+      "method": "Direct production page in Safari RDM; visible heading and selected page content inspected through CUA screenshot",
+      "result": "PASS",
+      "scope": "Visual smoke check, not exhaustive full-page or automated layout measurement"
+    },
+    {
+      "url": "https://pomosprint.app/en/",
+      "rdm_width_css_px": 1440,
+      "observed_at": "2026-10-28T18:23:04.643Z",
+      "method": "Direct production page in Safari RDM; visible heading and selected page content inspected through CUA screenshot",
+      "result": "PASS",
+      "scope": "Visual smoke check, not exhaustive full-page or automated layout measurement"
+    },
+    {
+      "url": "https://pomosprint.app/features",
+      "rdm_width_css_px": 1440,
+      "observed_at": "2026-10-28T18:23:07.075Z",
+      "method": "Direct production page in Safari RDM; visible heading and selected page content inspected through CUA screenshot",
+      "result": "PASS",
+      "scope": "Visual smoke check, not exhaustive full-page or automated layout measurement"
+    },
+    {
+      "url": "https://pomosprint.app/en/features",
+      "rdm_width_css_px": 1440,
+      "observed_at": "2026-10-28T18:23:15.219Z",
+      "method": "Direct production page in Safari RDM; visible heading and selected page content inspected through CUA screenshot",
+      "result": "PASS",
+      "scope": "Visual smoke check, not exhaustive full-page or automated layout measurement"
+    },
+    {
+      "url": "https://pomosprint.app/faq",
+      "rdm_width_css_px": 1440,
+      "observed_at": "2026-10-28T18:23:17.760Z",
+      "method": "Direct production page in Safari RDM; visible heading and selected page content inspected through CUA screenshot",
+      "result": "PASS",
+      "scope": "Visual smoke check, not exhaustive full-page or automated layout measurement"
+    },
+    {
+      "url": "https://pomosprint.app/en/faq",
+      "rdm_width_css_px": 1440,
+      "observed_at": "2026-10-28T18:23:19.563Z",
+      "method": "Direct production page in Safari RDM; visible heading and selected page content inspected through CUA screenshot",
+      "result": "PASS",
+      "scope": "Visual smoke check, not exhaustive full-page or automated layout measurement"
+    }
+  ],
+  "videos": [
+    {
+      "video": "timer-tr.mp4",
+      "page": "https://pomosprint.app/features",
+      "observed": "Autoplay visibly changed from countdown to timer/category frames; pause changed the accessible label to Kaydı oynat; resume was exercised."
+    },
+    {
+      "video": "marathon-tr.mp4",
+      "page": "https://pomosprint.app/features",
+      "observed": "The hourglass and Marathon planner frames were seen; pause changed the accessible label to Kaydı oynat; resume was exercised."
+    },
+    {
+      "video": "timer-en.mp4",
+      "page": "https://pomosprint.app/en/features",
+      "observed": "The timer and countdown frames were seen; pause changed the accessible label to Play recording; resume was exercised."
+    },
+    {
+      "video": "marathon-en.mp4",
+      "page": "https://pomosprint.app/en/features",
+      "observed": "The hourglass and two-session planner frames were seen; pause changed the accessible label to Play recording; resume was exercised."
+    }
+  ],
+  "navigation": [
+    "TR mobile menu open/close and Escape",
+    "TR/EN language link followed to TR home",
+    "Header Features link followed to /features",
+    "TR FAQ second answer expanded and first answer collapsed; EN answer opened"
+  ],
+  "ranking_observation": "Aylık sıralama hazırlanıyor. Odak zamanı!",
+  "console_status": "NOT_VERIFIED: Show JavaScript Console did not produce readable console content through this CUA view; no claim of zero console errors",
+  "not_exercised": [
+    "External forms or account submissions",
+    "Physical device browser",
+    "Numeric currentTime/muted/loop DOM inspection on production",
+    "Exact first paint timing",
+    "Chrome"
+  ]
+}

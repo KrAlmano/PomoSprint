@@ -1355,3 +1355,10 @@ Normal `lib/main.dart` son UI ile iki cihaza yeniden kuruldu; 25:00 görüntüs�
 
 
 Kapanış ikinci kapısı da1482/172temizdir. Geçici build/rawmedia temizliği~6.95GBalan açtı. `build/final_release_20261028` içindeki son paketler yereldir, Gitdışıdır; kalıcı deliller analiz/ altında. iOS18.6/AndroidAPI36QAcihazları ve HocamMacVar kişiselcihazı korundu. review/siteAPIHTTP200;kurulu uygulamalar yerelortamdadır. Son gönderim yalnız çalışma dalına; canlıya kurulum sonraki kullanıcı kararıdır.
+
+
+## 41. Güncel web sitesi canlı yayını — 28 Ekim 2026
+
+Kullanıcı canlıda eski ekranları görünce tüm siteyi Deneme/DUS ile güncellememizi istedi. Bu yeni yetki yalnız web sitesi için önceki no-deploy sınırını kaldırdı. `1a58014` kaynakları mevcut `pomosprint-website` Worker’ına yayımlandı: `e1bb6541-5794-4241-ab5e-66ded59a9298`, trafik %100, İstanbul21:19:31. Ana sayfa/Özellikler/SSS TR+EN,30ekran/4video,AYT/net/özelnot/Deneme/cüzdan/lig içerikleri artık webde. Ayrıca destek ve gizlilik verienvanteri düzeltilip yanlış yayında/Apple/duraklatma cümleleri temizlendi. Hukukisebep/onaysürümü/kimlik değiştirilmedi.
+
+Node172/172 ve canlı156/156 HTTP kontrolü geçti; 20 HTML’de mevcutCloudflarebeacon+tekLF çıkarılınca içerikbirebir,111statikdosya hamhashbirebir. İlkhamHTMLfarkları korundu. [Nihai yayın raporu](analiz/SITE_YAYIN_RAPORU_2026-10-28.md). DB/31/mobilstore/main/merge/force değişmedi. Uygulama hâlâ yayın hazırlığında; webyayını sunucupaketlerinin kurulduğunu göstermez.

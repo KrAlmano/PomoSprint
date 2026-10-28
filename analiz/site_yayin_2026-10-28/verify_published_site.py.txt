@@ -1,0 +1,70 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+from urllib.parse import urljoin,urlparse,unquote
+from urllib.request import Request,urlopen,build_opener,HTTPRedirectHandler
+from urllib.error import HTTPError
+import json,hashlib,re,time,datetime
+from zoneinfo import ZoneInfo
+R=Path('/Users/almano/Desktop/Projects/Pomodoro');L=R/'landing';OUT=R/'analiz/site_yayin_2026-10-28';OUT.mkdir(exist_ok=True)
+BASE='https://pomosprint.app';seen={};rows=[]
+class NoRedirect(HTTPRedirectHandler):
+ def redirect_request(self,*a,**k):return None
+
+def request(path,headers=None,method='GET',redirect=True):
+ url=path if path.startswith('http') else BASE+path
+ req=Request(url,headers={'User-Agent':'PomoSprint-deployment-verification/2026-10-28','Cache-Control':'no-cache',**(headers or {})},method=method)
+ try:
+  r=(urlopen(req,timeout=25) if redirect else build_opener(NoRedirect).open(req,timeout=25))
+ except HTTPError as err:r=err
+ with r:
+  b=r.read(8_000_001);assert len(b)<=8_000_000,'body too large'
+  return r.status,dict(r.headers),b,r.url
+
+def local_route(p):
+ rel=p.relative_to(L).as_posix()
+ if rel=='index.html':return '/'
+ if rel.endswith('/index.html'):return '/'+rel[:-10]
+ return '/'+rel[:-5]
+html=[p for p in L.rglob('*.html') if not any(s in p.parts for s in ['_partials','tools','.wrangler','node_modules']) and p.name!='404.html']
+resources={}
+for p in html:
+ path=local_route(p);resources[path]=p
+ for value in re.findall(r'(?:src|href|data-src|poster)=[\"\x27]([^\"\x27]+)',p.read_text()):
+  u=urlparse(urljoin(BASE+path,value))
+  if u.hostname!='pomosprint.app':continue
+  local=L/unquote(u.path.lstrip('/'))
+  if local.is_file() and local.suffix not in ['.md'] and u.path!='/worker.js':resources[u.path]=local
+
+for p in L.rglob('*'):
+ if not p.is_file() or any(x.startswith('.') or x in ['_partials','tools','node_modules'] for x in p.relative_to(L).parts):continue
+ if p.name in ['worker.js','wrangler.jsonc','_headers']:continue
+ if p.suffix in ['.css','.js','.json','.png','.webp','.woff2','.ico','.svg','.mp4','.xml','.txt']:
+  resources['/'+p.relative_to(L).as_posix()]=p
+
+def check(item):
+ path,p=item;s,h,b,final=request(path)
+ expected=p.read_bytes();normalized=b;beacon_count=0
+ if p.suffix=='.html':
+  beacon=rb'<script\b(?=[^>]*\bsrc="https://static\.cloudflareinsights\.com/beacon\.min\.js/[^"]+")[^>]*>\s*</script>\n'
+  normalized,beacon_count=re.subn(beacon,b'',b)
+ same=hashlib.sha256(normalized).digest()==hashlib.sha256(expected).digest();low={k.lower():v for k,v in h.items()}
+ tests={'http200':s==200,'body_matches_source':same,'nosniff':low.get('x-content-type-options')=='nosniff'}
+ if p.suffix=='.html':tests.update(exactly_one_platform_beacon=beacon_count==1,csp="frame-ancestors 'none'" in low.get('content-security-policy',''),html_type='text/html' in low.get('content-type',''))
+ return {'path':path,'status':s,'bytes':len(b),'sha256':hashlib.sha256(b).hexdigest(),'source_sha256':hashlib.sha256(expected).hexdigest(),'normalized_sha256':hashlib.sha256(normalized).hexdigest(),'cloudflare_beacon_count':beacon_count,'checks':tests,'ok':all(tests.values())}
+with ThreadPoolExecutor(max_workers=4) as pool:rows=list(pool.map(check,resources.items()))
+for path in ['/.env','/wrangler.jsonc','/worker.js','/README.md','/_partials/header.html','/tools/sync_partials.py','/does-not-exist-pomosprint-check']:
+ s,h,b,_=request(path);rows.append({'path':path,'kind':'private-or-unknown','checks':{'http404':s==404},'status':s,'ok':s==404})
+for path in ['/videos/20261028/'+name+'.mp4' for name in ['timer-tr','timer-en','marathon-tr','marathon-en']]:
+ raw=(L/path.lstrip('/')).read_bytes()
+ for range_value,expected_code,expected in [('bytes=0-31',206,raw[:32]),('bytes=-32',206,raw[-32:]),('bytes=999999-',416,b'')]:
+  s,h,b,_=request(path,{'Range':range_value});low={k.lower():v for k,v in h.items()}
+  checks={'status':s==expected_code,'body':b==expected,'content_range':low.get('content-range','').startswith('bytes '),'csp':"frame-ancestors 'none'" in low.get('content-security-policy','')}
+  rows.append({'path':path,'kind':'range','range':range_value,'status':s,'checks':checks,'ok':all(checks.values())})
+for url in ['http://pomosprint.app/features?qa=1','https://www.pomosprint.app/features?qa=1']:
+ s,h,b,_=request(url,redirect=False);low={k.lower():v for k,v in h.items()};checks={'status301':s==301,'target':low.get('location')=='https://pomosprint.app/features?qa=1'};rows.append({'path':url,'kind':'redirect','status':s,'checks':checks,'ok':all(checks.values())})
+for path,required in [('/', ['id="deneme"','DUS','exam-catalog-tr.png']),('/features',['exam-results-tr.png','Denemelerim','72 kum','DUS']),('/en/',['id="practice"','DUS','exam-catalog-en.png']),('/en/features',['exam-results-en.png','72 sand','DUS'])]:
+ s,h,b,_=request(path);txt=b.decode();checks={part:part in txt for part in required};rows.append({'path':path,'kind':'current-content','checks':checks,'ok':all(checks.values())})
+summary={'checked_at':datetime.datetime.now(ZoneInfo('Europe/Istanbul')).isoformat(),'source_commit':'1a58014','worker_version':'e1bb6541-5794-4241-ab5e-66ded59a9298','html_pages':len(html),'public_resource_requests':len(resources),'cases':len(rows),'passed':sum(x['ok'] for x in rows),'failed':sum(not x['ok'] for x in rows),'rows':rows,'scope':'GET/read-only checks; no forms, account or database mutation. HTML comparison removes exactly one observed Cloudflare Web Analytics script and its inserted newline; raw first comparison is retained.'}
+(OUT/'live_http.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps({k:v for k,v in summary.items() if k!='rows'},ensure_ascii=False));print(json.dumps([r for r in rows if not r['ok']],ensure_ascii=False))
+raise SystemExit(bool(summary['failed']))
