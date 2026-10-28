@@ -5,7 +5,7 @@ set -u -o pipefail
 ROOT="$(cd "$(dirname "$0")/../../../.." && pwd)"
 cd "$ROOT" || exit 1
 if [[ "${1:-}" == "--help" ]]; then
-  echo "Senaryolar: a aa b c d e g h i j k l m n o p q r s t u v w x y z; varsayılan: a b c d e"
+  echo "Senaryolar: a aa ab b c d e g h i j k l m n o p q r s t u v w x y z; varsayılan: a b c d e"
   echo "Yerel Supabase açık olmalı; sayaçlar gerçek 25/50 dakikadır."
   echo "Cihazı açıkça seçin: SIM_UDID (iOS) veya ANDROID_SERIAL (Android emülatörü)."
   exit 0
@@ -15,7 +15,7 @@ declare -a FILES=()
 shopt -s nullglob
 for part in "$@"; do
   case "$part" in
-    a|aa|b|c|d|e|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z) ;;
+    a|aa|ab|b|c|d|e|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z) ;;
     *) echo "HATA: desteklenmeyen senaryo '$part'; --help ile listeye bakın." >&2; exit 2 ;;
   esac
   matches=(integration_test/"${part}"_*_test.dart)
@@ -62,6 +62,14 @@ if [[ -n "${E2E_LEAGUE_FIXTURE_EMAIL:-}" ]]; then
   esac
   case "${E2E_LEAGUE_PHASE:-change}" in change|resume) ;; *) echo "HATA: geçersiz lig testi aşaması." >&2; exit 2 ;; esac
   EXTRA_DEFINES+=("--dart-define=E2E_LEAGUE_FIXTURE_EMAIL=$E2E_LEAGUE_FIXTURE_EMAIL" "--dart-define=E2E_LEAGUE_PHASE=${E2E_LEAGUE_PHASE:-change}")
+fi
+if [[ -n "${E2E_MARATHON_PROBE_MODE:-}" ]]; then
+  case "$E2E_MARATHON_PROBE_MODE" in start|resume) ;; *) echo "HATA: geçersiz Maraton süreç aşaması." >&2; exit 2 ;; esac
+  EXTRA_DEFINES+=("--dart-define=E2E_MARATHON_PROBE_MODE=$E2E_MARATHON_PROBE_MODE")
+  if [[ -n "${E2E_MARATHON_PROBE_EXPECT:-}" ]]; then
+    case "$E2E_MARATHON_PROBE_EXPECT" in focus|break|expired|late_rejected) ;; *) echo "HATA: geçersiz Maraton süreç beklentisi." >&2; exit 2 ;; esac
+    EXTRA_DEFINES+=("--dart-define=E2E_MARATHON_PROBE_EXPECT=$E2E_MARATHON_PROBE_EXPECT")
+  fi
 fi
 if [[ -n "${E2E_PROBE_MODE:-}" ]]; then
   case "$E2E_PROBE_MODE" in
@@ -119,7 +127,9 @@ for f in "${FILES[@]}"; do
 done
 # Şema yalnız kayıtlı referansla karşılaştırılır; güncel canlı doğrulaması değildir.
 PARITY_ARGS=()
-if [[ "${E2E_REVIEWED_NIGHT:-0}" == "2" ]]; then
+if [[ "${E2E_REVIEWED_NIGHT:-0}" == "3" ]]; then
+  PARITY_ARGS+=(--reviewed-night-20261028-with-marathon-anchor)
+elif [[ "${E2E_REVIEWED_NIGHT:-0}" == "2" ]]; then
   PARITY_ARGS+=(--reviewed-night-20261028-with-start-atomic)
 elif [[ "${E2E_REVIEWED_NIGHT:-0}" == "1" ]]; then
   PARITY_ARGS+=(--reviewed-night-20261028)

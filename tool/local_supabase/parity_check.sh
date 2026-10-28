@@ -33,6 +33,10 @@ if [[ "${1:-}" == "--reviewed-night-20261028-with-start-atomic" ]]; then
   [[ $# -eq 1 ]] || { echo "HATA: reviewed parity ek seçenek kabul etmez." >&2; exit 2; }
   exec python3 "$HERE/parity_check_reviewed.py" --with-session-start-atomic
 fi
+if [[ "${1:-}" == "--reviewed-night-20261028-with-marathon-anchor" ]]; then
+  [[ $# -eq 1 ]] || { echo "HATA: reviewed parity ek seçenek kabul etmez." >&2; exit 2; }
+  exec python3 "$HERE/parity_check_reviewed.py" --with-marathon-anchor
+fi
 
 case "$DB_URL" in
   *@127.0.0.1:*|*@localhost:*|*@\[::1\]:*) ;;

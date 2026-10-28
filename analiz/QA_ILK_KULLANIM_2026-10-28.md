@@ -92,3 +92,6 @@ başına sınır geçişi kanıtı sayılmaz.
 Native başarı ancak ilgili platformun koşu logu, gerçek geçen süre,
 korunan marker, sunucu sonuçları ve ekran kanıtları geldikten sonra
 raporlanabilir. Şu an bu belge üç platform için PASS iddiası içermez.
+
+## iOS27 gerçek sonuç — tamamlandı
+`night-first-ios27-h1`, `/tmp/pomosprint_ios27_first_use_h1.log`: **1/1 + yerelparite PASS**. Aynı UI-kayıtlı hesap yerelMailpit onayı, parola girişi, TRseçimi/TUS/yaş/kategori/rehber, gerçek25dakika, görünür5puan20kum, günlük/haftalık/aylık bağımsızSQLkarşılaştırmaları ve gerçekTUSstart/erkenret/vazgeçmeyi tamamladı. İlkodak 23:07:33.710918Z→23:32:33.710918Z, bağımsız1503duvarsaatisaniyesi.04:00 sınırı bu turda **geçilmedi**; flagfalse. Vazgeçmeden sonra tek25dakika/5normalpuan20kum ve0denemeödülü kaldı. Kanıt `build/overnight_backend/first_use_ios27_final.json`. iOS18 veAndroidHsonuçları henüzbekleniyor.

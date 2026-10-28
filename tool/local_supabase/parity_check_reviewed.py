@@ -15,6 +15,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 REFERENCE = HERE / "parity/reviewed_night_20261028.json"
 ATOMIC_REFERENCE = HERE / "parity/reviewed_night_20261028_start_atomic.json"
+MARATHON_REFERENCE = HERE / "parity/reviewed_night_20261028_marathon_anchor.json"
 LOCAL_URL = "postgresql://postgres:postgres@127.0.0.1:54322/postgres"
 
 
@@ -45,6 +46,8 @@ def reference_for(arguments):
         return REFERENCE, "reviewed-local-night-20261028", "27/28/29"
     if arguments == ["--with-session-start-atomic"]:
         return ATOMIC_REFERENCE, "reviewed-local-night-20261028-start-atomic", "27/28/29 + 30"
+    if arguments == ["--with-marathon-anchor"]:
+        return MARATHON_REFERENCE, "reviewed-local-night-20261028-marathon-anchor", "27/28/29 + 30 + 31 (unpaused anchor; paused limitation remains)"
     raise ValueError("unknown reviewed parity mode")
 
 

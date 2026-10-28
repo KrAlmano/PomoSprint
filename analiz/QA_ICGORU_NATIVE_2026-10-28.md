@@ -48,3 +48,6 @@ olarak sayılmaz. Önce devam eden gerçek süreli cevapsız Maraton testi bitme
 ve `E2E_EXAM_INSIGHT_OWNER`. Kaynak test, e-posta ad alanını, owner etiketini,
 12 saatlik hesap yaşını ve bitmemiş yerel kayıtları kontrol eder. Bu kontrol
 başarısızsa mevcut aktif seans veya kuyruk silinmez.
+
+## Android API36 finali — 28 Ekim01:40
+`/tmp/pomosprint_android_aa_01.log`: **1/1+yerelparite PASS**. Aynı kontrollü geçmişte25eşleşendakika,19.25→27.50net, Profil üzerinden TR→EN dildeğişimi, görünürinsight/disclaimerveekonomininkorunmasıdoğrulandı. Kanıt `analiz/ekran_gece_2026-10-28/android-insights/`. Gerçek165dakikalıkdenemebeklenmedi.

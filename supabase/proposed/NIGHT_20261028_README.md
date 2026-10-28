@@ -70,3 +70,11 @@ bash tool/local_supabase/parity_check.sh --reviewed-night-20261028-with-start-at
 ```
 
 Bu testlerin review DB hazırlama adımları gece raporunda bulunur. Şema testi kendi başına native test değildir. Gerçek60sn yerel sınav kataloğu deneyi tam75/135dk native denemesinin yerine sayılmaz; kontrollü tarihli kayıtlar da gerçek ayın geçmesini beklemiş sayılmaz.
+
+## 31: duraklatılmamış Maratonun geç gönderim sınırı
+
+[31 rehberi](31_marathon_completion_anchor_README.md) mevcut Maraton onay fonksiyonuna ayrı bir düzeltmedir; lig tablolarını yeniden değiştirmez. Gecikmiş, duraklatılmamış ilk/ara odakta mola ve onay süresi kabul edilen gerçek odak sonuna bağlanır. Normal seansın puanı/kumu korunur. Duraklatılmış kolun gerçek sonu mevcut API'de ayırt edilemediğinden eski davranışı korunur; bütün AFK yolları kapatılmış sayılmaz.
+
+Gece ortamında sıra27→28→29, bağımsız30 ve ardından ayrı31 olarak doğrulanır.31 canlıya uygulanmadı. Kendi gövde hash ön koşulu ve13maddelik DRYRUN'ı vardır;96izole kontrol geçti. Geçerli ve geçersiz onay,25/50, ara/final odak, idempotency ve geri alma kapsanır.31 kurulduysa geri alma önce31, ardından gerekiyorsa30 ve29→28→27 şeklindedir.31 geri alımı mevcut seans/plan/geçersizlik kararlarını silmez; yalnız gelecekteki çağrılar için eski işlevi getirir.
+
+Yeni yerel31 paritesi açıkça `--reviewed-night-20261028-with-marathon-anchor` ile seçilir. Eski referanslar yerinde kalır. Yeni şemaya geçtiğinizde native çalıştırıcı için `E2E_REVIEWED_NIGHT=3` gerekir.
