@@ -13,6 +13,7 @@ import 'package:pomodoro/services/supabase_service.dart';
 import 'package:pomodoro/services/timer_persistence.dart';
 import 'package:pomodoro/widgets/hourglass_widget.dart';
 import 'package:pomodoro/widgets/stats/session_type_summary.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'support/e2e.dart';
 
@@ -71,6 +72,28 @@ Future<Map<String, dynamic>> _profile(String owner) async => (await E2eHost.row(
   'select total_minutes,lifetime_points,coins from public.profiles '
   'where id=${sqlText(owner)}',
 ))!;
+
+// The UI SDK refreshes its own session during a 105-minute run. The original
+// ApiAccount is just a test snapshot and must not retain its expired JWT.
+Future<ApiAccount> _freshAccount(ApiAccount expected) async {
+  final auth = Supabase.instance.client.auth;
+  expect(auth.currentUser?.id, expected.id);
+  expect(auth.currentUser?.email, expected.email);
+  var session = auth.currentSession;
+  final soon = DateTime.now().millisecondsSinceEpoch ~/ 1000 + 30;
+  if (session != null && (session.expiresAt ?? 0) <= soon) {
+    await auth.refreshSession();
+    session = auth.currentSession;
+  }
+  expect(session, isNotNull);
+  expect(session!.user.id, expected.id);
+  expect(session.user.email, expected.email);
+  expect(
+    session.expiresAt,
+    greaterThan(DateTime.now().millisecondsSinceEpoch ~/ 1000),
+  );
+  return ApiAccount(expected.id, expected.email, session.accessToken);
+}
 
 void main() {
   initE2e();
@@ -345,17 +368,21 @@ void main() {
           'is_invalid': false,
         });
         final duplicate =
-            await LocalApi.rpc('complete_marathon_study_session', account, {
-                  'p_client_uuid': second.clientUuid,
-                  'p_category_id': second.categoryId,
-                  'p_duration_minutes': _minutes,
-                  'p_was_paused': false,
-                  'p_is_verified': 0,
-                  'p_started_at': second.startedAt.toUtc().toIso8601String(),
-                  'p_marathon_uuid': runId,
-                  'p_target_sessions': 2,
-                  'p_session_index': 2,
-                })
+            await LocalApi.rpc(
+                  'complete_marathon_study_session',
+                  await _freshAccount(account),
+                  {
+                    'p_client_uuid': second.clientUuid,
+                    'p_category_id': second.categoryId,
+                    'p_duration_minutes': _minutes,
+                    'p_was_paused': false,
+                    'p_is_verified': 0,
+                    'p_started_at': second.startedAt.toUtc().toIso8601String(),
+                    'p_marathon_uuid': runId,
+                    'p_target_sessions': 2,
+                    'p_session_index': 2,
+                  },
+                )
                 as Map;
         expect(duplicate['duplicate'], isTrue);
         expect(await _profile(owner), finalProfile);
@@ -402,10 +429,11 @@ void main() {
         expect(summary.counts.normalSessions, 0);
         expect(summary.counts.completedExams, 0);
         final league =
-            await LocalApi.rpc('get_monthly_league_ranking', account, {
-                  'p_kind': 'study',
-                  'p_scope': 'segment',
-                })
+            await LocalApi.rpc(
+                  'get_monthly_league_ranking',
+                  await _freshAccount(account),
+                  {'p_kind': 'study', 'p_scope': 'segment'},
+                )
                 as Map;
         final ownRank = (league['rows'] as List).cast<Map>().singleWhere(
           (r) => r['id'] == owner,

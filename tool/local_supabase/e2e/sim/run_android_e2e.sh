@@ -5,7 +5,7 @@ set -u -o pipefail
 ROOT="$(cd "$(dirname "$0")/../../../.." && pwd)"
 cd "$ROOT" || exit 1
 if [[ "${1:-}" == "--help" ]]; then
-  echo "Senaryolar: a aa b c d e g h i j k l m n o p q r s t u v w x; varsayılan: a b c d e"
+  echo "Senaryolar: a aa ac b c d e g h i j k l m n o p q r s t u v w x; varsayılan: a b c d e"
   echo "Yerel Supabase açık olmalı; sayaçlar gerçek 25/50 dakikadır."
   echo "Cihazı açıkça seçin: SIM_UDID (iOS) veya ANDROID_SERIAL (Android emülatörü)."
   exit 0
@@ -15,7 +15,7 @@ declare -a FILES=()
 shopt -s nullglob
 for part in "$@"; do
   case "$part" in
-    a|aa|b|c|d|e|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x) ;;
+    a|aa|ac|b|c|d|e|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x) ;;
     *) echo "HATA: desteklenmeyen senaryo '$part'; --help ile listeye bakın." >&2; exit 2 ;;
   esac
   matches=(integration_test/"${part}"_*_test.dart)
@@ -40,7 +40,7 @@ if [[ -n "${E2E_PLAIN_NAME:-}" ]]; then
 fi
 case "${E2E_MARATHON_MINUTES:-25}" in 25|50) ;; *) echo "HATA: Maraton yalnız25/50 dakika olabilir." >&2; exit 2 ;; esac
 EXTRA_DEFINES+=("--dart-define=E2E_MARATHON_MINUTES=${E2E_MARATHON_MINUTES:-25}")
-for flag in E2E_REAL_MARATHON E2E_HTTP_PROXY E2E_NORMAL_HTTP_REAL25 E2E_NORMAL_HTTP_PRESEEDED E2E_FIRST_USE_REAL25 E2E_EXAM_INSIGHTS; do
+for flag in E2E_REAL_MARATHON E2E_HTTP_PROXY E2E_NORMAL_HTTP_REAL25 E2E_NORMAL_HTTP_PRESEEDED E2E_FIRST_USE_REAL25 E2E_EXAM_INSIGHTS E2E_MARATHON_POSTFLIGHT; do
   case "${!flag:-false}" in
     true) EXTRA_DEFINES+=("--dart-define=$flag=true") ;;
     false) ;;
@@ -53,6 +53,15 @@ if [[ "${E2E_EXAM_INSIGHTS:-false}" == "true" ]]; then
   [[ "${E2E_EXAM_INSIGHT_OWNER:-}" =~ ^[0-9a-f-]{36}$ ]] \
     || { echo "HATA: insight owner UUID gereklidir." >&2; exit 2; }
   EXTRA_DEFINES+=("--dart-define=E2E_EXAM_INSIGHT_EMAIL=$E2E_EXAM_INSIGHT_EMAIL" "--dart-define=E2E_EXAM_INSIGHT_OWNER=$E2E_EXAM_INSIGHT_OWNER")
+fi
+if [[ "${E2E_MARATHON_POSTFLIGHT:-false}" == "true" ]]; then
+  [[ "${E2E_MARATHON_POSTFLIGHT_EMAIL:-}" =~ ^e2e-sim-real-marathon-[0-9]+-[a-z0-9-]+@pomosprint\.local$ ]] \
+    || { echo "HATA: yalnız yerel Maraton postflight hesabı kabul edilir." >&2; exit 2; }
+  for field in E2E_MARATHON_POSTFLIGHT_OWNER E2E_MARATHON_POSTFLIGHT_RUN; do
+    [[ "${!field:-}" =~ ^[0-9a-f-]{36}$ ]] || { echo "HATA: postflight UUID gerekli." >&2; exit 2; }
+    EXTRA_DEFINES+=("--dart-define=$field=${!field}")
+  done
+  EXTRA_DEFINES+=("--dart-define=E2E_MARATHON_POSTFLIGHT_EMAIL=$E2E_MARATHON_POSTFLIGHT_EMAIL")
 fi
 if [[ -n "${E2E_NORMAL_HTTP_MODE:-}" ]]; then
   case "$E2E_NORMAL_HTTP_MODE" in start|resume) ;; *) echo "HATA: geçersiz HTTP süreç testi aşaması." >&2; exit 2 ;; esac
@@ -130,7 +139,10 @@ for f in "${FILES[@]}"; do
   [[ "$rc" = 0 ]] || STATUS=1
 done
 # Same explicit reviewed local schema as the iOS runner; no live connection.
-if [[ "${E2E_REVIEWED_NIGHT:-0}" == "2" ]]; then
+if [[ "${E2E_REVIEWED_NIGHT:-0}" == "3" ]]; then
+  /bin/bash tool/local_supabase/parity_check.sh --reviewed-night-20261028-with-marathon-anchor | tee "$LOG_DIR/parity.log"
+  [[ ${PIPESTATUS[0]} -eq 0 ]] || STATUS=1
+elif [[ "${E2E_REVIEWED_NIGHT:-0}" == "2" ]]; then
   /bin/bash tool/local_supabase/parity_check.sh --reviewed-night-20261028-with-start-atomic | tee "$LOG_DIR/parity.log"
   [[ ${PIPESTATUS[0]} -eq 0 ]] || STATUS=1
 elif [[ "${E2E_REVIEWED_NIGHT:-0}" == "1" ]]; then
