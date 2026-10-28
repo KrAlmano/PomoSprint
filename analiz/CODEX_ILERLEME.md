@@ -363,3 +363,17 @@ Analiz temiz4,3sn; Flutter1416PASS/5isteğe bağlıPNG/0hata(61sn), Node164/164,
 - Alt çizgili test modunun ekran adı güvenli tireli ada dönüştürüldü; aynı hata gelecekte `late_rejected` çekiminde de önlendi. Ayrı `verify` modu yalnız mevcut tamamlanmış kurtarmayı yeni süreçte salt okur; marker baytları,tek seans/ödül/gate,owner ve temiz kuyruk korunur. İki eski FAIL halen FAIL'dir.
 -42.kapı: analyze temiz8,2sn; Flutter1417PASS/5isteğe bağlıPNGskip/0hata119sn; Node164/164. Commit öncesi stagedadları yalnız ABtesti+runner; sır bulunmadı. Ayrı native verify şimdi çalışıyor.
 - Denetçi04:18turu `8d2bf7a` için yeni bulgu bildirmedi; DENETIM.md değiştirilmedi.
+
+### 04:26 TR — Belgeler ve ekran kanıtları kontrol noktası (`6cca804`)
+
+-186dosya yolu kaydedildi:17doküman,168gerçekPNGve1yanlış test yorumu düzeltmesi. Ürün/DB davranışı bu commit'te değişmedi. Görsellerin PNG bütünlüğü/CRC'si168/168, stageddosya/sırdeseni taraması temiz; DENETIM.md, .env, anahtarlar ve yerel ayarlar eklenmedi.
+- Commit öncesi son kaynak kapısı42: analyze temiz,Flutter1417PASS/5opsiyonelPNGskip/0hata,Node164/164. Ara rapor nihai07:00teslimi değildir;R75/HAndroid,31sonrasıAB,normaluygulama kurulumu ve06:30temizliği hâlâ izleniyor.
+- ABsonkontrol1/1+paritePASS; `build/overnight_backend/ab_before_final_verified.json` diskteki kanıtın değişmediğini ve ayrı süreçte tek25dk/5puan/20kum korunduğunu doğrular. iOS27 veri korunarak kapatıldı.
+
+### 28 Ekim sabah kapanışı — gece kesintisi ve Android finalleri
+
+- Aktif çalışma22:26–yaklaşık04:27arasında sürdü; iOSson paket doğrulamasındaki alt ajan kullanım limitine takılınca kesildi.04:27sonrası hareket önceden başlatılmış arka plan Android koşularıdır;07:00nihai teslimi ve06:30temizliği gerçekleşmedi. Kullanıcının sabah talebiyle yalnız kapanış işlerine devam ediliyor; yeni özellik yok.
+- AndroidR75: `/tmp/pomosprint_android_r75_resume_01.log` **1/1+27/28/29+30yerelparitePASS**. Doğal4500sn LGS Sözel;75ortak dakika,15Denemepuanı,3Denemekumu,normalpuan/kum0,tekdeneme/tekolay.03:29:56–04:44:56TRbaşlangıçgünü27Ekim olarak kaldı. `build/overnight_backend/real75_final_verified.json` bağımsız disk/SQL doğrulamasıdır.
+- AndroidH1: `/tmp/pomosprint_android_first_use_h1.log` **1/1+aynıyerelparitePASS**. Kayıt/Mailpit/giriş/onboarding→gerçek25dk→günlük/haftalık/aylıkrapor→TUSbaşlat/erkenvazgeç akışı25:57sürdü; odak1503duvarsaniyesi,25dk/5normalpuan/20kum/seri1/tekolay. VazgeçilenTUSödülsüz. Arka plan koşusu05:12:04TR'de tamamlandı; `build/overnight_backend/first_use_android_final.json` bağımsız doğrulamasıdır.
+- Bekleyen yeniAndroidPNG'leri CRC/bütünlükten geçti. `extend_w_mixed_fixture.py` incelendi: yalnız sabitloopback,exactyerelQAowner,varsayılanROLLBACK,ayrıapplyvegeçmiştarihizinbayrakları; çalıştırılmadı. Kullanıcı özellikle commit istediğinden kaynak korunacak, geçici dosya diye silinmeyecek.
+- **31 uygulanmayacak ve31sonrasıMaraton testi yapılmayacak: kullanıcı kararı bekliyor.** Gece hazırlanan otomatik olmayan yerel applyyardımcısı çalıştırılmadı; kaldırılacak.
