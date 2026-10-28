@@ -39,6 +39,7 @@ class _ResultsDialog extends StatefulWidget {
 
 class _ResultsDialogState extends State<_ResultsDialog> {
   final Map<String, List<TextEditingController>> _fields = {};
+  final Set<String> _editedSubjects = {};
   bool _saving = false;
   bool _invalid = false;
   bool _saveFailed = false;
@@ -48,9 +49,16 @@ class _ResultsDialogState extends State<_ResultsDialog> {
     final pending = widget.service.records
         .where((r) => r.clientUuid == widget.attempt.clientUuid)
         .firstOrNull;
-    final results = pending?.pendingResults ?? widget.attempt.subjectResults;
+    // A queued edit may contain only some subjects. Keep the accepted values
+    // for every other subject visible when reopening the dialog offline.
+    final results = {
+      for (final result in widget.attempt.subjectResults)
+        result.subjectId: result,
+      for (final result in pending?.pendingResults ?? <ExamSubjectResult>[])
+        result.subjectId: result,
+    };
     for (final subject in widget.definition.subjects) {
-      final value = results.where((r) => r.subjectId == subject.id).firstOrNull;
+      final value = results[subject.id];
       _fields[subject.id] = [
         value?.correct ?? 0,
         value?.wrong ?? 0,
@@ -79,11 +87,34 @@ class _ResultsDialogState extends State<_ResultsDialog> {
     );
   }
 
+  void _changed(ExamSubject subject, int index) {
+    final fields = _fields[subject.id]!;
+    if (index < 2) {
+      final correct = int.tryParse(fields[0].text);
+      final wrong = int.tryParse(fields[1].text);
+      if (correct != null && wrong != null && correct >= 0 && wrong >= 0) {
+        // An over-total answer remains visibly invalid rather than producing
+        // a negative unanswered value. The user can still edit that value.
+        final blank = (subject.questionCount - correct - wrong).clamp(
+          0,
+          subject.questionCount,
+        );
+        fields[2].text = '$blank';
+      }
+    }
+    setState(() {
+      _editedSubjects.add(subject.id);
+      _invalid = false;
+    });
+  }
+
   Future<void> _save() async {
-    final results = widget.definition.subjects.map(_result).toList();
-    if (!widget.definition.subjects.every(
-      (s) => results.any((r) => r.isValidFor(s)),
-    )) {
+    final edited = widget.definition.subjects
+        .where((subject) => _editedSubjects.contains(subject.id))
+        .toList();
+    final results = edited.map(_result).toList();
+    if (results.isEmpty ||
+        !edited.every((s) => results.any((r) => r.isValidFor(s)))) {
       setState(() => _invalid = true);
       return;
     }
@@ -167,10 +198,24 @@ class _ResultsDialogState extends State<_ResultsDialog> {
                                 ),
                                 controller: _fields[subject.id]![index],
                                 enabled: !_saving,
-                                keyboardType: TextInputType.number,
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                      signed: true,
+                                    ),
                                 inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly,
-                                  LengthLimitingTextInputFormatter(3),
+                                  TextInputFormatter.withFunction((
+                                    oldValue,
+                                    newValue,
+                                  ) {
+                                    // Preserve an entered minus sign so saving
+                                    // reports an error instead of turning -1
+                                    // into a valid positive answer silently.
+                                    return RegExp(
+                                          r'^-?\d{0,3}$',
+                                        ).hasMatch(newValue.text)
+                                        ? newValue
+                                        : oldValue;
+                                  }),
                                 ],
                                 decoration: InputDecoration(
                                   border: const OutlineInputBorder(),
@@ -180,8 +225,7 @@ class _ResultsDialogState extends State<_ResultsDialog> {
                                     l10n.examBlank,
                                   ][index],
                                 ),
-                                onChanged: (_) =>
-                                    setState(() => _invalid = false),
+                                onChanged: (_) => _changed(subject, index),
                               ),
                             ],
                           ),
@@ -224,7 +268,7 @@ class _ResultsDialogState extends State<_ResultsDialog> {
             child: Text(l10n.cancel),
           ),
           FilledButton(
-            onPressed: _saving ? null : _save,
+            onPressed: _saving || _editedSubjects.isEmpty ? null : _save,
             child: Text(_saving ? l10n.examSaving : l10n.examSaveResults),
           ),
         ],

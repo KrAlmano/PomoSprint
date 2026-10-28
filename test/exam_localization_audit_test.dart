@@ -145,6 +145,14 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('open-results')));
     await tester.pumpAndSettle();
     final tr = await AppLocalizations.delegate.load(const Locale('tr'));
+    // Saving now sends only intentionally edited subjects; create a valid
+    // edit before exercising the persistence-error language transition.
+    await tester.enterText(
+      find.byKey(const ValueKey('exam-result-turkish-0')),
+      '1',
+    );
+    FocusManager.instance.primaryFocus?.unfocus();
+    await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(FilledButton, tr.examSaveResults));
     await tester.pumpAndSettle();
     expect(find.text(tr.examResultsSaveError), findsOneWidget);
@@ -188,6 +196,7 @@ void main() {
     final blank = find.byKey(const ValueKey('exam-result-turkish-2'));
     await tester.enterText(correct, '41');
     FocusManager.instance.primaryFocus?.unfocus();
+    await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(FilledButton, en.examSaveResults));
     await tester.pumpAndSettle();
     expect(find.text(en.examResultsInvalid), findsOneWidget);
