@@ -1,6 +1,7 @@
 // Real process-boundary probe, no shortened clocks or historical fixtures.
 // start -> OS terminate/shutdown -> resume (focus|break|expired expectation).
 // recovered_expired preserves the separately failed baseline break assertion.
+// verify checks that retained completed recovery without rewriting its proof.
 // Always retain the same installation with --no-uninstall and E2E_RUN_ID.
 import 'dart:convert';
 import 'dart:io' show pid;
@@ -516,10 +517,100 @@ Future<void> _resume(WidgetTester tester, SharedPreferences prefs) async {
   proof['last_pid'] = pid;
   proof['last_resumed_at'] = resumeAt.toIso8601String();
   expect(await prefs.setString(_key, jsonEncode(proof)), isTrue);
-  await E2eHost.screenshot(tester, 'e2e-marathon-process-$_expected');
+  await E2eHost.screenshot(
+    tester,
+    'e2e-marathon-process-${_expected.replaceAll('_', '-')}',
+  );
   expect(tester.takeException(), isNull);
   _log('RESUME ${jsonEncode(proof)}');
   // Even final success retains rows, owner, auth and marker as evidence.
+}
+
+Future<void> _verifyRecovered(
+  WidgetTester tester,
+  SharedPreferences prefs,
+) async {
+  expect(_run, 'night-ab-before31');
+  final raw = prefs.getString(_key);
+  expect(raw, isNotNull, reason: 'Retain the completed recovery proof');
+  final proof = Map<String, dynamic>.from(jsonDecode(raw!) as Map);
+  expect(proof['run_id'], _run);
+  expect(proof['email'], _email);
+  expect(proof['stage'], 'recovered_failed_break_assertion_then_expired');
+  expect(proof['recovery_from_stage'], 'same_focus_resumed');
+  expect(proof['completion_verified'], isTrue);
+  expect(proof['uses_historical_fixture'], isFalse);
+  expect(proof['gate'], isNull);
+  expect(proof['recovery_observed_gate'], isA<Map>());
+  expect(proof['last_pid'], isA<int>());
+  expect(pid, isNot(proof['last_pid']), reason: 'Use a new native process');
+  expect(pid, isNot(proof['start_pid']));
+  final owner = proof['owner_id'] as String;
+  final run = proof['marathon_uuid'] as String;
+  final cached = prefs.getString('saved_user');
+  expect(cached, isNotNull, reason: 'Never reset or replace the saved owner');
+  expect((jsonDecode(cached!) as Map)['id'], owner);
+  expect(
+    await E2eHost.row(
+      'select email from auth.users where id=${sqlText(owner)}',
+    ),
+    {'email': _email},
+  );
+  // Read durable state before main() can sync it. There must be no work for
+  // this final probe to submit or discard, including a legacy email queue.
+  for (final key in prefs.getKeys()) {
+    expect(
+      key.startsWith('active_session_uid_'),
+      isFalse,
+      reason: 'Postflight must not disturb another active timer',
+    );
+  }
+  for (final key in [
+    'pending_sessions_uid_$owner',
+    'pending_sessions_$_email',
+    'rejected_sessions_uid_$owner',
+  ]) {
+    expect(jsonDecode(prefs.getString(key) ?? '[]'), isEmpty, reason: key);
+  }
+  expect(await TimerPersistence.instance.load(owner), isNull);
+  final gate = await _gate(owner, run);
+  expect(
+    gate,
+    Map<String, dynamic>.from(proof['recovery_observed_gate'] as Map),
+  );
+  expect(gate!['previous_client_uuid'], proof['client_uuid']);
+  expect(gate['confirmed_at'], isNull);
+  expect(gate['next_client_uuid'], isNull);
+  await _oneAcceptedFocus(owner, proof);
+
+  await launchApp(tester);
+  await pumpUntil(
+    tester,
+    find.byType(MainNavigationShell),
+    timeout: const Duration(seconds: 50),
+    reason: 'the preserved completed recovery owner',
+  );
+  expect(Supabase.instance.client.auth.currentUser?.id, owner);
+  expect(Supabase.instance.client.auth.currentUser?.email, _email);
+  expect(SupabaseService.instance.currentUser.value?.id, owner);
+  expect(await TimerPersistence.instance.load(owner), isNull);
+  expect(await SupabaseService.instance.getPendingSessions(), isEmpty);
+  expect(await SupabaseService.instance.getRejectedSessions(), isEmpty);
+  expect(find.byKey(const ValueKey('marathon-break')), findsNothing);
+  expect(find.byKey(const ValueKey('marathon-presence')), findsNothing);
+  expect(await _gate(owner, run), gate);
+  await _oneAcceptedFocus(owner, proof);
+  await prefs.reload();
+  expect(
+    prefs.getString(_key),
+    raw,
+    reason: 'Postflight must not rewrite the completed recovery proof',
+  );
+  await E2eHost.screenshot(tester, 'e2e-marathon-process-verify-recovered');
+  expect(tester.takeException(), isNull);
+  _log(
+    'VERIFY ${jsonEncode({'run_id': _run, 'owner_id': owner, 'prior_pid': proof['last_pid'], 'verification_pid': pid, 'completion_proof_unchanged': true, 'original_failures_preserved': true})}',
+  );
 }
 
 void main() {
@@ -527,7 +618,7 @@ void main() {
     test(
       'ab · process probe is opt-in',
       () {},
-      skip: 'Set E2E_MARATHON_PROBE_MODE=start or resume',
+      skip: 'Set E2E_MARATHON_PROBE_MODE=start, resume or verify',
     );
     return;
   }
@@ -536,11 +627,13 @@ void main() {
     'ab · Marathon OS process probe $_mode $_expected',
     (tester) async {
       expect(RegExp(r'^[a-z0-9-]{1,40}$').hasMatch(_run), isTrue);
-      expect(const {'start', 'resume'}.contains(_mode), isTrue);
+      expect(const {'start', 'resume', 'verify'}.contains(_mode), isTrue);
       expect(E2eHost.available, isTrue);
       final prefs = await SharedPreferences.getInstance();
       if (_mode == 'start') {
         await _start(tester, prefs);
+      } else if (_mode == 'verify') {
+        await _verifyRecovered(tester, prefs);
       } else {
         expect(
           const {
