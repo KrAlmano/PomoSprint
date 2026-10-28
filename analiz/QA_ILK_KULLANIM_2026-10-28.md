@@ -1,8 +1,8 @@
 # Aynı hesapta ilk kullanım — 28 Ekim 2026
 
-**Durum: senaryo hazır; native koşu henüz yapılmadı.** Kaynak:
+**Durum: iOS27 ve iOS18 aynı hesapta ilk kullanım ayrı ayrı 1/1 + yerel parite PASS; Android H sonucu bekleniyor.** Kaynak:
 [integration_test/h_first_use_journey_test.dart](../integration_test/h_first_use_journey_test.dart).
-Bu belge planlanan gerçek süreli koşuları tamamlanmış göstermez.
+Yalnız aşağıda log ve manifest ile doğrulanan iOS koşuları tamamlanmış sayılır; Android planı sonuç değildir.
 
 ## Akış ve başarı ölçütü
 
@@ -91,7 +91,24 @@ başına sınır geçişi kanıtı sayılmaz.
 
 Native başarı ancak ilgili platformun koşu logu, gerçek geçen süre,
 korunan marker, sunucu sonuçları ve ekran kanıtları geldikten sonra
-raporlanabilir. Şu an bu belge üç platform için PASS iddiası içermez.
+raporlanabilir. iOS27 ve iOS18 sonuçları aşağıda ayrıdır; Android H için henüz başarı iddiası yoktur.
 
 ## iOS27 gerçek sonuç — tamamlandı
-`night-first-ios27-h1`, `/tmp/pomosprint_ios27_first_use_h1.log`: **1/1 + yerelparite PASS**. Aynı UI-kayıtlı hesap yerelMailpit onayı, parola girişi, TRseçimi/TUS/yaş/kategori/rehber, gerçek25dakika, görünür5puan20kum, günlük/haftalık/aylık bağımsızSQLkarşılaştırmaları ve gerçekTUSstart/erkenret/vazgeçmeyi tamamladı. İlkodak 23:07:33.710918Z→23:32:33.710918Z, bağımsız1503duvarsaatisaniyesi.04:00 sınırı bu turda **geçilmedi**; flagfalse. Vazgeçmeden sonra tek25dakika/5normalpuan20kum ve0denemeödülü kaldı. Kanıt `build/overnight_backend/first_use_ios27_final.json`. iOS18 veAndroidHsonuçları henüzbekleniyor.
+
+`night-first-ios27-h1`: **1/1 native test ve 27/28/29 + 30 yerel parite PASS**. [Özgün günlük](/tmp/pomosprint_ios27_first_use_h1.log), [korunan final işareti](../build/overnight_backend/first_use_ios27_final.json).
+
+Aynı UI-kayıtlı hesap; Mailpit onayı, parolalı giriş, TR seçimi, yaş/TUS/kategori/rehber, gerçek 25 dakikalık odak, görünür 5 puan/20 kum, günlük–haftalık–aylık SQL karşılaştırması ve TUS başlatma/erken tamamlama reddi/vazgeçme adımlarını tamamladı. Odak başlangıcı **27 Ekim 23:07:33.710918Z**, bitişi **23:32:33.710918Z**; bağımsız ölçüm 1503 duvar saati saniyesi. Manifest `stage=complete`, `completion_verified=true`, `uses_historical_fixture=false` içerir.
+
+**04:00 sınırı geçilmedi** (`crossed_04_boundary=false`). Tek 25 dakika/5 normal puan/20 kum ve 1 seri korundu; vazgeçilen Deneme 0 ödül verdi. Bu H koşusu 135 dakika TUS tamamlama değildir; o sonuç ayrı `r135_resume_final` koşusuyla doğrulandı. Android H ve AB finali burada tamamlanmış sayılmaz. Ayrı Android AC postflight başarısı da bu H zincirinin kapsamına dahil değildir.
+
+## iOS18 gerçek sonuç — doğal 04:00 sınırı tamamlandı
+
+`night-first-ios18-h1`: **1/1 native + 27/28/29 + 30 yerel parite PASS**. Aynı UI-kayıtlı hesapla kayıt, yerel Mailpit onayı, giriş, TUS onboarding/rehber, doğal25 dakika, başarı diyaloğu, günlük/haftalık/aylık rapor ve TUS başlatma/erken ret/vazgeçme zinciri tamamlandı. [Özgün günlük](/tmp/pomosprint_ios18_first_use_h1.log), [bağımsız marker/SQL dışa aktarımı](../build/overnight_backend/first_use_ios18_final.json).
+
+İlk odak **28 Ekim03:44:57.400537 İstanbul** anında başladı ve **04:09:57.400537** anında bitti; ham süre1500 saniye, bağımsız duvar ölçümü1503 saniyedir. `stage=complete`, `completion_verified=true`, `uses_historical_fixture=false`, `crossed_04_boundary=true` korunan native marker'dan okundu. Dışa aktarım sonrası yalnız bu QA simülatörü kapatıldı; veri silinmedi.
+
+**Seansın çalışma günü27 Ekim'dir.** Normal seans, tamamlanan Deneme, raporlar ve seri; bitiş günü yerine profil saat dilimindeki **başlangıç −4 saat** tarihini kullanır. Bu nedenle04:00'ten sonra bitse de bu25 dakika27 Ekim'e aittir. SQL'de `last_study_date=2026-10-27`, seri1, tek normal kayıt,25 dakika,5 puan ve20 kum doğrulandı. Bugünün28 Ekim günlük toplamının **0**, önceki günün **25**, haftalık ve aylık toplamın **25** olması doğrudur; seans kaybolmamıştır.
+
+Gün atfı bağımsız olarak [StudySession.studyDay](../lib/models/study_session.dart:60), [normal/Deneme rapor dönüşümleri](../lib/utils/stats_calculator.dart:101), [çalışma günü yardımcısı](../lib/utils/study_day.dart:1) ve gerçek yerel SQL fonksiyonlarıyla karşılaştırıldı. Normal `complete_study_session`, Deneme `complete_exam_attempt` ve `_competition_record` başlangıca göre04:00 çalışma gününü üretir. Lig ayı ise normalde `completed_at`, Denemede `ends_at` üzerinden İstanbul00:00 takvim ayına atanır; bu ayrı kuraldır.
+
+Son TUS denemesi **abandoned** kaldı:0 Deneme puanı,0 Deneme kumu,0 kabul edilmiş çalışma süresi ve ek lig olayı yok. Normal25 dakika korunur. Bu koşu gerçek04:00 sınırı kanıtıdır; doğal ay değişimi, DST veya135 dakika TUS tamamlaması değildir. Ürün veya tarih kuralı değiştirilmedi; bitiş gününü bekleyen varsayım düzeltilerek mevcut başlangıç-günü sözleşmesi doğrulandı.

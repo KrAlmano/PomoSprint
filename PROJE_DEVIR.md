@@ -1,6 +1,8 @@
 # PomoSprint — proje ve AI oturum devir belgesi
 
-**Güncel devam noktası — 9 Ekim 2026 / §37:** Proje kökü `/Users/almano/Desktop/Projects/Pomodoro`. Ronin kaldırıldı; 21 özel avatarın her biri 500 kum. Canlı SQL kullanıcı tarafından uygulandı ve 20/20 salt okuma kontrolüyle doğrulandı. Dört hesap ve dokuz seans korundu. Tüm simülatörler ve yerel Docker test verisi silindi; açık uygulama veya hazır QA hesabı yok. Eski QUICK/demo/gece komutlarını çalıştırma. Son sonuç 1291 PASS, isteğe bağlı 5 ekran görüntüsü testi atlaması ve temiz analizdir; güncel kapsam [temizlik QA](analiz/QA_RELEASE_CLEANUP_2026-10-09.md) raporundadır. Önceki ham kanıtlar kullanıcı talebiyle kaldırıldı; aşağıdaki tarihli sonuçlar geçmişin kaydıdır. §33 güvenlik/operasyon ve mağaza/fiziksel cihaz işleri halen açıktır.
+> **Güncel çalışma — 27/28 Ekim 2026 gece / §39:** `codex/gece-2026-10-27` dalında TUS, Deneme, birleşik raporlar ve aylık kategori/global lig geliştiriliyor. Yeni sunucu paketleri ve site **yalnız yereldedir; canlıya uygulanmadı, push/deploy yapılmadı**. Aşağıdaki 9 Ekim devam noktası tarihsel kayıttır. Önce [istek listesi](analiz/ISTEKLER.md), [ilerleme](analiz/CODEX_ILERLEME.md), [yeni API](supabase/proposed/EXAM_API_CONTRACT.md) ve [paket sırası](supabase/proposed/NIGHT_20261028_README.md) okunmalı. Güncel test sayıları ve cihaz kanıtları ilerleme kaydındadır; geçmiş sonuçları yeni test gibi aktarma.
+
+**Tarihsel devam noktası — 9 Ekim 2026 / §37:** Proje kökü `/Users/almano/Desktop/Projects/Pomodoro`. Ronin kaldırıldı; 21 özel avatarın her biri 500 kum. Canlı SQL kullanıcı tarafından uygulandı ve 20/20 salt okuma kontrolüyle doğrulandı. Dört hesap ve dokuz seans korundu. Tüm simülatörler ve yerel Docker test verisi silindi; açık uygulama veya hazır QA hesabı yok. Eski QUICK/demo/gece komutlarını çalıştırma. Son sonuç 1291 PASS, isteğe bağlı 5 ekran görüntüsü testi atlaması ve temiz analizdir; güncel kapsam [temizlik QA](analiz/QA_RELEASE_CLEANUP_2026-10-09.md) raporundadır. Önceki ham kanıtlar kullanıcı talebiyle kaldırıldı; aşağıdaki tarihli sonuçlar geçmişin kaydıdır. §33 güvenlik/operasyon ve mağaza/fiziksel cihaz işleri halen açıktır.
 
 ## 1. Yeni oturumda önce bunu bil
 
@@ -8,7 +10,7 @@
 2. Kullanıcı Türkçe iletişim kuruyor. Yapılabilir işi tamamlamanı, uygulamayı gerçekten çalıştırmanı, hata bulursan düzeltmeni ve sonuçları raporlamanı istiyor. Sadece test kodu üretmek isteği karşılamıyor.
 3. Şu an fiziksel cihaz kullanılmıyor. Kullanıcı fiziksel cihaz doğrulamasını sonraya bıraktı. iOS simülatörü ve Android emülatörü üzerinde çalış.
 4. Test hesapları ve test seansları varsayılan olarak **yerel Supabase** içindir. Kök `.env` normal uygulamayı canlıya bağlar. §26'da açık canlıya alma talebiyle yalnız bir üretim QA hesabı oluşturuldu, tamamlanmadan iptal akışları kontrol edilip hesap temizlendi; normal kullanıcı verisi kullanılmadı. Bu istisnayı sonraki testlere otomatik yetki sayma. Yerel test için URL/anon birlikte `--dart-define` ile ver.
-5. **Son kullanıcı isteği (§23) önceki kısa sayaç isteğini değiştirdi:** varsayılan yerel Maraton önizlemesi artık gerçek 25/50 dakika, mola300sn/onay60sn kullanır. 5/10sn kayıtlı mod yalnız açıkça seçilen eski QA profillerinde kalır; gece koşusunda iki kısa bayrak da false olmalıdır. Canlı sunucunun süre doğrulaması gevşetilmedi.
+5. **Gerçek süreler korunur:** normal debug/profile/release derlemelerinde odak 25/50 dakika, Maraton molası 300 saniye ve onay penceresi 60 saniyedir. Eski hızlı sayaç derleme bayrakları işlevsizdir; geceki gerçek süre testleri hızlandırılmaz. Tarihsel veriyle yapılan kontrollü fixture kontrolleri, gerçek bekleme kanıtından açıkça ayrı raporlanır.
 6. Cihaz/süreç ve açık hesap durumu oturuma özgüdür. 5 Ekim sonunda QA1 açık bırakılmıştı; 7 Ekim yeni koşuları kendi run ID hesaplarını kullanır. Eski ekran görüntüsünü bugünkü DB sonucu sayma; yeni oturumda emulator/simulator/Docker süreçlerini ve giriş hesabını kontrol et.
 7. “Testler geçti” mağazaya hazır demek değildir. Fiziksel bildirim/kilit ekranı, gerçek Google/Apple girişi ve ayrı operasyon/yayın işleri bekliyor.
 
@@ -1217,3 +1219,65 @@ Resend’in 5 GET isteği HTTP200; domain verified ve sending enabled. Günlük 
 Sitede 94 GET/HEAD içinde 219/219 kontrol; 18 sayfa ve 58 asset SHA aynı. TLS/DNS/redirect/güvenlik/404/Range düzgün. İlk 3 assert beklenti hatası aynı yanıtlarla düzeltildi, ürün değişmedi. Cloudflare Worker 840fd4f1… %100 trafik, son yayın 8 Ekim; 26–27 Ekim 24 saatte 878 istek/0 runtime error. Observability null; alarm/log kurulumu doğrulanmış değil. Yeni Node 133/133 ve partial check exit0; Safari ana/özellikler/haberdar ol formu açıldı, form gönderilmedi ve Chrome kullanılmadı.
 
 Bekleyenler değişmedi: welcome identity iki secret yok (bilinçli bekleyen kimlik), Apple provider kapalı, delete-account Edge yok. Sentry/limiter/kill switch/staging §33 açıkları çözülmüş sayılmaz. Sitede 21×500 özel avatar metni eksik; sonraki içerik işi olabilir. Mobil derleme/native E2E/yeni mail veya production yazımı yok; 9 Ekim 1291 Flutter sonucunu bugünkü test diye kullanma. Yeni geliştirme isteği gelene kadar kod/ayar değiştirme.
+
+
+## 39. 27/28 Ekim 2026 — yerel Deneme, TUS ve aylık lig devri
+
+**Bu gecenin güncel devam noktası bu §39'dur.** Önceki §34–38, kendi tarihlerindeki durumu anlatır; eski “0 simülatör”, katalog sayısı veya test sonucu bugünün durumu değildir. Aktif repo `/Users/almano/Desktop/Projects/Pomodoro`, dal `codex/gece-2026-10-27`; `Desktop/Courses/Projects/Pomodoro` ayrı kopyadır. Son kayıtlı adımlar `b37899e` eksik veri/içgörü, `01bf20f` native sürücüler ve `f2c6a7d` özel site avatarlarıdır. **Push, site deploy'u veya canlı Supabase değişikliği yapılmadı.**
+
+Bu bölüm çalışma sürerken güncellenir; son sonuç için [gece raporunu](analiz/GECE_RAPORU_2026-10-28.md), [ilerleme kaydını](analiz/CODEX_ILERLEME.md) ve [native sonuçları](analiz/QA_NATIVE_GECE_2026-10-28.md) birlikte oku. Kullanıcının çalışma sonu 28 Ekim 07:00 Europe/Istanbul; bu saate kadar yeni soru sorulmadan güvenli varsayımlar belgelenir. `analiz/DENETIM.md` denetçiye aittir: okunur, düzenlenmez veya commit edilmez. `Pomodoro-denetim` klasörüne dokunulmaz.
+
+### Güncel doğrulama ve sıradaki işler
+
+Root'un `full32` kontrolünde analyze temiz, **1416 Flutter testi PASS / 5 isteğe bağlı ekran üretimi atlama**, **158 Node testi PASS**. Bunlar aşağıdaki devam eden native testlerin yerine geçmez.
+
+| Kontrol | Güncel durum / sonraki adım |
+|---|---|
+| iOS18 gerçek r25 | **Final PASS:** 25 dakika, 5 normal puan, 20 kum, 1 günlük seri; tek seans ve tek lig olayı. Aynı kaydı tekrar gönderme ödülü çoğaltmadı. |
+| iOS27 TUS 135 | Ara yeniden açılış PASS; **02:03 İstanbul civarı final bekleniyor**. Ödül/tamamlama henüz PASS diye yazılmaz. |
+| Android | q/j/t/o1/o2 PASS. s25 gerçek Maraton devam ediyor; yeni final logu beklenir. |
+| w gerçek 25 + HTTP503 | Başlangıç **00:27:23**, doğal bitiş hedefi **00:52:23 İstanbul**. Sonra farklı OS PID, outbox, tek kayıt/ödül ve ortak rapor doğrulaması gerekir; henüz final PASS yok. |
+| Site videosu | İlk native y çekimi ve encoding geçti; test crosshair'i nedeniyle temiz yayın adayı değil. y'nin device-pointer helper'ı hazır; w bitince ikinci çekim, encoding ve görsel kontrol yapılacak. |
+
+[Native kapsam planı](analiz/NATIVE_KAPSAM_PLANI_2026-10-28.md) kalan kısa g/l/m/d/e/k gibi yolları ayırır. [Gerçek probe incelemesi](analiz/QA_REAL_PROBE_REVIEW_2026-10-28.md) r/w kanıt sınırlarını, [recovery notu](analiz/QA_PASSWORD_RECOVERY_2026-10-28.md) Mailpit/Auth ile web formu ayrımını açıklar. Bu güncelleme bu kısa native senaryoları tamamlanmış saymaz.
+
+### D-06: yayın sırası
+
+**27 TUS → 28 Deneme → 29 aylık lig → yeni uygulamanın yayını → sitenin yayını.** 30 başlangıç kota paketi bağımsızdır. Her SQL adımında güncel canlı tanım/ACL ön koşulları, izole test, DRYRUN ve kullanıcı SQL Editor işlemi korunur. Site, uygulama/sunucu tarafında kullanıcıya henüz açılmamış Deneme/TUS/yeni lig özelliklerini kullanılabilir gibi yayımlamamalıdır. Bütün paketler şu an yereldir; bu sıra bir uygulanmış canlı yayın kaydı değildir.
+
+### Yeni akış ve veri sahipliği
+
+- Kabuk eski dört sekmenin sırasını korur, beşinci sekme **Deneme** eklenir. `ExamService` hesap kimliği/epoch ile sahipli kayıtları yönetir; `ExamPersistence` aktif/terminal kayıt ve pending işlemi kalıcı tutar. Kayıt sessizce atılmaz. Normal sayaç/Maraton ile Deneme başlangıçları hem istemcide hem sunucuda karşılıklı kilitlenir.
+- `exam_catalog` süre ve soru sayısının sunucu kaynağıdır. Yedi tür: TYT165dk, AYT180dk, YDT120dk; LGS Sözel75dk ve Sayısal80dk ayrı; TUS Temel/Klinik135dk. Resmî kaynaklar `analiz/SINAV_KAYNAKLARI_2026-10-28.md` içindedir. Yerel katalog güvenli görüntü yedeğidir; sunucu capability yoksa ödüllü başlangıç açılmaz.
+- Deneme başında3-2-1 hazırlık; mola/duraklatma yok. Başlangıç ve bitiş sunucu saatlidir. Tamamlanmadan ödül verilemez; netler sadece kişisel rapor/içgörüdür. `complete_exam_attempt` idempotenttir. Vazgeçilen kayıt geçmişte kalır fakat süre, tamamlanma sayısı, seri ve ödüle **sıfır** katkı verir.
+- Tamamlanan Deneme süresi normal profil toplam dakikasına ve profil saat dilimindeki04:00 çalışma günü/serisine eklenir. Deneme puanı/kumu ve ligi ayrı cüzdandadır. Ödül varsayımı: tam5dk başına1deneme puanı, tam25dk başına1deneme kumu; istemci hesaplayıp yazmaz.
+- `StatsCalculator` + yeni `StudySessionKind` Pomodoro, Maraton odakları ve tamamlanmış Deneme süresini birleştirir. UUID tekrarları ve offline kuyruk çift sayılmaz. Deneme ders sürelerine dağıtılmaz, ayrı satırdır. Maraton odak sayısı ve tamamlanmış plan sayısı ayrı metriklerdir. Deneme geçmişi okunamazsa önceki sahipli veri korunur ve kısmi veri uyarısı gösterilir.
+- `ExamResultsDialog` doğru/yanlış/boş toplamını katalog sınırlarıyla doğrular. YKS/TUS D−Y/4, LGS D−Y/3. Net sonradan düzenlenebilir; ekonomi değişmez. `ExamInsights` yeterli, karşılaştırılabilir veri olmadan artış/azalış veya neden-sonuç iddiası üretmez.
+
+### Lig ve hedef geçişi
+
+`27_tus_segment` → `28_exam_core` → `29_monthly_competitions` sırası tek lig şema geçişini oluşturur; I-04/I-05/I-16 için ayrı ayrı aynı tablo değiştirilmez. Her paketin down/DRYRUN dosyası vardır. `30_session_start_atomic` bağımsız normal başlangıç kota düzeltmesidir; kendi rehberine göre uygulanır.
+
+- Normal/Deneme ligleri **aylık**, İstanbul ayın1'i00:00. Eski14günlük dönemler arşivlenir, geçmiş puan/ödül korunur; yeni sisteme aktivasyon gelecek ay başına planlanır.
+- LGS/YKS/TUS/KPSS/dil/üniversite/iş kendi odalarında yarışır; oda en fazla25kişi. Az aktif kullanıcıda hazırlık kurallarıyla kolay ödül sömürüsü sınırlandırılır. Kural değerlerinin kaynağı sunucu config ve API rehberidir.
+- Kategoriye ek global sıralama vardır; ikinci kez ödül üretmez. Ay ortası hedef değişikliği gelecek döneme yazılır, mevcut puan korunur. Geç gelen offline tarihsel kayıt süre/geçmişte kalır; kapanmış dönemin terfi/ödülü yeniden hesaplanmaz.
+- Eski sunucu normal özellikleri korur, Deneme capability yoksa güvenle kapalıdır. TUS eski constraint'e takılırsa seçimi `OnboardingSegmentIntentStore` hesap anahtarıyla saklar; yeni sunucu kabul ettiğinde yeniden yazar. Başka hesaba taşınmaz.
+- Deneme ligi avatar slotları hazırlanmıştır; gerçek görseller kullanıcıdan beklenir. Uydurma avatar ödülü/görseli eklenmez.
+
+### Dil, bildirim ve hata verisi
+
+Kayıt sonrası TR/EN seçimi, ayarlardan değişim, ikiARB anahtar eşitliği ve görünür sabit metin taraması vardır. Sunucu katalog/kategori/lig adları iki dilde çözülür. Dil değişince kalıcı form hataları yeniden çevrilir; planlı bildirim aynı mutlak bitiş zamanında yeni dille yeniden kurulur. Tarayıcı statik tarama tüm dinamik veri akışlarının kanıtı değildir; native iki dil kontrolleri ayrıca raporlanır.
+
+Sentry hata/breadcrumb/transaction verisinde iç içe credential, e-posta, URL query/fragment, request body/header ve kullanıcı alanlarını maskeleyen sınır bulunur. Bu değişiklik remote alert kurulumu veya HTTP500 otomatik yakalama değildir. Yerel Supabase define'ı kullanılırken dış Sentry gönderimi kapalıdır.
+
+### Güvenli test kurulumu ve kanıt sınırı
+
+- Yalnız `tool/local_supabase` Docker ortamı ve açıkça isimli yeniQA hesapları kullanılır; Auth onayı yerel Mailpit'ten yapılır. E2E wrapper local URL+public demo anon key verir; `.env` okunmaz. Ana yerel portlar API54321/DB54322/Mailpit54324; bunlar canlı parity kanıtı değildir.
+- iOS18.6: `PomoSprint QA iPhone16`, UUID `8D0EFF44-5AF3-42E6-9F59-92CDFF8C9E5C`; iOS27: `PomoSprint QA iPhone17`, UUID `59F07F60-879F-49CF-9749-51F4BFE8E106`; Android `PomoSprint_QA_API36`. Bu cihazlar bu oturuma aittir. `HocamMacVar · iPhone17` cihazına dokunulmaz.
+- iOS komutlarında `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer`. Flutter Android JDK17 yolu `~/Library/Java/pomosprint-qa/...` altında, sistem Java'sı değiştirilmedi. Yeni oturumda bu isimlerin/UUIDlerin varlığını yeniden doğrula.
+- `integration_test/a...` gerçek kayıt/Mailpit/tüm hedefler; `o...` Deneme/hesap/dil/fixture net düzenleme; `q...`8hesaplı sosyal gözlem (bir native gözlemci+API hesapları); `r...` gerçek süreli iki-process başlangıç/yeniden açma; `s...` opt-in gerçek2×25dk Maraton; `p...` bağımsız kum saati çizim ölçümüdür. Her testin gerçekten koşulmuş sonucu ayrı kayıtlıdır. Fixture tarih değiştirme tam süre bekleme kanıtı değildir.
+- Ham ekranlar `analiz/ekran_gece_2026-10-28/`, geçici log/DBmanifestleri `build/` ve `/tmp/` içindedir. Siteye alınan ekranların kaynak/hash listesi `landing/screenshots/README.md`; örnek hesap oldukları açıklanır. Safari yerel preview kullanılır; Chrome kullanıcıya ayrılmıştır. Site deploy edilmedi.
+
+### Açık güvenlik ve yayın işleri
+
+`analiz/QA_GUVENLIK_GECE_2026-10-28.md` normal offline geçmiş-tarihli ödülün sunucu makbuzu olmadan alınabildiğini ve waitlist consent/abuse sınırını belgeler. Deneme aynı açıkla ödül üretmez. Normal offline politikayı sessizce değiştirmek dürüst kullanıcının ödülünü kesebileceğinden kullanıcı kararı bekler; bu rapor bunu çözülmüş saymaz. Apple/Google gerçek cihaz girişi, fiziksel bildirim/CanlıEtkinlik, mağaza hesapları ve veri sorumlusu/gönderen kimliği hâlâ kullanıcı/cihaz gerektirir. Yerel testlerin geçmesi bu işleri tamamlamaz.

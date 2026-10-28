@@ -48,7 +48,7 @@ def main():
     check('metadata_anon_denied',bool(sql('begin;set local role anon;select public.get_my_study_sessions_v2();rollback;',True)))
     sql(f"update public.marathon_runs set is_invalid=true where user_id='{who}'and client_uuid='{run}'")
     check('invalid_marathon_keeps_focus_without_completed_plan',all(r['marathon_completed_at']is None for r in rpc(who,'get_my_study_sessions_v2')if r['session_kind']=='marathon'))
-    # Standard 80-minute exam spanning the 04:00 work-day boundary.
+    # Standard 80-minute exam entirely before 04:00; the later normal focus is after it.
     day_user,daycat=user('lgs','Day Boundary')
     exam=rpc(day_user,'start_exam_attempt',f"'{uid()}','lgs_quantitative'")['attempt']
     sql(f"update public.exam_attempts set started_at=((now()at time zone'Europe/Istanbul')::date+time '02:30')at time zone'Europe/Istanbul',ends_at=((now()at time zone'Europe/Istanbul')::date+time '03:50')at time zone'Europe/Istanbul'where id='{exam['id']}'")
