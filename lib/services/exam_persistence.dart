@@ -84,9 +84,10 @@ class ExamLocalRecord {
     final results = parsedResults?.cast<ExamSubjectResult>();
     if (action == ExamPendingAction.results &&
         (results == null ||
-            results.length != definition.subjects.length ||
-            !definition.subjects.every(
-              (subject) => results.any((result) => result.isValidFor(subject)),
+            results.isEmpty ||
+            results.length > definition.subjects.length ||
+            !results.every(
+              (result) => definition.subjects.any(result.isValidFor),
             ))) {
       return null;
     }

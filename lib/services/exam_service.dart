@@ -506,10 +506,11 @@ class ExamService extends ChangeNotifier {
           owned == null ||
           !owned.isCompleted ||
           definition == null ||
-          results.length != definition.subjects.length ||
+          results.isEmpty ||
+          results.length > definition.subjects.length ||
           results.map((r) => r.subjectId).toSet().length != results.length ||
-          !definition.subjects.every(
-            (s) => results.any((r) => r.isValidFor(s)),
+          !results.every(
+            (result) => definition.subjects.any(result.isValidFor),
           )) {
         throw const ExamFailure('exam_result_invalid');
       }
@@ -527,10 +528,21 @@ class ExamService extends ChangeNotifier {
             createdAt: owned.startedAt,
             attempt: owned,
           );
+      // Multiple offline edits must not replace other subjects that have not
+      // reached the server yet. The RPC upserts this subset and leaves all
+      // omitted accepted subjects unchanged.
+      final merged = {
+        if (prior.pendingAction == ExamPendingAction.results)
+          for (final result in prior.pendingResults ?? <ExamSubjectResult>[])
+            result.subjectId: result,
+        for (final result in results) result.subjectId: result,
+      };
       final next = prior.copy(
         attempt: owned,
         action: ExamPendingAction.results,
-        results: results,
+        results: [
+          for (final subject in definition.subjects) ?merged[subject.id],
+        ],
       );
       if (!await _replace(owner, epoch, next)) {
         throw const ExamFailure('storage');
