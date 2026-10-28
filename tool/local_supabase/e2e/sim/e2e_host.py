@@ -5,6 +5,8 @@ Uygulama (iOS simülatörü bilgisayarın ağını paylaşır) testin ortasında
 sunucuya 127.0.0.1 üzerinden istek atar:
 
 - ``GET /health`` → ``ok``
+- ``GET /verify-reports?owner=<canonical UUID>`` → fixed local read-only
+  report/exam accounting verifier; only explicitly named local QA owners.
 - ``POST /confirm-email`` (JSON: yalnız ``email``) → yerel Mailpit'teki
   kayıt doğrulama bağlantısını yönlendirmeyi takip etmeden açar.
 - ``GET /shot?name=e2e-kayit`` → ``xcrun simctl io <UDID> screenshot
@@ -40,6 +42,8 @@ from local_recovery import RecoveryError, reset_local_password
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
 DB_URL = "postgresql://postgres:postgres@127.0.0.1:54322/postgres"
 SHOT_NAME = re.compile(r"^e2e-[a-z0-9-]{1,60}$")
+QA_OWNER_UUID = re.compile(r"^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$")
+VERIFY_REPORTS_LIMIT = 2 * 1024 * 1024
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 
 
@@ -144,14 +148,56 @@ def _log(path, text):
         f.write(text)
 
 
+def verify_reports(owner):
+    """Fixed command, no shell or arbitrary CLI args; never expose stderr."""
+    if not QA_OWNER_UUID.fullmatch(owner):
+        raise ValueError("invalid_qa_owner")
+    command = [sys.executable, os.path.join(ROOT, "tool", "local_supabase", "e2e",
+                                          "verify_reports_and_exams.py"), "--owner", owner]
+    try:
+        # Disk capture bounds the amount read into this server even if the
+        # child fails noisily. The temporary stream is not published or logged.
+        with tempfile.TemporaryFile() as stream:
+            process = subprocess.run(command, cwd=ROOT, stdin=subprocess.DEVNULL,
+                                     stdout=stream, stderr=subprocess.DEVNULL, timeout=25)
+            stream.seek(0)
+            raw = stream.read(VERIFY_REPORTS_LIMIT + 1)
+        if len(raw) > VERIFY_REPORTS_LIMIT:
+            raise ValueError("verification_output_too_large")
+        payload = json.loads(raw)
+        state = payload.get("status") if isinstance(payload, dict) else None
+        if (process.returncode not in (0, 1, 2) or not isinstance(payload, dict)
+                or payload.get("schema_version") != 1
+                or not isinstance(state, str) or state not in {"PASS", "FAIL", "ERROR"}
+                or process.returncode != {"PASS": 0, "FAIL": 1, "ERROR": 2}.get(state)):
+            raise ValueError("invalid_verification_response")
+        if payload["status"] == "ERROR":
+            # The fixed verifier emits only its public error codes; no child
+            # stderr/database response reaches the client or access log.
+            if not isinstance(payload.get("error"), str) or not re.fullmatch(r"[a-z_]{1,80}", payload["error"]):
+                raise ValueError("invalid_verification_response")
+            return 422, {"schema_version": 1, "status": "ERROR", "error": payload["error"]}
+        expected = payload.get("expected")
+        if (payload.get("owner_id") != owner or not isinstance(expected, dict)
+                or not isinstance(expected.get("reports"), dict)):
+            raise ValueError("invalid_verification_response")
+        return 200, payload
+    except subprocess.TimeoutExpired:
+        return 503, {"schema_version": 1, "status": "ERROR", "error": "verification_timeout"}
+    except (OSError, ValueError, UnicodeDecodeError):
+        return 503, {"schema_version": 1, "status": "ERROR", "error": "verification_unavailable"}
+
+
 class Handler(BaseHTTPRequestHandler):
     server_version = "PomoSprintE2EHost/1"
 
-    def _reply(self, status, body, content_type="text/plain; charset=utf-8"):
+    def _reply(self, status, body, content_type="text/plain; charset=utf-8", *, no_store=False):
         data = body.encode("utf-8") if isinstance(body, str) else body
         self.send_response(status)
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(data)))
+        if no_store:
+            self.send_header("Cache-Control", "no-store")
         self.end_headers()
         self.wfile.write(data)
 
@@ -184,6 +230,15 @@ class Handler(BaseHTTPRequestHandler):
         url = urllib.parse.urlparse(self.path)
         if url.path == "/health":
             return self._reply(200, "ok")
+        if url.path == "/verify-reports":
+            query = urllib.parse.parse_qs(url.query, keep_blank_values=True)
+            owners = query.get("owner", [])
+            if (url.fragment or len(url.query) > 80 or set(query) != {"owner"}
+                    or len(owners) != 1 or not QA_OWNER_UUID.fullmatch(owners[0])):
+                return self._reply(400, "invalid_verification_request", no_store=True)
+            status, payload = verify_reports(owners[0])
+            return self._reply(status, json.dumps(payload, ensure_ascii=False),
+                               "application/json; charset=utf-8", no_store=True)
         if url.path == "/shot":
             name = (urllib.parse.parse_qs(url.query).get("name") or [""])[0]
             if not SHOT_NAME.fullmatch(name):

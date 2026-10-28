@@ -1,0 +1,18 @@
+{
+  "errors": [],
+  "events": [
+    {
+      "marker": "REAL_PROBE_RESUME",
+      "message": "run=vc-android-lgs-verbal-a1 mode=exam_catalog_start owner=5da1a6be-0b06-474d-927a-106f1ce57f25 completed=true evidence=final-completion"
+    }
+  ],
+  "native_process_result": "PASS",
+  "native_totals": [
+    "00:05 +1: (tearDownAll)",
+    "00:05 +1: All tests passed!"
+  ],
+  "schema_version": 1,
+  "scope": "Selected native checkpoints/totals only; not a release verdict or full-duration claim",
+  "wrapper_result": "NOT_PRESENT",
+  "wrapper_totals": []
+}

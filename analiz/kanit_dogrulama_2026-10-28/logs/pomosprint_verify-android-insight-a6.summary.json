@@ -1,0 +1,18 @@
+{
+  "errors": [],
+  "events": [
+    {
+      "marker": "EXAM_INSIGHT_NATIVE",
+      "message": "PASS: explicit historical fixtures, 25 matching minutes, 19.25→27.50, TR/EN visible text and disclaimer. This is not a real-duration exam/focus test."
+    }
+  ],
+  "native_process_result": "PASS",
+  "native_totals": [
+    "00:20 +1: (tearDownAll)",
+    "00:20 +1: All tests passed!"
+  ],
+  "schema_version": 1,
+  "scope": "Selected native checkpoints/totals only; not a release verdict or full-duration claim",
+  "wrapper_result": "NOT_PRESENT",
+  "wrapper_totals": []
+}

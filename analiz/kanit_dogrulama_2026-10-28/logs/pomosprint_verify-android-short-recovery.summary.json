@@ -1,0 +1,17 @@
+{
+  "errors": [
+    "integration_test/ah_pending_exam_recovery_test.dart:148:7: Error: Method not found: 'debugPrint'.",
+    "debugPrint(",
+    "^^^^^^^^^^"
+  ],
+  "events": [],
+  "native_process_result": "FAIL",
+  "native_totals": [
+    "00:00 +0 -1: loading integration_test/ah_pending_exam_recovery_test.dart [E]",
+    "00:00 +0 -1: Some tests failed."
+  ],
+  "schema_version": 1,
+  "scope": "Selected native checkpoints/totals only; not a release verdict or full-duration claim",
+  "wrapper_result": "NOT_PRESENT",
+  "wrapper_totals": []
+}

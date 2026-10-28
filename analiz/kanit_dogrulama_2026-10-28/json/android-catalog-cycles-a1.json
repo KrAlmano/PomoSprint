@@ -1,0 +1,2330 @@
+{
+  "cases": [
+    {
+      "exam_id": "tyt",
+      "final_proof": {
+        "attempt_id": "ae1382ba-c4bb-42c3-b7c6-7368bffca8a0",
+        "baseline": {
+          "coins": 0,
+          "current_streak": 0,
+          "exam_coins": 0,
+          "exam_points": 0,
+          "last_study_date": null,
+          "lifetime_points": 0,
+          "timezone": "Europe/Istanbul",
+          "total_minutes": 0
+        },
+        "client_uuid": "565b93f1-e8b0-4298-9e97-11389cda4a73",
+        "completion_verified": true,
+        "definition_snapshot": {
+          "catalog_version": 1,
+          "duration_seconds": 60,
+          "group": "yks",
+          "id": "tyt",
+          "name_en": "TYT",
+          "name_tr": "TYT",
+          "reward_coins": 0,
+          "reward_points": 0,
+          "segment": "yks",
+          "subjects": [
+            {
+              "category_keys": [
+                "Türkçe"
+              ],
+              "id": "turkish",
+              "name_en": "Turkish",
+              "name_tr": "Türkçe",
+              "question_count": 40
+            },
+            {
+              "category_keys": [
+                "Matematik"
+              ],
+              "id": "mathematics",
+              "name_en": "Basic Mathematics",
+              "name_tr": "Temel Matematik",
+              "question_count": 40
+            },
+            {
+              "category_keys": [
+                "Tarih"
+              ],
+              "id": "history",
+              "name_en": "History",
+              "name_tr": "Tarih",
+              "question_count": 5
+            },
+            {
+              "category_keys": [
+                "Coğrafya"
+              ],
+              "id": "geography",
+              "name_en": "Geography",
+              "name_tr": "Coğrafya",
+              "question_count": 5
+            },
+            {
+              "category_keys": [
+                "Felsefe"
+              ],
+              "id": "philosophy",
+              "name_en": "Philosophy",
+              "name_tr": "Felsefe",
+              "question_count": 5
+            },
+            {
+              "category_keys": [
+                "Din Kültürü"
+              ],
+              "id": "religion",
+              "name_en": "Religious Culture / Additional Philosophy",
+              "name_tr": "Din Kültürü / İlave Felsefe",
+              "question_count": 5
+            },
+            {
+              "category_keys": [
+                "Fizik"
+              ],
+              "id": "physics",
+              "name_en": "Physics",
+              "name_tr": "Fizik",
+              "question_count": 7
+            },
+            {
+              "category_keys": [
+                "Kimya"
+              ],
+              "id": "chemistry",
+              "name_en": "Chemistry",
+              "name_tr": "Kimya",
+              "question_count": 7
+            },
+            {
+              "category_keys": [
+                "Biyoloji"
+              ],
+              "id": "biology",
+              "name_en": "Biology",
+              "name_tr": "Biyoloji",
+              "question_count": 6
+            }
+          ],
+          "total_questions": 120,
+          "wrong_answer_divisor": 4
+        },
+        "duration_seconds": 60,
+        "email": "e2e-sim-probe-exam-catalog-start-vc-android-tyt-a1@pomosprint.local",
+        "ends_at": "2026-10-28T10:23:59.590759Z",
+        "exam_id": "tyt",
+        "expected_coins": 0,
+        "expected_points": 0,
+        "language": "en",
+        "last_resume_at": "2026-10-28T10:25:09.110064Z",
+        "mode": "exam_catalog_start",
+        "notification_delivery_tested": false,
+        "observed_at": "2026-10-28T10:23:00.084516Z",
+        "offline_pending_verified": true,
+        "owner_id": "59718365-a0c8-45c2-8f90-7c1747df62c0",
+        "remaining_at_start": 60,
+        "run_id": "vc-android-tyt-a1",
+        "scope": "SHORT local-catalog natural60 lifecycle, NOT official duration",
+        "started_at": "2026-10-28T10:22:59.590759Z",
+        "total_questions": 120
+      },
+      "independent_sql": {
+        "attempts": 1,
+        "completed": 1,
+        "events": 1,
+        "exam_points": 0,
+        "exam_sand": 0,
+        "minutes": 1,
+        "normal_points": 0,
+        "normal_sand": 0,
+        "streak": 1
+      },
+      "offline": {
+        "at": "2026-10-28T10:24:37.335425+00:00",
+        "exit_code": 0,
+        "log": "external/tmp/pomosprint_vc-android-tyt-a1-offline.log"
+      },
+      "offline_process_closed": {
+        "already_exited": false,
+        "at": "2026-10-28T10:24:37.393937+00:00",
+        "exit_code": 0
+      },
+      "offline_proof": {
+        "attempt_id": "ae1382ba-c4bb-42c3-b7c6-7368bffca8a0",
+        "baseline": {
+          "coins": 0,
+          "current_streak": 0,
+          "exam_coins": 0,
+          "exam_points": 0,
+          "last_study_date": null,
+          "lifetime_points": 0,
+          "timezone": "Europe/Istanbul",
+          "total_minutes": 0
+        },
+        "client_uuid": "565b93f1-e8b0-4298-9e97-11389cda4a73",
+        "completion_verified": false,
+        "definition_snapshot": {
+          "catalog_version": 1,
+          "duration_seconds": 60,
+          "group": "yks",
+          "id": "tyt",
+          "name_en": "TYT",
+          "name_tr": "TYT",
+          "reward_coins": 0,
+          "reward_points": 0,
+          "segment": "yks",
+          "subjects": [
+            {
+              "category_keys": [
+                "Türkçe"
+              ],
+              "id": "turkish",
+              "name_en": "Turkish",
+              "name_tr": "Türkçe",
+              "question_count": 40
+            },
+            {
+              "category_keys": [
+                "Matematik"
+              ],
+              "id": "mathematics",
+              "name_en": "Basic Mathematics",
+              "name_tr": "Temel Matematik",
+              "question_count": 40
+            },
+            {
+              "category_keys": [
+                "Tarih"
+              ],
+              "id": "history",
+              "name_en": "History",
+              "name_tr": "Tarih",
+              "question_count": 5
+            },
+            {
+              "category_keys": [
+                "Coğrafya"
+              ],
+              "id": "geography",
+              "name_en": "Geography",
+              "name_tr": "Coğrafya",
+              "question_count": 5
+            },
+            {
+              "category_keys": [
+                "Felsefe"
+              ],
+              "id": "philosophy",
+              "name_en": "Philosophy",
+              "name_tr": "Felsefe",
+              "question_count": 5
+            },
+            {
+              "category_keys": [
+                "Din Kültürü"
+              ],
+              "id": "religion",
+              "name_en": "Religious Culture / Additional Philosophy",
+              "name_tr": "Din Kültürü / İlave Felsefe",
+              "question_count": 5
+            },
+            {
+              "category_keys": [
+                "Fizik"
+              ],
+              "id": "physics",
+              "name_en": "Physics",
+              "name_tr": "Fizik",
+              "question_count": 7
+            },
+            {
+              "category_keys": [
+                "Kimya"
+              ],
+              "id": "chemistry",
+              "name_en": "Chemistry",
+              "name_tr": "Kimya",
+              "question_count": 7
+            },
+            {
+              "category_keys": [
+                "Biyoloji"
+              ],
+              "id": "biology",
+              "name_en": "Biology",
+              "name_tr": "Biyoloji",
+              "question_count": 6
+            }
+          ],
+          "total_questions": 120,
+          "wrong_answer_divisor": 4
+        },
+        "duration_seconds": 60,
+        "email": "e2e-sim-probe-exam-catalog-start-vc-android-tyt-a1@pomosprint.local",
+        "ends_at": "2026-10-28T10:23:59.590759Z",
+        "exam_id": "tyt",
+        "expected_coins": 0,
+        "expected_points": 0,
+        "language": "en",
+        "last_resume_at": "2026-10-28T10:24:35.621777Z",
+        "mode": "exam_catalog_start",
+        "notification_delivery_tested": false,
+        "observed_at": "2026-10-28T10:23:00.084516Z",
+        "offline_pending_verified": true,
+        "owner_id": "59718365-a0c8-45c2-8f90-7c1747df62c0",
+        "remaining_at_start": 60,
+        "run_id": "vc-android-tyt-a1",
+        "scope": "SHORT local-catalog natural60 lifecycle, NOT official duration",
+        "started_at": "2026-10-28T10:22:59.590759Z",
+        "total_questions": 120
+      },
+      "original_proof": {
+        "attempt_id": "ae1382ba-c4bb-42c3-b7c6-7368bffca8a0",
+        "baseline": {
+          "coins": 0,
+          "current_streak": 0,
+          "exam_coins": 0,
+          "exam_points": 0,
+          "last_study_date": null,
+          "lifetime_points": 0,
+          "timezone": "Europe/Istanbul",
+          "total_minutes": 0
+        },
+        "client_uuid": "565b93f1-e8b0-4298-9e97-11389cda4a73",
+        "definition_snapshot": {
+          "catalog_version": 1,
+          "duration_seconds": 60,
+          "group": "yks",
+          "id": "tyt",
+          "name_en": "TYT",
+          "name_tr": "TYT",
+          "reward_coins": 0,
+          "reward_points": 0,
+          "segment": "yks",
+          "subjects": [
+            {
+              "category_keys": [
+                "Türkçe"
+              ],
+              "id": "turkish",
+              "name_en": "Turkish",
+              "name_tr": "Türkçe",
+              "question_count": 40
+            },
+            {
+              "category_keys": [
+                "Matematik"
+              ],
+              "id": "mathematics",
+              "name_en": "Basic Mathematics",
+              "name_tr": "Temel Matematik",
+              "question_count": 40
+            },
+            {
+              "category_keys": [
+                "Tarih"
+              ],
+              "id": "history",
+              "name_en": "History",
+              "name_tr": "Tarih",
+              "question_count": 5
+            },
+            {
+              "category_keys": [
+                "Coğrafya"
+              ],
+              "id": "geography",
+              "name_en": "Geography",
+              "name_tr": "Coğrafya",
+              "question_count": 5
+            },
+            {
+              "category_keys": [
+                "Felsefe"
+              ],
+              "id": "philosophy",
+              "name_en": "Philosophy",
+              "name_tr": "Felsefe",
+              "question_count": 5
+            },
+            {
+              "category_keys": [
+                "Din Kültürü"
+              ],
+              "id": "religion",
+              "name_en": "Religious Culture / Additional Philosophy",
+              "name_tr": "Din Kültürü / İlave Felsefe",
+              "question_count": 5
+            },
+            {
+              "category_keys": [
+                "Fizik"
+              ],
+              "id": "physics",
+              "name_en": "Physics",
+              "name_tr": "Fizik",
+              "question_count": 7
+            },
+            {
+              "category_keys": [
+                "Kimya"
+              ],
+              "id": "chemistry",
+              "name_en": "Chemistry",
+              "name_tr": "Kimya",
+              "question_count": 7
+            },
+            {
+              "category_keys": [
+                "Biyoloji"
+              ],
+              "id": "biology",
+              "name_en": "Biology",
+              "name_tr": "Biyoloji",
+              "question_count": 6
+            }
+          ],
+          "total_questions": 120,
+          "wrong_answer_divisor": 4
+        },
+        "duration_seconds": 60,
+        "email": "e2e-sim-probe-exam-catalog-start-vc-android-tyt-a1@pomosprint.local",
+        "ends_at": "2026-10-28T10:23:59.590759Z",
+        "exam_id": "tyt",
+        "expected_coins": 0,
+        "expected_points": 0,
+        "language": "en",
+        "mode": "exam_catalog_start",
+        "notification_delivery_tested": false,
+        "observed_at": "2026-10-28T10:23:00.084516Z",
+        "owner_id": "59718365-a0c8-45c2-8f90-7c1747df62c0",
+        "remaining_at_start": 60,
+        "run_id": "vc-android-tyt-a1",
+        "scope": "SHORT local-catalog natural60 lifecycle, NOT official duration",
+        "started_at": "2026-10-28T10:22:59.590759Z",
+        "total_questions": 120
+      },
+      "process_closed": {
+        "already_exited": false,
+        "at": "2026-10-28T10:23:02.700277+00:00",
+        "exit_code": 0
+      },
+      "reconnected": {
+        "at": "2026-10-28T10:25:11.096773+00:00",
+        "exit_code": 0,
+        "log": "external/tmp/pomosprint_vc-android-tyt-a1-resume.log"
+      },
+      "result": "PASS",
+      "run": "vc-android-tyt-a1",
+      "start": {
+        "at": "2026-10-28T10:23:02.629074+00:00",
+        "exit_code": 0,
+        "log": "external/tmp/pomosprint_vc-android-tyt-a1-exam_catalog_start.log"
+      },
+      "started_at": "2026-10-28T10:22:00.248727+00:00"
+    },
+    {
+      "exam_id": "ayt",
+      "final_proof": {
+        "attempt_id": "e6e64721-ec2e-4e1a-8291-57d9179a7053",
+        "baseline": {
+          "coins": 0,
+          "current_streak": 0,
+          "exam_coins": 0,
+          "exam_points": 0,
+          "last_study_date": null,
+          "lifetime_points": 0,
+          "timezone": "Europe/Istanbul",
+          "total_minutes": 0
+        },
+        "client_uuid": "5c560dfc-ba5d-49d0-ad62-6675a9ae9d9c",
+        "completion_verified": true,
+        "definition_snapshot": {
+          "catalog_version": 1,
+          "duration_seconds": 60,
+          "group": "yks",
+          "id": "ayt",
+          "name_en": "AYT",
+          "name_tr": "AYT",
+          "reward_coins": 0,
+          "reward_points": 0,
+          "segment": "yks",
+          "subjects": [
+            {
+              "category_keys": [
+                "Edebiyat",
+                "Türkçe"
+              ],
+              "id": "literature",
+              "name_en": "Turkish Language and Literature",
+              "name_tr": "Türk Dili ve Edebiyatı",
+              "question_count": 24
+            },
+            {
+              "category_keys": [
+                "Tarih"
+              ],
+              "id": "history_1",
+              "name_en": "History-1",
+              "name_tr": "Tarih-1",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "Coğrafya"
+              ],
+              "id": "geography_1",
+              "name_en": "Geography-1",
+              "name_tr": "Coğrafya-1",
+              "question_count": 6
+            },
+            {
+              "category_keys": [
+                "Tarih"
+              ],
+              "id": "history_2",
+              "name_en": "History-2",
+              "name_tr": "Tarih-2",
+              "question_count": 11
+            },
+            {
+              "category_keys": [
+                "Coğrafya"
+              ],
+              "id": "geography_2",
+              "name_en": "Geography-2",
+              "name_tr": "Coğrafya-2",
+              "question_count": 11
+            },
+            {
+              "category_keys": [
+                "Felsefe"
+              ],
+              "id": "philosophy_group",
+              "name_en": "Philosophy Group",
+              "name_tr": "Felsefe Grubu",
+              "question_count": 12
+            },
+            {
+              "category_keys": [
+                "Din Kültürü"
+              ],
+              "id": "religion",
+              "name_en": "Religious Culture / Additional Philosophy",
+              "name_tr": "Din Kültürü / İlave Felsefe",
+              "question_count": 6
+            },
+            {
+              "category_keys": [
+                "Matematik"
+              ],
+              "id": "mathematics",
+              "name_en": "Mathematics",
+              "name_tr": "Matematik",
+              "question_count": 40
+            },
+            {
+              "category_keys": [
+                "Fizik"
+              ],
+              "id": "physics",
+              "name_en": "Physics",
+              "name_tr": "Fizik",
+              "question_count": 14
+            },
+            {
+              "category_keys": [
+                "Kimya"
+              ],
+              "id": "chemistry",
+              "name_en": "Chemistry",
+              "name_tr": "Kimya",
+              "question_count": 13
+            },
+            {
+              "category_keys": [
+                "Biyoloji"
+              ],
+              "id": "biology",
+              "name_en": "Biology",
+              "name_tr": "Biyoloji",
+              "question_count": 13
+            }
+          ],
+          "total_questions": 160,
+          "wrong_answer_divisor": 4
+        },
+        "duration_seconds": 60,
+        "email": "e2e-sim-probe-exam-catalog-start-vc-android-ayt-a1@pomosprint.local",
+        "ends_at": "2026-10-28T10:26:51.319590Z",
+        "exam_id": "ayt",
+        "expected_coins": 0,
+        "expected_points": 0,
+        "language": "en",
+        "last_resume_at": "2026-10-28T10:27:58.147938Z",
+        "mode": "exam_catalog_start",
+        "notification_delivery_tested": false,
+        "observed_at": "2026-10-28T10:25:51.325104Z",
+        "offline_pending_verified": true,
+        "owner_id": "148da72c-24ea-4d0e-a140-93c63fe1ee46",
+        "remaining_at_start": 60,
+        "run_id": "vc-android-ayt-a1",
+        "scope": "SHORT local-catalog natural60 lifecycle, NOT official duration",
+        "started_at": "2026-10-28T10:25:51.319590Z",
+        "total_questions": 160
+      },
+      "independent_sql": {
+        "attempts": 1,
+        "completed": 1,
+        "events": 1,
+        "exam_points": 0,
+        "exam_sand": 0,
+        "minutes": 1,
+        "normal_points": 0,
+        "normal_sand": 0,
+        "streak": 1
+      },
+      "offline": {
+        "at": "2026-10-28T10:27:27.711110+00:00",
+        "exit_code": 0,
+        "log": "external/tmp/pomosprint_vc-android-ayt-a1-offline.log"
+      },
+      "offline_process_closed": {
+        "already_exited": false,
+        "at": "2026-10-28T10:27:27.765323+00:00",
+        "exit_code": 0
+      },
+      "offline_proof": {
+        "attempt_id": "e6e64721-ec2e-4e1a-8291-57d9179a7053",
+        "baseline": {
+          "coins": 0,
+          "current_streak": 0,
+          "exam_coins": 0,
+          "exam_points": 0,
+          "last_study_date": null,
+          "lifetime_points": 0,
+          "timezone": "Europe/Istanbul",
+          "total_minutes": 0
+        },
+        "client_uuid": "5c560dfc-ba5d-49d0-ad62-6675a9ae9d9c",
+        "completion_verified": false,
+        "definition_snapshot": {
+          "catalog_version": 1,
+          "duration_seconds": 60,
+          "group": "yks",
+          "id": "ayt",
+          "name_en": "AYT",
+          "name_tr": "AYT",
+          "reward_coins": 0,
+          "reward_points": 0,
+          "segment": "yks",
+          "subjects": [
+            {
+              "category_keys": [
+                "Edebiyat",
+                "Türkçe"
+              ],
+              "id": "literature",
+              "name_en": "Turkish Language and Literature",
+              "name_tr": "Türk Dili ve Edebiyatı",
+              "question_count": 24
+            },
+            {
+              "category_keys": [
+                "Tarih"
+              ],
+              "id": "history_1",
+              "name_en": "History-1",
+              "name_tr": "Tarih-1",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "Coğrafya"
+              ],
+              "id": "geography_1",
+              "name_en": "Geography-1",
+              "name_tr": "Coğrafya-1",
+              "question_count": 6
+            },
+            {
+              "category_keys": [
+                "Tarih"
+              ],
+              "id": "history_2",
+              "name_en": "History-2",
+              "name_tr": "Tarih-2",
+              "question_count": 11
+            },
+            {
+              "category_keys": [
+                "Coğrafya"
+              ],
+              "id": "geography_2",
+              "name_en": "Geography-2",
+              "name_tr": "Coğrafya-2",
+              "question_count": 11
+            },
+            {
+              "category_keys": [
+                "Felsefe"
+              ],
+              "id": "philosophy_group",
+              "name_en": "Philosophy Group",
+              "name_tr": "Felsefe Grubu",
+              "question_count": 12
+            },
+            {
+              "category_keys": [
+                "Din Kültürü"
+              ],
+              "id": "religion",
+              "name_en": "Religious Culture / Additional Philosophy",
+              "name_tr": "Din Kültürü / İlave Felsefe",
+              "question_count": 6
+            },
+            {
+              "category_keys": [
+                "Matematik"
+              ],
+              "id": "mathematics",
+              "name_en": "Mathematics",
+              "name_tr": "Matematik",
+              "question_count": 40
+            },
+            {
+              "category_keys": [
+                "Fizik"
+              ],
+              "id": "physics",
+              "name_en": "Physics",
+              "name_tr": "Fizik",
+              "question_count": 14
+            },
+            {
+              "category_keys": [
+                "Kimya"
+              ],
+              "id": "chemistry",
+              "name_en": "Chemistry",
+              "name_tr": "Kimya",
+              "question_count": 13
+            },
+            {
+              "category_keys": [
+                "Biyoloji"
+              ],
+              "id": "biology",
+              "name_en": "Biology",
+              "name_tr": "Biyoloji",
+              "question_count": 13
+            }
+          ],
+          "total_questions": 160,
+          "wrong_answer_divisor": 4
+        },
+        "duration_seconds": 60,
+        "email": "e2e-sim-probe-exam-catalog-start-vc-android-ayt-a1@pomosprint.local",
+        "ends_at": "2026-10-28T10:26:51.319590Z",
+        "exam_id": "ayt",
+        "expected_coins": 0,
+        "expected_points": 0,
+        "language": "en",
+        "last_resume_at": "2026-10-28T10:27:25.811064Z",
+        "mode": "exam_catalog_start",
+        "notification_delivery_tested": false,
+        "observed_at": "2026-10-28T10:25:51.325104Z",
+        "offline_pending_verified": true,
+        "owner_id": "148da72c-24ea-4d0e-a140-93c63fe1ee46",
+        "remaining_at_start": 60,
+        "run_id": "vc-android-ayt-a1",
+        "scope": "SHORT local-catalog natural60 lifecycle, NOT official duration",
+        "started_at": "2026-10-28T10:25:51.319590Z",
+        "total_questions": 160
+      },
+      "original_proof": {
+        "attempt_id": "e6e64721-ec2e-4e1a-8291-57d9179a7053",
+        "baseline": {
+          "coins": 0,
+          "current_streak": 0,
+          "exam_coins": 0,
+          "exam_points": 0,
+          "last_study_date": null,
+          "lifetime_points": 0,
+          "timezone": "Europe/Istanbul",
+          "total_minutes": 0
+        },
+        "client_uuid": "5c560dfc-ba5d-49d0-ad62-6675a9ae9d9c",
+        "definition_snapshot": {
+          "catalog_version": 1,
+          "duration_seconds": 60,
+          "group": "yks",
+          "id": "ayt",
+          "name_en": "AYT",
+          "name_tr": "AYT",
+          "reward_coins": 0,
+          "reward_points": 0,
+          "segment": "yks",
+          "subjects": [
+            {
+              "category_keys": [
+                "Edebiyat",
+                "Türkçe"
+              ],
+              "id": "literature",
+              "name_en": "Turkish Language and Literature",
+              "name_tr": "Türk Dili ve Edebiyatı",
+              "question_count": 24
+            },
+            {
+              "category_keys": [
+                "Tarih"
+              ],
+              "id": "history_1",
+              "name_en": "History-1",
+              "name_tr": "Tarih-1",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "Coğrafya"
+              ],
+              "id": "geography_1",
+              "name_en": "Geography-1",
+              "name_tr": "Coğrafya-1",
+              "question_count": 6
+            },
+            {
+              "category_keys": [
+                "Tarih"
+              ],
+              "id": "history_2",
+              "name_en": "History-2",
+              "name_tr": "Tarih-2",
+              "question_count": 11
+            },
+            {
+              "category_keys": [
+                "Coğrafya"
+              ],
+              "id": "geography_2",
+              "name_en": "Geography-2",
+              "name_tr": "Coğrafya-2",
+              "question_count": 11
+            },
+            {
+              "category_keys": [
+                "Felsefe"
+              ],
+              "id": "philosophy_group",
+              "name_en": "Philosophy Group",
+              "name_tr": "Felsefe Grubu",
+              "question_count": 12
+            },
+            {
+              "category_keys": [
+                "Din Kültürü"
+              ],
+              "id": "religion",
+              "name_en": "Religious Culture / Additional Philosophy",
+              "name_tr": "Din Kültürü / İlave Felsefe",
+              "question_count": 6
+            },
+            {
+              "category_keys": [
+                "Matematik"
+              ],
+              "id": "mathematics",
+              "name_en": "Mathematics",
+              "name_tr": "Matematik",
+              "question_count": 40
+            },
+            {
+              "category_keys": [
+                "Fizik"
+              ],
+              "id": "physics",
+              "name_en": "Physics",
+              "name_tr": "Fizik",
+              "question_count": 14
+            },
+            {
+              "category_keys": [
+                "Kimya"
+              ],
+              "id": "chemistry",
+              "name_en": "Chemistry",
+              "name_tr": "Kimya",
+              "question_count": 13
+            },
+            {
+              "category_keys": [
+                "Biyoloji"
+              ],
+              "id": "biology",
+              "name_en": "Biology",
+              "name_tr": "Biyoloji",
+              "question_count": 13
+            }
+          ],
+          "total_questions": 160,
+          "wrong_answer_divisor": 4
+        },
+        "duration_seconds": 60,
+        "email": "e2e-sim-probe-exam-catalog-start-vc-android-ayt-a1@pomosprint.local",
+        "ends_at": "2026-10-28T10:26:51.319590Z",
+        "exam_id": "ayt",
+        "expected_coins": 0,
+        "expected_points": 0,
+        "language": "en",
+        "mode": "exam_catalog_start",
+        "notification_delivery_tested": false,
+        "observed_at": "2026-10-28T10:25:51.325104Z",
+        "owner_id": "148da72c-24ea-4d0e-a140-93c63fe1ee46",
+        "remaining_at_start": 60,
+        "run_id": "vc-android-ayt-a1",
+        "scope": "SHORT local-catalog natural60 lifecycle, NOT official duration",
+        "started_at": "2026-10-28T10:25:51.319590Z",
+        "total_questions": 160
+      },
+      "process_closed": {
+        "already_exited": false,
+        "at": "2026-10-28T10:25:53.327417+00:00",
+        "exit_code": 0
+      },
+      "reconnected": {
+        "at": "2026-10-28T10:28:00.019129+00:00",
+        "exit_code": 0,
+        "log": "external/tmp/pomosprint_vc-android-ayt-a1-resume.log"
+      },
+      "result": "PASS",
+      "run": "vc-android-ayt-a1",
+      "start": {
+        "at": "2026-10-28T10:25:53.268374+00:00",
+        "exit_code": 0,
+        "log": "external/tmp/pomosprint_vc-android-ayt-a1-exam_catalog_start.log"
+      },
+      "started_at": "2026-10-28T10:25:11.188083+00:00"
+    },
+    {
+      "exam_id": "ydt",
+      "final_proof": {
+        "attempt_id": "98b09d09-24e9-4fb3-8383-2b3010db4013",
+        "baseline": {
+          "coins": 0,
+          "current_streak": 0,
+          "exam_coins": 0,
+          "exam_points": 0,
+          "last_study_date": null,
+          "lifetime_points": 0,
+          "timezone": "Europe/Istanbul",
+          "total_minutes": 0
+        },
+        "client_uuid": "c746b1a5-92ca-49dd-8f1e-8d260f43555e",
+        "completion_verified": true,
+        "definition_snapshot": {
+          "catalog_version": 1,
+          "duration_seconds": 60,
+          "group": "yks",
+          "id": "ydt",
+          "name_en": "YDT",
+          "name_tr": "YDT",
+          "reward_coins": 0,
+          "reward_points": 0,
+          "segment": "yks",
+          "subjects": [
+            {
+              "category_keys": [
+                "İngilizce"
+              ],
+              "id": "foreign_language",
+              "name_en": "Foreign Language",
+              "name_tr": "Yabancı Dil",
+              "question_count": 80
+            }
+          ],
+          "total_questions": 80,
+          "wrong_answer_divisor": 4
+        },
+        "duration_seconds": 60,
+        "email": "e2e-sim-probe-exam-catalog-start-vc-android-ydt-a1@pomosprint.local",
+        "ends_at": "2026-10-28T10:29:38.950306Z",
+        "exam_id": "ydt",
+        "expected_coins": 0,
+        "expected_points": 0,
+        "language": "en",
+        "last_resume_at": "2026-10-28T10:30:56.700201Z",
+        "mode": "exam_catalog_start",
+        "notification_delivery_tested": false,
+        "observed_at": "2026-10-28T10:28:38.838769Z",
+        "offline_pending_verified": true,
+        "owner_id": "03ebe3e8-a063-491e-8a3c-5afebb224683",
+        "remaining_at_start": 60,
+        "run_id": "vc-android-ydt-a1",
+        "scope": "SHORT local-catalog natural60 lifecycle, NOT official duration",
+        "started_at": "2026-10-28T10:28:38.950306Z",
+        "total_questions": 80
+      },
+      "independent_sql": {
+        "attempts": 1,
+        "completed": 1,
+        "events": 1,
+        "exam_points": 0,
+        "exam_sand": 0,
+        "minutes": 1,
+        "normal_points": 0,
+        "normal_sand": 0,
+        "streak": 1
+      },
+      "offline": {
+        "at": "2026-10-28T10:30:22.088462+00:00",
+        "exit_code": 0,
+        "log": "external/tmp/pomosprint_vc-android-ydt-a1-offline.log"
+      },
+      "offline_process_closed": {
+        "already_exited": false,
+        "at": "2026-10-28T10:30:22.145129+00:00",
+        "exit_code": 0
+      },
+      "offline_proof": {
+        "attempt_id": "98b09d09-24e9-4fb3-8383-2b3010db4013",
+        "baseline": {
+          "coins": 0,
+          "current_streak": 0,
+          "exam_coins": 0,
+          "exam_points": 0,
+          "last_study_date": null,
+          "lifetime_points": 0,
+          "timezone": "Europe/Istanbul",
+          "total_minutes": 0
+        },
+        "client_uuid": "c746b1a5-92ca-49dd-8f1e-8d260f43555e",
+        "completion_verified": false,
+        "definition_snapshot": {
+          "catalog_version": 1,
+          "duration_seconds": 60,
+          "group": "yks",
+          "id": "ydt",
+          "name_en": "YDT",
+          "name_tr": "YDT",
+          "reward_coins": 0,
+          "reward_points": 0,
+          "segment": "yks",
+          "subjects": [
+            {
+              "category_keys": [
+                "İngilizce"
+              ],
+              "id": "foreign_language",
+              "name_en": "Foreign Language",
+              "name_tr": "Yabancı Dil",
+              "question_count": 80
+            }
+          ],
+          "total_questions": 80,
+          "wrong_answer_divisor": 4
+        },
+        "duration_seconds": 60,
+        "email": "e2e-sim-probe-exam-catalog-start-vc-android-ydt-a1@pomosprint.local",
+        "ends_at": "2026-10-28T10:29:38.950306Z",
+        "exam_id": "ydt",
+        "expected_coins": 0,
+        "expected_points": 0,
+        "language": "en",
+        "last_resume_at": "2026-10-28T10:30:19.926117Z",
+        "mode": "exam_catalog_start",
+        "notification_delivery_tested": false,
+        "observed_at": "2026-10-28T10:28:38.838769Z",
+        "offline_pending_verified": true,
+        "owner_id": "03ebe3e8-a063-491e-8a3c-5afebb224683",
+        "remaining_at_start": 60,
+        "run_id": "vc-android-ydt-a1",
+        "scope": "SHORT local-catalog natural60 lifecycle, NOT official duration",
+        "started_at": "2026-10-28T10:28:38.950306Z",
+        "total_questions": 80
+      },
+      "original_proof": {
+        "attempt_id": "98b09d09-24e9-4fb3-8383-2b3010db4013",
+        "baseline": {
+          "coins": 0,
+          "current_streak": 0,
+          "exam_coins": 0,
+          "exam_points": 0,
+          "last_study_date": null,
+          "lifetime_points": 0,
+          "timezone": "Europe/Istanbul",
+          "total_minutes": 0
+        },
+        "client_uuid": "c746b1a5-92ca-49dd-8f1e-8d260f43555e",
+        "definition_snapshot": {
+          "catalog_version": 1,
+          "duration_seconds": 60,
+          "group": "yks",
+          "id": "ydt",
+          "name_en": "YDT",
+          "name_tr": "YDT",
+          "reward_coins": 0,
+          "reward_points": 0,
+          "segment": "yks",
+          "subjects": [
+            {
+              "category_keys": [
+                "İngilizce"
+              ],
+              "id": "foreign_language",
+              "name_en": "Foreign Language",
+              "name_tr": "Yabancı Dil",
+              "question_count": 80
+            }
+          ],
+          "total_questions": 80,
+          "wrong_answer_divisor": 4
+        },
+        "duration_seconds": 60,
+        "email": "e2e-sim-probe-exam-catalog-start-vc-android-ydt-a1@pomosprint.local",
+        "ends_at": "2026-10-28T10:29:38.950306Z",
+        "exam_id": "ydt",
+        "expected_coins": 0,
+        "expected_points": 0,
+        "language": "en",
+        "mode": "exam_catalog_start",
+        "notification_delivery_tested": false,
+        "observed_at": "2026-10-28T10:28:38.838769Z",
+        "owner_id": "03ebe3e8-a063-491e-8a3c-5afebb224683",
+        "remaining_at_start": 60,
+        "run_id": "vc-android-ydt-a1",
+        "scope": "SHORT local-catalog natural60 lifecycle, NOT official duration",
+        "started_at": "2026-10-28T10:28:38.950306Z",
+        "total_questions": 80
+      },
+      "process_closed": {
+        "already_exited": false,
+        "at": "2026-10-28T10:28:40.809736+00:00",
+        "exit_code": 0
+      },
+      "reconnected": {
+        "at": "2026-10-28T10:30:58.719913+00:00",
+        "exit_code": 0,
+        "log": "external/tmp/pomosprint_vc-android-ydt-a1-resume.log"
+      },
+      "result": "PASS",
+      "run": "vc-android-ydt-a1",
+      "start": {
+        "at": "2026-10-28T10:28:40.751332+00:00",
+        "exit_code": 0,
+        "log": "external/tmp/pomosprint_vc-android-ydt-a1-exam_catalog_start.log"
+      },
+      "started_at": "2026-10-28T10:28:00.133605+00:00"
+    },
+    {
+      "exam_id": "lgs_verbal",
+      "final_proof": {
+        "attempt_id": "e92d8b3a-6e2f-454e-82e7-401ed61079c2",
+        "baseline": {
+          "coins": 0,
+          "current_streak": 0,
+          "exam_coins": 0,
+          "exam_points": 0,
+          "last_study_date": null,
+          "lifetime_points": 0,
+          "timezone": "Europe/Istanbul",
+          "total_minutes": 0
+        },
+        "client_uuid": "ba75705c-f4a7-4303-836f-adee0d987625",
+        "completion_verified": true,
+        "definition_snapshot": {
+          "catalog_version": 1,
+          "duration_seconds": 60,
+          "group": "lgs",
+          "id": "lgs_verbal",
+          "name_en": "LGS Verbal",
+          "name_tr": "LGS Sözel",
+          "reward_coins": 0,
+          "reward_points": 0,
+          "segment": "lgs",
+          "subjects": [
+            {
+              "category_keys": [
+                "Türkçe"
+              ],
+              "id": "turkish",
+              "name_en": "Turkish",
+              "name_tr": "Türkçe",
+              "question_count": 20
+            },
+            {
+              "category_keys": [
+                "T.C. İnkılap Tarihi"
+              ],
+              "id": "revolution_history",
+              "name_en": "Turkish Revolution History",
+              "name_tr": "T.C. İnkılap Tarihi",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "Din Kültürü"
+              ],
+              "id": "religion",
+              "name_en": "Religious Culture",
+              "name_tr": "Din Kültürü",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "İngilizce"
+              ],
+              "id": "foreign_language",
+              "name_en": "Foreign Language",
+              "name_tr": "Yabancı Dil",
+              "question_count": 10
+            }
+          ],
+          "total_questions": 50,
+          "wrong_answer_divisor": 3
+        },
+        "duration_seconds": 60,
+        "email": "e2e-sim-probe-exam-catalog-start-vc-android-lgs-verbal-a1@pomosprint.local",
+        "ends_at": "2026-10-28T10:32:43.763121Z",
+        "exam_id": "lgs_verbal",
+        "expected_coins": 0,
+        "expected_points": 0,
+        "language": "en",
+        "last_resume_at": "2026-10-28T10:33:56.276480Z",
+        "mode": "exam_catalog_start",
+        "notification_delivery_tested": false,
+        "observed_at": "2026-10-28T10:31:44.095384Z",
+        "offline_pending_verified": true,
+        "owner_id": "5da1a6be-0b06-474d-927a-106f1ce57f25",
+        "remaining_at_start": 60,
+        "run_id": "vc-android-lgs-verbal-a1",
+        "scope": "SHORT local-catalog natural60 lifecycle, NOT official duration",
+        "started_at": "2026-10-28T10:31:43.763121Z",
+        "total_questions": 50
+      },
+      "independent_sql": {
+        "attempts": 1,
+        "completed": 1,
+        "events": 1,
+        "exam_points": 0,
+        "exam_sand": 0,
+        "minutes": 1,
+        "normal_points": 0,
+        "normal_sand": 0,
+        "streak": 1
+      },
+      "offline": {
+        "at": "2026-10-28T10:33:26.462434+00:00",
+        "exit_code": 0,
+        "log": "external/tmp/pomosprint_vc-android-lgs-verbal-a1-offline.log"
+      },
+      "offline_process_closed": {
+        "already_exited": false,
+        "at": "2026-10-28T10:33:26.520667+00:00",
+        "exit_code": 0
+      },
+      "offline_proof": {
+        "attempt_id": "e92d8b3a-6e2f-454e-82e7-401ed61079c2",
+        "baseline": {
+          "coins": 0,
+          "current_streak": 0,
+          "exam_coins": 0,
+          "exam_points": 0,
+          "last_study_date": null,
+          "lifetime_points": 0,
+          "timezone": "Europe/Istanbul",
+          "total_minutes": 0
+        },
+        "client_uuid": "ba75705c-f4a7-4303-836f-adee0d987625",
+        "completion_verified": false,
+        "definition_snapshot": {
+          "catalog_version": 1,
+          "duration_seconds": 60,
+          "group": "lgs",
+          "id": "lgs_verbal",
+          "name_en": "LGS Verbal",
+          "name_tr": "LGS Sözel",
+          "reward_coins": 0,
+          "reward_points": 0,
+          "segment": "lgs",
+          "subjects": [
+            {
+              "category_keys": [
+                "Türkçe"
+              ],
+              "id": "turkish",
+              "name_en": "Turkish",
+              "name_tr": "Türkçe",
+              "question_count": 20
+            },
+            {
+              "category_keys": [
+                "T.C. İnkılap Tarihi"
+              ],
+              "id": "revolution_history",
+              "name_en": "Turkish Revolution History",
+              "name_tr": "T.C. İnkılap Tarihi",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "Din Kültürü"
+              ],
+              "id": "religion",
+              "name_en": "Religious Culture",
+              "name_tr": "Din Kültürü",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "İngilizce"
+              ],
+              "id": "foreign_language",
+              "name_en": "Foreign Language",
+              "name_tr": "Yabancı Dil",
+              "question_count": 10
+            }
+          ],
+          "total_questions": 50,
+          "wrong_answer_divisor": 3
+        },
+        "duration_seconds": 60,
+        "email": "e2e-sim-probe-exam-catalog-start-vc-android-lgs-verbal-a1@pomosprint.local",
+        "ends_at": "2026-10-28T10:32:43.763121Z",
+        "exam_id": "lgs_verbal",
+        "expected_coins": 0,
+        "expected_points": 0,
+        "language": "en",
+        "last_resume_at": "2026-10-28T10:33:24.601180Z",
+        "mode": "exam_catalog_start",
+        "notification_delivery_tested": false,
+        "observed_at": "2026-10-28T10:31:44.095384Z",
+        "offline_pending_verified": true,
+        "owner_id": "5da1a6be-0b06-474d-927a-106f1ce57f25",
+        "remaining_at_start": 60,
+        "run_id": "vc-android-lgs-verbal-a1",
+        "scope": "SHORT local-catalog natural60 lifecycle, NOT official duration",
+        "started_at": "2026-10-28T10:31:43.763121Z",
+        "total_questions": 50
+      },
+      "original_proof": {
+        "attempt_id": "e92d8b3a-6e2f-454e-82e7-401ed61079c2",
+        "baseline": {
+          "coins": 0,
+          "current_streak": 0,
+          "exam_coins": 0,
+          "exam_points": 0,
+          "last_study_date": null,
+          "lifetime_points": 0,
+          "timezone": "Europe/Istanbul",
+          "total_minutes": 0
+        },
+        "client_uuid": "ba75705c-f4a7-4303-836f-adee0d987625",
+        "definition_snapshot": {
+          "catalog_version": 1,
+          "duration_seconds": 60,
+          "group": "lgs",
+          "id": "lgs_verbal",
+          "name_en": "LGS Verbal",
+          "name_tr": "LGS Sözel",
+          "reward_coins": 0,
+          "reward_points": 0,
+          "segment": "lgs",
+          "subjects": [
+            {
+              "category_keys": [
+                "Türkçe"
+              ],
+              "id": "turkish",
+              "name_en": "Turkish",
+              "name_tr": "Türkçe",
+              "question_count": 20
+            },
+            {
+              "category_keys": [
+                "T.C. İnkılap Tarihi"
+              ],
+              "id": "revolution_history",
+              "name_en": "Turkish Revolution History",
+              "name_tr": "T.C. İnkılap Tarihi",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "Din Kültürü"
+              ],
+              "id": "religion",
+              "name_en": "Religious Culture",
+              "name_tr": "Din Kültürü",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "İngilizce"
+              ],
+              "id": "foreign_language",
+              "name_en": "Foreign Language",
+              "name_tr": "Yabancı Dil",
+              "question_count": 10
+            }
+          ],
+          "total_questions": 50,
+          "wrong_answer_divisor": 3
+        },
+        "duration_seconds": 60,
+        "email": "e2e-sim-probe-exam-catalog-start-vc-android-lgs-verbal-a1@pomosprint.local",
+        "ends_at": "2026-10-28T10:32:43.763121Z",
+        "exam_id": "lgs_verbal",
+        "expected_coins": 0,
+        "expected_points": 0,
+        "language": "en",
+        "mode": "exam_catalog_start",
+        "notification_delivery_tested": false,
+        "observed_at": "2026-10-28T10:31:44.095384Z",
+        "owner_id": "5da1a6be-0b06-474d-927a-106f1ce57f25",
+        "remaining_at_start": 60,
+        "run_id": "vc-android-lgs-verbal-a1",
+        "scope": "SHORT local-catalog natural60 lifecycle, NOT official duration",
+        "started_at": "2026-10-28T10:31:43.763121Z",
+        "total_questions": 50
+      },
+      "process_closed": {
+        "already_exited": false,
+        "at": "2026-10-28T10:31:46.502117+00:00",
+        "exit_code": 0
+      },
+      "reconnected": {
+        "at": "2026-10-28T10:33:58.342292+00:00",
+        "exit_code": 0,
+        "log": "external/tmp/pomosprint_vc-android-lgs-verbal-a1-resume.log"
+      },
+      "result": "PASS",
+      "run": "vc-android-lgs-verbal-a1",
+      "start": {
+        "at": "2026-10-28T10:31:46.383222+00:00",
+        "exit_code": 0,
+        "log": "external/tmp/pomosprint_vc-android-lgs-verbal-a1-exam_catalog_start.log"
+      },
+      "started_at": "2026-10-28T10:30:58.825374+00:00"
+    },
+    {
+      "exam_id": "lgs_quantitative",
+      "final_proof": {
+        "attempt_id": "ab532c9e-29e7-42ea-945b-bf2fcfd6f056",
+        "baseline": {
+          "coins": 0,
+          "current_streak": 0,
+          "exam_coins": 0,
+          "exam_points": 0,
+          "last_study_date": null,
+          "lifetime_points": 0,
+          "timezone": "Europe/Istanbul",
+          "total_minutes": 0
+        },
+        "client_uuid": "6de4db56-45c5-4e71-9f4f-f882fc59e9f6",
+        "completion_verified": true,
+        "definition_snapshot": {
+          "catalog_version": 1,
+          "duration_seconds": 60,
+          "group": "lgs",
+          "id": "lgs_quantitative",
+          "name_en": "LGS Quantitative",
+          "name_tr": "LGS Sayısal",
+          "reward_coins": 0,
+          "reward_points": 0,
+          "segment": "lgs",
+          "subjects": [
+            {
+              "category_keys": [
+                "Matematik"
+              ],
+              "id": "mathematics",
+              "name_en": "Mathematics",
+              "name_tr": "Matematik",
+              "question_count": 20
+            },
+            {
+              "category_keys": [
+                "Fen Bilimleri"
+              ],
+              "id": "science",
+              "name_en": "Science",
+              "name_tr": "Fen Bilimleri",
+              "question_count": 20
+            }
+          ],
+          "total_questions": 40,
+          "wrong_answer_divisor": 3
+        },
+        "duration_seconds": 60,
+        "email": "e2e-sim-probe-exam-catalog-start-vc-android-lgs-quantitative-a1@pomosprint.local",
+        "ends_at": "2026-10-28T10:35:41.277975Z",
+        "exam_id": "lgs_quantitative",
+        "expected_coins": 0,
+        "expected_points": 0,
+        "language": "en",
+        "last_resume_at": "2026-10-28T10:36:49.127292Z",
+        "mode": "exam_catalog_start",
+        "notification_delivery_tested": false,
+        "observed_at": "2026-10-28T10:34:41.178397Z",
+        "offline_pending_verified": true,
+        "owner_id": "154e6aa8-c004-4905-851a-4c5048c2f4f3",
+        "remaining_at_start": 60,
+        "run_id": "vc-android-lgs-quantitative-a1",
+        "scope": "SHORT local-catalog natural60 lifecycle, NOT official duration",
+        "started_at": "2026-10-28T10:34:41.277975Z",
+        "total_questions": 40
+      },
+      "independent_sql": {
+        "attempts": 1,
+        "completed": 1,
+        "events": 1,
+        "exam_points": 0,
+        "exam_sand": 0,
+        "minutes": 1,
+        "normal_points": 0,
+        "normal_sand": 0,
+        "streak": 1
+      },
+      "offline": {
+        "at": "2026-10-28T10:36:20.552044+00:00",
+        "exit_code": 0,
+        "log": "external/tmp/pomosprint_vc-android-lgs-quantitative-a1-offline.log"
+      },
+      "offline_process_closed": {
+        "already_exited": false,
+        "at": "2026-10-28T10:36:20.615892+00:00",
+        "exit_code": 0
+      },
+      "offline_proof": {
+        "attempt_id": "ab532c9e-29e7-42ea-945b-bf2fcfd6f056",
+        "baseline": {
+          "coins": 0,
+          "current_streak": 0,
+          "exam_coins": 0,
+          "exam_points": 0,
+          "last_study_date": null,
+          "lifetime_points": 0,
+          "timezone": "Europe/Istanbul",
+          "total_minutes": 0
+        },
+        "client_uuid": "6de4db56-45c5-4e71-9f4f-f882fc59e9f6",
+        "completion_verified": false,
+        "definition_snapshot": {
+          "catalog_version": 1,
+          "duration_seconds": 60,
+          "group": "lgs",
+          "id": "lgs_quantitative",
+          "name_en": "LGS Quantitative",
+          "name_tr": "LGS Sayısal",
+          "reward_coins": 0,
+          "reward_points": 0,
+          "segment": "lgs",
+          "subjects": [
+            {
+              "category_keys": [
+                "Matematik"
+              ],
+              "id": "mathematics",
+              "name_en": "Mathematics",
+              "name_tr": "Matematik",
+              "question_count": 20
+            },
+            {
+              "category_keys": [
+                "Fen Bilimleri"
+              ],
+              "id": "science",
+              "name_en": "Science",
+              "name_tr": "Fen Bilimleri",
+              "question_count": 20
+            }
+          ],
+          "total_questions": 40,
+          "wrong_answer_divisor": 3
+        },
+        "duration_seconds": 60,
+        "email": "e2e-sim-probe-exam-catalog-start-vc-android-lgs-quantitative-a1@pomosprint.local",
+        "ends_at": "2026-10-28T10:35:41.277975Z",
+        "exam_id": "lgs_quantitative",
+        "expected_coins": 0,
+        "expected_points": 0,
+        "language": "en",
+        "last_resume_at": "2026-10-28T10:36:18.662991Z",
+        "mode": "exam_catalog_start",
+        "notification_delivery_tested": false,
+        "observed_at": "2026-10-28T10:34:41.178397Z",
+        "offline_pending_verified": true,
+        "owner_id": "154e6aa8-c004-4905-851a-4c5048c2f4f3",
+        "remaining_at_start": 60,
+        "run_id": "vc-android-lgs-quantitative-a1",
+        "scope": "SHORT local-catalog natural60 lifecycle, NOT official duration",
+        "started_at": "2026-10-28T10:34:41.277975Z",
+        "total_questions": 40
+      },
+      "original_proof": {
+        "attempt_id": "ab532c9e-29e7-42ea-945b-bf2fcfd6f056",
+        "baseline": {
+          "coins": 0,
+          "current_streak": 0,
+          "exam_coins": 0,
+          "exam_points": 0,
+          "last_study_date": null,
+          "lifetime_points": 0,
+          "timezone": "Europe/Istanbul",
+          "total_minutes": 0
+        },
+        "client_uuid": "6de4db56-45c5-4e71-9f4f-f882fc59e9f6",
+        "definition_snapshot": {
+          "catalog_version": 1,
+          "duration_seconds": 60,
+          "group": "lgs",
+          "id": "lgs_quantitative",
+          "name_en": "LGS Quantitative",
+          "name_tr": "LGS Sayısal",
+          "reward_coins": 0,
+          "reward_points": 0,
+          "segment": "lgs",
+          "subjects": [
+            {
+              "category_keys": [
+                "Matematik"
+              ],
+              "id": "mathematics",
+              "name_en": "Mathematics",
+              "name_tr": "Matematik",
+              "question_count": 20
+            },
+            {
+              "category_keys": [
+                "Fen Bilimleri"
+              ],
+              "id": "science",
+              "name_en": "Science",
+              "name_tr": "Fen Bilimleri",
+              "question_count": 20
+            }
+          ],
+          "total_questions": 40,
+          "wrong_answer_divisor": 3
+        },
+        "duration_seconds": 60,
+        "email": "e2e-sim-probe-exam-catalog-start-vc-android-lgs-quantitative-a1@pomosprint.local",
+        "ends_at": "2026-10-28T10:35:41.277975Z",
+        "exam_id": "lgs_quantitative",
+        "expected_coins": 0,
+        "expected_points": 0,
+        "language": "en",
+        "mode": "exam_catalog_start",
+        "notification_delivery_tested": false,
+        "observed_at": "2026-10-28T10:34:41.178397Z",
+        "owner_id": "154e6aa8-c004-4905-851a-4c5048c2f4f3",
+        "remaining_at_start": 60,
+        "run_id": "vc-android-lgs-quantitative-a1",
+        "scope": "SHORT local-catalog natural60 lifecycle, NOT official duration",
+        "started_at": "2026-10-28T10:34:41.277975Z",
+        "total_questions": 40
+      },
+      "process_closed": {
+        "already_exited": false,
+        "at": "2026-10-28T10:34:43.078620+00:00",
+        "exit_code": 0
+      },
+      "reconnected": {
+        "at": "2026-10-28T10:36:50.944249+00:00",
+        "exit_code": 0,
+        "log": "external/tmp/pomosprint_vc-android-lgs-quantitative-a1-resume.log"
+      },
+      "result": "PASS",
+      "run": "vc-android-lgs-quantitative-a1",
+      "start": {
+        "at": "2026-10-28T10:34:43.018503+00:00",
+        "exit_code": 0,
+        "log": "external/tmp/pomosprint_vc-android-lgs-quantitative-a1-exam_catalog_start.log"
+      },
+      "started_at": "2026-10-28T10:33:58.424279+00:00"
+    },
+    {
+      "exam_id": "tus_basic",
+      "final_proof": {
+        "attempt_id": "d3417654-3b71-4c53-ab5f-742da6acc73a",
+        "baseline": {
+          "coins": 0,
+          "current_streak": 0,
+          "exam_coins": 0,
+          "exam_points": 0,
+          "last_study_date": null,
+          "lifetime_points": 0,
+          "timezone": "Europe/Istanbul",
+          "total_minutes": 0
+        },
+        "client_uuid": "28372cba-1108-4a99-8ca1-76dba802f1e0",
+        "completion_verified": true,
+        "definition_snapshot": {
+          "catalog_version": 1,
+          "duration_seconds": 60,
+          "group": "tus",
+          "id": "tus_basic",
+          "name_en": "TUS Basic Medicine",
+          "name_tr": "TUS Temel Tıp",
+          "reward_coins": 0,
+          "reward_points": 0,
+          "segment": "tus",
+          "subjects": [
+            {
+              "category_keys": [
+                "Anatomi"
+              ],
+              "id": "anatomy",
+              "name_en": "Anatomy",
+              "name_tr": "Anatomi",
+              "question_count": 13
+            },
+            {
+              "category_keys": [
+                "Fizyoloji, Histoloji ve Embriyoloji"
+              ],
+              "id": "histology_embryology",
+              "name_en": "Histology and Embryology",
+              "name_tr": "Histoloji ve Embriyoloji",
+              "question_count": 7
+            },
+            {
+              "category_keys": [
+                "Fizyoloji, Histoloji ve Embriyoloji"
+              ],
+              "id": "physiology",
+              "name_en": "Physiology",
+              "name_tr": "Fizyoloji",
+              "question_count": 8
+            },
+            {
+              "category_keys": [
+                "Biyokimya"
+              ],
+              "id": "biochemistry",
+              "name_en": "Biochemistry",
+              "name_tr": "Biyokimya",
+              "question_count": 18
+            },
+            {
+              "category_keys": [
+                "Mikrobiyoloji"
+              ],
+              "id": "microbiology",
+              "name_en": "Microbiology",
+              "name_tr": "Mikrobiyoloji",
+              "question_count": 18
+            },
+            {
+              "category_keys": [
+                "Patoloji"
+              ],
+              "id": "pathology",
+              "name_en": "Pathology",
+              "name_tr": "Patoloji",
+              "question_count": 18
+            },
+            {
+              "category_keys": [
+                "Farmakoloji"
+              ],
+              "id": "pharmacology",
+              "name_en": "Pharmacology",
+              "name_tr": "Farmakoloji",
+              "question_count": 18
+            }
+          ],
+          "total_questions": 100,
+          "wrong_answer_divisor": 4
+        },
+        "duration_seconds": 60,
+        "email": "e2e-sim-probe-exam-catalog-start-vc-android-tus-basic-a1@pomosprint.local",
+        "ends_at": "2026-10-28T10:38:30.642689Z",
+        "exam_id": "tus_basic",
+        "expected_coins": 0,
+        "expected_points": 0,
+        "language": "en",
+        "last_resume_at": "2026-10-28T10:39:36.684446Z",
+        "mode": "exam_catalog_start",
+        "notification_delivery_tested": false,
+        "observed_at": "2026-10-28T10:37:30.516937Z",
+        "offline_pending_verified": true,
+        "owner_id": "ea223b68-e7e6-444b-8a53-02c262aa21c4",
+        "remaining_at_start": 60,
+        "run_id": "vc-android-tus-basic-a1",
+        "scope": "SHORT local-catalog natural60 lifecycle, NOT official duration",
+        "started_at": "2026-10-28T10:37:30.642689Z",
+        "total_questions": 100
+      },
+      "independent_sql": {
+        "attempts": 1,
+        "completed": 1,
+        "events": 1,
+        "exam_points": 0,
+        "exam_sand": 0,
+        "minutes": 1,
+        "normal_points": 0,
+        "normal_sand": 0,
+        "streak": 1
+      },
+      "offline": {
+        "at": "2026-10-28T10:39:08.054924+00:00",
+        "exit_code": 0,
+        "log": "external/tmp/pomosprint_vc-android-tus-basic-a1-offline.log"
+      },
+      "offline_process_closed": {
+        "already_exited": false,
+        "at": "2026-10-28T10:39:08.113760+00:00",
+        "exit_code": 0
+      },
+      "offline_proof": {
+        "attempt_id": "d3417654-3b71-4c53-ab5f-742da6acc73a",
+        "baseline": {
+          "coins": 0,
+          "current_streak": 0,
+          "exam_coins": 0,
+          "exam_points": 0,
+          "last_study_date": null,
+          "lifetime_points": 0,
+          "timezone": "Europe/Istanbul",
+          "total_minutes": 0
+        },
+        "client_uuid": "28372cba-1108-4a99-8ca1-76dba802f1e0",
+        "completion_verified": false,
+        "definition_snapshot": {
+          "catalog_version": 1,
+          "duration_seconds": 60,
+          "group": "tus",
+          "id": "tus_basic",
+          "name_en": "TUS Basic Medicine",
+          "name_tr": "TUS Temel Tıp",
+          "reward_coins": 0,
+          "reward_points": 0,
+          "segment": "tus",
+          "subjects": [
+            {
+              "category_keys": [
+                "Anatomi"
+              ],
+              "id": "anatomy",
+              "name_en": "Anatomy",
+              "name_tr": "Anatomi",
+              "question_count": 13
+            },
+            {
+              "category_keys": [
+                "Fizyoloji, Histoloji ve Embriyoloji"
+              ],
+              "id": "histology_embryology",
+              "name_en": "Histology and Embryology",
+              "name_tr": "Histoloji ve Embriyoloji",
+              "question_count": 7
+            },
+            {
+              "category_keys": [
+                "Fizyoloji, Histoloji ve Embriyoloji"
+              ],
+              "id": "physiology",
+              "name_en": "Physiology",
+              "name_tr": "Fizyoloji",
+              "question_count": 8
+            },
+            {
+              "category_keys": [
+                "Biyokimya"
+              ],
+              "id": "biochemistry",
+              "name_en": "Biochemistry",
+              "name_tr": "Biyokimya",
+              "question_count": 18
+            },
+            {
+              "category_keys": [
+                "Mikrobiyoloji"
+              ],
+              "id": "microbiology",
+              "name_en": "Microbiology",
+              "name_tr": "Mikrobiyoloji",
+              "question_count": 18
+            },
+            {
+              "category_keys": [
+                "Patoloji"
+              ],
+              "id": "pathology",
+              "name_en": "Pathology",
+              "name_tr": "Patoloji",
+              "question_count": 18
+            },
+            {
+              "category_keys": [
+                "Farmakoloji"
+              ],
+              "id": "pharmacology",
+              "name_en": "Pharmacology",
+              "name_tr": "Farmakoloji",
+              "question_count": 18
+            }
+          ],
+          "total_questions": 100,
+          "wrong_answer_divisor": 4
+        },
+        "duration_seconds": 60,
+        "email": "e2e-sim-probe-exam-catalog-start-vc-android-tus-basic-a1@pomosprint.local",
+        "ends_at": "2026-10-28T10:38:30.642689Z",
+        "exam_id": "tus_basic",
+        "expected_coins": 0,
+        "expected_points": 0,
+        "language": "en",
+        "last_resume_at": "2026-10-28T10:39:06.180645Z",
+        "mode": "exam_catalog_start",
+        "notification_delivery_tested": false,
+        "observed_at": "2026-10-28T10:37:30.516937Z",
+        "offline_pending_verified": true,
+        "owner_id": "ea223b68-e7e6-444b-8a53-02c262aa21c4",
+        "remaining_at_start": 60,
+        "run_id": "vc-android-tus-basic-a1",
+        "scope": "SHORT local-catalog natural60 lifecycle, NOT official duration",
+        "started_at": "2026-10-28T10:37:30.642689Z",
+        "total_questions": 100
+      },
+      "original_proof": {
+        "attempt_id": "d3417654-3b71-4c53-ab5f-742da6acc73a",
+        "baseline": {
+          "coins": 0,
+          "current_streak": 0,
+          "exam_coins": 0,
+          "exam_points": 0,
+          "last_study_date": null,
+          "lifetime_points": 0,
+          "timezone": "Europe/Istanbul",
+          "total_minutes": 0
+        },
+        "client_uuid": "28372cba-1108-4a99-8ca1-76dba802f1e0",
+        "definition_snapshot": {
+          "catalog_version": 1,
+          "duration_seconds": 60,
+          "group": "tus",
+          "id": "tus_basic",
+          "name_en": "TUS Basic Medicine",
+          "name_tr": "TUS Temel Tıp",
+          "reward_coins": 0,
+          "reward_points": 0,
+          "segment": "tus",
+          "subjects": [
+            {
+              "category_keys": [
+                "Anatomi"
+              ],
+              "id": "anatomy",
+              "name_en": "Anatomy",
+              "name_tr": "Anatomi",
+              "question_count": 13
+            },
+            {
+              "category_keys": [
+                "Fizyoloji, Histoloji ve Embriyoloji"
+              ],
+              "id": "histology_embryology",
+              "name_en": "Histology and Embryology",
+              "name_tr": "Histoloji ve Embriyoloji",
+              "question_count": 7
+            },
+            {
+              "category_keys": [
+                "Fizyoloji, Histoloji ve Embriyoloji"
+              ],
+              "id": "physiology",
+              "name_en": "Physiology",
+              "name_tr": "Fizyoloji",
+              "question_count": 8
+            },
+            {
+              "category_keys": [
+                "Biyokimya"
+              ],
+              "id": "biochemistry",
+              "name_en": "Biochemistry",
+              "name_tr": "Biyokimya",
+              "question_count": 18
+            },
+            {
+              "category_keys": [
+                "Mikrobiyoloji"
+              ],
+              "id": "microbiology",
+              "name_en": "Microbiology",
+              "name_tr": "Mikrobiyoloji",
+              "question_count": 18
+            },
+            {
+              "category_keys": [
+                "Patoloji"
+              ],
+              "id": "pathology",
+              "name_en": "Pathology",
+              "name_tr": "Patoloji",
+              "question_count": 18
+            },
+            {
+              "category_keys": [
+                "Farmakoloji"
+              ],
+              "id": "pharmacology",
+              "name_en": "Pharmacology",
+              "name_tr": "Farmakoloji",
+              "question_count": 18
+            }
+          ],
+          "total_questions": 100,
+          "wrong_answer_divisor": 4
+        },
+        "duration_seconds": 60,
+        "email": "e2e-sim-probe-exam-catalog-start-vc-android-tus-basic-a1@pomosprint.local",
+        "ends_at": "2026-10-28T10:38:30.642689Z",
+        "exam_id": "tus_basic",
+        "expected_coins": 0,
+        "expected_points": 0,
+        "language": "en",
+        "mode": "exam_catalog_start",
+        "notification_delivery_tested": false,
+        "observed_at": "2026-10-28T10:37:30.516937Z",
+        "owner_id": "ea223b68-e7e6-444b-8a53-02c262aa21c4",
+        "remaining_at_start": 60,
+        "run_id": "vc-android-tus-basic-a1",
+        "scope": "SHORT local-catalog natural60 lifecycle, NOT official duration",
+        "started_at": "2026-10-28T10:37:30.642689Z",
+        "total_questions": 100
+      },
+      "process_closed": {
+        "already_exited": false,
+        "at": "2026-10-28T10:37:32.406558+00:00",
+        "exit_code": 0
+      },
+      "reconnected": {
+        "at": "2026-10-28T10:39:38.521477+00:00",
+        "exit_code": 0,
+        "log": "external/tmp/pomosprint_vc-android-tus-basic-a1-resume.log"
+      },
+      "result": "PASS",
+      "run": "vc-android-tus-basic-a1",
+      "start": {
+        "at": "2026-10-28T10:37:32.350059+00:00",
+        "exit_code": 0,
+        "log": "external/tmp/pomosprint_vc-android-tus-basic-a1-exam_catalog_start.log"
+      },
+      "started_at": "2026-10-28T10:36:51.021390+00:00"
+    },
+    {
+      "exam_id": "tus_clinical",
+      "final_proof": {
+        "attempt_id": "af016446-bab8-4728-ac4d-b1330bbedbde",
+        "baseline": {
+          "coins": 0,
+          "current_streak": 0,
+          "exam_coins": 0,
+          "exam_points": 0,
+          "last_study_date": null,
+          "lifetime_points": 0,
+          "timezone": "Europe/Istanbul",
+          "total_minutes": 0
+        },
+        "client_uuid": "b3f12922-22e8-4640-8110-dd2d008b75aa",
+        "completion_verified": true,
+        "definition_snapshot": {
+          "catalog_version": 1,
+          "duration_seconds": 60,
+          "group": "tus",
+          "id": "tus_clinical",
+          "name_en": "TUS Clinical Medicine",
+          "name_tr": "TUS Klinik Tıp",
+          "reward_coins": 0,
+          "reward_points": 0,
+          "segment": "tus",
+          "subjects": [
+            {
+              "category_keys": [
+                "Dahiliye"
+              ],
+              "id": "internal_medicine_group",
+              "name_en": "Internal Medicine Group",
+              "name_tr": "Dahiliye Grubu",
+              "question_count": 35
+            },
+            {
+              "category_keys": [
+                "Pediatri"
+              ],
+              "id": "pediatrics",
+              "name_en": "Pediatrics",
+              "name_tr": "Pediatri",
+              "question_count": 25
+            },
+            {
+              "category_keys": [
+                "Genel Cerrahi"
+              ],
+              "id": "surgery_group",
+              "name_en": "Surgery Group",
+              "name_tr": "Cerrahi Grubu",
+              "question_count": 30
+            },
+            {
+              "category_keys": [
+                "Kadın Hastalıkları ve Doğum"
+              ],
+              "id": "obstetrics_gynecology",
+              "name_en": "Obstetrics and Gynecology",
+              "name_tr": "Kadın Hastalıkları ve Doğum",
+              "question_count": 10
+            }
+          ],
+          "total_questions": 100,
+          "wrong_answer_divisor": 4
+        },
+        "duration_seconds": 60,
+        "email": "e2e-sim-probe-exam-catalog-start-vc-android-tus-clinical-a1@pomosprint.local",
+        "ends_at": "2026-10-28T10:41:18.139207Z",
+        "exam_id": "tus_clinical",
+        "expected_coins": 0,
+        "expected_points": 0,
+        "language": "en",
+        "last_resume_at": "2026-10-28T10:42:25.758327Z",
+        "mode": "exam_catalog_start",
+        "notification_delivery_tested": false,
+        "observed_at": "2026-10-28T10:40:18.132383Z",
+        "offline_pending_verified": true,
+        "owner_id": "c8d69a7e-6c3d-432c-90e0-b688dc8882aa",
+        "remaining_at_start": 60,
+        "run_id": "vc-android-tus-clinical-a1",
+        "scope": "SHORT local-catalog natural60 lifecycle, NOT official duration",
+        "started_at": "2026-10-28T10:40:18.139207Z",
+        "total_questions": 100
+      },
+      "independent_sql": {
+        "attempts": 1,
+        "completed": 1,
+        "events": 1,
+        "exam_points": 0,
+        "exam_sand": 0,
+        "minutes": 1,
+        "normal_points": 0,
+        "normal_sand": 0,
+        "streak": 1
+      },
+      "offline": {
+        "at": "2026-10-28T10:41:55.348041+00:00",
+        "exit_code": 0,
+        "log": "external/tmp/pomosprint_vc-android-tus-clinical-a1-offline.log"
+      },
+      "offline_process_closed": {
+        "already_exited": false,
+        "at": "2026-10-28T10:41:55.410937+00:00",
+        "exit_code": 0
+      },
+      "offline_proof": {
+        "attempt_id": "af016446-bab8-4728-ac4d-b1330bbedbde",
+        "baseline": {
+          "coins": 0,
+          "current_streak": 0,
+          "exam_coins": 0,
+          "exam_points": 0,
+          "last_study_date": null,
+          "lifetime_points": 0,
+          "timezone": "Europe/Istanbul",
+          "total_minutes": 0
+        },
+        "client_uuid": "b3f12922-22e8-4640-8110-dd2d008b75aa",
+        "completion_verified": false,
+        "definition_snapshot": {
+          "catalog_version": 1,
+          "duration_seconds": 60,
+          "group": "tus",
+          "id": "tus_clinical",
+          "name_en": "TUS Clinical Medicine",
+          "name_tr": "TUS Klinik Tıp",
+          "reward_coins": 0,
+          "reward_points": 0,
+          "segment": "tus",
+          "subjects": [
+            {
+              "category_keys": [
+                "Dahiliye"
+              ],
+              "id": "internal_medicine_group",
+              "name_en": "Internal Medicine Group",
+              "name_tr": "Dahiliye Grubu",
+              "question_count": 35
+            },
+            {
+              "category_keys": [
+                "Pediatri"
+              ],
+              "id": "pediatrics",
+              "name_en": "Pediatrics",
+              "name_tr": "Pediatri",
+              "question_count": 25
+            },
+            {
+              "category_keys": [
+                "Genel Cerrahi"
+              ],
+              "id": "surgery_group",
+              "name_en": "Surgery Group",
+              "name_tr": "Cerrahi Grubu",
+              "question_count": 30
+            },
+            {
+              "category_keys": [
+                "Kadın Hastalıkları ve Doğum"
+              ],
+              "id": "obstetrics_gynecology",
+              "name_en": "Obstetrics and Gynecology",
+              "name_tr": "Kadın Hastalıkları ve Doğum",
+              "question_count": 10
+            }
+          ],
+          "total_questions": 100,
+          "wrong_answer_divisor": 4
+        },
+        "duration_seconds": 60,
+        "email": "e2e-sim-probe-exam-catalog-start-vc-android-tus-clinical-a1@pomosprint.local",
+        "ends_at": "2026-10-28T10:41:18.139207Z",
+        "exam_id": "tus_clinical",
+        "expected_coins": 0,
+        "expected_points": 0,
+        "language": "en",
+        "last_resume_at": "2026-10-28T10:41:52.892777Z",
+        "mode": "exam_catalog_start",
+        "notification_delivery_tested": false,
+        "observed_at": "2026-10-28T10:40:18.132383Z",
+        "offline_pending_verified": true,
+        "owner_id": "c8d69a7e-6c3d-432c-90e0-b688dc8882aa",
+        "remaining_at_start": 60,
+        "run_id": "vc-android-tus-clinical-a1",
+        "scope": "SHORT local-catalog natural60 lifecycle, NOT official duration",
+        "started_at": "2026-10-28T10:40:18.139207Z",
+        "total_questions": 100
+      },
+      "original_proof": {
+        "attempt_id": "af016446-bab8-4728-ac4d-b1330bbedbde",
+        "baseline": {
+          "coins": 0,
+          "current_streak": 0,
+          "exam_coins": 0,
+          "exam_points": 0,
+          "last_study_date": null,
+          "lifetime_points": 0,
+          "timezone": "Europe/Istanbul",
+          "total_minutes": 0
+        },
+        "client_uuid": "b3f12922-22e8-4640-8110-dd2d008b75aa",
+        "definition_snapshot": {
+          "catalog_version": 1,
+          "duration_seconds": 60,
+          "group": "tus",
+          "id": "tus_clinical",
+          "name_en": "TUS Clinical Medicine",
+          "name_tr": "TUS Klinik Tıp",
+          "reward_coins": 0,
+          "reward_points": 0,
+          "segment": "tus",
+          "subjects": [
+            {
+              "category_keys": [
+                "Dahiliye"
+              ],
+              "id": "internal_medicine_group",
+              "name_en": "Internal Medicine Group",
+              "name_tr": "Dahiliye Grubu",
+              "question_count": 35
+            },
+            {
+              "category_keys": [
+                "Pediatri"
+              ],
+              "id": "pediatrics",
+              "name_en": "Pediatrics",
+              "name_tr": "Pediatri",
+              "question_count": 25
+            },
+            {
+              "category_keys": [
+                "Genel Cerrahi"
+              ],
+              "id": "surgery_group",
+              "name_en": "Surgery Group",
+              "name_tr": "Cerrahi Grubu",
+              "question_count": 30
+            },
+            {
+              "category_keys": [
+                "Kadın Hastalıkları ve Doğum"
+              ],
+              "id": "obstetrics_gynecology",
+              "name_en": "Obstetrics and Gynecology",
+              "name_tr": "Kadın Hastalıkları ve Doğum",
+              "question_count": 10
+            }
+          ],
+          "total_questions": 100,
+          "wrong_answer_divisor": 4
+        },
+        "duration_seconds": 60,
+        "email": "e2e-sim-probe-exam-catalog-start-vc-android-tus-clinical-a1@pomosprint.local",
+        "ends_at": "2026-10-28T10:41:18.139207Z",
+        "exam_id": "tus_clinical",
+        "expected_coins": 0,
+        "expected_points": 0,
+        "language": "en",
+        "mode": "exam_catalog_start",
+        "notification_delivery_tested": false,
+        "observed_at": "2026-10-28T10:40:18.132383Z",
+        "owner_id": "c8d69a7e-6c3d-432c-90e0-b688dc8882aa",
+        "remaining_at_start": 60,
+        "run_id": "vc-android-tus-clinical-a1",
+        "scope": "SHORT local-catalog natural60 lifecycle, NOT official duration",
+        "started_at": "2026-10-28T10:40:18.139207Z",
+        "total_questions": 100
+      },
+      "process_closed": {
+        "already_exited": false,
+        "at": "2026-10-28T10:40:20.112285+00:00",
+        "exit_code": 0
+      },
+      "reconnected": {
+        "at": "2026-10-28T10:42:27.615656+00:00",
+        "exit_code": 0,
+        "log": "external/tmp/pomosprint_vc-android-tus-clinical-a1-resume.log"
+      },
+      "result": "PASS",
+      "run": "vc-android-tus-clinical-a1",
+      "start": {
+        "at": "2026-10-28T10:40:20.055069+00:00",
+        "exit_code": 0,
+        "log": "external/tmp/pomosprint_vc-android-tus-clinical-a1-exam_catalog_start.log"
+      },
+      "started_at": "2026-10-28T10:39:38.608346+00:00"
+    }
+  ],
+  "cleanup_errors": [],
+  "finished_at": "2026-10-28T10:42:27.701799+00:00",
+  "language": "en",
+  "platform": "android",
+  "requested_exam_ids": [
+    "tyt",
+    "ayt",
+    "ydt",
+    "lgs_verbal",
+    "lgs_quantitative",
+    "tus_basic",
+    "tus_clinical"
+  ],
+  "result": "PASS",
+  "scope": "SHORT natural60 OS-close/offline/reconnect; NOT official duration",
+  "started_at": "2026-10-28T10:21:59.904836+00:00"
+}

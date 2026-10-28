@@ -1,0 +1,1798 @@
+{
+  "accepted_friend_ids_after": [
+    "04a2cd50-bffb-448a-a3f3-9835c728135d",
+    "48d35994-efa9-43b9-9697-c80794d5047e",
+    "5e0c109d-7c39-432d-bbc4-3f8639363c2e",
+    "60b39678-b92e-4d69-86b1-b7ea0d28357c",
+    "88f70816-0805-48b9-89b4-dcb58c727009",
+    "9415ef2a-ff0a-49b9-ab87-a79f444a9319",
+    "b8e5678f-6a7b-4e4d-95c3-5bc794fcbc70",
+    "c7535139-4286-4198-ab99-609b2584fd05"
+  ],
+  "accepted_friend_ids_before": [
+    "04a2cd50-bffb-448a-a3f3-9835c728135d",
+    "48d35994-efa9-43b9-9697-c80794d5047e",
+    "5e0c109d-7c39-432d-bbc4-3f8639363c2e",
+    "60b39678-b92e-4d69-86b1-b7ea0d28357c",
+    "88f70816-0805-48b9-89b4-dcb58c727009",
+    "9415ef2a-ff0a-49b9-ab87-a79f444a9319",
+    "b8e5678f-6a7b-4e4d-95c3-5bc794fcbc70",
+    "c7535139-4286-4198-ab99-609b2584fd05"
+  ],
+  "accounts_preserved": true,
+  "after": {
+    "attempts": [
+      {
+        "client_uuid": "66e96ad9-711b-495f-833b-e5b0798f34ef",
+        "definition": {
+          "catalog_version": 1,
+          "duration_seconds": 4500,
+          "group": "lgs",
+          "id": "lgs_verbal",
+          "name_en": "LGS Verbal",
+          "name_tr": "LGS Sözel",
+          "reward_coins": 3,
+          "reward_points": 15,
+          "segment": "lgs",
+          "subjects": [
+            {
+              "category_keys": [
+                "Türkçe"
+              ],
+              "id": "turkish",
+              "name_en": "Turkish",
+              "name_tr": "Türkçe",
+              "question_count": 20
+            },
+            {
+              "category_keys": [
+                "T.C. İnkılap Tarihi"
+              ],
+              "id": "revolution_history",
+              "name_en": "Turkish Revolution History",
+              "name_tr": "T.C. İnkılap Tarihi",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "Din Kültürü"
+              ],
+              "id": "religion",
+              "name_en": "Religious Culture",
+              "name_tr": "Din Kültürü",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "İngilizce"
+              ],
+              "id": "foreign_language",
+              "name_en": "Foreign Language",
+              "name_tr": "Yabancı Dil",
+              "question_count": 10
+            }
+          ],
+          "total_questions": 50,
+          "wrong_answer_divisor": 3
+        },
+        "elapsed_seconds": 2544,
+        "ends_at": "2026-10-28T11:30:35.147721+00:00",
+        "exam_coins_earned": 0,
+        "exam_id": "lgs_verbal",
+        "finished_at": "2026-10-28T10:57:59.159213+00:00",
+        "id": "2cdb6f6c-26a9-4807-b1d3-e8c80340a104",
+        "points_earned": 0,
+        "started_at": "2026-10-28T10:15:35.147721+00:00",
+        "status": "abandoned",
+        "user_id": "88f70816-0805-48b9-89b4-dcb58c727009"
+      },
+      {
+        "client_uuid": "71446fef-34a4-44d6-836c-1f0db1b1b862",
+        "definition": {
+          "catalog_version": 1,
+          "duration_seconds": 4500,
+          "group": "lgs",
+          "id": "lgs_verbal",
+          "name_en": "LGS Verbal",
+          "name_tr": "LGS Sözel",
+          "reward_coins": 3,
+          "reward_points": 15,
+          "segment": "lgs",
+          "subjects": [
+            {
+              "category_keys": [
+                "Türkçe"
+              ],
+              "id": "turkish",
+              "name_en": "Turkish",
+              "name_tr": "Türkçe",
+              "question_count": 20
+            },
+            {
+              "category_keys": [
+                "T.C. İnkılap Tarihi"
+              ],
+              "id": "revolution_history",
+              "name_en": "Turkish Revolution History",
+              "name_tr": "T.C. İnkılap Tarihi",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "Din Kültürü"
+              ],
+              "id": "religion",
+              "name_en": "Religious Culture",
+              "name_tr": "Din Kültürü",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "İngilizce"
+              ],
+              "id": "foreign_language",
+              "name_en": "Foreign Language",
+              "name_tr": "Yabancı Dil",
+              "question_count": 10
+            }
+          ],
+          "total_questions": 50,
+          "wrong_answer_divisor": 3
+        },
+        "elapsed_seconds": 1848,
+        "ends_at": "2026-10-28T10:49:18.244483+00:00",
+        "exam_coins_earned": 0,
+        "exam_id": "lgs_verbal",
+        "finished_at": "2026-10-28T10:05:06.265362+00:00",
+        "id": "44867ac3-5cfb-4427-96e0-b2e74fabfd43",
+        "points_earned": 0,
+        "started_at": "2026-10-28T09:34:18.244483+00:00",
+        "status": "abandoned",
+        "user_id": "88f70816-0805-48b9-89b4-dcb58c727009"
+      },
+      {
+        "client_uuid": "802336a5-fffe-4f19-a4b3-0289eef32739",
+        "definition": {
+          "catalog_version": 1,
+          "duration_seconds": 8100,
+          "group": "tus",
+          "id": "tus_basic",
+          "name_en": "TUS Basic Medicine",
+          "name_tr": "TUS Temel Tıp",
+          "reward_coins": 5,
+          "reward_points": 27,
+          "segment": "tus",
+          "subjects": [
+            {
+              "category_keys": [
+                "Anatomi"
+              ],
+              "id": "anatomy",
+              "name_en": "Anatomy",
+              "name_tr": "Anatomi",
+              "question_count": 13
+            },
+            {
+              "category_keys": [
+                "Fizyoloji, Histoloji ve Embriyoloji"
+              ],
+              "id": "histology_embryology",
+              "name_en": "Histology and Embryology",
+              "name_tr": "Histoloji ve Embriyoloji",
+              "question_count": 7
+            },
+            {
+              "category_keys": [
+                "Fizyoloji, Histoloji ve Embriyoloji"
+              ],
+              "id": "physiology",
+              "name_en": "Physiology",
+              "name_tr": "Fizyoloji",
+              "question_count": 8
+            },
+            {
+              "category_keys": [
+                "Biyokimya"
+              ],
+              "id": "biochemistry",
+              "name_en": "Biochemistry",
+              "name_tr": "Biyokimya",
+              "question_count": 18
+            },
+            {
+              "category_keys": [
+                "Mikrobiyoloji"
+              ],
+              "id": "microbiology",
+              "name_en": "Microbiology",
+              "name_tr": "Mikrobiyoloji",
+              "question_count": 18
+            },
+            {
+              "category_keys": [
+                "Patoloji"
+              ],
+              "id": "pathology",
+              "name_en": "Pathology",
+              "name_tr": "Patoloji",
+              "question_count": 18
+            },
+            {
+              "category_keys": [
+                "Farmakoloji"
+              ],
+              "id": "pharmacology",
+              "name_en": "Pharmacology",
+              "name_tr": "Farmakoloji",
+              "question_count": 18
+            }
+          ],
+          "total_questions": 100,
+          "wrong_answer_divisor": 4
+        },
+        "elapsed_seconds": 5020,
+        "ends_at": "2026-10-28T11:49:18.289597+00:00",
+        "exam_coins_earned": 0,
+        "exam_id": "tus_basic",
+        "finished_at": "2026-10-28T10:57:59.220539+00:00",
+        "id": "50201f9f-b64b-4c1a-9e70-cfc583ab3ea9",
+        "points_earned": 0,
+        "started_at": "2026-10-28T09:34:18.289597+00:00",
+        "status": "abandoned",
+        "user_id": "48d35994-efa9-43b9-9697-c80794d5047e"
+      },
+      {
+        "client_uuid": "81424c1f-d80b-48c3-ae72-c9a12cd93a0b",
+        "definition": {
+          "catalog_version": 1,
+          "duration_seconds": 4500,
+          "group": "lgs",
+          "id": "lgs_verbal",
+          "name_en": "LGS Verbal",
+          "name_tr": "LGS Sözel",
+          "reward_coins": 3,
+          "reward_points": 15,
+          "segment": "lgs",
+          "subjects": [
+            {
+              "category_keys": [
+                "Türkçe"
+              ],
+              "id": "turkish",
+              "name_en": "Turkish",
+              "name_tr": "Türkçe",
+              "question_count": 20
+            },
+            {
+              "category_keys": [
+                "T.C. İnkılap Tarihi"
+              ],
+              "id": "revolution_history",
+              "name_en": "Turkish Revolution History",
+              "name_tr": "T.C. İnkılap Tarihi",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "Din Kültürü"
+              ],
+              "id": "religion",
+              "name_en": "Religious Culture",
+              "name_tr": "Din Kültürü",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "İngilizce"
+              ],
+              "id": "foreign_language",
+              "name_en": "Foreign Language",
+              "name_tr": "Yabancı Dil",
+              "question_count": 10
+            }
+          ],
+          "total_questions": 50,
+          "wrong_answer_divisor": 3
+        },
+        "elapsed_seconds": 126,
+        "ends_at": "2026-10-28T11:28:00.748662+00:00",
+        "exam_coins_earned": 0,
+        "exam_id": "lgs_verbal",
+        "finished_at": "2026-10-28T10:15:06.922427+00:00",
+        "id": "6f085389-b29e-47d5-aaa4-c9a9f96d92c3",
+        "points_earned": 0,
+        "started_at": "2026-10-28T10:13:00.748662+00:00",
+        "status": "abandoned",
+        "user_id": "88f70816-0805-48b9-89b4-dcb58c727009"
+      },
+      {
+        "client_uuid": "76f3cf97-241f-4483-bb87-14d80c77f240",
+        "definition": {
+          "catalog_version": 1,
+          "duration_seconds": 4500,
+          "group": "lgs",
+          "id": "lgs_verbal",
+          "name_en": "LGS Verbal",
+          "name_tr": "LGS Sözel",
+          "reward_coins": 3,
+          "reward_points": 15,
+          "segment": "lgs",
+          "subjects": [
+            {
+              "category_keys": [
+                "Türkçe"
+              ],
+              "id": "turkish",
+              "name_en": "Turkish",
+              "name_tr": "Türkçe",
+              "question_count": 20
+            },
+            {
+              "category_keys": [
+                "T.C. İnkılap Tarihi"
+              ],
+              "id": "revolution_history",
+              "name_en": "Turkish Revolution History",
+              "name_tr": "T.C. İnkılap Tarihi",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "Din Kültürü"
+              ],
+              "id": "religion",
+              "name_en": "Religious Culture",
+              "name_tr": "Din Kültürü",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "İngilizce"
+              ],
+              "id": "foreign_language",
+              "name_en": "Foreign Language",
+              "name_tr": "Yabancı Dil",
+              "question_count": 10
+            }
+          ],
+          "total_questions": 50,
+          "wrong_answer_divisor": 3
+        },
+        "elapsed_seconds": 263,
+        "ends_at": "2026-10-28T11:23:08.88151+00:00",
+        "exam_coins_earned": 0,
+        "exam_id": "lgs_verbal",
+        "finished_at": "2026-10-28T10:12:32.386269+00:00",
+        "id": "a3aeb356-ebf3-4b27-aa4c-0bc919b9fbf1",
+        "points_earned": 0,
+        "started_at": "2026-10-28T10:08:08.88151+00:00",
+        "status": "abandoned",
+        "user_id": "88f70816-0805-48b9-89b4-dcb58c727009"
+      },
+      {
+        "client_uuid": "21c26afe-12e1-421e-8ddf-bfd83e63b941",
+        "definition": {
+          "catalog_version": 1,
+          "duration_seconds": 4500,
+          "group": "lgs",
+          "id": "lgs_verbal",
+          "name_en": "LGS Verbal",
+          "name_tr": "LGS Sözel",
+          "reward_coins": 3,
+          "reward_points": 15,
+          "segment": "lgs",
+          "subjects": [
+            {
+              "category_keys": [
+                "Türkçe"
+              ],
+              "id": "turkish",
+              "name_en": "Turkish",
+              "name_tr": "Türkçe",
+              "question_count": 20
+            },
+            {
+              "category_keys": [
+                "T.C. İnkılap Tarihi"
+              ],
+              "id": "revolution_history",
+              "name_en": "Turkish Revolution History",
+              "name_tr": "T.C. İnkılap Tarihi",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "Din Kültürü"
+              ],
+              "id": "religion",
+              "name_en": "Religious Culture",
+              "name_tr": "Din Kültürü",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "İngilizce"
+              ],
+              "id": "foreign_language",
+              "name_en": "Foreign Language",
+              "name_tr": "Yabancı Dil",
+              "question_count": 10
+            }
+          ],
+          "total_questions": 50,
+          "wrong_answer_divisor": 3
+        },
+        "elapsed_seconds": 126,
+        "ends_at": "2026-10-28T11:20:34.552156+00:00",
+        "exam_coins_earned": 0,
+        "exam_id": "lgs_verbal",
+        "finished_at": "2026-10-28T10:07:40.581992+00:00",
+        "id": "c8bd280e-cda5-45b0-b279-f615da372357",
+        "points_earned": 0,
+        "started_at": "2026-10-28T10:05:34.552156+00:00",
+        "status": "abandoned",
+        "user_id": "88f70816-0805-48b9-89b4-dcb58c727009"
+      }
+    ],
+    "captured_at": "2026-10-28T10:57:59.411538+00:00",
+    "economy": [
+      {
+        "current_streak": 0,
+        "exam_points": 0,
+        "exam_sand": 0,
+        "id": "04a2cd50-bffb-448a-a3f3-9835c728135d",
+        "last_study_date": null,
+        "longest_streak": 0,
+        "normal_points": 0,
+        "normal_sand": 0,
+        "total_minutes": 0
+      },
+      {
+        "current_streak": 0,
+        "exam_points": 0,
+        "exam_sand": 0,
+        "id": "48d35994-efa9-43b9-9697-c80794d5047e",
+        "last_study_date": null,
+        "longest_streak": 0,
+        "normal_points": 0,
+        "normal_sand": 0,
+        "total_minutes": 0
+      },
+      {
+        "current_streak": 0,
+        "exam_points": 0,
+        "exam_sand": 0,
+        "id": "5e0c109d-7c39-432d-bbc4-3f8639363c2e",
+        "last_study_date": null,
+        "longest_streak": 0,
+        "normal_points": 0,
+        "normal_sand": 0,
+        "total_minutes": 0
+      },
+      {
+        "current_streak": 0,
+        "exam_points": 0,
+        "exam_sand": 0,
+        "id": "60b39678-b92e-4d69-86b1-b7ea0d28357c",
+        "last_study_date": null,
+        "longest_streak": 0,
+        "normal_points": 0,
+        "normal_sand": 0,
+        "total_minutes": 0
+      },
+      {
+        "current_streak": 0,
+        "exam_points": 0,
+        "exam_sand": 0,
+        "id": "88f70816-0805-48b9-89b4-dcb58c727009",
+        "last_study_date": null,
+        "longest_streak": 0,
+        "normal_points": 0,
+        "normal_sand": 0,
+        "total_minutes": 0
+      },
+      {
+        "current_streak": 0,
+        "exam_points": 0,
+        "exam_sand": 0,
+        "id": "9415ef2a-ff0a-49b9-ab87-a79f444a9319",
+        "last_study_date": null,
+        "longest_streak": 0,
+        "normal_points": 0,
+        "normal_sand": 0,
+        "total_minutes": 0
+      },
+      {
+        "current_streak": 0,
+        "exam_points": 0,
+        "exam_sand": 0,
+        "id": "b8e5678f-6a7b-4e4d-95c3-5bc794fcbc70",
+        "last_study_date": null,
+        "longest_streak": 0,
+        "normal_points": 0,
+        "normal_sand": 0,
+        "total_minutes": 0
+      },
+      {
+        "current_streak": 0,
+        "exam_points": 0,
+        "exam_sand": 0,
+        "id": "c7535139-4286-4198-ab99-609b2584fd05",
+        "last_study_date": null,
+        "longest_streak": 0,
+        "normal_points": 0,
+        "normal_sand": 0,
+        "total_minutes": 0
+      },
+      {
+        "current_streak": 0,
+        "exam_points": 0,
+        "exam_sand": 0,
+        "id": "d88445b6-00d5-4162-9510-d92eb838384f",
+        "last_study_date": null,
+        "longest_streak": 0,
+        "normal_points": 0,
+        "normal_sand": 0,
+        "total_minutes": 0
+      }
+    ],
+    "events": [],
+    "friendships": [
+      {
+        "created_at": "2026-10-28T10:16:35.121689+00:00",
+        "friend_id": "d88445b6-00d5-4162-9510-d92eb838384f",
+        "status": "accepted",
+        "user_id": "04a2cd50-bffb-448a-a3f3-9835c728135d"
+      },
+      {
+        "created_at": "2026-10-28T09:34:18.264019+00:00",
+        "friend_id": "d88445b6-00d5-4162-9510-d92eb838384f",
+        "status": "accepted",
+        "user_id": "48d35994-efa9-43b9-9697-c80794d5047e"
+      },
+      {
+        "created_at": "2026-10-28T09:34:18.002797+00:00",
+        "friend_id": "d88445b6-00d5-4162-9510-d92eb838384f",
+        "status": "accepted",
+        "user_id": "5e0c109d-7c39-432d-bbc4-3f8639363c2e"
+      },
+      {
+        "created_at": "2026-10-28T09:34:17.631575+00:00",
+        "friend_id": "d88445b6-00d5-4162-9510-d92eb838384f",
+        "status": "accepted",
+        "user_id": "60b39678-b92e-4d69-86b1-b7ea0d28357c"
+      },
+      {
+        "created_at": "2026-10-28T09:34:18.123587+00:00",
+        "friend_id": "d88445b6-00d5-4162-9510-d92eb838384f",
+        "status": "accepted",
+        "user_id": "88f70816-0805-48b9-89b4-dcb58c727009"
+      },
+      {
+        "created_at": "2026-10-28T09:34:17.816804+00:00",
+        "friend_id": "d88445b6-00d5-4162-9510-d92eb838384f",
+        "status": "accepted",
+        "user_id": "9415ef2a-ff0a-49b9-ab87-a79f444a9319"
+      },
+      {
+        "created_at": "2026-10-28T09:34:17.50071+00:00",
+        "friend_id": "d88445b6-00d5-4162-9510-d92eb838384f",
+        "status": "accepted",
+        "user_id": "b8e5678f-6a7b-4e4d-95c3-5bc794fcbc70"
+      },
+      {
+        "created_at": "2026-10-28T09:34:17.570758+00:00",
+        "friend_id": "d88445b6-00d5-4162-9510-d92eb838384f",
+        "status": "accepted",
+        "user_id": "c7535139-4286-4198-ab99-609b2584fd05"
+      },
+      {
+        "created_at": "2026-10-28T10:16:35.106785+00:00",
+        "friend_id": "04a2cd50-bffb-448a-a3f3-9835c728135d",
+        "status": "accepted",
+        "user_id": "d88445b6-00d5-4162-9510-d92eb838384f"
+      },
+      {
+        "created_at": "2026-10-28T09:34:18.254988+00:00",
+        "friend_id": "48d35994-efa9-43b9-9697-c80794d5047e",
+        "status": "accepted",
+        "user_id": "d88445b6-00d5-4162-9510-d92eb838384f"
+      },
+      {
+        "created_at": "2026-10-28T09:34:17.985446+00:00",
+        "friend_id": "5e0c109d-7c39-432d-bbc4-3f8639363c2e",
+        "status": "accepted",
+        "user_id": "d88445b6-00d5-4162-9510-d92eb838384f"
+      },
+      {
+        "created_at": "2026-10-28T09:34:17.613552+00:00",
+        "friend_id": "60b39678-b92e-4d69-86b1-b7ea0d28357c",
+        "status": "accepted",
+        "user_id": "d88445b6-00d5-4162-9510-d92eb838384f"
+      },
+      {
+        "created_at": "2026-10-28T09:34:18.101444+00:00",
+        "friend_id": "88f70816-0805-48b9-89b4-dcb58c727009",
+        "status": "accepted",
+        "user_id": "d88445b6-00d5-4162-9510-d92eb838384f"
+      },
+      {
+        "created_at": "2026-10-28T09:34:17.802124+00:00",
+        "friend_id": "9415ef2a-ff0a-49b9-ab87-a79f444a9319",
+        "status": "accepted",
+        "user_id": "d88445b6-00d5-4162-9510-d92eb838384f"
+      },
+      {
+        "created_at": "2026-10-28T09:34:17.448792+00:00",
+        "friend_id": "b8e5678f-6a7b-4e4d-95c3-5bc794fcbc70",
+        "status": "accepted",
+        "user_id": "d88445b6-00d5-4162-9510-d92eb838384f"
+      },
+      {
+        "created_at": "2026-10-28T09:34:17.552797+00:00",
+        "friend_id": "c7535139-4286-4198-ab99-609b2584fd05",
+        "status": "accepted",
+        "user_id": "d88445b6-00d5-4162-9510-d92eb838384f"
+      }
+    ],
+    "identity": [
+      {
+        "email": "qa-i08-verify-social-1028-focus4@pomosprint.local",
+        "id": "04a2cd50-bffb-448a-a3f3-9835c728135d",
+        "run": "verify-social-1028"
+      },
+      {
+        "email": "qa-i08-verify-social-1028-exam2@pomosprint.local",
+        "id": "48d35994-efa9-43b9-9697-c80794d5047e",
+        "run": "verify-social-1028"
+      },
+      {
+        "email": "qa-i08-verify-social-1028-break2@pomosprint.local",
+        "id": "5e0c109d-7c39-432d-bbc4-3f8639363c2e",
+        "run": "verify-social-1028"
+      },
+      {
+        "email": "qa-i08-verify-social-1028-focus3@pomosprint.local",
+        "id": "60b39678-b92e-4d69-86b1-b7ea0d28357c",
+        "run": "verify-social-1028"
+      },
+      {
+        "email": "qa-i08-verify-social-1028-exam1@pomosprint.local",
+        "id": "88f70816-0805-48b9-89b4-dcb58c727009",
+        "run": "verify-social-1028"
+      },
+      {
+        "email": "qa-i08-verify-social-1028-break1@pomosprint.local",
+        "id": "9415ef2a-ff0a-49b9-ab87-a79f444a9319",
+        "run": "verify-social-1028"
+      },
+      {
+        "email": "qa-i08-verify-social-1028-focus1@pomosprint.local",
+        "id": "b8e5678f-6a7b-4e4d-95c3-5bc794fcbc70",
+        "run": "verify-social-1028"
+      },
+      {
+        "email": "qa-i08-verify-social-1028-focus2@pomosprint.local",
+        "id": "c7535139-4286-4198-ab99-609b2584fd05",
+        "run": "verify-social-1028"
+      },
+      {
+        "email": "qa-i08-verify-social-1028-observer@pomosprint.local",
+        "id": "d88445b6-00d5-4162-9510-d92eb838384f",
+        "run": "verify-social-1028"
+      }
+    ],
+    "presence": [
+      {
+        "break_end": null,
+        "category": null,
+        "focus_end": null,
+        "id": "04a2cd50-bffb-448a-a3f3-9835c728135d"
+      },
+      {
+        "break_end": null,
+        "category": null,
+        "focus_end": null,
+        "id": "48d35994-efa9-43b9-9697-c80794d5047e"
+      },
+      {
+        "break_end": null,
+        "category": null,
+        "focus_end": null,
+        "id": "5e0c109d-7c39-432d-bbc4-3f8639363c2e"
+      },
+      {
+        "break_end": null,
+        "category": null,
+        "focus_end": null,
+        "id": "60b39678-b92e-4d69-86b1-b7ea0d28357c"
+      },
+      {
+        "break_end": null,
+        "category": null,
+        "focus_end": null,
+        "id": "88f70816-0805-48b9-89b4-dcb58c727009"
+      },
+      {
+        "break_end": null,
+        "category": null,
+        "focus_end": null,
+        "id": "9415ef2a-ff0a-49b9-ab87-a79f444a9319"
+      },
+      {
+        "break_end": null,
+        "category": null,
+        "focus_end": null,
+        "id": "b8e5678f-6a7b-4e4d-95c3-5bc794fcbc70"
+      },
+      {
+        "break_end": null,
+        "category": null,
+        "focus_end": null,
+        "id": "c7535139-4286-4198-ab99-609b2584fd05"
+      },
+      {
+        "break_end": null,
+        "category": null,
+        "focus_end": null,
+        "id": "d88445b6-00d5-4162-9510-d92eb838384f"
+      }
+    ],
+    "results": [],
+    "studies": [],
+    "wallets": []
+  },
+  "before": {
+    "attempts": [
+      {
+        "client_uuid": "66e96ad9-711b-495f-833b-e5b0798f34ef",
+        "definition": {
+          "catalog_version": 1,
+          "duration_seconds": 4500,
+          "group": "lgs",
+          "id": "lgs_verbal",
+          "name_en": "LGS Verbal",
+          "name_tr": "LGS Sözel",
+          "reward_coins": 3,
+          "reward_points": 15,
+          "segment": "lgs",
+          "subjects": [
+            {
+              "category_keys": [
+                "Türkçe"
+              ],
+              "id": "turkish",
+              "name_en": "Turkish",
+              "name_tr": "Türkçe",
+              "question_count": 20
+            },
+            {
+              "category_keys": [
+                "T.C. İnkılap Tarihi"
+              ],
+              "id": "revolution_history",
+              "name_en": "Turkish Revolution History",
+              "name_tr": "T.C. İnkılap Tarihi",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "Din Kültürü"
+              ],
+              "id": "religion",
+              "name_en": "Religious Culture",
+              "name_tr": "Din Kültürü",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "İngilizce"
+              ],
+              "id": "foreign_language",
+              "name_en": "Foreign Language",
+              "name_tr": "Yabancı Dil",
+              "question_count": 10
+            }
+          ],
+          "total_questions": 50,
+          "wrong_answer_divisor": 3
+        },
+        "elapsed_seconds": 0,
+        "ends_at": "2026-10-28T11:30:35.147721+00:00",
+        "exam_coins_earned": 0,
+        "exam_id": "lgs_verbal",
+        "finished_at": null,
+        "id": "2cdb6f6c-26a9-4807-b1d3-e8c80340a104",
+        "points_earned": 0,
+        "started_at": "2026-10-28T10:15:35.147721+00:00",
+        "status": "active",
+        "user_id": "88f70816-0805-48b9-89b4-dcb58c727009"
+      },
+      {
+        "client_uuid": "71446fef-34a4-44d6-836c-1f0db1b1b862",
+        "definition": {
+          "catalog_version": 1,
+          "duration_seconds": 4500,
+          "group": "lgs",
+          "id": "lgs_verbal",
+          "name_en": "LGS Verbal",
+          "name_tr": "LGS Sözel",
+          "reward_coins": 3,
+          "reward_points": 15,
+          "segment": "lgs",
+          "subjects": [
+            {
+              "category_keys": [
+                "Türkçe"
+              ],
+              "id": "turkish",
+              "name_en": "Turkish",
+              "name_tr": "Türkçe",
+              "question_count": 20
+            },
+            {
+              "category_keys": [
+                "T.C. İnkılap Tarihi"
+              ],
+              "id": "revolution_history",
+              "name_en": "Turkish Revolution History",
+              "name_tr": "T.C. İnkılap Tarihi",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "Din Kültürü"
+              ],
+              "id": "religion",
+              "name_en": "Religious Culture",
+              "name_tr": "Din Kültürü",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "İngilizce"
+              ],
+              "id": "foreign_language",
+              "name_en": "Foreign Language",
+              "name_tr": "Yabancı Dil",
+              "question_count": 10
+            }
+          ],
+          "total_questions": 50,
+          "wrong_answer_divisor": 3
+        },
+        "elapsed_seconds": 1848,
+        "ends_at": "2026-10-28T10:49:18.244483+00:00",
+        "exam_coins_earned": 0,
+        "exam_id": "lgs_verbal",
+        "finished_at": "2026-10-28T10:05:06.265362+00:00",
+        "id": "44867ac3-5cfb-4427-96e0-b2e74fabfd43",
+        "points_earned": 0,
+        "started_at": "2026-10-28T09:34:18.244483+00:00",
+        "status": "abandoned",
+        "user_id": "88f70816-0805-48b9-89b4-dcb58c727009"
+      },
+      {
+        "client_uuid": "802336a5-fffe-4f19-a4b3-0289eef32739",
+        "definition": {
+          "catalog_version": 1,
+          "duration_seconds": 8100,
+          "group": "tus",
+          "id": "tus_basic",
+          "name_en": "TUS Basic Medicine",
+          "name_tr": "TUS Temel Tıp",
+          "reward_coins": 5,
+          "reward_points": 27,
+          "segment": "tus",
+          "subjects": [
+            {
+              "category_keys": [
+                "Anatomi"
+              ],
+              "id": "anatomy",
+              "name_en": "Anatomy",
+              "name_tr": "Anatomi",
+              "question_count": 13
+            },
+            {
+              "category_keys": [
+                "Fizyoloji, Histoloji ve Embriyoloji"
+              ],
+              "id": "histology_embryology",
+              "name_en": "Histology and Embryology",
+              "name_tr": "Histoloji ve Embriyoloji",
+              "question_count": 7
+            },
+            {
+              "category_keys": [
+                "Fizyoloji, Histoloji ve Embriyoloji"
+              ],
+              "id": "physiology",
+              "name_en": "Physiology",
+              "name_tr": "Fizyoloji",
+              "question_count": 8
+            },
+            {
+              "category_keys": [
+                "Biyokimya"
+              ],
+              "id": "biochemistry",
+              "name_en": "Biochemistry",
+              "name_tr": "Biyokimya",
+              "question_count": 18
+            },
+            {
+              "category_keys": [
+                "Mikrobiyoloji"
+              ],
+              "id": "microbiology",
+              "name_en": "Microbiology",
+              "name_tr": "Mikrobiyoloji",
+              "question_count": 18
+            },
+            {
+              "category_keys": [
+                "Patoloji"
+              ],
+              "id": "pathology",
+              "name_en": "Pathology",
+              "name_tr": "Patoloji",
+              "question_count": 18
+            },
+            {
+              "category_keys": [
+                "Farmakoloji"
+              ],
+              "id": "pharmacology",
+              "name_en": "Pharmacology",
+              "name_tr": "Farmakoloji",
+              "question_count": 18
+            }
+          ],
+          "total_questions": 100,
+          "wrong_answer_divisor": 4
+        },
+        "elapsed_seconds": 0,
+        "ends_at": "2026-10-28T11:49:18.289597+00:00",
+        "exam_coins_earned": 0,
+        "exam_id": "tus_basic",
+        "finished_at": null,
+        "id": "50201f9f-b64b-4c1a-9e70-cfc583ab3ea9",
+        "points_earned": 0,
+        "started_at": "2026-10-28T09:34:18.289597+00:00",
+        "status": "active",
+        "user_id": "48d35994-efa9-43b9-9697-c80794d5047e"
+      },
+      {
+        "client_uuid": "81424c1f-d80b-48c3-ae72-c9a12cd93a0b",
+        "definition": {
+          "catalog_version": 1,
+          "duration_seconds": 4500,
+          "group": "lgs",
+          "id": "lgs_verbal",
+          "name_en": "LGS Verbal",
+          "name_tr": "LGS Sözel",
+          "reward_coins": 3,
+          "reward_points": 15,
+          "segment": "lgs",
+          "subjects": [
+            {
+              "category_keys": [
+                "Türkçe"
+              ],
+              "id": "turkish",
+              "name_en": "Turkish",
+              "name_tr": "Türkçe",
+              "question_count": 20
+            },
+            {
+              "category_keys": [
+                "T.C. İnkılap Tarihi"
+              ],
+              "id": "revolution_history",
+              "name_en": "Turkish Revolution History",
+              "name_tr": "T.C. İnkılap Tarihi",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "Din Kültürü"
+              ],
+              "id": "religion",
+              "name_en": "Religious Culture",
+              "name_tr": "Din Kültürü",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "İngilizce"
+              ],
+              "id": "foreign_language",
+              "name_en": "Foreign Language",
+              "name_tr": "Yabancı Dil",
+              "question_count": 10
+            }
+          ],
+          "total_questions": 50,
+          "wrong_answer_divisor": 3
+        },
+        "elapsed_seconds": 126,
+        "ends_at": "2026-10-28T11:28:00.748662+00:00",
+        "exam_coins_earned": 0,
+        "exam_id": "lgs_verbal",
+        "finished_at": "2026-10-28T10:15:06.922427+00:00",
+        "id": "6f085389-b29e-47d5-aaa4-c9a9f96d92c3",
+        "points_earned": 0,
+        "started_at": "2026-10-28T10:13:00.748662+00:00",
+        "status": "abandoned",
+        "user_id": "88f70816-0805-48b9-89b4-dcb58c727009"
+      },
+      {
+        "client_uuid": "76f3cf97-241f-4483-bb87-14d80c77f240",
+        "definition": {
+          "catalog_version": 1,
+          "duration_seconds": 4500,
+          "group": "lgs",
+          "id": "lgs_verbal",
+          "name_en": "LGS Verbal",
+          "name_tr": "LGS Sözel",
+          "reward_coins": 3,
+          "reward_points": 15,
+          "segment": "lgs",
+          "subjects": [
+            {
+              "category_keys": [
+                "Türkçe"
+              ],
+              "id": "turkish",
+              "name_en": "Turkish",
+              "name_tr": "Türkçe",
+              "question_count": 20
+            },
+            {
+              "category_keys": [
+                "T.C. İnkılap Tarihi"
+              ],
+              "id": "revolution_history",
+              "name_en": "Turkish Revolution History",
+              "name_tr": "T.C. İnkılap Tarihi",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "Din Kültürü"
+              ],
+              "id": "religion",
+              "name_en": "Religious Culture",
+              "name_tr": "Din Kültürü",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "İngilizce"
+              ],
+              "id": "foreign_language",
+              "name_en": "Foreign Language",
+              "name_tr": "Yabancı Dil",
+              "question_count": 10
+            }
+          ],
+          "total_questions": 50,
+          "wrong_answer_divisor": 3
+        },
+        "elapsed_seconds": 263,
+        "ends_at": "2026-10-28T11:23:08.88151+00:00",
+        "exam_coins_earned": 0,
+        "exam_id": "lgs_verbal",
+        "finished_at": "2026-10-28T10:12:32.386269+00:00",
+        "id": "a3aeb356-ebf3-4b27-aa4c-0bc919b9fbf1",
+        "points_earned": 0,
+        "started_at": "2026-10-28T10:08:08.88151+00:00",
+        "status": "abandoned",
+        "user_id": "88f70816-0805-48b9-89b4-dcb58c727009"
+      },
+      {
+        "client_uuid": "21c26afe-12e1-421e-8ddf-bfd83e63b941",
+        "definition": {
+          "catalog_version": 1,
+          "duration_seconds": 4500,
+          "group": "lgs",
+          "id": "lgs_verbal",
+          "name_en": "LGS Verbal",
+          "name_tr": "LGS Sözel",
+          "reward_coins": 3,
+          "reward_points": 15,
+          "segment": "lgs",
+          "subjects": [
+            {
+              "category_keys": [
+                "Türkçe"
+              ],
+              "id": "turkish",
+              "name_en": "Turkish",
+              "name_tr": "Türkçe",
+              "question_count": 20
+            },
+            {
+              "category_keys": [
+                "T.C. İnkılap Tarihi"
+              ],
+              "id": "revolution_history",
+              "name_en": "Turkish Revolution History",
+              "name_tr": "T.C. İnkılap Tarihi",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "Din Kültürü"
+              ],
+              "id": "religion",
+              "name_en": "Religious Culture",
+              "name_tr": "Din Kültürü",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "İngilizce"
+              ],
+              "id": "foreign_language",
+              "name_en": "Foreign Language",
+              "name_tr": "Yabancı Dil",
+              "question_count": 10
+            }
+          ],
+          "total_questions": 50,
+          "wrong_answer_divisor": 3
+        },
+        "elapsed_seconds": 126,
+        "ends_at": "2026-10-28T11:20:34.552156+00:00",
+        "exam_coins_earned": 0,
+        "exam_id": "lgs_verbal",
+        "finished_at": "2026-10-28T10:07:40.581992+00:00",
+        "id": "c8bd280e-cda5-45b0-b279-f615da372357",
+        "points_earned": 0,
+        "started_at": "2026-10-28T10:05:34.552156+00:00",
+        "status": "abandoned",
+        "user_id": "88f70816-0805-48b9-89b4-dcb58c727009"
+      }
+    ],
+    "captured_at": "2026-10-28T10:57:58.280465+00:00",
+    "economy": [
+      {
+        "current_streak": 0,
+        "exam_points": 0,
+        "exam_sand": 0,
+        "id": "04a2cd50-bffb-448a-a3f3-9835c728135d",
+        "last_study_date": null,
+        "longest_streak": 0,
+        "normal_points": 0,
+        "normal_sand": 0,
+        "total_minutes": 0
+      },
+      {
+        "current_streak": 0,
+        "exam_points": 0,
+        "exam_sand": 0,
+        "id": "48d35994-efa9-43b9-9697-c80794d5047e",
+        "last_study_date": null,
+        "longest_streak": 0,
+        "normal_points": 0,
+        "normal_sand": 0,
+        "total_minutes": 0
+      },
+      {
+        "current_streak": 0,
+        "exam_points": 0,
+        "exam_sand": 0,
+        "id": "5e0c109d-7c39-432d-bbc4-3f8639363c2e",
+        "last_study_date": null,
+        "longest_streak": 0,
+        "normal_points": 0,
+        "normal_sand": 0,
+        "total_minutes": 0
+      },
+      {
+        "current_streak": 0,
+        "exam_points": 0,
+        "exam_sand": 0,
+        "id": "60b39678-b92e-4d69-86b1-b7ea0d28357c",
+        "last_study_date": null,
+        "longest_streak": 0,
+        "normal_points": 0,
+        "normal_sand": 0,
+        "total_minutes": 0
+      },
+      {
+        "current_streak": 0,
+        "exam_points": 0,
+        "exam_sand": 0,
+        "id": "88f70816-0805-48b9-89b4-dcb58c727009",
+        "last_study_date": null,
+        "longest_streak": 0,
+        "normal_points": 0,
+        "normal_sand": 0,
+        "total_minutes": 0
+      },
+      {
+        "current_streak": 0,
+        "exam_points": 0,
+        "exam_sand": 0,
+        "id": "9415ef2a-ff0a-49b9-ab87-a79f444a9319",
+        "last_study_date": null,
+        "longest_streak": 0,
+        "normal_points": 0,
+        "normal_sand": 0,
+        "total_minutes": 0
+      },
+      {
+        "current_streak": 0,
+        "exam_points": 0,
+        "exam_sand": 0,
+        "id": "b8e5678f-6a7b-4e4d-95c3-5bc794fcbc70",
+        "last_study_date": null,
+        "longest_streak": 0,
+        "normal_points": 0,
+        "normal_sand": 0,
+        "total_minutes": 0
+      },
+      {
+        "current_streak": 0,
+        "exam_points": 0,
+        "exam_sand": 0,
+        "id": "c7535139-4286-4198-ab99-609b2584fd05",
+        "last_study_date": null,
+        "longest_streak": 0,
+        "normal_points": 0,
+        "normal_sand": 0,
+        "total_minutes": 0
+      },
+      {
+        "current_streak": 0,
+        "exam_points": 0,
+        "exam_sand": 0,
+        "id": "d88445b6-00d5-4162-9510-d92eb838384f",
+        "last_study_date": null,
+        "longest_streak": 0,
+        "normal_points": 0,
+        "normal_sand": 0,
+        "total_minutes": 0
+      }
+    ],
+    "events": [],
+    "friendships": [
+      {
+        "created_at": "2026-10-28T10:16:35.121689+00:00",
+        "friend_id": "d88445b6-00d5-4162-9510-d92eb838384f",
+        "status": "accepted",
+        "user_id": "04a2cd50-bffb-448a-a3f3-9835c728135d"
+      },
+      {
+        "created_at": "2026-10-28T09:34:18.264019+00:00",
+        "friend_id": "d88445b6-00d5-4162-9510-d92eb838384f",
+        "status": "accepted",
+        "user_id": "48d35994-efa9-43b9-9697-c80794d5047e"
+      },
+      {
+        "created_at": "2026-10-28T09:34:18.002797+00:00",
+        "friend_id": "d88445b6-00d5-4162-9510-d92eb838384f",
+        "status": "accepted",
+        "user_id": "5e0c109d-7c39-432d-bbc4-3f8639363c2e"
+      },
+      {
+        "created_at": "2026-10-28T09:34:17.631575+00:00",
+        "friend_id": "d88445b6-00d5-4162-9510-d92eb838384f",
+        "status": "accepted",
+        "user_id": "60b39678-b92e-4d69-86b1-b7ea0d28357c"
+      },
+      {
+        "created_at": "2026-10-28T09:34:18.123587+00:00",
+        "friend_id": "d88445b6-00d5-4162-9510-d92eb838384f",
+        "status": "accepted",
+        "user_id": "88f70816-0805-48b9-89b4-dcb58c727009"
+      },
+      {
+        "created_at": "2026-10-28T09:34:17.816804+00:00",
+        "friend_id": "d88445b6-00d5-4162-9510-d92eb838384f",
+        "status": "accepted",
+        "user_id": "9415ef2a-ff0a-49b9-ab87-a79f444a9319"
+      },
+      {
+        "created_at": "2026-10-28T09:34:17.50071+00:00",
+        "friend_id": "d88445b6-00d5-4162-9510-d92eb838384f",
+        "status": "accepted",
+        "user_id": "b8e5678f-6a7b-4e4d-95c3-5bc794fcbc70"
+      },
+      {
+        "created_at": "2026-10-28T09:34:17.570758+00:00",
+        "friend_id": "d88445b6-00d5-4162-9510-d92eb838384f",
+        "status": "accepted",
+        "user_id": "c7535139-4286-4198-ab99-609b2584fd05"
+      },
+      {
+        "created_at": "2026-10-28T10:16:35.106785+00:00",
+        "friend_id": "04a2cd50-bffb-448a-a3f3-9835c728135d",
+        "status": "accepted",
+        "user_id": "d88445b6-00d5-4162-9510-d92eb838384f"
+      },
+      {
+        "created_at": "2026-10-28T09:34:18.254988+00:00",
+        "friend_id": "48d35994-efa9-43b9-9697-c80794d5047e",
+        "status": "accepted",
+        "user_id": "d88445b6-00d5-4162-9510-d92eb838384f"
+      },
+      {
+        "created_at": "2026-10-28T09:34:17.985446+00:00",
+        "friend_id": "5e0c109d-7c39-432d-bbc4-3f8639363c2e",
+        "status": "accepted",
+        "user_id": "d88445b6-00d5-4162-9510-d92eb838384f"
+      },
+      {
+        "created_at": "2026-10-28T09:34:17.613552+00:00",
+        "friend_id": "60b39678-b92e-4d69-86b1-b7ea0d28357c",
+        "status": "accepted",
+        "user_id": "d88445b6-00d5-4162-9510-d92eb838384f"
+      },
+      {
+        "created_at": "2026-10-28T09:34:18.101444+00:00",
+        "friend_id": "88f70816-0805-48b9-89b4-dcb58c727009",
+        "status": "accepted",
+        "user_id": "d88445b6-00d5-4162-9510-d92eb838384f"
+      },
+      {
+        "created_at": "2026-10-28T09:34:17.802124+00:00",
+        "friend_id": "9415ef2a-ff0a-49b9-ab87-a79f444a9319",
+        "status": "accepted",
+        "user_id": "d88445b6-00d5-4162-9510-d92eb838384f"
+      },
+      {
+        "created_at": "2026-10-28T09:34:17.448792+00:00",
+        "friend_id": "b8e5678f-6a7b-4e4d-95c3-5bc794fcbc70",
+        "status": "accepted",
+        "user_id": "d88445b6-00d5-4162-9510-d92eb838384f"
+      },
+      {
+        "created_at": "2026-10-28T09:34:17.552797+00:00",
+        "friend_id": "c7535139-4286-4198-ab99-609b2584fd05",
+        "status": "accepted",
+        "user_id": "d88445b6-00d5-4162-9510-d92eb838384f"
+      }
+    ],
+    "identity": [
+      {
+        "email": "qa-i08-verify-social-1028-focus4@pomosprint.local",
+        "id": "04a2cd50-bffb-448a-a3f3-9835c728135d",
+        "run": "verify-social-1028"
+      },
+      {
+        "email": "qa-i08-verify-social-1028-exam2@pomosprint.local",
+        "id": "48d35994-efa9-43b9-9697-c80794d5047e",
+        "run": "verify-social-1028"
+      },
+      {
+        "email": "qa-i08-verify-social-1028-break2@pomosprint.local",
+        "id": "5e0c109d-7c39-432d-bbc4-3f8639363c2e",
+        "run": "verify-social-1028"
+      },
+      {
+        "email": "qa-i08-verify-social-1028-focus3@pomosprint.local",
+        "id": "60b39678-b92e-4d69-86b1-b7ea0d28357c",
+        "run": "verify-social-1028"
+      },
+      {
+        "email": "qa-i08-verify-social-1028-exam1@pomosprint.local",
+        "id": "88f70816-0805-48b9-89b4-dcb58c727009",
+        "run": "verify-social-1028"
+      },
+      {
+        "email": "qa-i08-verify-social-1028-break1@pomosprint.local",
+        "id": "9415ef2a-ff0a-49b9-ab87-a79f444a9319",
+        "run": "verify-social-1028"
+      },
+      {
+        "email": "qa-i08-verify-social-1028-focus1@pomosprint.local",
+        "id": "b8e5678f-6a7b-4e4d-95c3-5bc794fcbc70",
+        "run": "verify-social-1028"
+      },
+      {
+        "email": "qa-i08-verify-social-1028-focus2@pomosprint.local",
+        "id": "c7535139-4286-4198-ab99-609b2584fd05",
+        "run": "verify-social-1028"
+      },
+      {
+        "email": "qa-i08-verify-social-1028-observer@pomosprint.local",
+        "id": "d88445b6-00d5-4162-9510-d92eb838384f",
+        "run": "verify-social-1028"
+      }
+    ],
+    "presence": [
+      {
+        "break_end": null,
+        "category": "Matematik",
+        "focus_end": "2026-10-28T10:35:33.814461+00:00",
+        "id": "04a2cd50-bffb-448a-a3f3-9835c728135d"
+      },
+      {
+        "break_end": null,
+        "category": null,
+        "focus_end": null,
+        "id": "48d35994-efa9-43b9-9697-c80794d5047e"
+      },
+      {
+        "break_end": "2026-10-28T10:15:34.062045+00:00",
+        "category": null,
+        "focus_end": null,
+        "id": "5e0c109d-7c39-432d-bbc4-3f8639363c2e"
+      },
+      {
+        "break_end": null,
+        "category": "Matematik",
+        "focus_end": "2026-10-28T10:35:33.680302+00:00",
+        "id": "60b39678-b92e-4d69-86b1-b7ea0d28357c"
+      },
+      {
+        "break_end": null,
+        "category": null,
+        "focus_end": null,
+        "id": "88f70816-0805-48b9-89b4-dcb58c727009"
+      },
+      {
+        "break_end": "2026-10-28T10:20:05.193268+00:00",
+        "category": null,
+        "focus_end": null,
+        "id": "9415ef2a-ff0a-49b9-ab87-a79f444a9319"
+      },
+      {
+        "break_end": null,
+        "category": "Matematik",
+        "focus_end": "2026-10-28T10:35:33.402892+00:00",
+        "id": "b8e5678f-6a7b-4e4d-95c3-5bc794fcbc70"
+      },
+      {
+        "break_end": null,
+        "category": "Matematik",
+        "focus_end": "2026-10-28T10:39:34.998332+00:00",
+        "id": "c7535139-4286-4198-ab99-609b2584fd05"
+      },
+      {
+        "break_end": null,
+        "category": null,
+        "focus_end": null,
+        "id": "d88445b6-00d5-4162-9510-d92eb838384f"
+      }
+    ],
+    "results": [],
+    "studies": [],
+    "wallets": []
+  },
+  "economy_unchanged": true,
+  "finished_at": "2026-10-28T10:57:59.425315+00:00",
+  "friendships_preserved": true,
+  "history_preserved": true,
+  "live_rows_after": [],
+  "receipts": [
+    {
+      "action": "abandon_exam_attempt",
+      "attempt": {
+        "catalog_version": 1,
+        "client_uuid": "66e96ad9-711b-495f-833b-e5b0798f34ef",
+        "completed_at": null,
+        "definition": {
+          "catalog_version": 1,
+          "duration_seconds": 4500,
+          "group": "lgs",
+          "id": "lgs_verbal",
+          "name_en": "LGS Verbal",
+          "name_tr": "LGS Sözel",
+          "reward_coins": 3,
+          "reward_points": 15,
+          "segment": "lgs",
+          "subjects": [
+            {
+              "category_keys": [
+                "Türkçe"
+              ],
+              "id": "turkish",
+              "name_en": "Turkish",
+              "name_tr": "Türkçe",
+              "question_count": 20
+            },
+            {
+              "category_keys": [
+                "T.C. İnkılap Tarihi"
+              ],
+              "id": "revolution_history",
+              "name_en": "Turkish Revolution History",
+              "name_tr": "T.C. İnkılap Tarihi",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "Din Kültürü"
+              ],
+              "id": "religion",
+              "name_en": "Religious Culture",
+              "name_tr": "Din Kültürü",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "İngilizce"
+              ],
+              "id": "foreign_language",
+              "name_en": "Foreign Language",
+              "name_tr": "Yabancı Dil",
+              "question_count": 10
+            }
+          ],
+          "total_questions": 50,
+          "wrong_answer_divisor": 3
+        },
+        "duration_seconds": 4500,
+        "elapsed_seconds": 2544,
+        "ends_at": "2026-10-28T11:30:35.147721+00:00",
+        "exam_coins_earned": 0,
+        "exam_id": "lgs_verbal",
+        "finished_at": "2026-10-28T10:57:59.159213+00:00",
+        "id": "2cdb6f6c-26a9-4807-b1d3-e8c80340a104",
+        "name_en": "LGS Verbal",
+        "name_tr": "LGS Sözel",
+        "points_earned": 0,
+        "started_at": "2026-10-28T10:15:35.147721+00:00",
+        "status": "abandoned",
+        "subject_results": [],
+        "subjects": [
+          {
+            "category_keys": [
+              "Türkçe"
+            ],
+            "id": "turkish",
+            "name_en": "Turkish",
+            "name_tr": "Türkçe",
+            "question_count": 20
+          },
+          {
+            "category_keys": [
+              "T.C. İnkılap Tarihi"
+            ],
+            "id": "revolution_history",
+            "name_en": "Turkish Revolution History",
+            "name_tr": "T.C. İnkılap Tarihi",
+            "question_count": 10
+          },
+          {
+            "category_keys": [
+              "Din Kültürü"
+            ],
+            "id": "religion",
+            "name_en": "Religious Culture",
+            "name_tr": "Din Kültürü",
+            "question_count": 10
+          },
+          {
+            "category_keys": [
+              "İngilizce"
+            ],
+            "id": "foreign_language",
+            "name_en": "Foreign Language",
+            "name_tr": "Yabancı Dil",
+            "question_count": 10
+          }
+        ],
+        "total_questions": 50,
+        "wrong_answer_divisor": 3
+      },
+      "owner": "88f70816-0805-48b9-89b4-dcb58c727009"
+    },
+    {
+      "action": "abandon_exam_attempt",
+      "attempt": {
+        "catalog_version": 1,
+        "client_uuid": "802336a5-fffe-4f19-a4b3-0289eef32739",
+        "completed_at": null,
+        "definition": {
+          "catalog_version": 1,
+          "duration_seconds": 8100,
+          "group": "tus",
+          "id": "tus_basic",
+          "name_en": "TUS Basic Medicine",
+          "name_tr": "TUS Temel Tıp",
+          "reward_coins": 5,
+          "reward_points": 27,
+          "segment": "tus",
+          "subjects": [
+            {
+              "category_keys": [
+                "Anatomi"
+              ],
+              "id": "anatomy",
+              "name_en": "Anatomy",
+              "name_tr": "Anatomi",
+              "question_count": 13
+            },
+            {
+              "category_keys": [
+                "Fizyoloji, Histoloji ve Embriyoloji"
+              ],
+              "id": "histology_embryology",
+              "name_en": "Histology and Embryology",
+              "name_tr": "Histoloji ve Embriyoloji",
+              "question_count": 7
+            },
+            {
+              "category_keys": [
+                "Fizyoloji, Histoloji ve Embriyoloji"
+              ],
+              "id": "physiology",
+              "name_en": "Physiology",
+              "name_tr": "Fizyoloji",
+              "question_count": 8
+            },
+            {
+              "category_keys": [
+                "Biyokimya"
+              ],
+              "id": "biochemistry",
+              "name_en": "Biochemistry",
+              "name_tr": "Biyokimya",
+              "question_count": 18
+            },
+            {
+              "category_keys": [
+                "Mikrobiyoloji"
+              ],
+              "id": "microbiology",
+              "name_en": "Microbiology",
+              "name_tr": "Mikrobiyoloji",
+              "question_count": 18
+            },
+            {
+              "category_keys": [
+                "Patoloji"
+              ],
+              "id": "pathology",
+              "name_en": "Pathology",
+              "name_tr": "Patoloji",
+              "question_count": 18
+            },
+            {
+              "category_keys": [
+                "Farmakoloji"
+              ],
+              "id": "pharmacology",
+              "name_en": "Pharmacology",
+              "name_tr": "Farmakoloji",
+              "question_count": 18
+            }
+          ],
+          "total_questions": 100,
+          "wrong_answer_divisor": 4
+        },
+        "duration_seconds": 8100,
+        "elapsed_seconds": 5020,
+        "ends_at": "2026-10-28T11:49:18.289597+00:00",
+        "exam_coins_earned": 0,
+        "exam_id": "tus_basic",
+        "finished_at": "2026-10-28T10:57:59.220539+00:00",
+        "id": "50201f9f-b64b-4c1a-9e70-cfc583ab3ea9",
+        "name_en": "TUS Basic Medicine",
+        "name_tr": "TUS Temel Tıp",
+        "points_earned": 0,
+        "started_at": "2026-10-28T09:34:18.289597+00:00",
+        "status": "abandoned",
+        "subject_results": [],
+        "subjects": [
+          {
+            "category_keys": [
+              "Anatomi"
+            ],
+            "id": "anatomy",
+            "name_en": "Anatomy",
+            "name_tr": "Anatomi",
+            "question_count": 13
+          },
+          {
+            "category_keys": [
+              "Fizyoloji, Histoloji ve Embriyoloji"
+            ],
+            "id": "histology_embryology",
+            "name_en": "Histology and Embryology",
+            "name_tr": "Histoloji ve Embriyoloji",
+            "question_count": 7
+          },
+          {
+            "category_keys": [
+              "Fizyoloji, Histoloji ve Embriyoloji"
+            ],
+            "id": "physiology",
+            "name_en": "Physiology",
+            "name_tr": "Fizyoloji",
+            "question_count": 8
+          },
+          {
+            "category_keys": [
+              "Biyokimya"
+            ],
+            "id": "biochemistry",
+            "name_en": "Biochemistry",
+            "name_tr": "Biyokimya",
+            "question_count": 18
+          },
+          {
+            "category_keys": [
+              "Mikrobiyoloji"
+            ],
+            "id": "microbiology",
+            "name_en": "Microbiology",
+            "name_tr": "Mikrobiyoloji",
+            "question_count": 18
+          },
+          {
+            "category_keys": [
+              "Patoloji"
+            ],
+            "id": "pathology",
+            "name_en": "Pathology",
+            "name_tr": "Patoloji",
+            "question_count": 18
+          },
+          {
+            "category_keys": [
+              "Farmakoloji"
+            ],
+            "id": "pharmacology",
+            "name_en": "Pharmacology",
+            "name_tr": "Farmakoloji",
+            "question_count": 18
+          }
+        ],
+        "total_questions": 100,
+        "wrong_answer_divisor": 4
+      },
+      "owner": "48d35994-efa9-43b9-9697-c80794d5047e"
+    },
+    {
+      "action": "cancel_study_session",
+      "owner": "b8e5678f-6a7b-4e4d-95c3-5bc794fcbc70",
+      "void_receipt": true
+    },
+    {
+      "action": "cancel_study_session",
+      "owner": "c7535139-4286-4198-ab99-609b2584fd05",
+      "void_receipt": true
+    },
+    {
+      "action": "cancel_study_session",
+      "owner": "60b39678-b92e-4d69-86b1-b7ea0d28357c",
+      "void_receipt": true
+    },
+    {
+      "action": "cancel_study_session",
+      "owner": "04a2cd50-bffb-448a-a3f3-9835c728135d",
+      "void_receipt": true
+    },
+    {
+      "action": "cancel_study_session",
+      "owner": "9415ef2a-ff0a-49b9-ab87-a79f444a9319",
+      "void_receipt": true
+    },
+    {
+      "action": "cancel_study_session",
+      "owner": "5e0c109d-7c39-432d-bbc4-3f8639363c2e",
+      "void_receipt": true
+    },
+    {
+      "action": "cancel_study_session",
+      "owner": "88f70816-0805-48b9-89b4-dcb58c727009",
+      "void_receipt": true
+    },
+    {
+      "action": "cancel_study_session",
+      "owner": "48d35994-efa9-43b9-9697-c80794d5047e",
+      "void_receipt": true
+    }
+  ],
+  "run_id": "verify-social-1028",
+  "scope": "Only exact eight I08 peers; authenticated abandon/cancel RPCs, no deletions or direct SQL writes",
+  "started_at": "2026-10-28T10:57:58.230795+00:00",
+  "status": "PASS"
+}

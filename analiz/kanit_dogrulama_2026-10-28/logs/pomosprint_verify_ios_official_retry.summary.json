@@ -1,0 +1,83 @@
+{
+  "distinction": "Native passed; wrapper failed. This is not an overall wrapper PASS.",
+  "errors": [
+    "tool/local_supabase/e2e/sim/run_sim_e2e.sh: line 132: syntax error near unexpected token `fi'"
+  ],
+  "events": [
+    {
+      "marker": "AD_RECOVERY",
+      "message": "Explicitly cancelled prior failed-test focus owner=5262f2b7-4de6-4472-a8c6-9378cbd6b39b uuid=d0a48279-6d72-463f-b231-43bd8ec5a069; completed rows/economy unchanged; no silent reset."
+    },
+    {
+      "marker": "AD_OFFICIAL",
+      "message": "tr tyt duration=9900 questions=120 abandoned no-award PASS"
+    },
+    {
+      "marker": "AD_OFFICIAL",
+      "message": "tr ayt duration=10800 questions=160 abandoned no-award PASS"
+    },
+    {
+      "marker": "AD_OFFICIAL",
+      "message": "tr ydt duration=7200 questions=80 abandoned no-award PASS"
+    },
+    {
+      "marker": "AD_OFFICIAL",
+      "message": "tr lgs_verbal duration=4500 questions=50 abandoned no-award PASS"
+    },
+    {
+      "marker": "AD_OFFICIAL",
+      "message": "tr lgs_quantitative duration=4800 questions=40 abandoned no-award PASS"
+    },
+    {
+      "marker": "AD_OFFICIAL",
+      "message": "tr tus_basic duration=8100 questions=100 abandoned no-award PASS"
+    },
+    {
+      "marker": "AD_OFFICIAL",
+      "message": "tr tus_clinical duration=8100 questions=100 abandoned no-award PASS"
+    },
+    {
+      "marker": "AD_OFFICIAL",
+      "message": "en tyt duration=9900 questions=120 abandoned no-award PASS"
+    },
+    {
+      "marker": "AD_OFFICIAL",
+      "message": "en ayt duration=10800 questions=160 abandoned no-award PASS"
+    },
+    {
+      "marker": "AD_OFFICIAL",
+      "message": "en ydt duration=7200 questions=80 abandoned no-award PASS"
+    },
+    {
+      "marker": "AD_OFFICIAL",
+      "message": "en lgs_verbal duration=4500 questions=50 abandoned no-award PASS"
+    },
+    {
+      "marker": "AD_OFFICIAL",
+      "message": "en lgs_quantitative duration=4800 questions=40 abandoned no-award PASS"
+    },
+    {
+      "marker": "AD_OFFICIAL",
+      "message": "en tus_basic duration=8100 questions=100 abandoned no-award PASS"
+    },
+    {
+      "marker": "AD_OFFICIAL",
+      "message": "en tus_clinical duration=8100 questions=100 abandoned no-award PASS"
+    },
+    {
+      "marker": "AD_OFFICIAL",
+      "message": "owner=b49cd12c-618f-4f65-964f-bb83cc5cec35 all14 attempts and bidirectional normal/Marathon conflict PASS"
+    }
+  ],
+  "native_process_result": "PASS",
+  "native_totals": [
+    "03:23 +1 ~2: (tearDownAll)",
+    "03:23 +1 ~2: All tests passed!"
+  ],
+  "schema_version": 1,
+  "scope": "Selected native checkpoints/totals only; not a release verdict or full-duration claim",
+  "wrapper_result": "FAIL",
+  "wrapper_totals": [
+    "=== integration_test/ad_verify_reports_exams_test.dart: GEÇTİ"
+  ]
+}

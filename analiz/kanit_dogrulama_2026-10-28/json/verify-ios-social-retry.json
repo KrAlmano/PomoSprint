@@ -1,0 +1,10 @@
+{
+  "api_port": 54321,
+  "finished_at": "2026-10-28T10:09:10.641949+00:00",
+  "log": "external/tmp/pomosprint_verify-ios-social-retry.log",
+  "native_exit_code": 0,
+  "platform": "ios",
+  "run": "verify-ios-social-a7b",
+  "source": "integration_test/af_verification_leagues_social_test.dart",
+  "started_at": "2026-10-28T10:02:27.534342+00:00"
+}

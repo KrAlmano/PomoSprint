@@ -1,0 +1,10 @@
+{
+  "api_port": 54341,
+  "finished_at": "2026-10-28T09:28:08.795376+00:00",
+  "log": "external/tmp/pomosprint_verify-ios-old-retry2.log",
+  "native_exit_code": 0,
+  "platform": "ios",
+  "run": "verify-ios-old-a8c",
+  "source": "integration_test/ae_old_server_isolated_test.dart",
+  "started_at": "2026-10-28T09:25:37.565237+00:00"
+}

@@ -1,0 +1,84 @@
+{
+  "errors": [],
+  "events": [
+    {
+      "data": {
+        "attempt_id": "ab532c9e-29e7-42ea-945b-bf2fcfd6f056",
+        "baseline": {
+          "coins": 0,
+          "current_streak": 0,
+          "exam_coins": 0,
+          "exam_points": 0,
+          "last_study_date": null,
+          "lifetime_points": 0,
+          "timezone": "Europe/Istanbul",
+          "total_minutes": 0
+        },
+        "client_uuid": "6de4db56-45c5-4e71-9f4f-f882fc59e9f6",
+        "completion_verified": false,
+        "definition_snapshot": {
+          "catalog_version": 1,
+          "duration_seconds": 60,
+          "group": "lgs",
+          "id": "lgs_quantitative",
+          "name_en": "LGS Quantitative",
+          "name_tr": "LGS Sayısal",
+          "reward_coins": 0,
+          "reward_points": 0,
+          "segment": "lgs",
+          "subjects": [
+            {
+              "category_keys": [
+                "Matematik"
+              ],
+              "id": "mathematics",
+              "name_en": "Mathematics",
+              "name_tr": "Matematik",
+              "question_count": 20
+            },
+            {
+              "category_keys": [
+                "Fen Bilimleri"
+              ],
+              "id": "science",
+              "name_en": "Science",
+              "name_tr": "Fen Bilimleri",
+              "question_count": 20
+            }
+          ],
+          "total_questions": 40,
+          "wrong_answer_divisor": 3
+        },
+        "duration_seconds": 60,
+        "email": "e2e-sim-probe-exam-catalog-start-vc-android-lgs-quantitative-a1@pomosprint.local",
+        "ends_at": "2026-10-28T10:35:41.277975Z",
+        "exam_id": "lgs_quantitative",
+        "expected_coins": 0,
+        "expected_points": 0,
+        "language": "en",
+        "last_resume_at": "2026-10-28T10:36:18.662991Z",
+        "mode": "exam_catalog_start",
+        "notification_delivery_tested": false,
+        "observed_at": "2026-10-28T10:34:41.178397Z",
+        "offline_pending_verified": true,
+        "owner_id": "154e6aa8-c004-4905-851a-4c5048c2f4f3",
+        "remaining_at_start": 60,
+        "run_id": "vc-android-lgs-quantitative-a1",
+        "scope": "SHORT local-catalog natural60 lifecycle, NOT official duration",
+        "started_at": "2026-10-28T10:34:41.277975Z",
+        "total_questions": 40
+      },
+      "marker": "CATALOG_PROBE_OFFLINE",
+      "message": ""
+    }
+  ],
+  "native_process_result": "PASS",
+  "native_totals": [
+    "00:09 +1: (tearDownAll)",
+    "00:09 +1: All tests passed!"
+  ],
+  "schema_version": 1,
+  "scope": "Selected native checkpoints/totals only; not a release verdict or full-duration claim",
+  "wrapper_result": "NOT_PRESENT",
+  "wrapper_totals": []
+}

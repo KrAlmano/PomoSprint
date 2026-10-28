@@ -1,0 +1,102 @@
+{
+  "errors": [],
+  "events": [
+    {
+      "data": {
+        "attempt_id": "e92d8b3a-6e2f-454e-82e7-401ed61079c2",
+        "baseline": {
+          "coins": 0,
+          "current_streak": 0,
+          "exam_coins": 0,
+          "exam_points": 0,
+          "last_study_date": null,
+          "lifetime_points": 0,
+          "timezone": "Europe/Istanbul",
+          "total_minutes": 0
+        },
+        "client_uuid": "ba75705c-f4a7-4303-836f-adee0d987625",
+        "completion_verified": false,
+        "definition_snapshot": {
+          "catalog_version": 1,
+          "duration_seconds": 60,
+          "group": "lgs",
+          "id": "lgs_verbal",
+          "name_en": "LGS Verbal",
+          "name_tr": "LGS Sözel",
+          "reward_coins": 0,
+          "reward_points": 0,
+          "segment": "lgs",
+          "subjects": [
+            {
+              "category_keys": [
+                "Türkçe"
+              ],
+              "id": "turkish",
+              "name_en": "Turkish",
+              "name_tr": "Türkçe",
+              "question_count": 20
+            },
+            {
+              "category_keys": [
+                "T.C. İnkılap Tarihi"
+              ],
+              "id": "revolution_history",
+              "name_en": "Turkish Revolution History",
+              "name_tr": "T.C. İnkılap Tarihi",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "Din Kültürü"
+              ],
+              "id": "religion",
+              "name_en": "Religious Culture",
+              "name_tr": "Din Kültürü",
+              "question_count": 10
+            },
+            {
+              "category_keys": [
+                "İngilizce"
+              ],
+              "id": "foreign_language",
+              "name_en": "Foreign Language",
+              "name_tr": "Yabancı Dil",
+              "question_count": 10
+            }
+          ],
+          "total_questions": 50,
+          "wrong_answer_divisor": 3
+        },
+        "duration_seconds": 60,
+        "email": "e2e-sim-probe-exam-catalog-start-vc-android-lgs-verbal-a1@pomosprint.local",
+        "ends_at": "2026-10-28T10:32:43.763121Z",
+        "exam_id": "lgs_verbal",
+        "expected_coins": 0,
+        "expected_points": 0,
+        "language": "en",
+        "last_resume_at": "2026-10-28T10:33:24.601180Z",
+        "mode": "exam_catalog_start",
+        "notification_delivery_tested": false,
+        "observed_at": "2026-10-28T10:31:44.095384Z",
+        "offline_pending_verified": true,
+        "owner_id": "5da1a6be-0b06-474d-927a-106f1ce57f25",
+        "remaining_at_start": 60,
+        "run_id": "vc-android-lgs-verbal-a1",
+        "scope": "SHORT local-catalog natural60 lifecycle, NOT official duration",
+        "started_at": "2026-10-28T10:31:43.763121Z",
+        "total_questions": 50
+      },
+      "marker": "CATALOG_PROBE_OFFLINE",
+      "message": ""
+    }
+  ],
+  "native_process_result": "PASS",
+  "native_totals": [
+    "00:09 +1: (tearDownAll)",
+    "00:09 +1: All tests passed!"
+  ],
+  "schema_version": 1,
+  "scope": "Selected native checkpoints/totals only; not a release verdict or full-duration claim",
+  "wrapper_result": "NOT_PRESENT",
+  "wrapper_totals": []
+}

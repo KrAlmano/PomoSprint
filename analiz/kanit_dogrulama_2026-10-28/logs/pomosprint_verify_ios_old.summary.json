@@ -1,0 +1,22 @@
+{
+  "errors": [
+    "The following HttpException was thrown running a test:",
+    "e2e_host 400: gecersiz ad, uri = http://127.0.0.1:54399/shot?name=a8-old-tr-tus-categories",
+    "When the exception was thrown, this was the stack:",
+    "e2e_host 400: gecersiz ad, uri = http://127.0.0.1:54399/shot?name=a8-old-en-tus-categories"
+  ],
+  "events": [],
+  "native_process_result": "FAIL",
+  "native_totals": [
+    "00:15 +0 -1: ae · isolated old server keeps TUS intent and normal reports (tr) [E]",
+    "00:30 +0 -2: ae · isolated old server keeps TUS intent and normal reports (en) [E]",
+    "00:30 +0 -2: (tearDownAll)",
+    "00:30 +0 -2: Some tests failed."
+  ],
+  "schema_version": 1,
+  "scope": "Selected native checkpoints/totals only; not a release verdict or full-duration claim",
+  "wrapper_result": "FAIL",
+  "wrapper_totals": [
+    "=== integration_test/ae_old_server_isolated_test.dart: KALDI (1)"
+  ]
+}

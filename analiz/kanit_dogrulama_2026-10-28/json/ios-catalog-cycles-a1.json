@@ -1,0 +1,31 @@
+{
+  "cases": [
+    {
+      "exam_id": "tyt",
+      "run": "vc-ios-tyt-a1",
+      "start": {
+        "at": "2026-10-28T10:23:39.321016+00:00",
+        "exit_code": 0,
+        "log": "external/tmp/pomosprint_vc-ios-tyt-a1-exam_catalog_start.log"
+      },
+      "started_at": "2026-10-28T10:22:00.290846+00:00"
+    }
+  ],
+  "cleanup_errors": [],
+  "error": "'flutter.e2e_real_duration_probe_vc-ios-tyt-a1'",
+  "finished_at": "2026-10-28T10:23:39.464754+00:00",
+  "language": "tr",
+  "platform": "ios",
+  "requested_exam_ids": [
+    "tyt",
+    "ayt",
+    "ydt",
+    "lgs_verbal",
+    "lgs_quantitative",
+    "tus_basic",
+    "tus_clinical"
+  ],
+  "result": "FAIL",
+  "scope": "SHORT natural60 OS-close/offline/reconnect; NOT official duration",
+  "started_at": "2026-10-28T10:21:59.904836+00:00"
+}

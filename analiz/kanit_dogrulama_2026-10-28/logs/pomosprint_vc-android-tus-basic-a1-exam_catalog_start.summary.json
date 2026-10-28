@@ -1,0 +1,126 @@
+{
+  "errors": [],
+  "events": [
+    {
+      "data": {
+        "attempt_id": "d3417654-3b71-4c53-ab5f-742da6acc73a",
+        "baseline": {
+          "coins": 0,
+          "current_streak": 0,
+          "exam_coins": 0,
+          "exam_points": 0,
+          "last_study_date": null,
+          "lifetime_points": 0,
+          "timezone": "Europe/Istanbul",
+          "total_minutes": 0
+        },
+        "client_uuid": "28372cba-1108-4a99-8ca1-76dba802f1e0",
+        "definition_snapshot": {
+          "catalog_version": 1,
+          "duration_seconds": 60,
+          "group": "tus",
+          "id": "tus_basic",
+          "name_en": "TUS Basic Medicine",
+          "name_tr": "TUS Temel Tıp",
+          "reward_coins": 0,
+          "reward_points": 0,
+          "segment": "tus",
+          "subjects": [
+            {
+              "category_keys": [
+                "Anatomi"
+              ],
+              "id": "anatomy",
+              "name_en": "Anatomy",
+              "name_tr": "Anatomi",
+              "question_count": 13
+            },
+            {
+              "category_keys": [
+                "Fizyoloji, Histoloji ve Embriyoloji"
+              ],
+              "id": "histology_embryology",
+              "name_en": "Histology and Embryology",
+              "name_tr": "Histoloji ve Embriyoloji",
+              "question_count": 7
+            },
+            {
+              "category_keys": [
+                "Fizyoloji, Histoloji ve Embriyoloji"
+              ],
+              "id": "physiology",
+              "name_en": "Physiology",
+              "name_tr": "Fizyoloji",
+              "question_count": 8
+            },
+            {
+              "category_keys": [
+                "Biyokimya"
+              ],
+              "id": "biochemistry",
+              "name_en": "Biochemistry",
+              "name_tr": "Biyokimya",
+              "question_count": 18
+            },
+            {
+              "category_keys": [
+                "Mikrobiyoloji"
+              ],
+              "id": "microbiology",
+              "name_en": "Microbiology",
+              "name_tr": "Mikrobiyoloji",
+              "question_count": 18
+            },
+            {
+              "category_keys": [
+                "Patoloji"
+              ],
+              "id": "pathology",
+              "name_en": "Pathology",
+              "name_tr": "Patoloji",
+              "question_count": 18
+            },
+            {
+              "category_keys": [
+                "Farmakoloji"
+              ],
+              "id": "pharmacology",
+              "name_en": "Pharmacology",
+              "name_tr": "Farmakoloji",
+              "question_count": 18
+            }
+          ],
+          "total_questions": 100,
+          "wrong_answer_divisor": 4
+        },
+        "duration_seconds": 60,
+        "email": "e2e-sim-probe-exam-catalog-start-vc-android-tus-basic-a1@pomosprint.local",
+        "ends_at": "2026-10-28T10:38:30.642689Z",
+        "exam_id": "tus_basic",
+        "expected_coins": 0,
+        "expected_points": 0,
+        "language": "en",
+        "mode": "exam_catalog_start",
+        "notification_delivery_tested": false,
+        "observed_at": "2026-10-28T10:37:30.516937Z",
+        "owner_id": "ea223b68-e7e6-444b-8a53-02c262aa21c4",
+        "remaining_at_start": 60,
+        "run_id": "vc-android-tus-basic-a1",
+        "scope": "SHORT local-catalog natural60 lifecycle, NOT official duration",
+        "started_at": "2026-10-28T10:37:30.642689Z",
+        "total_questions": 100
+      },
+      "marker": "REAL_PROBE_START",
+      "message": ""
+    }
+  ],
+  "native_process_result": "PASS",
+  "native_totals": [
+    "00:15 +1: (tearDownAll)",
+    "00:16 +1: All tests passed!"
+  ],
+  "schema_version": 1,
+  "scope": "Selected native checkpoints/totals only; not a release verdict or full-duration claim",
+  "wrapper_result": "NOT_PRESENT",
+  "wrapper_totals": []
+}

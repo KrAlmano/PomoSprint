@@ -1,0 +1,22 @@
+[
+  {
+    "exit_code": 0,
+    "seconds": 0.206,
+    "suite": "oracle"
+  },
+  {
+    "exit_code": 0,
+    "seconds": 0.162,
+    "suite": "cohort"
+  },
+  {
+    "exit_code": 0,
+    "seconds": 0.907,
+    "suite": "old-stack"
+  },
+  {
+    "exit_code": 0,
+    "seconds": 14.358,
+    "suite": "host"
+  }
+]

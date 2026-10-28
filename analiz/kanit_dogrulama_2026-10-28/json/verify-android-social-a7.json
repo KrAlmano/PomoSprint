@@ -1,0 +1,10 @@
+{
+  "api_port": 54321,
+  "finished_at": "2026-10-28T10:16:36.814684+00:00",
+  "log": "external/tmp/pomosprint_verify-android-social-a7.log",
+  "native_exit_code": 0,
+  "platform": "android",
+  "run": "verify-android-social-a7",
+  "source": "integration_test/af_verification_leagues_social_test.dart",
+  "started_at": "2026-10-28T10:10:52.505418+00:00"
+}

@@ -1,0 +1,45 @@
+{
+  "errors": [],
+  "events": [
+    {
+      "data": {
+        "attempt_id": "dc71c9a1-9a6a-4996-b5b8-cdf1d26f1d40",
+        "baseline": {
+          "coins": 0,
+          "current_streak": 0,
+          "exam_coins": 0,
+          "exam_points": 0,
+          "last_study_date": null,
+          "lifetime_points": 0,
+          "timezone": "Europe/Istanbul",
+          "total_minutes": 0
+        },
+        "client_uuid": "ea054eb5-1bff-472d-ac43-17b0b014562a",
+        "duration_seconds": 4500,
+        "email": "e2e-sim-probe-exam-lgs-start-verify-real75-20261028-a1@pomosprint.local",
+        "ends_at": "2026-10-28T08:52:35.623271Z",
+        "mode": "exam_lgs_start",
+        "notification_delivery_tested": false,
+        "observed_at": "2026-10-28T07:37:35.647520Z",
+        "owner_id": "c64b15d7-67a7-4d2e-9774-cefbdba57e10",
+        "remaining_at_start": 4500,
+        "run_id": "verify-real75-20261028-a1",
+        "scope": "real UI start, untouched wall-clock duration",
+        "started_at": "2026-10-28T07:37:35.623271Z"
+      },
+      "marker": "REAL_PROBE_START",
+      "message": ""
+    }
+  ],
+  "native_process_result": "PASS",
+  "native_totals": [
+    "00:13 +1: (tearDownAll)",
+    "00:14 +1: All tests passed!"
+  ],
+  "schema_version": 1,
+  "scope": "Selected native checkpoints/totals only; not a release verdict or full-duration claim",
+  "wrapper_result": "PASS",
+  "wrapper_totals": [
+    "=== integration_test/r_real_duration_probe_test.dart: GEÇTİ"
+  ]
+}

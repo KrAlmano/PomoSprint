@@ -1,0 +1,18 @@
+{
+  "errors": [],
+  "events": [
+    {
+      "marker": "REAL_PROBE_RESUME",
+      "message": "run=vc-ios-lgs-verbal-a3 mode=exam_catalog_start owner=d5d766e0-b823-403e-ae7a-e19e8e157576 completed=true evidence=final-completion"
+    }
+  ],
+  "native_process_result": "PASS",
+  "native_totals": [
+    "00:06 +1: (tearDownAll)",
+    "00:07 +1: All tests passed!"
+  ],
+  "schema_version": 1,
+  "scope": "Selected native checkpoints/totals only; not a release verdict or full-duration claim",
+  "wrapper_result": "NOT_PRESENT",
+  "wrapper_totals": []
+}

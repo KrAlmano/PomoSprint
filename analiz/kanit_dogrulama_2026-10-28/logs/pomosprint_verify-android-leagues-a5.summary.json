@@ -1,0 +1,110 @@
+{
+  "errors": [],
+  "events": [
+    {
+      "marker": "AF_LEAGUES",
+      "message": "lang=tr kind=study scope=segment state=visible rows=2 exact SQL/RPC/native order PASS"
+    },
+    {
+      "marker": "AF_LEAGUES",
+      "message": "lang=tr kind=study scope=global state=visible rows=18 exact SQL/RPC/native order PASS"
+    },
+    {
+      "marker": "AF_LEAGUES",
+      "message": "lang=tr kind=exam scope=segment state=visible rows=2 exact SQL/RPC/native order PASS"
+    },
+    {
+      "marker": "AF_LEAGUES",
+      "message": "lang=tr kind=exam scope=global state=visible rows=17 exact SQL/RPC/native order PASS"
+    },
+    {
+      "marker": "AF_LEAGUES",
+      "message": "lang=tr kind=study scope=segment state=private rows=2 exact SQL/RPC/native order PASS"
+    },
+    {
+      "marker": "AF_LEAGUES",
+      "message": "lang=tr kind=study scope=global state=private rows=17 exact SQL/RPC/native order PASS"
+    },
+    {
+      "marker": "AF_LEAGUES",
+      "message": "lang=tr kind=exam scope=segment state=private rows=2 exact SQL/RPC/native order PASS"
+    },
+    {
+      "marker": "AF_LEAGUES",
+      "message": "lang=tr kind=exam scope=global state=private rows=16 exact SQL/RPC/native order PASS"
+    },
+    {
+      "marker": "AF_LEAGUES",
+      "message": "lang=tr kind=study scope=segment state=blocked rows=2 exact SQL/RPC/native order PASS"
+    },
+    {
+      "marker": "AF_LEAGUES",
+      "message": "lang=tr kind=study scope=global state=blocked rows=17 exact SQL/RPC/native order PASS"
+    },
+    {
+      "marker": "AF_LEAGUES",
+      "message": "lang=tr kind=exam scope=segment state=blocked rows=2 exact SQL/RPC/native order PASS"
+    },
+    {
+      "marker": "AF_LEAGUES",
+      "message": "lang=tr kind=exam scope=global state=blocked rows=16 exact SQL/RPC/native order PASS"
+    },
+    {
+      "marker": "AF_LEAGUES",
+      "message": "lang=en kind=study scope=segment state=visible rows=2 exact SQL/RPC/native order PASS"
+    },
+    {
+      "marker": "AF_LEAGUES",
+      "message": "lang=en kind=study scope=global state=visible rows=18 exact SQL/RPC/native order PASS"
+    },
+    {
+      "marker": "AF_LEAGUES",
+      "message": "lang=en kind=exam scope=segment state=visible rows=2 exact SQL/RPC/native order PASS"
+    },
+    {
+      "marker": "AF_LEAGUES",
+      "message": "lang=en kind=exam scope=global state=visible rows=17 exact SQL/RPC/native order PASS"
+    },
+    {
+      "marker": "AF_LEAGUES",
+      "message": "lang=en kind=study scope=segment state=private rows=2 exact SQL/RPC/native order PASS"
+    },
+    {
+      "marker": "AF_LEAGUES",
+      "message": "lang=en kind=study scope=global state=private rows=17 exact SQL/RPC/native order PASS"
+    },
+    {
+      "marker": "AF_LEAGUES",
+      "message": "lang=en kind=exam scope=segment state=private rows=2 exact SQL/RPC/native order PASS"
+    },
+    {
+      "marker": "AF_LEAGUES",
+      "message": "lang=en kind=exam scope=global state=private rows=16 exact SQL/RPC/native order PASS"
+    },
+    {
+      "marker": "AF_LEAGUES",
+      "message": "lang=en kind=study scope=segment state=blocked rows=2 exact SQL/RPC/native order PASS"
+    },
+    {
+      "marker": "AF_LEAGUES",
+      "message": "lang=en kind=study scope=global state=blocked rows=17 exact SQL/RPC/native order PASS"
+    },
+    {
+      "marker": "AF_LEAGUES",
+      "message": "lang=en kind=exam scope=segment state=blocked rows=2 exact SQL/RPC/native order PASS"
+    },
+    {
+      "marker": "AF_LEAGUES",
+      "message": "lang=en kind=exam scope=global state=blocked rows=16 exact SQL/RPC/native order PASS"
+    }
+  ],
+  "native_process_result": "PASS",
+  "native_totals": [
+    "01:47 +1 ~1: (tearDownAll)",
+    "01:47 +1 ~1: All tests passed!"
+  ],
+  "schema_version": 1,
+  "scope": "Selected native checkpoints/totals only; not a release verdict or full-duration claim",
+  "wrapper_result": "NOT_PRESENT",
+  "wrapper_totals": []
+}

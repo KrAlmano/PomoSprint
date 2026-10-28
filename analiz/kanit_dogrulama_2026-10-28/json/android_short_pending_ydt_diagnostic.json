@@ -1,0 +1,49 @@
+{
+  "journal": [
+    {
+      "client_uuid": "ddc3f019-0f3d-409b-9026-312dad8e7c20",
+      "duration_seconds": 60,
+      "ends_at": "2026-10-28T09:25:42.602663Z",
+      "error_code": null,
+      "exam_coins_earned": 0,
+      "exam_id": "tyt",
+      "id": "11c5af90-e1c0-4878-b182-09ea2ac27a47",
+      "pending_action": null,
+      "points_earned": 0,
+      "started_at": "2026-10-28T09:24:42.602663Z",
+      "status": "completed",
+      "total_questions": 120
+    },
+    {
+      "client_uuid": "6c8c256b-df64-4fc9-82b8-c2e491f7303f",
+      "duration_seconds": 60,
+      "ends_at": "2026-10-28T09:27:12.715198Z",
+      "error_code": null,
+      "exam_coins_earned": 0,
+      "exam_id": "ayt",
+      "id": "f4b62dba-ad09-488b-9a38-8f48c80c34cf",
+      "pending_action": null,
+      "points_earned": 0,
+      "started_at": "2026-10-28T09:26:12.715198Z",
+      "status": "completed",
+      "total_questions": 160
+    },
+    {
+      "client_uuid": "c4d6dd84-8fa5-499f-9917-7449b2a8cefa",
+      "duration_seconds": 60,
+      "ends_at": "2026-10-28T09:28:46.588943Z",
+      "error_code": "exam_not_elapsed",
+      "exam_coins_earned": 0,
+      "exam_id": "ydt",
+      "id": "182a0524-053b-4588-b3a7-b79cb616ae4b",
+      "pending_action": "complete",
+      "points_earned": 0,
+      "started_at": "2026-10-28T09:27:46.588943Z",
+      "status": "active",
+      "total_questions": 80
+    }
+  ],
+  "native_case_failed": "ydt-tr natural85s wait",
+  "owner": "e832b4fb-ee82-4b08-b07a-589fec4e8e78",
+  "preserved": true
+}

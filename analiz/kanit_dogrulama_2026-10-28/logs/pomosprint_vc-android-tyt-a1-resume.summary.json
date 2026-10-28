@@ -1,0 +1,18 @@
+{
+  "errors": [],
+  "events": [
+    {
+      "marker": "REAL_PROBE_RESUME",
+      "message": "run=vc-android-tyt-a1 mode=exam_catalog_start owner=59718365-a0c8-45c2-8f90-7c1747df62c0 completed=true evidence=final-completion"
+    }
+  ],
+  "native_process_result": "PASS",
+  "native_totals": [
+    "00:05 +1: (tearDownAll)",
+    "00:06 +1: All tests passed!"
+  ],
+  "schema_version": 1,
+  "scope": "Selected native checkpoints/totals only; not a release verdict or full-duration claim",
+  "wrapper_result": "NOT_PRESENT",
+  "wrapper_totals": []
+}

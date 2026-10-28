@@ -1,0 +1,31 @@
+{
+  "errors": [
+    "The following HttpException was thrown running a test:",
+    "e2e_host 400: gecersiz ad, uri = http://127.0.0.1:54399/shot?name=e2e-ad-nets-lgs_verbal-tr",
+    "When the exception was thrown, this was the stack:"
+  ],
+  "events": [
+    {
+      "marker": "AD_SHORT",
+      "message": "tr tyt real60 server-minute and editable-net/no-economy-change PASS"
+    },
+    {
+      "marker": "AD_SHORT",
+      "message": "tr ayt real60 server-minute and editable-net/no-economy-change PASS"
+    },
+    {
+      "marker": "AD_SHORT",
+      "message": "tr ydt real60 server-minute and editable-net/no-economy-change PASS"
+    }
+  ],
+  "native_process_result": "FAIL",
+  "native_totals": [
+    "05:51 +0 ~1 -1: ad2 · fourteen natural local60 exams and all-subject net entry TR EN [E]",
+    "05:51 +0 ~2 -1: (tearDownAll)",
+    "05:51 +0 ~2 -1: Some tests failed."
+  ],
+  "schema_version": 1,
+  "scope": "Selected native checkpoints/totals only; not a release verdict or full-duration claim",
+  "wrapper_result": "NOT_PRESENT",
+  "wrapper_totals": []
+}

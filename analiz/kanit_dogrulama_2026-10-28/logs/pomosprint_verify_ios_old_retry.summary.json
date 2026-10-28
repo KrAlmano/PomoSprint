@@ -1,0 +1,22 @@
+{
+  "errors": [
+    "The following TestFailure was thrown running a test:",
+    "Expected: at least one matching candidate",
+    "Actual: _TextWidgetFinder:<Found 0 widgets with text \"Ders Raporları\": []>",
+    "Actual: _TextWidgetFinder:<Found 0 widgets with text \"Subject Reports\": []>"
+  ],
+  "events": [],
+  "native_process_result": "FAIL",
+  "native_totals": [
+    "00:33 +0 -1: ae · isolated old server keeps TUS intent and normal reports (tr) [E]",
+    "01:05 +0 -2: ae · isolated old server keeps TUS intent and normal reports (en) [E]",
+    "01:05 +0 -2: (tearDownAll)",
+    "01:05 +0 -2: Some tests failed."
+  ],
+  "schema_version": 1,
+  "scope": "Selected native checkpoints/totals only; not a release verdict or full-duration claim",
+  "wrapper_result": "FAIL",
+  "wrapper_totals": [
+    "=== integration_test/ae_old_server_isolated_test.dart: KALDI (1)"
+  ]
+}

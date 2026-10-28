@@ -1,0 +1,10 @@
+{
+  "api_port": 54325,
+  "finished_at": "2026-10-28T10:52:24.363329+00:00",
+  "log": "external/tmp/pomosprint_ios-ayt-a2-recovered-offline.log",
+  "native_exit_code": 0,
+  "platform": "ios",
+  "run": "vc-ios-ayt-a2",
+  "source": "integration_test/r_real_duration_probe_test.dart",
+  "started_at": "2026-10-28T10:51:00.120845+00:00"
+}

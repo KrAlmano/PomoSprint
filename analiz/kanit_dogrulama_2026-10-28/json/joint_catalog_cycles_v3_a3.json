@@ -1,0 +1,31 @@
+{
+  "all_owned_drivers_stopped": true,
+  "catalog_backup": "build/verification_20261028/joint_catalog_cycles_v3_a3_original_catalog.json",
+  "catalog_restored_exactly": true,
+  "cleanup_errors": [],
+  "expected_exam_ids": [
+    "ydt",
+    "lgs_verbal",
+    "lgs_quantitative",
+    "tus_basic",
+    "tus_clinical"
+  ],
+  "finished_at": "2026-10-28T11:16:23.752189+00:00",
+  "parity_log": "build/verification_20261028/joint_catalog_cycles_v3_a3_restored_parity.log",
+  "real75_attempt_unchanged": true,
+  "restored_parity_exit_code": 0,
+  "result": "PASS",
+  "runs": {
+    "ios": {
+      "cases": 5,
+      "evidence": "build/verification_20261028/ios-catalog-cycles-a3.json",
+      "exit_code": 0,
+      "log": "external/tmp/pomosprint_ios_catalog_cycles_v3_a3.log",
+      "pid": 95256,
+      "result": "PASS"
+    }
+  },
+  "scope": "V3 iOS remaining five SHORT natural60 cases; original TYT and AYT are NOT restarted; NOT official durations",
+  "started_at": "2026-10-28T10:54:51.783642+00:00",
+  "suffix": "a3"
+}

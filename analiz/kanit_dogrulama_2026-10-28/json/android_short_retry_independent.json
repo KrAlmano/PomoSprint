@@ -1,0 +1,5011 @@
+{
+  "actual": {
+    "exam_wallet": {
+      "coins": 0,
+      "lifetime_points": 0
+    },
+    "profile": {
+      "coins": 0,
+      "current_streak": 1,
+      "daily_goal_minutes": 120,
+      "id": "09d33f39-5434-4e53-8f2c-9045ac9e09cd",
+      "last_study_date": "2026-10-28",
+      "lifetime_points": 0,
+      "longest_streak": 1,
+      "timezone": "Europe/Istanbul",
+      "total_minutes": 14
+    },
+    "row_counts": {
+      "attempts": 14,
+      "events": 14,
+      "mappings": 0,
+      "results": 76,
+      "runs": 0,
+      "studies": 0,
+      "unlocks": 7
+    }
+  },
+  "as_of": "2026-10-28T09:57:23.819878+00:00",
+  "captured_at": "2026-10-28T09:57:23.819878+00:00",
+  "checks": [
+    {
+      "actual": true,
+      "control": "schema.required_27_30",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": false,
+      "control": "schema.package31_not_installed",
+      "expected": false,
+      "passed": true
+    },
+    {
+      "actual": "177a238a9aa8a4ffd3738b2865120568",
+      "control": "schema.marathon_before31",
+      "expected": "177a238a9aa8a4ffd3738b2865120568",
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "study_client_uuid_unique",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": 14,
+      "control": "exam_client_uuid_unique",
+      "expected": 14,
+      "passed": true
+    },
+    {
+      "actual": 76,
+      "control": "subject_result_unique",
+      "expected": 76,
+      "passed": true
+    },
+    {
+      "actual": 14,
+      "control": "competition_event_unique",
+      "expected": 14,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "marathon_mapping_unique",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "at_most_one_active_exam",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "tyt",
+      "control": "exam[0].definition_id",
+      "expected": "tyt",
+      "passed": true
+    },
+    {
+      "actual": 60,
+      "control": "exam[0].exact_interval_seconds",
+      "expected": 60,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "exam[0].status",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "2026-10-28T09:37:30.979924+00:00",
+      "control": "exam[0].finished_at",
+      "expected": "2026-10-28T09:37:30.979924+00:00",
+      "passed": true
+    },
+    {
+      "actual": 60,
+      "control": "exam[0].elapsed_seconds",
+      "expected": 60,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam[0].points",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam[0].coins",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "exam[0].not_early",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "ayt",
+      "control": "exam[1].definition_id",
+      "expected": "ayt",
+      "passed": true
+    },
+    {
+      "actual": 60,
+      "control": "exam[1].exact_interval_seconds",
+      "expected": 60,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "exam[1].status",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "2026-10-28T09:39:03.329585+00:00",
+      "control": "exam[1].finished_at",
+      "expected": "2026-10-28T09:39:03.329585+00:00",
+      "passed": true
+    },
+    {
+      "actual": 60,
+      "control": "exam[1].elapsed_seconds",
+      "expected": 60,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam[1].points",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam[1].coins",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "exam[1].not_early",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "ydt",
+      "control": "exam[2].definition_id",
+      "expected": "ydt",
+      "passed": true
+    },
+    {
+      "actual": 60,
+      "control": "exam[2].exact_interval_seconds",
+      "expected": 60,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "exam[2].status",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "2026-10-28T09:40:38.045439+00:00",
+      "control": "exam[2].finished_at",
+      "expected": "2026-10-28T09:40:38.045439+00:00",
+      "passed": true
+    },
+    {
+      "actual": 60,
+      "control": "exam[2].elapsed_seconds",
+      "expected": 60,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam[2].points",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam[2].coins",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "exam[2].not_early",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "lgs_verbal",
+      "control": "exam[3].definition_id",
+      "expected": "lgs_verbal",
+      "passed": true
+    },
+    {
+      "actual": 60,
+      "control": "exam[3].exact_interval_seconds",
+      "expected": 60,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "exam[3].status",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "2026-10-28T09:41:57.733429+00:00",
+      "control": "exam[3].finished_at",
+      "expected": "2026-10-28T09:41:57.733429+00:00",
+      "passed": true
+    },
+    {
+      "actual": 60,
+      "control": "exam[3].elapsed_seconds",
+      "expected": 60,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam[3].points",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam[3].coins",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "exam[3].not_early",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "lgs_quantitative",
+      "control": "exam[4].definition_id",
+      "expected": "lgs_quantitative",
+      "passed": true
+    },
+    {
+      "actual": 60,
+      "control": "exam[4].exact_interval_seconds",
+      "expected": 60,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "exam[4].status",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "2026-10-28T09:43:21.373697+00:00",
+      "control": "exam[4].finished_at",
+      "expected": "2026-10-28T09:43:21.373697+00:00",
+      "passed": true
+    },
+    {
+      "actual": 60,
+      "control": "exam[4].elapsed_seconds",
+      "expected": 60,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam[4].points",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam[4].coins",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "exam[4].not_early",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "tus_basic",
+      "control": "exam[5].definition_id",
+      "expected": "tus_basic",
+      "passed": true
+    },
+    {
+      "actual": 60,
+      "control": "exam[5].exact_interval_seconds",
+      "expected": 60,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "exam[5].status",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "2026-10-28T09:44:44.299570+00:00",
+      "control": "exam[5].finished_at",
+      "expected": "2026-10-28T09:44:44.299570+00:00",
+      "passed": true
+    },
+    {
+      "actual": 60,
+      "control": "exam[5].elapsed_seconds",
+      "expected": 60,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam[5].points",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam[5].coins",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "exam[5].not_early",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "tus_clinical",
+      "control": "exam[6].definition_id",
+      "expected": "tus_clinical",
+      "passed": true
+    },
+    {
+      "actual": 60,
+      "control": "exam[6].exact_interval_seconds",
+      "expected": 60,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "exam[6].status",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "2026-10-28T09:46:12.249716+00:00",
+      "control": "exam[6].finished_at",
+      "expected": "2026-10-28T09:46:12.249716+00:00",
+      "passed": true
+    },
+    {
+      "actual": 60,
+      "control": "exam[6].elapsed_seconds",
+      "expected": 60,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam[6].points",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam[6].coins",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "exam[6].not_early",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "tyt",
+      "control": "exam[7].definition_id",
+      "expected": "tyt",
+      "passed": true
+    },
+    {
+      "actual": 60,
+      "control": "exam[7].exact_interval_seconds",
+      "expected": 60,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "exam[7].status",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "2026-10-28T09:47:38.106083+00:00",
+      "control": "exam[7].finished_at",
+      "expected": "2026-10-28T09:47:38.106083+00:00",
+      "passed": true
+    },
+    {
+      "actual": 60,
+      "control": "exam[7].elapsed_seconds",
+      "expected": 60,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam[7].points",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam[7].coins",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "exam[7].not_early",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "ayt",
+      "control": "exam[8].definition_id",
+      "expected": "ayt",
+      "passed": true
+    },
+    {
+      "actual": 60,
+      "control": "exam[8].exact_interval_seconds",
+      "expected": 60,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "exam[8].status",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "2026-10-28T09:49:09.052873+00:00",
+      "control": "exam[8].finished_at",
+      "expected": "2026-10-28T09:49:09.052873+00:00",
+      "passed": true
+    },
+    {
+      "actual": 60,
+      "control": "exam[8].elapsed_seconds",
+      "expected": 60,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam[8].points",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam[8].coins",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "exam[8].not_early",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "ydt",
+      "control": "exam[9].definition_id",
+      "expected": "ydt",
+      "passed": true
+    },
+    {
+      "actual": 60,
+      "control": "exam[9].exact_interval_seconds",
+      "expected": 60,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "exam[9].status",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "2026-10-28T09:50:43.350677+00:00",
+      "control": "exam[9].finished_at",
+      "expected": "2026-10-28T09:50:43.350677+00:00",
+      "passed": true
+    },
+    {
+      "actual": 60,
+      "control": "exam[9].elapsed_seconds",
+      "expected": 60,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam[9].points",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam[9].coins",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "exam[9].not_early",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "lgs_verbal",
+      "control": "exam[10].definition_id",
+      "expected": "lgs_verbal",
+      "passed": true
+    },
+    {
+      "actual": 60,
+      "control": "exam[10].exact_interval_seconds",
+      "expected": 60,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "exam[10].status",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "2026-10-28T09:52:03.441349+00:00",
+      "control": "exam[10].finished_at",
+      "expected": "2026-10-28T09:52:03.441349+00:00",
+      "passed": true
+    },
+    {
+      "actual": 60,
+      "control": "exam[10].elapsed_seconds",
+      "expected": 60,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam[10].points",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam[10].coins",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "exam[10].not_early",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "lgs_quantitative",
+      "control": "exam[11].definition_id",
+      "expected": "lgs_quantitative",
+      "passed": true
+    },
+    {
+      "actual": 60,
+      "control": "exam[11].exact_interval_seconds",
+      "expected": 60,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "exam[11].status",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "2026-10-28T09:53:27.673903+00:00",
+      "control": "exam[11].finished_at",
+      "expected": "2026-10-28T09:53:27.673903+00:00",
+      "passed": true
+    },
+    {
+      "actual": 60,
+      "control": "exam[11].elapsed_seconds",
+      "expected": 60,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam[11].points",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam[11].coins",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "exam[11].not_early",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "tus_basic",
+      "control": "exam[12].definition_id",
+      "expected": "tus_basic",
+      "passed": true
+    },
+    {
+      "actual": 60,
+      "control": "exam[12].exact_interval_seconds",
+      "expected": 60,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "exam[12].status",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "2026-10-28T09:54:50.800628+00:00",
+      "control": "exam[12].finished_at",
+      "expected": "2026-10-28T09:54:50.800628+00:00",
+      "passed": true
+    },
+    {
+      "actual": 60,
+      "control": "exam[12].elapsed_seconds",
+      "expected": 60,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam[12].points",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam[12].coins",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "exam[12].not_early",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "tus_clinical",
+      "control": "exam[13].definition_id",
+      "expected": "tus_clinical",
+      "passed": true
+    },
+    {
+      "actual": 60,
+      "control": "exam[13].exact_interval_seconds",
+      "expected": 60,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "exam[13].status",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "2026-10-28T09:56:23.082868+00:00",
+      "control": "exam[13].finished_at",
+      "expected": "2026-10-28T09:56:23.082868+00:00",
+      "passed": true
+    },
+    {
+      "actual": 60,
+      "control": "exam[13].elapsed_seconds",
+      "expected": 60,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam[13].points",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam[13].coins",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "exam[13].not_early",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[0].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[0].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[0].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[0].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 80,
+      "control": "result[0].question_total",
+      "expected": 80,
+      "passed": true
+    },
+    {
+      "actual": 76.5,
+      "control": "result[0].net_formula",
+      "expected": 76.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[0].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[0].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[1].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[1].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[1].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[1].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 13,
+      "control": "result[1].question_total",
+      "expected": 13,
+      "passed": true
+    },
+    {
+      "actual": 9.5,
+      "control": "result[1].net_formula",
+      "expected": 9.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[1].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[1].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[2].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[2].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[2].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[2].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 13,
+      "control": "result[2].question_total",
+      "expected": 13,
+      "passed": true
+    },
+    {
+      "actual": 9.5,
+      "control": "result[2].net_formula",
+      "expected": 9.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[2].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[2].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[3].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[3].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[3].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[3].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 6,
+      "control": "result[3].question_total",
+      "expected": 6,
+      "passed": true
+    },
+    {
+      "actual": 2.5,
+      "control": "result[3].net_formula",
+      "expected": 2.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[3].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[3].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[4].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[4].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[4].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[4].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 11,
+      "control": "result[4].question_total",
+      "expected": 11,
+      "passed": true
+    },
+    {
+      "actual": 7.5,
+      "control": "result[4].net_formula",
+      "expected": 7.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[4].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[4].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[5].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[5].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[5].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[5].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 10,
+      "control": "result[5].question_total",
+      "expected": 10,
+      "passed": true
+    },
+    {
+      "actual": 6.5,
+      "control": "result[5].net_formula",
+      "expected": 6.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[5].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[5].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[6].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[6].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[6].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[6].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 11,
+      "control": "result[6].question_total",
+      "expected": 11,
+      "passed": true
+    },
+    {
+      "actual": 7.5,
+      "control": "result[6].net_formula",
+      "expected": 7.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[6].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[6].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[7].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[7].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[7].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[7].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 24,
+      "control": "result[7].question_total",
+      "expected": 24,
+      "passed": true
+    },
+    {
+      "actual": 20.5,
+      "control": "result[7].net_formula",
+      "expected": 20.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[7].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[7].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[8].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[8].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[8].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[8].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 40,
+      "control": "result[8].question_total",
+      "expected": 40,
+      "passed": true
+    },
+    {
+      "actual": 36.5,
+      "control": "result[8].net_formula",
+      "expected": 36.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[8].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[8].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[9].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[9].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[9].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[9].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 12,
+      "control": "result[9].question_total",
+      "expected": 12,
+      "passed": true
+    },
+    {
+      "actual": 8.5,
+      "control": "result[9].net_formula",
+      "expected": 8.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[9].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[9].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[10].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[10].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[10].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[10].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 14,
+      "control": "result[10].question_total",
+      "expected": 14,
+      "passed": true
+    },
+    {
+      "actual": 10.5,
+      "control": "result[10].net_formula",
+      "expected": 10.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[10].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[10].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[11].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[11].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[11].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[11].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 6,
+      "control": "result[11].question_total",
+      "expected": 6,
+      "passed": true
+    },
+    {
+      "actual": 2.5,
+      "control": "result[11].net_formula",
+      "expected": 2.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[11].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[11].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[12].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[12].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[12].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[12].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 20,
+      "control": "result[12].question_total",
+      "expected": 20,
+      "passed": true
+    },
+    {
+      "actual": 16.333333333333332,
+      "control": "result[12].net_formula",
+      "expected": 16.333333333333332,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[12].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[12].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[13].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[13].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[13].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[13].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 20,
+      "control": "result[13].question_total",
+      "expected": 20,
+      "passed": true
+    },
+    {
+      "actual": 16.333333333333332,
+      "control": "result[13].net_formula",
+      "expected": 16.333333333333332,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[13].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[13].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[14].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[14].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[14].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[14].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 10,
+      "control": "result[14].question_total",
+      "expected": 10,
+      "passed": true
+    },
+    {
+      "actual": 6.333333333333333,
+      "control": "result[14].net_formula",
+      "expected": 6.333333333333333,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[14].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[14].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[15].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[15].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[15].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[15].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 10,
+      "control": "result[15].question_total",
+      "expected": 10,
+      "passed": true
+    },
+    {
+      "actual": 6.333333333333333,
+      "control": "result[15].net_formula",
+      "expected": 6.333333333333333,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[15].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[15].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[16].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[16].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[16].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[16].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 10,
+      "control": "result[16].question_total",
+      "expected": 10,
+      "passed": true
+    },
+    {
+      "actual": 6.333333333333333,
+      "control": "result[16].net_formula",
+      "expected": 6.333333333333333,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[16].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[16].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[17].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[17].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[17].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[17].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 20,
+      "control": "result[17].question_total",
+      "expected": 20,
+      "passed": true
+    },
+    {
+      "actual": 16.333333333333332,
+      "control": "result[17].net_formula",
+      "expected": 16.333333333333332,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[17].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[17].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[18].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[18].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[18].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[18].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 10,
+      "control": "result[18].question_total",
+      "expected": 10,
+      "passed": true
+    },
+    {
+      "actual": 6.333333333333333,
+      "control": "result[18].net_formula",
+      "expected": 6.333333333333333,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[18].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[18].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[19].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[19].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[19].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[19].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 10,
+      "control": "result[19].question_total",
+      "expected": 10,
+      "passed": true
+    },
+    {
+      "actual": 6.333333333333333,
+      "control": "result[19].net_formula",
+      "expected": 6.333333333333333,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[19].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[19].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[20].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[20].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[20].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[20].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 10,
+      "control": "result[20].question_total",
+      "expected": 10,
+      "passed": true
+    },
+    {
+      "actual": 6.333333333333333,
+      "control": "result[20].net_formula",
+      "expected": 6.333333333333333,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[20].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[20].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[21].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[21].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[21].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[21].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 20,
+      "control": "result[21].question_total",
+      "expected": 20,
+      "passed": true
+    },
+    {
+      "actual": 16.333333333333332,
+      "control": "result[21].net_formula",
+      "expected": 16.333333333333332,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[21].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[21].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[22].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[22].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[22].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[22].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 20,
+      "control": "result[22].question_total",
+      "expected": 20,
+      "passed": true
+    },
+    {
+      "actual": 16.333333333333332,
+      "control": "result[22].net_formula",
+      "expected": 16.333333333333332,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[22].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[22].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[23].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[23].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[23].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[23].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 20,
+      "control": "result[23].question_total",
+      "expected": 20,
+      "passed": true
+    },
+    {
+      "actual": 16.333333333333332,
+      "control": "result[23].net_formula",
+      "expected": 16.333333333333332,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[23].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[23].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[24].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[24].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[24].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[24].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 80,
+      "control": "result[24].question_total",
+      "expected": 80,
+      "passed": true
+    },
+    {
+      "actual": 76.5,
+      "control": "result[24].net_formula",
+      "expected": 76.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[24].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[24].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[25].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[25].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[25].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[25].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 13,
+      "control": "result[25].question_total",
+      "expected": 13,
+      "passed": true
+    },
+    {
+      "actual": 9.5,
+      "control": "result[25].net_formula",
+      "expected": 9.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[25].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[25].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[26].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[26].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[26].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[26].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 13,
+      "control": "result[26].question_total",
+      "expected": 13,
+      "passed": true
+    },
+    {
+      "actual": 9.5,
+      "control": "result[26].net_formula",
+      "expected": 9.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[26].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[26].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[27].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[27].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[27].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[27].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 6,
+      "control": "result[27].question_total",
+      "expected": 6,
+      "passed": true
+    },
+    {
+      "actual": 2.5,
+      "control": "result[27].net_formula",
+      "expected": 2.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[27].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[27].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[28].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[28].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[28].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[28].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 11,
+      "control": "result[28].question_total",
+      "expected": 11,
+      "passed": true
+    },
+    {
+      "actual": 7.5,
+      "control": "result[28].net_formula",
+      "expected": 7.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[28].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[28].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[29].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[29].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[29].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[29].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 10,
+      "control": "result[29].question_total",
+      "expected": 10,
+      "passed": true
+    },
+    {
+      "actual": 6.5,
+      "control": "result[29].net_formula",
+      "expected": 6.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[29].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[29].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[30].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[30].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[30].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[30].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 11,
+      "control": "result[30].question_total",
+      "expected": 11,
+      "passed": true
+    },
+    {
+      "actual": 7.5,
+      "control": "result[30].net_formula",
+      "expected": 7.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[30].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[30].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[31].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[31].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[31].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[31].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 24,
+      "control": "result[31].question_total",
+      "expected": 24,
+      "passed": true
+    },
+    {
+      "actual": 20.5,
+      "control": "result[31].net_formula",
+      "expected": 20.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[31].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[31].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[32].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[32].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[32].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[32].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 40,
+      "control": "result[32].question_total",
+      "expected": 40,
+      "passed": true
+    },
+    {
+      "actual": 36.5,
+      "control": "result[32].net_formula",
+      "expected": 36.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[32].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[32].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[33].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[33].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[33].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[33].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 12,
+      "control": "result[33].question_total",
+      "expected": 12,
+      "passed": true
+    },
+    {
+      "actual": 8.5,
+      "control": "result[33].net_formula",
+      "expected": 8.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[33].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[33].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[34].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[34].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[34].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[34].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 14,
+      "control": "result[34].question_total",
+      "expected": 14,
+      "passed": true
+    },
+    {
+      "actual": 10.5,
+      "control": "result[34].net_formula",
+      "expected": 10.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[34].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[34].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[35].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[35].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[35].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[35].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 6,
+      "control": "result[35].question_total",
+      "expected": 6,
+      "passed": true
+    },
+    {
+      "actual": 2.5,
+      "control": "result[35].net_formula",
+      "expected": 2.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[35].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[35].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[36].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[36].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[36].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[36].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 35,
+      "control": "result[36].question_total",
+      "expected": 35,
+      "passed": true
+    },
+    {
+      "actual": 31.5,
+      "control": "result[36].net_formula",
+      "expected": 31.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[36].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[36].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[37].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[37].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[37].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[37].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 10,
+      "control": "result[37].question_total",
+      "expected": 10,
+      "passed": true
+    },
+    {
+      "actual": 6.5,
+      "control": "result[37].net_formula",
+      "expected": 6.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[37].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[37].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[38].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[38].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[38].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[38].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 25,
+      "control": "result[38].question_total",
+      "expected": 25,
+      "passed": true
+    },
+    {
+      "actual": 21.5,
+      "control": "result[38].net_formula",
+      "expected": 21.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[38].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[38].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[39].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[39].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[39].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[39].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 30,
+      "control": "result[39].question_total",
+      "expected": 30,
+      "passed": true
+    },
+    {
+      "actual": 26.5,
+      "control": "result[39].net_formula",
+      "expected": 26.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[39].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[39].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[40].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[40].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[40].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[40].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 6,
+      "control": "result[40].question_total",
+      "expected": 6,
+      "passed": true
+    },
+    {
+      "actual": 2.5,
+      "control": "result[40].net_formula",
+      "expected": 2.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[40].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[40].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[41].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[41].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[41].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[41].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 7,
+      "control": "result[41].question_total",
+      "expected": 7,
+      "passed": true
+    },
+    {
+      "actual": 3.5,
+      "control": "result[41].net_formula",
+      "expected": 3.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[41].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[41].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[42].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[42].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[42].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[42].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 5,
+      "control": "result[42].question_total",
+      "expected": 5,
+      "passed": true
+    },
+    {
+      "actual": 1.5,
+      "control": "result[42].net_formula",
+      "expected": 1.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[42].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[42].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[43].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[43].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[43].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[43].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 5,
+      "control": "result[43].question_total",
+      "expected": 5,
+      "passed": true
+    },
+    {
+      "actual": 1.5,
+      "control": "result[43].net_formula",
+      "expected": 1.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[43].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[43].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[44].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[44].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[44].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[44].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 40,
+      "control": "result[44].question_total",
+      "expected": 40,
+      "passed": true
+    },
+    {
+      "actual": 36.5,
+      "control": "result[44].net_formula",
+      "expected": 36.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[44].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[44].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[45].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[45].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[45].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[45].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 5,
+      "control": "result[45].question_total",
+      "expected": 5,
+      "passed": true
+    },
+    {
+      "actual": 1.5,
+      "control": "result[45].net_formula",
+      "expected": 1.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[45].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[45].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[46].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[46].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[46].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[46].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 7,
+      "control": "result[46].question_total",
+      "expected": 7,
+      "passed": true
+    },
+    {
+      "actual": 3.5,
+      "control": "result[46].net_formula",
+      "expected": 3.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[46].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[46].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[47].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[47].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[47].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[47].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 5,
+      "control": "result[47].question_total",
+      "expected": 5,
+      "passed": true
+    },
+    {
+      "actual": 1.5,
+      "control": "result[47].net_formula",
+      "expected": 1.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[47].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[47].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[48].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[48].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[48].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[48].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 40,
+      "control": "result[48].question_total",
+      "expected": 40,
+      "passed": true
+    },
+    {
+      "actual": 36.5,
+      "control": "result[48].net_formula",
+      "expected": 36.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[48].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[48].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[49].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[49].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[49].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[49].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 13,
+      "control": "result[49].question_total",
+      "expected": 13,
+      "passed": true
+    },
+    {
+      "actual": 9.5,
+      "control": "result[49].net_formula",
+      "expected": 9.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[49].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[49].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[50].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[50].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[50].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[50].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 18,
+      "control": "result[50].question_total",
+      "expected": 18,
+      "passed": true
+    },
+    {
+      "actual": 14.5,
+      "control": "result[50].net_formula",
+      "expected": 14.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[50].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[50].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[51].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[51].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[51].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[51].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 7,
+      "control": "result[51].question_total",
+      "expected": 7,
+      "passed": true
+    },
+    {
+      "actual": 3.5,
+      "control": "result[51].net_formula",
+      "expected": 3.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[51].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[51].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[52].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[52].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[52].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[52].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 18,
+      "control": "result[52].question_total",
+      "expected": 18,
+      "passed": true
+    },
+    {
+      "actual": 14.5,
+      "control": "result[52].net_formula",
+      "expected": 14.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[52].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[52].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[53].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[53].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[53].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[53].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 18,
+      "control": "result[53].question_total",
+      "expected": 18,
+      "passed": true
+    },
+    {
+      "actual": 14.5,
+      "control": "result[53].net_formula",
+      "expected": 14.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[53].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[53].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[54].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[54].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[54].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[54].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 18,
+      "control": "result[54].question_total",
+      "expected": 18,
+      "passed": true
+    },
+    {
+      "actual": 14.5,
+      "control": "result[54].net_formula",
+      "expected": 14.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[54].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[54].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[55].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[55].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[55].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[55].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 8,
+      "control": "result[55].question_total",
+      "expected": 8,
+      "passed": true
+    },
+    {
+      "actual": 4.5,
+      "control": "result[55].net_formula",
+      "expected": 4.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[55].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[55].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[56].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[56].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[56].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[56].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 6,
+      "control": "result[56].question_total",
+      "expected": 6,
+      "passed": true
+    },
+    {
+      "actual": 2.5,
+      "control": "result[56].net_formula",
+      "expected": 2.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[56].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[56].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[57].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[57].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[57].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[57].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 7,
+      "control": "result[57].question_total",
+      "expected": 7,
+      "passed": true
+    },
+    {
+      "actual": 3.5,
+      "control": "result[57].net_formula",
+      "expected": 3.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[57].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[57].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[58].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[58].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[58].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[58].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 5,
+      "control": "result[58].question_total",
+      "expected": 5,
+      "passed": true
+    },
+    {
+      "actual": 1.5,
+      "control": "result[58].net_formula",
+      "expected": 1.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[58].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[58].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[59].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[59].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[59].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[59].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 5,
+      "control": "result[59].question_total",
+      "expected": 5,
+      "passed": true
+    },
+    {
+      "actual": 1.5,
+      "control": "result[59].net_formula",
+      "expected": 1.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[59].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[59].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[60].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[60].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[60].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[60].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 40,
+      "control": "result[60].question_total",
+      "expected": 40,
+      "passed": true
+    },
+    {
+      "actual": 36.5,
+      "control": "result[60].net_formula",
+      "expected": 36.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[60].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[60].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[61].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[61].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[61].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[61].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 5,
+      "control": "result[61].question_total",
+      "expected": 5,
+      "passed": true
+    },
+    {
+      "actual": 1.5,
+      "control": "result[61].net_formula",
+      "expected": 1.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[61].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[61].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[62].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[62].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[62].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[62].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 7,
+      "control": "result[62].question_total",
+      "expected": 7,
+      "passed": true
+    },
+    {
+      "actual": 3.5,
+      "control": "result[62].net_formula",
+      "expected": 3.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[62].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[62].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[63].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[63].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[63].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[63].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 5,
+      "control": "result[63].question_total",
+      "expected": 5,
+      "passed": true
+    },
+    {
+      "actual": 1.5,
+      "control": "result[63].net_formula",
+      "expected": 1.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[63].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[63].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[64].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[64].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[64].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[64].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 40,
+      "control": "result[64].question_total",
+      "expected": 40,
+      "passed": true
+    },
+    {
+      "actual": 36.5,
+      "control": "result[64].net_formula",
+      "expected": 36.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[64].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[64].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[65].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[65].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[65].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[65].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 13,
+      "control": "result[65].question_total",
+      "expected": 13,
+      "passed": true
+    },
+    {
+      "actual": 9.5,
+      "control": "result[65].net_formula",
+      "expected": 9.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[65].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[65].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[66].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[66].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[66].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[66].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 18,
+      "control": "result[66].question_total",
+      "expected": 18,
+      "passed": true
+    },
+    {
+      "actual": 14.5,
+      "control": "result[66].net_formula",
+      "expected": 14.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[66].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[66].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[67].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[67].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[67].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[67].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 7,
+      "control": "result[67].question_total",
+      "expected": 7,
+      "passed": true
+    },
+    {
+      "actual": 3.5,
+      "control": "result[67].net_formula",
+      "expected": 3.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[67].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[67].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[68].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[68].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[68].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[68].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 18,
+      "control": "result[68].question_total",
+      "expected": 18,
+      "passed": true
+    },
+    {
+      "actual": 14.5,
+      "control": "result[68].net_formula",
+      "expected": 14.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[68].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[68].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[69].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[69].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[69].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[69].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 18,
+      "control": "result[69].question_total",
+      "expected": 18,
+      "passed": true
+    },
+    {
+      "actual": 14.5,
+      "control": "result[69].net_formula",
+      "expected": 14.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[69].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[69].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[70].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[70].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[70].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[70].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 18,
+      "control": "result[70].question_total",
+      "expected": 18,
+      "passed": true
+    },
+    {
+      "actual": 14.5,
+      "control": "result[70].net_formula",
+      "expected": 14.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[70].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[70].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[71].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[71].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[71].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[71].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 8,
+      "control": "result[71].question_total",
+      "expected": 8,
+      "passed": true
+    },
+    {
+      "actual": 4.5,
+      "control": "result[71].net_formula",
+      "expected": 4.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[71].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[71].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[72].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[72].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[72].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[72].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 35,
+      "control": "result[72].question_total",
+      "expected": 35,
+      "passed": true
+    },
+    {
+      "actual": 31.5,
+      "control": "result[72].net_formula",
+      "expected": 31.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[72].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[72].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[73].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[73].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[73].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[73].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 10,
+      "control": "result[73].question_total",
+      "expected": 10,
+      "passed": true
+    },
+    {
+      "actual": 6.5,
+      "control": "result[73].net_formula",
+      "expected": 6.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[73].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[73].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[74].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[74].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[74].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[74].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 25,
+      "control": "result[74].question_total",
+      "expected": 25,
+      "passed": true
+    },
+    {
+      "actual": 21.5,
+      "control": "result[74].net_formula",
+      "expected": 21.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[74].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[74].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[75].attempt_exists",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": "completed",
+      "control": "result[75].completed_attempt",
+      "expected": "completed",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[75].subject_known",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[75].nonnegative_integers",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 30,
+      "control": "result[75].question_total",
+      "expected": 30,
+      "passed": true
+    },
+    {
+      "actual": 26.5,
+      "control": "result[75].net_formula",
+      "expected": 26.5,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[75].updated_at_present",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "result[75].updated_not_future",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": 14,
+      "control": "profile.total_minutes",
+      "expected": 14,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "profile.lifetime_points",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "profile.coins_after_avatar_spending",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam_wallet.lifetime_points",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": 0,
+      "control": "exam_wallet.coins",
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "actual": "2026-10-28",
+      "control": "profile.last_study_date",
+      "expected": "2026-10-28",
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "profile.streak_bounds",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": true,
+      "control": "profile.completed_day_has_streak",
+      "expected": true,
+      "passed": true
+    },
+    {
+      "actual": {
+        "('exam', '18e7716e-b66d-4035-9db9-480b40866e6f')": {
+          "completed_at": "2026-10-28T09:50:43.350677+00:00",
+          "minutes": 1,
+          "period_month": "2026-10-01",
+          "points": 0,
+          "study_day": "2026-10-28"
+        },
+        "('exam', '22db7e3e-49cb-4b8e-a870-b6f806093f4b')": {
+          "completed_at": "2026-10-28T09:39:03.329585+00:00",
+          "minutes": 1,
+          "period_month": "2026-10-01",
+          "points": 0,
+          "study_day": "2026-10-28"
+        },
+        "('exam', '2f6e7ef9-378f-4923-a2ca-b5e0c8eeefd3')": {
+          "completed_at": "2026-10-28T09:53:27.673903+00:00",
+          "minutes": 1,
+          "period_month": "2026-10-01",
+          "points": 0,
+          "study_day": "2026-10-28"
+        },
+        "('exam', '4ac1d975-f6bb-450b-b60c-3cc6d878daf7')": {
+          "completed_at": "2026-10-28T09:41:57.733429+00:00",
+          "minutes": 1,
+          "period_month": "2026-10-01",
+          "points": 0,
+          "study_day": "2026-10-28"
+        },
+        "('exam', '61e65974-d5e5-4a68-b911-a60b1a9e7e26')": {
+          "completed_at": "2026-10-28T09:52:03.441349+00:00",
+          "minutes": 1,
+          "period_month": "2026-10-01",
+          "points": 0,
+          "study_day": "2026-10-28"
+        },
+        "('exam', '67cb8be6-bcf6-46ff-beab-50385eddb66d')": {
+          "completed_at": "2026-10-28T09:43:21.373697+00:00",
+          "minutes": 1,
+          "period_month": "2026-10-01",
+          "points": 0,
+          "study_day": "2026-10-28"
+        },
+        "('exam', '6e8cc3ae-4846-44b0-bdd1-219c5807e545')": {
+          "completed_at": "2026-10-28T09:40:38.045439+00:00",
+          "minutes": 1,
+          "period_month": "2026-10-01",
+          "points": 0,
+          "study_day": "2026-10-28"
+        },
+        "('exam', '7d84ff66-19a1-482c-86b3-a6ca2a8b2d58')": {
+          "completed_at": "2026-10-28T09:49:09.052873+00:00",
+          "minutes": 1,
+          "period_month": "2026-10-01",
+          "points": 0,
+          "study_day": "2026-10-28"
+        },
+        "('exam', '8252972f-9f12-40c7-9b52-4ec1342594be')": {
+          "completed_at": "2026-10-28T09:46:12.249716+00:00",
+          "minutes": 1,
+          "period_month": "2026-10-01",
+          "points": 0,
+          "study_day": "2026-10-28"
+        },
+        "('exam', '93dab7e8-9e9e-4c7d-abc4-e08aaec8de12')": {
+          "completed_at": "2026-10-28T09:37:30.979924+00:00",
+          "minutes": 1,
+          "period_month": "2026-10-01",
+          "points": 0,
+          "study_day": "2026-10-28"
+        },
+        "('exam', '9fd823ec-52d2-43a3-8cd2-2fe796d2cc9c')": {
+          "completed_at": "2026-10-28T09:54:50.800628+00:00",
+          "minutes": 1,
+          "period_month": "2026-10-01",
+          "points": 0,
+          "study_day": "2026-10-28"
+        },
+        "('exam', 'dfdc8f42-6aef-469a-853d-fd85927140b5')": {
+          "completed_at": "2026-10-28T09:47:38.106083+00:00",
+          "minutes": 1,
+          "period_month": "2026-10-01",
+          "points": 0,
+          "study_day": "2026-10-28"
+        },
+        "('exam', 'e0aa7d13-92f5-4d08-9094-650af3a8bfd4')": {
+          "completed_at": "2026-10-28T09:44:44.299570+00:00",
+          "minutes": 1,
+          "period_month": "2026-10-01",
+          "points": 0,
+          "study_day": "2026-10-28"
+        },
+        "('exam', 'f970e0f5-925d-4888-b61a-e372200c5f4a')": {
+          "completed_at": "2026-10-28T09:56:23.082868+00:00",
+          "minutes": 1,
+          "period_month": "2026-10-01",
+          "points": 0,
+          "study_day": "2026-10-28"
+        }
+      },
+      "control": "competition_events.exact_sources_and_accounting",
+      "expected": {
+        "('exam', '18e7716e-b66d-4035-9db9-480b40866e6f')": {
+          "completed_at": "2026-10-28T09:50:43.350677+00:00",
+          "minutes": 1,
+          "period_month": "2026-10-01",
+          "points": 0,
+          "study_day": "2026-10-28"
+        },
+        "('exam', '22db7e3e-49cb-4b8e-a870-b6f806093f4b')": {
+          "completed_at": "2026-10-28T09:39:03.329585+00:00",
+          "minutes": 1,
+          "period_month": "2026-10-01",
+          "points": 0,
+          "study_day": "2026-10-28"
+        },
+        "('exam', '2f6e7ef9-378f-4923-a2ca-b5e0c8eeefd3')": {
+          "completed_at": "2026-10-28T09:53:27.673903+00:00",
+          "minutes": 1,
+          "period_month": "2026-10-01",
+          "points": 0,
+          "study_day": "2026-10-28"
+        },
+        "('exam', '4ac1d975-f6bb-450b-b60c-3cc6d878daf7')": {
+          "completed_at": "2026-10-28T09:41:57.733429+00:00",
+          "minutes": 1,
+          "period_month": "2026-10-01",
+          "points": 0,
+          "study_day": "2026-10-28"
+        },
+        "('exam', '61e65974-d5e5-4a68-b911-a60b1a9e7e26')": {
+          "completed_at": "2026-10-28T09:52:03.441349+00:00",
+          "minutes": 1,
+          "period_month": "2026-10-01",
+          "points": 0,
+          "study_day": "2026-10-28"
+        },
+        "('exam', '67cb8be6-bcf6-46ff-beab-50385eddb66d')": {
+          "completed_at": "2026-10-28T09:43:21.373697+00:00",
+          "minutes": 1,
+          "period_month": "2026-10-01",
+          "points": 0,
+          "study_day": "2026-10-28"
+        },
+        "('exam', '6e8cc3ae-4846-44b0-bdd1-219c5807e545')": {
+          "completed_at": "2026-10-28T09:40:38.045439+00:00",
+          "minutes": 1,
+          "period_month": "2026-10-01",
+          "points": 0,
+          "study_day": "2026-10-28"
+        },
+        "('exam', '7d84ff66-19a1-482c-86b3-a6ca2a8b2d58')": {
+          "completed_at": "2026-10-28T09:49:09.052873+00:00",
+          "minutes": 1,
+          "period_month": "2026-10-01",
+          "points": 0,
+          "study_day": "2026-10-28"
+        },
+        "('exam', '8252972f-9f12-40c7-9b52-4ec1342594be')": {
+          "completed_at": "2026-10-28T09:46:12.249716+00:00",
+          "minutes": 1,
+          "period_month": "2026-10-01",
+          "points": 0,
+          "study_day": "2026-10-28"
+        },
+        "('exam', '93dab7e8-9e9e-4c7d-abc4-e08aaec8de12')": {
+          "completed_at": "2026-10-28T09:37:30.979924+00:00",
+          "minutes": 1,
+          "period_month": "2026-10-01",
+          "points": 0,
+          "study_day": "2026-10-28"
+        },
+        "('exam', '9fd823ec-52d2-43a3-8cd2-2fe796d2cc9c')": {
+          "completed_at": "2026-10-28T09:54:50.800628+00:00",
+          "minutes": 1,
+          "period_month": "2026-10-01",
+          "points": 0,
+          "study_day": "2026-10-28"
+        },
+        "('exam', 'dfdc8f42-6aef-469a-853d-fd85927140b5')": {
+          "completed_at": "2026-10-28T09:47:38.106083+00:00",
+          "minutes": 1,
+          "period_month": "2026-10-01",
+          "points": 0,
+          "study_day": "2026-10-28"
+        },
+        "('exam', 'e0aa7d13-92f5-4d08-9094-650af3a8bfd4')": {
+          "completed_at": "2026-10-28T09:44:44.299570+00:00",
+          "minutes": 1,
+          "period_month": "2026-10-01",
+          "points": 0,
+          "study_day": "2026-10-28"
+        },
+        "('exam', 'f970e0f5-925d-4888-b61a-e372200c5f4a')": {
+          "completed_at": "2026-10-28T09:56:23.082868+00:00",
+          "minutes": 1,
+          "period_month": "2026-10-01",
+          "points": 0,
+          "study_day": "2026-10-28"
+        }
+      },
+      "passed": true
+    }
+  ],
+  "expected": {
+    "economy": {
+      "exam_coins": 0,
+      "exam_points": 0,
+      "normal_coins": 0,
+      "normal_points": 0,
+      "total_minutes": 14
+    },
+    "reconstructed_streak": {
+      "current_streak": 1,
+      "last_study_date": "2026-10-28",
+      "longest_streak": 1
+    },
+    "reports": {
+      "daily": {
+        "active_days": 1,
+        "busiest_day": {
+          "day": "2026-10-28",
+          "focus_equivalents": 0,
+          "minutes": 14
+        },
+        "categories": [
+          {
+            "category_id": "pomosprint:exam",
+            "focus_equivalents": 0,
+            "minutes": 14,
+            "name": "",
+            "percentage": 100,
+            "sessions": 14
+          }
+        ],
+        "category_minutes": {
+          "pomosprint:exam": 14
+        },
+        "category_percentages": {
+          "pomosprint:exam": 100
+        },
+        "counts": {
+          "completed_exams": 14,
+          "completed_marathons": 0,
+          "marathon_focus_sessions": 0,
+          "normal_sessions": 0,
+          "pending_sessions": 0,
+          "unknown_sessions": 0
+        },
+        "days": [
+          {
+            "day": "2026-10-28",
+            "focus_equivalents": 0,
+            "minutes": 14
+          }
+        ],
+        "efficiency": 11,
+        "efficiency_percentage": 11,
+        "end": "2026-10-28",
+        "focus_equivalents": 0,
+        "goal_minutes": 120,
+        "goal_percentage": 11,
+        "goal_progress_percentage": 11,
+        "start": "2026-10-28",
+        "total_minutes": 14
+      },
+      "monthly": {
+        "active_days": 1,
+        "busiest_day": {
+          "day": "2026-10-28",
+          "focus_equivalents": 0,
+          "minutes": 14
+        },
+        "categories": [
+          {
+            "category_id": "pomosprint:exam",
+            "focus_equivalents": 0,
+            "minutes": 14,
+            "name": "",
+            "percentage": 100,
+            "sessions": 14
+          }
+        ],
+        "category_minutes": {
+          "pomosprint:exam": 14
+        },
+        "category_percentages": {
+          "pomosprint:exam": 100
+        },
+        "counts": {
+          "completed_exams": 14,
+          "completed_marathons": 0,
+          "marathon_focus_sessions": 0,
+          "normal_sessions": 0,
+          "pending_sessions": 0,
+          "unknown_sessions": 0
+        },
+        "days": [
+          {
+            "day": "2026-10-01",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-02",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-03",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-04",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-05",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-06",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-07",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-08",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-09",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-10",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-11",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-12",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-13",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-14",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-15",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-16",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-17",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-18",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-19",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-20",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-21",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-22",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-23",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-24",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-25",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-26",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-27",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-28",
+            "focus_equivalents": 0,
+            "minutes": 14
+          },
+          {
+            "day": "2026-10-29",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-30",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-31",
+            "focus_equivalents": 0,
+            "minutes": 0
+          }
+        ],
+        "efficiency": 0,
+        "end": "2026-10-31",
+        "focus_equivalents": 0,
+        "goal_minutes": 3720,
+        "goal_percentage": 0,
+        "goal_progress_percentage": 0,
+        "month_to_date_growth_percentage": null,
+        "month_to_date_minutes": 14,
+        "previous_month_to_date_minutes": 0,
+        "start": "2026-10-01",
+        "total_minutes": 14
+      },
+      "weekly": {
+        "active_days": 1,
+        "busiest_day": {
+          "day": "2026-10-28",
+          "focus_equivalents": 0,
+          "minutes": 14
+        },
+        "categories": [
+          {
+            "category_id": "pomosprint:exam",
+            "focus_equivalents": 0,
+            "minutes": 14,
+            "name": "",
+            "percentage": 100,
+            "sessions": 14
+          }
+        ],
+        "category_minutes": {
+          "pomosprint:exam": 14
+        },
+        "category_percentages": {
+          "pomosprint:exam": 100
+        },
+        "counts": {
+          "completed_exams": 14,
+          "completed_marathons": 0,
+          "marathon_focus_sessions": 0,
+          "normal_sessions": 0,
+          "pending_sessions": 0,
+          "unknown_sessions": 0
+        },
+        "days": [
+          {
+            "day": "2026-10-26",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-27",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-28",
+            "focus_equivalents": 0,
+            "minutes": 14
+          },
+          {
+            "day": "2026-10-29",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-30",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-10-31",
+            "focus_equivalents": 0,
+            "minutes": 0
+          },
+          {
+            "day": "2026-11-01",
+            "focus_equivalents": 0,
+            "minutes": 0
+          }
+        ],
+        "efficiency": 1,
+        "efficiency_label_key": "eff_normal",
+        "efficiency_percentage": 1,
+        "elapsed_pace_percentage": 3,
+        "end": "2026-11-01",
+        "focus_equivalents": 0,
+        "goal_minutes": 840,
+        "goal_percentage": 1,
+        "goal_progress_percentage": 1,
+        "start": "2026-10-26",
+        "total_minutes": 14
+      }
+    }
+  },
+  "owner_id": "09d33f39-5434-4e53-8f2c-9045ac9e09cd",
+  "passed_checks": 738,
+  "profile_time_zone": "Europe/Istanbul",
+  "schema_version": 1,
+  "scope": "fixed loopback read-only QA snapshot; accepted records only; pending device outbox is not in DB",
+  "status": "PASS",
+  "study_day": "2026-10-28",
+  "total_checks": 738,
+  "warnings": []
+}

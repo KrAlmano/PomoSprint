@@ -1,0 +1,20 @@
+[
+  {
+    "exit_code": 0,
+    "log": "build/verification_20261028/gate_a2_ui/analyze.log",
+    "name": "analyze",
+    "seconds": 5.99
+  },
+  {
+    "exit_code": 0,
+    "log": "build/verification_20261028/gate_a2_ui/flutter.log",
+    "name": "flutter",
+    "seconds": 89.75
+  },
+  {
+    "exit_code": 0,
+    "log": "build/verification_20261028/gate_a2_ui/node.log",
+    "name": "node",
+    "seconds": 0.68
+  }
+]

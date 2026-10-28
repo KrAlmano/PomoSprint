@@ -1,0 +1,12 @@
+{
+  "lines": [
+    "PASS reviewed SQL/source SHA-256",
+    "PASS reviewed local schema",
+    "PASS reviewed local migrations",
+    "PASS reviewed local catalog",
+    "PASS reviewed local mail_trigger",
+    "PASS: reviewed local 27/28/29 + 30 candidate; this is NOT live parity"
+  ],
+  "result": "REFERENCE_ONLY",
+  "scope": "Recorded local reviewed parity only; not a current live-service check"
+}

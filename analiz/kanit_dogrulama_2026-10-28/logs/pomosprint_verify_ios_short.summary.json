@@ -1,0 +1,19 @@
+{
+  "errors": [
+    "Xcode build is missing expected TARGET_BUILD_DIR build setting.",
+    "Could not build the application for the simulator.",
+    "00:00 +0 -1: loading integration_test/ad_verify_reports_exams_test.dart [E]"
+  ],
+  "events": [],
+  "native_process_result": "FAIL",
+  "native_totals": [
+    "00:00 +0 -1: loading integration_test/ad_verify_reports_exams_test.dart [E]",
+    "00:00 +0 -1: Some tests failed."
+  ],
+  "schema_version": 1,
+  "scope": "Selected native checkpoints/totals only; not a release verdict or full-duration claim",
+  "wrapper_result": "FAIL",
+  "wrapper_totals": [
+    "=== integration_test/ad_verify_reports_exams_test.dart: KALDI (1)"
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "all_owned_drivers_stopped": true,
+  "catalog_backup": "build/verification_20261028/joint_catalog_cycles_a1_original_catalog.json",
+  "catalog_restored_exactly": true,
+  "cleanup_errors": [],
+  "error": "Matrix failed: ios; inspect same-owner journal before retry",
+  "finished_at": "2026-10-28T10:42:31.639589+00:00",
+  "parity_log": "build/verification_20261028/joint_catalog_cycles_a1_restored_parity.log",
+  "real75_attempt_unchanged": true,
+  "restored_parity_exit_code": 0,
+  "result": "FAIL",
+  "runs": {
+    "android": {
+      "cases": 7,
+      "evidence": "build/verification_20261028/android-catalog-cycles-a1.json",
+      "exit_code": 0,
+      "log": "external/tmp/pomosprint_android_catalog_cycles_a1.log",
+      "pid": 72081,
+      "result": "PASS"
+    },
+    "ios": {
+      "cases": 1,
+      "evidence": "build/verification_20261028/ios-catalog-cycles-a1.json",
+      "exit_code": 1,
+      "log": "external/tmp/pomosprint_ios_catalog_cycles_a1.log",
+      "pid": 72080,
+      "result": "FAIL"
+    }
+  },
+  "scope": "SHORT natural60 OS/offline matrix; NOT official durations",
+  "started_at": "2026-10-28T10:21:59.664478+00:00",
+  "suffix": "a1"
+}

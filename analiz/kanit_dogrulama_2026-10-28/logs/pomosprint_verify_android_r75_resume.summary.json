@@ -1,0 +1,20 @@
+{
+  "errors": [],
+  "events": [
+    {
+      "marker": "REAL_PROBE_RESUME",
+      "message": "run=verify-real75-20261028-a1 mode=exam_lgs_start owner=c64b15d7-67a7-4d2e-9774-cefbdba57e10 completed=true evidence=final-completion"
+    }
+  ],
+  "native_process_result": "PASS",
+  "native_totals": [
+    "00:06 +1: (tearDownAll)",
+    "00:06 +1: All tests passed!"
+  ],
+  "schema_version": 1,
+  "scope": "Selected native checkpoints/totals only; not a release verdict or full-duration claim",
+  "wrapper_result": "PASS",
+  "wrapper_totals": [
+    "=== integration_test/r_real_duration_probe_test.dart: GEÇTİ"
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "errors": [],
+  "events": [
+    {
+      "data": {
+        "attempt_id": "af016446-bab8-4728-ac4d-b1330bbedbde",
+        "baseline": {
+          "coins": 0,
+          "current_streak": 0,
+          "exam_coins": 0,
+          "exam_points": 0,
+          "last_study_date": null,
+          "lifetime_points": 0,
+          "timezone": "Europe/Istanbul",
+          "total_minutes": 0
+        },
+        "client_uuid": "b3f12922-22e8-4640-8110-dd2d008b75aa",
+        "completion_verified": false,
+        "definition_snapshot": {
+          "catalog_version": 1,
+          "duration_seconds": 60,
+          "group": "tus",
+          "id": "tus_clinical",
+          "name_en": "TUS Clinical Medicine",
+          "name_tr": "TUS Klinik Tıp",
+          "reward_coins": 0,
+          "reward_points": 0,
+          "segment": "tus",
+          "subjects": [
+            {
+              "category_keys": [
+                "Dahiliye"
+              ],
+              "id": "internal_medicine_group",
+              "name_en": "Internal Medicine Group",
+              "name_tr": "Dahiliye Grubu",
+              "question_count": 35
+            },
+            {
+              "category_keys": [
+                "Pediatri"
+              ],
+              "id": "pediatrics",
+              "name_en": "Pediatrics",
+              "name_tr": "Pediatri",
+              "question_count": 25
+            },
+            {
+              "category_keys": [
+                "Genel Cerrahi"
+              ],
+              "id": "surgery_group",
+              "name_en": "Surgery Group",
+              "name_tr": "Cerrahi Grubu",
+              "question_count": 30
+            },
+            {
+              "category_keys": [
+                "Kadın Hastalıkları ve Doğum"
+              ],
+              "id": "obstetrics_gynecology",
+              "name_en": "Obstetrics and Gynecology",
+              "name_tr": "Kadın Hastalıkları ve Doğum",
+              "question_count": 10
+            }
+          ],
+          "total_questions": 100,
+          "wrong_answer_divisor": 4
+        },
+        "duration_seconds": 60,
+        "email": "e2e-sim-probe-exam-catalog-start-vc-android-tus-clinical-a1@pomosprint.local",
+        "ends_at": "2026-10-28T10:41:18.139207Z",
+        "exam_id": "tus_clinical",
+        "expected_coins": 0,
+        "expected_points": 0,
+        "language": "en",
+        "last_resume_at": "2026-10-28T10:41:52.892777Z",
+        "mode": "exam_catalog_start",
+        "notification_delivery_tested": false,
+        "observed_at": "2026-10-28T10:40:18.132383Z",
+        "offline_pending_verified": true,
+        "owner_id": "c8d69a7e-6c3d-432c-90e0-b688dc8882aa",
+        "remaining_at_start": 60,
+        "run_id": "vc-android-tus-clinical-a1",
+        "scope": "SHORT local-catalog natural60 lifecycle, NOT official duration",
+        "started_at": "2026-10-28T10:40:18.139207Z",
+        "total_questions": 100
+      },
+      "marker": "CATALOG_PROBE_OFFLINE",
+      "message": ""
+    }
+  ],
+  "native_process_result": "PASS",
+  "native_totals": [
+    "00:09 +1: (tearDownAll)",
+    "00:09 +1: All tests passed!"
+  ],
+  "schema_version": 1,
+  "scope": "Selected native checkpoints/totals only; not a release verdict or full-duration claim",
+  "wrapper_result": "NOT_PRESENT",
+  "wrapper_totals": []
+}

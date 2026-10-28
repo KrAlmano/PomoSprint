@@ -5,14 +5,19 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro/app/main_shell.dart';
+import 'package:pomodoro/l10n/app_localizations.dart';
 import 'package:pomodoro/models/exam_model.dart';
+import 'package:pomodoro/screens/profile_screen.dart';
 import 'package:pomodoro/services/exam_persistence.dart';
 import 'package:pomodoro/services/exam_service.dart';
+import 'package:pomodoro/services/language_service.dart';
 import 'package:pomodoro/services/notification_service.dart';
 import 'package:pomodoro/services/supabase_service.dart';
 import 'package:pomodoro/services/timer_persistence.dart';
+import 'package:pomodoro/widgets/avatar_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -21,13 +26,57 @@ import 'support/e2e.dart';
 const _mode = String.fromEnvironment('E2E_PROBE_MODE');
 const _run = String.fromEnvironment('E2E_RUN_ID');
 const _requireCompleted = bool.fromEnvironment('E2E_PROBE_REQUIRE_COMPLETED');
+const _catalogExamId = String.fromEnvironment('E2E_PROBE_EXAM_ID');
+const _probeLanguage = String.fromEnvironment(
+  'E2E_PROBE_LANGUAGE',
+  defaultValue: 'tr',
+);
+const _expectOfflineCompletion = bool.fromEnvironment(
+  'E2E_PROBE_EXPECT_OFFLINE_COMPLETION',
+);
+const _catalogQuestions = <String, int>{
+  'tyt': 120,
+  'ayt': 160,
+  'ydt': 80,
+  'lgs_verbal': 50,
+  'lgs_quantitative': 40,
+  'tus_basic': 100,
+  'tus_clinical': 100,
+};
 const _startModes = {
   'normal25_start',
   'normal50_start',
   'exam_lgs_start',
   'exam_tus_start',
+  // A1 lifecycle matrix only. The local catalogue must be an explicitly
+  // installed natural 60-second/zero-reward fixture. Never called a real
+  // official-duration run; existing LGS75/TUS135 modes remain unchanged.
+  'exam_catalog_start',
 };
 String get _key => 'e2e_real_duration_probe_$_run';
+
+AppLocalizations get _probeText => lookupAppLocalizations(
+  Locale(LanguageService.instance.currentLocale.languageCode),
+);
+
+Future<void> _catalogLanguage(WidgetTester tester) async {
+  await tapOn(
+    tester,
+    find.descendant(
+      of: find.byType(AppBar),
+      matching: find.byType(AvatarWidget),
+    ),
+  );
+  await pumpUntil(tester, find.byType(ProfileScreen));
+  await tapOn(tester, find.text(_probeLanguage == 'tr' ? 'Türkçe' : 'English'));
+  await pumpUntilTrue(
+    tester,
+    () => LanguageService.instance.currentLocale.languageCode == _probeLanguage,
+    reason: 'Real Settings language selection is persisted before OS closure',
+  );
+  Navigator.of(tester.element(find.byType(ProfileScreen))).pop();
+  await pumpUntilGone(tester, find.byType(ProfileScreen));
+}
 
 Future<Map<String, dynamic>> _economy(String uid) async => (await E2eHost.row(
   'select p.total_minutes,p.lifetime_points,p.coins,p.current_streak,p.last_study_date,p.timezone,'
@@ -92,29 +141,61 @@ Future<void> _start(WidgetTester tester) async {
     isFalse,
     reason: 'Existing probe must be resumed, not overwritten',
   );
-  final unfinished = prefs
-      .getKeys()
-      .where(
-        (key) =>
-            key.startsWith('e2e_real_duration_probe_') ||
-            key.startsWith('e2e_normal_http_restart_'),
-      )
-      .where((key) {
-        final value = jsonDecode(prefs.getString(key)!) as Map;
-        return value['completion_verified'] != true;
-      });
-  expect(
-    unfinished,
-    isEmpty,
-    reason:
-        'This app installation already has an unfinished real-duration or HTTP restart probe',
-  );
+  // Starting a new probe uses the shared reset helper. Refuse to clear any
+  // other owner's unfinished lifecycle marker, timer or durable outbox.
+  for (final key in prefs.getKeys()) {
+    if (key.startsWith('e2e_real_duration_probe_') ||
+        key.startsWith('e2e_normal_http_restart_') ||
+        key.startsWith('e2e_marathon_process_probe_') ||
+        key.startsWith('e2e_first_use_real25_')) {
+      final value = jsonDecode(prefs.getString(key)!) as Map;
+      expect(
+        value['completion_verified'],
+        isTrue,
+        reason: 'Preserve unfinished lifecycle probe $key',
+      );
+    }
+    expect(
+      key.startsWith('active_session_uid_'),
+      isFalse,
+      reason: 'Do not clear an existing focus or Marathon timer',
+    );
+    if (key.startsWith('pending_sessions_')) {
+      expect(
+        jsonDecode(prefs.getString(key)!),
+        isEmpty,
+        reason: 'Do not clear another owner’s pending study outbox',
+      );
+    }
+    if (key.startsWith('exam_journal_uid_')) {
+      final records = jsonDecode(prefs.getString(key)!) as List;
+      for (final raw in records) {
+        final record = ExamLocalRecord.fromJson(raw);
+        expect(record, isNotNull);
+        expect(
+          record!.pendingAction,
+          isNull,
+          reason: 'Do not clear a pending exam action',
+        );
+        expect(
+          record.attempt?.status,
+          isNot(ExamAttemptStatus.active),
+          reason: 'Do not clear an existing active exam',
+        );
+      }
+    }
+  }
   final account = await openShellWithNewAccount(
     tester,
     'probe-${_mode.replaceAll('_', '-')}',
     name: 'QA Real Duration',
   );
   await NotificationService.instance.setEnabled(false);
+  if (_mode == 'exam_catalog_start') {
+    expect(_catalogQuestions, contains(_catalogExamId));
+    expect({'tr', 'en'}, contains(_probeLanguage));
+    await _catalogLanguage(tester);
+  }
   final baseline = await _economy(account.id);
   expect(baseline['total_minutes'], 0);
   expect(baseline['lifetime_points'], 0);
@@ -179,11 +260,34 @@ Future<void> _start(WidgetTester tester) async {
       () => exams.catalog.available,
       reason: 'standard server exam catalog',
     );
-    final id = _mode == 'exam_lgs_start' ? 'lgs_verbal' : 'tus_basic';
-    final duration = id == 'lgs_verbal' ? 4500 : 8100;
+    final catalogProbe = _mode == 'exam_catalog_start';
+    final id = catalogProbe
+        ? _catalogExamId
+        : _mode == 'exam_lgs_start'
+        ? 'lgs_verbal'
+        : 'tus_basic';
+    final duration = catalogProbe
+        ? 60
+        : id == 'lgs_verbal'
+        ? 4500
+        : 8100;
+    final definition = exams.catalog.byId(id);
+    expect(definition, isNotNull);
+    expect(definition!.durationSeconds, duration);
+    if (catalogProbe) {
+      expect(definition.totalQuestions, _catalogQuestions[id]);
+      proof['scope'] =
+          'SHORT local-catalog natural60 lifecycle, NOT official duration';
+      proof['exam_id'] = id;
+      proof['language'] = _probeLanguage;
+      proof['total_questions'] = definition.totalQuestions;
+    }
     await tapOn(tester, find.byKey(ValueKey('exam-start-$id')));
-    await pumpUntil(tester, find.text(trL10n.examRulesTitle));
-    await tapOn(tester, find.widgetWithText(FilledButton, trL10n.examReady));
+    await pumpUntil(tester, find.text(_probeText.examRulesTitle));
+    await tapOn(
+      tester,
+      find.widgetWithText(FilledButton, _probeText.examReady),
+    );
     await pumpUntilTrue(
       tester,
       () => exams.activeRecord?.attempt != null,
@@ -197,10 +301,20 @@ Future<void> _start(WidgetTester tester) async {
     expect(disk.single.attempt!.id, attempt.id);
     expect(disk.single.pendingAction, isNull);
     final row = await E2eHost.row(
-      'select status,started_at,ends_at from public.exam_attempts where id=${sqlText(attempt.id)} and user_id=${sqlText(account.id)}',
+      'select status,started_at,ends_at,definition from public.exam_attempts where id=${sqlText(attempt.id)} and user_id=${sqlText(account.id)}',
     );
     expect(row!['status'], 'active');
     expect(DateTime.parse(row['started_at'] as String), attempt.startedAt);
+    if (catalogProbe) {
+      final snapshot = Map<String, dynamic>.from(row['definition'] as Map);
+      expect(snapshot['duration_seconds'], 60);
+      expect(snapshot['reward_points'], 0);
+      expect(snapshot['reward_coins'], 0);
+      proof['definition_snapshot'] = snapshot;
+      proof['expected_points'] = snapshot['reward_points'];
+      proof['expected_coins'] = snapshot['reward_coins'];
+      expect(find.text(_probeText.examNoPause), findsOneWidget);
+    }
     proof.addAll({
       'client_uuid': attempt.clientUuid,
       'attempt_id': attempt.id,
@@ -215,7 +329,9 @@ Future<void> _start(WidgetTester tester) async {
   expect(tester.takeException(), isNull);
   await E2eHost.screenshot(
     tester,
-    'e2e-real-probe-${_mode.replaceAll('_', '-')}',
+    _mode == 'exam_catalog_start'
+        ? 'e2e-r-catalog-${_catalogExamId.replaceAll('_', '-')}-$_probeLanguage-start'
+        : 'e2e-real-probe-${_mode.replaceAll('_', '-')}',
   );
   debugPrint('[REAL_PROBE_START] ${jsonEncode(proof)}');
   // Intentionally no resetAppState / signOut / timer clear / account cleanup.
@@ -239,6 +355,21 @@ Future<void> _resume(WidgetTester tester) async {
   final duration = proof['duration_seconds'] as int;
   final baseline = Map<String, dynamic>.from(proof['baseline'] as Map);
   final isNormal = (proof['mode'] as String).startsWith('normal');
+  final catalogProbe = proof['mode'] == 'exam_catalog_start';
+  if (catalogProbe) {
+    expect(_catalogQuestions, contains(proof['exam_id']));
+    expect({'tr', 'en'}, contains(proof['language']));
+    expect(duration, 60);
+    expect(proof['expected_points'], 0);
+    expect(proof['expected_coins'], 0);
+    final disk = await ExamPersistence().read(owner);
+    final original = disk.singleWhere((record) => record.clientUuid == uuid);
+    expect(original.attempt!.id, proof['attempt_id']);
+    expect(original.attempt!.examId, proof['exam_id']);
+    expect(original.attempt!.startedAt, started);
+    expect(original.attempt!.endsAt, end);
+    expect(original.definition.totalQuestions, proof['total_questions']);
+  }
   if (isNormal && proof['completion_verified'] != true) {
     final persisted = await TimerPersistence.instance.load(owner);
     expect(
@@ -259,6 +390,13 @@ Future<void> _resume(WidgetTester tester) async {
   );
   expect(SupabaseService.instance.currentUser.value?.id, owner);
   expect(Supabase.instance.client.auth.currentUser?.id, owner);
+  if (catalogProbe) {
+    expect(
+      LanguageService.instance.currentLocale.languageCode,
+      proof['language'],
+      reason: 'The selected language survives real OS process closure',
+    );
+  }
   final account = ApiAccount(
     owner,
     proof['email'] as String,
@@ -368,6 +506,79 @@ Future<void> _resume(WidgetTester tester) async {
       () => exams.attempts.any((a) => a.clientUuid == uuid),
       reason: 'same server exam restored',
     );
+    if (_expectOfflineCompletion) {
+      expect(
+        catalogProbe,
+        isTrue,
+        reason: 'Offline short matrix must never replace a real-duration probe',
+      );
+      expect(
+        kSupabaseUrl.endsWith(':54325') ||
+            (defaultTargetPlatform == TargetPlatform.android &&
+                kSupabaseUrl == 'http://127.0.0.1:54321'),
+        isTrue,
+        reason:
+            'Only the local iOS proxy or selected Android adb reverse is interrupted',
+      );
+      expect(
+        _requireCompleted,
+        isFalse,
+        reason:
+            'Pending offline is intermediate evidence, not accepted completion',
+      );
+      await pumpUntilTrue(
+        tester,
+        () => exams.records.any(
+          (record) =>
+              record.clientUuid == uuid &&
+              record.pendingAction == ExamPendingAction.complete &&
+              record.attempt?.status == ExamAttemptStatus.active &&
+              record.errorCode == 'connection' &&
+              !exams.busy,
+        ),
+        timeout: const Duration(seconds: 45),
+        reason:
+            'Natural deadline queues completion durably while proxy is offline',
+      );
+      final disk = await ExamPersistence().read(owner);
+      final pending = disk.singleWhere((record) => record.clientUuid == uuid);
+      expect(pending.pendingAction, ExamPendingAction.complete);
+      expect(
+        pending.errorCode,
+        'connection',
+        reason:
+            'The real SDK request failed while the local transport was unavailable',
+      );
+      expect(pending.attempt!.id, proof['attempt_id']);
+      expect(pending.attempt!.startedAt, started);
+      expect(pending.attempt!.endsAt, end);
+      expect(pending.attempt!.durationSeconds, 60);
+      expect(pending.attempt!.totalQuestions, proof['total_questions']);
+      expect(await _economy(owner), baseline);
+      final server = (await E2eHost.row(
+        'select status,points_earned,exam_coins_earned,started_at,ends_at '
+        'from public.exam_attempts where id=${sqlText(proof['attempt_id'] as String)} '
+        'and user_id=${sqlText(owner)}',
+      ))!;
+      expect(server['status'], 'active');
+      expect(server['points_earned'], 0);
+      expect(server['exam_coins_earned'], 0);
+      expect(DateTime.parse(server['started_at'] as String), started);
+      expect(DateTime.parse(server['ends_at'] as String), end);
+      expect(find.text(_probeText.examPending), findsOneWidget);
+      expect(find.text(_probeText.examPendingBody), findsOneWidget);
+      proof['offline_pending_verified'] = true;
+      proof['last_resume_at'] = DateTime.now().toUtc().toIso8601String();
+      proof['completion_verified'] = false;
+      expect(await prefs.setString(_key, jsonEncode(proof)), isTrue);
+      await E2eHost.screenshot(
+        tester,
+        'e2e-r-catalog-${(proof['exam_id'] as String).replaceAll('_', '-')}-${proof['language']}-offline',
+      );
+      expect(tester.takeException(), isNull);
+      debugPrint('[CATALOG_PROBE_OFFLINE] ${jsonEncode(proof)}');
+      return; // Preserve marker/journal for a separate reconnected OS launch.
+    }
     if (exams.now().isBefore(end.subtract(const Duration(seconds: 2)))) {
       final attempt = exams.attempts.singleWhere((a) => a.clientUuid == uuid);
       expect(attempt.status, ExamAttemptStatus.active);
@@ -389,9 +600,28 @@ Future<void> _resume(WidgetTester tester) async {
       expect(attempt.durationSeconds, duration);
       expect(attempt.startedAt, started);
       expect(attempt.endsAt, end);
-      final expectedPoints = proof['mode'] == 'exam_lgs_start' ? 15 : 27;
-      final expectedCoins = proof['mode'] == 'exam_lgs_start' ? 3 : 5;
-      expect(duration, proof['mode'] == 'exam_lgs_start' ? 4500 : 8100);
+      final expectedPoints = catalogProbe
+          ? proof['expected_points'] as int
+          : proof['mode'] == 'exam_lgs_start'
+          ? 15
+          : 27;
+      final expectedCoins = catalogProbe
+          ? proof['expected_coins'] as int
+          : proof['mode'] == 'exam_lgs_start'
+          ? 3
+          : 5;
+      expect(
+        duration,
+        catalogProbe
+            ? 60
+            : proof['mode'] == 'exam_lgs_start'
+            ? 4500
+            : 8100,
+      );
+      if (catalogProbe) {
+        expect(attempt.examId, proof['exam_id']);
+        expect(attempt.totalQuestions, proof['total_questions']);
+      }
       expect(attempt.pointsEarned, expectedPoints);
       expect(attempt.examCoinsEarned, expectedCoins);
       final rows = await E2eHost.rows(
@@ -450,7 +680,12 @@ Future<void> _resume(WidgetTester tester) async {
   proof['last_resume_at'] = DateTime.now().toUtc().toIso8601String();
   proof['completion_verified'] = completed;
   expect(await prefs.setString(_key, jsonEncode(proof)), isTrue);
-  await E2eHost.screenshot(tester, 'e2e-real-probe-resume');
+  await E2eHost.screenshot(
+    tester,
+    catalogProbe
+        ? 'e2e-r-catalog-${(proof['exam_id'] as String).replaceAll('_', '-')}-${proof['language']}-resume'
+        : 'e2e-real-probe-resume',
+  );
   expect(tester.takeException(), isNull);
   debugPrint(
     '[REAL_PROBE_RESUME] run=$_run mode=${proof['mode']} owner=$owner completed=$completed evidence=${completed ? 'final-completion' : 'intermediate-resume-only'}',

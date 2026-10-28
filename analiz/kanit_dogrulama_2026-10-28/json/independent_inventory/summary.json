@@ -1,0 +1,310 @@
+[
+  {
+    "actual": {
+      "exam_wallet": {
+        "coins": 3,
+        "lifetime_points": 15
+      },
+      "profile": {
+        "coins": 80,
+        "current_streak": 2,
+        "daily_goal_minutes": 120,
+        "id": "ef5ae0e0-ec69-4501-badd-e104be16b08a",
+        "last_study_date": "2026-10-28",
+        "lifetime_points": 20,
+        "longest_streak": 2,
+        "timezone": "Europe/Istanbul",
+        "total_minutes": 175
+      },
+      "row_counts": {
+        "attempts": 1,
+        "events": 5,
+        "mappings": 0,
+        "results": 1,
+        "runs": 0,
+        "studies": 4,
+        "unlocks": 7
+      }
+    },
+    "case": "cohort_lgs_a",
+    "economy": {
+      "exam_coins": 3,
+      "exam_points": 15,
+      "normal_coins": 80,
+      "normal_points": 20,
+      "total_minutes": 175
+    },
+    "exit": 0,
+    "failed": [],
+    "owner": "ef5ae0e0-ec69-4501-badd-e104be16b08a",
+    "passed": 53,
+    "path": "build/verification_20261028/independent_inventory/cohort_lgs_a.json",
+    "status": "PASS",
+    "total": 53,
+    "warnings": []
+  },
+  {
+    "actual": {
+      "exam_wallet": {
+        "coins": 3,
+        "lifetime_points": 15
+      },
+      "profile": {
+        "coins": 60,
+        "current_streak": 2,
+        "daily_goal_minutes": 120,
+        "id": "90548a4c-6f6b-45b8-ba4c-1c6d533c822d",
+        "last_study_date": "2026-10-28",
+        "lifetime_points": 15,
+        "longest_streak": 2,
+        "timezone": "Europe/Istanbul",
+        "total_minutes": 150
+      },
+      "row_counts": {
+        "attempts": 1,
+        "events": 4,
+        "mappings": 0,
+        "results": 1,
+        "runs": 0,
+        "studies": 3,
+        "unlocks": 7
+      }
+    },
+    "case": "cohort_lgs_b",
+    "economy": {
+      "exam_coins": 3,
+      "exam_points": 15,
+      "normal_coins": 60,
+      "normal_points": 15,
+      "total_minutes": 150
+    },
+    "exit": 0,
+    "failed": [],
+    "owner": "90548a4c-6f6b-45b8-ba4c-1c6d533c822d",
+    "passed": 49,
+    "path": "build/verification_20261028/independent_inventory/cohort_lgs_b.json",
+    "status": "PASS",
+    "total": 49,
+    "warnings": []
+  },
+  {
+    "actual": {
+      "exam_wallet": {
+        "coins": 5,
+        "lifetime_points": 27
+      },
+      "profile": {
+        "coins": 100,
+        "current_streak": 2,
+        "daily_goal_minutes": 120,
+        "id": "311a2c6a-cfeb-426c-8482-afb730dd5af5",
+        "last_study_date": "2026-10-28",
+        "lifetime_points": 25,
+        "longest_streak": 2,
+        "timezone": "Europe/Istanbul",
+        "total_minutes": 260
+      },
+      "row_counts": {
+        "attempts": 1,
+        "events": 6,
+        "mappings": 0,
+        "results": 1,
+        "runs": 0,
+        "studies": 5,
+        "unlocks": 7
+      }
+    },
+    "case": "cohort_tus_a",
+    "economy": {
+      "exam_coins": 5,
+      "exam_points": 27,
+      "normal_coins": 100,
+      "normal_points": 25,
+      "total_minutes": 260
+    },
+    "exit": 0,
+    "failed": [],
+    "owner": "311a2c6a-cfeb-426c-8482-afb730dd5af5",
+    "passed": 57,
+    "path": "build/verification_20261028/independent_inventory/cohort_tus_a.json",
+    "status": "PASS",
+    "total": 57,
+    "warnings": []
+  },
+  {
+    "actual": {
+      "exam_wallet": {
+        "coins": 5,
+        "lifetime_points": 27
+      },
+      "profile": {
+        "coins": 40,
+        "current_streak": 2,
+        "daily_goal_minutes": 120,
+        "id": "b01df03c-7ca2-4ae6-87f5-974c9dd2197d",
+        "last_study_date": "2026-10-28",
+        "lifetime_points": 10,
+        "longest_streak": 2,
+        "timezone": "Europe/Istanbul",
+        "total_minutes": 185
+      },
+      "row_counts": {
+        "attempts": 1,
+        "events": 3,
+        "mappings": 0,
+        "results": 1,
+        "runs": 0,
+        "studies": 2,
+        "unlocks": 7
+      }
+    },
+    "case": "cohort_tus_b",
+    "economy": {
+      "exam_coins": 5,
+      "exam_points": 27,
+      "normal_coins": 40,
+      "normal_points": 10,
+      "total_minutes": 185
+    },
+    "exit": 0,
+    "failed": [],
+    "owner": "b01df03c-7ca2-4ae6-87f5-974c9dd2197d",
+    "passed": 45,
+    "path": "build/verification_20261028/independent_inventory/cohort_tus_b.json",
+    "status": "PASS",
+    "total": 45,
+    "warnings": []
+  },
+  {
+    "actual": {
+      "exam_wallet": {
+        "coins": 0,
+        "lifetime_points": 0
+      },
+      "profile": {
+        "coins": 0,
+        "current_streak": 1,
+        "daily_goal_minutes": 120,
+        "id": "d84a1634-dbe9-4b71-af0b-1c84890f2814",
+        "last_study_date": "2026-10-28",
+        "lifetime_points": 0,
+        "longest_streak": 1,
+        "timezone": "Europe/Istanbul",
+        "total_minutes": 14
+      },
+      "row_counts": {
+        "attempts": 14,
+        "events": 14,
+        "mappings": 0,
+        "results": 76,
+        "runs": 0,
+        "studies": 0,
+        "unlocks": 7
+      }
+    },
+    "case": "ios_short_a3",
+    "economy": {
+      "exam_coins": 0,
+      "exam_points": 0,
+      "normal_coins": 0,
+      "normal_points": 0,
+      "total_minutes": 14
+    },
+    "exit": 0,
+    "failed": [],
+    "owner": "d84a1634-dbe9-4b71-af0b-1c84890f2814",
+    "passed": 741,
+    "path": "build/verification_20261028/independent_inventory/ios_short_a3.json",
+    "status": "PASS",
+    "total": 741,
+    "warnings": []
+  },
+  {
+    "actual": {
+      "exam_wallet": {
+        "coins": 0,
+        "lifetime_points": 0
+      },
+      "profile": {
+        "coins": 0,
+        "current_streak": 0,
+        "daily_goal_minutes": 120,
+        "id": "4faf3680-159d-4fe1-8fca-c07ef0ca1af2",
+        "last_study_date": null,
+        "lifetime_points": 0,
+        "longest_streak": 0,
+        "timezone": "Europe/Istanbul",
+        "total_minutes": 0
+      },
+      "row_counts": {
+        "attempts": 14,
+        "events": 0,
+        "mappings": 0,
+        "results": 0,
+        "runs": 0,
+        "studies": 0,
+        "unlocks": 7
+      }
+    },
+    "case": "android_official_a1",
+    "economy": {
+      "exam_coins": 0,
+      "exam_points": 0,
+      "normal_coins": 0,
+      "normal_points": 0,
+      "total_minutes": 0
+    },
+    "exit": 0,
+    "failed": [],
+    "owner": "4faf3680-159d-4fe1-8fca-c07ef0ca1af2",
+    "passed": 116,
+    "path": "build/verification_20261028/independent_inventory/android_official_a1.json",
+    "status": "PASS",
+    "total": 116,
+    "warnings": []
+  },
+  {
+    "actual": {
+      "exam_wallet": {
+        "coins": 3,
+        "lifetime_points": 15
+      },
+      "profile": {
+        "coins": 0,
+        "current_streak": 1,
+        "daily_goal_minutes": 120,
+        "id": "c64b15d7-67a7-4d2e-9774-cefbdba57e10",
+        "last_study_date": "2026-10-28",
+        "lifetime_points": 0,
+        "longest_streak": 1,
+        "timezone": "Europe/Istanbul",
+        "total_minutes": 75
+      },
+      "row_counts": {
+        "attempts": 1,
+        "events": 1,
+        "mappings": 0,
+        "results": 0,
+        "runs": 0,
+        "studies": 0,
+        "unlocks": 7
+      }
+    },
+    "case": "actual_r75_final",
+    "economy": {
+      "exam_coins": 3,
+      "exam_points": 15,
+      "normal_coins": 0,
+      "normal_points": 0,
+      "total_minutes": 75
+    },
+    "exit": 0,
+    "failed": [],
+    "owner": "c64b15d7-67a7-4d2e-9774-cefbdba57e10",
+    "passed": 26,
+    "path": "build/verification_20261028/independent_inventory/actual_r75_final.json",
+    "status": "PASS",
+    "total": 26,
+    "warnings": []
+  }
+]

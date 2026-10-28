@@ -1,0 +1,14 @@
+{
+  "active_timer_keys": [],
+  "at": "2026-10-28T10:21:02.961100+00:00",
+  "device": "emulator-5554",
+  "device_available": "device",
+  "host54398_free": true,
+  "pending_records": [],
+  "remaining_reverse_mappings": "",
+  "removed_owned_reverse_ports": [
+    54321,
+    54398,
+    54341
+  ]
+}

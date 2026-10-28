@@ -1,0 +1,43 @@
+{
+  "at": "2026-10-28T07:46:22.005658+00:00",
+  "data_retained": true,
+  "force_stopped": true,
+  "proof": {
+    "attempt_id": "dc71c9a1-9a6a-4996-b5b8-cdf1d26f1d40",
+    "baseline": {
+      "coins": 0,
+      "current_streak": 0,
+      "exam_coins": 0,
+      "exam_points": 0,
+      "last_study_date": null,
+      "lifetime_points": 0,
+      "timezone": "Europe/Istanbul",
+      "total_minutes": 0
+    },
+    "client_uuid": "ea054eb5-1bff-472d-ac43-17b0b014562a",
+    "duration_seconds": 4500,
+    "email": "e2e-sim-probe-exam-lgs-start-verify-real75-20261028-a1@pomosprint.local",
+    "ends_at": "2026-10-28T08:52:35.623271Z",
+    "mode": "exam_lgs_start",
+    "notification_delivery_tested": false,
+    "observed_at": "2026-10-28T07:37:35.647520Z",
+    "owner_id": "c64b15d7-67a7-4d2e-9774-cefbdba57e10",
+    "remaining_at_start": 4500,
+    "run_id": "verify-real75-20261028-a1",
+    "scope": "real UI start, untouched wall-clock duration",
+    "started_at": "2026-10-28T07:37:35.623271Z"
+  },
+  "sql": {
+    "duration_seconds": 4500,
+    "ends_at": "2026-10-28T08:52:35.623271+00:00",
+    "exam_coins_earned": 0,
+    "exam_points": 0,
+    "exam_sand": 0,
+    "normal_points": 0,
+    "normal_sand": 0,
+    "points_earned": 0,
+    "started_at": "2026-10-28T07:37:35.623271+00:00",
+    "status": "active",
+    "total_minutes": 0
+  }
+}

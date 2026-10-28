@@ -1,0 +1,144 @@
+{
+  "errors": [],
+  "events": [
+    {
+      "data": {
+        "attempt_id": "0a8b15c0-eb8f-4fc9-a4b7-a78e14f37ee1",
+        "baseline": {
+          "coins": 0,
+          "current_streak": 0,
+          "exam_coins": 0,
+          "exam_points": 0,
+          "last_study_date": null,
+          "lifetime_points": 0,
+          "timezone": "Europe/Istanbul",
+          "total_minutes": 0
+        },
+        "client_uuid": "6e3cf4d4-02b9-46ab-9256-6b1bb7bf373e",
+        "definition_snapshot": {
+          "catalog_version": 1,
+          "duration_seconds": 60,
+          "group": "yks",
+          "id": "tyt",
+          "name_en": "TYT",
+          "name_tr": "TYT",
+          "reward_coins": 0,
+          "reward_points": 0,
+          "segment": "yks",
+          "subjects": [
+            {
+              "category_keys": [
+                "Türkçe"
+              ],
+              "id": "turkish",
+              "name_en": "Turkish",
+              "name_tr": "Türkçe",
+              "question_count": 40
+            },
+            {
+              "category_keys": [
+                "Matematik"
+              ],
+              "id": "mathematics",
+              "name_en": "Basic Mathematics",
+              "name_tr": "Temel Matematik",
+              "question_count": 40
+            },
+            {
+              "category_keys": [
+                "Tarih"
+              ],
+              "id": "history",
+              "name_en": "History",
+              "name_tr": "Tarih",
+              "question_count": 5
+            },
+            {
+              "category_keys": [
+                "Coğrafya"
+              ],
+              "id": "geography",
+              "name_en": "Geography",
+              "name_tr": "Coğrafya",
+              "question_count": 5
+            },
+            {
+              "category_keys": [
+                "Felsefe"
+              ],
+              "id": "philosophy",
+              "name_en": "Philosophy",
+              "name_tr": "Felsefe",
+              "question_count": 5
+            },
+            {
+              "category_keys": [
+                "Din Kültürü"
+              ],
+              "id": "religion",
+              "name_en": "Religious Culture / Additional Philosophy",
+              "name_tr": "Din Kültürü / İlave Felsefe",
+              "question_count": 5
+            },
+            {
+              "category_keys": [
+                "Fizik"
+              ],
+              "id": "physics",
+              "name_en": "Physics",
+              "name_tr": "Fizik",
+              "question_count": 7
+            },
+            {
+              "category_keys": [
+                "Kimya"
+              ],
+              "id": "chemistry",
+              "name_en": "Chemistry",
+              "name_tr": "Kimya",
+              "question_count": 7
+            },
+            {
+              "category_keys": [
+                "Biyoloji"
+              ],
+              "id": "biology",
+              "name_en": "Biology",
+              "name_tr": "Biyoloji",
+              "question_count": 6
+            }
+          ],
+          "total_questions": 120,
+          "wrong_answer_divisor": 4
+        },
+        "duration_seconds": 60,
+        "email": "e2e-sim-probe-exam-catalog-start-vc-ios-tyt-a1@pomosprint.local",
+        "ends_at": "2026-10-28T10:24:37.269963Z",
+        "exam_id": "tyt",
+        "expected_coins": 0,
+        "expected_points": 0,
+        "language": "tr",
+        "mode": "exam_catalog_start",
+        "notification_delivery_tested": false,
+        "observed_at": "2026-10-28T10:23:37.459372Z",
+        "owner_id": "5b760ab8-3372-4bd2-8d16-c37558bc8d96",
+        "remaining_at_start": 60,
+        "run_id": "vc-ios-tyt-a1",
+        "scope": "SHORT local-catalog natural60 lifecycle, NOT official duration",
+        "started_at": "2026-10-28T10:23:37.269963Z",
+        "total_questions": 120
+      },
+      "marker": "REAL_PROBE_START",
+      "message": ""
+    }
+  ],
+  "native_process_result": "PASS",
+  "native_totals": [
+    "00:16 +1: (tearDownAll)",
+    "00:16 +1: All tests passed!"
+  ],
+  "schema_version": 1,
+  "scope": "Selected native checkpoints/totals only; not a release verdict or full-duration claim",
+  "wrapper_result": "NOT_PRESENT",
+  "wrapper_totals": []
+}

@@ -1,0 +1,11 @@
+{
+  "catalog_restored_exactly": true,
+  "catalog_temporary_seconds": 60,
+  "finished_at": "2026-10-28T09:56:41.658530+00:00",
+  "native_exit_code": 0,
+  "natural_completion": true,
+  "official_duration_claim": false,
+  "r75_original_attempt_unchanged": true,
+  "restored_parity_exit_code": 0,
+  "started_at": "2026-10-28T09:35:50.383480+00:00"
+}

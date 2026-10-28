@@ -390,3 +390,65 @@ Analiz temiz4,3sn; Flutter1416PASS/5isteğe bağlıPNG/0hata(61sn), Node164/164,
 - Normal `lib/main.dart` DEBUGuygulama yalnız8D0iOS18.6simülatörüne uninstall/eraseyapılmadan kuruldu/açıldı;PID72227yaşıyor,aynıowner/H18tamamlanmaişareti korundu,aktifseansyok. Gerçek normalPomo25:00ekranı görüldü. YerelQA127.0.0.1:54321/Sentrykapalı; canlıhesap/TestFlightkurulumu değildir.04:27eskiyanlışyolpostflighthatası korunur; tampaket yolu doğrulandı.
 - Son derleme ve ortak kapı bittikten sonra15kesingeçici/araçıktıyolu kaldırıldı; cachetemizliği sonrası13,52GiBekboşalan,142,12GiBtoplamboş. SwiftPMhedefi/JDK17/SDK/globalönbellekler,finalpaketler/kanıtlar ve istenenfixturekaynağı korundu. İki fazlaiOSsilindi,1PomoSprintiPhone+1Androidkaldı;HocamMacVar'a dokunulmadı.
 - **31 kullanıcı kararı bekliyor**: yeni yerel/canlıuygulama veya31sonrasıMaratontesti yok. Sonkontroller kaynak değişmeden1417/5/0Flutter,164/164Node,temizanalyze. Nihairapor denetçiSabahözetiyle ve29'un31Ekim23:59→1Kasım/Kasım→1Aralıkuyarısıyla güncellendi. Soncommit yalnız kapanışbelgelerini kaydeder; push/mainmergeyok.
+
+
+### Yeni A/B doğrulama talebi — başlangıç ve GitHub yedeği
+
+Kullanıcının D ek talimatı önceki push yasağını yalnız bu dal için kaldırdı. Başlangıçta temiz ağaçla `origin/main..HEAD`36commit/984yol ve tüm yeni bloblar tarandı: .env/anahtar/sertifika/keystore/yerelayar yok,50MBüstü yok. `git push -u origin codex/gece-2026-10-27` başarılı; remote uç `fb70839ecd36ce314da5389928ef01fa5e40ce00`. Main/merge/forcepush/deploy yok. Sonraki yedeklerAsonu,Bsonu,kapanışta aynı güvenlik kontrolüyle yapılacak.
+
+Yeni çalışma raporu `analiz/DOGRULAMA_RAPORU_2026-10-28.md`. Mainyerel27–30paritesi geçti;31yok. Android yeni gerçekLGS75başlangıcı1/1+paritePASS (`verify-real75-20261028-a1`),10:37:35→11:52:35TR; force-stopsonrası native işaret veSQL0erkenödül doğrulandı. Final bekleniyor; cihaz/appverisi sıfırlanmayacak.
+
+### A2 — Kısmi net kaydı (`11ea62c`)
+
+Servis ve kalıcı journal artık yalnız düzenlenen geçerli ders alt kümesini kabul ediyor; çevrimdışı ikinci düzenleme önceki bekleyen diğer dersleri kaybetmeden birleştiriyor. Sunucu28'in zaten desteklediği partialupsert sözleşmesiyle uyumlandı; yeniSQL yok. Üç servis/journal regresyonu ayrı dosyada. Commit öncesi analyze temiz6,22sn,Flutter1425PASS/5opsiyonelPNGskip/0hata69,63sn,Node164/164PASS. Stage yalnız `exam_service.dart`, `exam_persistence.dart` ve üç regresyon içeren tek test dosyasıydı; sır yok.
+
+iOSresmîADturunda7×TR/EN sınavın süre/soru/vazgeçme/0ödül kontrolleri geçti; testin son normal sayaçResetadımında arka plan ve onay diyaloğunun aynı etiketine takılan testfinderroru nedeniyle özgün koşuFAILolarak korunuyor (`/tmp/pomosprint_verify_ios_official.log`). Testfinderdiyaloglascopelandı; sadece bu testin bitmemiş yerelQAodağı UI'den açıkça iptal edilip yeniden koşuluyor. GerçekR75Androidkaydına dokunulmadı.
+
+### A2 UI (`8446eff`) ve native araç tekrarları
+
+Sonuç diyaloğunda doğru/yanlışa göre otomatik boş, elle boş düzenleme, negatif/taşan değer için açık doğrulama ve yalnız düzenlenen derslerin gönderilmesi5widgetregresyonuyla kaydedildi. Lokalizasyon denetimi artık geçerli bir düzenleme yapıp Save'e basar. Commit öncesi analyze temiz5,99sn; Flutter1425PASS/5PNGskip/0hata89,75sn; Node164/164PASS. Stageyalnızdiyalog,5widgettestdosyasıvelokalizasyontesti.
+
+iOSresmîADyeniden koşusu14resmîsınav+çakışmakontrollerinde native1/1PASS verdi. Rootçalışanbashçalıştırıcısınıgüncellerkensonpariteadımınınokumaofsetinikesti; wrapperFAILolarakkorundu. Mevcutdosyabash-nveayrıyeni27–30paritePASS; bağımsız `ios_official_independent.json` app/DBsonucunudoğruladı. Çalışırkenwrapperdüzenlemesitekrarlanmayacak.
+
+KısaADilkdenemesindedoğruXcodederlemesisonrasıFlutter'ınönbuildsettingssorgusuTARGET_BUILD_DIRvermeyinceappbaşlamadı. Yerelkatalogtamgeri yüklenipR75snapshotaynıkaldıveparitegeçti. SDK/projekodu değiştirilmedenikiayrıshowBuildSettingssorgusudoğruçıktı;verboseyenidenkoşuappbaşlattı.
+
+KısaADyenidenkoşudaTRTYT/AYT/YDTdoğaltamamlanma/netUI/ayrıekonomikontrollerigeçti. LGSSözelnetkontrollerindensonraekranadındaki`_`hostgüvenlikkuralınatakıldı; koşuFAILkorundu,katalogbirebirgeriyüklendi,R75attemptdeğişmedi,27–30paritePASS. Ekranadıyalnıztirekullanacakşekildetestyardımcısıdüzeltilecek; sonuçlarbaşarıgibigenişletilmedi.
+
+### A doğrulaması — devam kontrol noktası
+
+- Yeni Android gerçek LGS75 finali native 1/1 ve 27–30 paritesiyle geçti. Özgün 4.500 saniye ve bitiş zamanı, tek kayıt/olay, 75 ortak dakika, 15 deneme puanı, 3 deneme kumu ve sıfır normal ekonomi bağımsız doğrulandı (`build/verification_20261028/real75_final.json`).
+- iOS AD kısa üçüncü turu 7 sınav × TR/EN doğal 60 saniye tamamlanma ve net UI akışlarını geçti. Yerel katalog birebir geri yüklendi, gerçek75 kaydı değişmedi, parite geçti. Android resmî14 sınav + normal/Maraton çakışma turu native 1/1 + parite PASS; Android kısa tur sürüyor.
+- Yeni bağımsız araç, dört lig hesabı/iOS kısa/Android resmî/gerçek75 üzerinde 1.087/1.087 kontrol geçti; bütün warning listeleri boş. Ham JSONlar `build/verification_20261028/independent_inventory/`.
+- Eski sunucu AE testinin ekran öneki ve güncel rapor sekme etiketi hataları düzeltildi. Özgün iki FAIL korunur; üçüncü tur ayrı API54341/Auth/DB kopyasında sürüyor. Android kısa katalog açıkken ana parite beklenen biçimde farklıdır; son katalog geri yüklemesinden sonra ayrıca doğrulanacak.
+
+### A4–A8 native sonuçları ve kanıt kalitesi
+
+iOS/Android raporlar TR/EN bütün günlük/haftalık/aylık değerleri Python/SQL oracle ile eşleştirdi (0/265/430 dk). İçgörü iki platformda 25 dk ilişkili Türkçe, 19,25→27,5 net ve değişmeyen ekonomiyle geçti. İzole eski Auth+REST+DB’de iki platform × iki dil TUS niyeti, güvenli Deneme kapalı durumu, normal başlat/iptal ve kontrollü25dk raporu geçti. Ligler her platformda 24 TR/EN/tür/scope/mahremiyet görünümünde aynı sıralama/maskeyi gösterdi; screenshot adlarına state eklenerek her kanıt ayrı saklandı.
+
+Android kısa ikinci tur14/14 PASS; bağımsız738/738, katalog birebir geri yüklendi, gerçek75 değişmedi, parite geçti. İlk YDT pending kaydı ayrı aynı-owner kurtarmasıyla otomatik uzlaştırıldı; özgün FAIL silinmedi. Native yardımcılar yeni `VERIFICATION_20261028_README.md` içinde belgeli.
+
+iOS sosyal ilk turdaki lazy-sliver görünürlük assertion’ı test yardımcısında düzeltildi. Yeniden TR/EN turu odak/mola/deneme bitişi, gizlilik ve engel için doğal30sn polling PASS; API aktörleri ve arkadaşlık açıkça geri kuruldu. Android sosyal ve yeni kısa OS/offline R matrisi sırada.
+
+### A1 yaşam döngüsü matrisi — aktif devam noktası
+
+- Yeni iki cihazlı kısa R matrisi `python3 /tmp/pomosprint_joint_catalog_cycles.py` ile başladı (exec57166). Main katalog root lock’ı `/tmp/pomosprint_a_native_catalog.lock` altında geçici60/0/0; script finally’de özgün7satırı, R75 eşitliğini ve27–30paritesini doğrulayarak geri alır. Bu esnada pariteyi veya kataloğu başka süreçten değiştirme. Android R doğrudanAPI54321/host54398 kullanır; yalnız kendi adb reverse bağlantısını keser. iOS R proxy54325/host54399 kullanır.
+- iOS ilk TYT native başlangıcı PASS; host CFPreferences dosyasını OS daemon diske yazmadan okuyunca a1 driver `KeyError` verdi. Aynı anahtar sonra diskte görüldü; ürün verisi kaybolmadı. Özgün `ios-catalog-cycles-a1.json` FAIL olarak korunur. Aynı `vc-ios-tyt-a1`/owner5b760ab8-3372-4bd2-8d16-c37558bc8d96/attempt0a8b15c0-eb8f-4fc9-a4b7-a78e14f37ee1 ayrı offline ve final native aşamalarıyla kurtarıldı: iki native PASS, disk pending→completed,1dk/0normalekonomi/0denemeekonomi/tek olay/seri1. Kanıt `build/verification_20261028/ios_tyt_lifecycle_recovered.json`. Proxy tekrar available=true; root kurtarma watcher’ı her çıkışta bunu geri alır (exec99752). Yeni hesap/reset kullanılmadı.
+- Android a1 sürüyor; ilk TYT/AYT/YDT/LGS Sözel OS-kapat/offline/reconnect/duplicate adımları geçti. Son durum `build/verification_20261028/android-catalog-cycles-a1.json`; tam sonuç henüz yok. Ana joint a1, iOS host hatası nedeniyle nihayet FAIL raporlayacak; Android sonucu ayrıca korunacak. Bu FAIL yeni başarı gibi değiştirilmemeli.
+- CFPreferences diske yazımını aşama predicate’iyle en fazla30sn bekleyen ayrı `/tmp/pomosprint_catalog_cycles_v2.py` hazır (12/12 mocked). Ayrı `/tmp/pomosprint_joint_catalog_cycles_v2.py`, a1 restore/paritesi ve aynı TYT kurtarması TAMAMLANDIKTAN sonra yalnız iOS kalan6türü (AYT/YDT/LGS Sözel/Sayısal/TUS Temel/Klinik) a2 ile çalıştırır. TYT yeniden başlatılmaz. V2 joint9/9mocked. Henüz çalıştırılmadı.
+- Android sosyal TR/EN10doğal poll ve pozitif TUS raporu geçti (160/260/260dk,verimlilik133%/halka100%). iOS pozitifLGSraporu75/175/175dk geçti. Android host/adb mapleri alt ajan tarafından temizlenip root R’ye teslim edildi; root R sürerken adb/proxy’ye başka süreçten dokunma.
+- Eski A8 kopyası9yerelQAhesabı/aktifodak0 olarak salt okunur dışa aktarıldı (`isolated_old_final_export.json`), yalnız ona ait Auth/REST/gateway ve kopya DB güvenle durduruldu. Main27–30 değişmedi.
+- B hazırlığı /tmp’dadır, henüz repo/site medya değişmedi.8797izolepreview exec13097;8798QApreview PID75467/session67557, `/__qa` yolu.8798HTTPguard/Range15/15 veJSsyntax3/3 geçti; final B tarayıcı testi değildir. Safari RDM bu turda çalıştı; sonrasında Cua `cgWindowNotFound` vermeye başladı. Mevcut Chrome sekmeleri okunmadı/değiştirilmedi. B çekimi ve son tarayıcı doğrulamaları bekler.
+
+### A tamamlandı — arşiv ve GitHub kontrol noktası
+
+Android7türün OS/offline/reconnect matrisi a1'de geçti. iOS'ta özgün TYT ve AYT aynı hesap/UUID ile ayrı offline/final aşamalarından geçti; a3 kalan5tür PASS. a1/a2 toplu FAIL'leri host CFPreferences/“zaten kapalı” hataları olarak korundu; ürün verileri sıfırlanmadı. Son v3 kataloğu birebir geri yükledi, özgünR75 değişmedi, parite0;31yok. Yeni23hesap final oracle568/568, warnings boş. Dolu16attempt ve14wallet kaynaklarında peerRLS görünürlüğü0; boş net kaynakları SKIP_EMPTY_SOURCE, eski dolu netRLS kanıtı korunur.
+
+I08'in yalnız8APIarkadaşının geçici varlığı kendiRPC'leriyle kapatıldı; iki deneme süre dolmadan0ödülle vazgeçildi.9hesap,8arkadaşlık,geçmiş/bakiyeler korunur; canlıliste0. B demo hesapları daha oluşturulmadı.
+
+Tam A kapısı: analyze temiz8,1sn; Flutter1425PASS/5opsiyonelPNGskip/0FAIL,107sn,concurrency2; Node164/164,0,532sn; Python19+10+9+39=77/77. Kaynak değişmedi. Nested SwiftPM üretilmiş lock yedek/hash sonrası HEAD'deki özgün baytlara döndürüldü.
+
+Taşınabilir kanıtlar `analiz/kanit_dogrulama_2026-10-28/INDEX.json`: özgün FAIL'ler dahil173dosya/~1,44MB,14/14tür lifecyclecoverage. Hamtercih/.env/binary/tamXcodelog alınmadı. Safari kullanıcı Mac'i görünür bırakınca çalıştı; yalnız yerel test tabı ayrı pencereye taşındı. Mevcut site tabanının72/72 ölçüm JSON'u `build/site_verification_20261028/safari_baseline.json`; final B doğrulaması değildir.
+
+### Kullanıcının A sonrasında eklediği kapsam
+
+Net otomatik boş/Kaydet akışı tekrar onaylandı (A2 hazır). Site QA adları yerine insan adları istendi; B planı Deniz ve6uydurma arkadaşla zaten uyumlu. Kullanıcı Deneme kumu hedeflerini LGS Sözel60/TYT150/AYT175 belirledi; önceki +5 önerisi uygulanmadı. AYT erken bitirme, dört çözülen test grubunun seçimi, doğru/yanlış ve deneme adı/notu eklenecek. Erken bitirmede süreye orantılı kum veya tam175 tercihi soruldu; resmî2026ÖSYM dağılımı araştırılıyor. Yeni32tasarımı /tmp'da; kaynak/mainlocal/canlı henüz değiştirilmedi. A kanıtları mevcut27–30politikasının dondurulmuş doğru sonuçlarıdır; geriye dönük ödül değişmez.

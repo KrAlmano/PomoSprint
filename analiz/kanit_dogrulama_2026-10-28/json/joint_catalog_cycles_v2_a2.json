@@ -1,0 +1,33 @@
+{
+  "all_owned_drivers_stopped": true,
+  "catalog_backup": "build/verification_20261028/joint_catalog_cycles_v2_a2_original_catalog.json",
+  "catalog_restored_exactly": true,
+  "cleanup_errors": [],
+  "error": "Matrix failed: ios; inspect same-owner journal before retry",
+  "expected_exam_ids": [
+    "ayt",
+    "ydt",
+    "lgs_verbal",
+    "lgs_quantitative",
+    "tus_basic",
+    "tus_clinical"
+  ],
+  "finished_at": "2026-10-28T10:45:56.084939+00:00",
+  "parity_log": "build/verification_20261028/joint_catalog_cycles_v2_a2_restored_parity.log",
+  "real75_attempt_unchanged": true,
+  "restored_parity_exit_code": 0,
+  "result": "FAIL",
+  "runs": {
+    "ios": {
+      "cases": 1,
+      "evidence": "build/verification_20261028/ios-catalog-cycles-a2.json",
+      "exit_code": 1,
+      "log": "external/tmp/pomosprint_ios_catalog_cycles_v2_a2.log",
+      "pid": 87324,
+      "result": "FAIL"
+    }
+  },
+  "scope": "V2 iOS remaining six SHORT natural60 cases; TYT is NOT restarted; NOT official durations",
+  "started_at": "2026-10-28T10:44:10.365733+00:00",
+  "suffix": "a2"
+}

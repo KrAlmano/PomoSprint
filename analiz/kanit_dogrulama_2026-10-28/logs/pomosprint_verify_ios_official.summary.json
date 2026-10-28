@@ -1,0 +1,77 @@
+{
+  "errors": [
+    "The following TestFailure was thrown running a test:",
+    "Koşul gerçekleşmedi (15 sn): dokunulacak öğe görünür ve hit-test hedefi olmalı: Found 2 widgets with",
+    "type \"TextButton\" that are ancestors of widgets with text \"Reset\": ["
+  ],
+  "events": [
+    {
+      "marker": "AD_OFFICIAL",
+      "message": "tr tyt duration=9900 questions=120 abandoned no-award PASS"
+    },
+    {
+      "marker": "AD_OFFICIAL",
+      "message": "tr ayt duration=10800 questions=160 abandoned no-award PASS"
+    },
+    {
+      "marker": "AD_OFFICIAL",
+      "message": "tr ydt duration=7200 questions=80 abandoned no-award PASS"
+    },
+    {
+      "marker": "AD_OFFICIAL",
+      "message": "tr lgs_verbal duration=4500 questions=50 abandoned no-award PASS"
+    },
+    {
+      "marker": "AD_OFFICIAL",
+      "message": "tr lgs_quantitative duration=4800 questions=40 abandoned no-award PASS"
+    },
+    {
+      "marker": "AD_OFFICIAL",
+      "message": "tr tus_basic duration=8100 questions=100 abandoned no-award PASS"
+    },
+    {
+      "marker": "AD_OFFICIAL",
+      "message": "tr tus_clinical duration=8100 questions=100 abandoned no-award PASS"
+    },
+    {
+      "marker": "AD_OFFICIAL",
+      "message": "en tyt duration=9900 questions=120 abandoned no-award PASS"
+    },
+    {
+      "marker": "AD_OFFICIAL",
+      "message": "en ayt duration=10800 questions=160 abandoned no-award PASS"
+    },
+    {
+      "marker": "AD_OFFICIAL",
+      "message": "en ydt duration=7200 questions=80 abandoned no-award PASS"
+    },
+    {
+      "marker": "AD_OFFICIAL",
+      "message": "en lgs_verbal duration=4500 questions=50 abandoned no-award PASS"
+    },
+    {
+      "marker": "AD_OFFICIAL",
+      "message": "en lgs_quantitative duration=4800 questions=40 abandoned no-award PASS"
+    },
+    {
+      "marker": "AD_OFFICIAL",
+      "message": "en tus_basic duration=8100 questions=100 abandoned no-award PASS"
+    },
+    {
+      "marker": "AD_OFFICIAL",
+      "message": "en tus_clinical duration=8100 questions=100 abandoned no-award PASS"
+    }
+  ],
+  "native_process_result": "FAIL",
+  "native_totals": [
+    "03:14 +0 -1: ad1 · official seven exam catalogues and abandonment matrix TR EN [E]",
+    "03:14 +0 ~2 -1: (tearDownAll)",
+    "03:14 +0 ~2 -1: Some tests failed."
+  ],
+  "schema_version": 1,
+  "scope": "Selected native checkpoints/totals only; not a release verdict or full-duration claim",
+  "wrapper_result": "FAIL",
+  "wrapper_totals": [
+    "=== integration_test/ad_verify_reports_exams_test.dart: KALDI (1)"
+  ]
+}

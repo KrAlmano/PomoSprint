@@ -1,0 +1,10 @@
+{
+  "api_port": 54325,
+  "finished_at": "2026-10-28T09:35:04.421131+00:00",
+  "log": "external/tmp/pomosprint_verify-android-short-recovery2.log",
+  "native_exit_code": 0,
+  "platform": "android",
+  "run": "verify-android-short-a1-recovery2",
+  "source": "integration_test/ah_pending_exam_recovery_test.dart",
+  "started_at": "2026-10-28T09:34:25.831388+00:00"
+}

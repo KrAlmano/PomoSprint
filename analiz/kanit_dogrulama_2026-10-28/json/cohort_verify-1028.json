@@ -1,0 +1,230 @@
+{
+  "accounts": [
+    {
+      "attempt_id": "65286f3b-d5ae-4446-839c-184e80c244bb",
+      "duration_seconds": 4500,
+      "economy": {
+        "exam_coins": 3,
+        "exam_points": 15,
+        "normal_coins": 80,
+        "normal_points": 20,
+        "total_minutes": 175
+      },
+      "email": "e2e-sim-cohort-verify-1028-lgs-a@pomosprint.local",
+      "exam_client_uuid": "94f69668-d692-43e9-b818-330019a95fa4",
+      "exam_coins": 3,
+      "exam_id": "lgs_verbal",
+      "exam_points": 15,
+      "historical_exam_ends_at": "2026-10-28T04:35:42.202229+00:00",
+      "historical_exam_started_at": "2026-10-28T03:20:42.202229+00:00",
+      "id": "ef5ae0e0-ec69-4501-badd-e104be16b08a",
+      "name": "Deniz LGS",
+      "normal_client_uuids": [
+        "6070199f-4c45-4014-a29c-732c7666308f",
+        "848ecb3a-8dae-4637-9b45-d2d5d404f03a",
+        "c9c49f5e-f3d3-4b94-92f6-4c2243e96c5d",
+        "49e784b6-e882-47b5-8184-a453d086de92"
+      ],
+      "normal_count": 4,
+      "role": "lgs-a",
+      "segment": "lgs",
+      "stage": "completed",
+      "verification_checks": 50
+    },
+    {
+      "attempt_id": "4e6c3144-2529-4af8-abd7-85b3b9bce576",
+      "duration_seconds": 4500,
+      "economy": {
+        "exam_coins": 3,
+        "exam_points": 15,
+        "normal_coins": 60,
+        "normal_points": 15,
+        "total_minutes": 150
+      },
+      "email": "e2e-sim-cohort-verify-1028-lgs-b@pomosprint.local",
+      "exam_client_uuid": "9280d721-57e9-4070-a38e-0d32c91b5d2f",
+      "exam_coins": 3,
+      "exam_id": "lgs_verbal",
+      "exam_points": 15,
+      "historical_exam_ends_at": "2026-10-28T04:35:42.202229+00:00",
+      "historical_exam_started_at": "2026-10-28T03:20:42.202229+00:00",
+      "id": "90548a4c-6f6b-45b8-ba4c-1c6d533c822d",
+      "name": "Ece LGS",
+      "normal_client_uuids": [
+        "b085b65c-4945-45d0-b794-92c23b61e1d5",
+        "1dbbe1e3-57f1-4d9b-a533-6c00b98dd410",
+        "27b3cf72-9b2a-4426-95b6-946188018187"
+      ],
+      "normal_count": 3,
+      "role": "lgs-b",
+      "segment": "lgs",
+      "stage": "completed",
+      "verification_checks": 46
+    },
+    {
+      "attempt_id": "45169086-768e-4ca3-91d0-565a66ca7db6",
+      "duration_seconds": 8100,
+      "economy": {
+        "exam_coins": 5,
+        "exam_points": 27,
+        "normal_coins": 100,
+        "normal_points": 25,
+        "total_minutes": 260
+      },
+      "email": "e2e-sim-cohort-verify-1028-tus-a@pomosprint.local",
+      "exam_client_uuid": "a6df58d7-a199-4d54-8a9b-eb0f32dd0f71",
+      "exam_coins": 5,
+      "exam_id": "tus_basic",
+      "exam_points": 27,
+      "historical_exam_ends_at": "2026-10-28T05:35:42.202229+00:00",
+      "historical_exam_started_at": "2026-10-28T03:20:42.202229+00:00",
+      "id": "311a2c6a-cfeb-426c-8482-afb730dd5af5",
+      "name": "Arda TUS",
+      "normal_client_uuids": [
+        "0f37cd1b-0e2c-4fcb-bf70-280de135f5b7",
+        "f27896f9-552f-4bdf-a606-6ef8bf122819",
+        "2a80ecd9-eec0-4030-8509-73b0f8795b30",
+        "a06d6fbc-1697-44eb-8ade-09c82be8352d",
+        "cc4c12d7-5532-4267-a327-c92ad47e76fa"
+      ],
+      "normal_count": 5,
+      "role": "tus-a",
+      "segment": "tus",
+      "stage": "completed",
+      "verification_checks": 54
+    },
+    {
+      "attempt_id": "daa98adf-460d-4949-a61c-8491abcf19c8",
+      "duration_seconds": 8100,
+      "economy": {
+        "exam_coins": 5,
+        "exam_points": 27,
+        "normal_coins": 40,
+        "normal_points": 10,
+        "total_minutes": 185
+      },
+      "email": "e2e-sim-cohort-verify-1028-tus-b@pomosprint.local",
+      "exam_client_uuid": "35f51eb6-90ae-42a0-8ff2-a1131e891e4c",
+      "exam_coins": 5,
+      "exam_id": "tus_basic",
+      "exam_points": 27,
+      "historical_exam_ends_at": "2026-10-28T05:35:42.202229+00:00",
+      "historical_exam_started_at": "2026-10-28T03:20:42.202229+00:00",
+      "id": "b01df03c-7ca2-4ae6-87f5-974c9dd2197d",
+      "name": "Selin TUS",
+      "normal_client_uuids": [
+        "fa3c1ef7-0da0-47a1-9fc5-92adb0f3a552",
+        "4c61d59d-b6f7-4478-be07-702226603bb9"
+      ],
+      "normal_count": 2,
+      "role": "tus-b",
+      "segment": "tus",
+      "stage": "completed",
+      "verification_checks": 42
+    }
+  ],
+  "completed_at": "2026-10-28T08:20:44.285889+00:00",
+  "local_only": true,
+  "memberships": [
+    {
+      "kind": "exam",
+      "room_id": "c3ce771c-dbc3-465e-86e7-0c52c146949a",
+      "segment": "tus",
+      "user_id": "311a2c6a-cfeb-426c-8482-afb730dd5af5"
+    },
+    {
+      "kind": "study",
+      "room_id": "efff58cd-1e78-4bc9-9abe-7c39c7b1f0da",
+      "segment": "tus",
+      "user_id": "311a2c6a-cfeb-426c-8482-afb730dd5af5"
+    },
+    {
+      "kind": "exam",
+      "room_id": "a179a431-8822-41c8-a971-7d1d49c3fa2f",
+      "segment": "lgs",
+      "user_id": "90548a4c-6f6b-45b8-ba4c-1c6d533c822d"
+    },
+    {
+      "kind": "study",
+      "room_id": "4af5444b-da49-4908-a028-0c9a04cdd2ce",
+      "segment": "lgs",
+      "user_id": "90548a4c-6f6b-45b8-ba4c-1c6d533c822d"
+    },
+    {
+      "kind": "exam",
+      "room_id": "c3ce771c-dbc3-465e-86e7-0c52c146949a",
+      "segment": "tus",
+      "user_id": "b01df03c-7ca2-4ae6-87f5-974c9dd2197d"
+    },
+    {
+      "kind": "study",
+      "room_id": "efff58cd-1e78-4bc9-9abe-7c39c7b1f0da",
+      "segment": "tus",
+      "user_id": "b01df03c-7ca2-4ae6-87f5-974c9dd2197d"
+    },
+    {
+      "kind": "exam",
+      "room_id": "a179a431-8822-41c8-a971-7d1d49c3fa2f",
+      "segment": "lgs",
+      "user_id": "ef5ae0e0-ec69-4501-badd-e104be16b08a"
+    },
+    {
+      "kind": "study",
+      "room_id": "4af5444b-da49-4908-a028-0c9a04cdd2ce",
+      "segment": "lgs",
+      "user_id": "ef5ae0e0-ec69-4501-badd-e104be16b08a"
+    }
+  ],
+  "natural_elapsed_test": false,
+  "planned_accounts": [
+    {
+      "duration_seconds": 4500,
+      "email": "e2e-sim-cohort-verify-1028-lgs-a@pomosprint.local",
+      "exam_coins": 3,
+      "exam_id": "lgs_verbal",
+      "exam_points": 15,
+      "name": "Deniz LGS",
+      "normal_count": 4,
+      "role": "lgs-a",
+      "segment": "lgs"
+    },
+    {
+      "duration_seconds": 4500,
+      "email": "e2e-sim-cohort-verify-1028-lgs-b@pomosprint.local",
+      "exam_coins": 3,
+      "exam_id": "lgs_verbal",
+      "exam_points": 15,
+      "name": "Ece LGS",
+      "normal_count": 3,
+      "role": "lgs-b",
+      "segment": "lgs"
+    },
+    {
+      "duration_seconds": 8100,
+      "email": "e2e-sim-cohort-verify-1028-tus-a@pomosprint.local",
+      "exam_coins": 5,
+      "exam_id": "tus_basic",
+      "exam_points": 27,
+      "name": "Arda TUS",
+      "normal_count": 5,
+      "role": "tus-a",
+      "segment": "tus"
+    },
+    {
+      "duration_seconds": 8100,
+      "email": "e2e-sim-cohort-verify-1028-tus-b@pomosprint.local",
+      "exam_coins": 5,
+      "exam_id": "tus_basic",
+      "exam_points": 27,
+      "name": "Selin TUS",
+      "normal_count": 2,
+      "role": "tus-b",
+      "segment": "tus"
+    }
+  ],
+  "run": "verify-1028",
+  "scope": "Real local Auth/Mailpit/onboarding and public completion/net RPCs; controlled normal starts and newly-created exam date metadata, never direct economic writes",
+  "status": "ready",
+  "tokens_persisted": false,
+  "uses_historical_fixture": true
+}

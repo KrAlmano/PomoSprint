@@ -1,0 +1,10 @@
+{
+  "api_port": 54325,
+  "finished_at": "2026-10-28T10:30:42.768456+00:00",
+  "log": "external/tmp/pomosprint_verify-ios-tyt-recovery-offline.log",
+  "native_exit_code": 0,
+  "platform": "ios",
+  "run": "vc-ios-tyt-a1",
+  "source": "integration_test/r_real_duration_probe_test.dart",
+  "started_at": "2026-10-28T10:29:09.565585+00:00"
+}

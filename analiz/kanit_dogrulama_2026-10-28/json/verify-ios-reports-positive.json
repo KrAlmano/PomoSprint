@@ -1,0 +1,10 @@
+{
+  "api_port": 54321,
+  "finished_at": "2026-10-28T10:18:06.789240+00:00",
+  "log": "external/tmp/pomosprint_verify-ios-reports-positive.log",
+  "native_exit_code": 0,
+  "platform": "ios",
+  "run": "verify-ios-positive-a4",
+  "source": "integration_test/ad_verify_reports_exams_test.dart",
+  "started_at": "2026-10-28T10:16:20.533493+00:00"
+}

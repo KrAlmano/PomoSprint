@@ -1,0 +1,1878 @@
+{
+  "curated_at": "2026-10-28T11:32:15.144039+00:00",
+  "entries": [
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/android-catalog-cycles-a1.json",
+      "output_bytes": 74641,
+      "output_sha256": "1ae9e47bb02dccc1d805bd8dcf16f47b5382b29b696b5c8eb8e99056a3027b7d",
+      "source": "build/verification_20261028/android-catalog-cycles-a1.json",
+      "source_bytes": 75169,
+      "source_sha256": "a7732570ae1dd38ef11d4b53e1a60cae9ce636935d30b2b8fb67c290f5c65456"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/android_failed_short_recovered_independent.json",
+      "output_bytes": 37239,
+      "output_sha256": "fc75e1a99d9eb1e4211c7754c48d1a4a98d0b7cb697710188b7c5f8f632b0638",
+      "source": "build/verification_20261028/android_failed_short_recovered_independent.json",
+      "source_bytes": 23864,
+      "source_sha256": "ea086c2592c33a959eab5f6e5b63f258812d44520e21e1881d78f8e3e151eaa3"
+    },
+    {
+      "kind": "json",
+      "outcome": "COMPLETE_REFERENCE",
+      "output": "json/android_handback.json",
+      "output_bytes": 294,
+      "output_sha256": "5b16bf5ffde011d430a0ac7ce5af6982806dac52affa72b1ba814eeddc75fbb5",
+      "source": "build/verification_20261028/android_handback.json",
+      "source_bytes": 294,
+      "source_sha256": "d36eac21bb4d93b3f05f733d7b36237bc782c607d1e2861e16bdc720db8ac7ed"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/android_mixed_w_preflight.json",
+      "output_bytes": 39943,
+      "output_sha256": "c92dc952f81ce0bee24b9e8523350d4534dffccd1c011be5d349c2ea3a6efed1",
+      "source": "build/verification_20261028/android_mixed_w_preflight.json",
+      "source_bytes": 25784,
+      "source_sha256": "55dcb56745cb08e0b45abd931567d20e0ec1c363992e267bc7519b9d90b90ac0"
+    },
+    {
+      "kind": "json",
+      "outcome": "COMPLETE_REFERENCE",
+      "output": "json/android_positive_reports_summary.json",
+      "output_bytes": 1021,
+      "output_sha256": "ebba7041eb04774c3c4aa9b9307632329182ddedb0ee847b312af6588beb5945",
+      "source": "build/verification_20261028/android_positive_reports_summary.json",
+      "source_bytes": 1021,
+      "source_sha256": "d521c6a5f0323948b98dbc316d0e75730b6a77744501a490f27868a498bbb079"
+    },
+    {
+      "kind": "json",
+      "outcome": "COMPLETE_REFERENCE",
+      "output": "json/android_short_pending_ydt_diagnostic.json",
+      "output_bytes": 1507,
+      "output_sha256": "583fd7233fe7a40e4691b316add631306889e24279c238c78a91d8729822f547",
+      "source": "build/verification_20261028/android_short_pending_ydt_diagnostic.json",
+      "source_bytes": 1507,
+      "source_sha256": "d033fda58d840a0952ab4adde8247f8ca749b724f668012b63ffa74ed73da658"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/android_short_retry_independent.json",
+      "output_bytes": 111751,
+      "output_sha256": "011c02ed0a4aae1e609ad8545d20028274ff9af2bd7715c4b24188d9b632bb7d",
+      "source": "build/verification_20261028/android_short_retry_independent.json",
+      "source_bytes": 74252,
+      "source_sha256": "03de48180f49024ea2f8476e2659e84eea4e3ecbfcc8967a6e3da48f7784ab42"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/android_short_retry_run.json",
+      "output_bytes": 346,
+      "output_sha256": "dfc6d56b34230e7b7fc5b3b97891002a1b69d1c46751c3da215782970e2f5519",
+      "source": "build/verification_20261028/android_short_retry_run.json",
+      "source_bytes": 346,
+      "source_sha256": "28f655f0242d3bf76e9aae5f2e489d3b224487139c6bfab323b7f3eb04bc81c7"
+    },
+    {
+      "kind": "json",
+      "outcome": "FAIL",
+      "output": "json/android_short_run.json",
+      "output_bytes": 346,
+      "output_sha256": "bcf9e91a7f1fecbcabc618d170d18a6867304543846985acde9d6840adc3e062",
+      "source": "build/verification_20261028/android_short_run.json",
+      "source_bytes": 346,
+      "source_sha256": "1f3c1231baffed516a2fb5db5091861fffbd826fbe4a8f9e48bb48a93d81cc0c"
+    },
+    {
+      "kind": "json",
+      "outcome": "COMPLETE_REFERENCE",
+      "output": "json/catalog_before_android_short.json",
+      "output_bytes": 11519,
+      "output_sha256": "f559ffa3ed4045ec9ae0ff7de3fd07c189499cdfeacfde1a974e111508df34b8",
+      "source": "build/verification_20261028/catalog_before_android_short.json",
+      "source_bytes": 11751,
+      "source_sha256": "6606d44b16a6679091dbacf3aa15d9ccf13b441305e1a802a6150f77564a71bf"
+    },
+    {
+      "kind": "json",
+      "outcome": "COMPLETE_REFERENCE",
+      "output": "json/catalog_before_android_short_retry.json",
+      "output_bytes": 11519,
+      "output_sha256": "f559ffa3ed4045ec9ae0ff7de3fd07c189499cdfeacfde1a974e111508df34b8",
+      "source": "build/verification_20261028/catalog_before_android_short_retry.json",
+      "source_bytes": 11751,
+      "source_sha256": "6606d44b16a6679091dbacf3aa15d9ccf13b441305e1a802a6150f77564a71bf"
+    },
+    {
+      "kind": "json",
+      "outcome": "COMPLETE_REFERENCE",
+      "output": "json/catalog_before_ios_short.json",
+      "output_bytes": 11519,
+      "output_sha256": "f559ffa3ed4045ec9ae0ff7de3fd07c189499cdfeacfde1a974e111508df34b8",
+      "source": "build/verification_20261028/catalog_before_ios_short.json",
+      "source_bytes": 11751,
+      "source_sha256": "6606d44b16a6679091dbacf3aa15d9ccf13b441305e1a802a6150f77564a71bf"
+    },
+    {
+      "kind": "json",
+      "outcome": "COMPLETE_REFERENCE",
+      "output": "json/cohort_verify-1028.json",
+      "output_bytes": 7168,
+      "output_sha256": "500d734028f60a821e36622894728a84b248384caa3bae9092e26a298ce06cb2",
+      "source": "build/verification_20261028/cohort_verify-1028.json",
+      "source_bytes": 7168,
+      "source_sha256": "11bc2e6d3d160027ac8b62555b1cefff29f580920c47723df7193bf4da0258b3"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/final_oracles/i08_break1.json",
+      "output_bytes": 10588,
+      "output_sha256": "f1aa3fe45829836b4a4d44850e0acf9fef3acfcb3a30cafcda9299f4ab0bff0f",
+      "source": "build/verification_20261028/final_oracles/i08_break1.json",
+      "source_bytes": 10588,
+      "source_sha256": "ae72a9537d25d984d2cd623d9853c06ed2afb68749bba29e2087b6d7ec0c1573"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/final_oracles/i08_break2.json",
+      "output_bytes": 10588,
+      "output_sha256": "f378b61a89a09c3edc0bd4c29f3f97cdd0aaaf51ee1c3f9d45d118a356148f73",
+      "source": "build/verification_20261028/final_oracles/i08_break2.json",
+      "source_bytes": 10588,
+      "source_sha256": "46a266a722572f40328a1d83bdd9f02803e493635043f583c5a326d1efc4f5ea"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/final_oracles/i08_exam1.json",
+      "output_bytes": 14982,
+      "output_sha256": "98a69fa02c10c8374868f58070c3744e91c7264556ff4f3b573ab4ee14db12eb",
+      "source": "build/verification_20261028/final_oracles/i08_exam1.json",
+      "source_bytes": 14982,
+      "source_sha256": "956ca9c3a8c7bdeb4c647bd12e3fe76cd47235134a8ece36d3874e96c193be03"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/final_oracles/i08_exam2.json",
+      "output_bytes": 11466,
+      "output_sha256": "c31ae1a931b7147c58fcc29af83dd7e80749b4262ef4733c17a8839c06c81f76",
+      "source": "build/verification_20261028/final_oracles/i08_exam2.json",
+      "source_bytes": 11466,
+      "source_sha256": "1ac9621f87b18304b037bc9ee23a177a342c49c5aefcd9d06db9f8fef18ec693"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/final_oracles/i08_focus1.json",
+      "output_bytes": 10588,
+      "output_sha256": "2af6d8c39075a30955e5d5a471656bdc640ed7233589597d6efab4b7d88c46a8",
+      "source": "build/verification_20261028/final_oracles/i08_focus1.json",
+      "source_bytes": 10588,
+      "source_sha256": "b40883f84c29a714c1089bc198eb3dabee8fe6a3dc0a9471708c2b2d9b05e8cf"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/final_oracles/i08_focus2.json",
+      "output_bytes": 10588,
+      "output_sha256": "9a88129dc3cf26e6f43cd6475b61f9c458f9d92bd0d761ee41e663630de7806d",
+      "source": "build/verification_20261028/final_oracles/i08_focus2.json",
+      "source_bytes": 10588,
+      "source_sha256": "87511be738f049ea305414283223c93992c21906bf9b0b1c8bf9d513bb4d296d"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/final_oracles/i08_focus3.json",
+      "output_bytes": 10588,
+      "output_sha256": "c17fb12b7eb40ed18fbf6d92f6c1a44de4da03abf36c90aeb101a9acd295ca6a",
+      "source": "build/verification_20261028/final_oracles/i08_focus3.json",
+      "source_bytes": 10588,
+      "source_sha256": "9b29aecd841fc7873674419fe7f541ebcca565fd159b4bd60906c8afbd496061"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/final_oracles/i08_focus4.json",
+      "output_bytes": 10588,
+      "output_sha256": "e3d40ca55dcb8bced17e73f48d98e8e7f7e627e66daa84a5d44a11c8e7f97015",
+      "source": "build/verification_20261028/final_oracles/i08_focus4.json",
+      "source_bytes": 10588,
+      "source_sha256": "dbeba48068d1c7911160435380a3f96b500613d8f475e87ec71882d74ba44c07"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/final_oracles/i08_observer.json",
+      "output_bytes": 10588,
+      "output_sha256": "715acf41f2741045af5c2d21a0b099d09d0b8e851cd12d96960626b473a3d1cf",
+      "source": "build/verification_20261028/final_oracles/i08_observer.json",
+      "source_bytes": 10588,
+      "source_sha256": "f48a20ac088bcba509f1297115acca71b028dd81e7a9185fd3db306d08ddb1b2"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/final_oracles/r_android_ayt.json",
+      "output_bytes": 13337,
+      "output_sha256": "6603e74772148a8c82b641152122312fda3cf696bcef1a1c8bbd1966fad2e352",
+      "source": "build/verification_20261028/final_oracles/r_android_ayt.json",
+      "source_bytes": 13337,
+      "source_sha256": "756af8e6da02ea8981230dd82142a41548ee135f12daf59ec529c57b07fa7d2e"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/final_oracles/r_android_lgs_quantitative.json",
+      "output_bytes": 13363,
+      "output_sha256": "48435b7030c4bdc621e69d36ad6ad9dfc0d993788a60a68c6d2d64edec9c3e6d",
+      "source": "build/verification_20261028/final_oracles/r_android_lgs_quantitative.json",
+      "source_bytes": 13363,
+      "source_sha256": "4c689d97e39fd26af27243a8e9f758cb099d5dc1f8f34d880e4a66a6888f9131"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/final_oracles/r_android_lgs_verbal.json",
+      "output_bytes": 13351,
+      "output_sha256": "0ad44518e73296889334b20f4d1289d35c8f71b54b0dfb617367e0f2dce63322",
+      "source": "build/verification_20261028/final_oracles/r_android_lgs_verbal.json",
+      "source_bytes": 13351,
+      "source_sha256": "8e862b6fc27cfad3cc8a189dca1a0a5815798eb168c485bb82b0ee76e8a8d1f6"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/final_oracles/r_android_tus_basic.json",
+      "output_bytes": 13349,
+      "output_sha256": "96d5dba9de292dbc7d9b0aa57a2acfbf5eb52dde9a3b562718b2fd65965f648a",
+      "source": "build/verification_20261028/final_oracles/r_android_tus_basic.json",
+      "source_bytes": 13349,
+      "source_sha256": "60e53895220aef448c857ccf6ab454442490a8b11c9c71a63d5a7b017eaa502e"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/final_oracles/r_android_tus_clinical.json",
+      "output_bytes": 13355,
+      "output_sha256": "410981fdb18c2d41d1b17ec50ad99577aed66029055fd90d4d5322c6c1abc508",
+      "source": "build/verification_20261028/final_oracles/r_android_tus_clinical.json",
+      "source_bytes": 13355,
+      "source_sha256": "b069aeae251cc71a463a455ed175a94e9069d7f90d0dcfe781c469f7de01605f"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/final_oracles/r_android_tyt.json",
+      "output_bytes": 13337,
+      "output_sha256": "dd4652f68c2b5d4451a3a76c2ac5ee6739f74d9ce2026a6954fb22152970e171",
+      "source": "build/verification_20261028/final_oracles/r_android_tyt.json",
+      "source_bytes": 13337,
+      "source_sha256": "1b3c2f923db95b267bd5b3fa156e94227de4bce14f126caa268b435b1c8306de"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/final_oracles/r_android_ydt.json",
+      "output_bytes": 13337,
+      "output_sha256": "403c6c0ebfa3df0e1f785bcdeacccb871f4b0d8762524530ccf6165230211125",
+      "source": "build/verification_20261028/final_oracles/r_android_ydt.json",
+      "source_bytes": 13337,
+      "source_sha256": "d9c85c67c83864babb332c19080fdc7a569802bc54486083d5382eeff524c78f"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/final_oracles/r_ios_ayt.json",
+      "output_bytes": 13337,
+      "output_sha256": "fd8fc8e38d542a299a7b82df8c60ab3685c646fed91c765d994f2df56bb5758d",
+      "source": "build/verification_20261028/final_oracles/r_ios_ayt.json",
+      "source_bytes": 13337,
+      "source_sha256": "af2897adea13aefbe8550d4d62574cfe4aed8e9a81a94ee87a7ff7e6cf9cb889"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/final_oracles/r_ios_lgs_quantitative.json",
+      "output_bytes": 13363,
+      "output_sha256": "2f8d179a4e8b6f68c7fb7bd76df8ad6ef41abb818ca8938b86df4d9d8ac0d845",
+      "source": "build/verification_20261028/final_oracles/r_ios_lgs_quantitative.json",
+      "source_bytes": 13363,
+      "source_sha256": "cd3ade8219e88fdf1ecb99872463e2dddda9d2759686db54ee0bbb0038f045a6"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/final_oracles/r_ios_lgs_verbal.json",
+      "output_bytes": 13351,
+      "output_sha256": "15ef1a0d0c75a067730d039e027fa19546af59244a76867a9d19ccaa16ebf4e5",
+      "source": "build/verification_20261028/final_oracles/r_ios_lgs_verbal.json",
+      "source_bytes": 13351,
+      "source_sha256": "4a6d95664b21d0622c66f8910eacb2f843cab3b07b3907a1ba568138b84470d6"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/final_oracles/r_ios_tus_basic.json",
+      "output_bytes": 13349,
+      "output_sha256": "6791689715291061324f9ef47feba025350dafe27a2caa484591f25078460699",
+      "source": "build/verification_20261028/final_oracles/r_ios_tus_basic.json",
+      "source_bytes": 13349,
+      "source_sha256": "5268fa0ed7def172fd064c0b4079c2f3325cfd1300e73f0b680687f4a1591291"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/final_oracles/r_ios_tus_clinical.json",
+      "output_bytes": 13355,
+      "output_sha256": "d64cae708d82e790688468bc6a49dcf7d31ffb5c5727f1c17c589dd34fcfc53f",
+      "source": "build/verification_20261028/final_oracles/r_ios_tus_clinical.json",
+      "source_bytes": 13355,
+      "source_sha256": "2208383331d96a9085607d31044bafb4fa2c7951ffe77fb4b2c4f1a44f5c1319"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/final_oracles/r_ios_tyt.json",
+      "output_bytes": 13337,
+      "output_sha256": "843b8de2bc5ae5193d02698e3e5473c2c1ece5c34c1610f68e8a2f80d3cf0d6d",
+      "source": "build/verification_20261028/final_oracles/r_ios_tyt.json",
+      "source_bytes": 13337,
+      "source_sha256": "102796f878bc37f2a6beb6b815bcd90f3973b8d1e7379bd3287f211d8d03d61a"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/final_oracles/r_ios_ydt.json",
+      "output_bytes": 13337,
+      "output_sha256": "3a3ca2be939740d15abcf195358f9ac85d5f258d7e10d629df6f1ace45bcf1aa",
+      "source": "build/verification_20261028/final_oracles/r_ios_ydt.json",
+      "source_bytes": 13337,
+      "source_sha256": "2c8ddbf44fa37b7081af277726c8333bdde2563238073e6ba97493bffa1ab826"
+    },
+    {
+      "kind": "json",
+      "outcome": "COMPLETE_REFERENCE",
+      "output": "json/final_oracles/rls_against_real75_peer.json",
+      "output_bytes": 10759,
+      "output_sha256": "0eba9b63063d92b316127a8da00e21279a5c6137e1f781709cf1ccf24e8718ed",
+      "source": "build/verification_20261028/final_oracles/rls_against_real75_peer.json",
+      "source_bytes": 10759,
+      "source_sha256": "a8e4c066cde79634e9a673f72791c495e7c9ec9bc715fd39c2578bbebf952d0d"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/final_oracles/summary.json",
+      "output_bytes": 17945,
+      "output_sha256": "fb6955c06196bc08da1ebc1f63e58f01c40cc34bcc99cc775ce3b470ff9dcc1d",
+      "source": "build/verification_20261028/final_oracles/summary.json",
+      "source_bytes": 17945,
+      "source_sha256": "bfd776000be186d7907bc4a39c480cfe0b03009f626771430f188c55a07175d9"
+    },
+    {
+      "kind": "json",
+      "outcome": "COMPLETE_REFERENCE",
+      "output": "json/gate_A_full/python_results.json",
+      "output_bytes": 297,
+      "output_sha256": "c79d25ab8875f0294ea550ce989621f614a663ead70f0482f0f780df9e67bf14",
+      "source": "build/verification_20261028/gate_A_full/python_results.json",
+      "source_bytes": 297,
+      "source_sha256": "ebd19f58fd1c27ee419820dff0b64789a3273d7f4dd7eae962d6d5f5520de2d0"
+    },
+    {
+      "kind": "json",
+      "outcome": "COMPLETE_REFERENCE",
+      "output": "json/gate_A_full/summary.json",
+      "output_bytes": 623,
+      "output_sha256": "01730336bf5268bdd16391c1d455da05793cfa56496d5b85a2e6ac4cd3d7db4e",
+      "source": "build/verification_20261028/gate_A_full/summary.json",
+      "source_bytes": 623,
+      "source_sha256": "3ebf36b817daaecf925807f5b0162d3b6dfdb2f4c8728223b1bb73489b920a79"
+    },
+    {
+      "kind": "json",
+      "outcome": "COMPLETE_REFERENCE",
+      "output": "json/gate_a2_service/results.json",
+      "output_bytes": 424,
+      "output_sha256": "00459970ab4b8296b6d06e6991e9add55952542109fbc27cd1149d8c6daf7efe",
+      "source": "build/verification_20261028/gate_a2_service/results.json",
+      "source_bytes": 544,
+      "source_sha256": "a7010e43c48d56c4434e9d1217bfc34d709606e5471f92e49e0df84eb0872874"
+    },
+    {
+      "kind": "json",
+      "outcome": "COMPLETE_REFERENCE",
+      "output": "json/gate_a2_ui/results.json",
+      "output_bytes": 409,
+      "output_sha256": "7e7baf2d5292b39307c6519d2b34aecfec4f045b929fb48786cbdcf44822d8f3",
+      "source": "build/verification_20261028/gate_a2_ui/results.json",
+      "source_bytes": 529,
+      "source_sha256": "810bd3a12822bea04521b45ca3c85a20bcd2c5fa75be106d02a5675af54e1339"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/i08_presence_cleanup.json",
+      "output_bytes": 55511,
+      "output_sha256": "ec0adfebf3b4cfeb8c2536a9109ec87cf42db004b1c5b55feccebc48e2743aa4",
+      "source": "build/verification_20261028/i08_presence_cleanup.json",
+      "source_bytes": 55511,
+      "source_sha256": "a707674beba2a460c1106af909b26ffb3748b17b145fc4075b57e7455fe6ac8e"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/independent_inventory/actual_r75_final.json",
+      "output_bytes": 13394,
+      "output_sha256": "8c8e579173a711eb8a70da8878efd4854c996a90c733c6672db55858906bd727",
+      "source": "build/verification_20261028/independent_inventory/actual_r75_final.json",
+      "source_bytes": 7853,
+      "source_sha256": "ea5243f6f04c96c0582d950d1f7411cccb1418a7bbf32956a466c0b8a8202849"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/independent_inventory/android_official_a1.json",
+      "output_bytes": 22809,
+      "output_sha256": "33ae65c087bfc7b0aaa5a66ced300e9d1cba2ac9e2e96b7c74d8874e7b99c1e7",
+      "source": "build/verification_20261028/independent_inventory/android_official_a1.json",
+      "source_bytes": 14266,
+      "source_sha256": "cd7df7779d796e22331a53bd10fd9818cb709363e223dc3ef469babf900d5f61"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/independent_inventory/cohort_lgs_a.json",
+      "output_bytes": 19621,
+      "output_sha256": "26efa2e2fcd0700712097dc64e8c3503e6814c8892aa8f8c5075da64ac25aae3",
+      "source": "build/verification_20261028/independent_inventory/cohort_lgs_a.json",
+      "source_bytes": 12054,
+      "source_sha256": "4cc286bd1968db22c0f35de13780c97fe3cdc3af1ca1d8d406620965663a68f9"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/independent_inventory/cohort_lgs_b.json",
+      "output_bytes": 18587,
+      "output_sha256": "9586e2ff619069b243b2a9ab6825d1c9c91d7a89dd0236e0f29d58f5cf83f27c",
+      "source": "build/verification_20261028/independent_inventory/cohort_lgs_b.json",
+      "source_bytes": 11346,
+      "source_sha256": "772aec833e9b0aea77b26a2104ab0330c9f8f4e272923a084a3c1554ce63f597"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/independent_inventory/cohort_tus_a.json",
+      "output_bytes": 21014,
+      "output_sha256": "15b6d40d8306a6754ff4be5e78ac9d563d9168c753fa3844d91b16863171dd77",
+      "source": "build/verification_20261028/independent_inventory/cohort_tus_a.json",
+      "source_bytes": 12991,
+      "source_sha256": "52ade49c1b0704e370a3760d033d45d72f9d6056fe5196aa3e53f23e1bf5af2e"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/independent_inventory/cohort_tus_b.json",
+      "output_bytes": 17576,
+      "output_sha256": "dc3b0aad751855529638dc683f8c43f810f2db32805c03caf595ca8bd7a53f82",
+      "source": "build/verification_20261028/independent_inventory/cohort_tus_b.json",
+      "source_bytes": 10661,
+      "source_sha256": "dba78f03f54e9fba974d08f817e9f6f5c853802c253595230e5d729ba6596473"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/independent_inventory/ios_short_a3.json",
+      "output_bytes": 112122,
+      "output_sha256": "af81b54cfd59216d1ed72e072386540b3aec8f20f05126fc96cdcf81f5489b20",
+      "source": "build/verification_20261028/independent_inventory/ios_short_a3.json",
+      "source_bytes": 74497,
+      "source_sha256": "08ccfa606ff5c70bc9511a0415e5f4b14a69813f3c96c43428a7345cd9181c2c"
+    },
+    {
+      "kind": "json",
+      "outcome": "COMPLETE_REFERENCE",
+      "output": "json/independent_inventory/summary.json",
+      "output_bytes": 7395,
+      "output_sha256": "088b949bb4219302c32f147cbcde5f024439d2026340218f67d6a71c2700c4a1",
+      "source": "build/verification_20261028/independent_inventory/summary.json",
+      "source_bytes": 7395,
+      "source_sha256": "c625725389d77b9a3a77db4cbcf66c625edca91515a4d389ebbde52daff02770"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/ios-ayt-a2-recovered-final.json",
+      "output_bytes": 332,
+      "output_sha256": "a56a044c83312874ee3c1978df2b77ab35e8d2fbdbe808e2b2233cee7b68a182",
+      "source": "build/verification_20261028/ios-ayt-a2-recovered-final.json",
+      "source_bytes": 324,
+      "source_sha256": "aa0653728b566c2991271fbd3c422634f0d525bf39382a9cdc76f9b28bce5d17"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/ios-ayt-a2-recovered-offline.json",
+      "output_bytes": 334,
+      "output_sha256": "398ff3d8c48a9ed3e2be962d23980629a3f65f5fdc5fc20a486ad2a2956d465d",
+      "source": "build/verification_20261028/ios-ayt-a2-recovered-offline.json",
+      "source_bytes": 326,
+      "source_sha256": "b79b58e57dd0ea70101e934deea4f216c29706e70da5fa1a659c17525ebf8d37"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/ios-ayt-a2-recovered.json",
+      "output_bytes": 8500,
+      "output_sha256": "95467e744ad4e1807ab91db99dc828181b91eb505e5bdc25166ac576d6ce8c86",
+      "source": "build/verification_20261028/ios-ayt-a2-recovered.json",
+      "source_bytes": 8700,
+      "source_sha256": "ec6a494c665f3d88d2c32ddf7513806caaff29acde2852f12e44396ec4195a20"
+    },
+    {
+      "kind": "json",
+      "outcome": "FAIL",
+      "output": "json/ios-catalog-cycles-a1.json",
+      "output_bytes": 794,
+      "output_sha256": "69390eb2088ffb0acfa1c36eea5ca1c54802e421e697901f89d9bd84d940c7ec",
+      "source": "build/verification_20261028/ios-catalog-cycles-a1.json",
+      "source_bytes": 786,
+      "source_sha256": "51b73d281797227f21c1df8a3be185ba86d131f166d7b8448fc0b63d94849001"
+    },
+    {
+      "kind": "json",
+      "outcome": "FAIL",
+      "output": "json/ios-catalog-cycles-a2.json",
+      "output_bytes": 5205,
+      "output_sha256": "b154f0b1faad302627d6a0bc5d58874efd1785ceb875fdd3cf87082005fc0d27",
+      "source": "build/verification_20261028/ios-catalog-cycles-a2.json",
+      "source_bytes": 5257,
+      "source_sha256": "8fd5b4b344022275ed02d59d1b46c8414cf88d3c87cf96452f924a07c4878bf7"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/ios-catalog-cycles-a3.json",
+      "output_bytes": 46991,
+      "output_sha256": "c9d70ed8c53198cba4b11ad83caa170c24d4c9ae04ddf4e09b15bfc359a6bf6f",
+      "source": "build/verification_20261028/ios-catalog-cycles-a3.json",
+      "source_bytes": 47231,
+      "source_sha256": "ffb25b2fa01eeb63616a389b3859d62541711f4baa8791218a2e4e3e122f21c0"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/ios_official_independent.json",
+      "output_bytes": 22809,
+      "output_sha256": "ac0368a4b44a72edda342ec877bc627905f71a730a0b93d13689745cd4c9846b",
+      "source": "build/verification_20261028/ios_official_independent.json",
+      "source_bytes": 14266,
+      "source_sha256": "c50c41701f515b70f1c2f3f00c5184005dd0043ac200243a9257596945d1d552"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/ios_short_retry2_run.json",
+      "output_bytes": 346,
+      "output_sha256": "84d980fa6cb646d6fadbbd0a2a780c218a1fe517d01b268ee4d7febcde97d566",
+      "source": "build/verification_20261028/ios_short_retry2_run.json",
+      "source_bytes": 346,
+      "source_sha256": "858dc0485eae40ed581d6434d269c3d9908618df931827138eb71ec9d1f050f0"
+    },
+    {
+      "kind": "json",
+      "outcome": "FAIL",
+      "output": "json/ios_short_retry_run.json",
+      "output_bytes": 346,
+      "output_sha256": "135fe3e55329b7891097ddaa2629d6877a7b6c2946b8b4bcdbde914fa53c4858",
+      "source": "build/verification_20261028/ios_short_retry_run.json",
+      "source_bytes": 346,
+      "source_sha256": "0c9cb628d93ab731627eb40f24780c5f5554aa66f6a73af5579ddc6be0abb6c4"
+    },
+    {
+      "kind": "json",
+      "outcome": "FAIL",
+      "output": "json/ios_short_run.json",
+      "output_bytes": 346,
+      "output_sha256": "761427adaff4b279c12db5bc9cc93f27c4862d72aabda7b9052b542dbeb90095",
+      "source": "build/verification_20261028/ios_short_run.json",
+      "source_bytes": 346,
+      "source_sha256": "27236910c244100cb3576297d848a5319bf82bf43814462cf9662e96d69bf180"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/ios_tyt_lifecycle_recovered.json",
+      "output_bytes": 4647,
+      "output_sha256": "e943da7d496bbdf55ef925a779e9eb18294c12e373f7976e7157abe553509620",
+      "source": "build/verification_20261028/ios_tyt_lifecycle_recovered.json",
+      "source_bytes": 4683,
+      "source_sha256": "46e5ea6c0a82adff98fcb88eb2f0dc396c4f8b81d0d9ed0549ecc8547de9a1dc"
+    },
+    {
+      "kind": "json",
+      "outcome": "COMPLETE_REFERENCE",
+      "output": "json/isolated_old_final_export.json",
+      "output_bytes": 3251,
+      "output_sha256": "67475c7ef2c76c7694bbf9066f7da418c5689baa49245899cb759cab8bb64507",
+      "source": "build/verification_20261028/isolated_old_final_export.json",
+      "source_bytes": 3251,
+      "source_sha256": "db9b98961f6ab2beee03e250370eac2138f28ccb2f21190cb38b61345cba2c41"
+    },
+    {
+      "kind": "json",
+      "outcome": "FAIL",
+      "output": "json/joint_catalog_cycles_a1.json",
+      "output_bytes": 1165,
+      "output_sha256": "d202d15fff1ebaf09c604b6ff9b49fa186e2bcccea79b7d6844abeee1c47817b",
+      "source": "build/verification_20261028/joint_catalog_cycles_a1.json",
+      "source_bytes": 1309,
+      "source_sha256": "398ac238d2d03711a739cca062f4397b13f6010a431e7a044e6f91801ee02f30"
+    },
+    {
+      "kind": "json",
+      "outcome": "COMPLETE_REFERENCE",
+      "output": "json/joint_catalog_cycles_a1_original_catalog.json",
+      "output_bytes": 11519,
+      "output_sha256": "f559ffa3ed4045ec9ae0ff7de3fd07c189499cdfeacfde1a974e111508df34b8",
+      "source": "build/verification_20261028/joint_catalog_cycles_a1_original_catalog.json",
+      "source_bytes": 11751,
+      "source_sha256": "6606d44b16a6679091dbacf3aa15d9ccf13b441305e1a802a6150f77564a71bf"
+    },
+    {
+      "kind": "json",
+      "outcome": "FAIL",
+      "output": "json/joint_catalog_cycles_v2_a2.json",
+      "output_bytes": 1078,
+      "output_sha256": "17ab855a7c09382385778fb257430b6591370f57db9c49742e916ac5c2bfed38",
+      "source": "build/verification_20261028/joint_catalog_cycles_v2_a2.json",
+      "source_bytes": 1190,
+      "source_sha256": "2e23fea700f7f28135731b1e99b01f23c82aa43f134948e981c5322305866cb1"
+    },
+    {
+      "kind": "json",
+      "outcome": "COMPLETE_REFERENCE",
+      "output": "json/joint_catalog_cycles_v2_a2_original_catalog.json",
+      "output_bytes": 11519,
+      "output_sha256": "f559ffa3ed4045ec9ae0ff7de3fd07c189499cdfeacfde1a974e111508df34b8",
+      "source": "build/verification_20261028/joint_catalog_cycles_v2_a2_original_catalog.json",
+      "source_bytes": 11751,
+      "source_sha256": "6606d44b16a6679091dbacf3aa15d9ccf13b441305e1a802a6150f77564a71bf"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/joint_catalog_cycles_v3_a3.json",
+      "output_bytes": 1012,
+      "output_sha256": "d2a1b29262bbe45136f6efc5a7b697841a604a6076e02c74546af41ab0f27e2b",
+      "source": "build/verification_20261028/joint_catalog_cycles_v3_a3.json",
+      "source_bytes": 1124,
+      "source_sha256": "06305514471f832e6d48418b696dd6b99bdbf2eda379c1d389bc0befefc38029"
+    },
+    {
+      "kind": "json",
+      "outcome": "COMPLETE_REFERENCE",
+      "output": "json/joint_catalog_cycles_v3_a3_original_catalog.json",
+      "output_bytes": 11519,
+      "output_sha256": "f559ffa3ed4045ec9ae0ff7de3fd07c189499cdfeacfde1a974e111508df34b8",
+      "source": "build/verification_20261028/joint_catalog_cycles_v3_a3_original_catalog.json",
+      "source_bytes": 11751,
+      "source_sha256": "6606d44b16a6679091dbacf3aa15d9ccf13b441305e1a802a6150f77564a71bf"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/real75_final.json",
+      "output_bytes": 1391,
+      "output_sha256": "bf4502ef9d162ca4031d52dd4688c3204cbb4871b74350a7fd69c410a204834d",
+      "source": "build/verification_20261028/real75_final.json",
+      "source_bytes": 1383,
+      "source_sha256": "156179bfecc4ceeec047c8d1ffa0a3fee365f4b62bed47b302d198de9256b886"
+    },
+    {
+      "kind": "json",
+      "outcome": "COMPLETE_CHECKPOINT",
+      "output": "json/real75_schedule.json",
+      "output_bytes": 126,
+      "output_sha256": "975edaa773ab2b3c2a121204bae7df166490145bc0eae68945da12cf78aa5476",
+      "source": "build/verification_20261028/real75_schedule.json",
+      "source_bytes": 126,
+      "source_sha256": "66d72d036adbc09131b11aac7376b88357c01752049ba784af6284e12ec5eacd"
+    },
+    {
+      "kind": "json",
+      "outcome": "COMPLETE_REFERENCE",
+      "output": "json/real75_start_closed.json",
+      "output_bytes": 1335,
+      "output_sha256": "844d428268c74860b4dbad76bcfaa27e3b6fb3316db09dc12e4fe2ffcfe0d17b",
+      "source": "build/verification_20261028/real75_start_closed.json",
+      "source_bytes": 1335,
+      "source_sha256": "76c0d5b48bcc58b6ee5a196be8aca19d9b046661eb4791a81890703d3de7e2d8"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/verifier_current_real75_active.json",
+      "output_bytes": 11457,
+      "output_sha256": "1af437d42cb77dc301393157f61448fd562d2bced84e9b269bb8b135f328db8b",
+      "source": "build/verification_20261028/verifier_current_real75_active.json",
+      "source_bytes": 6736,
+      "source_sha256": "b39fa2d6bd1bd1d886ddd4fd68ba94f9b63d752d87179b10f6395731d4bd9586"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/verifier_existing_h1.json",
+      "output_bytes": 13956,
+      "output_sha256": "5efbd348b681a0a7ae21ff30f2bbf1692a4496236733a2562cb319ff174da649",
+      "source": "build/verification_20261028/verifier_existing_h1.json",
+      "source_bytes": 8289,
+      "source_sha256": "cbc1301276f754c31194baf4ed00d5e969647ed19d333b8b231b4a9c912740d6"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/verifier_mixed_w_rls.json",
+      "output_bytes": 40314,
+      "output_sha256": "0d239f90713b0fad0ab6b7398e198d3e5bbeda08fd06b259deb81b52c2d78e7e",
+      "source": "build/verification_20261028/verifier_mixed_w_rls.json",
+      "source_bytes": 26029,
+      "source_sha256": "a6df6fbab50ea5ed27c641d6de20df935e03cccc61f57b0b63f7b9f2c0fb6d80"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/verify-android-insight-a6.json",
+      "output_bytes": 342,
+      "output_sha256": "5e57a937b65b2d919acb6d7c82da66e291f00a0941ef4858a9d150386a0d450d",
+      "source": "build/verification_20261028/verify-android-insight-a6.json",
+      "source_bytes": 334,
+      "source_sha256": "d4163e32e0dc1491f2397907d847a0b89bedc2a20fccf512ef32161339ddde8c"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/verify-android-leagues-a5.json",
+      "output_bytes": 356,
+      "output_sha256": "99408a8cb77005d7ad52c766cb1215a8419fc668bb9d55d1d7ea7bc96d487fa8",
+      "source": "build/verification_20261028/verify-android-leagues-a5.json",
+      "source_bytes": 348,
+      "source_sha256": "9685707dfe8e66f244a66d223026f89cfa6136ff0d65c8b27333f08fde71ac85"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/verify-android-old-a8.json",
+      "output_bytes": 340,
+      "output_sha256": "6160deae58f95967730720246048411c6fa8cf73881f62ee5f52c676a8c9078a",
+      "source": "build/verification_20261028/verify-android-old-a8.json",
+      "source_bytes": 332,
+      "source_sha256": "88f73ffff163d09c2a24e52e48a0522799187f62cbb0b0c3778801c4cd3958b4"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/verify-android-reports-a4.json",
+      "output_bytes": 349,
+      "output_sha256": "1702b7f355a7236583e328e833c3711fec741f07a2f7a227d665cc3379af9d02",
+      "source": "build/verification_20261028/verify-android-reports-a4.json",
+      "source_bytes": 341,
+      "source_sha256": "494f865972e00767527fa5f94173ad1bb258d1d090bc28225662b98b267d9509"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/verify-android-reports-positive.json",
+      "output_bytes": 361,
+      "output_sha256": "5cf2410532e765fe017bf867aa9591535e90fab7fdf0b0d7b732ff633268e498",
+      "source": "build/verification_20261028/verify-android-reports-positive.json",
+      "source_bytes": 353,
+      "source_sha256": "e098915e112c65e81b0d3e9a6c5958653033bfed0596fb55535e83bbfba5a90f"
+    },
+    {
+      "kind": "json",
+      "outcome": "FAIL",
+      "output": "json/verify-android-short-recovery.json",
+      "output_bytes": 361,
+      "output_sha256": "867e46241f547b9ec3706440daf0a3590586d78f9145949d884f743e662d859d",
+      "source": "build/verification_20261028/verify-android-short-recovery.json",
+      "source_bytes": 353,
+      "source_sha256": "00b77d5c3ee7fb26b9aba7ec6f39c0259e808153469ed3b3be1b45f79e8d4bc8"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/verify-android-short-recovery2.json",
+      "output_bytes": 363,
+      "output_sha256": "d4642248b178c55070c7519543cd7707204dc9e5551814cde667f15c298c2d16",
+      "source": "build/verification_20261028/verify-android-short-recovery2.json",
+      "source_bytes": 355,
+      "source_sha256": "c1f9b0967252a68624caf875545c6ead2cd17a7f27349345ab313ac3f1caccb4"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/verify-android-social-a7.json",
+      "output_bytes": 354,
+      "output_sha256": "d6fff2bda58e9e3005dab31fbd7fc8e4d0723688f5d0424127b10f1f010fef5f",
+      "source": "build/verification_20261028/verify-android-social-a7.json",
+      "source_bytes": 346,
+      "source_sha256": "43a3c483ae58de7d5f9cdb3b52b04b53535f8efba2ee0868bc3213a5e6d18254"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/verify-ios-insights.json",
+      "output_bytes": 329,
+      "output_sha256": "cb0c553853b8def07d18e890e1d17642ff8fc8c3efba864e757b3a892325bdf0",
+      "source": "build/verification_20261028/verify-ios-insights.json",
+      "source_bytes": 321,
+      "source_sha256": "bd2c1833930c066daea1ae6230fa60ee4370547bffbbf8759d35e91dff313ea5"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/verify-ios-leagues-final.json",
+      "output_bytes": 348,
+      "output_sha256": "f44e03a07af5c41116c0595fbee746aa5a9c788ea85c73c727d358a7b6be862f",
+      "source": "build/verification_20261028/verify-ios-leagues-final.json",
+      "source_bytes": 340,
+      "source_sha256": "c701dfaf5e27f843287593731a5a285935794a31c1ae7486985436c8f8990dbc"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/verify-ios-leagues.json",
+      "output_bytes": 341,
+      "output_sha256": "df9564ac9817303597e14ce8185005db828eb896aee08108f941ea544f178abc",
+      "source": "build/verification_20261028/verify-ios-leagues.json",
+      "source_bytes": 333,
+      "source_sha256": "db19de3ccf0623d49f989be627a85371048ffa1fdda6626b2a23e8d7ccbd7b49"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/verify-ios-old-retry2.json",
+      "output_bytes": 333,
+      "output_sha256": "c32d3b83de4facbdf5c45cb441f7a95f8ebf6054383c298bb6b40095ebd2fec2",
+      "source": "build/verification_20261028/verify-ios-old-retry2.json",
+      "source_bytes": 325,
+      "source_sha256": "a2b3730cb12c88ce784ece4a19cb383067ff265db7c7275c295c61af22dc6aad"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/verify-ios-reports-positive.json",
+      "output_bytes": 344,
+      "output_sha256": "3c9f32e4f0947e7592792dff7d621e928e1176946e3515f27caba71cb9c0f494",
+      "source": "build/verification_20261028/verify-ios-reports-positive.json",
+      "source_bytes": 336,
+      "source_sha256": "c1b9376041f6c11846dab66482c92d5aefb01c482f8f02179faf84abc6550aff"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/verify-ios-reports.json",
+      "output_bytes": 334,
+      "output_sha256": "52b5212a3565e2dc9072682fae86215a01dd6114145782c0014d7de07b51eb5f",
+      "source": "build/verification_20261028/verify-ios-reports.json",
+      "source_bytes": 326,
+      "source_sha256": "c231a0a4c4f0ba7eee6078d07eea962469c670ad10ca4c62cc6bee48e71b0b4d"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/verify-ios-social-retry.json",
+      "output_bytes": 346,
+      "output_sha256": "b2563b7545b41f525da3bbbe4d72af0f84e09ac8ed2854ca5e2464d7cf148aa9",
+      "source": "build/verification_20261028/verify-ios-social-retry.json",
+      "source_bytes": 338,
+      "source_sha256": "98614da20e310e3f8370b8f67a3757c30af71c990b7795bf9e799692efb52f08"
+    },
+    {
+      "kind": "json",
+      "outcome": "FAIL",
+      "output": "json/verify-ios-social.json",
+      "output_bytes": 339,
+      "output_sha256": "2bd9ed6ca9ec689d8d7ec1aebfc963e3231b00109b79ce3e8584a0dc5f387a2e",
+      "source": "build/verification_20261028/verify-ios-social.json",
+      "source_bytes": 331,
+      "source_sha256": "4833c83dfb2e607b506edb1187e5bf609b7c556edbdb2755276cb3e3a3629559"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/verify-ios-tyt-recovery-final.json",
+      "output_bytes": 335,
+      "output_sha256": "e66fbca2fbc566f8be3eaee5d27a0ad701d3d7fd5ed426e8146cf2177fcd425a",
+      "source": "build/verification_20261028/verify-ios-tyt-recovery-final.json",
+      "source_bytes": 327,
+      "source_sha256": "21cc88003bff31091d3117d23d4a15c73c5e05ee03d7c4c6cad7a9ef3a278d9f"
+    },
+    {
+      "kind": "json",
+      "outcome": "PASS",
+      "output": "json/verify-ios-tyt-recovery-offline.json",
+      "output_bytes": 337,
+      "output_sha256": "823dc6c788eec354a43cdf1005106c80d96dbea04223b23a5166d04ed87468d7",
+      "source": "build/verification_20261028/verify-ios-tyt-recovery-offline.json",
+      "source_bytes": 329,
+      "source_sha256": "a4d6a440a1c15c9dab8b8ddb68719c15ac494bd2eb9713c169d7d4de797143c0"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_ios-ayt-a2-recovered-final.summary.json",
+      "output_bytes": 540,
+      "output_sha256": "a39dd055a72f8d68f516436485369f554bd95631a4b7e6fa2a7f2f7f801b3cb4",
+      "source": "external/tmp/pomosprint_ios-ayt-a2-recovered-final.log",
+      "source_bytes": 971147,
+      "source_sha256": "118c55dc4ac7461f21a9edff3c74c84b8ddf906acf825d47f913a0b34cac6358"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_ios-ayt-a2-recovered-offline.summary.json",
+      "output_bytes": 4980,
+      "output_sha256": "c36c06d6c3982ecfeeb656d0c1cef102df417605c22ac0b92bbc2184349b6ab2",
+      "source": "external/tmp/pomosprint_ios-ayt-a2-recovered-offline.log",
+      "source_bytes": 974118,
+      "source_sha256": "026376d8d3b046bf4d6241630db18f74b0e9665a0193c4a595f852a33032e146"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-android-ayt-a1-exam_catalog_start.summary.json",
+      "output_bytes": 4846,
+      "output_sha256": "ad0de71fcb26d0112bc38a94b0c945627de21ac00bbc6d457ea8efc8c841dc7e",
+      "source": "external/tmp/pomosprint_vc-android-ayt-a1-exam_catalog_start.log",
+      "source_bytes": 3171,
+      "source_sha256": "c0da5050ebe2592a175e344372444ef1c6d930e2689e6cd92efac304118c4f19"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-android-ayt-a1-offline.summary.json",
+      "output_bytes": 4988,
+      "output_sha256": "ede7c5068c41632084c00f1e1187c7e14e51200102c84234e00068cb619924fd",
+      "source": "external/tmp/pomosprint_vc-android-ayt-a1-offline.log",
+      "source_bytes": 3898,
+      "source_sha256": "4ae2f0588ca5a9679665f72b4e7f535a9ff356c8b08830f67c2fd5b8cd309a5c"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-android-ayt-a1-resume.summary.json",
+      "output_bytes": 544,
+      "output_sha256": "ffc6eea965393a1ea5becfd6fcd75e8be4de3360a0c442e24f6254308c246dea",
+      "source": "external/tmp/pomosprint_vc-android-ayt-a1-resume.log",
+      "source_bytes": 864,
+      "source_sha256": "80179a9a1a201416208504bbc4b1dcaa67a55e7118c8d24e0d7dba43718024ce"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-android-lgs-quantitative-a1-exam_catalog_start.summary.json",
+      "output_bytes": 2552,
+      "output_sha256": "973cc0616d6b55a57ae9d937d62263cfb625735b02a6bb798aede57a053615d9",
+      "source": "external/tmp/pomosprint_vc-android-lgs-quantitative-a1-exam_catalog_start.log",
+      "source_bytes": 2149,
+      "source_sha256": "5c698414df2fe95cab6f2366fd0d22a11851ac13d02c2c6fca0d8998a593fb5d"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-android-lgs-quantitative-a1-offline.summary.json",
+      "output_bytes": 2694,
+      "output_sha256": "7b05a55665a54c25d77455db488eadb286ecc9b4717b9652ccef57fb90dbf4b8",
+      "source": "external/tmp/pomosprint_vc-android-lgs-quantitative-a1-offline.log",
+      "source_bytes": 2876,
+      "source_sha256": "45dea339069adbe462b19608a58106b25b13c39ef26728a8737c4b9119a15be2"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-android-lgs-quantitative-a1-resume.summary.json",
+      "output_bytes": 557,
+      "output_sha256": "37a19b0c22a5b2ab87762a5f249c6b48c8357fd7656226e6cc0eb0855b8c1adb",
+      "source": "external/tmp/pomosprint_vc-android-lgs-quantitative-a1-resume.log",
+      "source_bytes": 890,
+      "source_sha256": "b67a01bf19fc44526b0ab310b561aae15facd5584bb040093c35ce98fb33b931"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-android-lgs-verbal-a1-exam_catalog_start.summary.json",
+      "output_bytes": 3093,
+      "output_sha256": "84b173d5e8a31f256fb6a4ac09eb1badc78bff984f5fd0b37c3acf744b8755d3",
+      "source": "external/tmp/pomosprint_vc-android-lgs-verbal-a1-exam_catalog_start.log",
+      "source_bytes": 2408,
+      "source_sha256": "9ce572bc2cc203c108ffb75960d947f878f80efd47640a3f906b7773d860efe1"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-android-lgs-verbal-a1-offline.summary.json",
+      "output_bytes": 3235,
+      "output_sha256": "39bd044fd79cdc671cb9b2178a1e7b5f38588188e616a40de8d9902af1b9a0de",
+      "source": "external/tmp/pomosprint_vc-android-lgs-verbal-a1-offline.log",
+      "source_bytes": 3135,
+      "source_sha256": "a1be2c1a109b8e05090f20612b5b3cbf439594fb0c8550d2432fd3789554545a"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-android-lgs-verbal-a1-resume.summary.json",
+      "output_bytes": 551,
+      "output_sha256": "0272e9aed4f190fa9351283e451f9e56842b4a28d88542101cef9c9bd913870e",
+      "source": "external/tmp/pomosprint_vc-android-lgs-verbal-a1-resume.log",
+      "source_bytes": 878,
+      "source_sha256": "f8296940c2ab4beb1fea8b35f94bc8008cd21f532f4c2ddb81a0521247cbacb7"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-android-tus-basic-a1-exam_catalog_start.summary.json",
+      "output_bytes": 3890,
+      "output_sha256": "67dc394c458c1af3f1e5f060acd1c3fc6e775078b2b6122864112040e24091ac",
+      "source": "external/tmp/pomosprint_vc-android-tus-basic-a1-exam_catalog_start.log",
+      "source_bytes": 2790,
+      "source_sha256": "14e45f806bced46fe57b57bebab4331248642203f2a255ecbdf814c4aa439a22"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-android-tus-basic-a1-offline.summary.json",
+      "output_bytes": 4032,
+      "output_sha256": "01c198862f77cb8e8b0ed5e4c8427af4f5c7881b35d822dcc5e7a65696623dd4",
+      "source": "external/tmp/pomosprint_vc-android-tus-basic-a1-offline.log",
+      "source_bytes": 3517,
+      "source_sha256": "f8ae00d6bc47bbaa5dd6d149f001b8a42d2171438179d6126468dc35e63702fe"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-android-tus-basic-a1-resume.summary.json",
+      "output_bytes": 550,
+      "output_sha256": "f6c872f10f4b58246a102535bdd720462ed8a38437ba1018ce9d5b6f6b0af13a",
+      "source": "external/tmp/pomosprint_vc-android-tus-basic-a1-resume.log",
+      "source_bytes": 876,
+      "source_sha256": "fb7be1cee34de3d8aa0fc782f6bdc1cfb67fd603ed366d481622c6a7e0206c9a"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-android-tus-clinical-a1-exam_catalog_start.summary.json",
+      "output_bytes": 3160,
+      "output_sha256": "79f7987a5f46d7c420627b2a71e4229769fae02d353f4b64947b29709288973c",
+      "source": "external/tmp/pomosprint_vc-android-tus-clinical-a1-exam_catalog_start.log",
+      "source_bytes": 2477,
+      "source_sha256": "35a14549d9555e68ee9a3c2e898290b51c628090cc6aeae3b32a2cfcb7212a42"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-android-tus-clinical-a1-offline.summary.json",
+      "output_bytes": 3302,
+      "output_sha256": "cf979425effb359b75063a8da6ba3594f4a15bf4abf9867d6d6a9ff47296f138",
+      "source": "external/tmp/pomosprint_vc-android-tus-clinical-a1-offline.log",
+      "source_bytes": 3204,
+      "source_sha256": "3e36a87bf2403c851baa5a7ce061826bd9ba4c118ffdfa13ecc2f05710dc0956"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-android-tus-clinical-a1-resume.summary.json",
+      "output_bytes": 553,
+      "output_sha256": "05a29bbb75c45cbaded294b768336b4a0fd0a4dc2df63a350f9aee076e4575e4",
+      "source": "external/tmp/pomosprint_vc-android-tus-clinical-a1-resume.log",
+      "source_bytes": 882,
+      "source_sha256": "92430158116b190f20b4584ea9854c8a1ad4c0ffc12492fd0498afbf791ab471"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-android-tyt-a1-exam_catalog_start.summary.json",
+      "output_bytes": 4250,
+      "output_sha256": "24410e4698efbdef3288d62250985de2cbe16f4fa1f3373aaec7d95484a37da0",
+      "source": "external/tmp/pomosprint_vc-android-tyt-a1-exam_catalog_start.log",
+      "source_bytes": 3250,
+      "source_sha256": "27f2ea104fd9b7558bbb28aaff0bd0aa92af9e7e2eef9fd20beea992ba9aa5e0"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-android-tyt-a1-offline.summary.json",
+      "output_bytes": 4392,
+      "output_sha256": "f69caeab79a5ccc0ad693e85b29de84d719719aae815a216687bb393d8371db8",
+      "source": "external/tmp/pomosprint_vc-android-tyt-a1-offline.log",
+      "source_bytes": 3595,
+      "source_sha256": "324caf11f1f68556f4d4c58afa57fa431dfb3917eaee39d3e19207398e2f168d"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-android-tyt-a1-resume.summary.json",
+      "output_bytes": 544,
+      "output_sha256": "beb79f4955f0b6e8e65c967c346ad07ef179de39a3178661ae823af0dc61bfa8",
+      "source": "external/tmp/pomosprint_vc-android-tyt-a1-resume.log",
+      "source_bytes": 864,
+      "source_sha256": "f34d091da6a81fb212319f9895589b3c019e4ff6d9d511ddccba65c65a77594b"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-android-ydt-a1-exam_catalog_start.summary.json",
+      "output_bytes": 2237,
+      "output_sha256": "cc504fc2ce406c95f40cfc310939fe6b18b6a83080b52341e7cacef204eb78c1",
+      "source": "external/tmp/pomosprint_vc-android-ydt-a1-exam_catalog_start.log",
+      "source_bytes": 1959,
+      "source_sha256": "405fc3bca56d491ad0c42edec42e4f797e085f0cd6d30e8c01a955a7b12a9c98"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-android-ydt-a1-offline.summary.json",
+      "output_bytes": 2379,
+      "output_sha256": "262cb366a3583f5218e6fd490ae825019892f5f5ef149130ab49c7367b30983a",
+      "source": "external/tmp/pomosprint_vc-android-ydt-a1-offline.log",
+      "source_bytes": 2686,
+      "source_sha256": "3c5fbc82793c787eb9089094a3e0b76f40e03325a04b290626487c43cfdefc4e"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-android-ydt-a1-resume.summary.json",
+      "output_bytes": 544,
+      "output_sha256": "31487d09905ee4d1bce638c3df7633e6f2514ce557a6299ca610eafa7fb21701",
+      "source": "external/tmp/pomosprint_vc-android-ydt-a1-resume.log",
+      "source_bytes": 864,
+      "source_sha256": "997b593e7d6b4af546b4ba9f051aedaaf40fea12b3db70b120d201532f8180b7"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-ios-ayt-a2-exam_catalog_start.summary.json",
+      "output_bytes": 4838,
+      "output_sha256": "1bec111e30fb70ef29240af267fb1b0dd95c2093d78d4b3daef749113ec726a4",
+      "source": "external/tmp/pomosprint_vc-ios-ayt-a2-exam_catalog_start.log",
+      "source_bytes": 973717,
+      "source_sha256": "5af66590185708ebe226914be54b8748cfc9198e7e9926f2d36daefc92583bad"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-ios-lgs-quantitative-a3-exam_catalog_start.summary.json",
+      "output_bytes": 2544,
+      "output_sha256": "62bd5c67321e6a2f493c39cbd090dca74f3c9906a2fce1ea59b1fc94fee7d0ec",
+      "source": "external/tmp/pomosprint_vc-ios-lgs-quantitative-a3-exam_catalog_start.log",
+      "source_bytes": 972734,
+      "source_sha256": "c577c737ff5c3c54a60c333e560ff4987f2bfd04e5834633ce794525a75754da"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-ios-lgs-quantitative-a3-offline.summary.json",
+      "output_bytes": 2686,
+      "output_sha256": "f7d538643895be40d4226ffda2cce7639d074b1d1f72171723c5279f623ba376",
+      "source": "external/tmp/pomosprint_vc-ios-lgs-quantitative-a3-offline.log",
+      "source_bytes": 973281,
+      "source_sha256": "90e5e4eaaeb090f549f95852974ddbfae7a03ea06cbf4e957814de64d8a0c689"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-ios-lgs-quantitative-a3-resume.summary.json",
+      "output_bytes": 553,
+      "output_sha256": "517eca2ed3699d63e2a55a564722ddf83c2e90b23c85825ccc4f9298111481f9",
+      "source": "external/tmp/pomosprint_vc-ios-lgs-quantitative-a3-resume.log",
+      "source_bytes": 971425,
+      "source_sha256": "c22eee0cf12b585505bee07e7ec5d9580d7dfc01dd158b03455c26bfd9bef066"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-ios-lgs-verbal-a3-exam_catalog_start.summary.json",
+      "output_bytes": 3085,
+      "output_sha256": "27ea1c6bbabccb4966013d18c2ce536879ce46f2f54956ae3f5546280b33aabb",
+      "source": "external/tmp/pomosprint_vc-ios-lgs-verbal-a3-exam_catalog_start.log",
+      "source_bytes": 973254,
+      "source_sha256": "1bfd927447a29f6dc360bc6a891494ac1825dd8292832d306ed8b93e5a35c69a"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-ios-lgs-verbal-a3-offline.summary.json",
+      "output_bytes": 3227,
+      "output_sha256": "46e5e59eb45cc314f15806084748607cc0bd40e01a7c58d39b7b1e901edfce66",
+      "source": "external/tmp/pomosprint_vc-ios-lgs-verbal-a3-offline.log",
+      "source_bytes": 973886,
+      "source_sha256": "cd00ad945a6c5b989ada30ddc62b81f83864c29d2d4e97f658cb53c2806ec9a2"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-ios-lgs-verbal-a3-resume.summary.json",
+      "output_bytes": 547,
+      "output_sha256": "ec740714bc4768d1140e6a14913d61d73e75ebc559319f5683e7e8af1d384739",
+      "source": "external/tmp/pomosprint_vc-ios-lgs-verbal-a3-resume.log",
+      "source_bytes": 971383,
+      "source_sha256": "8be6a5741164acd4d318adcab1a7cd359d4c3391b9555a133ebf27bc61a3fde6"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-ios-tus-basic-a3-exam_catalog_start.summary.json",
+      "output_bytes": 3882,
+      "output_sha256": "82d04bea9967aa40c7be02b3428402635a53d0921087e52deb68390e71f03f35",
+      "source": "external/tmp/pomosprint_vc-ios-tus-basic-a3-exam_catalog_start.log",
+      "source_bytes": 973272,
+      "source_sha256": "99e11356e1b5b1efb3c27a3f3689fc0a5891febea527c8c9946aeeb6c971f6f2"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-ios-tus-basic-a3-offline.summary.json",
+      "output_bytes": 4024,
+      "output_sha256": "0bc0540595cd0389b6039cfbc06773ac0c26dc8784771f7b3f51036caa394be4",
+      "source": "external/tmp/pomosprint_vc-ios-tus-basic-a3-offline.log",
+      "source_bytes": 973738,
+      "source_sha256": "1ab3f5617e17edab16c816f24587c716d1c07466dfe3718c3a03e89a8686fa70"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-ios-tus-basic-a3-resume.summary.json",
+      "output_bytes": 546,
+      "output_sha256": "583ff8a5e0e0f95902e9dfeb4ecbdec33a031730786eb418c1cc1b5152cba07f",
+      "source": "external/tmp/pomosprint_vc-ios-tus-basic-a3-resume.log",
+      "source_bytes": 971221,
+      "source_sha256": "be01e9947963a8bc3a6dd5046922e47dd62fa8a40b0bd1bc38e9799c3ef5925e"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-ios-tus-clinical-a3-exam_catalog_start.summary.json",
+      "output_bytes": 3152,
+      "output_sha256": "a40f37d364afcd57b0cb5841129a2eb6911c0c2f1c9fe9be1ca71342705920a8",
+      "source": "external/tmp/pomosprint_vc-ios-tus-clinical-a3-exam_catalog_start.log",
+      "source_bytes": 972959,
+      "source_sha256": "983b50721d446a57cea9ed9fbcddc69ceea3d2f784be85f8e7b50f1e3a6704ea"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-ios-tus-clinical-a3-offline.summary.json",
+      "output_bytes": 3294,
+      "output_sha256": "02d3dcf9f212b892fbb6427abc9ee681bd1f8cb5733aaa620c78fa6a151d651c",
+      "source": "external/tmp/pomosprint_vc-ios-tus-clinical-a3-offline.log",
+      "source_bytes": 973487,
+      "source_sha256": "3f1c0b18d3148a1ebe8c0cf5716f585997614b07731eef21d982b4d719bead2a"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-ios-tus-clinical-a3-resume.summary.json",
+      "output_bytes": 549,
+      "output_sha256": "6dd39bc2b36c09b261745cfb8d2a5c7f459dffb74f1b20128527d64bba58536f",
+      "source": "external/tmp/pomosprint_vc-ios-tus-clinical-a3-resume.log",
+      "source_bytes": 971289,
+      "source_sha256": "f5dd6f950acc1a49d4d9bc546e16e3d419f1d8b43832c959ef188387d3eae93e"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-ios-tyt-a1-exam_catalog_start.summary.json",
+      "output_bytes": 4242,
+      "output_sha256": "7aea49efc66ec199baf061e9cae1bb263b825b97bee7266672711a32cfbf9869",
+      "source": "external/tmp/pomosprint_vc-ios-tyt-a1-exam_catalog_start.log",
+      "source_bytes": 973490,
+      "source_sha256": "41568772853bd9d7fb865642f31de7b3f5d6510af159709cead671bc55b53fa0"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-ios-ydt-a3-exam_catalog_start.summary.json",
+      "output_bytes": 2229,
+      "output_sha256": "647fdf722521006aa0571aacca5e040bd7c514f44d523762598f64d322be9229",
+      "source": "external/tmp/pomosprint_vc-ios-ydt-a3-exam_catalog_start.log",
+      "source_bytes": 972615,
+      "source_sha256": "df1529c6d6dae99bfa58f600453e98e6ba5c5715fa8722ecff63cae3836f017c"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-ios-ydt-a3-offline.summary.json",
+      "output_bytes": 2371,
+      "output_sha256": "ceb537d91a44360bf6cc48b2678c6ad0b422c87759b0f3301a31f6130154fff6",
+      "source": "external/tmp/pomosprint_vc-ios-ydt-a3-offline.log",
+      "source_bytes": 973187,
+      "source_sha256": "3ef68cf65302dc4643412002d9dfe9c69ca78016e530804315ca8c69f97828a1"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_vc-ios-ydt-a3-resume.summary.json",
+      "output_bytes": 540,
+      "output_sha256": "9d7637bb3da732ba7ec870eb16ab699f83a37ae9f17bd8455490c1cdbc5f453d",
+      "source": "external/tmp/pomosprint_vc-ios-ydt-a3-resume.log",
+      "source_bytes": 971475,
+      "source_sha256": "50b49028529d3e8b231fe75884151069cc9e6c383eaf25fba7d6104a0331a283"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_verify-android-insight-a6.summary.json",
+      "output_bytes": 568,
+      "output_sha256": "26e854e2ae0d3c5b497d379d30025c3f5d844d5e3681fd99210208896136c23f",
+      "source": "external/tmp/pomosprint_verify-android-insight-a6.log",
+      "source_bytes": 1250,
+      "source_sha256": "d3482cec6c19e2f7d2cbb0bb4e220cf1f14a34f0abee84e80eaa0915dbc0a837"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_verify-android-leagues-a5.summary.json",
+      "output_bytes": 3891,
+      "output_sha256": "74fd1cb5e1274fd5e65b917fa7451a22b3777bb73d8b1aa26564e9536094a0b6",
+      "source": "external/tmp/pomosprint_verify-android-leagues-a5.log",
+      "source_bytes": 6012,
+      "source_sha256": "de520290a300f2601afcf4a34918e50392331aead06195423627af31001c7ee4"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_verify-android-old-a8.summary.json",
+      "output_bytes": 1587,
+      "output_sha256": "94527d1c0ce2a9b893e1109ade51bb325a470dd5fadfa5745bb535af5e0ab6b5",
+      "source": "external/tmp/pomosprint_verify-android-old-a8.log",
+      "source_bytes": 3301,
+      "source_sha256": "efee4e789bb1d75c1ad64379c31d3af42fc0dc40d0d77eaf3fa221a25d246521"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_verify-android-reports-a4.summary.json",
+      "output_bytes": 19029,
+      "output_sha256": "f0f20102bb2d926e33dc483855eef7946af8b08d2dbf3438fcbc50a6354c2c6e",
+      "source": "external/tmp/pomosprint_verify-android-reports-a4.log",
+      "source_bytes": 10657,
+      "source_sha256": "0eca8dafd9c23a94a356262242e7f620ac2ec70d260d5b0f6b6ed9eb6d2578a1"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_verify-android-reports-positive.summary.json",
+      "output_bytes": 20665,
+      "output_sha256": "cf4f14ef0e84de6fdc8c02f2fd428c0f4dced64e46c622654ead7fec3c0e928d",
+      "source": "external/tmp/pomosprint_verify-android-reports-positive.log",
+      "source_bytes": 11557,
+      "source_sha256": "6f1e8d903754809454b3dde52f69199391a14c61be312a8f4e0ab2419a9d9174"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "FAIL",
+      "output": "logs/pomosprint_verify-android-short-recovery.summary.json",
+      "output_bytes": 544,
+      "output_sha256": "f0825f25c5b5f12cb2228e0145720d7b17358e7a21217fdd32f6b0bb1bb9ac34",
+      "source": "external/tmp/pomosprint_verify-android-short-recovery.log",
+      "source_bytes": 2340,
+      "source_sha256": "537aa6ad212f3a9538243b9e16cb2d2eea1a35432d92a1d2d5090c042001db46"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_verify-android-short-recovery2.summary.json",
+      "output_bytes": 1076,
+      "output_sha256": "44d015e01acccfe9e1c2815786c47f9a0c62e8b3b911fb2ad931bb7b43fdf0dd",
+      "source": "external/tmp/pomosprint_verify-android-short-recovery2.log",
+      "source_bytes": 1198,
+      "source_sha256": "e02623250b7bb542e24fec471ae9169d004843a0ddc800ed7ef94a94038a110a"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_verify-android-social-a7.summary.json",
+      "output_bytes": 709,
+      "output_sha256": "53f2677bf794352c6e72389c27986b842995f97b7c1abc42fe0dd58ab9fdb371",
+      "source": "external/tmp/pomosprint_verify-android-social-a7.log",
+      "source_bytes": 2087,
+      "source_sha256": "3cd85029624dee79fc9ca8903ed6ab017a1b0add442a0bf35381887994e64b55"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_verify-ios-insights.summary.json",
+      "output_bytes": 568,
+      "output_sha256": "26e854e2ae0d3c5b497d379d30025c3f5d844d5e3681fd99210208896136c23f",
+      "source": "external/tmp/pomosprint_verify-ios-insights.log",
+      "source_bytes": 971596,
+      "source_sha256": "07cede0dbc582cb332f75b8699a4ce969716ebedb30de419232cc032b9d0c8c8"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_verify-ios-leagues-final.summary.json",
+      "output_bytes": 3891,
+      "output_sha256": "3085f842155a0e5d1de7da7fb4a644a85553fc83c32ca58dd59b4bd62c317a13",
+      "source": "external/tmp/pomosprint_verify-ios-leagues-final.log",
+      "source_bytes": 975397,
+      "source_sha256": "c2636f8777283d5e594f397209e37e641209760c3ecc0b54c63f904a1e47f232"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_verify-ios-leagues.summary.json",
+      "output_bytes": 3891,
+      "output_sha256": "3085f842155a0e5d1de7da7fb4a644a85553fc83c32ca58dd59b4bd62c317a13",
+      "source": "external/tmp/pomosprint_verify-ios-leagues.log",
+      "source_bytes": 975350,
+      "source_sha256": "6bb78949a250aeaa381a707885ff609854fc8834a654c8d76859cdabb92cbab9"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_verify-ios-old-retry2.summary.json",
+      "output_bytes": 1587,
+      "output_sha256": "cffc01012f79e4445c3cebadc33e6745abb388353c92af5a709755658af6f677",
+      "source": "external/tmp/pomosprint_verify-ios-old-retry2.log",
+      "source_bytes": 972007,
+      "source_sha256": "fecca26d429c91dc600ae1624a1bbf1fe41861962e2cfcc2e476597a274135a3"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_verify-ios-reports-positive.summary.json",
+      "output_bytes": 19899,
+      "output_sha256": "80f195bcb92aa931e9d08f6a3652b229953bf8b950246e3247ec9f08c6ad1b45",
+      "source": "external/tmp/pomosprint_verify-ios-reports-positive.log",
+      "source_bytes": 981622,
+      "source_sha256": "42455168ee716aeeaa7c95fb8eb74d8509e37ff5470cc16e47a36f0b977b9756"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_verify-ios-reports.summary.json",
+      "output_bytes": 19029,
+      "output_sha256": "83fef0a552b87adfbf37d05ffc6252753d9e65b9a21de503fe39dea611a2f4c3",
+      "source": "external/tmp/pomosprint_verify-ios-reports.log",
+      "source_bytes": 980231,
+      "source_sha256": "4f29988165fdf3f64909d84212003f584962ba55d67accc7fde3ca6aaa9bfdda"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_verify-ios-social-retry.summary.json",
+      "output_bytes": 709,
+      "output_sha256": "53f2677bf794352c6e72389c27986b842995f97b7c1abc42fe0dd58ab9fdb371",
+      "source": "external/tmp/pomosprint_verify-ios-social-retry.log",
+      "source_bytes": 971549,
+      "source_sha256": "a67816f571909e70b3d2d40be789fa14d32cd0b17abf82aaa590532250ad77b6"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "FAIL",
+      "output": "logs/pomosprint_verify-ios-social.summary.json",
+      "output_bytes": 625,
+      "output_sha256": "8cc3ea90804c71b05a93d46d859d05ef2f7c12ad068d808cfd57a15bce793f28",
+      "source": "external/tmp/pomosprint_verify-ios-social.log",
+      "source_bytes": 974267,
+      "source_sha256": "457ac66c5eab3d776697cdaf2cbaebb89601461126e98dd6eb7f70fafa98afb1"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_verify-ios-tyt-recovery-final.summary.json",
+      "output_bytes": 540,
+      "output_sha256": "78d227a1d3f56404d93314d60816e8c987d97772455294a6ccf1a85bfab37045",
+      "source": "external/tmp/pomosprint_verify-ios-tyt-recovery-final.log",
+      "source_bytes": 970820,
+      "source_sha256": "5e79bb87521ee15e48b0ae15ea019fc83a587f012c57e99674248ed60e58ee1e"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_verify-ios-tyt-recovery-offline.summary.json",
+      "output_bytes": 4384,
+      "output_sha256": "573b19d230bcd458183fa470511583d6d669552272026f473bcee32bdd991b46",
+      "source": "external/tmp/pomosprint_verify-ios-tyt-recovery-offline.log",
+      "source_bytes": 973870,
+      "source_sha256": "497bf9c7fe18d0c2792c0b327d677d2b0df2d3a15852220de56f6f9b88937a3e"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_verify_android_official.summary.json",
+      "output_bytes": 2360,
+      "output_sha256": "bf7779d022f71880cfd856c6e56bab0e546d1c3d847a762a641ad70d6f4cce46",
+      "source": "external/tmp/pomosprint_verify_android_official.log",
+      "source_bytes": 2739,
+      "source_sha256": "f9933d800fd6b7dec6d64d6f4e02eb86df6bfa89d263d8602d6ed4e3fd91178a"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_verify_android_r75_resume.summary.json",
+      "output_bytes": 612,
+      "output_sha256": "f496f790a2261ef01eacdca1cb8bcdccc0b8651d7293999e7b05142f10f2ee74",
+      "source": "external/tmp/pomosprint_verify_android_r75_resume.log",
+      "source_bytes": 1349,
+      "source_sha256": "53393ec2170e37f146be6319e1db44bbb2ae9bdab91579eff689863dd656b65d"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_verify_android_r75_start.summary.json",
+      "output_bytes": 1477,
+      "output_sha256": "aa8ec63bfe775be31f2fdc7271eba8107968ed4ee751a21d430b7ce35abb3e82",
+      "source": "external/tmp/pomosprint_verify_android_r75_start.log",
+      "source_bytes": 2184,
+      "source_sha256": "d11c20544e1dfc855f59d22bf9aa1dbf4611af4e32c06745772cf8fa8fc8816c"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "FAIL",
+      "output": "logs/pomosprint_verify_android_short.summary.json",
+      "output_bytes": 874,
+      "output_sha256": "103a40ea7abe962a70f7be3c2d9d7e0ba3377fb4261c5689c1e2d9ccd80bcf0c",
+      "source": "external/tmp/pomosprint_verify_android_short.log",
+      "source_bytes": 3184,
+      "source_sha256": "ebf9a3498f756c8c62d8769dac8d454a7db6d4d310783d585e6a94dbda80eb08"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_verify_android_short_retry.summary.json",
+      "output_bytes": 2372,
+      "output_sha256": "8f18bf1f5a637398bf10d52eb8c1206cdbbd133c4428802c9a34b61c4c987d99",
+      "source": "external/tmp/pomosprint_verify_android_short_retry.log",
+      "source_bytes": 3813,
+      "source_sha256": "e93fd2fe5553fefd6b357336c00d7c33c8819474bc4b4c6d0ce83bd0674d4ee5"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "FAIL",
+      "output": "logs/pomosprint_verify_ios_official.summary.json",
+      "output_bytes": 2550,
+      "output_sha256": "edafdb0caa65be84d9536c95050bf0f0e8efb63f6e25fe1b59a29ea5df7759ee",
+      "source": "external/tmp/pomosprint_verify_ios_official.log",
+      "source_bytes": 5857,
+      "source_sha256": "d3983924958fec969b868572d4c719f2acb6c6132c2cd7c3020d18f40ed74ec1"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "NATIVE_PASS_WRAPPER_FAIL",
+      "output": "logs/pomosprint_verify_ios_official_retry.summary.json",
+      "output_bytes": 2796,
+      "output_sha256": "26a5a6bc805dc2d1d70b7084f530a8a9d1bee6be1cfa0ced2104eafc6838c728",
+      "source": "external/tmp/pomosprint_verify_ios_official_retry.log",
+      "source_bytes": 3036,
+      "source_sha256": "6608678a19e8e26be175127006966c0c1dec5fb582a82f304eb280cf5f24c7c9"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "FAIL",
+      "output": "logs/pomosprint_verify_ios_old.summary.json",
+      "output_bytes": 917,
+      "output_sha256": "c9d638a5c95c19f0aa1114cd8dd10b87cdb927b7697f73852888042a705d299e",
+      "source": "external/tmp/pomosprint_verify_ios_old.log",
+      "source_bytes": 5553,
+      "source_sha256": "b7bb19c4fb790b0b831ff84ad4494b5f3414c6c801dbf6bb638f274107417496"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "FAIL",
+      "output": "logs/pomosprint_verify_ios_old_retry.summary.json",
+      "output_bytes": 880,
+      "output_sha256": "d69a56b4e414ce3539c2e0ed48c3ceff4447be79522eb8f1642c706fe3edbe24",
+      "source": "external/tmp/pomosprint_verify_ios_old_retry.log",
+      "source_bytes": 6672,
+      "source_sha256": "d3d2e2537007368f94e7dd8572a43022f1d2dbb97954a23e0e9add79e64c3e4f"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "FAIL",
+      "output": "logs/pomosprint_verify_ios_short.summary.json",
+      "output_bytes": 681,
+      "output_sha256": "6900c03ecc1782165121a3b8138403a058034d121d9a9cbec92fe263741a4935",
+      "source": "external/tmp/pomosprint_verify_ios_short.log",
+      "source_bytes": 1637,
+      "source_sha256": "ea5027f6b17a7736ef93bc75e3c89dd591187a0de0c688d41a078efbef703ec3"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "FAIL",
+      "output": "logs/pomosprint_verify_ios_short_retry.summary.json",
+      "output_bytes": 1060,
+      "output_sha256": "5c2708f6feb4ca89a5a56a221d77f7439eee65685e70490129ba5dda805a2819",
+      "source": "external/tmp/pomosprint_verify_ios_short_retry.log",
+      "source_bytes": 974801,
+      "source_sha256": "3d67109384938c73a6fab0cb0c16a48636b85b038baf2dd4773642ab757e30e5"
+    },
+    {
+      "kind": "filtered_native_log",
+      "outcome": "PASS",
+      "output": "logs/pomosprint_verify_ios_short_retry2.summary.json",
+      "output_bytes": 2372,
+      "output_sha256": "930edb81375bf3b1957dc2b97caf8038e2ec81a11da178872069e2a5276fb261",
+      "source": "external/tmp/pomosprint_verify_ios_short_retry2.log",
+      "source_bytes": 973392,
+      "source_sha256": "73cde3bbe20e1aaf775a38be6d5bd11c81e2bfed85f8b77783d6f97db53da6b4"
+    },
+    {
+      "kind": "filtered_local_parity",
+      "outcome": "REFERENCE_ONLY",
+      "output": "parity/android_short_restored_parity.summary.json",
+      "output_bytes": 398,
+      "output_sha256": "6ce9a0937c25eec67186350eff73a3ea8a0fa2894bc0e11dbda789bf873aee51",
+      "source": "build/verification_20261028/android_short_restored_parity.log",
+      "source_bytes": 222,
+      "source_sha256": "82d732ba47cead7d635774f9a3d7c040c4c4a177e65732eac22e65ef4830743e"
+    },
+    {
+      "kind": "filtered_local_parity",
+      "outcome": "REFERENCE_ONLY",
+      "output": "parity/android_short_retry_restored_parity.summary.json",
+      "output_bytes": 398,
+      "output_sha256": "6ce9a0937c25eec67186350eff73a3ea8a0fa2894bc0e11dbda789bf873aee51",
+      "source": "build/verification_20261028/android_short_retry_restored_parity.log",
+      "source_bytes": 222,
+      "source_sha256": "82d732ba47cead7d635774f9a3d7c040c4c4a177e65732eac22e65ef4830743e"
+    },
+    {
+      "kind": "filtered_local_parity",
+      "outcome": "REFERENCE_ONLY",
+      "output": "parity/ios_short_restored_parity.summary.json",
+      "output_bytes": 398,
+      "output_sha256": "6ce9a0937c25eec67186350eff73a3ea8a0fa2894bc0e11dbda789bf873aee51",
+      "source": "build/verification_20261028/ios_short_restored_parity.log",
+      "source_bytes": 222,
+      "source_sha256": "82d732ba47cead7d635774f9a3d7c040c4c4a177e65732eac22e65ef4830743e"
+    },
+    {
+      "kind": "filtered_local_parity",
+      "outcome": "REFERENCE_ONLY",
+      "output": "parity/joint_catalog_cycles_a1_restored_parity.summary.json",
+      "output_bytes": 398,
+      "output_sha256": "6ce9a0937c25eec67186350eff73a3ea8a0fa2894bc0e11dbda789bf873aee51",
+      "source": "build/verification_20261028/joint_catalog_cycles_a1_restored_parity.log",
+      "source_bytes": 222,
+      "source_sha256": "82d732ba47cead7d635774f9a3d7c040c4c4a177e65732eac22e65ef4830743e"
+    },
+    {
+      "kind": "filtered_local_parity",
+      "outcome": "REFERENCE_ONLY",
+      "output": "parity/joint_catalog_cycles_v2_a2_restored_parity.summary.json",
+      "output_bytes": 398,
+      "output_sha256": "6ce9a0937c25eec67186350eff73a3ea8a0fa2894bc0e11dbda789bf873aee51",
+      "source": "build/verification_20261028/joint_catalog_cycles_v2_a2_restored_parity.log",
+      "source_bytes": 222,
+      "source_sha256": "82d732ba47cead7d635774f9a3d7c040c4c4a177e65732eac22e65ef4830743e"
+    },
+    {
+      "kind": "filtered_local_parity",
+      "outcome": "REFERENCE_ONLY",
+      "output": "parity/joint_catalog_cycles_v3_a3_restored_parity.summary.json",
+      "output_bytes": 398,
+      "output_sha256": "6ce9a0937c25eec67186350eff73a3ea8a0fa2894bc0e11dbda789bf873aee51",
+      "source": "build/verification_20261028/joint_catalog_cycles_v3_a3_restored_parity.log",
+      "source_bytes": 222,
+      "source_sha256": "82d732ba47cead7d635774f9a3d7c040c4c4a177e65732eac22e65ef4830743e"
+    },
+    {
+      "kind": "independent_review",
+      "outcome": "REVIEW_ONLY",
+      "output": "reviews/A_visual_review.md",
+      "output_bytes": 5912,
+      "output_sha256": "52dd6162126dd6f3e7fca27a8ebd0863f8bd4e177a64be7976b2018e9c2801ee",
+      "source": "external/tmp/pomosprint_A_visual_review.md",
+      "source_bytes": 5944,
+      "source_sha256": "f99c76bd0d122f510c8b77c4e0146b6b302ae9c810f9147232dc0973fb2f2494"
+    },
+    {
+      "kind": "independent_review",
+      "outcome": "REVIEW_ONLY",
+      "output": "reviews/android_native_execution_summary.md",
+      "output_bytes": 5275,
+      "output_sha256": "237ff5bda181d2bcc0dbe4ce4ad8706f005b90c33f39727107d548fbc0626702",
+      "source": "external/tmp/pomosprint_android_native_execution_summary.md",
+      "source_bytes": 5233,
+      "source_sha256": "81cd946efa6cf8f2d23addd5d545ad1cfd3d42468048491020106667536b41d2"
+    }
+  ],
+  "generator": "pomosprint_collect_A_evidence_v1",
+  "input_bytes_examined": 31518432,
+  "native_wrapper_distinction": "See ios official retry filtered log: native PASS does not erase wrapper FAIL",
+  "normalization": "Repo prefix removed; /tmp represented as external/tmp; full logs not copied",
+  "pending_is_not_pass": true,
+  "schema_version": 1,
+  "scope": "Local fictional QA A evidence only; no live/deploy/release verdict",
+  "short_lifecycle_coverage": {
+    "android": {
+      "all_seven_verified": true,
+      "evidence": {
+        "ayt": [
+          "json/android-catalog-cycles-a1.json"
+        ],
+        "lgs_quantitative": [
+          "json/android-catalog-cycles-a1.json"
+        ],
+        "lgs_verbal": [
+          "json/android-catalog-cycles-a1.json"
+        ],
+        "tus_basic": [
+          "json/android-catalog-cycles-a1.json"
+        ],
+        "tus_clinical": [
+          "json/android-catalog-cycles-a1.json"
+        ],
+        "tyt": [
+          "json/android-catalog-cycles-a1.json"
+        ],
+        "ydt": [
+          "json/android-catalog-cycles-a1.json"
+        ]
+      },
+      "pending_exam_ids": [],
+      "scope": "SHORT natural60 OS/offline/reconnect; not official durations",
+      "verified_exam_ids": [
+        "tyt",
+        "ayt",
+        "ydt",
+        "lgs_verbal",
+        "lgs_quantitative",
+        "tus_basic",
+        "tus_clinical"
+      ]
+    },
+    "ios": {
+      "all_seven_verified": true,
+      "evidence": {
+        "ayt": [
+          "json/ios-ayt-a2-recovered.json"
+        ],
+        "lgs_quantitative": [
+          "json/ios-catalog-cycles-a3.json"
+        ],
+        "lgs_verbal": [
+          "json/ios-catalog-cycles-a3.json"
+        ],
+        "tus_basic": [
+          "json/ios-catalog-cycles-a3.json"
+        ],
+        "tus_clinical": [
+          "json/ios-catalog-cycles-a3.json"
+        ],
+        "tyt": [
+          "json/ios_tyt_lifecycle_recovered.json"
+        ],
+        "ydt": [
+          "json/ios-catalog-cycles-a3.json"
+        ]
+      },
+      "pending_exam_ids": [],
+      "scope": "SHORT natural60 OS/offline/reconnect; not official durations",
+      "verified_exam_ids": [
+        "tyt",
+        "ayt",
+        "ydt",
+        "lgs_verbal",
+        "lgs_quantitative",
+        "tus_basic",
+        "tus_clinical"
+      ]
+    }
+  },
+  "source_fingerprints": [
+    {
+      "bytes": 9810,
+      "path": "lib/widgets/exam_results_dialog.dart",
+      "scope": "Current source fingerprint; not a claim of historical compiled bytes",
+      "sha256_at_curation": "af306cc814e5b366c0aca8c04a4f092c8ef974cc7a8cc3c41a24a8bb57a6a415"
+    },
+    {
+      "bytes": 24424,
+      "path": "lib/services/exam_service.dart",
+      "scope": "Current source fingerprint; not a claim of historical compiled bytes",
+      "sha256_at_curation": "652b0e48d0eb582edb8fe252f8f1adb2c20cd3d7664ed10f8de26a571ac69ff4"
+    },
+    {
+      "bytes": 5901,
+      "path": "lib/services/exam_persistence.dart",
+      "scope": "Current source fingerprint; not a claim of historical compiled bytes",
+      "sha256_at_curation": "391f8df56a546249adb5fae72bc0d432c8994dd3f2157b40ae80e110bc0358d0"
+    },
+    {
+      "bytes": 36656,
+      "path": "integration_test/ad_verify_reports_exams_test.dart",
+      "scope": "Current source fingerprint; not a claim of historical compiled bytes",
+      "sha256_at_curation": "d7022e6b3af97c34d05d53bf1275a7ac7ebd658e04913f7c01be3dfc90f01016"
+    },
+    {
+      "bytes": 15012,
+      "path": "integration_test/ae_old_server_isolated_test.dart",
+      "scope": "Current source fingerprint; not a claim of historical compiled bytes",
+      "sha256_at_curation": "1b5089a8a4299e0dc112badd58d54a6892a579b2a14e8ace27d4cb1fc7656880"
+    },
+    {
+      "bytes": 26825,
+      "path": "integration_test/af_verification_leagues_social_test.dart",
+      "scope": "Current source fingerprint; not a claim of historical compiled bytes",
+      "sha256_at_curation": "e9fecc8d381e1483114b44a30604862bc61cf52227a1c25cb2858fe031d96251"
+    },
+    {
+      "bytes": 6959,
+      "path": "integration_test/ah_pending_exam_recovery_test.dart",
+      "scope": "Current source fingerprint; not a claim of historical compiled bytes",
+      "sha256_at_curation": "e119c626d3adaeee3cc2423c64025985b3eefdf717d48a2525d1abe3988483b6"
+    },
+    {
+      "bytes": 10085,
+      "path": "integration_test/aa_exam_insights_test.dart",
+      "scope": "Current source fingerprint; not a claim of historical compiled bytes",
+      "sha256_at_curation": "beae738f716a957110314a07880d916ba228bf7fe132e722cbcabf6ddf424b12"
+    },
+    {
+      "bytes": 28229,
+      "path": "integration_test/r_real_duration_probe_test.dart",
+      "scope": "Current source fingerprint; not a claim of historical compiled bytes",
+      "sha256_at_curation": "b88c2f8d9b136e1873182cff04617cc4eca5572537d590a635839d0100c19b77"
+    },
+    {
+      "bytes": 26557,
+      "path": "tool/local_supabase/e2e/verify_reports_and_exams.py",
+      "scope": "Current source fingerprint; not a claim of historical compiled bytes",
+      "sha256_at_curation": "64ffb1854df1f7e372cad1416e0b8023ecc24ef19db873eba7eb0c34b6ef1c2e"
+    },
+    {
+      "bytes": 13519,
+      "path": "tool/local_supabase/e2e/create_verification_cohort.py",
+      "scope": "Current source fingerprint; not a claim of historical compiled bytes",
+      "sha256_at_curation": "4b89c750a31a19425c10b28a060ce90cfc008a3dcde7416f45d1fd790f1f111f"
+    },
+    {
+      "bytes": 17860,
+      "path": "tool/local_supabase/e2e/isolated_old_stack.py",
+      "scope": "Current source fingerprint; not a claim of historical compiled bytes",
+      "sha256_at_curation": "22e953edf25a2b9963317594ce68cc32c88e78977fefad916d016d0b38416c7a"
+    },
+    {
+      "bytes": 41446,
+      "path": "external/tmp/pomosprint_collect_A_evidence.py",
+      "scope": "Exact curation implementation; source file is not copied into the evidence bundle",
+      "sha256_at_curation": "08d7eebcfbefa4f14cf1d9c0959647ff79b8a814dbf7afb96d4871d7075ae7bd"
+    }
+  ]
+}

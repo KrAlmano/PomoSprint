@@ -1,0 +1,742 @@
+{
+  "errors": [],
+  "events": [
+    {
+      "data": {
+        "daily": {
+          "active_days": 1,
+          "busiest_day": {
+            "day": "2026-10-28",
+            "focus_equivalents": 1,
+            "minutes": 160
+          },
+          "categories": [
+            {
+              "category_id": "pomosprint:exam",
+              "focus_equivalents": 0,
+              "minutes": 135,
+              "name": "",
+              "percentage": 84,
+              "sessions": 1
+            },
+            {
+              "category_id": "595b0968-0bcf-46e9-b19f-c183270ff40e",
+              "focus_equivalents": 1,
+              "minutes": 25,
+              "name": "Matematik",
+              "percentage": 16,
+              "sessions": 1
+            }
+          ],
+          "category_minutes": {
+            "595b0968-0bcf-46e9-b19f-c183270ff40e": 25,
+            "pomosprint:exam": 135
+          },
+          "category_percentages": {
+            "595b0968-0bcf-46e9-b19f-c183270ff40e": 16,
+            "pomosprint:exam": 84
+          },
+          "counts": {
+            "completed_exams": 1,
+            "completed_marathons": 0,
+            "marathon_focus_sessions": 0,
+            "normal_sessions": 1,
+            "pending_sessions": 0,
+            "unknown_sessions": 0
+          },
+          "days": [
+            {
+              "day": "2026-10-28",
+              "focus_equivalents": 1,
+              "minutes": 160
+            }
+          ],
+          "efficiency": 133,
+          "efficiency_percentage": 133,
+          "end": "2026-10-28",
+          "focus_equivalents": 1,
+          "goal_minutes": 120,
+          "goal_percentage": 100,
+          "goal_progress_percentage": 133,
+          "start": "2026-10-28",
+          "total_minutes": 160
+        },
+        "monthly": {
+          "active_days": 2,
+          "busiest_day": {
+            "day": "2026-10-28",
+            "focus_equivalents": 1,
+            "minutes": 160
+          },
+          "categories": [
+            {
+              "category_id": "pomosprint:exam",
+              "focus_equivalents": 0,
+              "minutes": 135,
+              "name": "",
+              "percentage": 52,
+              "sessions": 1
+            },
+            {
+              "category_id": "595b0968-0bcf-46e9-b19f-c183270ff40e",
+              "focus_equivalents": 5,
+              "minutes": 125,
+              "name": "Matematik",
+              "percentage": 48,
+              "sessions": 5
+            }
+          ],
+          "category_minutes": {
+            "595b0968-0bcf-46e9-b19f-c183270ff40e": 125,
+            "pomosprint:exam": 135
+          },
+          "category_percentages": {
+            "595b0968-0bcf-46e9-b19f-c183270ff40e": 48,
+            "pomosprint:exam": 52
+          },
+          "counts": {
+            "completed_exams": 1,
+            "completed_marathons": 0,
+            "marathon_focus_sessions": 0,
+            "normal_sessions": 5,
+            "pending_sessions": 0,
+            "unknown_sessions": 0
+          },
+          "days": [
+            {
+              "day": "2026-10-01",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-02",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-03",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-04",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-05",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-06",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-07",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-08",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-09",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-10",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-11",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-12",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-13",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-14",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-15",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-16",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-17",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-18",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-19",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-20",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-21",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-22",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-23",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-24",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-25",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-26",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-27",
+              "focus_equivalents": 4,
+              "minutes": 100
+            },
+            {
+              "day": "2026-10-28",
+              "focus_equivalents": 1,
+              "minutes": 160
+            },
+            {
+              "day": "2026-10-29",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-30",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-31",
+              "focus_equivalents": 0,
+              "minutes": 0
+            }
+          ],
+          "efficiency": 6,
+          "end": "2026-10-31",
+          "focus_equivalents": 5,
+          "goal_minutes": 3720,
+          "goal_percentage": 6,
+          "goal_progress_percentage": 6,
+          "month_to_date_growth_percentage": null,
+          "month_to_date_minutes": 260,
+          "previous_month_to_date_minutes": 0,
+          "start": "2026-10-01",
+          "total_minutes": 260
+        },
+        "weekly": {
+          "active_days": 2,
+          "busiest_day": {
+            "day": "2026-10-28",
+            "focus_equivalents": 1,
+            "minutes": 160
+          },
+          "categories": [
+            {
+              "category_id": "pomosprint:exam",
+              "focus_equivalents": 0,
+              "minutes": 135,
+              "name": "",
+              "percentage": 52,
+              "sessions": 1
+            },
+            {
+              "category_id": "595b0968-0bcf-46e9-b19f-c183270ff40e",
+              "focus_equivalents": 5,
+              "minutes": 125,
+              "name": "Matematik",
+              "percentage": 48,
+              "sessions": 5
+            }
+          ],
+          "category_minutes": {
+            "595b0968-0bcf-46e9-b19f-c183270ff40e": 125,
+            "pomosprint:exam": 135
+          },
+          "category_percentages": {
+            "595b0968-0bcf-46e9-b19f-c183270ff40e": 48,
+            "pomosprint:exam": 52
+          },
+          "counts": {
+            "completed_exams": 1,
+            "completed_marathons": 0,
+            "marathon_focus_sessions": 0,
+            "normal_sessions": 5,
+            "pending_sessions": 0,
+            "unknown_sessions": 0
+          },
+          "days": [
+            {
+              "day": "2026-10-26",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-27",
+              "focus_equivalents": 4,
+              "minutes": 100
+            },
+            {
+              "day": "2026-10-28",
+              "focus_equivalents": 1,
+              "minutes": 160
+            },
+            {
+              "day": "2026-10-29",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-30",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-31",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-11-01",
+              "focus_equivalents": 0,
+              "minutes": 0
+            }
+          ],
+          "efficiency": 30,
+          "efficiency_label_key": "eff_high",
+          "efficiency_percentage": 30,
+          "elapsed_pace_percentage": 72,
+          "end": "2026-11-01",
+          "focus_equivalents": 5,
+          "goal_minutes": 840,
+          "goal_percentage": 30,
+          "goal_progress_percentage": 30,
+          "start": "2026-10-26",
+          "total_minutes": 260
+        }
+      },
+      "marker": "AD_REPORTS",
+      "message": "owner=311a2c6a-cfeb-426c-8482-afb730dd5af5 lang=tr DB/UI daily weekly monthly PASS"
+    },
+    {
+      "data": {
+        "daily": {
+          "active_days": 1,
+          "busiest_day": {
+            "day": "2026-10-28",
+            "focus_equivalents": 1,
+            "minutes": 160
+          },
+          "categories": [
+            {
+              "category_id": "pomosprint:exam",
+              "focus_equivalents": 0,
+              "minutes": 135,
+              "name": "",
+              "percentage": 84,
+              "sessions": 1
+            },
+            {
+              "category_id": "595b0968-0bcf-46e9-b19f-c183270ff40e",
+              "focus_equivalents": 1,
+              "minutes": 25,
+              "name": "Matematik",
+              "percentage": 16,
+              "sessions": 1
+            }
+          ],
+          "category_minutes": {
+            "595b0968-0bcf-46e9-b19f-c183270ff40e": 25,
+            "pomosprint:exam": 135
+          },
+          "category_percentages": {
+            "595b0968-0bcf-46e9-b19f-c183270ff40e": 16,
+            "pomosprint:exam": 84
+          },
+          "counts": {
+            "completed_exams": 1,
+            "completed_marathons": 0,
+            "marathon_focus_sessions": 0,
+            "normal_sessions": 1,
+            "pending_sessions": 0,
+            "unknown_sessions": 0
+          },
+          "days": [
+            {
+              "day": "2026-10-28",
+              "focus_equivalents": 1,
+              "minutes": 160
+            }
+          ],
+          "efficiency": 133,
+          "efficiency_percentage": 133,
+          "end": "2026-10-28",
+          "focus_equivalents": 1,
+          "goal_minutes": 120,
+          "goal_percentage": 100,
+          "goal_progress_percentage": 133,
+          "start": "2026-10-28",
+          "total_minutes": 160
+        },
+        "monthly": {
+          "active_days": 2,
+          "busiest_day": {
+            "day": "2026-10-28",
+            "focus_equivalents": 1,
+            "minutes": 160
+          },
+          "categories": [
+            {
+              "category_id": "pomosprint:exam",
+              "focus_equivalents": 0,
+              "minutes": 135,
+              "name": "",
+              "percentage": 52,
+              "sessions": 1
+            },
+            {
+              "category_id": "595b0968-0bcf-46e9-b19f-c183270ff40e",
+              "focus_equivalents": 5,
+              "minutes": 125,
+              "name": "Matematik",
+              "percentage": 48,
+              "sessions": 5
+            }
+          ],
+          "category_minutes": {
+            "595b0968-0bcf-46e9-b19f-c183270ff40e": 125,
+            "pomosprint:exam": 135
+          },
+          "category_percentages": {
+            "595b0968-0bcf-46e9-b19f-c183270ff40e": 48,
+            "pomosprint:exam": 52
+          },
+          "counts": {
+            "completed_exams": 1,
+            "completed_marathons": 0,
+            "marathon_focus_sessions": 0,
+            "normal_sessions": 5,
+            "pending_sessions": 0,
+            "unknown_sessions": 0
+          },
+          "days": [
+            {
+              "day": "2026-10-01",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-02",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-03",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-04",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-05",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-06",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-07",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-08",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-09",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-10",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-11",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-12",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-13",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-14",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-15",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-16",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-17",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-18",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-19",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-20",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-21",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-22",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-23",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-24",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-25",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-26",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-27",
+              "focus_equivalents": 4,
+              "minutes": 100
+            },
+            {
+              "day": "2026-10-28",
+              "focus_equivalents": 1,
+              "minutes": 160
+            },
+            {
+              "day": "2026-10-29",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-30",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-31",
+              "focus_equivalents": 0,
+              "minutes": 0
+            }
+          ],
+          "efficiency": 6,
+          "end": "2026-10-31",
+          "focus_equivalents": 5,
+          "goal_minutes": 3720,
+          "goal_percentage": 6,
+          "goal_progress_percentage": 6,
+          "month_to_date_growth_percentage": null,
+          "month_to_date_minutes": 260,
+          "previous_month_to_date_minutes": 0,
+          "start": "2026-10-01",
+          "total_minutes": 260
+        },
+        "weekly": {
+          "active_days": 2,
+          "busiest_day": {
+            "day": "2026-10-28",
+            "focus_equivalents": 1,
+            "minutes": 160
+          },
+          "categories": [
+            {
+              "category_id": "pomosprint:exam",
+              "focus_equivalents": 0,
+              "minutes": 135,
+              "name": "",
+              "percentage": 52,
+              "sessions": 1
+            },
+            {
+              "category_id": "595b0968-0bcf-46e9-b19f-c183270ff40e",
+              "focus_equivalents": 5,
+              "minutes": 125,
+              "name": "Matematik",
+              "percentage": 48,
+              "sessions": 5
+            }
+          ],
+          "category_minutes": {
+            "595b0968-0bcf-46e9-b19f-c183270ff40e": 125,
+            "pomosprint:exam": 135
+          },
+          "category_percentages": {
+            "595b0968-0bcf-46e9-b19f-c183270ff40e": 48,
+            "pomosprint:exam": 52
+          },
+          "counts": {
+            "completed_exams": 1,
+            "completed_marathons": 0,
+            "marathon_focus_sessions": 0,
+            "normal_sessions": 5,
+            "pending_sessions": 0,
+            "unknown_sessions": 0
+          },
+          "days": [
+            {
+              "day": "2026-10-26",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-27",
+              "focus_equivalents": 4,
+              "minutes": 100
+            },
+            {
+              "day": "2026-10-28",
+              "focus_equivalents": 1,
+              "minutes": 160
+            },
+            {
+              "day": "2026-10-29",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-30",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-31",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-11-01",
+              "focus_equivalents": 0,
+              "minutes": 0
+            }
+          ],
+          "efficiency": 30,
+          "efficiency_label_key": "eff_high",
+          "efficiency_percentage": 30,
+          "elapsed_pace_percentage": 72,
+          "end": "2026-11-01",
+          "focus_equivalents": 5,
+          "goal_minutes": 840,
+          "goal_percentage": 30,
+          "goal_progress_percentage": 30,
+          "start": "2026-10-26",
+          "total_minutes": 260
+        }
+      },
+      "marker": "AD_REPORTS",
+      "message": "owner=311a2c6a-cfeb-426c-8482-afb730dd5af5 lang=en DB/UI daily weekly monthly PASS"
+    }
+  ],
+  "native_process_result": "PASS",
+  "native_totals": [
+    "00:25 +1 ~2: (tearDownAll)",
+    "00:25 +1 ~2: All tests passed!"
+  ],
+  "schema_version": 1,
+  "scope": "Selected native checkpoints/totals only; not a release verdict or full-duration claim",
+  "wrapper_result": "NOT_PRESENT",
+  "wrapper_totals": []
+}

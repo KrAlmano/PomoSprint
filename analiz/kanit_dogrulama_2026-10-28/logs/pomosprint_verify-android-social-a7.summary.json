@@ -1,0 +1,22 @@
+{
+  "errors": [],
+  "events": [
+    {
+      "marker": "AF_SOCIAL",
+      "message": "language=tr focus/break/exam ended, privacy off and blocked all removed by natural poll; explicit QA restoration PASS"
+    },
+    {
+      "marker": "AF_SOCIAL",
+      "message": "language=en focus/break/exam ended, privacy off and blocked all removed by natural poll; explicit QA restoration PASS"
+    }
+  ],
+  "native_process_result": "PASS",
+  "native_totals": [
+    "05:17 +1 ~1: (tearDownAll)",
+    "05:17 +1 ~1: All tests passed!"
+  ],
+  "schema_version": 1,
+  "scope": "Selected native checkpoints/totals only; not a release verdict or full-duration claim",
+  "wrapper_result": "NOT_PRESENT",
+  "wrapper_totals": []
+}

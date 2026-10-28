@@ -1,0 +1,46 @@
+[
+  {
+    "category_percentages": {
+      "595b0968-0bcf-46e9-b19f-c183270ff40e": 16,
+      "pomosprint:exam": 84
+    },
+    "daily_counts": {
+      "completed_exams": 1,
+      "completed_marathons": 0,
+      "marathon_focus_sessions": 0,
+      "normal_sessions": 1,
+      "pending_sessions": 0,
+      "unknown_sessions": 0
+    },
+    "daily_efficiency": 133,
+    "daily_goal_ring_percentage": 100,
+    "language": "tr",
+    "minutes": {
+      "daily": 160,
+      "monthly": 260,
+      "weekly": 260
+    }
+  },
+  {
+    "category_percentages": {
+      "595b0968-0bcf-46e9-b19f-c183270ff40e": 16,
+      "pomosprint:exam": 84
+    },
+    "daily_counts": {
+      "completed_exams": 1,
+      "completed_marathons": 0,
+      "marathon_focus_sessions": 0,
+      "normal_sessions": 1,
+      "pending_sessions": 0,
+      "unknown_sessions": 0
+    },
+    "daily_efficiency": 133,
+    "daily_goal_ring_percentage": 100,
+    "language": "en",
+    "minutes": {
+      "daily": 160,
+      "monthly": 260,
+      "weekly": 260
+    }
+  }
+]

@@ -1,0 +1,75 @@
+{
+  "errors": [],
+  "events": [
+    {
+      "data": {
+        "attempt_id": "af8cde3b-4316-4c9c-b677-61b5d3c2befa",
+        "baseline": {
+          "coins": 0,
+          "current_streak": 0,
+          "exam_coins": 0,
+          "exam_points": 0,
+          "last_study_date": null,
+          "lifetime_points": 0,
+          "timezone": "Europe/Istanbul",
+          "total_minutes": 0
+        },
+        "client_uuid": "72d4170b-cca6-4604-951d-2bff9c0c2c2c",
+        "completion_verified": false,
+        "definition_snapshot": {
+          "catalog_version": 1,
+          "duration_seconds": 60,
+          "group": "yks",
+          "id": "ydt",
+          "name_en": "YDT",
+          "name_tr": "YDT",
+          "reward_coins": 0,
+          "reward_points": 0,
+          "segment": "yks",
+          "subjects": [
+            {
+              "category_keys": [
+                "İngilizce"
+              ],
+              "id": "foreign_language",
+              "name_en": "Foreign Language",
+              "name_tr": "Yabancı Dil",
+              "question_count": 80
+            }
+          ],
+          "total_questions": 80,
+          "wrong_answer_divisor": 4
+        },
+        "duration_seconds": 60,
+        "email": "e2e-sim-probe-exam-catalog-start-vc-ios-ydt-a3@pomosprint.local",
+        "ends_at": "2026-10-28T10:57:18.591978Z",
+        "exam_id": "ydt",
+        "expected_coins": 0,
+        "expected_points": 0,
+        "language": "tr",
+        "last_resume_at": "2026-10-28T10:58:14.981182Z",
+        "mode": "exam_catalog_start",
+        "notification_delivery_tested": false,
+        "observed_at": "2026-10-28T10:56:18.792565Z",
+        "offline_pending_verified": true,
+        "owner_id": "7db9612e-b4ac-4a6d-9e35-655f07486f64",
+        "remaining_at_start": 60,
+        "run_id": "vc-ios-ydt-a3",
+        "scope": "SHORT local-catalog natural60 lifecycle, NOT official duration",
+        "started_at": "2026-10-28T10:56:18.591978Z",
+        "total_questions": 80
+      },
+      "marker": "CATALOG_PROBE_OFFLINE",
+      "message": ""
+    }
+  ],
+  "native_process_result": "PASS",
+  "native_totals": [
+    "00:09 +1: (tearDownAll)",
+    "00:09 +1: All tests passed!"
+  ],
+  "schema_version": 1,
+  "scope": "Selected native checkpoints/totals only; not a release verdict or full-duration claim",
+  "wrapper_result": "NOT_PRESENT",
+  "wrapper_totals": []
+}

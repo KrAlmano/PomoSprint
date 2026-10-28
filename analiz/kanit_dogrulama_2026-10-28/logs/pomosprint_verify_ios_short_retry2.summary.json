@@ -1,0 +1,74 @@
+{
+  "errors": [],
+  "events": [
+    {
+      "marker": "AD_SHORT",
+      "message": "tr tyt real60 server-minute and editable-net/no-economy-change PASS"
+    },
+    {
+      "marker": "AD_SHORT",
+      "message": "tr ayt real60 server-minute and editable-net/no-economy-change PASS"
+    },
+    {
+      "marker": "AD_SHORT",
+      "message": "tr ydt real60 server-minute and editable-net/no-economy-change PASS"
+    },
+    {
+      "marker": "AD_SHORT",
+      "message": "tr lgs_verbal real60 server-minute and editable-net/no-economy-change PASS"
+    },
+    {
+      "marker": "AD_SHORT",
+      "message": "tr lgs_quantitative real60 server-minute and editable-net/no-economy-change PASS"
+    },
+    {
+      "marker": "AD_SHORT",
+      "message": "tr tus_basic real60 server-minute and editable-net/no-economy-change PASS"
+    },
+    {
+      "marker": "AD_SHORT",
+      "message": "tr tus_clinical real60 server-minute and editable-net/no-economy-change PASS"
+    },
+    {
+      "marker": "AD_SHORT",
+      "message": "en tyt real60 server-minute and editable-net/no-economy-change PASS"
+    },
+    {
+      "marker": "AD_SHORT",
+      "message": "en ayt real60 server-minute and editable-net/no-economy-change PASS"
+    },
+    {
+      "marker": "AD_SHORT",
+      "message": "en ydt real60 server-minute and editable-net/no-economy-change PASS"
+    },
+    {
+      "marker": "AD_SHORT",
+      "message": "en lgs_verbal real60 server-minute and editable-net/no-economy-change PASS"
+    },
+    {
+      "marker": "AD_SHORT",
+      "message": "en lgs_quantitative real60 server-minute and editable-net/no-economy-change PASS"
+    },
+    {
+      "marker": "AD_SHORT",
+      "message": "en tus_basic real60 server-minute and editable-net/no-economy-change PASS"
+    },
+    {
+      "marker": "AD_SHORT",
+      "message": "en tus_clinical real60 server-minute and editable-net/no-economy-change PASS"
+    },
+    {
+      "marker": "AD_SHORT",
+      "message": "owner=d84a1634-dbe9-4b71-af0b-1c84890f2814 fourteen natural60 completed, no clock/history mutation"
+    }
+  ],
+  "native_process_result": "PASS",
+  "native_totals": [
+    "20:06 +1 ~2: (tearDownAll)",
+    "20:06 +1 ~2: All tests passed!"
+  ],
+  "schema_version": 1,
+  "scope": "Selected native checkpoints/totals only; not a release verdict or full-duration claim",
+  "wrapper_result": "NOT_PRESENT",
+  "wrapper_totals": []
+}

@@ -1,0 +1,681 @@
+{
+  "cases": [
+    {
+      "economy": {
+        "exam_coins": 0,
+        "exam_points": 0,
+        "normal_coins": 0,
+        "normal_points": 0,
+        "total_minutes": 1
+      },
+      "email": "e2e-sim-probe-exam-catalog-start-vc-android-tyt-a1@pomosprint.local",
+      "exit_code": 0,
+      "failed_checks": [],
+      "label": "r_android_tyt",
+      "owner": "59718365-a0c8-45c2-8f90-7c1747df62c0",
+      "passed_checks": 26,
+      "rows": {
+        "attempts": 1,
+        "events": 1,
+        "mappings": 0,
+        "results": 0,
+        "runs": 0,
+        "studies": 0,
+        "unlocks": 7
+      },
+      "scope": "natural60 OS/offline/final",
+      "source": "android-catalog-cycles-a1.json",
+      "status": "PASS",
+      "total_checks": 26,
+      "warnings": []
+    },
+    {
+      "economy": {
+        "exam_coins": 0,
+        "exam_points": 0,
+        "normal_coins": 0,
+        "normal_points": 0,
+        "total_minutes": 1
+      },
+      "email": "e2e-sim-probe-exam-catalog-start-vc-android-ayt-a1@pomosprint.local",
+      "exit_code": 0,
+      "failed_checks": [],
+      "label": "r_android_ayt",
+      "owner": "148da72c-24ea-4d0e-a140-93c63fe1ee46",
+      "passed_checks": 26,
+      "rows": {
+        "attempts": 1,
+        "events": 1,
+        "mappings": 0,
+        "results": 0,
+        "runs": 0,
+        "studies": 0,
+        "unlocks": 7
+      },
+      "scope": "natural60 OS/offline/final",
+      "source": "android-catalog-cycles-a1.json",
+      "status": "PASS",
+      "total_checks": 26,
+      "warnings": []
+    },
+    {
+      "economy": {
+        "exam_coins": 0,
+        "exam_points": 0,
+        "normal_coins": 0,
+        "normal_points": 0,
+        "total_minutes": 1
+      },
+      "email": "e2e-sim-probe-exam-catalog-start-vc-android-ydt-a1@pomosprint.local",
+      "exit_code": 0,
+      "failed_checks": [],
+      "label": "r_android_ydt",
+      "owner": "03ebe3e8-a063-491e-8a3c-5afebb224683",
+      "passed_checks": 26,
+      "rows": {
+        "attempts": 1,
+        "events": 1,
+        "mappings": 0,
+        "results": 0,
+        "runs": 0,
+        "studies": 0,
+        "unlocks": 7
+      },
+      "scope": "natural60 OS/offline/final",
+      "source": "android-catalog-cycles-a1.json",
+      "status": "PASS",
+      "total_checks": 26,
+      "warnings": []
+    },
+    {
+      "economy": {
+        "exam_coins": 0,
+        "exam_points": 0,
+        "normal_coins": 0,
+        "normal_points": 0,
+        "total_minutes": 1
+      },
+      "email": "e2e-sim-probe-exam-catalog-start-vc-android-lgs-verbal-a1@pomosprint.local",
+      "exit_code": 0,
+      "failed_checks": [],
+      "label": "r_android_lgs_verbal",
+      "owner": "5da1a6be-0b06-474d-927a-106f1ce57f25",
+      "passed_checks": 26,
+      "rows": {
+        "attempts": 1,
+        "events": 1,
+        "mappings": 0,
+        "results": 0,
+        "runs": 0,
+        "studies": 0,
+        "unlocks": 7
+      },
+      "scope": "natural60 OS/offline/final",
+      "source": "android-catalog-cycles-a1.json",
+      "status": "PASS",
+      "total_checks": 26,
+      "warnings": []
+    },
+    {
+      "economy": {
+        "exam_coins": 0,
+        "exam_points": 0,
+        "normal_coins": 0,
+        "normal_points": 0,
+        "total_minutes": 1
+      },
+      "email": "e2e-sim-probe-exam-catalog-start-vc-android-lgs-quantitative-a1@pomosprint.local",
+      "exit_code": 0,
+      "failed_checks": [],
+      "label": "r_android_lgs_quantitative",
+      "owner": "154e6aa8-c004-4905-851a-4c5048c2f4f3",
+      "passed_checks": 26,
+      "rows": {
+        "attempts": 1,
+        "events": 1,
+        "mappings": 0,
+        "results": 0,
+        "runs": 0,
+        "studies": 0,
+        "unlocks": 7
+      },
+      "scope": "natural60 OS/offline/final",
+      "source": "android-catalog-cycles-a1.json",
+      "status": "PASS",
+      "total_checks": 26,
+      "warnings": []
+    },
+    {
+      "economy": {
+        "exam_coins": 0,
+        "exam_points": 0,
+        "normal_coins": 0,
+        "normal_points": 0,
+        "total_minutes": 1
+      },
+      "email": "e2e-sim-probe-exam-catalog-start-vc-android-tus-basic-a1@pomosprint.local",
+      "exit_code": 0,
+      "failed_checks": [],
+      "label": "r_android_tus_basic",
+      "owner": "ea223b68-e7e6-444b-8a53-02c262aa21c4",
+      "passed_checks": 26,
+      "rows": {
+        "attempts": 1,
+        "events": 1,
+        "mappings": 0,
+        "results": 0,
+        "runs": 0,
+        "studies": 0,
+        "unlocks": 7
+      },
+      "scope": "natural60 OS/offline/final",
+      "source": "android-catalog-cycles-a1.json",
+      "status": "PASS",
+      "total_checks": 26,
+      "warnings": []
+    },
+    {
+      "economy": {
+        "exam_coins": 0,
+        "exam_points": 0,
+        "normal_coins": 0,
+        "normal_points": 0,
+        "total_minutes": 1
+      },
+      "email": "e2e-sim-probe-exam-catalog-start-vc-android-tus-clinical-a1@pomosprint.local",
+      "exit_code": 0,
+      "failed_checks": [],
+      "label": "r_android_tus_clinical",
+      "owner": "c8d69a7e-6c3d-432c-90e0-b688dc8882aa",
+      "passed_checks": 26,
+      "rows": {
+        "attempts": 1,
+        "events": 1,
+        "mappings": 0,
+        "results": 0,
+        "runs": 0,
+        "studies": 0,
+        "unlocks": 7
+      },
+      "scope": "natural60 OS/offline/final",
+      "source": "android-catalog-cycles-a1.json",
+      "status": "PASS",
+      "total_checks": 26,
+      "warnings": []
+    },
+    {
+      "economy": {
+        "exam_coins": 0,
+        "exam_points": 0,
+        "normal_coins": 0,
+        "normal_points": 0,
+        "total_minutes": 1
+      },
+      "email": "e2e-sim-probe-exam-catalog-start-vc-ios-ydt-a3@pomosprint.local",
+      "exit_code": 0,
+      "failed_checks": [],
+      "label": "r_ios_ydt",
+      "owner": "7db9612e-b4ac-4a6d-9e35-655f07486f64",
+      "passed_checks": 26,
+      "rows": {
+        "attempts": 1,
+        "events": 1,
+        "mappings": 0,
+        "results": 0,
+        "runs": 0,
+        "studies": 0,
+        "unlocks": 7
+      },
+      "scope": "natural60 OS/offline/final",
+      "source": "ios-catalog-cycles-a3.json",
+      "status": "PASS",
+      "total_checks": 26,
+      "warnings": []
+    },
+    {
+      "economy": {
+        "exam_coins": 0,
+        "exam_points": 0,
+        "normal_coins": 0,
+        "normal_points": 0,
+        "total_minutes": 1
+      },
+      "email": "e2e-sim-probe-exam-catalog-start-vc-ios-lgs-verbal-a3@pomosprint.local",
+      "exit_code": 0,
+      "failed_checks": [],
+      "label": "r_ios_lgs_verbal",
+      "owner": "d5d766e0-b823-403e-ae7a-e19e8e157576",
+      "passed_checks": 26,
+      "rows": {
+        "attempts": 1,
+        "events": 1,
+        "mappings": 0,
+        "results": 0,
+        "runs": 0,
+        "studies": 0,
+        "unlocks": 7
+      },
+      "scope": "natural60 OS/offline/final",
+      "source": "ios-catalog-cycles-a3.json",
+      "status": "PASS",
+      "total_checks": 26,
+      "warnings": []
+    },
+    {
+      "economy": {
+        "exam_coins": 0,
+        "exam_points": 0,
+        "normal_coins": 0,
+        "normal_points": 0,
+        "total_minutes": 1
+      },
+      "email": "e2e-sim-probe-exam-catalog-start-vc-ios-lgs-quantitative-a3@pomosprint.local",
+      "exit_code": 0,
+      "failed_checks": [],
+      "label": "r_ios_lgs_quantitative",
+      "owner": "222bafae-5611-45f0-b4a6-e3bff184b689",
+      "passed_checks": 26,
+      "rows": {
+        "attempts": 1,
+        "events": 1,
+        "mappings": 0,
+        "results": 0,
+        "runs": 0,
+        "studies": 0,
+        "unlocks": 7
+      },
+      "scope": "natural60 OS/offline/final",
+      "source": "ios-catalog-cycles-a3.json",
+      "status": "PASS",
+      "total_checks": 26,
+      "warnings": []
+    },
+    {
+      "economy": {
+        "exam_coins": 0,
+        "exam_points": 0,
+        "normal_coins": 0,
+        "normal_points": 0,
+        "total_minutes": 1
+      },
+      "email": "e2e-sim-probe-exam-catalog-start-vc-ios-tus-basic-a3@pomosprint.local",
+      "exit_code": 0,
+      "failed_checks": [],
+      "label": "r_ios_tus_basic",
+      "owner": "763d1d9c-4a84-4a1c-8355-c70e6a0f7139",
+      "passed_checks": 26,
+      "rows": {
+        "attempts": 1,
+        "events": 1,
+        "mappings": 0,
+        "results": 0,
+        "runs": 0,
+        "studies": 0,
+        "unlocks": 7
+      },
+      "scope": "natural60 OS/offline/final",
+      "source": "ios-catalog-cycles-a3.json",
+      "status": "PASS",
+      "total_checks": 26,
+      "warnings": []
+    },
+    {
+      "economy": {
+        "exam_coins": 0,
+        "exam_points": 0,
+        "normal_coins": 0,
+        "normal_points": 0,
+        "total_minutes": 1
+      },
+      "email": "e2e-sim-probe-exam-catalog-start-vc-ios-tus-clinical-a3@pomosprint.local",
+      "exit_code": 0,
+      "failed_checks": [],
+      "label": "r_ios_tus_clinical",
+      "owner": "390c5e0f-a9cd-4134-854b-06601050fdaf",
+      "passed_checks": 26,
+      "rows": {
+        "attempts": 1,
+        "events": 1,
+        "mappings": 0,
+        "results": 0,
+        "runs": 0,
+        "studies": 0,
+        "unlocks": 7
+      },
+      "scope": "natural60 OS/offline/final",
+      "source": "ios-catalog-cycles-a3.json",
+      "status": "PASS",
+      "total_checks": 26,
+      "warnings": []
+    },
+    {
+      "economy": {
+        "exam_coins": 0,
+        "exam_points": 0,
+        "normal_coins": 0,
+        "normal_points": 0,
+        "total_minutes": 1
+      },
+      "email": "e2e-sim-probe-exam-catalog-start-vc-ios-tyt-a1@pomosprint.local",
+      "exit_code": 0,
+      "failed_checks": [],
+      "label": "r_ios_tyt",
+      "owner": "5b760ab8-3372-4bd2-8d16-c37558bc8d96",
+      "passed_checks": 26,
+      "rows": {
+        "attempts": 1,
+        "events": 1,
+        "mappings": 0,
+        "results": 0,
+        "runs": 0,
+        "studies": 0,
+        "unlocks": 7
+      },
+      "scope": "natural60 OS/offline/final",
+      "source": "ios_tyt_lifecycle_recovered.json",
+      "status": "PASS",
+      "total_checks": 26,
+      "warnings": []
+    },
+    {
+      "economy": {
+        "exam_coins": 0,
+        "exam_points": 0,
+        "normal_coins": 0,
+        "normal_points": 0,
+        "total_minutes": 1
+      },
+      "email": "e2e-sim-probe-exam-catalog-start-vc-ios-ayt-a2@pomosprint.local",
+      "exit_code": 0,
+      "failed_checks": [],
+      "label": "r_ios_ayt",
+      "owner": "6968753f-bc15-4523-a7ec-271cc739fee6",
+      "passed_checks": 26,
+      "rows": {
+        "attempts": 1,
+        "events": 1,
+        "mappings": 0,
+        "results": 0,
+        "runs": 0,
+        "studies": 0,
+        "unlocks": 7
+      },
+      "scope": "natural60 OS/offline/final",
+      "source": "ios-ayt-a2-recovered.json",
+      "status": "PASS",
+      "total_checks": 26,
+      "warnings": []
+    },
+    {
+      "economy": {
+        "exam_coins": 0,
+        "exam_points": 0,
+        "normal_coins": 0,
+        "normal_points": 0,
+        "total_minutes": 0
+      },
+      "email": "qa-i08-verify-social-1028-focus4@pomosprint.local",
+      "exit_code": 0,
+      "failed_checks": [],
+      "label": "i08_focus4",
+      "owner": "04a2cd50-bffb-448a-a3f3-9835c728135d",
+      "passed_checks": 18,
+      "rows": {
+        "attempts": 0,
+        "events": 0,
+        "mappings": 0,
+        "results": 0,
+        "runs": 0,
+        "studies": 0,
+        "unlocks": 7
+      },
+      "scope": "preserved accounts after presence cleanup",
+      "source": "i08_presence_cleanup.json",
+      "status": "PASS",
+      "total_checks": 18,
+      "warnings": []
+    },
+    {
+      "economy": {
+        "exam_coins": 0,
+        "exam_points": 0,
+        "normal_coins": 0,
+        "normal_points": 0,
+        "total_minutes": 0
+      },
+      "email": "qa-i08-verify-social-1028-exam2@pomosprint.local",
+      "exit_code": 0,
+      "failed_checks": [],
+      "label": "i08_exam2",
+      "owner": "48d35994-efa9-43b9-9697-c80794d5047e",
+      "passed_checks": 25,
+      "rows": {
+        "attempts": 1,
+        "events": 0,
+        "mappings": 0,
+        "results": 0,
+        "runs": 0,
+        "studies": 0,
+        "unlocks": 7
+      },
+      "scope": "preserved accounts after presence cleanup",
+      "source": "i08_presence_cleanup.json",
+      "status": "PASS",
+      "total_checks": 25,
+      "warnings": []
+    },
+    {
+      "economy": {
+        "exam_coins": 0,
+        "exam_points": 0,
+        "normal_coins": 0,
+        "normal_points": 0,
+        "total_minutes": 0
+      },
+      "email": "qa-i08-verify-social-1028-break2@pomosprint.local",
+      "exit_code": 0,
+      "failed_checks": [],
+      "label": "i08_break2",
+      "owner": "5e0c109d-7c39-432d-bbc4-3f8639363c2e",
+      "passed_checks": 18,
+      "rows": {
+        "attempts": 0,
+        "events": 0,
+        "mappings": 0,
+        "results": 0,
+        "runs": 0,
+        "studies": 0,
+        "unlocks": 7
+      },
+      "scope": "preserved accounts after presence cleanup",
+      "source": "i08_presence_cleanup.json",
+      "status": "PASS",
+      "total_checks": 18,
+      "warnings": []
+    },
+    {
+      "economy": {
+        "exam_coins": 0,
+        "exam_points": 0,
+        "normal_coins": 0,
+        "normal_points": 0,
+        "total_minutes": 0
+      },
+      "email": "qa-i08-verify-social-1028-focus3@pomosprint.local",
+      "exit_code": 0,
+      "failed_checks": [],
+      "label": "i08_focus3",
+      "owner": "60b39678-b92e-4d69-86b1-b7ea0d28357c",
+      "passed_checks": 18,
+      "rows": {
+        "attempts": 0,
+        "events": 0,
+        "mappings": 0,
+        "results": 0,
+        "runs": 0,
+        "studies": 0,
+        "unlocks": 7
+      },
+      "scope": "preserved accounts after presence cleanup",
+      "source": "i08_presence_cleanup.json",
+      "status": "PASS",
+      "total_checks": 18,
+      "warnings": []
+    },
+    {
+      "economy": {
+        "exam_coins": 0,
+        "exam_points": 0,
+        "normal_coins": 0,
+        "normal_points": 0,
+        "total_minutes": 0
+      },
+      "email": "qa-i08-verify-social-1028-exam1@pomosprint.local",
+      "exit_code": 0,
+      "failed_checks": [],
+      "label": "i08_exam1",
+      "owner": "88f70816-0805-48b9-89b4-dcb58c727009",
+      "passed_checks": 53,
+      "rows": {
+        "attempts": 5,
+        "events": 0,
+        "mappings": 0,
+        "results": 0,
+        "runs": 0,
+        "studies": 0,
+        "unlocks": 7
+      },
+      "scope": "preserved accounts after presence cleanup",
+      "source": "i08_presence_cleanup.json",
+      "status": "PASS",
+      "total_checks": 53,
+      "warnings": []
+    },
+    {
+      "economy": {
+        "exam_coins": 0,
+        "exam_points": 0,
+        "normal_coins": 0,
+        "normal_points": 0,
+        "total_minutes": 0
+      },
+      "email": "qa-i08-verify-social-1028-break1@pomosprint.local",
+      "exit_code": 0,
+      "failed_checks": [],
+      "label": "i08_break1",
+      "owner": "9415ef2a-ff0a-49b9-ab87-a79f444a9319",
+      "passed_checks": 18,
+      "rows": {
+        "attempts": 0,
+        "events": 0,
+        "mappings": 0,
+        "results": 0,
+        "runs": 0,
+        "studies": 0,
+        "unlocks": 7
+      },
+      "scope": "preserved accounts after presence cleanup",
+      "source": "i08_presence_cleanup.json",
+      "status": "PASS",
+      "total_checks": 18,
+      "warnings": []
+    },
+    {
+      "economy": {
+        "exam_coins": 0,
+        "exam_points": 0,
+        "normal_coins": 0,
+        "normal_points": 0,
+        "total_minutes": 0
+      },
+      "email": "qa-i08-verify-social-1028-focus1@pomosprint.local",
+      "exit_code": 0,
+      "failed_checks": [],
+      "label": "i08_focus1",
+      "owner": "b8e5678f-6a7b-4e4d-95c3-5bc794fcbc70",
+      "passed_checks": 18,
+      "rows": {
+        "attempts": 0,
+        "events": 0,
+        "mappings": 0,
+        "results": 0,
+        "runs": 0,
+        "studies": 0,
+        "unlocks": 7
+      },
+      "scope": "preserved accounts after presence cleanup",
+      "source": "i08_presence_cleanup.json",
+      "status": "PASS",
+      "total_checks": 18,
+      "warnings": []
+    },
+    {
+      "economy": {
+        "exam_coins": 0,
+        "exam_points": 0,
+        "normal_coins": 0,
+        "normal_points": 0,
+        "total_minutes": 0
+      },
+      "email": "qa-i08-verify-social-1028-focus2@pomosprint.local",
+      "exit_code": 0,
+      "failed_checks": [],
+      "label": "i08_focus2",
+      "owner": "c7535139-4286-4198-ab99-609b2584fd05",
+      "passed_checks": 18,
+      "rows": {
+        "attempts": 0,
+        "events": 0,
+        "mappings": 0,
+        "results": 0,
+        "runs": 0,
+        "studies": 0,
+        "unlocks": 7
+      },
+      "scope": "preserved accounts after presence cleanup",
+      "source": "i08_presence_cleanup.json",
+      "status": "PASS",
+      "total_checks": 18,
+      "warnings": []
+    },
+    {
+      "economy": {
+        "exam_coins": 0,
+        "exam_points": 0,
+        "normal_coins": 0,
+        "normal_points": 0,
+        "total_minutes": 0
+      },
+      "email": "qa-i08-verify-social-1028-observer@pomosprint.local",
+      "exit_code": 0,
+      "failed_checks": [],
+      "label": "i08_observer",
+      "owner": "d88445b6-00d5-4162-9510-d92eb838384f",
+      "passed_checks": 18,
+      "rows": {
+        "attempts": 0,
+        "events": 0,
+        "mappings": 0,
+        "results": 0,
+        "runs": 0,
+        "studies": 0,
+        "unlocks": 7
+      },
+      "scope": "preserved accounts after presence cleanup",
+      "source": "i08_presence_cleanup.json",
+      "status": "PASS",
+      "total_checks": 18,
+      "warnings": []
+    }
+  ],
+  "owners": 23,
+  "passed_checks": 568,
+  "rls_evidence": "rls_against_real75_peer.json",
+  "rls_nonempty_attempt_sources": 16,
+  "rls_nonempty_net_sources": 0,
+  "rls_nonempty_wallet_sources": 14,
+  "scope": "14 completed lifecycle owners plus9preserved I08 accounts; immutable artifacts selected owners",
+  "status": "PASS",
+  "total_checks": 568,
+  "warnings": []
+}

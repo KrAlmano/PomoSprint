@@ -1,0 +1,38 @@
+{
+  "errors": [],
+  "events": [
+    {
+      "data": {
+        "attempt_id": "182a0524-053b-4588-b3a7-b79cb616ae4b",
+        "client_uuid": "c4d6dd84-8fa5-499f-9917-7449b2a8cefa",
+        "completed": true,
+        "economy": {
+          "coins": 0,
+          "current_streak": 1,
+          "exam_coins": 0,
+          "exam_points": 0,
+          "lifetime_points": 0,
+          "total_minutes": 3
+        },
+        "ends_at": "2026-10-28T09:28:46.588943Z",
+        "new_events": 1,
+        "other_history_unchanged": true,
+        "owner": "e832b4fb-ee82-4b08-b07a-589fec4e8e78",
+        "pending_action": null,
+        "reset": false,
+        "started_at": "2026-10-28T09:27:46.588943Z"
+      },
+      "marker": "AD_PENDING_RECOVERY",
+      "message": ""
+    }
+  ],
+  "native_process_result": "PASS",
+  "native_totals": [
+    "00:06 +1: (tearDownAll)",
+    "00:06 +1: All tests passed!"
+  ],
+  "schema_version": 1,
+  "scope": "Selected native checkpoints/totals only; not a release verdict or full-duration claim",
+  "wrapper_result": "NOT_PRESENT",
+  "wrapper_totals": []
+}

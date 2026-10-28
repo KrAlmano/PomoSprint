@@ -1,0 +1,18 @@
+{
+  "errors": [
+    "The following TestFailure was thrown running a test:",
+    "Expected: exactly one matching candidate",
+    "Actual: _HitTestableWidgetFinder:<Found 0 widgets with key"
+  ],
+  "events": [],
+  "native_process_result": "FAIL",
+  "native_totals": [
+    "00:12 +0 -1: af1 · social status endings privacy and block natural polling TR EN [E]",
+    "00:12 +0 ~1 -1: (tearDownAll)",
+    "00:12 +0 ~1 -1: Some tests failed."
+  ],
+  "schema_version": 1,
+  "scope": "Selected native checkpoints/totals only; not a release verdict or full-duration claim",
+  "wrapper_result": "NOT_PRESENT",
+  "wrapper_totals": []
+}

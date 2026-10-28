@@ -1,0 +1,688 @@
+{
+  "errors": [],
+  "events": [
+    {
+      "data": {
+        "daily": {
+          "active_days": 0,
+          "busiest_day": null,
+          "categories": [],
+          "category_minutes": {},
+          "category_percentages": {},
+          "counts": {
+            "completed_exams": 0,
+            "completed_marathons": 0,
+            "marathon_focus_sessions": 0,
+            "normal_sessions": 0,
+            "pending_sessions": 0,
+            "unknown_sessions": 0
+          },
+          "days": [
+            {
+              "day": "2026-10-28",
+              "focus_equivalents": 0,
+              "minutes": 0
+            }
+          ],
+          "efficiency": 0,
+          "efficiency_percentage": 0,
+          "end": "2026-10-28",
+          "focus_equivalents": 0,
+          "goal_minutes": 120,
+          "goal_percentage": 0,
+          "goal_progress_percentage": 0,
+          "start": "2026-10-28",
+          "total_minutes": 0
+        },
+        "monthly": {
+          "active_days": 3,
+          "busiest_day": {
+            "day": "2026-10-24",
+            "focus_equivalents": 0,
+            "minutes": 165
+          },
+          "categories": [
+            {
+              "category_id": "pomosprint:exam",
+              "focus_equivalents": 0,
+              "minutes": 330,
+              "name": "",
+              "percentage": 77,
+              "sessions": 2
+            },
+            {
+              "category_id": "c695ca01-9806-4907-9e2b-dc5611a747a8",
+              "focus_equivalents": 4,
+              "minutes": 100,
+              "name": "Türkçe",
+              "percentage": 23,
+              "sessions": 4
+            }
+          ],
+          "category_minutes": {
+            "c695ca01-9806-4907-9e2b-dc5611a747a8": 100,
+            "pomosprint:exam": 330
+          },
+          "category_percentages": {
+            "c695ca01-9806-4907-9e2b-dc5611a747a8": 23,
+            "pomosprint:exam": 77
+          },
+          "counts": {
+            "completed_exams": 2,
+            "completed_marathons": 1,
+            "marathon_focus_sessions": 2,
+            "normal_sessions": 2,
+            "pending_sessions": 0,
+            "unknown_sessions": 0
+          },
+          "days": [
+            {
+              "day": "2026-10-01",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-02",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-03",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-04",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-05",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-06",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-07",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-08",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-09",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-10",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-11",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-12",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-13",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-14",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-15",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-16",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-17",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-18",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-19",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-20",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-21",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-22",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-23",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-24",
+              "focus_equivalents": 0,
+              "minutes": 165
+            },
+            {
+              "day": "2026-10-25",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-26",
+              "focus_equivalents": 0,
+              "minutes": 165
+            },
+            {
+              "day": "2026-10-27",
+              "focus_equivalents": 4,
+              "minutes": 100
+            },
+            {
+              "day": "2026-10-28",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-29",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-30",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-31",
+              "focus_equivalents": 0,
+              "minutes": 0
+            }
+          ],
+          "efficiency": 11,
+          "end": "2026-10-31",
+          "focus_equivalents": 4,
+          "goal_minutes": 3720,
+          "goal_percentage": 11,
+          "goal_progress_percentage": 11,
+          "month_to_date_growth_percentage": null,
+          "month_to_date_minutes": 430,
+          "previous_month_to_date_minutes": 0,
+          "start": "2026-10-01",
+          "total_minutes": 430
+        },
+        "weekly": {
+          "active_days": 2,
+          "busiest_day": {
+            "day": "2026-10-26",
+            "focus_equivalents": 0,
+            "minutes": 165
+          },
+          "categories": [
+            {
+              "category_id": "pomosprint:exam",
+              "focus_equivalents": 0,
+              "minutes": 165,
+              "name": "",
+              "percentage": 62,
+              "sessions": 1
+            },
+            {
+              "category_id": "c695ca01-9806-4907-9e2b-dc5611a747a8",
+              "focus_equivalents": 4,
+              "minutes": 100,
+              "name": "Türkçe",
+              "percentage": 38,
+              "sessions": 4
+            }
+          ],
+          "category_minutes": {
+            "c695ca01-9806-4907-9e2b-dc5611a747a8": 100,
+            "pomosprint:exam": 165
+          },
+          "category_percentages": {
+            "c695ca01-9806-4907-9e2b-dc5611a747a8": 38,
+            "pomosprint:exam": 62
+          },
+          "counts": {
+            "completed_exams": 1,
+            "completed_marathons": 1,
+            "marathon_focus_sessions": 2,
+            "normal_sessions": 2,
+            "pending_sessions": 0,
+            "unknown_sessions": 0
+          },
+          "days": [
+            {
+              "day": "2026-10-26",
+              "focus_equivalents": 0,
+              "minutes": 165
+            },
+            {
+              "day": "2026-10-27",
+              "focus_equivalents": 4,
+              "minutes": 100
+            },
+            {
+              "day": "2026-10-28",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-29",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-30",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-31",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-11-01",
+              "focus_equivalents": 0,
+              "minutes": 0
+            }
+          ],
+          "efficiency": 31,
+          "efficiency_label_key": "eff_high",
+          "efficiency_percentage": 31,
+          "elapsed_pace_percentage": 73,
+          "end": "2026-11-01",
+          "focus_equivalents": 4,
+          "goal_minutes": 840,
+          "goal_percentage": 31,
+          "goal_progress_percentage": 31,
+          "start": "2026-10-26",
+          "total_minutes": 265
+        }
+      },
+      "marker": "AD_REPORTS",
+      "message": "owner=71ffd38f-84db-4003-b785-840ea83bb477 lang=tr DB/UI daily weekly monthly PASS"
+    },
+    {
+      "data": {
+        "daily": {
+          "active_days": 0,
+          "busiest_day": null,
+          "categories": [],
+          "category_minutes": {},
+          "category_percentages": {},
+          "counts": {
+            "completed_exams": 0,
+            "completed_marathons": 0,
+            "marathon_focus_sessions": 0,
+            "normal_sessions": 0,
+            "pending_sessions": 0,
+            "unknown_sessions": 0
+          },
+          "days": [
+            {
+              "day": "2026-10-28",
+              "focus_equivalents": 0,
+              "minutes": 0
+            }
+          ],
+          "efficiency": 0,
+          "efficiency_percentage": 0,
+          "end": "2026-10-28",
+          "focus_equivalents": 0,
+          "goal_minutes": 120,
+          "goal_percentage": 0,
+          "goal_progress_percentage": 0,
+          "start": "2026-10-28",
+          "total_minutes": 0
+        },
+        "monthly": {
+          "active_days": 3,
+          "busiest_day": {
+            "day": "2026-10-24",
+            "focus_equivalents": 0,
+            "minutes": 165
+          },
+          "categories": [
+            {
+              "category_id": "pomosprint:exam",
+              "focus_equivalents": 0,
+              "minutes": 330,
+              "name": "",
+              "percentage": 77,
+              "sessions": 2
+            },
+            {
+              "category_id": "c695ca01-9806-4907-9e2b-dc5611a747a8",
+              "focus_equivalents": 4,
+              "minutes": 100,
+              "name": "Türkçe",
+              "percentage": 23,
+              "sessions": 4
+            }
+          ],
+          "category_minutes": {
+            "c695ca01-9806-4907-9e2b-dc5611a747a8": 100,
+            "pomosprint:exam": 330
+          },
+          "category_percentages": {
+            "c695ca01-9806-4907-9e2b-dc5611a747a8": 23,
+            "pomosprint:exam": 77
+          },
+          "counts": {
+            "completed_exams": 2,
+            "completed_marathons": 1,
+            "marathon_focus_sessions": 2,
+            "normal_sessions": 2,
+            "pending_sessions": 0,
+            "unknown_sessions": 0
+          },
+          "days": [
+            {
+              "day": "2026-10-01",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-02",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-03",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-04",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-05",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-06",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-07",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-08",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-09",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-10",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-11",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-12",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-13",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-14",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-15",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-16",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-17",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-18",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-19",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-20",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-21",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-22",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-23",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-24",
+              "focus_equivalents": 0,
+              "minutes": 165
+            },
+            {
+              "day": "2026-10-25",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-26",
+              "focus_equivalents": 0,
+              "minutes": 165
+            },
+            {
+              "day": "2026-10-27",
+              "focus_equivalents": 4,
+              "minutes": 100
+            },
+            {
+              "day": "2026-10-28",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-29",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-30",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-31",
+              "focus_equivalents": 0,
+              "minutes": 0
+            }
+          ],
+          "efficiency": 11,
+          "end": "2026-10-31",
+          "focus_equivalents": 4,
+          "goal_minutes": 3720,
+          "goal_percentage": 11,
+          "goal_progress_percentage": 11,
+          "month_to_date_growth_percentage": null,
+          "month_to_date_minutes": 430,
+          "previous_month_to_date_minutes": 0,
+          "start": "2026-10-01",
+          "total_minutes": 430
+        },
+        "weekly": {
+          "active_days": 2,
+          "busiest_day": {
+            "day": "2026-10-26",
+            "focus_equivalents": 0,
+            "minutes": 165
+          },
+          "categories": [
+            {
+              "category_id": "pomosprint:exam",
+              "focus_equivalents": 0,
+              "minutes": 165,
+              "name": "",
+              "percentage": 62,
+              "sessions": 1
+            },
+            {
+              "category_id": "c695ca01-9806-4907-9e2b-dc5611a747a8",
+              "focus_equivalents": 4,
+              "minutes": 100,
+              "name": "Türkçe",
+              "percentage": 38,
+              "sessions": 4
+            }
+          ],
+          "category_minutes": {
+            "c695ca01-9806-4907-9e2b-dc5611a747a8": 100,
+            "pomosprint:exam": 165
+          },
+          "category_percentages": {
+            "c695ca01-9806-4907-9e2b-dc5611a747a8": 38,
+            "pomosprint:exam": 62
+          },
+          "counts": {
+            "completed_exams": 1,
+            "completed_marathons": 1,
+            "marathon_focus_sessions": 2,
+            "normal_sessions": 2,
+            "pending_sessions": 0,
+            "unknown_sessions": 0
+          },
+          "days": [
+            {
+              "day": "2026-10-26",
+              "focus_equivalents": 0,
+              "minutes": 165
+            },
+            {
+              "day": "2026-10-27",
+              "focus_equivalents": 4,
+              "minutes": 100
+            },
+            {
+              "day": "2026-10-28",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-29",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-30",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-10-31",
+              "focus_equivalents": 0,
+              "minutes": 0
+            },
+            {
+              "day": "2026-11-01",
+              "focus_equivalents": 0,
+              "minutes": 0
+            }
+          ],
+          "efficiency": 31,
+          "efficiency_label_key": "eff_high",
+          "efficiency_percentage": 31,
+          "elapsed_pace_percentage": 73,
+          "end": "2026-11-01",
+          "focus_equivalents": 4,
+          "goal_minutes": 840,
+          "goal_percentage": 31,
+          "goal_progress_percentage": 31,
+          "start": "2026-10-26",
+          "total_minutes": 265
+        }
+      },
+      "marker": "AD_REPORTS",
+      "message": "owner=71ffd38f-84db-4003-b785-840ea83bb477 lang=en DB/UI daily weekly monthly PASS"
+    }
+  ],
+  "native_process_result": "PASS",
+  "native_totals": [
+    "00:26 +1 ~2: (tearDownAll)",
+    "00:27 +1 ~2: All tests passed!"
+  ],
+  "schema_version": 1,
+  "scope": "Selected native checkpoints/totals only; not a release verdict or full-duration claim",
+  "wrapper_result": "NOT_PRESENT",
+  "wrapper_totals": []
+}

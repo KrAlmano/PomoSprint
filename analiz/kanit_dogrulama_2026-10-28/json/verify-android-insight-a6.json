@@ -1,0 +1,10 @@
+{
+  "api_port": 54321,
+  "finished_at": "2026-10-28T09:58:12.787562+00:00",
+  "log": "external/tmp/pomosprint_verify-android-insight-a6.log",
+  "native_exit_code": 0,
+  "platform": "android",
+  "run": "verify-android-insight-a6",
+  "source": "integration_test/aa_exam_insights_test.dart",
+  "started_at": "2026-10-28T09:57:22.576437+00:00"
+}

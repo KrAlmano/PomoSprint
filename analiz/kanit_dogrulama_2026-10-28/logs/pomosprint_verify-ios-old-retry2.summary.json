@@ -1,0 +1,54 @@
+{
+  "errors": [],
+  "events": [
+    {
+      "data": {
+        "coins": 20,
+        "completion_verified": true,
+        "exam_unavailable": true,
+        "history_is_controlled_fixture": true,
+        "language": "tr",
+        "natural_25_minute_wait_claimed": false,
+        "normal_ui_started_and_cancelled": true,
+        "old_database": "pomosprint_verify_old_20261028",
+        "owner_id": "623a0138-5298-4ace-895a-6de2e4d8cb38",
+        "points": 5,
+        "report_minutes": 25,
+        "shared_auth_used": false,
+        "study_rows": 1,
+        "tus_intent_retained": true
+      },
+      "marker": "ISOLATED_OLD_A8",
+      "message": ""
+    },
+    {
+      "data": {
+        "coins": 20,
+        "completion_verified": true,
+        "exam_unavailable": true,
+        "history_is_controlled_fixture": true,
+        "language": "en",
+        "natural_25_minute_wait_claimed": false,
+        "normal_ui_started_and_cancelled": true,
+        "old_database": "pomosprint_verify_old_20261028",
+        "owner_id": "d53cc59b-4efa-407d-b4d9-cba2a0abe106",
+        "points": 5,
+        "report_minutes": 25,
+        "shared_auth_used": false,
+        "study_rows": 1,
+        "tus_intent_retained": true
+      },
+      "marker": "ISOLATED_OLD_A8",
+      "message": ""
+    }
+  ],
+  "native_process_result": "PASS",
+  "native_totals": [
+    "01:20 +2: (tearDownAll)",
+    "01:20 +2: All tests passed!"
+  ],
+  "schema_version": 1,
+  "scope": "Selected native checkpoints/totals only; not a release verdict or full-duration claim",
+  "wrapper_result": "NOT_PRESENT",
+  "wrapper_totals": []
+}

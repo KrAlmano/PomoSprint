@@ -1,0 +1,10 @@
+{
+  "api_port": 54321,
+  "finished_at": "2026-10-28T10:03:37.342979+00:00",
+  "log": "external/tmp/pomosprint_verify-android-reports-a4.log",
+  "native_exit_code": 0,
+  "platform": "android",
+  "run": "verify-android-reports-a4",
+  "source": "integration_test/ad_verify_reports_exams_test.dart",
+  "started_at": "2026-10-28T10:02:38.921408+00:00"
+}

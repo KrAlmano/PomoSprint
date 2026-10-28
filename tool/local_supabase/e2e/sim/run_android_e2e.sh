@@ -5,7 +5,7 @@ set -u -o pipefail
 ROOT="$(cd "$(dirname "$0")/../../../.." && pwd)"
 cd "$ROOT" || exit 1
 if [[ "${1:-}" == "--help" ]]; then
-  echo "Senaryolar: a aa ac b c d e g h i j k l m n o p q r s t u v w x; varsayılan: a b c d e"
+  echo "Senaryolar: a aa ac ad ae af b c d e g h i j k l m n o p q r s t u v w x; varsayılan: a b c d e"
   echo "Yerel Supabase açık olmalı; sayaçlar gerçek 25/50 dakikadır."
   echo "Cihazı açıkça seçin: SIM_UDID (iOS) veya ANDROID_SERIAL (Android emülatörü)."
   exit 0
@@ -15,7 +15,7 @@ declare -a FILES=()
 shopt -s nullglob
 for part in "$@"; do
   case "$part" in
-    a|aa|ac|b|c|d|e|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x) ;;
+    a|aa|ac|ad|ae|af|b|c|d|e|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x) ;;
     *) echo "HATA: desteklenmeyen senaryo '$part'; --help ile listeye bakın." >&2; exit 2 ;;
   esac
   matches=(integration_test/"${part}"_*_test.dart)
@@ -30,11 +30,25 @@ export PATH="$ANDROID_HOME/platform-tools:$PATH"
 export GRADLE_OPTS='-Dorg.gradle.jvmargs=-Xmx2048m -Dorg.gradle.workers.max=2 -Dorg.gradle.parallel=false'
 PORT="${E2E_HOST_PORT:-54399}"
 API_PORT="${E2E_API_PORT:-54321}"
-case "$API_PORT" in 54321|54325) ;; *) echo "HATA: yalnız yerel QA API portu kabul edilir." >&2; exit 2 ;; esac
+case "$API_PORT" in 54321|54325|54341) ;; *) echo "HATA: yalnız yerel QA API portu kabul edilir." >&2; exit 2 ;; esac
 # Herkese açık yerel demo anon anahtarı; üretimde geçmez.
 ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0"
 RUN_ID="${E2E_RUN_ID:-$(date +%m%d%H%M%S)}"
 EXTRA_DEFINES=()
+if [[ -n "${E2E_AF_PHASE:-}" ]]; then
+  case "$E2E_AF_PHASE" in all|social|leagues) ;; *) echo "HATA: geçersiz lig/sosyal doğrulama aşaması." >&2; exit 2 ;; esac
+  EXTRA_DEFINES+=("--dart-define=E2E_AF_PHASE=$E2E_AF_PHASE")
+fi
+for field in E2E_VERIFY_COHORT_RUN E2E_SOCIAL_FIXTURE_RUN; do
+  if [[ -n "${!field:-}" ]]; then
+    [[ "${!field}" =~ ^[a-z0-9-]{1,40}$ ]] || { echo "HATA: geçersiz yerel QA koşu adı." >&2; exit 2; }
+    EXTRA_DEFINES+=("--dart-define=$field=${!field}")
+  fi
+done
+if [[ -n "${E2E_VERIFY_PHASE:-}" ]]; then
+  case "$E2E_VERIFY_PHASE" in official|short|reports) ;; *) echo "HATA: geçersiz rapor/deneme doğrulama aşaması." >&2; exit 2 ;; esac
+  EXTRA_DEFINES+=("--dart-define=E2E_VERIFY_PHASE=$E2E_VERIFY_PHASE")
+fi
 if [[ -n "${E2E_PLAIN_NAME:-}" ]]; then
   EXTRA_DEFINES+=("--plain-name=$E2E_PLAIN_NAME")
 fi
@@ -77,17 +91,31 @@ if [[ -n "${E2E_LEAGUE_FIXTURE_EMAIL:-}" ]]; then
 fi
 if [[ -n "${E2E_PROBE_MODE:-}" ]]; then
   case "$E2E_PROBE_MODE" in
-    normal25_start|normal50_start|exam_lgs_start|exam_tus_start|resume) ;;
+    normal25_start|normal50_start|exam_lgs_start|exam_tus_start|exam_catalog_start|resume) ;;
     *) echo "HATA: geçersiz gerçek süre probe modu." >&2; exit 2 ;;
   esac
   case "${E2E_PROBE_REQUIRE_COMPLETED:-false}" in true|false) ;; *) exit 2 ;; esac
   EXTRA_DEFINES+=("--dart-define=E2E_PROBE_MODE=$E2E_PROBE_MODE" "--dart-define=E2E_PROBE_REQUIRE_COMPLETED=${E2E_PROBE_REQUIRE_COMPLETED:-false}")
+  case "${E2E_PROBE_LANGUAGE:-tr}" in tr|en) ;; *) echo "HATA: geçersiz probe dili." >&2; exit 2 ;; esac
+  case "${E2E_PROBE_EXPECT_OFFLINE_COMPLETION:-false}" in true|false) ;; *) exit 2 ;; esac
+  if [[ -n "${E2E_PROBE_EXAM_ID:-}" ]]; then
+    case "$E2E_PROBE_EXAM_ID" in tyt|ayt|ydt|lgs_verbal|lgs_quantitative|tus_basic|tus_clinical) ;; *) echo "HATA: geçersiz probe sınavı." >&2; exit 2 ;; esac
+    EXTRA_DEFINES+=("--dart-define=E2E_PROBE_EXAM_ID=$E2E_PROBE_EXAM_ID")
+  elif [[ "$E2E_PROBE_MODE" == "exam_catalog_start" ]]; then
+    echo "HATA: kısa katalog probe için E2E_PROBE_EXAM_ID gereklidir." >&2; exit 2
+  fi
+  EXTRA_DEFINES+=("--dart-define=E2E_PROBE_LANGUAGE=${E2E_PROBE_LANGUAGE:-tr}" "--dart-define=E2E_PROBE_EXPECT_OFFLINE_COMPLETION=${E2E_PROBE_EXPECT_OFFLINE_COMPLETION:-false}")
 fi
 if [[ -n "${E2E_EXAM_FIXTURE_EMAIL:-}" ]]; then
   case "$E2E_EXAM_FIXTURE_EMAIL" in
     e2e-sim-*@pomosprint.local) EXTRA_DEFINES+=("--dart-define=E2E_EXAM_FIXTURE_EMAIL=$E2E_EXAM_FIXTURE_EMAIL") ;;
     *) echo "HATA: yalnız yerel e2e-sim deneme fixture hesabı kabul edilir." >&2; exit 2 ;;
   esac
+fi
+if [[ "${E2E_API_PORT:-54321}" == "54341" ]]; then
+  [[ "$#" -eq 1 && "$1" == "ae" ]] || { echo "HATA: eski kopya portu yalnız AE içindir." >&2; exit 2; }
+  curl -fsS -o /dev/null http://127.0.0.1:54341/health \
+    || { echo "HATA: izole eski QA sunucusu başlamadı." >&2; exit 1; }
 fi
 LOG_DIR="$ROOT/build/e2e_android"
 curl -fsS -o /dev/null "http://127.0.0.1:54321/auth/v1/health" -H "apikey: $ANON_KEY" \
