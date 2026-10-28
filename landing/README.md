@@ -56,9 +56,9 @@ python3 landing/tools/sync_partials.py
 python3 landing/tools/sync_partials.py --check
 ```
 
-CSS/JS değişiminde cache sürümü ortak parçalarda ve Auth yardımcı sayfalarında birlikte güncellenir. Güncel CSS sürümü `20261028b`; ortak parça eşliği kontrol edildi. `_headers` CSP'si korunur; inline JS/style eklenmez, JSON-LD veri blokları istisnadır. Fontlar ve GSAP kendi alan adından sunulur; dış CDN geri eklenmez. `_partials/`, `tools/` ve Markdown dokümanlar `.assetsignore` ile yayın dışında kalır.
+CSS/JS değişiminde cache sürümü ortak parçalarda ve Auth yardımcı sayfalarında birlikte güncellenir. Güncel CSS sürümü `20261028c`; ortak parça eşliği kontrol edildi. `_headers` CSP'si korunur; inline JS/style eklenmez, JSON-LD veri blokları istisnadır. Fontlar ve GSAP kendi alan adından sunulur; dış CDN geri eklenmez. `_partials/`, `tools/` ve Markdown dokümanlar `.assetsignore` ile yayın dışında kalır.
 
-Mevcut `.phone`/`.phone-screen` kullanılır. Aspect ratio ekran kutusunda 540/1170'dir; padding'li dış telefona sabit yükseklik veya oran verilmez. `object-fit: contain` ile ekran kırpılmaz. Eşli ekran grupları 960px altında metnin altına, 420px altında tek telefona iner. Küçük yazı/taşma ve dikey akış yine gerçek 375/1024/1440 tarayıcı görünümüyle değerlendirilir.
+Bütün uygulama görselleri ve videoları ortak `.phone`/`.phone-screen` iPhone çerçevesini kullanır. Siyah Dynamic Island, ekranın oransal üst merkezinde dekoratif CSS katmanıdır; kaynak medya değiştirilmez ve katman tıklamaları engellemez. Aspect ratio ekran kutusunda 540/1170'dir; padding'li dış telefona sabit yükseklik veya oran verilmez. `object-fit: contain` ile ekran kırpılmaz. Eşli ekran grupları 960px altında metnin altına, 420px altında tek telefona iner. Küçük yazı/taşma ve dikey akış yine gerçek 375/1024/1440 tarayıcı görünümüyle değerlendirilir.
 
 ## Yeni native medya sözleşmesi
 

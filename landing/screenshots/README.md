@@ -1,6 +1,6 @@
 # Güncel uygulama medyası — 28 Ekim2026
 
-Bu set tek iOS18.6 cihazından, **PomoSprint QA iPhone16 (18.6)** simülatöründen alındı. Uygulama güncel beş sekmelidir. Durum çubuğu09:41, pil100%, Wi-Fi3/hat4 olarak simctl ile sabitlendi ve çekim sonunda geri alındı. Bütün web görselleri **540×1170**; kullanılan iPhone çerçevesi iki dilde aynıdır.
+Bu set tek iOS18.6 cihazından, **PomoSprint QA iPhone16 (18.6)** simülatöründen alındı. Uygulama güncel beş sekmelidir. Durum çubuğu09:41, pil100%, Wi-Fi3/hat4 olarak simctl ile sabitlendi ve çekim sonunda geri alındı. Bütün web görselleri **540×1170**; kullanılan iPhone çerçevesi iki dilde aynıdır. Dynamic Island, sitede fotoğraf ve videoların üzerine aynı oranda yerleşen dekoratif CSS katmanıdır; orijinal ekran dosyalarına eklenmez.
 
 Tek kurgu hesap **Deniz**, UID `ca271e26-fc2c-44b6-b88f-9537f809639c`, yalnız `pomosprint_site32_dus` yerel veritabanında. Türkçe/İngilizce için hesap veya veri değiştirilmedi. Altı kurgu arkadaş: Ece,Mert,Ada,Arda,Duru,Can. Gerçek kullanıcı veya kullanım sayısı iddiası değildir.
 
