@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "platform": "android",
+  "device": "emulator-5554",
+  "run": "ex32-android-a3",
+  "api_port": 54351,
+  "host_port": 54369,
+  "database": "pomosprint_review32_final",
+  "started_at": "2026-10-28T12:17:43.083724+00:00",
+  "finished_at": "2026-10-28T12:19:42.007278+00:00",
+  "native_exit_code": 0,
+  "sql_checks": 21,
+  "source": [
+    {
+      "path": "integration_test/ah_exam_details_early_test.dart",
+      "sha256": "1a3924448b200f17f1b831ee5c7ffa8d59afbcf9de8beab7b5a64dd9732aec20",
+      "bytes": 16031
+    },
+    {
+      "path": "lib/models/exam_model.dart",
+      "sha256": "6eb320498e557dec311059cafcd2403f3aad4dc30e2a1818650a09830d0ef140",
+      "bytes": 22636
+    },
+    {
+      "path": "lib/models/exam_details.dart",
+      "sha256": "00b72a04e07d2751ce3723c7fa2ec7e612317ccc30e2044f9ac42609cf96b957",
+      "bytes": 5913
+    },
+    {
+      "path": "lib/services/exam_service.dart",
+      "sha256": "8ff4e357771ec3780cf79f148bf54dbc4ff625d4d34210ac9c200b57d1f8f245",
+      "bytes": 33488
+    },
+    {
+      "path": "lib/services/exam_persistence.dart",
+      "sha256": "e56d503260551c7639a11f85fe91afc33cf59aceadf25916e8097f35cc600c37",
+      "bytes": 9219
+    },
+    {
+      "path": "lib/screens/exam_screen.dart",
+      "sha256": "efdc02e8a41bf1a0b8a98434789d22b32ea7cab5839bd461344d412cb16c44e2",
+      "bytes": 32117
+    },
+    {
+      "path": "lib/widgets/exam_results_dialog.dart",
+      "sha256": "7672ea1a3437d640c57e5d2e0c1bcdbec653378ccb730b0695a1a91769da19e3",
+      "bytes": 20956
+    },
+    {
+      "path": "lib/l10n/app_tr.arb",
+      "sha256": "a89c1f8528d3c54b7f63b46e568195192e5fcf48eb9479e2e7171fcef67a0774",
+      "bytes": 80646
+    },
+    {
+      "path": "lib/l10n/app_en.arb",
+      "sha256": "0917f3343b6d076ecd1f278717a67363d27854f0279e8f791a09df21b3431a4b",
+      "bytes": 70257
+    }
+  ],
+  "native_summary": {
+    "path": "a3/native_summary.log",
+    "sha256": "46196bd2bf9ccdead652e4f93ce79265762a2e61aa3ec0d623e9e9df06a0c2eb",
+    "bytes": 1302,
+    "source_sha256": "46196bd2bf9ccdead652e4f93ce79265762a2e61aa3ec0d623e9e9df06a0c2eb"
+  },
+  "independent_sql": {
+    "path": "a3/independent_sql.json",
+    "sha256": "093c512311292f469a198d67b6d3391c5dcd300b6174c18fef6e6e40aace42ae",
+    "bytes": 2471,
+    "source_sha256": "093c512311292f469a198d67b6d3391c5dcd300b6174c18fef6e6e40aace42ae"
+  },
+  "screenshots": [
+    {
+      "path": "a3/screenshots/e2e-ah32-details-en.png",
+      "sha256": "e515dc4c104f7755b58df7a208d8281789c717e34f588a250514bfc43b5b45e1",
+      "bytes": 157993,
+      "source_sha256": "e515dc4c104f7755b58df7a208d8281789c717e34f588a250514bfc43b5b45e1"
+    },
+    {
+      "path": "a3/screenshots/e2e-ah32-details-tr.png",
+      "sha256": "2733cc05816801567aec5c598c3212396d106005f69121bfdd5b8b4df7e630aa",
+      "bytes": 149159,
+      "source_sha256": "2733cc05816801567aec5c598c3212396d106005f69121bfdd5b8b4df7e630aa"
+    },
+    {
+      "path": "a3/screenshots/e2e-ah32-history-en.png",
+      "sha256": "8b895f8f786359215b01ba9e9b53e0940da5cbc90f139fd5a9a6c468ec3f089b",
+      "bytes": 245703,
+      "source_sha256": "8b895f8f786359215b01ba9e9b53e0940da5cbc90f139fd5a9a6c468ec3f089b"
+    },
+    {
+      "path": "a3/screenshots/e2e-ah32-history-tr.png",
+      "sha256": "a88b369e147c67e3974eb94b9d9da974169ed48855880951ad608ecefe241926",
+      "bytes": 233746,
+      "source_sha256": "a88b369e147c67e3974eb94b9d9da974169ed48855880951ad608ecefe241926"
+    },
+    {
+      "path": "a3/screenshots/e2e-ah32-report-en.png",
+      "sha256": "c32846978243ef026ec8105b884a0bfa013ec2005c2791bb445cd141f3eae5af",
+      "bytes": 221836,
+      "source_sha256": "c32846978243ef026ec8105b884a0bfa013ec2005c2791bb445cd141f3eae5af"
+    },
+    {
+      "path": "a3/screenshots/e2e-ah32-report-tr.png",
+      "sha256": "a5383b2dea2cc936dbe3e6096765a52a7216676b4346a48a213ad54a0b8a4ed0",
+      "bytes": 208400,
+      "source_sha256": "a5383b2dea2cc936dbe3e6096765a52a7216676b4346a48a213ad54a0b8a4ed0"
+    },
+    {
+      "path": "a3/screenshots/e2e-ah32-running-en.png",
+      "sha256": "efc5a83a8de3952d4494ad93ea2a67109d272f04af8986bc49f5d4dd8edc21c4",
+      "bytes": 207721,
+      "source_sha256": "efc5a83a8de3952d4494ad93ea2a67109d272f04af8986bc49f5d4dd8edc21c4"
+    },
+    {
+      "path": "a3/screenshots/e2e-ah32-running-tr.png",
+      "sha256": "40550a0f5e628d2acf24d61cf02004542a94c5eb9d53ca34609dcc7d90585bd0",
+      "bytes": 218565,
+      "source_sha256": "40550a0f5e628d2acf24d61cf02004542a94c5eb9d53ca34609dcc7d90585bd0"
+    }
+  ],
+  "original_native_log_provenance": {
+    "path": "a3/native.log",
+    "sha256": "0e09ea60d12d7268f9305c057a7afc25c7a45be5926ac7c6119507be4475bb4d",
+    "bytes": 1743,
+    "source_sha256": "e3d729a43a2356b33c1533c48c9de8c076a54afd874f30f6a36d55b62df14572"
+  },
+  "prior_runs": [
+    {
+      "run": "ex32-android-a1",
+      "result": "FAIL",
+      "reason": "local gateway foreign_host rejected 10.0.2.2 before account creation",
+      "native_status": {
+        "path": "a1/status.json",
+        "sha256": "1e0adbf3dd252bf4be90d02d53ea5954608f59ffdbff6a51045b57bcac20f34c",
+        "bytes": 344,
+        "source_sha256": "2f685bf8704bdf42a44afd27b36f474362c23d66565d618de3421ff3476b1b06"
+      }
+    },
+    {
+      "run": "ex32-android-a2",
+      "result": "PASS",
+      "native_status": {
+        "path": "a2/status.json",
+        "sha256": "d5ad4b07e030c128bdc9422956ae756c64ac7d13124eb15353b6a71797179b89",
+        "bytes": 344,
+        "source_sha256": "320d0754e41a47f276c26a61f782a28e81c928c584eb67f25885fdc393a0c08b"
+      },
+      "independent_sql": {
+        "path": "a2/independent_sql.json",
+        "sha256": "cc6022419c4bca66de450b8371c24f51e5bfceb514a65004d1d513900b92dd2a",
+        "bytes": 2471,
+        "source_sha256": "cc6022419c4bca66de450b8371c24f51e5bfceb514a65004d1d513900b92dd2a"
+      },
+      "screenshots_directory": "a2/screenshots"
+    }
+  ],
+  "prior_a2_rows_preserved": {
+    "owner": "992708b1-9e08-4ef5-8572-f1dc9e855dee",
+    "revision_sum": 2,
+    "completed_attempts": 2
+  },
+  "path_base": "this android archive directory, except source[] paths are repository-relative"
+}

@@ -2973,4 +2973,124 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get leagueGlobalScopeBody =>
       'Tüm hedeflerdeki kullanıcıların bu ay kazandığı normal odak puanları. Deneme puanları ayrı ligdedir; global görünüm ek ödül vermez.';
+
+  @override
+  String get examFinishEarly => 'AYT\'yi bitir';
+
+  @override
+  String get examFinishEarlyTitle => 'AYT\'yi erken bitirmek istiyor musun?';
+
+  @override
+  String get examFinishEarlyBody =>
+      'Bitirme isteğin sunucu tarafından kabul edildiğinde süre ve ödül kesinleşir. Ardından çözdüğün testleri seçip netlerini, başlığını ve notunu kaydedebilirsin.';
+
+  @override
+  String get examEarlyPendingTitle => 'Erken bitirme onayı bekleniyor';
+
+  @override
+  String get examEarlyPendingBody =>
+      'İsteğin bu cihazda saklandı. Süre ve ödül sunucu kabul ettiğinde kesinleşir; bağlantı geldiğinde tekrar gönderilir. O zamana kadar planlanan süre dolarsa tam süre kuralları uygulanır.';
+
+  @override
+  String get examEarlyUnavailable =>
+      'Bu sunucuda erken bitirme şu anda kullanılamıyor. Kaydın silinmedi; yeniden deneyebilir veya bağlantı durumunu kontrol edebilirsin.';
+
+  @override
+  String get examEarlyTooSoon =>
+      'Bitirmeden önce en az bir saniye geçmeli. Yeniden deneyebilirsin.';
+
+  @override
+  String get examCompletedEarly => 'Erken tamamlandı';
+
+  @override
+  String examActualPlanned(String actual, String planned) {
+    return 'Gerçek süre: $actual · Planlanan: $planned';
+  }
+
+  @override
+  String examCreditedMinutes(int minutes) {
+    return 'Rapora eklenen: $minutes dk';
+  }
+
+  @override
+  String examSeconds(int seconds) {
+    return '$seconds sn';
+  }
+
+  @override
+  String get examDetailsTitle => 'Deneme ayrıntıları ve netler';
+
+  @override
+  String get examTitleLabel => 'Deneme başlığı';
+
+  @override
+  String get examNoteLabel => 'Not';
+
+  @override
+  String get examSelectModules => 'Çözdüğün AYT testlerini seç';
+
+  @override
+  String get examModuleHint =>
+      'Net girmek için en az bir test seç. Başlık ve notunu net girmeden de kaydedebilirsin.';
+
+  @override
+  String get examModuleUnknown => 'Bu kayıtta AYT test seçimi henüz yok.';
+
+  @override
+  String examSelectedQuestions(int selected, int total) {
+    return 'Seçilen kapsam: $selected / $total soru';
+  }
+
+  @override
+  String get examReligionAlternativeInfo =>
+      'Sosyal Bilimler-2\'de Din Kültürü / ek felsefe alanı toplam 6 sorudur; aynı alan iki kez sayılmaz.';
+
+  @override
+  String get examDetailsEdit => 'Ayrıntıları ve netleri düzenle';
+
+  @override
+  String get examDetailsSaved => 'Deneme ayrıntıların ve netlerin kaydedildi.';
+
+  @override
+  String get examDetailsQueued =>
+      'Ayrıntıların ve netlerin bu cihazda saklandı; bağlantı geldiğinde aynı istek gönderilecek.';
+
+  @override
+  String get examDetailsConflict =>
+      'Bu deneme başka bir yerde düzenlenmiş. Güncel kaydı yükle, değişikliklerini kontrol et ve tekrar kaydet.';
+
+  @override
+  String get examScopeConflict =>
+      'Sonuçları kaydedilmiş bir testi seçimin dışına çıkaramazsın. Test seçimini ve girdiğin dersleri kontrol et.';
+
+  @override
+  String get examDetailsInvalid =>
+      'Başlık en fazla 120, not en fazla 2000 karakter olabilir. Başlık tek satır olmalı; test seçimini ve sonuçlarını da kontrol et.';
+
+  @override
+  String get examDetailsReload => 'Güncel kaydı yükle';
+
+  @override
+  String get examDetailsPending =>
+      'Önceki kayıt isteğinin sonucu bekleniyor. Yeniden gönderebilir, sonucu aldıktan sonra düzenlemeye devam edebilirsin.';
+
+  @override
+  String get examDefinitionUnsupported =>
+      'Bu AYT kaydının test yapısı tanınmıyor. Kaydın korundu; güncel sınav bilgisi için bağlantını kontrol et.';
+
+  @override
+  String get examDetailsUnavailable =>
+      'Bu sunucuda başlık, not ve test seçimi düzenleme henüz kullanılamıyor.';
+
+  @override
+  String get examIntroEarly =>
+      'Sınavını seç ve çalışmaya başla. AYT\'yi erken bitirebilir, ardından çözdüğün testleri ve netlerini kaydedebilirsin.';
+
+  @override
+  String examCharacterCount(int current, int maximum) {
+    return '$current / $maximum karakter';
+  }
+
+  @override
+  String get onboardingSegmentDus => 'DUS (Diş Hekimliğinde Uzmanlık)';
 }

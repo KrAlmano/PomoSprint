@@ -16,7 +16,7 @@ CREATE FUNCTION public._competition_month(p_at timestamptz) RETURNS date LANGUAG
 CREATE FUNCTION public._competition_month_time(p_month date) RETURNS timestamptz LANGUAGE sql IMMUTABLE SET search_path=public,pg_temp AS $$ SELECT p_month::timestamp AT TIME ZONE 'Europe/Istanbul' $$;
 CREATE TABLE public.competition_policy(singleton boolean PRIMARY KEY DEFAULT true CHECK(singleton),activates_at timestamptz NOT NULL,legacy_finalized boolean NOT NULL DEFAULT false,legacy_snapshot jsonb NOT NULL,legacy_decisions jsonb NOT NULL DEFAULT '[]'::jsonb);
 INSERT INTO public.competition_policy(singleton,activates_at,legacy_snapshot) SELECT true,public._competition_month_time((public._competition_month(now())+interval '1 month')::date),jsonb_build_object('state',(SELECT jsonb_build_object('start_at',s.start_at,'initialized',s.initialized,'period_started_at',s.period_started_at) FROM public.league_competition_state s WHERE singleton),'rooms',coalesce((SELECT jsonb_agg(to_jsonb(l)) FROM public.leagues l),'[]'::jsonb),'members',coalesce((SELECT jsonb_agg(to_jsonb(m)) FROM public.league_memberships m),'[]'::jsonb),'cron',coalesce((SELECT jsonb_agg(to_jsonb(j)) FROM cron.job j WHERE jobname='weekly_leagues_job'),'[]'::jsonb));
-CREATE TABLE public.competition_target_history(user_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,from_month date NOT NULL,segment text NOT NULL CHECK(segment IN('lgs','yks','tus','kpss','language','university','work','other')),PRIMARY KEY(user_id,from_month));
+CREATE TABLE public.competition_target_history(user_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,from_month date NOT NULL,segment text NOT NULL CHECK(segment IN('lgs','yks','tus','dus','kpss','language','university','work','other')),PRIMARY KEY(user_id,from_month));
 INSERT INTO public.competition_target_history SELECT id,public._competition_month(now()),coalesce(user_segment,'other') FROM public.profiles;
 CREATE TABLE public.competition_profiles(user_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,kind text NOT NULL CHECK(kind IN('study','exam')),tier integer NOT NULL CHECK(tier BETWEEN 1 AND 5),PRIMARY KEY(user_id,kind));
 INSERT INTO public.competition_profiles SELECT id,'study',league_tier FROM public.profiles;
@@ -58,7 +58,7 @@ END $$;
 CREATE FUNCTION public.set_competition_target(p_segment text) RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path=public,pg_temp AS $$
 BEGIN
  IF auth.uid() IS NULL THEN RAISE EXCEPTION 'not authenticated'; END IF;
- IF p_segment IS NOT NULL AND p_segment NOT IN('lgs','yks','tus','kpss','language','university','work','other') THEN RAISE EXCEPTION 'competition_invalid_segment'; END IF;
+ IF p_segment IS NOT NULL AND p_segment NOT IN('lgs','yks','tus','dus','kpss','language','university','work','other') THEN RAISE EXCEPTION 'competition_invalid_segment'; END IF;
  PERFORM 1 FROM public.profiles WHERE id=auth.uid() FOR UPDATE;
  UPDATE public.profiles SET user_segment=nullif(p_segment,'other') WHERE id=auth.uid();
  RETURN public.get_competition_target();

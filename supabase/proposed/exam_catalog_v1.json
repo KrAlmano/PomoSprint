@@ -448,6 +448,165 @@
           ]
         }
       ]
+    },
+    {
+      "id": "dus",
+      "name_tr": "DUS",
+      "name_en": "DUS",
+      "segment": "dus",
+      "group": "dus",
+      "duration_seconds": 9000,
+      "total_questions": 120,
+      "wrong_answer_divisor": 4,
+      "catalog_version": 1,
+      "reward_points": 30,
+      "reward_coins": 6,
+      "subjects": [
+        {
+          "id": "anatomy",
+          "name_tr": "Anatomi",
+          "name_en": "Anatomy",
+          "question_count": 6,
+          "category_keys": [
+            "Anatomi"
+          ]
+        },
+        {
+          "id": "histology_embryology",
+          "name_tr": "Histoloji ve Embriyoloji",
+          "name_en": "Histology and Embryology",
+          "question_count": 4,
+          "category_keys": [
+            "Histoloji ve Embriyoloji"
+          ]
+        },
+        {
+          "id": "physiology",
+          "name_tr": "Fizyoloji",
+          "name_en": "Physiology",
+          "question_count": 6,
+          "category_keys": [
+            "Fizyoloji"
+          ]
+        },
+        {
+          "id": "biochemistry",
+          "name_tr": "Tıbbi Biyokimya",
+          "name_en": "Medical Biochemistry",
+          "question_count": 6,
+          "category_keys": [
+            "Biyokimya"
+          ]
+        },
+        {
+          "id": "microbiology",
+          "name_tr": "Tıbbi Mikrobiyoloji",
+          "name_en": "Medical Microbiology",
+          "question_count": 6,
+          "category_keys": [
+            "Mikrobiyoloji"
+          ]
+        },
+        {
+          "id": "pathology",
+          "name_tr": "Tıbbi Patoloji",
+          "name_en": "Medical Pathology",
+          "question_count": 4,
+          "category_keys": [
+            "Patoloji"
+          ]
+        },
+        {
+          "id": "pharmacology",
+          "name_tr": "Tıbbi Farmakoloji",
+          "name_en": "Medical Pharmacology",
+          "question_count": 4,
+          "category_keys": [
+            "Farmakoloji"
+          ]
+        },
+        {
+          "id": "medical_biology_genetics",
+          "name_tr": "Tıbbi Biyoloji ve Genetik",
+          "name_en": "Medical Biology and Genetics",
+          "question_count": 4,
+          "category_keys": [
+            "Tıbbi Biyoloji ve Genetik"
+          ]
+        },
+        {
+          "id": "restorative_dentistry",
+          "name_tr": "Restoratif Diş Tedavisi",
+          "name_en": "Restorative Dentistry",
+          "question_count": 10,
+          "category_keys": [
+            "Restoratif Diş Tedavisi"
+          ]
+        },
+        {
+          "id": "prosthetic_dentistry",
+          "name_tr": "Protetik Diş Tedavisi",
+          "name_en": "Prosthodontics",
+          "question_count": 10,
+          "category_keys": [
+            "Protetik Diş Tedavisi"
+          ]
+        },
+        {
+          "id": "oral_maxillofacial_surgery",
+          "name_tr": "Ağız, Diş ve Çene Cerrahisi",
+          "name_en": "Oral and Maxillofacial Surgery",
+          "question_count": 10,
+          "category_keys": [
+            "Ağız, Diş ve Çene Cerrahisi"
+          ]
+        },
+        {
+          "id": "oral_maxillofacial_radiology",
+          "name_tr": "Ağız, Diş ve Çene Radyolojisi",
+          "name_en": "Oral and Maxillofacial Radiology",
+          "question_count": 10,
+          "category_keys": [
+            "Ağız, Diş ve Çene Radyolojisi"
+          ]
+        },
+        {
+          "id": "periodontology",
+          "name_tr": "Periodontoloji",
+          "name_en": "Periodontology",
+          "question_count": 10,
+          "category_keys": [
+            "Periodontoloji"
+          ]
+        },
+        {
+          "id": "orthodontics",
+          "name_tr": "Ortodonti",
+          "name_en": "Orthodontics",
+          "question_count": 10,
+          "category_keys": [
+            "Ortodonti"
+          ]
+        },
+        {
+          "id": "endodontics",
+          "name_tr": "Endodonti",
+          "name_en": "Endodontics",
+          "question_count": 10,
+          "category_keys": [
+            "Endodonti"
+          ]
+        },
+        {
+          "id": "pediatric_dentistry",
+          "name_tr": "Çocuk Diş Hekimliği",
+          "name_en": "Pediatric Dentistry",
+          "question_count": 10,
+          "category_keys": [
+            "Çocuk Diş Hekimliği"
+          ]
+        }
+      ]
     }
   ]
 }

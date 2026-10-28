@@ -6,6 +6,7 @@ import 'package:uuid/uuid.dart';
 
 import '../models/exam_catalog_defaults.dart';
 import '../models/exam_model.dart';
+import '../models/exam_details.dart';
 import '../utils/async_lock.dart';
 import 'exam_persistence.dart';
 import 'server_clock.dart';
@@ -96,6 +97,27 @@ class ExamService extends ChangeNotifier {
   String? errorCode;
   bool busy = false;
   ExamCatalog get catalog => _catalog;
+  bool get supportsDetails => _catalog.capabilities.details;
+  bool canFinishEarly(ExamLocalRecord row) =>
+      _catalog.capabilities.aytEarlyFinish &&
+      _catalog.capabilities.aytModulesVersion == 1 &&
+      row.definition.effectiveModules.isNotEmpty &&
+      row.definition.id == 'ayt' &&
+      row.attempt?.status == ExamAttemptStatus.active &&
+      row.pendingAction == null;
+  ExamLocalRecord? recordFor(String uuid) =>
+      _records.where((r) => r.clientUuid == uuid).firstOrNull;
+  static bool needsUserReview(String? error) => const {
+    'exam_details_conflict',
+    'exam_scope_conflict',
+    'exam_details_invalid',
+    'exam_result_invalid',
+    'exam_definition_unsupported',
+    'exam_early_finish_not_supported',
+    'exam_early_finish_unavailable',
+    'exam_early_finish_too_soon',
+    'unavailable',
+  }.contains(error);
   List<ExamLocalRecord> get records => List.unmodifiable(_records);
   DateTime now() => backend.now();
 
@@ -118,7 +140,9 @@ class ExamService extends ChangeNotifier {
       // A fresh terminal server row supersedes an old active cache.
       if (remote == null ||
           remote.status == ExamAttemptStatus.active ||
-          r.pendingAction == ExamPendingAction.results) {
+          r.pendingAction == ExamPendingAction.results ||
+          r.pendingAction == ExamPendingAction.details ||
+          a.detailsRevision > remote.detailsRevision) {
         byUuid[a.clientUuid] = a;
       }
     }
@@ -132,6 +156,7 @@ class ExamService extends ChangeNotifier {
             r.pendingAction == ExamPendingAction.start ||
             r.pendingAction == ExamPendingAction.abandon ||
             r.pendingAction == ExamPendingAction.complete ||
+            r.pendingAction == ExamPendingAction.completeEarly ||
             r.attempt?.status == ExamAttemptStatus.active,
       )
       .firstOrNull;
@@ -233,7 +258,7 @@ class ExamService extends ChangeNotifier {
   void _scheduleTimer() {
     if (!_records.any(
       (r) =>
-          r.pendingAction != null ||
+          (r.pendingAction != null && !needsUserReview(r.errorCode)) ||
           r.attempt?.status == ExamAttemptStatus.active,
     )) {
       _timer?.cancel();
@@ -260,7 +285,10 @@ class ExamService extends ChangeNotifier {
           );
         }
       }
-      if (++_ticks % 30 == 0 && _records.any((r) => r.pendingAction != null)) {
+      if (++_ticks % 30 == 0 &&
+          _records.any(
+            (r) => r.pendingAction != null && !needsUserReview(r.errorCode),
+          )) {
         unawaited(sync());
       }
     });
@@ -275,6 +303,7 @@ class ExamService extends ChangeNotifier {
         active != null &&
             (active.pendingAction == ExamPendingAction.start ||
                 active.pendingAction == ExamPendingAction.abandon ||
+                active.pendingAction == ExamPendingAction.completeEarly ||
                 (active.attempt?.remainingSecondsAt(now()) ?? 0) > 0);
     if (blocksOtherSessions.value != blocks) blocksOtherSessions.value = blocks;
     _scheduleTimer();
@@ -377,7 +406,10 @@ class ExamService extends ChangeNotifier {
                       incoming.status != saved.status))) {
             return saved;
           }
-          return incoming;
+          return saved != null &&
+                  saved.detailsRevision > incoming.detailsRevision
+              ? incoming.withDetailsFrom(saved)
+              : incoming;
         }).toList();
         var rows = List<ExamLocalRecord>.of(_records);
         for (final a in _remote) {
@@ -393,8 +425,19 @@ class ExamService extends ChangeNotifier {
                 attempt: a.withDefinition(definition),
               ),
             );
-          } else if (i >= 0 && rows[i].pendingAction == null) {
-            rows[i] = rows[i].copy(attempt: a.withDefinition(definition));
+          } else if (i >= 0 &&
+              (rows[i].pendingAction == null ||
+                  (a.status != ExamAttemptStatus.active &&
+                      const {
+                        ExamPendingAction.complete,
+                        ExamPendingAction.completeEarly,
+                        ExamPendingAction.abandon,
+                      }.contains(rows[i].pendingAction)))) {
+            rows[i] = rows[i].copy(
+              attempt: a.withDefinition(definition),
+              definition: definition,
+              details: null,
+            );
           }
         }
         await _save(owner, epoch, rows);
@@ -457,6 +500,16 @@ class ExamService extends ChangeNotifier {
       _transition(uuid, ExamPendingAction.complete);
   Future<void> abandon(String uuid) =>
       _transition(uuid, ExamPendingAction.abandon);
+  Future<void> finishEarly(String uuid) async {
+    final row = recordFor(uuid);
+    if (row == null || !canFinishEarly(row)) {
+      throw const ExamFailure('exam_early_finish_unavailable');
+    }
+    await _transition(uuid, ExamPendingAction.completeEarly);
+    final error = recordFor(uuid)?.errorCode;
+    if (needsUserReview(error)) throw ExamFailure(error!);
+  }
+
   Future<void> _transition(String uuid, ExamPendingAction action) async {
     final owner = _owner, epoch = _epoch;
     if (_restoringJournal) await initialize();
@@ -468,9 +521,9 @@ class ExamService extends ChangeNotifier {
           row.attempt!.status != ExamAttemptStatus.active) {
         return;
       }
-      // A requested abandon is never replaced by a later automatic completion.
-      if (row.pendingAction == ExamPendingAction.abandon &&
-          action != ExamPendingAction.abandon) {
+      // The first durable terminal intent wins locally. Server state is final.
+      if (row.pendingAction != null) {
+        if (row.pendingAction == action) await _send(owner, epoch, row);
         return;
       }
       if (action == ExamPendingAction.complete &&
@@ -486,6 +539,14 @@ class ExamService extends ChangeNotifier {
     ExamAttempt attempt,
     List<ExamSubjectResult> results,
   ) async {
+    if (supportsDetails) {
+      return saveDetails(
+        attempt,
+        patch: ExamDetailsPatch({}),
+        results: results,
+        expectedRevision: attempt.detailsRevision,
+      );
+    }
     final owner = _owner, epoch = _epoch;
     if (_restoringJournal) await initialize();
     return _lock.synchronized(() async {
@@ -551,6 +612,167 @@ class ExamService extends ChangeNotifier {
     });
   }
 
+  ExamAttempt? _ownedAttempt(ExamAttempt attempt) => attempts
+      .where(
+        (a) =>
+            a.id == attempt.id &&
+            a.clientUuid == attempt.clientUuid &&
+            a.examId == attempt.examId &&
+            a.catalogVersion == attempt.catalogVersion,
+      )
+      .firstOrNull;
+
+  Future<void> updateDetailsDraft(
+    ExamAttempt attempt,
+    ExamDetailsDraft draft, {
+    required String owner,
+  }) async {
+    final epoch = _epoch;
+    await _lock.synchronized(() async {
+      if (!_current(owner, epoch)) return;
+      if (!draft.hasSupportedTextLengths ||
+          ExamDetailsDraft.fromJson(draft.toJson()) == null) {
+        throw const ExamFailure('exam_details_invalid');
+      }
+      final owned = _ownedAttempt(attempt);
+      if (owned == null || !owned.isCompleted) return;
+      final definition = definitionFor(owned);
+      if (definition == null) return;
+      final row =
+          recordFor(owned.clientUuid) ??
+          ExamLocalRecord(
+            clientUuid: owned.clientUuid,
+            definition: definition,
+            createdAt: owned.startedAt,
+            attempt: owned,
+          );
+      if (!await _replace(
+        owner,
+        epoch,
+        row.copy(
+          action: row.pendingAction,
+          results: row.pendingResults,
+          error: row.errorCode,
+          draft: draft,
+        ),
+      )) {
+        throw const ExamFailure('storage');
+      }
+    });
+  }
+
+  Future<void> saveDetails(
+    ExamAttempt attempt, {
+    required ExamDetailsPatch patch,
+    List<ExamSubjectResult>? results,
+    required int expectedRevision,
+  }) async {
+    final owner = _owner, epoch = _epoch;
+    if (_restoringJournal) await initialize();
+    await _lock.synchronized(() async {
+      final owned = _ownedAttempt(attempt);
+      final definition = owned == null ? null : definitionFor(owned);
+      if (owner == null ||
+          !_current(owner, epoch) ||
+          !supportsDetails ||
+          owned == null ||
+          !owned.isCompleted ||
+          definition == null ||
+          expectedRevision < 0 ||
+          !patch.isValid) {
+        throw const ExamFailure('exam_details_invalid');
+      }
+      final prior =
+          recordFor(owned.clientUuid) ??
+          ExamLocalRecord(
+            clientUuid: owned.clientUuid,
+            definition: definition,
+            createdAt: owned.startedAt,
+            attempt: owned,
+          );
+      if (prior.pendingAction != null) {
+        throw const ExamFailure('exam_details_pending');
+      }
+      final selected = patch.values.containsKey('selected_module_ids')
+          ? (patch.values['selected_module_ids'] as List<String>)
+          : owned.selectedModuleIds;
+      if (selected != null &&
+          (definition.id != 'ayt' ||
+              definition.effectiveModules.isEmpty ||
+              !selected.every(
+                (id) => definition.effectiveModules.any((m) => m.id == id),
+              ))) {
+        throw const ExamFailure('exam_scope_conflict');
+      }
+      final allowed = selected == null
+          ? definition.subjects.map((s) => s.id).toSet()
+          : definition.subjectIdsForModules(selected);
+      if (results != null &&
+          (results.isEmpty ||
+              results.map((r) => r.subjectId).toSet().length !=
+                  results.length ||
+              !results.every(
+                (r) =>
+                    allowed.contains(r.subjectId) &&
+                    definition.subjects.any(r.isValidFor),
+              ))) {
+        throw const ExamFailure('exam_result_invalid');
+      }
+      final mutation = ExamDetailsMutation(
+        patch: patch,
+        results: results,
+        expectedRevision: expectedRevision,
+      );
+      final next = prior.copy(
+        attempt: owned,
+        definition: definition,
+        action: ExamPendingAction.details,
+        details: mutation,
+      );
+      if (!await _replace(owner, epoch, next)) {
+        throw const ExamFailure('storage');
+      }
+      await _send(owner, epoch, next);
+      final error = recordFor(owned.clientUuid)?.errorCode;
+      if (needsUserReview(error)) throw ExamFailure(error!);
+    });
+  }
+
+  /// Explicit user review discards only the old request envelope, never edits.
+  Future<ExamAttempt> reloadDetailsForReview(ExamAttempt attempt) async {
+    final owner = _owner, epoch = _epoch;
+    if (owner == null) throw const ExamFailure('owner_changed');
+    await refresh();
+    return _lock.synchronized(() async {
+      if (!_current(owner, epoch) || _historyRefreshFailed) {
+        throw const ExamFailure('connection');
+      }
+      final remote = _remote
+          .where(
+            (a) => a.id == attempt.id && a.clientUuid == attempt.clientUuid,
+          )
+          .firstOrNull;
+      final prior = recordFor(attempt.clientUuid);
+      if (remote == null || !remote.isCompleted || prior == null) {
+        throw const ExamFailure('exam_not_found');
+      }
+      final definition = definitionFor(remote);
+      if (definition == null) {
+        throw const ExamFailure('exam_definition_unsupported');
+      }
+      final next = prior.copy(
+        attempt: remote,
+        definition: definition,
+        details: null,
+        draft: prior.detailsDraft?.atRevision(remote.detailsRevision),
+      );
+      if (!await _replace(owner, epoch, next)) {
+        throw const ExamFailure('storage');
+      }
+      return remote;
+    });
+  }
+
   Future<bool> _replace(String owner, int epoch, ExamLocalRecord row) {
     final rows = List<ExamLocalRecord>.of(_records);
     final i = rows.indexWhere((r) => r.clientUuid == row.clientUuid);
@@ -574,7 +796,9 @@ class ExamService extends ChangeNotifier {
       }
       for (final row in List<ExamLocalRecord>.of(_records)) {
         if (!_current(owner, epoch)) return;
-        if (row.pendingAction != null) await _send(owner, epoch, row);
+        if (row.pendingAction != null && !needsUserReview(row.errorCode)) {
+          await _send(owner, epoch, row);
+        }
       }
     });
   }
@@ -617,6 +841,21 @@ class ExamService extends ChangeNotifier {
           'abandon_exam_attempt',
           <String, dynamic>{'p_attempt_id': row.attempt!.id},
         ),
+        ExamPendingAction.completeEarly => (
+          'finish_ayt_early',
+          <String, dynamic>{'p_attempt_id': row.attempt!.id},
+        ),
+        ExamPendingAction.details => (
+          'save_exam_details',
+          <String, dynamic>{
+            'p_attempt_id': row.attempt!.id,
+            'p_details': row.pendingDetails!.patch.toJson(),
+            'p_subject_results': row.pendingDetails!.results
+                ?.map((r) => r.toJson())
+                .toList(),
+            'p_expected_revision': row.pendingDetails!.expectedRevision,
+          },
+        ),
         ExamPendingAction.results => (
           'save_exam_results',
           <String, dynamic>{
@@ -635,15 +874,26 @@ class ExamService extends ChangeNotifier {
           attempt.examId != row.definition.id ||
           (row.attempt != null && row.attempt!.id != attempt.id) ||
           (action == ExamPendingAction.complete && !attempt.isCompleted) ||
+          (action == ExamPendingAction.completeEarly && !attempt.isCompleted) ||
           (action == ExamPendingAction.abandon &&
               attempt.status == ExamAttemptStatus.active) ||
-          (action == ExamPendingAction.results && !attempt.isCompleted)) {
+          ((action == ExamPendingAction.results ||
+                  action == ExamPendingAction.details) &&
+              !attempt.isCompleted)) {
         throw const ExamFailure('invalid_response');
       }
+      final accepted = attempt.withDefinition(
+        attempt.definition ?? row.definition,
+      );
       final committed = await _replace(
         owner,
         epoch,
-        row.copy(attempt: attempt.withDefinition(row.definition)),
+        row.copy(
+          attempt: accepted,
+          definition: accepted.definition,
+          details: null,
+          draft: action == ExamPendingAction.details ? null : row.detailsDraft,
+        ),
       );
       if (committed && _current(owner, epoch)) {
         // The history cache may contain an older completed row. Publishing a
@@ -651,13 +901,12 @@ class ExamService extends ChangeNotifier {
         // until the next network refresh.
         _remote = [
           for (final cached in _remote)
-            cached.clientUuid == attempt.clientUuid
-                ? attempt.withDefinition(row.definition)
-                : cached,
+            cached.clientUuid == attempt.clientUuid ? accepted : cached,
         ];
       }
       if (attempt.isCompleted &&
           action != ExamPendingAction.results &&
+          action != ExamPendingAction.details &&
           _current(owner, epoch)) {
         // The complete RPC has already committed. A profile refresh failure
         // must not resurrect a completed queue entry or duplicate its reward.
@@ -718,6 +967,13 @@ class ExamService extends ChangeNotifier {
         'exam_overlap',
         'exam_not_found',
         'exam_unavailable',
+        'exam_early_finish_too_soon',
+        'exam_early_finish_not_supported',
+        'exam_early_finish_unavailable',
+        'exam_definition_unsupported',
+        'exam_details_invalid',
+        'exam_scope_conflict',
+        'exam_details_conflict',
       ]) {
         if (error.message.contains(code)) return code;
       }

@@ -1,0 +1,112 @@
+{
+  "reference_id": "reviewed-isolated-exam32-20261028-proportional",
+  "database": "pomosprint_review32_final",
+  "scope": "Reviewed104/104 isolated final SQL result plus existing avatar-catalog alignment; not main or live. No capture CLI.",
+  "sources_sha256": {
+    "supabase/proposed/27_tus_segment.sql": "5836949553fc20a72348bdb2370b44e8c8d4dd51d014f64474291b8acb818fa1",
+    "supabase/proposed/27_tus_segment_down.sql": "9292ec74679b5f9cb0d620f555ec9a7b9e0160b2a6557934f4b54967bda7c4ef",
+    "supabase/proposed/27_tus_segment_dryrun.sql": "068d383f2d0b712cf5426332b92616b49743d4740cd619e046cd8b0ee5bc0c1a",
+    "supabase/proposed/28_exam_core.sql": "420810cbc2d9d72c2c9695da09402a01429561b296088be5139c9dbc587d7c9c",
+    "supabase/proposed/28_exam_core_down.sql": "4989b31fa55f45a6f30a9e84b7b8a9b8b4028d642c3c19ce27ee40a891e68fe8",
+    "supabase/proposed/28_exam_core_dryrun.sql": "286ca4c8b1f4a2de30631ebebd78a5383bacce7dd66f9bc99f84e73135d4da52",
+    "supabase/proposed/29_monthly_competitions.sql": "6276e13aa1846302ac3f103aff1b84b5f45f67ace401b4cc0e33220e72e6cfd5",
+    "supabase/proposed/29_monthly_competitions_down.sql": "f529dc4a33bb4971525230e764737342b82e2b8ab2bde54ff33f81d124bee109",
+    "supabase/proposed/29_monthly_competitions_dryrun.sql": "c1d4daaf3c97758be7b0f2458bf78f6c1605ad601a5d61f26b814d3f8137d40f",
+    "supabase/proposed/exam_catalog_v1.json": "ccebb3e7a52dad5901245413aa2241bde098cb119e08e658d4bb557dc701f18c",
+    "tool/local_supabase/parity/fingerprint_lines.sql": "625593a088175b2a30e6ac48fc134834451206100f582977b1a5ebcc5cb1c4ca",
+    "supabase/proposed/30_session_start_atomic.sql": "c10d8235eb6f6f22372f8ebddb473b7ace186e2504e741705c01b1c15e4c7d73",
+    "supabase/proposed/30_session_start_atomic_down.sql": "c6308def8c42da3056dbc84eb576d12734b0f599836a3afd9b006f59a4bc1d12",
+    "supabase/proposed/30_session_start_atomic_dryrun.sql": "bb3058823571c80fb382c936c1b5440ecddc8ee010cd3a0654817e0c25747908",
+    "supabase/proposed/32_exam_details_early_finish.sql": "cecd277c37a3f4e5dc9ac81e882f86107767439ef170ec34f1737f0b66e5b70d",
+    "supabase/proposed/32_exam_details_early_finish_down.sql": "2c61c379de8a97025dc174d4d1e5e2866e86cae9cb3d56ea2a7761819425d899",
+    "supabase/proposed/32_exam_details_early_finish_dryrun.sql": "a02f01c110c583d2db82c1417ccd29dae7ab391758ee7c498b4f28085e7cfdc4",
+    "supabase/proposed/exam_catalog_32.json": "4422ef90733757276d45ad5ca8d1f86da7dfa6f80db67a7738854c79dbc73487"
+  },
+  "expected": {
+    "schema": {
+      "col": [
+        "257",
+        "aa9aed96b49834c12e3c2f1487732d74"
+      ],
+      "con": [
+        "160",
+        "30129fa8056b42256e5c2a96d3adb87b"
+      ],
+      "cron": [
+        "3",
+        "fefadd57a7e0f9a7fba62d26214e6050"
+      ],
+      "defacl": [
+        "6",
+        "d257813ad5c72bd659fec221c1ed34f8"
+      ],
+      "ext": [
+        "4",
+        "2b8b22fab036282a91f3c85fd208f6db"
+      ],
+      "extver": [
+        "4",
+        "8a02433da75920eb84bb24126b84df17"
+      ],
+      "func": [
+        "118",
+        "5a11620545941c78bf9965daca3817dc"
+      ],
+      "idx": [
+        "77",
+        "d93faf09b2b5a75275822e5a3c26c69e"
+      ],
+      "pol": [
+        "20",
+        "182c4cbfe09d2fd9ac55481c8e758c66"
+      ],
+      "rel": [
+        "43",
+        "973c20b6630162a5a59a876363b47a55"
+      ],
+      "schema": [
+        "1",
+        "6ae3d56d282d7fbcf093eae1da2f4491"
+      ],
+      "trg": [
+        "27",
+        "23e72fcf0b37305d3f80fa22fd882547"
+      ]
+    },
+    "migrations": [
+      "20261003180000|monthly_leaderboard_study_month",
+      "20261003181000|categories_order_and_privileges",
+      "20261003194000|privacy_social",
+      "20261004120000|live_snapshot",
+      "20261005120000|lig_donemi",
+      "20261005121000|seans_kilit_gec_bonus",
+      "20261005122000|avatar_satin_alma",
+      "20261005123000|kategori_butunluk",
+      "20261005124000|onboarding_profil",
+      "20261005125000|sosyal_erisim",
+      "20261005126000|segment_genisletme",
+      "20261007110000|report_submission_lock",
+      "20261007150000|marathon_break_presence",
+      "20261007160000|marathon_rewards",
+      "20261007170000|marathon_presence_confirmation",
+      "20261008190000|league_launch_policy",
+      "20261009190000|special_avatar_catalog",
+      "20261009233000|remove_unowned_ronin",
+      "20261028010000|tus_segment",
+      "20261028020000|exam_core",
+      "20261028030000|monthly_competitions",
+      "20261028040000|session_start_atomic",
+      "20261028060000|exam_details_early_finish"
+    ],
+    "catalog": {
+      "avatars": "48|3e88f75541a31ec3c8a9f83816ec40bd",
+      "exam_catalog": "7|58fafb530c8894732237d1ecc2ba5974",
+      "competition_avatar_rewards": "30|ca20b98cdfd6c50d8c441d7334aa7472"
+    },
+    "mail_trigger": "D",
+    "policy": [
+      true,
+      "proportional"
+    ]
+  }
+}

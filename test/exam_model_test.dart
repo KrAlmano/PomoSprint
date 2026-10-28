@@ -7,16 +7,35 @@ import 'package:pomodoro/models/exam_model.dart';
 
 void main() {
   test(
-    'offline catalog matches the proposed server catalog, never its rewards',
+    'offline reference preserves eight official question structures and current32 reward policy',
     () {
       final json = jsonDecode(
         File('supabase/proposed/exam_catalog_v1.json').readAsStringSync(),
       );
       final parsed = ExamCatalog.fromJson(json)!;
+      Map<String, dynamic> structure(ExamDefinition e) => e.toJson()
+        ..remove('reward_points')
+        ..remove('reward_coins')
+        ..remove('reward_policy_version')
+        ..remove('modules');
       expect(
-        parsed.exams.map((e) => e.toJson()).toList(),
-        offlineExamCatalog.exams.map((e) => e.toJson()).toList(),
+        parsed.exams.map(structure).toList(),
+        offlineExamCatalog.exams.map(structure).toList(),
       );
+      final latest = ExamCatalog.fromJson(
+        jsonDecode(
+          File('supabase/proposed/exam_catalog_32.json').readAsStringSync(),
+        ),
+      )!;
+      for (final exam in latest.exams) {
+        final offline = offlineExamCatalog.byId(exam.id)!;
+        expect(offline.fullRewardCoins, exam.fullRewardCoins, reason: exam.id);
+        expect(
+          offline.fullRewardPoints,
+          exam.fullRewardPoints,
+          reason: exam.id,
+        );
+      }
       expect(parsed.available, isFalse);
     },
   );
@@ -25,7 +44,7 @@ void main() {
     () {
       expect(offlineExamCatalog.available, isFalse);
       expect(offlineExamCatalog.fromServer, isFalse);
-      expect(offlineExamCatalog.exams, hasLength(7));
+      expect(offlineExamCatalog.exams, hasLength(8));
       for (final exam in offlineExamCatalog.exams) {
         expect(exam.isValid, isTrue, reason: exam.id);
         expect(ExamDefinition.fromJson(exam.toJson())?.toJson(), exam.toJson());

@@ -1,0 +1,66 @@
+{
+  "cleanup_evidence": "build/verification_20261028/site_demo_site-oct28_cleanup.json",
+  "profiles": {
+    "review": {
+      "health": {
+        "scope": "isolated32 local QA",
+        "database": "pomosprint_review32_dus",
+        "port": 54351
+      },
+      "rewards": {
+        "ayt": 145,
+        "dus": 120,
+        "lgs_quantitative": 70,
+        "lgs_verbal": 60,
+        "tus_basic": 110,
+        "tus_clinical": 110,
+        "tyt": 130,
+        "ydt": 95
+      },
+      "capabilities": {
+        "exam_details": true,
+        "ayt_early_finish": true,
+        "ayt_modules_version": 1
+      },
+      "all_reward_policy_version": 2,
+      "DUS": {
+        "seconds": 9000,
+        "questions": 120,
+        "subjects": 16
+      },
+      "gateway_pid": 65010
+    },
+    "site": {
+      "health": {
+        "scope": "isolated32 local QA",
+        "database": "pomosprint_site32_dus",
+        "port": 54361
+      },
+      "rewards": {
+        "ayt": 145,
+        "dus": 120,
+        "lgs_quantitative": 70,
+        "lgs_verbal": 60,
+        "tus_basic": 110,
+        "tus_clinical": 110,
+        "tyt": 130,
+        "ydt": 95
+      },
+      "capabilities": {
+        "exam_details": true,
+        "ayt_early_finish": true,
+        "ayt_modules_version": 1
+      },
+      "all_reward_policy_version": 2,
+      "DUS": {
+        "seconds": 9000,
+        "questions": 120,
+        "subjects": 16
+      },
+      "gateway_pid": 65036
+    }
+  },
+  "old_stacks_stopped": true,
+  "old_databases_deleted": false,
+  "status": "PASS"
+}

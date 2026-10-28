@@ -1,0 +1,127 @@
+{
+  "database": "pomosprint_site32_final",
+  "created": true,
+  "retained": true,
+  "error": "Read outside fixed allowlist",
+  "checks": [
+    {
+      "name": "pomosprint_overnight_baseline:required_owner_tables",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "pomosprint_overnight_baseline:zero_users_and_user_tables",
+      "ok": true,
+      "detail": {}
+    },
+    {
+      "name": "pomosprint_overnight_baseline:no_proposed27_to32",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "new_clone_name_unused",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "pomosprint_site32_final:required_owner_tables",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "pomosprint_site32_final:zero_users_and_user_tables",
+      "ok": true,
+      "detail": {}
+    },
+    {
+      "name": "pomosprint_site32_final:no_proposed27_to32",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "site_clone_empty_before_install",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "installed:20261009190000_special_avatar_catalog.sql",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "installed:20261009233000_remove_unowned_ronin.sql",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "installed:27_tus_segment.sql",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "installed:28_exam_core.sql",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "installed:29_monthly_competitions.sql",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "installed:30_session_start_atomic.sql",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "site_has_zero_users",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "site_has_zero_profiles",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "site_has_zero_attempts",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "site_has_zero_study_sessions",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "pomosprint_overnight_baseline:required_owner_tables",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "pomosprint_overnight_baseline:zero_users_and_user_tables",
+      "ok": true,
+      "detail": {}
+    },
+    {
+      "name": "pomosprint_overnight_baseline:no_proposed27_to32",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "source_remains_empty",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "site_exact_reviewed32_parity",
+      "ok": true,
+      "detail": "PASS isolated32 schema\nPASS isolated32 migrations\nPASS isolated32 catalog\nPASS isolated32 mail_trigger\nPASS isolated32 policy\n"
+    }
+  ],
+  "passed": 23,
+  "total": 23,
+  "users_copied": false,
+  "main_or_review_modified": false
+}

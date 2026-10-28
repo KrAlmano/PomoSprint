@@ -1,4 +1,4 @@
--- HAZIRLANDI / CANLIYA UYGULANMADI. Sıra: 27 → 28 → 29.
+-- HAZIRLANDI / CANLIYA UYGULANMADI. TUS + DUS. Sıra: 27 → 28 → 29.
 -- SQL Editor'de çalıştırmadan önce eşlik eden DRYRUN ve README'yi okuyun.
 \echo 'Öneri 27: inceleme dosyası; SQL Editor için echo/quit satırlarını kaldırın.'
 \quit
@@ -17,6 +17,6 @@ BEGIN
 END $$;
 ALTER TABLE public.profiles DROP CONSTRAINT profiles_user_segment_check;
 ALTER TABLE public.profiles ADD CONSTRAINT profiles_user_segment_check
- CHECK(user_segment=ANY(ARRAY['lgs','yks','tus','kpss','language','university','work']::text[]));
+ CHECK(user_segment=ANY(ARRAY['lgs','yks','tus','dus','kpss','language','university','work']::text[]));
 INSERT INTO supabase_migrations.schema_migrations(version,name) VALUES('20261028010000','tus_segment');
 COMMIT;

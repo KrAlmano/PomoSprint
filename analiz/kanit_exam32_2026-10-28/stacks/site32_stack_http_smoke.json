@@ -1,0 +1,16 @@
+{
+  "checks": [
+    {
+      "port": 54351,
+      "database": "pomosprint_review32_final",
+      "status": 200
+    },
+    {
+      "port": 54361,
+      "database": "pomosprint_site32_final",
+      "status": 200
+    }
+  ],
+  "review_preserved": true,
+  "site_separate": true
+}

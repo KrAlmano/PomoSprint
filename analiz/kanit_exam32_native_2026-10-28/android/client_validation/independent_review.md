@@ -1,0 +1,17 @@
+# 32 bağımsız istemci/sunucu incelemesi — 28 Ekim 2026
+
+Kapsam: `exam_model.dart`, `exam_details.dart`, `exam_service.dart`, `exam_persistence.dart`, `exam_results_dialog.dart`, önerilen 32 SQL; süre raporuna ve telemetri sınırına ilişkin iki çağrı noktası da okundu. Ürün dosyaları değiştirilmedi. Native/tarayıcı/DB testi başlatılmadı. Aşağıdaki iki küçük Flutter unit probe yalnız bellekteki SharedPreferences sahtesini kullanır; bunların geçmesi kusurun yeniden üretildiği anlamına gelir.
+
+## P1 — Uzun başlık/not, uygulamanın kendi kalıcı günlüğünü okunamaz yapabiliyor
+
+**Tekrar:** Tamamlanmış denemenin ayrıntılarında başlığa 5001 karakter veya nota 20001 karakter yapıştır; 250 ms otomatik kayıt gerçekleşsin; uygulamayı yeniden aç. Başlık/not alanları uzunluk sınırı koymuyor (`lib/widgets/exam_results_dialog.dart:454`,`:472`). `_makeDraft` ham metni taşır (`:129`); otomatik kayıt (`:149`) ve `ExamService.updateDetailsDraft` (`lib/services/exam_service.dart:624`) yazmadan önce draftın tekrar okunabildiğini doğrulamıyor. `ExamPersistence.write` JSON'u başarılı kaydeder (`lib/services/exam_persistence.dart:209`). Ancak `ExamDetailsDraft.fromJson` 5000/20000 UTF-16 sınırını aşanı reddeder (`lib/models/exam_details.dart:134`). Sonraki okumada tek satır yüzünden owner'ın **bütün** deneme günlüğü geçersiz olur (`exam_persistence.dart:203`); `journal_invalid` normal seansları da bloke eder (`exam_service.dart:301`). Sunucudaki kayıtlar silinmez; sorun yerel yeniden açılış/erişilebilirliktir.
+
+**Kanıt:** `<TMP>/pomosprint_oversized_draft_review_test.dart`; çıktı `<TMP>/pomosprint_oversized_draft_review.log`: **2/2 kusur yeniden üretimi**. Başlık testi `write=true` ardından aynı owner `read→FormatException` doğrular; not testi de kendi JSON roundtrip'inin reddedildiğini doğrular.
+
+**Dar düzeltme:** Başlık/not için görünür ve Unicode tanımıyla tutarlı giriş sınırı koy; kalıcı yazma sınırında her üretilen draftın aynı sürüm okuyucusundan geçebildiğini garanti et. Aşırı uzun girdiyi anlaşılır hata ile reddet; mevcut owner günlüğünü veya ilgisiz kayıtları temizleme. Regresyonlar: tam sınır/sınır + 1, emoji, yapıştırma, 250 ms autosave, form kapatma/yeniden açma ve diğer geçerli kayıtların korunması.
+
+## İncelenen diğer kritik bağlantılar
+
+- **Gerçek/planlanan süre:** SQL 64–76 tamamlananda gerçek `elapsed_seconds` ve ayrı planlanan süreyi döndürüyor; model 560–579 pozitif gerçek süre, bitiş ve dakika tutarlılığını kontrol ediyor. `StatSession.fromExamAttempt` (`stats_calculator.dart:98`) gerçek DTO süresini kullanıyor. Erken bitiş sonrası overlap helper gerçek `finished_at` kullanıyor (SQL 87–90), lig olayı gerçek süre/bitiş kullanıyor (92–99). Kaynak incelemesinde yeni bir çift sayım yolu görülmedi.
+- **Tek kayıt ve owner sınırı:** Erken/tam bitiş profil→attempt kilidi, terminal duplicate ve server clock'a bağlı (SQL 101–137). `_send` geç yanıtı owner+epoch ile eliyor (`exam_service.dart:864`), kabul edilen terminal makbuzu profile yenileme hatasında geri çevirmiyor (`:902`). Başlık/not gönderimi ayrı immutable envelope; conflict açık yeniden yüklemeyi gerektiriyor (`:659–769`).
+- **Modül bypass:** Yeni details RPC seçimi doğruluyor; eski `save_exam_results` de aynı scope helper'ını kullanıyor (SQL 176–233). Sonuç içeren modül çıkarılamıyor. Başlık/not sosyal/lig payload'ına eklenmiyor; telemetri `title/note/p_details` alanlarını kaldırıyor (`lib/app/error_reporting.dart:103`). Bu dar incelemede başka doğrulanmış P0/P1 bulunmadı; bu ifade tüm ürünün yeniden test edildiği anlamına gelmez.

@@ -1,0 +1,300 @@
+{
+  "schema_version": 1,
+  "database": "pomosprint_review32_dus",
+  "platform": "android",
+  "runs": [
+    {
+      "mode": "official",
+      "run": "dus-android-official-a1",
+      "native_exit_code": 0,
+      "started_at": "2026-10-28T12:49:30.288485+00:00",
+      "finished_at": "2026-10-28T12:50:49.574635+00:00",
+      "sql_checks": 14,
+      "log": {
+        "path": "official/native.log",
+        "source": "<TMP>/pomosprint_dus_android_official_a1.log",
+        "source_sha256": "0a0f3590c8acc0ad7e6ebcbfe4721c5967f6bb023b56ba1888b9278a1ead6ee5",
+        "sha256": "cc2ea0adb8fef260339ea994e766b7931e5321b24a67c892d97d75bbb37f6a63",
+        "bytes": 1395,
+        "transformation": "portable paths and line breaks"
+      },
+      "sql": {
+        "path": "official/independent_sql.json",
+        "source": "<REPO>/build/verification_20261028/dus/android/official-independent-sql-a1.json",
+        "source_sha256": "0062ed544cdd2ffffc2d47e99237e3c64cecc8f96b9c8cbbae7a03ca932cc986",
+        "sha256": "0062ed544cdd2ffffc2d47e99237e3c64cecc8f96b9c8cbbae7a03ca932cc986",
+        "bytes": 1998,
+        "transformation": "exact"
+      },
+      "images": [
+        {
+          "path": "official/screenshots/e2e-dus-abandoned-en.png",
+          "source": "<REPO>/build/verification_20261028/dus/android/screenshots/e2e-dus-abandoned-en.png",
+          "source_sha256": "d7bd4b25b537b78561e23fedcad3f04edbb645bcca4492c9ee968d9c43e67c4b",
+          "sha256": "d7bd4b25b537b78561e23fedcad3f04edbb645bcca4492c9ee968d9c43e67c4b",
+          "bytes": 235776,
+          "transformation": "exact",
+          "width": 590,
+          "height": 1311
+        },
+        {
+          "path": "official/screenshots/e2e-dus-abandoned-tr.png",
+          "source": "<REPO>/build/verification_20261028/dus/android/screenshots/e2e-dus-abandoned-tr.png",
+          "source_sha256": "87796c41ea80b031548332656c2782ee7d23fdc4e4c52ff95e7fa018ea833617",
+          "sha256": "87796c41ea80b031548332656c2782ee7d23fdc4e4c52ff95e7fa018ea833617",
+          "bytes": 184349,
+          "transformation": "exact",
+          "width": 590,
+          "height": 1311
+        },
+        {
+          "path": "official/screenshots/e2e-dus-catalog-en.png",
+          "source": "<REPO>/build/verification_20261028/dus/android/screenshots/e2e-dus-catalog-en.png",
+          "source_sha256": "e505e5795234800c0077241dc45f5f28ceb4f2f8f6171a30caba703b34935ec5",
+          "sha256": "e505e5795234800c0077241dc45f5f28ceb4f2f8f6171a30caba703b34935ec5",
+          "bytes": 250373,
+          "transformation": "exact",
+          "width": 590,
+          "height": 1311
+        },
+        {
+          "path": "official/screenshots/e2e-dus-catalog-tr.png",
+          "source": "<REPO>/build/verification_20261028/dus/android/screenshots/e2e-dus-catalog-tr.png",
+          "source_sha256": "fc997c0f2c4dc1b1926629ebbd26d4aa63cda89533c41f2b7faa895a854ebc3e",
+          "sha256": "fc997c0f2c4dc1b1926629ebbd26d4aa63cda89533c41f2b7faa895a854ebc3e",
+          "bytes": 227923,
+          "transformation": "exact",
+          "width": 590,
+          "height": 1311
+        },
+        {
+          "path": "official/screenshots/e2e-dus-running-en.png",
+          "source": "<REPO>/build/verification_20261028/dus/android/screenshots/e2e-dus-running-en.png",
+          "source_sha256": "f2e1689560f32776e5e20e81937697258b3a3a50daafbbfcabcd845977a4feb8",
+          "sha256": "f2e1689560f32776e5e20e81937697258b3a3a50daafbbfcabcd845977a4feb8",
+          "bytes": 207850,
+          "transformation": "exact",
+          "width": 590,
+          "height": 1311
+        },
+        {
+          "path": "official/screenshots/e2e-dus-running-tr.png",
+          "source": "<REPO>/build/verification_20261028/dus/android/screenshots/e2e-dus-running-tr.png",
+          "source_sha256": "b3030e5540518abeaa1cb7eba43b323e8400260105be067bc45719c7597cde45",
+          "sha256": "b3030e5540518abeaa1cb7eba43b323e8400260105be067bc45719c7597cde45",
+          "bytes": 228323,
+          "transformation": "exact",
+          "width": 590,
+          "height": 1311
+        }
+      ]
+    },
+    {
+      "mode": "ayt",
+      "run": "ex32-dus-android-a1",
+      "native_exit_code": 0,
+      "started_at": "2026-10-28T12:51:02.184951+00:00",
+      "finished_at": "2026-10-28T12:52:47.483578+00:00",
+      "sql_checks": 17,
+      "log": {
+        "path": "ayt/native.log",
+        "source": "<TMP>/pomosprint_dus_android_ayt_a1.log",
+        "source_sha256": "f0c7d023564dd632aeb7274e6e97cf6f627ccb96afc79aa1a6164c4f84f6b485",
+        "sha256": "8117096462e2a4ea6b14a61c1c16d249fabfde3994c49edaac165bb44984aa36",
+        "bytes": 1719,
+        "transformation": "portable paths and line breaks"
+      },
+      "sql": {
+        "path": "ayt/independent_sql.json",
+        "source": "<REPO>/build/verification_20261028/dus/android/ayt-independent-sql-a1.json",
+        "source_sha256": "decce1c8ad434da2d45f370a4040f4a304c6b7855febbf9284e4bafd2adcb622",
+        "sha256": "decce1c8ad434da2d45f370a4040f4a304c6b7855febbf9284e4bafd2adcb622",
+        "bytes": 2226,
+        "transformation": "exact"
+      },
+      "images": [
+        {
+          "path": "ayt/screenshots/e2e-ah32-details-en.png",
+          "source": "<REPO>/build/verification_20261028/dus/android/screenshots/e2e-ah32-details-en.png",
+          "source_sha256": "d9ad44d78036136090dfbcd544c7b661a191e83129d2468c9877538ce849cf6d",
+          "sha256": "d9ad44d78036136090dfbcd544c7b661a191e83129d2468c9877538ce849cf6d",
+          "bytes": 158000,
+          "transformation": "exact",
+          "width": 590,
+          "height": 1311
+        },
+        {
+          "path": "ayt/screenshots/e2e-ah32-details-tr.png",
+          "source": "<REPO>/build/verification_20261028/dus/android/screenshots/e2e-ah32-details-tr.png",
+          "source_sha256": "d028fb8a691ae32a3408d7be193a71c34a388a3fb7076b730bb71113c8d9e61a",
+          "sha256": "d028fb8a691ae32a3408d7be193a71c34a388a3fb7076b730bb71113c8d9e61a",
+          "bytes": 149369,
+          "transformation": "exact",
+          "width": 590,
+          "height": 1311
+        },
+        {
+          "path": "ayt/screenshots/e2e-ah32-history-en.png",
+          "source": "<REPO>/build/verification_20261028/dus/android/screenshots/e2e-ah32-history-en.png",
+          "source_sha256": "74f9290784a6ff20f62e0771ad838aee7c49a0bef4dc4c340052bc9a15bfba11",
+          "sha256": "74f9290784a6ff20f62e0771ad838aee7c49a0bef4dc4c340052bc9a15bfba11",
+          "bytes": 246396,
+          "transformation": "exact",
+          "width": 590,
+          "height": 1311
+        },
+        {
+          "path": "ayt/screenshots/e2e-ah32-history-tr.png",
+          "source": "<REPO>/build/verification_20261028/dus/android/screenshots/e2e-ah32-history-tr.png",
+          "source_sha256": "a6d52628bcd3ad8c71162f4dc6025d75e24aa36d0715be063ca8a354839abe08",
+          "sha256": "a6d52628bcd3ad8c71162f4dc6025d75e24aa36d0715be063ca8a354839abe08",
+          "bytes": 245016,
+          "transformation": "exact",
+          "width": 590,
+          "height": 1311
+        },
+        {
+          "path": "ayt/screenshots/e2e-ah32-report-en.png",
+          "source": "<REPO>/build/verification_20261028/dus/android/screenshots/e2e-ah32-report-en.png",
+          "source_sha256": "0a9316413d8ec98c1972712729fdd02e69dfee0828afaca294183a9a586f1963",
+          "sha256": "0a9316413d8ec98c1972712729fdd02e69dfee0828afaca294183a9a586f1963",
+          "bytes": 222111,
+          "transformation": "exact",
+          "width": 590,
+          "height": 1311
+        },
+        {
+          "path": "ayt/screenshots/e2e-ah32-report-tr.png",
+          "source": "<REPO>/build/verification_20261028/dus/android/screenshots/e2e-ah32-report-tr.png",
+          "source_sha256": "a47836e86863055111de7117c2519a7f41d5a3615ffdf9316cec184171389fcd",
+          "sha256": "a47836e86863055111de7117c2519a7f41d5a3615ffdf9316cec184171389fcd",
+          "bytes": 208540,
+          "transformation": "exact",
+          "width": 590,
+          "height": 1311
+        },
+        {
+          "path": "ayt/screenshots/e2e-ah32-running-en.png",
+          "source": "<REPO>/build/verification_20261028/dus/android/screenshots/e2e-ah32-running-en.png",
+          "source_sha256": "440bbbc141fd7fe9d9dedb796d7bcf9a81703acc543c6b06501e468088605a65",
+          "sha256": "440bbbc141fd7fe9d9dedb796d7bcf9a81703acc543c6b06501e468088605a65",
+          "bytes": 194779,
+          "transformation": "exact",
+          "width": 590,
+          "height": 1311
+        },
+        {
+          "path": "ayt/screenshots/e2e-ah32-running-tr.png",
+          "source": "<REPO>/build/verification_20261028/dus/android/screenshots/e2e-ah32-running-tr.png",
+          "source_sha256": "4558cef7509cb03b5302c9c718cb1c30c9249b9b3cded18107cf05ecd5e93f16",
+          "sha256": "4558cef7509cb03b5302c9c718cb1c30c9249b9b3cded18107cf05ecd5e93f16",
+          "bytes": 200691,
+          "transformation": "exact",
+          "width": 590,
+          "height": 1311
+        }
+      ]
+    }
+  ],
+  "source_hash_scope": "hashes at archive after source freeze; not extracted from installed binary",
+  "source": [
+    {
+      "path": "lib/models/dus_catalog.dart",
+      "sha256": "d41c1352bff72fd2fdd710d197aa40d5f90048ac62fcdb8ea33d8583b26b8122",
+      "bytes": 4549
+    },
+    {
+      "path": "lib/models/exam_reward_policy.dart",
+      "sha256": "9e5bebb2bb44b9ed5de2dfd1fff359cf2968691a8b1e3b33603149dbb41e7e2c",
+      "bytes": 691
+    },
+    {
+      "path": "lib/models/exam_catalog_defaults.dart",
+      "sha256": "487af954b5a9b4753048e5d5323eaead09403ebef62bc90dc5c7276c86d44054",
+      "bytes": 9675
+    },
+    {
+      "path": "lib/models/exam_model.dart",
+      "sha256": "972209f2b1a20524493a1e5af334bc13c88daba044e9dcf80edd578e5442e732",
+      "bytes": 23906
+    },
+    {
+      "path": "lib/models/competition_target.dart",
+      "sha256": "770149cf47ff2188273ed8cded501e2a095c8a71546238d12b5e2ed4bb55abcb",
+      "bytes": 1137
+    },
+    {
+      "path": "lib/services/onboarding_categories.dart",
+      "sha256": "3bf58e328a99d786f017512c0f319493b3330a15a0630859e0c60bb6af8609f4",
+      "bytes": 11051
+    },
+    {
+      "path": "lib/services/onboarding_segment_intent.dart",
+      "sha256": "119b0556e7d32cc84ea1e445988d0f6aad222841ae6424f1a41876615bd5f07a",
+      "bytes": 3126
+    },
+    {
+      "path": "lib/services/supabase_service.dart",
+      "sha256": "8b68c40b383ee072a849263ae4fa6eb311aab12c9e84be1d7de3c189c7339e04",
+      "bytes": 109259
+    },
+    {
+      "path": "lib/utils/category_names.dart",
+      "sha256": "93830327f9a248012e731a11fd835dc0ee6ae11ea9526e7606d10c2cc118d70c",
+      "bytes": 3038
+    },
+    {
+      "path": "lib/screens/post_auth_onboarding_screen.dart",
+      "sha256": "77c2fa130b169ef0db6eb2fb8ce2e84d4e73924c0c2b2de20fab01e21760cf28",
+      "bytes": 49692
+    },
+    {
+      "path": "lib/screens/exam_screen.dart",
+      "sha256": "0800d9cd5c924c9d82504a5f49648909de0feb05327e1b2782d4af5a42b37e78",
+      "bytes": 32180
+    },
+    {
+      "path": "lib/widgets/exam_results_dialog.dart",
+      "sha256": "9d3a58e530db9c3da301ad5e3ea7014f3fc0782af2fe5cf69cf4fe8e349215bb",
+      "bytes": 21834
+    },
+    {
+      "path": "lib/widgets/competition_target_dialog.dart",
+      "sha256": "aa3562632aa4256e39fe3ddb20026bc5b29320edcdfc97d28911429c01c936ef",
+      "bytes": 4100
+    },
+    {
+      "path": "lib/l10n/app_tr.arb",
+      "sha256": "cb8a7a4e0939684d08b1cdc15b243c04e69575c80dfe358657da189a518d6273",
+      "bytes": 80710
+    },
+    {
+      "path": "lib/l10n/app_en.arb",
+      "sha256": "d29a3d989f7120d274f0f070f4d0f7f6fe624efddaad823338336e9291c88b32",
+      "bytes": 70314
+    },
+    {
+      "path": "integration_test/ai_dus_native_test.dart",
+      "sha256": "73a6ebbfcaff20a73d45a02c08ec75f865176455e797f52e9ec11de977739448",
+      "bytes": 14486
+    },
+    {
+      "path": "integration_test/ah_exam_details_early_test.dart",
+      "sha256": "d2b564c306b2ea808734fb90a5e13f78b9868392bfffe451acfc2589cb44ab00",
+      "bytes": 16643
+    }
+  ],
+  "visual_review": {
+    "method": "view_image",
+    "viewed": [
+      "official/screenshots/e2e-dus-catalog-en.png",
+      "official/screenshots/e2e-dus-running-en.png",
+      "ayt/screenshots/e2e-ah32-details-en.png"
+    ],
+    "findings": [
+      "DUS English catalogue shows150min/120questions and sixteen fields; running countdown2:29:57 and no early finish button.",
+      "English Unanswered stays on one line, answer fields aligned; no keyboard visible in the inspected form."
+    ],
+    "not_claimed": "No independent visual review of every remaining archived screenshot; no natural150min completion."
+  }
+}

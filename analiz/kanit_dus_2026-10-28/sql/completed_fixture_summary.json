@@ -1,0 +1,11 @@
+{
+  "early_owner": "76493d9c-db55-4d2c-8e20-5900601e1fc4",
+  "early_attempt": "9a46638f-935d-4a05-a6a7-59ba489be9fd",
+  "early_seconds": 5400,
+  "early_coins": 72,
+  "one_second_attempt": "74374f53-912f-4e8a-a3ae-5a6b6fa1c8b4",
+  "old_active_reward": 3,
+  "policy": "proportional",
+  "policy_status": "user_approved_final",
+  "notice": "Synthetic local timestamps; no native or natural-duration claim."
+}

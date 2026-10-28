@@ -1,0 +1,327 @@
+{
+  "schema_version": 1,
+  "scope": "Android proposed32; fictional local accounts; no live service use",
+  "files": [
+    {
+      "path": "a1/status.json",
+      "source": "<REPO>/build/verification_20261028/exam32/android/status-a1.json",
+      "source_sha256": "2f685bf8704bdf42a44afd27b36f474362c23d66565d618de3421ff3476b1b06",
+      "sha256": "1e0adbf3dd252bf4be90d02d53ea5954608f59ffdbff6a51045b57bcac20f34c",
+      "bytes": 344,
+      "transformation": "portable text"
+    },
+    {
+      "path": "a1/native.log",
+      "source": "<TMP>/pomosprint_exam32_android_a1.log",
+      "source_sha256": "52b5108cc64b67a9cbc43c32c202874c340e93ff561c67ecbdd63dbcadc61fd0",
+      "sha256": "bf4281f8c8b30284c3932a16f585094a82271494906a5a7e63af16568c3a3251",
+      "bytes": 2344,
+      "transformation": "portable text"
+    },
+    {
+      "path": "a2/status.json",
+      "source": "<REPO>/build/verification_20261028/exam32/android/status-a2.json",
+      "source_sha256": "320d0754e41a47f276c26a61f782a28e81c928c584eb67f25885fdc393a0c08b",
+      "sha256": "d5ad4b07e030c128bdc9422956ae756c64ac7d13124eb15353b6a71797179b89",
+      "bytes": 344,
+      "transformation": "portable text"
+    },
+    {
+      "path": "a2/native.log",
+      "source": "<TMP>/pomosprint_exam32_android_a2.log",
+      "source_sha256": "8f5191ed6ceb665d5c75f69bff68373799c28558f45ea99f12476bbd96b90749",
+      "sha256": "e2da0488adea6707df94c63f823312d24ab80af386f26963e25de0209d6deeb2",
+      "bytes": 1743,
+      "transformation": "portable text"
+    },
+    {
+      "path": "a2/independent_sql.json",
+      "source": "<REPO>/build/verification_20261028/exam32/android/independent-sql-a2.json",
+      "source_sha256": "cc6022419c4bca66de450b8371c24f51e5bfceb514a65004d1d513900b92dd2a",
+      "sha256": "cc6022419c4bca66de450b8371c24f51e5bfceb514a65004d1d513900b92dd2a",
+      "bytes": 2471,
+      "transformation": "exact"
+    },
+    {
+      "path": "a3/status.json",
+      "source": "<REPO>/build/verification_20261028/exam32/android/status-a3.json",
+      "source_sha256": "d8d547e8f9a410e05b7eda5acd184d6b506e6172c3390b8f69d29c93720a8a7f",
+      "sha256": "4d7bf77cea605ba34b2157043858eac075a4d9debc2bbeb0b417c1dbbac92e12",
+      "bytes": 344,
+      "transformation": "portable text"
+    },
+    {
+      "path": "a3/native.log",
+      "source": "<TMP>/pomosprint_exam32_android_a3.log",
+      "source_sha256": "e3d729a43a2356b33c1533c48c9de8c076a54afd874f30f6a36d55b62df14572",
+      "sha256": "0e09ea60d12d7268f9305c057a7afc25c7a45be5926ac7c6119507be4475bb4d",
+      "bytes": 1743,
+      "transformation": "portable text"
+    },
+    {
+      "path": "a3/independent_sql.json",
+      "source": "<REPO>/build/verification_20261028/exam32/android/independent-sql-a3.json",
+      "source_sha256": "093c512311292f469a198d67b6d3391c5dcd300b6174c18fef6e6e40aace42ae",
+      "sha256": "093c512311292f469a198d67b6d3391c5dcd300b6174c18fef6e6e40aace42ae",
+      "bytes": 2471,
+      "transformation": "exact"
+    },
+    {
+      "path": "a2/screenshots/e2e-ah32-details-en.png",
+      "source": "<REPO>/build/verification_20261028/exam32/android/screenshots-a2/e2e-ah32-details-en.png",
+      "source_sha256": "a28d0b5a85a85a68356d842e09bb39c41b6b0035dad9d12a419a7bfafa2f5bcd",
+      "sha256": "a28d0b5a85a85a68356d842e09bb39c41b6b0035dad9d12a419a7bfafa2f5bcd",
+      "bytes": 160921,
+      "transformation": "exact",
+      "width": 590,
+      "height": 1311
+    },
+    {
+      "path": "a2/screenshots/e2e-ah32-details-tr.png",
+      "source": "<REPO>/build/verification_20261028/exam32/android/screenshots-a2/e2e-ah32-details-tr.png",
+      "source_sha256": "9ccf48a02ddcc7c897a6a8b1bc51790b809a25dc6f0c165294927064987fd47e",
+      "sha256": "9ccf48a02ddcc7c897a6a8b1bc51790b809a25dc6f0c165294927064987fd47e",
+      "bytes": 149862,
+      "transformation": "exact",
+      "width": 590,
+      "height": 1311
+    },
+    {
+      "path": "a2/screenshots/e2e-ah32-history-en.png",
+      "source": "<REPO>/build/verification_20261028/exam32/android/screenshots-a2/e2e-ah32-history-en.png",
+      "source_sha256": "f68972081c5e0f4ce54476f17299b1a1a49293061b6f7afdbe1028362ee1dfab",
+      "sha256": "f68972081c5e0f4ce54476f17299b1a1a49293061b6f7afdbe1028362ee1dfab",
+      "bytes": 237529,
+      "transformation": "exact",
+      "width": 590,
+      "height": 1311
+    },
+    {
+      "path": "a2/screenshots/e2e-ah32-history-tr.png",
+      "source": "<REPO>/build/verification_20261028/exam32/android/screenshots-a2/e2e-ah32-history-tr.png",
+      "source_sha256": "d195febdccc110548402791dd878aa3509c4c0f5345c92caff70226ff07db910",
+      "sha256": "d195febdccc110548402791dd878aa3509c4c0f5345c92caff70226ff07db910",
+      "bytes": 224164,
+      "transformation": "exact",
+      "width": 590,
+      "height": 1311
+    },
+    {
+      "path": "a2/screenshots/e2e-ah32-report-en.png",
+      "source": "<REPO>/build/verification_20261028/exam32/android/screenshots-a2/e2e-ah32-report-en.png",
+      "source_sha256": "0e1166b49494d89661dfa1d6b039db4ae40a6d6bfb383cc540ed0c3ecadf9d17",
+      "sha256": "0e1166b49494d89661dfa1d6b039db4ae40a6d6bfb383cc540ed0c3ecadf9d17",
+      "bytes": 221530,
+      "transformation": "exact",
+      "width": 590,
+      "height": 1311
+    },
+    {
+      "path": "a2/screenshots/e2e-ah32-report-tr.png",
+      "source": "<REPO>/build/verification_20261028/exam32/android/screenshots-a2/e2e-ah32-report-tr.png",
+      "source_sha256": "03da56311bb1ea751276dccbf4e0998441c94632f6ce3b242475c50abf6f62af",
+      "sha256": "03da56311bb1ea751276dccbf4e0998441c94632f6ce3b242475c50abf6f62af",
+      "bytes": 207964,
+      "transformation": "exact",
+      "width": 590,
+      "height": 1311
+    },
+    {
+      "path": "a2/screenshots/e2e-ah32-running-en.png",
+      "source": "<REPO>/build/verification_20261028/exam32/android/screenshots-a2/e2e-ah32-running-en.png",
+      "source_sha256": "38ccc98df651f31324c14a5b84e640a3588fa56d3e08177fcc5047098097dd46",
+      "sha256": "38ccc98df651f31324c14a5b84e640a3588fa56d3e08177fcc5047098097dd46",
+      "bytes": 200617,
+      "transformation": "exact",
+      "width": 590,
+      "height": 1311
+    },
+    {
+      "path": "a2/screenshots/e2e-ah32-running-tr.png",
+      "source": "<REPO>/build/verification_20261028/exam32/android/screenshots-a2/e2e-ah32-running-tr.png",
+      "source_sha256": "5b8f1d0afab252ba1ebdff84601e7b851181582dad5222a3228da5bc514c6c61",
+      "sha256": "5b8f1d0afab252ba1ebdff84601e7b851181582dad5222a3228da5bc514c6c61",
+      "bytes": 209311,
+      "transformation": "exact",
+      "width": 590,
+      "height": 1311
+    },
+    {
+      "path": "a3/screenshots/e2e-ah32-details-en.png",
+      "source": "<REPO>/build/verification_20261028/exam32/android/screenshots/e2e-ah32-details-en.png",
+      "source_sha256": "e515dc4c104f7755b58df7a208d8281789c717e34f588a250514bfc43b5b45e1",
+      "sha256": "e515dc4c104f7755b58df7a208d8281789c717e34f588a250514bfc43b5b45e1",
+      "bytes": 157993,
+      "transformation": "exact",
+      "width": 590,
+      "height": 1311
+    },
+    {
+      "path": "a3/screenshots/e2e-ah32-details-tr.png",
+      "source": "<REPO>/build/verification_20261028/exam32/android/screenshots/e2e-ah32-details-tr.png",
+      "source_sha256": "2733cc05816801567aec5c598c3212396d106005f69121bfdd5b8b4df7e630aa",
+      "sha256": "2733cc05816801567aec5c598c3212396d106005f69121bfdd5b8b4df7e630aa",
+      "bytes": 149159,
+      "transformation": "exact",
+      "width": 590,
+      "height": 1311
+    },
+    {
+      "path": "a3/screenshots/e2e-ah32-history-en.png",
+      "source": "<REPO>/build/verification_20261028/exam32/android/screenshots/e2e-ah32-history-en.png",
+      "source_sha256": "8b895f8f786359215b01ba9e9b53e0940da5cbc90f139fd5a9a6c468ec3f089b",
+      "sha256": "8b895f8f786359215b01ba9e9b53e0940da5cbc90f139fd5a9a6c468ec3f089b",
+      "bytes": 245703,
+      "transformation": "exact",
+      "width": 590,
+      "height": 1311
+    },
+    {
+      "path": "a3/screenshots/e2e-ah32-history-tr.png",
+      "source": "<REPO>/build/verification_20261028/exam32/android/screenshots/e2e-ah32-history-tr.png",
+      "source_sha256": "a88b369e147c67e3974eb94b9d9da974169ed48855880951ad608ecefe241926",
+      "sha256": "a88b369e147c67e3974eb94b9d9da974169ed48855880951ad608ecefe241926",
+      "bytes": 233746,
+      "transformation": "exact",
+      "width": 590,
+      "height": 1311
+    },
+    {
+      "path": "a3/screenshots/e2e-ah32-report-en.png",
+      "source": "<REPO>/build/verification_20261028/exam32/android/screenshots/e2e-ah32-report-en.png",
+      "source_sha256": "c32846978243ef026ec8105b884a0bfa013ec2005c2791bb445cd141f3eae5af",
+      "sha256": "c32846978243ef026ec8105b884a0bfa013ec2005c2791bb445cd141f3eae5af",
+      "bytes": 221836,
+      "transformation": "exact",
+      "width": 590,
+      "height": 1311
+    },
+    {
+      "path": "a3/screenshots/e2e-ah32-report-tr.png",
+      "source": "<REPO>/build/verification_20261028/exam32/android/screenshots/e2e-ah32-report-tr.png",
+      "source_sha256": "a5383b2dea2cc936dbe3e6096765a52a7216676b4346a48a213ad54a0b8a4ed0",
+      "sha256": "a5383b2dea2cc936dbe3e6096765a52a7216676b4346a48a213ad54a0b8a4ed0",
+      "bytes": 208400,
+      "transformation": "exact",
+      "width": 590,
+      "height": 1311
+    },
+    {
+      "path": "a3/screenshots/e2e-ah32-running-en.png",
+      "source": "<REPO>/build/verification_20261028/exam32/android/screenshots/e2e-ah32-running-en.png",
+      "source_sha256": "efc5a83a8de3952d4494ad93ea2a67109d272f04af8986bc49f5d4dd8edc21c4",
+      "sha256": "efc5a83a8de3952d4494ad93ea2a67109d272f04af8986bc49f5d4dd8edc21c4",
+      "bytes": 207721,
+      "transformation": "exact",
+      "width": 590,
+      "height": 1311
+    },
+    {
+      "path": "a3/screenshots/e2e-ah32-running-tr.png",
+      "source": "<REPO>/build/verification_20261028/exam32/android/screenshots/e2e-ah32-running-tr.png",
+      "source_sha256": "40550a0f5e628d2acf24d61cf02004542a94c5eb9d53ca34609dcc7d90585bd0",
+      "sha256": "40550a0f5e628d2acf24d61cf02004542a94c5eb9d53ca34609dcc7d90585bd0",
+      "bytes": 218565,
+      "transformation": "exact",
+      "width": 590,
+      "height": 1311
+    },
+    {
+      "path": "a3/native_summary.log",
+      "source": "<REPO>/build/verification_20261028/exam32/android/native-summary-a3.txt",
+      "source_sha256": "46196bd2bf9ccdead652e4f93ce79265762a2e61aa3ec0d623e9e9df06a0c2eb",
+      "sha256": "46196bd2bf9ccdead652e4f93ce79265762a2e61aa3ec0d623e9e9df06a0c2eb",
+      "bytes": 1302,
+      "transformation": "exact"
+    },
+    {
+      "path": "verification/preflight_parity.log",
+      "source": "<TMP>/pomosprint_exam32_android_preflight.log",
+      "source_sha256": "9846ca0309cf084100fa78369e9e7b3d1a1432db412cd7f9404ac63a66b60562",
+      "sha256": "9846ca0309cf084100fa78369e9e7b3d1a1432db412cd7f9404ac63a66b60562",
+      "bytes": 126,
+      "transformation": "exact"
+    },
+    {
+      "path": "verification/a2_parity.log",
+      "source": "<TMP>/pomosprint_exam32_android_postflight.log",
+      "source_sha256": "9846ca0309cf084100fa78369e9e7b3d1a1432db412cd7f9404ac63a66b60562",
+      "sha256": "9846ca0309cf084100fa78369e9e7b3d1a1432db412cd7f9404ac63a66b60562",
+      "bytes": 126,
+      "transformation": "exact"
+    },
+    {
+      "path": "verification/a3_parity.log",
+      "source": "<TMP>/pomosprint_exam32_android_postflight_a3.log",
+      "source_sha256": "9846ca0309cf084100fa78369e9e7b3d1a1432db412cd7f9404ac63a66b60562",
+      "sha256": "9846ca0309cf084100fa78369e9e7b3d1a1432db412cd7f9404ac63a66b60562",
+      "bytes": 126,
+      "transformation": "exact"
+    },
+    {
+      "path": "client_validation/exam_and_locale_113.log",
+      "source": "<TMP>/pomosprint_32_draft_final_regression2.log",
+      "source_sha256": "accb9a8e63bbe674f2faa8c336b5d13756d20e33d2c25afa313152af789043ee",
+      "sha256": "d404709c775faba508acc33825df044d38305aa97083621aff62a51b498b3522",
+      "bytes": 13676,
+      "transformation": "portable text"
+    },
+    {
+      "path": "client_validation/analyze.log",
+      "source": "<TMP>/pomosprint_32_draft_final_analyze.log",
+      "source_sha256": "a1c323868e98752a0196256c0b542f8eb49c8cf757923587241a3c00955a5538",
+      "sha256": "a1c323868e98752a0196256c0b542f8eb49c8cf757923587241a3c00955a5538",
+      "bytes": 96,
+      "transformation": "exact"
+    },
+    {
+      "path": "client_validation/privacy_7.log",
+      "source": "<TMP>/pomosprint_exam_privacy_test.log",
+      "source_sha256": "8bd9845ce85d94e06595c344d0c95c21623ed23399a0c8748baf2d7e247147a2",
+      "sha256": "a85a3c3156c408a4bca69bce073be6bd730918e224559d92863e6c7a91ff0131",
+      "bytes": 3702,
+      "transformation": "portable text"
+    },
+    {
+      "path": "client_validation/independent_review.md",
+      "source": "<TMP>/POMOSPRINT32_BAGIMSIZ_INCELEME_2026-10-28.md",
+      "source_sha256": "35ef63a7bd29b54428b427b7be6775164476caf0863bc5de4059b7b71a85bbdc",
+      "sha256": "0c11a2e328e7f5bc8066919c074935b75c525a17093366a51875cfc185cf7f39",
+      "bytes": 3815,
+      "transformation": "portable text"
+    },
+    {
+      "path": "client_validation/oversized_draft_reproduction.dart.txt",
+      "source": "<TMP>/pomosprint_oversized_draft_review_test.dart",
+      "source_sha256": "9f8b8199ae98977a25b11b299f7e279ea31fbc00aaadf99cf1d402c5aeee9b8d",
+      "sha256": "9f8b8199ae98977a25b11b299f7e279ea31fbc00aaadf99cf1d402c5aeee9b8d",
+      "bytes": 1728,
+      "transformation": "exact"
+    },
+    {
+      "path": "client_validation/oversized_draft_reproduction.log",
+      "source": "<TMP>/pomosprint_oversized_draft_review.log",
+      "source_sha256": "74a140e68a754dcf1bade48b7d2dba9a428f646e20e0d64416ccf81f9ea96173",
+      "sha256": "5de72aa14a5ec2866ea41e44868deb689605bd2bb02767d3dca2a4642d0177d3",
+      "bytes": 237,
+      "transformation": "portable text"
+    },
+    {
+      "path": "a3/source_proof_original.json",
+      "source": "<REPO>/build/verification_20261028/exam32/android/native-proof-a3.json",
+      "source_sha256": "9fa8f59fdf36efa87d9871b99813c939e90f31e251bf0b9a37ff2349ebaec881",
+      "sha256": "9fa8f59fdf36efa87d9871b99813c939e90f31e251bf0b9a37ff2349ebaec881",
+      "bytes": 5365,
+      "transformation": "exact"
+    },
+    {
+      "path": "a3/proof.json",
+      "source": "<REPO>/build/verification_20261028/exam32/android/native-proof-a3.json",
+      "source_sha256": "9fa8f59fdf36efa87d9871b99813c939e90f31e251bf0b9a37ff2349ebaec881",
+      "sha256": "9f56bca42793df976ea027f75f7b651a630f318fefb7748f9d7a09bdb6542c62",
+      "bytes": 6138,
+      "transformation": "archive-relative evidence paths; original proof retained"
+    }
+  ],
+  "self_hash_included": false
+}

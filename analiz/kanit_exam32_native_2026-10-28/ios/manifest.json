@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "files": [
+    {
+      "path": "a1/screenshots/e2e-ah32-details-en.png",
+      "source": "<REPO>/build/verification_20261028/exam32/ios/screenshots-a1/e2e-ah32-details-en.png",
+      "source_sha256": "21525bc258267b27beef2445e0943fe781740c46522e460283350912138a251e",
+      "sha256": "21525bc258267b27beef2445e0943fe781740c46522e460283350912138a251e",
+      "bytes": 175723,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "a1/screenshots/e2e-ah32-details-tr.png",
+      "source": "<REPO>/build/verification_20261028/exam32/ios/screenshots-a1/e2e-ah32-details-tr.png",
+      "source_sha256": "e30666a7e1a87af6e15783149d675e3560dfdf2d8e891dd26a55416137b8c9e5",
+      "sha256": "e30666a7e1a87af6e15783149d675e3560dfdf2d8e891dd26a55416137b8c9e5",
+      "bytes": 172385,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "a1/screenshots/e2e-ah32-history-en.png",
+      "source": "<REPO>/build/verification_20261028/exam32/ios/screenshots-a1/e2e-ah32-history-en.png",
+      "source_sha256": "c72f72fcbf7fb20a26d272e49498a7dfddb27e55c1c0c1c2205ed813f3bccddb",
+      "sha256": "c72f72fcbf7fb20a26d272e49498a7dfddb27e55c1c0c1c2205ed813f3bccddb",
+      "bytes": 263677,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "a1/screenshots/e2e-ah32-history-tr.png",
+      "source": "<REPO>/build/verification_20261028/exam32/ios/screenshots-a1/e2e-ah32-history-tr.png",
+      "source_sha256": "26eaef70fba591c0e78d4c91f9b2ac0072a580c874762113a6e8b9d135f39c31",
+      "sha256": "26eaef70fba591c0e78d4c91f9b2ac0072a580c874762113a6e8b9d135f39c31",
+      "bytes": 256156,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "a1/screenshots/e2e-ah32-report-en.png",
+      "source": "<REPO>/build/verification_20261028/exam32/ios/screenshots-a1/e2e-ah32-report-en.png",
+      "source_sha256": "2195e25376a40ecc7f4ad11b8a7df099f3ba52a7bd7fe51f08d4e892ed503a87",
+      "sha256": "2195e25376a40ecc7f4ad11b8a7df099f3ba52a7bd7fe51f08d4e892ed503a87",
+      "bytes": 221837,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "a1/screenshots/e2e-ah32-report-tr.png",
+      "source": "<REPO>/build/verification_20261028/exam32/ios/screenshots-a1/e2e-ah32-report-tr.png",
+      "source_sha256": "d24704ec49168259389f58f29952e7b07ac21f00bbcf921992e3dad201e1bc6a",
+      "sha256": "d24704ec49168259389f58f29952e7b07ac21f00bbcf921992e3dad201e1bc6a",
+      "bytes": 211544,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "a1/screenshots/e2e-ah32-running-en.png",
+      "source": "<REPO>/build/verification_20261028/exam32/ios/screenshots-a1/e2e-ah32-running-en.png",
+      "source_sha256": "8793b9dcc245a25fe2893783aa79c509c84af589a37d890810ffd72d3b60ee51",
+      "sha256": "8793b9dcc245a25fe2893783aa79c509c84af589a37d890810ffd72d3b60ee51",
+      "bytes": 228649,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "a1/screenshots/e2e-ah32-running-tr.png",
+      "source": "<REPO>/build/verification_20261028/exam32/ios/screenshots-a1/e2e-ah32-running-tr.png",
+      "source_sha256": "f9d6247c45673ee56e0cf56165976ee778a17617bc8bad61bf770432f39b3ba4",
+      "sha256": "f9d6247c45673ee56e0cf56165976ee778a17617bc8bad61bf770432f39b3ba4",
+      "bytes": 203786,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "a1/native.log",
+      "source": "<TMP>/pomosprint_exam32_ios_a1.log",
+      "source_sha256": "92aaa964f63afeb192915ce6b864e51df2383ae334c17a1da5be723d7675448b",
+      "sha256": "512299ecb42ba10feea05bb5f571a1f4afbed0c4dcbdfe7e551e510b2331f69d",
+      "bytes": 3310,
+      "transformation": "portable paths and line breaks"
+    },
+    {
+      "path": "a2/screenshots/e2e-ah32-details-en.png",
+      "source": "<REPO>/build/native_site_media/site-oct28/screenshots/e2e-ah32-details-en.png",
+      "source_sha256": "85f0af699d5144938e35d60516da87117ae8be2c370a0381070c673e189f5206",
+      "sha256": "85f0af699d5144938e35d60516da87117ae8be2c370a0381070c673e189f5206",
+      "bytes": 180508,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "a2/screenshots/e2e-ah32-details-tr.png",
+      "source": "<REPO>/build/native_site_media/site-oct28/screenshots/e2e-ah32-details-tr.png",
+      "source_sha256": "7597a8b5be4d1f559a0208dac49ace4e8a75b2d1ec77d68c46932dccb5edb1eb",
+      "sha256": "7597a8b5be4d1f559a0208dac49ace4e8a75b2d1ec77d68c46932dccb5edb1eb",
+      "bytes": 171323,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "a2/screenshots/e2e-ah32-history-en.png",
+      "source": "<REPO>/build/native_site_media/site-oct28/screenshots/e2e-ah32-history-en.png",
+      "source_sha256": "13a4b75e2ec58617add6249a6ac52aab07e121f72b2b9e5692bddf7d2198911d",
+      "sha256": "13a4b75e2ec58617add6249a6ac52aab07e121f72b2b9e5692bddf7d2198911d",
+      "bytes": 264906,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "a2/screenshots/e2e-ah32-history-tr.png",
+      "source": "<REPO>/build/native_site_media/site-oct28/screenshots/e2e-ah32-history-tr.png",
+      "source_sha256": "dc79170c2187fe921653729283080bf2fa4a32a5ba343cdb38821bca33033c35",
+      "sha256": "dc79170c2187fe921653729283080bf2fa4a32a5ba343cdb38821bca33033c35",
+      "bytes": 257335,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "a2/screenshots/e2e-ah32-report-en.png",
+      "source": "<REPO>/build/native_site_media/site-oct28/screenshots/e2e-ah32-report-en.png",
+      "source_sha256": "d4cda664c96372146f113e60474aa99fb139212bac7dd3e1bb534aa29900d001",
+      "sha256": "d4cda664c96372146f113e60474aa99fb139212bac7dd3e1bb534aa29900d001",
+      "bytes": 219451,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "a2/screenshots/e2e-ah32-report-tr.png",
+      "source": "<REPO>/build/native_site_media/site-oct28/screenshots/e2e-ah32-report-tr.png",
+      "source_sha256": "171876da2ce459d30e925d0c94b9d56c742fce3c67a8515039905338bdc8b454",
+      "sha256": "171876da2ce459d30e925d0c94b9d56c742fce3c67a8515039905338bdc8b454",
+      "bytes": 212101,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "a2/screenshots/e2e-ah32-running-en.png",
+      "source": "<REPO>/build/native_site_media/site-oct28/screenshots/e2e-ah32-running-en.png",
+      "source_sha256": "ab272bc25a15b40da07d9e0aee954ea549d82418bfd7fb7366d38af256322505",
+      "sha256": "ab272bc25a15b40da07d9e0aee954ea549d82418bfd7fb7366d38af256322505",
+      "bytes": 231984,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "a2/screenshots/e2e-ah32-running-tr.png",
+      "source": "<REPO>/build/native_site_media/site-oct28/screenshots/e2e-ah32-running-tr.png",
+      "source_sha256": "301539bc87cfdd48d3f0f338bc8ab67f6a1503bc116311e7e2327d70b57f6ccf",
+      "sha256": "301539bc87cfdd48d3f0f338bc8ab67f6a1503bc116311e7e2327d70b57f6ccf",
+      "bytes": 217679,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "a2/native.log",
+      "source": "<TMP>/pomosprint_exam32_ios_a2.log",
+      "source_sha256": "5ce80be6b853e7f06cf76d3f06c03562bd6ee315352a47e32f08b74c861c231f",
+      "sha256": "07dc7f5046aee54c31365fe4a895788c3d9d76ae90d6fc1cb7d683ff3177ad4e",
+      "bytes": 1610,
+      "transformation": "portable paths and line breaks"
+    },
+    {
+      "path": "a1/notification_prompt.png",
+      "source": "<REPO>/build/verification_20261028/exam32/ios/a1-stopped.png",
+      "source_sha256": "4f5474ec9c9b125cc8827b8de2f4f45cbb933729b619cb67ed42a0a3f45b1fdb",
+      "sha256": "4f5474ec9c9b125cc8827b8de2f4f45cbb933729b619cb67ed42a0a3f45b1fdb",
+      "bytes": 2937235,
+      "transformation": "exact",
+      "width": 1179,
+      "height": 2556
+    },
+    {
+      "path": "a2/independent_sql.json",
+      "source": "<REPO>/build/verification_20261028/exam32/ios/independent-sql-a2.json",
+      "source_sha256": "42b50fa7c876cc276df9ed1b2d41ac0db53f42fb2f6ee98c8c8dbd7249546a65",
+      "sha256": "42b50fa7c876cc276df9ed1b2d41ac0db53f42fb2f6ee98c8c8dbd7249546a65",
+      "bytes": 2467,
+      "transformation": "exact"
+    },
+    {
+      "path": "a2/proof.json",
+      "source": "derived from native log, independent SQL and root process result",
+      "sha256": "550fe1684a70a47dd2d10d9115bd80646e9992c557ef3bf1aab5a01c25f5ca9b",
+      "bytes": 6639,
+      "transformation": "new portable summary"
+    }
+  ],
+  "self_hash_included": false
+}

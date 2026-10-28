@@ -1,6 +1,8 @@
-# 28 Ekim 2026 — TUS, Deneme ve birleşik aylık lig paketleri
+# 28 Ekim 2026 — TUS/DUS, Deneme ve birleşik aylık lig paketleri
 
 **Durum: yalnız yerelde hazırlanmıştır; canlıya uygulanmadı.** Gece boyunca canlı Supabase'e okuma/yazma isteği yapılmaz. Yeni uygulama eski sunucuda Deneme için güvenli hazırlık/kapalı görünümünü kullanır; eski normal seans/Maraton sürer.
+
+Güncel yerel sözleşme aynı 27/28/29 paketlerinde DUS içerir; yeni bir paket numarası açılmadı. Sekiz sınavın tek ödül tablosu ve AYT erken bitiş/ayrıntılar için [32 rehberi](32_exam_details_early_finish_README.md) geçerlidir. Eski yedi sınavlı yerel veritabanları değiştirilmedi; yeni kaynak zinciri temiz `pomosprint_review32_dus` ve `pomosprint_site32_dus` kopyalarında kurulur. **31 bu akışta yoktur.**
 
 ## Uygulama sırası
 
@@ -10,18 +12,19 @@
 | 2 | `28_exam_core_dryrun.sql` | `28_exam_core.sql` | `28_exam_core_down.sql` |
 | 3 | `29_monthly_competitions_dryrun.sql` | `29_monthly_competitions.sql` | `29_monthly_competitions_down.sql` |
 | Ek güvenlik | `30_session_start_atomic_dryrun.sql` | `30_session_start_atomic.sql` | `30_session_start_atomic_down.sql` |
+| 4 | `32_exam_details_early_finish_dryrun.sql` | `32_exam_details_early_finish.sql` | `32_exam_details_early_finish_down.sql` |
 
 Dosyalar bu klasördedir. İleri/down başındaki `\echo` ve `\quit` satırları yanlışlıkla CLI uygulamasını önler. Sabah kullanıcı incelemesinde SQL Editor için yalnız bu iki satır kaldırılır. DRYRUN olduğu gibi çalıştırılır; sondaki **`DRYRUN_RESULT` hatası bilinçli rollback** sonucudur. Her Txx sonucu `true` olmalıdır. Her DRYRUN, kendi önceki paketleri kurulmuş durumda çalıştırılır. Bir adım başarısızsa devam edilmez. **Toplu `db push/reset` yoktur.**
 
-27, altı eski hedefin tamamını koruyup `tus` ekler. 28, 8 Ekim sonrası normal başlatma/sosyal/tamamlama gövde parmak izlerini denetler. Kaynaklar 27 Ekim kontrolünden sonra yeniden canlıdan okunmadığından sabah canlı tanımla eşleştirme gerekir; uyuşmazlıkta guard kaldırılmaz, paket yeniden incelenir.
+27, altı eski hedefin tamamını koruyup `tus` ve `dus` ekler. 28, 8 Ekim sonrası normal başlatma/sosyal/tamamlama gövde parmak izlerini denetler. Kaynaklar 27 Ekim kontrolünden sonra yeniden canlıdan okunmadığından sabah canlı tanımla eşleştirme gerekir; uyuşmazlıkta guard kaldırılmaz, paket yeniden incelenir.
 
 ## Deneme ve ekonomi
 
 Tam API: [EXAM_API_CONTRACT.md](EXAM_API_CONTRACT.md). Katalog: [exam_catalog_v1.json](exam_catalog_v1.json); resmî süre/soru/net kaynakları: [Sınav kaynakları](../../analiz/SINAV_KAYNAKLARI_2026-10-28.md).
 
 - Her denemenin sunucu başlangıcı, bitişi ve tam katalog sürümü değişmez snapshot'tır. Başlangıçtan önce 3-2-1 istemcide; başlangıç isteği aynı kalıcı UUID ile yeniden denenir.
-- Sunucuya erken tamamlama, başkasının denemesi, üst üste seans ve tekrar ödül reddedilir. Normal başlangıç/deneme başlangıcı/tamamlama aynı profil satırını kilitler. Normal tamamlamanın INSERT trigger'ı deneme aralığıyla çakışırsa bütün ekonomik transaction geri alınır.
-- Ödül varsayımı: tam süreli her **5 dakika için 1 deneme puanı**, her **25 dakika için 1 deneme kumu**, aşağı yuvarlama. Bunlar katalog snapshot'ındadır. Normal puan/kum cüzdanına eklenmez; netler sonucu değiştirmez.
+- Normal tamamlama RPC’sinde erken bitirme, başkasının denemesi, üst üste seans ve tekrar ödül reddedilir.32’nin ayrı AYT erken bitiş RPC’si gerçek süreyi kabul eder; diğer türler tam süre ister. Normal başlangıç/deneme başlangıcı/tamamlama aynı profil satırını kilitler. Normal tamamlamanın INSERT trigger'ı deneme aralığıyla çakışırsa bütün ekonomik transaction geri alınır.
+- Puan: her **5 dakika için 1 deneme puanı**.32 ile kum tek tabloda LGS Sözel60, LGS Sayısal70, YDT95, TUS Temel110, TUS Klinik110, DUS120, TYT130, AYT145 olur; sekiz katalog satırında reward_policy_version2. AYT erken bitiş kumu gerçek sürenin dondurulmuş tam ödüle oranıdır. Bunlar katalog snapshot’ındadır. Normal puan/kum cüzdanına eklenmez; netler sonucu değiştirmez.
 - Vazgeçme `abandoned` ve sunucunun ölçtüğü `elapsed_seconds` ile geçmişte saklanır. Sayı, toplam çalışma süresi, seri veya ekonomi kazandırmaz. Tam süre dolmuşsa vazgeçme isteği güvenli/idempotent tamamlamaya döner.
 - Kapanma ve arka plan süreyi durdurmaz; uygulama açıldığında aynı sunucu zamanlarıyla devam edilir. Bu, kullanıcının fiziksel dikkatini ölçen bir cihaz tasdiki değildir.
 - D-05: Yeni başlangıç aynı sahibin süresi dolmuş aktif denemesini önce normal tamamlama yoluyla bir kez kapatır. Süresi dolmuş aynı UUID tekrarında da yeni kayıt açmadan tamamlanmış makbuz döner. Orijinal süre/bitiş/ödül snapshot'ı korunur; henüz dolmamış deneme yine çakışma hatası verir.
@@ -29,11 +32,13 @@ Tam API: [EXAM_API_CONTRACT.md](EXAM_API_CONTRACT.md). Katalog: [exam_catalog_v1
 - Net satırı dersin tam soru toplamını karşılar, boşlar açıkça kaydedilir. Eksik ders sonucu “0 net” diye uydurulmaz; gönderilmeyen ders korunur. Negatif net geçerlidir. Sahip dışındaki istemci deneme/net okuyamaz veya yazamaz.
 - TUS'ta yedi temel ve dört klinik resmî test grubu vardır. TUS Fizyoloji ile Histoloji/Embriyoloji, `Fizyoloji, Histoloji ve Embriyoloji` çalışma kategorisine; AYT edebiyatı `Edebiyat` ve `Türkçe` kategorilerine bağlanır. Birleşik kategorinin aynı dakika toplamı her ilgili net karşılaştırmasına bağlam olur; derslere paylaştırılmaz ve toplam çalışma süresini artırmaz. Arayüz bu yüzden “İlişkili çalışma kategorilerinde …” der. “Küçük Stajlar” için resmî ayrı soru kotası veya uydurma ders eşlemesi yoktur; yetersiz sonuç içgörü oluşturmaz.
 
+DUS tek150 dakika/120 soru oturumdur:16 ayrı ders ve kategori, temel bilim40/klinik bilim80 standart dağılım. [ÖSYM2026 DUS2 kılavuzu](https://dokuman.osym.gov.tr/web/2026/9/basvuru-kilavuzu-e1esxj-16163038.pdf), §1.3 ve basılı sayfa40 Tablo1 bu planın kaynağıdır. Kılavuz dağılımın yaklaşık olduğunu belirtir; her kitapçık için sabit kota iddiası değildir.
+
 ## Tek aylık lig geçişi
 
 29 hem normal hem deneme ligini ve hedef ayrımını **bir kez** oluşturur; ayrı paketler aynı lig tablosunu yeniden değiştirmez. Yeni tablolar `competition_*` ad alanındadır. Hesap silmede owner satırları FK cascade ile, yeni arşiv JSON kimlikleri private temizleme triggerıyla kaldırılır. Eski `leagues`, `league_memberships`, kazanılmış avatarlar, lifetime puan/kum, seri ve çalışma kayıtları silinmez.
 
-- Lig ayı **Europe/Istanbul ayın 1'i 00:00** sınırıdır. Puanı hangi aya yazacağını normalde `completed_at`, denemede değişmez `ends_at` belirler. Çalışma günü ve seri **profil saat diliminde 04:00** olarak kalır. Örneğin 1 Kasım 03:30'da başlayan denemenin çalışma süresi 31 Ekim çalışma günündedir; lig puanı Kasım'dadır.
+- Lig ayı **Europe/Istanbul ayın 1'i 00:00** sınırıdır. Puanı hangi aya yazacağını normalde `completed_at`, denemede gerçek `finished_at` belirler; tam süreli kayıtta bu `ends_at` ile aynıdır. Çalışma günü ve seri **profil saat diliminde 04:00** olarak kalır. Örneğin 1 Kasım 03:30'da başlayan denemenin çalışma süresi 31 Ekim çalışma günündedir; lig puanı Kasım'dadır.
 - Normal ve deneme ayrı `kind=study|exam` kayıtlarıdır. Her tür kendi hedef odasında en fazla25 kişiyle yarışır. Global sıralama bütün hedeflerin aynı tür puanını gösteren ek görünümdür; ikinci ödül/cüzdan oluşturmaz.
 - İlk puanlı aktivite odaya yerleştirir. Üçten az aktif kişide hazırlık vardır. Terfi için ham sıranın ilk `floor(aktif/3)` içinde olması, en az3 çalışma günü/300dk/pozitif puan gerekir. Düşme en az10 aktif kişide son `floor(aktif/3)`; son72saatte katılan korunur. Bronz–Elmas sınırları korunur.
 - Normal avatar ödülü en az10 aktif kişi, ilk3 ve aynı kişisel yeterlilikle verilir. Deneme ödül slotları15 adet `NULL` yer tutucudur; gerçek görseller/katalog gelmeden hayalî avatar açılmaz veya kuşanılmaz.
@@ -45,7 +50,7 @@ Tam API: [EXAM_API_CONTRACT.md](EXAM_API_CONTRACT.md). Katalog: [exam_catalog_v1
 
 ## Geri alma ve kayıt güvenliği
 
-Ters sıra29→28→27. 29, aktivasyondan sonra veya kaybolacak bekleyen hedef tercihi/işlenmiş sonuç varsa **reddeder**; telafi migration gerekir. 28, kaydedilmiş tek bir deneme/cüzdan varsa **reddeder**, geçmişi silmez. 27, TUS profili varsa **reddeder**, hedefi sessizce NULL yapmaz. Boş izole kopyada ileri→down şema/fonksiyon/ACL/cron eşitliği test edilir. Canlı kullanıcı verisi silinerek rollback zorlanmaz.
+Ters sıra32→30→29→28→27.32 kişisel ayrıntı veya erken bitiş geçmişi oluşmuşsa veri kaybını önlemek için reddeder. 29, aktivasyondan sonra veya kaybolacak bekleyen hedef tercihi/işlenmiş sonuç varsa **reddeder**; telafi migration gerekir. 28, kaydedilmiş tek bir deneme/cüzdan varsa **reddeder**, geçmişi silmez. 27, TUS veya DUS profili varsa **reddeder**, hedefi sessizce NULL yapmaz. Boş izole kopyada ileri→down şema/fonksiyon/ACL/cron eşitliği test edilir. Canlı kullanıcı verisi silinerek rollback zorlanmaz.
 
 ## Yerel tekrar
 
@@ -71,7 +76,7 @@ bash tool/local_supabase/parity_check.sh --reviewed-night-20261028-with-start-at
 
 Bu testlerin review DB hazırlama adımları gece raporunda bulunur. Şema testi kendi başına native test değildir. Gerçek60sn yerel sınav kataloğu deneyi tam75/135dk native denemesinin yerine sayılmaz; kontrollü tarihli kayıtlar da gerçek ayın geçmesini beklemiş sayılmaz.
 
-## 31: duraklatılmamış Maratonun geç gönderim sınırı
+## Tarihsel öneri31: bu DUS akışında uygulanmadı
 
 [31 rehberi](31_marathon_completion_anchor_README.md) mevcut Maraton onay fonksiyonuna ayrı bir düzeltmedir; lig tablolarını yeniden değiştirmez. Gecikmiş, duraklatılmamış ilk/ara odakta mola ve onay süresi kabul edilen gerçek odak sonuna bağlanır. Normal seansın puanı/kumu korunur. Duraklatılmış kolun gerçek sonu mevcut API'de ayırt edilemediğinden eski davranışı korunur; bütün AFK yolları kapatılmış sayılmaz.
 

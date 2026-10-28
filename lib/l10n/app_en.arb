@@ -1175,5 +1175,81 @@
   "leagueTargetSave": "Save target",
   "leagueTargetSaveError": "Could not save the target. Check your connection and try again.",
   "leagueTargetOther": "Other",
-  "leagueGlobalScopeBody": "This month’s focus points across all targets. Practice exam points have a separate league; the global view gives no additional reward."
+  "leagueGlobalScopeBody": "This month’s focus points across all targets. Practice exam points have a separate league; the global view gives no additional reward.",
+  "examFinishEarly": "Finish AYT",
+  "examFinishEarlyTitle": "Finish AYT early?",
+  "examFinishEarlyBody": "Your time and reward are final only after the server accepts your request. Then select the tests you took and save your scores, title and note.",
+  "examEarlyPendingTitle": "Waiting for early-finish confirmation",
+  "examEarlyPendingBody": "Your request is stored on this device. Time and reward become final when the server accepts it; it will retry when connected. If the planned time has elapsed by then, full-duration rules apply.",
+  "examEarlyUnavailable": "Early finish is currently unavailable on this server. Your record is preserved; retry or check your connection.",
+  "examEarlyTooSoon": "At least one second must elapse before finishing. You can retry.",
+  "examCompletedEarly": "Completed early",
+  "examActualPlanned": "Actual time: {actual} · Planned: {planned}",
+  "examCreditedMinutes": "Added to reports: {minutes} min",
+  "examSeconds": "{seconds} sec",
+  "examDetailsTitle": "Practice exam details and scores",
+  "examTitleLabel": "Practice exam title",
+  "examNoteLabel": "Note",
+  "examSelectModules": "Select the AYT tests you took",
+  "examModuleHint": "Select at least one test to enter scores. You can also save a title or note without entering scores.",
+  "examModuleUnknown": "AYT tests have not been selected for this record yet.",
+  "examSelectedQuestions": "Selected scope: {selected} / {total} questions",
+  "examReligionAlternativeInfo": "The Religious Culture / additional philosophy section in Social Sciences-2 contains 6 questions in total; it is not counted twice.",
+  "examDetailsEdit": "Edit details and scores",
+  "examDetailsSaved": "Your practice exam details and scores were saved.",
+  "examDetailsQueued": "Your details and scores are stored on this device; the same request will be sent when connected.",
+  "examDetailsConflict": "This practice exam was edited elsewhere. Load the latest record, review your changes and save again.",
+  "examScopeConflict": "You cannot remove a test with saved results. Check your selected tests and subjects.",
+  "examDetailsInvalid": "Use at most 120 characters for the title and 2000 for the note. Keep the title on one line, and check your tests and results.",
+  "examDetailsReload": "Load latest record",
+  "examDetailsPending": "Your previous save is awaiting confirmation. Retry it, then continue editing after it is accepted.",
+  "examDefinitionUnsupported": "The test structure of this AYT record is not recognized. Your record is preserved; check your connection for current exam information.",
+  "examDetailsUnavailable": "Editing titles, notes and test selections is not available on this server yet.",
+  "@examActualPlanned": {
+    "placeholders": {
+      "actual": {
+        "type": "String"
+      },
+      "planned": {
+        "type": "String"
+      }
+    }
+  },
+  "@examCreditedMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "@examSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "@examSelectedQuestions": {
+    "placeholders": {
+      "selected": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "examIntroEarly": "Choose an exam and start studying. You can finish AYT early, then record the tests you took and your scores.",
+  "examCharacterCount": "{current} of {maximum} characters",
+  "@examCharacterCount": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "maximum": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingSegmentDus": "DUS (Dental Specialty Exam)"
 }

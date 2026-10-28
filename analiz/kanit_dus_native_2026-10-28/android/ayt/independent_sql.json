@@ -1,0 +1,113 @@
+{
+  "status": "PASS",
+  "database": "pomosprint_review32_dus",
+  "read_only": true,
+  "mode": "ayt",
+  "owner": "5698f7d4-283e-4854-805f-ccd7b7274b5e",
+  "email": "e2e-sim-exam32-ex32-dus-android-a1@pomosprint.local",
+  "checks": [
+    {
+      "name": "exactly two native attempts",
+      "pass": true
+    },
+    {
+      "name": "no active attempts",
+      "pass": true
+    },
+    {
+      "name": "both AYT early complete",
+      "pass": true
+    },
+    {
+      "name": "natural early seconds",
+      "pass": true
+    },
+    {
+      "name": "unchanged planned10800sec",
+      "pass": true
+    },
+    {
+      "name": "current full snapshot36points145sand",
+      "pass": true
+    },
+    {
+      "name": "proportional current reward",
+      "pass": true
+    },
+    {
+      "name": "metadata one revision each",
+      "pass": true
+    },
+    {
+      "name": "two selected modules",
+      "pass": true
+    },
+    {
+      "name": "four partial results",
+      "pass": true
+    },
+    {
+      "name": "zero minutes",
+      "pass": true
+    },
+    {
+      "name": "zero points",
+      "pass": true
+    },
+    {
+      "name": "zero sand",
+      "pass": true
+    },
+    {
+      "name": "zero streak",
+      "pass": true
+    },
+    {
+      "name": "zero exam_points",
+      "pass": true
+    },
+    {
+      "name": "zero exam_sand",
+      "pass": true
+    },
+    {
+      "name": "zero normal_count",
+      "pass": true
+    }
+  ],
+  "profile": {
+    "sand": 0,
+    "points": 0,
+    "streak": 0,
+    "minutes": 0,
+    "segment": "yks",
+    "exam_sand": 0,
+    "exam_points": 0,
+    "normal_count": 0,
+    "result_count": 4
+  },
+  "attempts": [
+    {
+      "id": "076a54e1-f654-4c1f-83d7-1bd3507cc5a6",
+      "status": "completed",
+      "elapsed_seconds": 5,
+      "planned_seconds": 10800,
+      "full_reward_points": 36,
+      "full_reward_sand": 145,
+      "earned_points": 0,
+      "earned_sand": 0,
+      "details_revision": 1
+    },
+    {
+      "id": "74eadcba-0b05-41ba-86a4-9202f3e350b1",
+      "status": "completed",
+      "elapsed_seconds": 5,
+      "planned_seconds": 10800,
+      "full_reward_points": 36,
+      "full_reward_sand": 145,
+      "earned_points": 0,
+      "earned_sand": 0,
+      "details_revision": 1
+    }
+  ]
+}

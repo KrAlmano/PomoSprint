@@ -1,0 +1,11 @@
+{
+  "platform": "android",
+  "run": "ex32-android-a2",
+  "api_port": 54351,
+  "host_port": 54369,
+  "source": "integration_test/ah_exam_details_early_test.dart",
+  "started_at": "2026-10-28T12:09:40.998053+00:00",
+  "log": "<TMP>/pomosprint_exam32_android_a2.log",
+  "native_exit_code": 0,
+  "finished_at": "2026-10-28T12:11:35.911875+00:00"
+}

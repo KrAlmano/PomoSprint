@@ -189,7 +189,7 @@ void main() {
     },
   );
   test(
-    'all seven catalog families use the intended divisor and decimal separator',
+    'all eight exam types use the intended divisor and decimal separator',
     () {
       const expected = {
         'tyt': (4, '1.75', '1,75'),
@@ -199,6 +199,7 @@ void main() {
         'lgs_quantitative': (3, '1.67', '1,67'),
         'tus_basic': (4, '1.75', '1,75'),
         'tus_clinical': (4, '1.75', '1,75'),
+        'dus': (4, '1.75', '1,75'),
       };
       expect(
         offlineExamCatalog.exams.map((e) => e.id).toSet(),

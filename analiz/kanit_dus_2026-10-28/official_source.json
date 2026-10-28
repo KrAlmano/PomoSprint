@@ -1,0 +1,11 @@
+{
+  "url": "https://dokuman.osym.gov.tr/web/2026/9/basvuru-kilavuzu-e1esxj-16163038.pdf",
+  "scope": "2026DUS2 guide,section1.3 and printed page40 Table1",
+  "seconds": 9000,
+  "questions": 120,
+  "basic_questions": 40,
+  "clinical_questions": 80,
+  "subject_count": 16,
+  "approximation_note": "Official guide describes subject allocations as approximate; app catalog is the standard plan.",
+  "text_source_sha256": "be774de0c9467b26e171cf211e841dff3ccb5e182b3e5dd38b83ec0d31615dec"
+}

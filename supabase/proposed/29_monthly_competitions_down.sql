@@ -4,6 +4,7 @@
 \quit
 BEGIN;
 DO $$ BEGIN
+ IF to_regclass('public.exam_extension_32_backup') IS NOT NULL THEN RAISE EXCEPTION 'competition_rollback_requires32_down_first';END IF;
  IF now()>=(SELECT activates_at FROM public.competition_policy WHERE singleton)
  OR EXISTS(SELECT 1 FROM public.competition_results)
  OR EXISTS(SELECT 1 FROM public.competition_target_history WHERE from_month>public._competition_month(now()))

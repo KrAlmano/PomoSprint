@@ -1,0 +1,58 @@
+[
+  {
+    "before": "base_before27",
+    "after": "after_all_down",
+    "identical": true,
+    "canonical_before_sha256": "b4a0b96830448b91ae3c6f458fe9cf7a5180876fbfab5b20fb65ef32956a624d",
+    "canonical_after_sha256": "b4a0b96830448b91ae3c6f458fe9cf7a5180876fbfab5b20fb65ef32956a624d"
+  },
+  {
+    "before": "before32_empty",
+    "after": "after_dryrun",
+    "identical": true,
+    "canonical_before_sha256": "235b54f993027c51ad699d3c3cf75ca5f73535ae547c615a6ff5406afbd9b819",
+    "canonical_after_sha256": "235b54f993027c51ad699d3c3cf75ca5f73535ae547c615a6ff5406afbd9b819"
+  },
+  {
+    "before": "before32_empty",
+    "after": "after_empty_down",
+    "identical": true,
+    "canonical_before_sha256": "235b54f993027c51ad699d3c3cf75ca5f73535ae547c615a6ff5406afbd9b819",
+    "canonical_after_sha256": "235b54f993027c51ad699d3c3cf75ca5f73535ae547c615a6ff5406afbd9b819"
+  },
+  {
+    "before": "protected_down_before",
+    "after": "protected_down_after",
+    "identical": true,
+    "canonical_before_sha256": "40129deb4ed8c9fb792fddb228157a36713bd003ff0bc4e7a9d83b604b97fd67",
+    "canonical_after_sha256": "40129deb4ed8c9fb792fddb228157a36713bd003ff0bc4e7a9d83b604b97fd67"
+  },
+  {
+    "before": "before_27_tus_segment_dryrun",
+    "after": "after_27_tus_segment_dryrun",
+    "identical": true,
+    "canonical_before_sha256": "b4a0b96830448b91ae3c6f458fe9cf7a5180876fbfab5b20fb65ef32956a624d",
+    "canonical_after_sha256": "b4a0b96830448b91ae3c6f458fe9cf7a5180876fbfab5b20fb65ef32956a624d"
+  },
+  {
+    "before": "before_28_exam_core_dryrun",
+    "after": "after_28_exam_core_dryrun",
+    "identical": true,
+    "canonical_before_sha256": "c4ba48a21d2f414efec6463be453c8e1dba33b068a2ca2c0660b7a8bfcde5df5",
+    "canonical_after_sha256": "c4ba48a21d2f414efec6463be453c8e1dba33b068a2ca2c0660b7a8bfcde5df5"
+  },
+  {
+    "before": "before_29_monthly_competitions_dryrun",
+    "after": "after_29_monthly_competitions_dryrun",
+    "identical": true,
+    "canonical_before_sha256": "f4ebaa1ddebfca92548669043107566d5b85817ffae271d121603108137f0e11",
+    "canonical_after_sha256": "f4ebaa1ddebfca92548669043107566d5b85817ffae271d121603108137f0e11"
+  },
+  {
+    "before": "before_30_session_start_atomic_dryrun",
+    "after": "after_30_session_start_atomic_dryrun",
+    "identical": true,
+    "canonical_before_sha256": "5b0eab10bed867a4463e2c69c83c0a89c0c2d2786844626866bc15caf33141b2",
+    "canonical_after_sha256": "5b0eab10bed867a4463e2c69c83c0a89c0c2d2786844626866bc15caf33141b2"
+  }
+]

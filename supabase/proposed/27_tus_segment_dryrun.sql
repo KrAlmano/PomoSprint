@@ -18,11 +18,12 @@ BEGIN
 END $$;
 ALTER TABLE public.profiles DROP CONSTRAINT profiles_user_segment_check;
 ALTER TABLE public.profiles ADD CONSTRAINT profiles_user_segment_check
- CHECK(user_segment=ANY(ARRAY['lgs','yks','tus','kpss','language','university','work']::text[]));
+ CHECK(user_segment=ANY(ARRAY['lgs','yks','tus','dus','kpss','language','university','work']::text[]));
 INSERT INTO supabase_migrations.schema_migrations(version,name) VALUES('20261028010000','tus_segment');
 
 -- <<< PROPOSED BODY
 CREATE TEMP TABLE qa_checks(name text,passed boolean);
+INSERT INTO qa_checks VALUES('T00 DUS constraint',coalesce((position('dus' in (select pg_get_constraintdef(oid)from pg_constraint where conrelid='public.profiles'::regclass and conname='profiles_user_segment_check'))>0),false));
 INSERT INTO qa_checks VALUES('T01 TUS constraint',coalesce((position('tus' in (select pg_get_constraintdef(oid)from pg_constraint where conrelid='public.profiles'::regclass and conname='profiles_user_segment_check'))>0),false));
 INSERT INTO qa_checks VALUES('T02 existing segment names',coalesce((position('kpss' in (select pg_get_constraintdef(oid)from pg_constraint where conrelid='public.profiles'::regclass and conname='profiles_user_segment_check'))>0),false));
 INSERT INTO qa_checks VALUES('T03 migration once',coalesce(((select count(*)from supabase_migrations.schema_migrations where version='20261028010000')=1),false));

@@ -1,0 +1,258 @@
+{
+  "scope": "Only seven exact tagged old-site QA owners, authenticated public RPC cleanup; no database row deletion or main/new-DUS write",
+  "database": "pomosprint_site32_final",
+  "manifest_sha256": "ae496bb69bafdb1e334630faaffd37896fb6914b22d6326fc56a1a1bba0e63bf",
+  "owner_ids": [
+    "4328a15c-983c-47f0-973f-70e0e9d9a43e",
+    "d98163b9-0298-466e-a7d9-3f5d58ab365b",
+    "d1b7782f-e76b-4be4-b3d1-4d3ab6d1a78f",
+    "1b232728-2310-43e3-9412-24bb8ab25347",
+    "b9cbe260-6ca6-4576-a55a-08c38d40083c",
+    "934cc586-4938-4b7a-9833-be8af4b5a16c",
+    "d537bc75-95a1-4c5a-bdda-c6f5a91b1932"
+  ],
+  "before": {
+    "profiles": [
+      {
+        "id": "1b232728-2310-43e3-9412-24bb8ab25347",
+        "day": "2026-10-28",
+        "coins": 40,
+        "points": 10,
+        "streak": 1,
+        "longest": 1,
+        "minutes": 50
+      },
+      {
+        "id": "4328a15c-983c-47f0-973f-70e0e9d9a43e",
+        "day": "2026-10-28",
+        "coins": 80,
+        "points": 29,
+        "streak": 2,
+        "longest": 2,
+        "minutes": 455
+      },
+      {
+        "id": "934cc586-4938-4b7a-9833-be8af4b5a16c",
+        "day": "2026-10-28",
+        "coins": 20,
+        "points": 5,
+        "streak": 1,
+        "longest": 1,
+        "minutes": 25
+      },
+      {
+        "id": "b9cbe260-6ca6-4576-a55a-08c38d40083c",
+        "day": "2026-10-28",
+        "coins": 40,
+        "points": 10,
+        "streak": 1,
+        "longest": 1,
+        "minutes": 50
+      },
+      {
+        "id": "d1b7782f-e76b-4be4-b3d1-4d3ab6d1a78f",
+        "day": "2026-10-28",
+        "coins": 40,
+        "points": 24,
+        "streak": 1,
+        "longest": 1,
+        "minutes": 100
+      },
+      {
+        "id": "d537bc75-95a1-4c5a-bdda-c6f5a91b1932",
+        "day": "2026-10-28",
+        "coins": 20,
+        "points": 5,
+        "streak": 1,
+        "longest": 1,
+        "minutes": 25
+      },
+      {
+        "id": "d98163b9-0298-466e-a7d9-3f5d58ab365b",
+        "day": "2026-10-28",
+        "coins": 60,
+        "points": 36,
+        "streak": 1,
+        "longest": 1,
+        "minutes": 150
+      }
+    ],
+    "wallets": [
+      {
+        "coins": 300,
+        "user_id": "4328a15c-983c-47f0-973f-70e0e9d9a43e",
+        "lifetime_points": 66
+      }
+    ],
+    "studies": {
+      "hash": "fe33415bb0c89ea8919f6088ce117723",
+      "count": 15
+    },
+    "results": {
+      "hash": "abf4baa3c4a9409b83051ac9a2ddaa48",
+      "count": 18
+    },
+    "finished_exams": {
+      "hash": "a083973ffb9991ba221a3fd2aabec3ca",
+      "count": 3
+    },
+    "friendships": {
+      "hash": "8c0188df21173982e5b55b0c7d5f4e5a",
+      "count": 12
+    },
+    "marathon_runs": {
+      "hash": "2fa98a7bf761bc641bcbae1ac63e80b2",
+      "count": 3
+    },
+    "unlocks": {
+      "hash": "81657f3961b9cd48c3ce4f4e629b69f4",
+      "count": 49
+    }
+  },
+  "after": {
+    "profiles": [
+      {
+        "id": "1b232728-2310-43e3-9412-24bb8ab25347",
+        "day": "2026-10-28",
+        "coins": 40,
+        "points": 10,
+        "streak": 1,
+        "longest": 1,
+        "minutes": 50
+      },
+      {
+        "id": "4328a15c-983c-47f0-973f-70e0e9d9a43e",
+        "day": "2026-10-28",
+        "coins": 80,
+        "points": 29,
+        "streak": 2,
+        "longest": 2,
+        "minutes": 455
+      },
+      {
+        "id": "934cc586-4938-4b7a-9833-be8af4b5a16c",
+        "day": "2026-10-28",
+        "coins": 20,
+        "points": 5,
+        "streak": 1,
+        "longest": 1,
+        "minutes": 25
+      },
+      {
+        "id": "b9cbe260-6ca6-4576-a55a-08c38d40083c",
+        "day": "2026-10-28",
+        "coins": 40,
+        "points": 10,
+        "streak": 1,
+        "longest": 1,
+        "minutes": 50
+      },
+      {
+        "id": "d1b7782f-e76b-4be4-b3d1-4d3ab6d1a78f",
+        "day": "2026-10-28",
+        "coins": 40,
+        "points": 24,
+        "streak": 1,
+        "longest": 1,
+        "minutes": 100
+      },
+      {
+        "id": "d537bc75-95a1-4c5a-bdda-c6f5a91b1932",
+        "day": "2026-10-28",
+        "coins": 20,
+        "points": 5,
+        "streak": 1,
+        "longest": 1,
+        "minutes": 25
+      },
+      {
+        "id": "d98163b9-0298-466e-a7d9-3f5d58ab365b",
+        "day": "2026-10-28",
+        "coins": 60,
+        "points": 36,
+        "streak": 1,
+        "longest": 1,
+        "minutes": 150
+      }
+    ],
+    "wallets": [
+      {
+        "coins": 300,
+        "user_id": "4328a15c-983c-47f0-973f-70e0e9d9a43e",
+        "lifetime_points": 66
+      }
+    ],
+    "studies": {
+      "hash": "fe33415bb0c89ea8919f6088ce117723",
+      "count": 15
+    },
+    "results": {
+      "hash": "abf4baa3c4a9409b83051ac9a2ddaa48",
+      "count": 18
+    },
+    "finished_exams": {
+      "hash": "c5a1459efd529c111aef572fa1bba372",
+      "count": 5
+    },
+    "friendships": {
+      "hash": "8c0188df21173982e5b55b0c7d5f4e5a",
+      "count": 12
+    },
+    "marathon_runs": {
+      "hash": "2fa98a7bf761bc641bcbae1ac63e80b2",
+      "count": 3
+    },
+    "unlocks": {
+      "hash": "81657f3961b9cd48c3ce4f4e629b69f4",
+      "count": 49
+    }
+  },
+  "prior_finished_after": {
+    "hash": "a083973ffb9991ba221a3fd2aabec3ca",
+    "count": 3
+  },
+  "receipts": [
+    {
+      "owner": "d537bc75-95a1-4c5a-bdda-c6f5a91b1932",
+      "attempt_id": "9ce9f273-5e8c-4465-ad8a-d627db893ebf",
+      "status": "abandoned",
+      "points": 0,
+      "coins": 0,
+      "elapsed_seconds": 2102
+    },
+    {
+      "owner": "934cc586-4938-4b7a-9833-be8af4b5a16c",
+      "attempt_id": "ad740f47-481d-4873-89d0-a0ab562bfae1",
+      "status": "abandoned",
+      "points": 0,
+      "coins": 0,
+      "elapsed_seconds": 2102
+    },
+    {
+      "owner": "d98163b9-0298-466e-a7d9-3f5d58ab365b",
+      "rpc": "cancel_study_session",
+      "cleared": true
+    },
+    {
+      "owner": "d1b7782f-e76b-4be4-b3d1-4d3ab6d1a78f",
+      "rpc": "cancel_study_session",
+      "cleared": true
+    },
+    {
+      "owner": "1b232728-2310-43e3-9412-24bb8ab25347",
+      "rpc": "cancel_study_session",
+      "cleared": true
+    },
+    {
+      "owner": "b9cbe260-6ca6-4576-a55a-08c38d40083c",
+      "rpc": "cancel_study_session",
+      "cleared": true
+    }
+  ],
+  "live_before": 4,
+  "live_after": 0,
+  "economy_unchanged": true,
+  "old_history_unchanged": true,
+  "status": "PASS",
+  "cancel_function_sha256": "34bcd5133e892a3168a56e60dec5141f2d787f4318c2969c6ebc37571fa2c7aa"
+}

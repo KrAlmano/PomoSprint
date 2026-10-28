@@ -1,0 +1,106 @@
+{
+  "status": "PASS",
+  "database": "pomosprint_review32_dus",
+  "owner": "d199a3da-1d20-412a-9428-48ae34fa0a9f",
+  "scope": "Controlled60s/0reward snapshot; not official150min award proof",
+  "checks": [
+    {
+      "name": "two completed DUS attempts",
+      "pass": true
+    },
+    {
+      "name": "current official catalog restored",
+      "pass": true
+    },
+    {
+      "name": "tr fixed temporary snapshot60/0/0",
+      "pass": true
+    },
+    {
+      "name": "tr real elapsed60seconds",
+      "pass": true
+    },
+    {
+      "name": "tr question metadata intact",
+      "pass": true
+    },
+    {
+      "name": "tr no reward",
+      "pass": true
+    },
+    {
+      "name": "tr one metadata revision",
+      "pass": true
+    },
+    {
+      "name": "tr two partial results",
+      "pass": true
+    },
+    {
+      "name": "tr title and note saved",
+      "pass": true
+    },
+    {
+      "name": "en fixed temporary snapshot60/0/0",
+      "pass": true
+    },
+    {
+      "name": "en real elapsed60seconds",
+      "pass": true
+    },
+    {
+      "name": "en question metadata intact",
+      "pass": true
+    },
+    {
+      "name": "en no reward",
+      "pass": true
+    },
+    {
+      "name": "en one metadata revision",
+      "pass": true
+    },
+    {
+      "name": "en two partial results",
+      "pass": true
+    },
+    {
+      "name": "en title and note saved",
+      "pass": true
+    },
+    {
+      "name": "two credited minutes and one worked day",
+      "pass": true
+    },
+    {
+      "name": "both wallets zero",
+      "pass": true
+    }
+  ],
+  "profile": {
+    "sand": 0,
+    "points": 0,
+    "streak": 1,
+    "minutes": 2,
+    "exam_sand": 0,
+    "exam_points": 0
+  },
+  "attempts": [
+    {
+      "id": "badfb2b1-0178-46ef-a5d2-ea82f5879136",
+      "elapsed_seconds": 60,
+      "planned_seconds": 60,
+      "reference_reward_points": 0,
+      "reference_reward_sand": 0,
+      "metadata_revision": 1
+    },
+    {
+      "id": "8ee27441-590a-4079-830d-b61f0b3f5ab8",
+      "elapsed_seconds": 60,
+      "planned_seconds": 60,
+      "reference_reward_points": 0,
+      "reference_reward_sand": 0,
+      "metadata_revision": 1
+    }
+  ]
+}

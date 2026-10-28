@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../models/category_model.dart';
+import '../models/dus_catalog.dart';
 import '../utils/category_names.dart';
 import '../widgets/auth/category_name_dialog.dart' show kCategoryPalette;
 
@@ -42,6 +43,7 @@ const Map<String, List<String>> kRecommendedCategoriesBySegment = {
     'Kadın Hastalıkları ve Doğum',
     'Küçük Stajlar',
   ],
+  'dus': dusCategoryNames,
   'kpss': [
     'Türkçe',
     'Matematik',

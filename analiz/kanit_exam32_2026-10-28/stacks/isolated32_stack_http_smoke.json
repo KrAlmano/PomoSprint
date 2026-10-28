@@ -1,0 +1,51 @@
+{
+  "scope": "Local read-only HTTP checks; no signup, email or account mutation",
+  "checks": [
+    {
+      "path": "/health",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "path": "/health",
+      "status": 403,
+      "expected": 403,
+      "ok": true
+    },
+    {
+      "path": "/psql",
+      "status": 404,
+      "expected": 404,
+      "ok": true
+    },
+    {
+      "path": "/auth/v1/health",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "path": "/rest/v1/rpc/get_exam_config",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    }
+  ],
+  "coins": {
+    "ayt": 175,
+    "lgs_quantitative": 3,
+    "lgs_verbal": 60,
+    "tus_basic": 5,
+    "tus_clinical": 5,
+    "tyt": 150,
+    "ydt": 4
+  },
+  "capabilities": {
+    "exam_details": true,
+    "ayt_early_finish": true,
+    "ayt_modules_version": 1
+  },
+  "passed": 5,
+  "total": 5
+}

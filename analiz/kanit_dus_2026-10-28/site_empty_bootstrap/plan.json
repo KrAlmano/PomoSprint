@@ -1,0 +1,16 @@
+{
+  "mode": "plan_only_no_connections",
+  "source": "pomosprint_overnight_baseline",
+  "target": "pomosprint_site32_dus",
+  "endpoint": "127.0.0.1:54322",
+  "copy_users": false,
+  "sources_sha256": {
+    "supabase/migrations/20261009190000_special_avatar_catalog.sql": "e274d9cb00668d6f38a58f856f15c789a81073950cd21a67027f816a3b75354d",
+    "supabase/migrations/20261009233000_remove_unowned_ronin.sql": "112ed80b6e55cadf2ba9cbf0cff6138f3b3e601467d2c6cd9004547e2674074a",
+    "supabase/proposed/27_tus_segment.sql": "9bd539da18f402b09ca8416dab485a8956a686c42847517862cc3552c958d7fd",
+    "supabase/proposed/28_exam_core.sql": "6d721fb66672679458951992e73f6e5472741a9b6a67cb71f5e47dcc81c416ce",
+    "supabase/proposed/29_monthly_competitions.sql": "408da466d17267bea6dbbd0527fc57e57399cc84289bde607f9ffdc92cc88a1f",
+    "supabase/proposed/30_session_start_atomic.sql": "c10d8235eb6f6f22372f8ebddb473b7ace186e2504e741705c01b1c15e4c7d73",
+    "supabase/proposed/32_exam_details_early_finish.sql": "5380d2cf015875259cd6e1fef99e42c6623a3cb2209d0b76117d94a2f1184fe2"
+  }
+}

@@ -100,6 +100,15 @@ bool _privateField(String key) {
     'sessionid',
     'codeverifier',
     'codechallenge',
+    // Owner-only exam details may contain arbitrary personal text. Removing
+    // the whole patch also protects future nested fields before RPC transport.
+    'title',
+    'note',
+    'examtitle',
+    'examnote',
+    'details',
+    'pdetails',
+    'detailspatch',
   }.contains(normalized)) {
     return true;
   }

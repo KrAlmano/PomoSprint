@@ -54,6 +54,39 @@ void main() {
   );
 
   test(
+    'owner-only exam text and details patches never enter telemetry',
+    () async {
+      final options = _options();
+      final payload = <String, dynamic>{
+        'operation': 'save_exam_details',
+        'status_code': 409,
+        'title': 'PRIVATE_EXAM_TITLE',
+        'exam_note': 'PRIVATE_EXAM_NOTE',
+        'p_details': {'new_field': 'PRIVATE_FUTURE_DETAIL'},
+        'detailsPatch': {'note': 'PRIVATE_DRAFT_NOTE'},
+        'nested': [
+          {'NOTE': 'PRIVATE_NESTED_NOTE', 'revision': 2},
+        ],
+      };
+      final clean = await options.beforeSend!(
+        SentryEvent(breadcrumbs: [Breadcrumb(data: payload)]),
+        Hint(),
+      );
+      final encoded = jsonEncode(clean!.toJson());
+      expect(encoded, isNot(contains('PRIVATE_')));
+      expect(encoded, contains('save_exam_details'));
+      expect(encoded, contains('409'));
+      expect(encoded, contains('revision'));
+
+      final breadcrumb = options.beforeBreadcrumb!(
+        Breadcrumb(data: payload),
+        Hint(),
+      );
+      expect(jsonEncode(breadcrumb!.toJson()), isNot(contains('PRIVATE_')));
+    },
+  );
+
+  test(
     'request is rebuilt without userinfo, query, fragment, body, cookies or headers',
     () async {
       final options = _options();

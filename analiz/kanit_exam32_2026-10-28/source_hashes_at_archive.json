@@ -1,0 +1,20 @@
+{
+  "scope": "Current source at archival time. The per-run plan separately records exact SQL source hashes used by each historical run; Python runner evolved after earlier runs.",
+  "files": {
+    "supabase/proposed/32_exam_details_early_finish.sql": "cecd277c37a3f4e5dc9ac81e882f86107767439ef170ec34f1737f0b66e5b70d",
+    "supabase/proposed/32_exam_details_early_finish_down.sql": "2c61c379de8a97025dc174d4d1e5e2866e86cae9cb3d56ea2a7761819425d899",
+    "supabase/proposed/32_exam_details_early_finish_dryrun.sql": "a02f01c110c583d2db82c1417ccd29dae7ab391758ee7c498b4f28085e7cfdc4",
+    "supabase/proposed/32_exam_details_early_finish_README.md": "7ec451daef277dc1ef66eceb57dafbc1890e57272222d50fb11c9341b4f23c71",
+    "supabase/proposed/exam_catalog_32.json": "4422ef90733757276d45ad5ca8d1f86da7dfa6f80db67a7738854c79dbc73487",
+    "supabase/proposed/EXAM_API_CONTRACT.md": "7231277678a0d076b1ab1e04ad019dc9ee1de6e1d32504c62f0e68bb6d9d543d",
+    "tool/local_supabase/isolated32_check.py": "9c9c5cb6cb377395e40425c91dbab502ae2e897222d59e83646071aaf24e8505",
+    "tool/local_supabase/test_isolated32_check.py": "61d44ea1984ca950d7ca7e61c5dc1343144e5592963b4e674b7e867a9db81a8d",
+    "tool/local_supabase/parity_check_exam32.py": "2eaa276f4be3ec067e800310c9cb528c0947b23b0783153e9d8df253f56f4bd9",
+    "tool/local_supabase/parity/reviewed_exam32_20261028.json": "cbf39c44d22678ae8c2f89d0239bccd3af02cef326e352c0453bedfd9bb1e8fd",
+    "tool/local_supabase/test_parity_exam32.py": "799abef51fc1d9c66f92956e01c39b53c5423b4eca58d5bc7b8beced1c11bd45",
+    "tool/local_supabase/e2e/isolated32_stack.py": "899d0a03e9ec1c87e9ee1f03a8ceb44da01f1dfb0fb30f32d77e2d8e823fa897",
+    "tool/local_supabase/e2e/test_isolated32_stack.py": "ec8e3283488bd40b4a1a676b98503f58662d4eff09a840639bb3e7dcb126221e",
+    "tool/local_supabase/prepare_site32_clone.py": "19d19064fd4dfe0b08fda1266ff4dd9aa0a6f965a16f2b9ddb6e94870b92672f",
+    "tool/local_supabase/test_prepare_site32_clone.py": "d80c33119146481c429c3969cb85456b61d2a96f0bd808bb8c4bd426e3a090f7"
+  }
+}

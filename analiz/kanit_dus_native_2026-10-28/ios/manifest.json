@@ -1,0 +1,238 @@
+{
+  "schema_version": 1,
+  "files": [
+    {
+      "path": "official/native.log",
+      "source": "<TMP>/pomosprint_dus_ios_official_a1.log",
+      "source_sha256": "f47c4765aa3e771b4bf4b8e81f5337f34f377dead87fe521fc75cd1f8309b091",
+      "sha256": "431ea5af66f98033c43f63db5902e8d9f0c268790a26fc3873c90710379e934b",
+      "bytes": 1302,
+      "transformation": "portable paths and line breaks"
+    },
+    {
+      "path": "official/oracle.json",
+      "source": "<REPO>/build/verification_20261028/dus/ios/official-oracle-a1.json",
+      "source_sha256": "4db58ffe1c70573f586ee2bc73d6f58efecf021bb956a7f1b9f3c1fa98ca5789",
+      "sha256": "4db58ffe1c70573f586ee2bc73d6f58efecf021bb956a7f1b9f3c1fa98ca5789",
+      "bytes": 10179,
+      "transformation": "exact"
+    },
+    {
+      "path": "official/independent_sql.json",
+      "source": "<REPO>/build/verification_20261028/dus/ios/official-independent-sql-a1.json",
+      "source_sha256": "d4e98dca4d6f252f61f986ff9dc774762b5a384de04a5c93d4f0d121285b8334",
+      "sha256": "d4e98dca4d6f252f61f986ff9dc774762b5a384de04a5c93d4f0d121285b8334",
+      "bytes": 1994,
+      "transformation": "exact"
+    },
+    {
+      "path": "short/native.log",
+      "source": "<REPO>/build/verification_20261028/dus/ios/short-a1/native.log",
+      "source_sha256": "ce119fed7a7fde31bbce91f855cc2ebd984dd50afa0354c33c82ecb4439d6ff0",
+      "sha256": "00ee9cc64b4ca22eb96ca36730ac566da965fd5eef8bcd376c67c0ef181fccc2",
+      "bytes": 1979,
+      "transformation": "portable paths and line breaks"
+    },
+    {
+      "path": "short/status.json",
+      "source": "<REPO>/build/verification_20261028/dus/ios/short-a1/status.json",
+      "source_sha256": "c5c68075e880a039c7a0369bc188181b9282c60ac3f2d2bdc7e8b503de45330f",
+      "sha256": "c5c68075e880a039c7a0369bc188181b9282c60ac3f2d2bdc7e8b503de45330f",
+      "bytes": 4398,
+      "transformation": "exact"
+    },
+    {
+      "path": "short/parity-before.log",
+      "source": "<REPO>/build/verification_20261028/dus/ios/short-a1/parity-before.log",
+      "source_sha256": "9846ca0309cf084100fa78369e9e7b3d1a1432db412cd7f9404ac63a66b60562",
+      "sha256": "9846ca0309cf084100fa78369e9e7b3d1a1432db412cd7f9404ac63a66b60562",
+      "bytes": 126,
+      "transformation": "exact"
+    },
+    {
+      "path": "short/parity-after.log",
+      "source": "<REPO>/build/verification_20261028/dus/ios/short-a1/parity-after.log",
+      "source_sha256": "9846ca0309cf084100fa78369e9e7b3d1a1432db412cd7f9404ac63a66b60562",
+      "sha256": "9846ca0309cf084100fa78369e9e7b3d1a1432db412cd7f9404ac63a66b60562",
+      "bytes": 126,
+      "transformation": "exact"
+    },
+    {
+      "path": "short/oracle.json",
+      "source": "<REPO>/build/verification_20261028/dus/ios/short-a1/oracle.json",
+      "source_sha256": "d19f2dac29f69038a23ae4ec15811972d9b16693bccbed57c191d474495859e8",
+      "sha256": "d19f2dac29f69038a23ae4ec15811972d9b16693bccbed57c191d474495859e8",
+      "bytes": 14767,
+      "transformation": "exact"
+    },
+    {
+      "path": "short/independent_sql.json",
+      "source": "<REPO>/build/verification_20261028/dus/ios/short-a1/independent_sql.json",
+      "source_sha256": "d0c689ce1ad6245ada08986807523fb90e4acd11252bc782d7bff313c6f0fe88",
+      "sha256": "d0c689ce1ad6245ada08986807523fb90e4acd11252bc782d7bff313c6f0fe88",
+      "bytes": 2147,
+      "transformation": "exact"
+    },
+    {
+      "path": "official/screenshots/e2e-dus-abandoned-en.png",
+      "source": "<REPO>/build/verification_20261028/dus/ios/screenshots/e2e-dus-abandoned-en.png",
+      "source_sha256": "92f33370e8b59794df14ee71730138d9f8bfda8600925678c2d1348db7202080",
+      "sha256": "92f33370e8b59794df14ee71730138d9f8bfda8600925678c2d1348db7202080",
+      "bytes": 256348,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "official/screenshots/e2e-dus-abandoned-tr.png",
+      "source": "<REPO>/build/verification_20261028/dus/ios/screenshots/e2e-dus-abandoned-tr.png",
+      "source_sha256": "521aafc20084344455d554ea190c38aaae8d7aa17b03056f15a4eac103097754",
+      "sha256": "521aafc20084344455d554ea190c38aaae8d7aa17b03056f15a4eac103097754",
+      "bytes": 236384,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "official/screenshots/e2e-dus-catalog-en.png",
+      "source": "<REPO>/build/verification_20261028/dus/ios/screenshots/e2e-dus-catalog-en.png",
+      "source_sha256": "406b4f6ca53cfc99fa7dfb3da8af7433f18d7c1c937bdfde9dd98cc7d355ea6d",
+      "sha256": "406b4f6ca53cfc99fa7dfb3da8af7433f18d7c1c937bdfde9dd98cc7d355ea6d",
+      "bytes": 303449,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "official/screenshots/e2e-dus-catalog-tr.png",
+      "source": "<REPO>/build/verification_20261028/dus/ios/screenshots/e2e-dus-catalog-tr.png",
+      "source_sha256": "a94c94541bd05d1a449d6bd7dfe38884e3f2d2a37ed7b8bea702c6855aa1b4ef",
+      "sha256": "a94c94541bd05d1a449d6bd7dfe38884e3f2d2a37ed7b8bea702c6855aa1b4ef",
+      "bytes": 283230,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "official/screenshots/e2e-dus-running-en.png",
+      "source": "<REPO>/build/verification_20261028/dus/ios/screenshots/e2e-dus-running-en.png",
+      "source_sha256": "71f44b40dddaab6b1a66aba3e882f22617b9084c780a5f5cc2f73a4a5d5c81bf",
+      "sha256": "71f44b40dddaab6b1a66aba3e882f22617b9084c780a5f5cc2f73a4a5d5c81bf",
+      "bytes": 216710,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "official/screenshots/e2e-dus-running-tr.png",
+      "source": "<REPO>/build/verification_20261028/dus/ios/screenshots/e2e-dus-running-tr.png",
+      "source_sha256": "49e198051bbd3f956086deb37ab317c9d5b224a7697fbb94c3a8405d36f7791d",
+      "sha256": "49e198051bbd3f956086deb37ab317c9d5b224a7697fbb94c3a8405d36f7791d",
+      "bytes": 210522,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "short/screenshots/e2e-dus-short-catalog-en.png",
+      "source": "<REPO>/build/verification_20261028/dus/ios/screenshots/e2e-dus-short-catalog-en.png",
+      "source_sha256": "f655e3ec5e169d50e1880d1dfc78e399cbf45520eb8b3cb29cd144f6ebcb130a",
+      "sha256": "f655e3ec5e169d50e1880d1dfc78e399cbf45520eb8b3cb29cd144f6ebcb130a",
+      "bytes": 302619,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "short/screenshots/e2e-dus-short-catalog-tr.png",
+      "source": "<REPO>/build/verification_20261028/dus/ios/screenshots/e2e-dus-short-catalog-tr.png",
+      "source_sha256": "9f2e48c18d6aa2b599c41ef5dbf308f26a6f61f48a166b1e953b0ab50135bac4",
+      "sha256": "9f2e48c18d6aa2b599c41ef5dbf308f26a6f61f48a166b1e953b0ab50135bac4",
+      "bytes": 282108,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "short/screenshots/e2e-dus-short-details-en.png",
+      "source": "<REPO>/build/verification_20261028/dus/ios/screenshots/e2e-dus-short-details-en.png",
+      "source_sha256": "d33e552ca33d254d66949625b8acf34775d75c8bea76d97f75870d77974fb291",
+      "sha256": "d33e552ca33d254d66949625b8acf34775d75c8bea76d97f75870d77974fb291",
+      "bytes": 190897,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "short/screenshots/e2e-dus-short-details-tr.png",
+      "source": "<REPO>/build/verification_20261028/dus/ios/screenshots/e2e-dus-short-details-tr.png",
+      "source_sha256": "6d40e0f481683c1f4dc8a7b828fb1056139fcabc1f136ab69fe78d39ac262a39",
+      "sha256": "6d40e0f481683c1f4dc8a7b828fb1056139fcabc1f136ab69fe78d39ac262a39",
+      "bytes": 181468,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "short/screenshots/e2e-dus-short-history-en.png",
+      "source": "<REPO>/build/verification_20261028/dus/ios/screenshots/e2e-dus-short-history-en.png",
+      "source_sha256": "1d24faf81401cf4a5152a29d3a4b67d4047c954b4aeab4f9bbf99d8077e61c3a",
+      "sha256": "1d24faf81401cf4a5152a29d3a4b67d4047c954b4aeab4f9bbf99d8077e61c3a",
+      "bytes": 241007,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "short/screenshots/e2e-dus-short-history-tr.png",
+      "source": "<REPO>/build/verification_20261028/dus/ios/screenshots/e2e-dus-short-history-tr.png",
+      "source_sha256": "68d46d7e26e87b13025489d2c2d4d74dbce7ad66fcdcf4dc7f4041ae1eb0bbc9",
+      "sha256": "68d46d7e26e87b13025489d2c2d4d74dbce7ad66fcdcf4dc7f4041ae1eb0bbc9",
+      "bytes": 254151,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "short/screenshots/e2e-dus-short-report-en.png",
+      "source": "<REPO>/build/verification_20261028/dus/ios/screenshots/e2e-dus-short-report-en.png",
+      "source_sha256": "a0d45afbcf22d0a9b5962d72daaedeb8ede1b0b4c34d36da9d68d03c93650b08",
+      "sha256": "a0d45afbcf22d0a9b5962d72daaedeb8ede1b0b4c34d36da9d68d03c93650b08",
+      "bytes": 223887,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "short/screenshots/e2e-dus-short-report-tr.png",
+      "source": "<REPO>/build/verification_20261028/dus/ios/screenshots/e2e-dus-short-report-tr.png",
+      "source_sha256": "3d1de2185726df8953253c92ca65ff7bd40b9da34f3154c4662cac3a412bb311",
+      "sha256": "3d1de2185726df8953253c92ca65ff7bd40b9da34f3154c4662cac3a412bb311",
+      "bytes": 218351,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "short/screenshots/e2e-dus-short-running-en.png",
+      "source": "<REPO>/build/verification_20261028/dus/ios/screenshots/e2e-dus-short-running-en.png",
+      "source_sha256": "44872ffa41ff9300511f2c215b6b577144b0874fb992493ff1cb23cf99f0c010",
+      "sha256": "44872ffa41ff9300511f2c215b6b577144b0874fb992493ff1cb23cf99f0c010",
+      "bytes": 213926,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "short/screenshots/e2e-dus-short-running-tr.png",
+      "source": "<REPO>/build/verification_20261028/dus/ios/screenshots/e2e-dus-short-running-tr.png",
+      "source_sha256": "290fb06917465474f51719cd247d5cbc651d644b0bc77d4ec6a98b4fa46dba3e",
+      "sha256": "290fb06917465474f51719cd247d5cbc651d644b0bc77d4ec6a98b4fa46dba3e",
+      "bytes": 210632,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    }
+  ],
+  "self_hash_included": false
+}

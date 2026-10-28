@@ -12,6 +12,7 @@ class CompetitionTarget {
     'lgs',
     'yks',
     'tus',
+    'dus',
     'kpss',
     'language',
     'university',

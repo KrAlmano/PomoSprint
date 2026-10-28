@@ -993,6 +993,13 @@ class _PostAuthOnboardingScreenState extends State<PostAuthOnboardingScreen> {
         textColor,
       ),
       _optionButton(
+        l10n.onboardingSegmentDus,
+        _userSegment == 'dus',
+        () => _selectSegment('dus'),
+        isDark,
+        textColor,
+      ),
+      _optionButton(
         l10n.onboardingSegmentKpss,
         _userSegment == 'kpss',
         () => _selectSegment('kpss'),

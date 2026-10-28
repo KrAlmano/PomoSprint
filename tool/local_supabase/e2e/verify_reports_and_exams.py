@@ -23,6 +23,11 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 ROOT = Path(__file__).resolve().parents[3]
 DB = 'postgresql://postgres:postgres@127.0.0.1:54322/postgres'
+PROFILES = {
+    'main': (DB, 'http://127.0.0.1:54321', 'postgres'),
+    'review': ('postgresql://postgres:postgres@127.0.0.1:54322/pomosprint_review32_dus', 'http://127.0.0.1:54351', 'pomosprint_review32_dus'),
+    'site': ('postgresql://postgres:postgres@127.0.0.1:54322/pomosprint_site32_dus', 'http://127.0.0.1:54361', 'pomosprint_site32_dus'),
+}
 MAX_ROWS = 10000
 EXAM_CATEGORY = 'pomosprint:exam'
 QA_EMAIL = re.compile(r'^(?:e2e-sim-|qa-)[a-z0-9._+-]+@pomosprint\.local$')
@@ -61,15 +66,27 @@ def month_of(value):
     return date(local.year, local.month, 1).isoformat()
 
 
-def _local_guard():
-    if os.environ.get('LOCAL_DB_URL', DB) != DB:
+def _profile(value):
+    if value not in PROFILES:
+        raise VerificationError('unknown_fixed_database_profile')
+    return PROFILES[value]
+
+
+def _qa_email(email, owner, profile):
+    return bool(QA_EMAIL.fullmatch(email or '')) or (
+        profile == 'review' and email == f'review32-{owner}@pomosprint.local')
+
+
+def _local_guard(profile='main'):
+    db, api, _ = _profile(profile)
+    if os.environ.get('LOCAL_DB_URL', db) != db:
         raise VerificationError('only_fixed_loopback_database_allowed')
-    if os.environ.get('LOCAL_SUPABASE_URL', 'http://127.0.0.1:54321') != 'http://127.0.0.1:54321':
+    if os.environ.get('LOCAL_SUPABASE_URL', api) != api:
         raise VerificationError('only_fixed_loopback_api_allowed')
 
 
-def _psql(body):
-    _local_guard()
+def _psql(body, profile='main'):
+    _local_guard(profile)
     # A PGHOSTADDR/PGSERVICE inherited from another project must not redirect
     # libpq despite the fixed host in the URI. Do not inherit any PG routing,
     # password-file, service-file or option variables.
@@ -77,7 +94,7 @@ def _psql(body):
     env.update(PGOPTIONS='-c default_transaction_read_only=on -c statement_timeout=15000',
                PGCONNECT_TIMEOUT='5')
     try:
-        process = subprocess.run(['psql', DB, '-XqAt', '-v', 'ON_ERROR_STOP=1'],
+        process = subprocess.run(['psql', _profile(profile)[0], '-XqAt', '-v', 'ON_ERROR_STOP=1'],
                                  input=body, capture_output=True, text=True, timeout=20, env=env)
     except (OSError, subprocess.TimeoutExpired):
         raise VerificationError('local_database_unavailable') from None
@@ -91,7 +108,7 @@ def _psql(body):
         raise VerificationError('invalid_local_snapshot') from None
 
 
-def read_snapshot(owner):
+def read_snapshot(owner, profile='main'):
     owner = owner_uuid(owner)
     # Only a canonical UUID is interpolated. Every subquery is owner-scoped;
     # no password, token, friend code or unrelated account data is projected.
@@ -114,6 +131,8 @@ SELECT jsonb_build_object(
    WHERE s.user_id='{owner}' ORDER BY s.started_at,s.id LIMIT {MAX_ROWS+1})x),
  'attempts',(SELECT coalesce(jsonb_agg(to_jsonb(x)),'[]') FROM (
    SELECT * FROM public.exam_attempts WHERE user_id='{owner}' ORDER BY started_at,id LIMIT {MAX_ROWS+1})x),
+ 'attempt_payloads',(SELECT coalesce(jsonb_agg(public._exam_payload(x.id)),'[]') FROM (
+   SELECT id FROM public.exam_attempts WHERE user_id='{owner}' ORDER BY started_at,id LIMIT {MAX_ROWS+1})x),
  'results',(SELECT coalesce(jsonb_agg(to_jsonb(x)),'[]') FROM (
    SELECT r.* FROM public.exam_subject_results r JOIN public.exam_attempts a ON a.id=r.attempt_id
    WHERE a.user_id='{owner}' ORDER BY r.attempt_id,r.subject_id LIMIT {MAX_ROWS+1})x),
@@ -128,10 +147,10 @@ SELECT jsonb_build_object(
  'unlocks',(SELECT coalesce(jsonb_agg(to_jsonb(x)),'[]') FROM (
    SELECT avatar_id,coins_spent FROM public.avatar_unlocks WHERE user_id='{owner}' ORDER BY avatar_id LIMIT {MAX_ROWS+1})x));
 ROLLBACK;
-""")
+""", profile=profile)
 
 
-def check_peer_rls(owner, peer):
+def check_peer_rls(owner, peer, profile='main'):
     owner, peer = owner_uuid(owner), owner_uuid(peer)
     if owner == peer:
         raise VerificationError('rls_peer_must_differ')
@@ -140,9 +159,9 @@ def check_peer_rls(owner, peer):
       'emails',(SELECT jsonb_agg(email) FROM auth.users WHERE id IN('{owner}','{peer}')),
       'attempt_count',(SELECT count(*) FROM public.exam_attempts WHERE user_id='{owner}'),
       'result_count',(SELECT count(*) FROM public.exam_subject_results r JOIN public.exam_attempts a
-       ON a.id=r.attempt_id WHERE a.user_id='{owner}')); ROLLBACK;""")
+       ON a.id=r.attempt_id WHERE a.user_id='{owner}')); ROLLBACK;""", profile=profile)
     emails = pair.get('emails') if isinstance(pair, dict) else None
-    if not isinstance(emails, list) or len(emails) != 2 or not all(QA_EMAIL.fullmatch(x or '') for x in emails):
+    if not isinstance(emails, list) or len(emails) != 2 or not all(_qa_email(x,owner,profile) or _qa_email(x,peer,profile) for x in emails):
         raise VerificationError('rls_requires_two_local_qa_owners')
     if pair.get('attempt_count',0)<1 or pair.get('result_count',0)<1:
         raise VerificationError('rls_source_needs_exam_and_subject_rows')
@@ -154,7 +173,7 @@ SELECT jsonb_build_object('peer_exam_attempts_visible',
  'peer_subject_results_visible',(SELECT count(*) FROM public.exam_subject_results r
  JOIN public.exam_attempts a ON a.id=r.attempt_id WHERE a.user_id='{owner}'),
  'peer_wallets_visible',(SELECT count(*) FROM public.exam_wallets WHERE user_id='{owner}'));
-ROLLBACK;""")
+ROLLBACK;""", profile=profile)
 
 
 def _rounded_percentages(rows):
@@ -215,14 +234,15 @@ def _report(records, completed_runs, start, end, goal, today):
             'goal_progress_percentage': minutes*100//goal if goal > 0 else 0}
 
 
-def analyze_snapshot(snapshot, as_of=None, rls=None):
-    if not isinstance(snapshot, dict) or snapshot.get('database') != 'postgres':
+def analyze_snapshot(snapshot, as_of=None, rls=None, profile='main'):
+    if not isinstance(snapshot, dict) or snapshot.get('database') != _profile(profile)[2]:
         raise VerificationError('unexpected_database')
-    if not QA_EMAIL.fullmatch(snapshot.get('qa_email') or '') or not snapshot.get('profile'):
+    if not snapshot.get('profile') or not _qa_email(snapshot.get('qa_email'),snapshot['profile'].get('id'),profile):
         raise VerificationError('owner_is_not_named_local_qa')
     arrays = ('studies','attempts','results','runs','mappings','events','unlocks')
     if any(not isinstance(snapshot.get(k), list) or len(snapshot[k]) > MAX_ROWS for k in arrays):
         raise VerificationError('snapshot_row_limit_or_shape')
+    profile_name = profile
     profile = snapshot['profile']; owner = owner_uuid(profile['id'])
     zone = profile.get('timezone') or 'Europe/Istanbul'
     try:
@@ -236,6 +256,10 @@ def analyze_snapshot(snapshot, as_of=None, rls=None):
     check('schema.required_27_30',True,{'20261028010000','20261028020000','20261028030000','20261028040000'}<=set(snapshot.get('schema_versions',[])))
     check('schema.package31_not_installed',False,'20261028050000' in snapshot.get('schema_versions',[]))
     check('schema.marathon_before31','177a238a9aa8a4ffd3738b2865120568',snapshot.get('marathon_function_md5'))
+    is32='20261028060000' in snapshot.get('schema_versions',[])
+    payloads=snapshot.get('attempt_payloads')
+    if payloads is not None and (not isinstance(payloads,list) or len(payloads)>MAX_ROWS):
+        raise VerificationError('attempt_payload_limit_or_shape')
     studies=snapshot['studies']; attempts=snapshot['attempts']; results=snapshot['results']
     mappings=snapshot['mappings']; runs=snapshot['runs']; events=snapshot['events']
     for key, rows, fields in [('study_client_uuid',studies,('client_uuid',)),
@@ -249,7 +273,7 @@ def analyze_snapshot(snapshot, as_of=None, rls=None):
     by_study={s['id']:s for s in studies}; by_attempt={a['id']:a for a in attempts}
     by_mapping={m['study_session_id']:m for m in mappings}; by_run={r['client_uuid']:r for r in runs}
     per_day=Counter(workday(s.get('started_at') or s['completed_at'],zone) for s in studies)
-    records=[]; completed_runs={}; completed=[]
+    records=[]; completed_runs={}; completed=[]; completed_accounting={}
     for index, study in enumerate(studies):
         label=f'study[{index}]'; start=instant(study.get('started_at') or study['completed_at'])
         duration=int(study['duration_minutes']);end=instant(study['completed_at'])
@@ -277,16 +301,34 @@ def analyze_snapshot(snapshot, as_of=None, rls=None):
         label=f'exam[{index}]'; definition=attempt['definition'];start=instant(attempt['started_at'])
         end=instant(attempt['ends_at']);duration=int(definition['duration_seconds']);status=attempt['status']
         check(label+'.definition_id',attempt['exam_id'],definition['id'])
-        check(label+'.exact_interval_seconds',duration,int((end-start).total_seconds()))
+        check(label+'.positive_planned_duration',True,duration>0)
+        check(label+'.exact_interval_seconds',duration,(end-start).total_seconds())
         check(label+'.status',True,status in {'active','completed','abandoned'})
+        policy_version=definition.get('reward_policy_version',1)
+        check(label+'.known_snapshot_policy',True,type(policy_version) is int and policy_version in (1,2))
         if status=='completed':
-            check(label+'.finished_at',end.isoformat(),instant(attempt['finished_at']).isoformat())
-            check(label+'.elapsed_seconds',duration,attempt['elapsed_seconds'])
-            check(label+'.points',definition['reward_points'],attempt['points_earned'])
-            check(label+'.coins',definition['reward_coins'],attempt['exam_coins_earned'])
-            check(label+'.not_early',True,end<=observed)
+            finished=instant(attempt['finished_at']);early=finished<end
+            check(label+'.finished_range',True,start<=finished<=end)
+            check(label+'.completion_not_future',True,finished<=observed)
+            if early:
+                check(label+'.early_requires32',True,is32)
+                check(label+'.early_ayt_only','ayt',attempt['exam_id'])
+                elapsed=int((finished-start).total_seconds())
+                check(label+'.early_minimum_one_second',True,elapsed>=1)
+                expected_points=min(int(definition['reward_points']),elapsed//300)
+                expected_coins=min(int(definition['reward_coins']),int(definition['reward_coins'])*elapsed//duration)
+            else:
+                check(label+'.finished_at',end.isoformat(),finished.isoformat())
+                elapsed=duration
+                expected_points=int(definition['reward_points']);expected_coins=int(definition['reward_coins'])
+                check(label+'.not_early',True,end<=observed)
+            check(label+'.elapsed_seconds',elapsed,attempt['elapsed_seconds'])
+            check(label+'.points',expected_points,attempt['points_earned'])
+            check(label+'.coins',expected_coins,attempt['exam_coins_earned'])
             completed.append(attempt)
-            records.append({'id':attempt['id'],'kind':'exam','day':workday(start,zone),'minutes':duration//60,
+            completed_accounting[attempt['id']]={'elapsed':elapsed,'minutes':elapsed//60,'points':expected_points,
+                'coins':expected_coins,'finished':finished,'kind':'early' if early else 'full'}
+            records.append({'id':attempt['id'],'kind':'exam','day':workday(start,zone),'minutes':elapsed//60,
                             'category_id':EXAM_CATEGORY,'category_name':''})
         else:
             check(label+'.uncompleted_points',0,attempt['points_earned'])
@@ -298,6 +340,25 @@ def analyze_snapshot(snapshot, as_of=None, rls=None):
                 finished=instant(attempt['finished_at'])
                 check(label+'.abandoned_before_end',True,start<=finished<end)
                 check(label+'.abandoned_elapsed',int((finished-start).total_seconds()),attempt['elapsed_seconds'])
+    if payloads is not None:
+        projected={p['id']:p for p in payloads}
+        check('attempt_payloads.exact_ids',sorted(by_attempt),sorted(projected))
+        check('attempt_payloads.unique',len(payloads),len(projected))
+        for ident,a in by_attempt.items():
+            if ident not in projected:continue
+            p=projected[ident];label='payload['+ident+']';planned=int(a['definition']['duration_seconds'])
+            accounting=completed_accounting.get(ident)
+            check(label+'.duration_seconds',accounting['elapsed'] if accounting and is32 else planned,p.get('duration_seconds'))
+            check(label+'.elapsed_seconds',a['elapsed_seconds'],p.get('elapsed_seconds'))
+            check(label+'.snapshot_coins',a['definition']['reward_coins'],p.get('definition',{}).get('reward_coins'))
+            check(label+'.snapshot_points',a['definition']['reward_points'],p.get('definition',{}).get('reward_points'))
+            if is32:
+                check(label+'.planned_duration_seconds',planned,p.get('planned_duration_seconds'))
+                check(label+'.credited_minutes',accounting['minutes'] if accounting else 0,p.get('credited_minutes'))
+                check(label+'.completion_kind',accounting['kind'] if accounting else None,p.get('completion_kind'))
+                check(label+'.details_revision',a.get('details_revision',0),p.get('details_revision'))
+                # Do not expose private free text as expected/actual diagnostics.
+                check(label+'.private_metadata_preserved',True,all(p.get(k)==a.get(k) for k in ('title','note','selected_module_ids')))
     for index,result in enumerate(results):
         label=f'result[{index}]';attempt=by_attempt.get(result['attempt_id'])
         check(label+'.attempt_exists',True,attempt is not None)
@@ -333,18 +394,18 @@ def analyze_snapshot(snapshot, as_of=None, rls=None):
     for index,mapping in enumerate(mappings):
         check(f'mapping[{index}].study_exists',True,mapping['study_session_id'] in by_study)
         check(f'mapping[{index}].run_exists',True,mapping['marathon_uuid'] in by_run)
-    expected_minutes=sum(s['duration_minutes'] for s in studies)+sum(a['definition']['duration_seconds']//60 for a in completed)
+    expected_minutes=sum(s['duration_minutes'] for s in studies)+sum(a['minutes'] for a in completed_accounting.values())
     normal_points=sum(s['base_points']+s['bonus_points'] for s in studies)
     normal_coins=sum(20 for s in studies if s['base_points']>0)-sum(u['coins_spent'] for u in snapshot['unlocks'])
-    exam_points=sum(a['definition']['reward_points'] for a in completed)
-    exam_coins=sum(a['definition']['reward_coins'] for a in completed)
+    exam_points=sum(a['points'] for a in completed_accounting.values())
+    exam_coins=sum(a['coins'] for a in completed_accounting.values())
     wallet=snapshot['wallet'] or {'coins':0,'lifetime_points':0}
     check('profile.total_minutes',expected_minutes,profile['total_minutes'])
     check('profile.lifetime_points',normal_points,profile['lifetime_points'])
     check('profile.coins_after_avatar_spending',normal_coins,profile['coins'])
     check('exam_wallet.lifetime_points',exam_points,wallet['lifetime_points'])
     check('exam_wallet.coins',exam_coins,wallet['coins'])
-    activity_days=sorted({r['day'] for r in records});longest=0;current=0;previous=None
+    activity_days=sorted({r['day'] for r in records if r['minutes']>0});longest=0;current=0;previous=None
     for day in activity_days:
         current=current+1 if previous and day==previous+timedelta(days=1) else 1
         longest=max(longest,current);previous=day
@@ -363,8 +424,11 @@ def analyze_snapshot(snapshot, as_of=None, rls=None):
          'minutes':study['duration_minutes'],'completed_at':instant(study['completed_at']).isoformat(),
          'period_month':month_of(study['completed_at']),'study_day':workday(study.get('started_at') or study['completed_at'],zone).isoformat()}
     for attempt in completed:
-        expected_events[('exam',attempt['id'])]={'points':attempt['points_earned'],'minutes':attempt['definition']['duration_seconds']//60,
-         'completed_at':instant(attempt['ends_at']).isoformat(),'period_month':month_of(attempt['ends_at']),
+        accepted=completed_accounting[attempt['id']]
+        if accepted['minutes']<=0:
+            continue  #32 zero-minute completion counts once, but has no league event.
+        expected_events[('exam',attempt['id'])]={'points':accepted['points'],'minutes':accepted['minutes'],
+         'completed_at':accepted['finished'].isoformat(),'period_month':month_of(accepted['finished']),
          'study_day':workday(attempt['started_at'],zone).isoformat()}
     actual_events={(e['kind'],e['source_id']):{k:instant(e[k]).isoformat() if k=='completed_at' else e[k] for k in ('points','minutes','completed_at','period_month','study_day')} for e in events}
     check('competition_events.exact_sources_and_accounting',expected_events,actual_events)
@@ -391,6 +455,7 @@ def analyze_snapshot(snapshot, as_of=None, rls=None):
     return {'schema_version':1,'status':'PASS' if all(c['passed'] for c in checks) else 'FAIL',
      'owner_id':owner,'captured_at':observed.isoformat(),'as_of':now.isoformat(),'profile_time_zone':zone,
      'study_day':today.isoformat(),'scope':'fixed loopback read-only QA snapshot; accepted records only; pending device outbox is not in DB',
+     'database_profile':profile_name,'server_contract':'exam32' if is32 else 'exam28',
      'expected':{'economy':{'total_minutes':expected_minutes,'normal_points':normal_points,'normal_coins':normal_coins,
        'exam_points':exam_points,'exam_coins':exam_coins},'reconstructed_streak':{'current_streak':current,'longest_streak':longest,'last_study_date':last},
        'reports':{'daily':daily,'weekly':weekly,'monthly':monthly}},
@@ -405,10 +470,11 @@ def json_safe(value):
     return value
 
 
-def verify_owner(owner, as_of=None, peer=None):
-    snapshot=read_snapshot(owner)
-    rls=check_peer_rls(owner,peer) if peer else None
-    return json_safe(analyze_snapshot(snapshot,as_of=as_of,rls=rls))
+def verify_owner(owner, as_of=None, peer=None, profile='main'):
+    _profile(profile)
+    snapshot=read_snapshot(owner,profile=profile)
+    rls=check_peer_rls(owner,peer,profile=profile) if peer else None
+    return json_safe(analyze_snapshot(snapshot,as_of=as_of,rls=rls,profile=profile))
 
 
 def main():
@@ -416,9 +482,10 @@ def main():
     parser.add_argument('--owner',required=True,help='Canonical UUID of an e2e-sim-/qa- @pomosprint.local owner')
     parser.add_argument('--as-of',help='Offset-qualified instant used only to choose report calendar windows')
     parser.add_argument('--peer-owner',help='A second named local QA owner for authenticated read-isolation checks')
+    parser.add_argument('--profile',choices=PROFILES,default='main',help='Fixed main/review/site database only; no URL override')
     args=parser.parse_args()
     try:
-        result=verify_owner(args.owner,args.as_of,args.peer_owner)
+        result=verify_owner(args.owner,args.as_of,args.peer_owner,profile=args.profile)
     except (VerificationError,ValueError,KeyError,TypeError,OverflowError) as error:
         code=str(error) if isinstance(error,VerificationError) else 'invalid_snapshot_accounting_data'
         print(json.dumps({'schema_version':1,'status':'ERROR','error':code}))

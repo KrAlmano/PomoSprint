@@ -1,0 +1,12 @@
+{
+  "platform": "android",
+  "mode": "official",
+  "run": "dus-android-official-a1",
+  "source": "integration_test/ai_dus_native_test.dart",
+  "api_port": 54351,
+  "host_port": 54369,
+  "started_at": "2026-10-28T12:49:30.288485+00:00",
+  "log": "<TMP>/pomosprint_dus_android_official_a1.log",
+  "native_exit_code": 0,
+  "finished_at": "2026-10-28T12:50:49.574635+00:00"
+}

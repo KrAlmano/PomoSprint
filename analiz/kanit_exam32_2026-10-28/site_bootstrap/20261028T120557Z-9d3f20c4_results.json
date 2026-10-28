@@ -1,0 +1,73 @@
+{
+  "database": "pomosprint_site32_final",
+  "created": false,
+  "retained": true,
+  "mode": "read_only_verify",
+  "error": null,
+  "checks": [
+    {
+      "name": "pomosprint_overnight_baseline:required_owner_tables",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "pomosprint_overnight_baseline:zero_users_and_user_tables",
+      "ok": true,
+      "detail": {}
+    },
+    {
+      "name": "pomosprint_overnight_baseline:no_proposed27_to32",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "site_has_zero_users",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "site_has_zero_profiles",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "site_has_zero_attempts",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "site_has_zero_study_sessions",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "pomosprint_overnight_baseline:required_owner_tables",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "pomosprint_overnight_baseline:zero_users_and_user_tables",
+      "ok": true,
+      "detail": {}
+    },
+    {
+      "name": "pomosprint_overnight_baseline:no_proposed27_to32",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "source_remains_empty",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "site_exact_reviewed32_parity",
+      "ok": true,
+      "detail": "PASS isolated32 schema\nPASS isolated32 migrations\nPASS isolated32 catalog\nPASS isolated32 mail_trigger\nPASS isolated32 policy\n"
+    }
+  ],
+  "passed": 12,
+  "total": 12,
+  "users_copied": false,
+  "main_or_review_modified": false
+}

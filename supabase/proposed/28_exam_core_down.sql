@@ -3,6 +3,7 @@
 \quit
 BEGIN;
 DO $$ BEGIN
+ IF to_regclass('public.exam_extension_32_backup') IS NOT NULL THEN RAISE EXCEPTION 'exam_rollback_requires32_down_first';END IF;
  IF to_regclass('public.competition_policy') IS NOT NULL THEN RAISE EXCEPTION 'exam_rollback_requires_competition_down_first';END IF;
  IF EXISTS(SELECT 1 FROM public.exam_attempts) OR EXISTS(SELECT 1 FROM public.exam_wallets) THEN RAISE EXCEPTION 'exam_rollback_refused_existing_attempts';END IF;
 END $$;

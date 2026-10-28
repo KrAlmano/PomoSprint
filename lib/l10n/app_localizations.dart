@@ -5086,6 +5086,198 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Tüm hedeflerdeki kullanıcıların bu ay kazandığı normal odak puanları. Deneme puanları ayrı ligdedir; global görünüm ek ödül vermez.'**
   String get leagueGlobalScopeBody;
+
+  /// No description provided for @examFinishEarly.
+  ///
+  /// In tr, this message translates to:
+  /// **'AYT\'yi bitir'**
+  String get examFinishEarly;
+
+  /// No description provided for @examFinishEarlyTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'AYT\'yi erken bitirmek istiyor musun?'**
+  String get examFinishEarlyTitle;
+
+  /// No description provided for @examFinishEarlyBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bitirme isteğin sunucu tarafından kabul edildiğinde süre ve ödül kesinleşir. Ardından çözdüğün testleri seçip netlerini, başlığını ve notunu kaydedebilirsin.'**
+  String get examFinishEarlyBody;
+
+  /// No description provided for @examEarlyPendingTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Erken bitirme onayı bekleniyor'**
+  String get examEarlyPendingTitle;
+
+  /// No description provided for @examEarlyPendingBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'İsteğin bu cihazda saklandı. Süre ve ödül sunucu kabul ettiğinde kesinleşir; bağlantı geldiğinde tekrar gönderilir. O zamana kadar planlanan süre dolarsa tam süre kuralları uygulanır.'**
+  String get examEarlyPendingBody;
+
+  /// No description provided for @examEarlyUnavailable.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu sunucuda erken bitirme şu anda kullanılamıyor. Kaydın silinmedi; yeniden deneyebilir veya bağlantı durumunu kontrol edebilirsin.'**
+  String get examEarlyUnavailable;
+
+  /// No description provided for @examEarlyTooSoon.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bitirmeden önce en az bir saniye geçmeli. Yeniden deneyebilirsin.'**
+  String get examEarlyTooSoon;
+
+  /// No description provided for @examCompletedEarly.
+  ///
+  /// In tr, this message translates to:
+  /// **'Erken tamamlandı'**
+  String get examCompletedEarly;
+
+  /// No description provided for @examActualPlanned.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gerçek süre: {actual} · Planlanan: {planned}'**
+  String examActualPlanned(String actual, String planned);
+
+  /// No description provided for @examCreditedMinutes.
+  ///
+  /// In tr, this message translates to:
+  /// **'Rapora eklenen: {minutes} dk'**
+  String examCreditedMinutes(int minutes);
+
+  /// No description provided for @examSeconds.
+  ///
+  /// In tr, this message translates to:
+  /// **'{seconds} sn'**
+  String examSeconds(int seconds);
+
+  /// No description provided for @examDetailsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Deneme ayrıntıları ve netler'**
+  String get examDetailsTitle;
+
+  /// No description provided for @examTitleLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Deneme başlığı'**
+  String get examTitleLabel;
+
+  /// No description provided for @examNoteLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Not'**
+  String get examNoteLabel;
+
+  /// No description provided for @examSelectModules.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çözdüğün AYT testlerini seç'**
+  String get examSelectModules;
+
+  /// No description provided for @examModuleHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Net girmek için en az bir test seç. Başlık ve notunu net girmeden de kaydedebilirsin.'**
+  String get examModuleHint;
+
+  /// No description provided for @examModuleUnknown.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu kayıtta AYT test seçimi henüz yok.'**
+  String get examModuleUnknown;
+
+  /// No description provided for @examSelectedQuestions.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seçilen kapsam: {selected} / {total} soru'**
+  String examSelectedQuestions(int selected, int total);
+
+  /// No description provided for @examReligionAlternativeInfo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sosyal Bilimler-2\'de Din Kültürü / ek felsefe alanı toplam 6 sorudur; aynı alan iki kez sayılmaz.'**
+  String get examReligionAlternativeInfo;
+
+  /// No description provided for @examDetailsEdit.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ayrıntıları ve netleri düzenle'**
+  String get examDetailsEdit;
+
+  /// No description provided for @examDetailsSaved.
+  ///
+  /// In tr, this message translates to:
+  /// **'Deneme ayrıntıların ve netlerin kaydedildi.'**
+  String get examDetailsSaved;
+
+  /// No description provided for @examDetailsQueued.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ayrıntıların ve netlerin bu cihazda saklandı; bağlantı geldiğinde aynı istek gönderilecek.'**
+  String get examDetailsQueued;
+
+  /// No description provided for @examDetailsConflict.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu deneme başka bir yerde düzenlenmiş. Güncel kaydı yükle, değişikliklerini kontrol et ve tekrar kaydet.'**
+  String get examDetailsConflict;
+
+  /// No description provided for @examScopeConflict.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sonuçları kaydedilmiş bir testi seçimin dışına çıkaramazsın. Test seçimini ve girdiğin dersleri kontrol et.'**
+  String get examScopeConflict;
+
+  /// No description provided for @examDetailsInvalid.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başlık en fazla 120, not en fazla 2000 karakter olabilir. Başlık tek satır olmalı; test seçimini ve sonuçlarını da kontrol et.'**
+  String get examDetailsInvalid;
+
+  /// No description provided for @examDetailsReload.
+  ///
+  /// In tr, this message translates to:
+  /// **'Güncel kaydı yükle'**
+  String get examDetailsReload;
+
+  /// No description provided for @examDetailsPending.
+  ///
+  /// In tr, this message translates to:
+  /// **'Önceki kayıt isteğinin sonucu bekleniyor. Yeniden gönderebilir, sonucu aldıktan sonra düzenlemeye devam edebilirsin.'**
+  String get examDetailsPending;
+
+  /// No description provided for @examDefinitionUnsupported.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu AYT kaydının test yapısı tanınmıyor. Kaydın korundu; güncel sınav bilgisi için bağlantını kontrol et.'**
+  String get examDefinitionUnsupported;
+
+  /// No description provided for @examDetailsUnavailable.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu sunucuda başlık, not ve test seçimi düzenleme henüz kullanılamıyor.'**
+  String get examDetailsUnavailable;
+
+  /// No description provided for @examIntroEarly.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sınavını seç ve çalışmaya başla. AYT\'yi erken bitirebilir, ardından çözdüğün testleri ve netlerini kaydedebilirsin.'**
+  String get examIntroEarly;
+
+  /// No description provided for @examCharacterCount.
+  ///
+  /// In tr, this message translates to:
+  /// **'{current} / {maximum} karakter'**
+  String examCharacterCount(int current, int maximum);
+
+  /// No description provided for @onboardingSegmentDus.
+  ///
+  /// In tr, this message translates to:
+  /// **'DUS (Diş Hekimliğinde Uzmanlık)'**
+  String get onboardingSegmentDus;
 }
 
 class _AppLocalizationsDelegate

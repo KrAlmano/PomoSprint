@@ -11,6 +11,7 @@ class OnboardingSegmentIntentStore {
     'lgs',
     'yks',
     'tus',
+    'dus',
     'kpss',
     'language',
     'university',
@@ -29,7 +30,9 @@ class OnboardingSegmentIntentStore {
     String segment, {
     required bool Function() isCurrent,
   }) => _lock.synchronized(() async {
-    if (_retired.contains(owner) || !isCurrent() || !segments.contains(segment)) {
+    if (_retired.contains(owner) ||
+        !isCurrent() ||
+        !segments.contains(segment)) {
       return false;
     }
     final prefs = await SharedPreferences.getInstance();

@@ -1533,12 +1533,13 @@ class SupabaseService {
 
   /// Onboarding'in yazdığı hedefler; dışındaki değer (ör. "Diğer") null
   /// yazılır. Eski CHECK yeni hedefleri reddederse [completeOnboarding]
-  /// seçimi UID anahtarlı niyet kaydında korur. 26 KPSS/dil, 27 TUS desteği
+  /// seçimi UID anahtarlı niyet kaydında korur. 26 KPSS/dil, 27 TUS ve 32 DUS desteği
   /// geldikten sonraki profil yüklemesi bu tercihi bir kez yeniden dener.
   static const Set<String> validUserSegments = {
     'lgs',
     'yks',
     'tus',
+    'dus',
     'kpss',
     'language',
     'university',
@@ -1578,7 +1579,7 @@ class SupabaseService {
   }
 
   /// Hata, profiles_user_segment_check ihlali mi (23514)? Sunucu yeni hedefi
-  /// ('kpss', 'language', 'tus'; proposed/26 ve 27) henüz tanımıyor demektir.
+  /// ('kpss', 'language', 'tus', 'dus'; proposed/26, 27 ve 32) henüz tanımıyor demektir.
   @visibleForTesting
   static bool isUserSegmentCheckViolation(Object error) {
     final cause = error is ServiceException ? error.cause : error;

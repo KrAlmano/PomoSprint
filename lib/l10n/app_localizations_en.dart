@@ -3016,4 +3016,126 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get leagueGlobalScopeBody =>
       'This month’s focus points across all targets. Practice exam points have a separate league; the global view gives no additional reward.';
+
+  @override
+  String get examFinishEarly => 'Finish AYT';
+
+  @override
+  String get examFinishEarlyTitle => 'Finish AYT early?';
+
+  @override
+  String get examFinishEarlyBody =>
+      'Your time and reward are final only after the server accepts your request. Then select the tests you took and save your scores, title and note.';
+
+  @override
+  String get examEarlyPendingTitle => 'Waiting for early-finish confirmation';
+
+  @override
+  String get examEarlyPendingBody =>
+      'Your request is stored on this device. Time and reward become final when the server accepts it; it will retry when connected. If the planned time has elapsed by then, full-duration rules apply.';
+
+  @override
+  String get examEarlyUnavailable =>
+      'Early finish is currently unavailable on this server. Your record is preserved; retry or check your connection.';
+
+  @override
+  String get examEarlyTooSoon =>
+      'At least one second must elapse before finishing. You can retry.';
+
+  @override
+  String get examCompletedEarly => 'Completed early';
+
+  @override
+  String examActualPlanned(String actual, String planned) {
+    return 'Actual time: $actual · Planned: $planned';
+  }
+
+  @override
+  String examCreditedMinutes(int minutes) {
+    return 'Added to reports: $minutes min';
+  }
+
+  @override
+  String examSeconds(int seconds) {
+    return '$seconds sec';
+  }
+
+  @override
+  String get examDetailsTitle => 'Practice exam details and scores';
+
+  @override
+  String get examTitleLabel => 'Practice exam title';
+
+  @override
+  String get examNoteLabel => 'Note';
+
+  @override
+  String get examSelectModules => 'Select the AYT tests you took';
+
+  @override
+  String get examModuleHint =>
+      'Select at least one test to enter scores. You can also save a title or note without entering scores.';
+
+  @override
+  String get examModuleUnknown =>
+      'AYT tests have not been selected for this record yet.';
+
+  @override
+  String examSelectedQuestions(int selected, int total) {
+    return 'Selected scope: $selected / $total questions';
+  }
+
+  @override
+  String get examReligionAlternativeInfo =>
+      'The Religious Culture / additional philosophy section in Social Sciences-2 contains 6 questions in total; it is not counted twice.';
+
+  @override
+  String get examDetailsEdit => 'Edit details and scores';
+
+  @override
+  String get examDetailsSaved =>
+      'Your practice exam details and scores were saved.';
+
+  @override
+  String get examDetailsQueued =>
+      'Your details and scores are stored on this device; the same request will be sent when connected.';
+
+  @override
+  String get examDetailsConflict =>
+      'This practice exam was edited elsewhere. Load the latest record, review your changes and save again.';
+
+  @override
+  String get examScopeConflict =>
+      'You cannot remove a test with saved results. Check your selected tests and subjects.';
+
+  @override
+  String get examDetailsInvalid =>
+      'Use at most 120 characters for the title and 2000 for the note. Keep the title on one line, and check your tests and results.';
+
+  @override
+  String get examDetailsReload => 'Load latest record';
+
+  @override
+  String get examDetailsPending =>
+      'Your previous save is awaiting confirmation. Retry it, then continue editing after it is accepted.';
+
+  @override
+  String get examDefinitionUnsupported =>
+      'The test structure of this AYT record is not recognized. Your record is preserved; check your connection for current exam information.';
+
+  @override
+  String get examDetailsUnavailable =>
+      'Editing titles, notes and test selections is not available on this server yet.';
+
+  @override
+  String get examIntroEarly =>
+      'Choose an exam and start studying. You can finish AYT early, then record the tests you took and your scores.';
+
+  @override
+  String examCharacterCount(int current, int maximum) {
+    return '$current of $maximum characters';
+  }
+
+  @override
+  String get onboardingSegmentDus => 'DUS (Dental Specialty Exam)';
 }

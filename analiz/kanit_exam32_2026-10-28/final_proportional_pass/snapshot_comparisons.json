@@ -1,0 +1,20 @@
+{
+  "before32_empty → after_dryrun": {
+    "identical": true,
+    "before_sha256": "bbd4c39370b4a66a7a0b2933f2b8a5c593ea7a5979400ba652b930559d0256eb",
+    "after_sha256": "bbd4c39370b4a66a7a0b2933f2b8a5c593ea7a5979400ba652b930559d0256eb",
+    "hash_scope": "Canonical selected snapshot JSON: schema, all scoped row counts/hashes; sorted keys."
+  },
+  "before32_empty → after_empty_down": {
+    "identical": true,
+    "before_sha256": "bbd4c39370b4a66a7a0b2933f2b8a5c593ea7a5979400ba652b930559d0256eb",
+    "after_sha256": "bbd4c39370b4a66a7a0b2933f2b8a5c593ea7a5979400ba652b930559d0256eb",
+    "hash_scope": "Canonical selected snapshot JSON: schema, all scoped row counts/hashes; sorted keys."
+  },
+  "protected_down_before → protected_down_after": {
+    "identical": true,
+    "before_sha256": "4ec938b634f7a504667f186fa60b373d5851c2357bc8f75b16bb8038ad2f9d42",
+    "after_sha256": "4ec938b634f7a504667f186fa60b373d5851c2357bc8f75b16bb8038ad2f9d42",
+    "hash_scope": "Canonical selected snapshot JSON: schema, all scoped row counts/hashes; sorted keys."
+  }
+}

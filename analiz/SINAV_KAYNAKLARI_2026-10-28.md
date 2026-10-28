@@ -55,3 +55,23 @@ Rapordaki sosyal sayaç, yorum, ekip kimliği ve çıkış tarihi önerileri ger
 ## Uygulamadaki kategori eşlemesi (D-04)
 
 TUS Fizyoloji ile Histoloji/Embriyoloji, `Fizyoloji, Histoloji ve Embriyoloji` çalışma kategorisine; AYT edebiyatı `Edebiyat` ve `Türkçe` kategorilerine bağlanır. Birleşik kategorinin aynı dakika toplamı her ilgili net karşılaştırmasına bağlam olur; derslere paylaştırılmaz ve toplam çalışma süresini artırmaz. Arayüz bu yüzden “İlişkili çalışma kategorilerinde …” der. “Küçük Stajlar” için resmî ayrı soru kotası veya uydurma ders eşlemesi yoktur; yetersiz sonuç içgörü oluşturmaz. Bu eşleme resmî soru dağılımını değiştirmez; yalnız uygulamadaki çalışma kayıtlarıyla kişisel netleri ilişkilendirir.
+
+
+## DUS — 28 Ekim ek doğrulaması
+
+[ÖSYM 2026-DUS2. Dönem Başvuru Kılavuzu](https://dokuman.osym.gov.tr/web/2026/9/basvuru-kilavuzu-e1esxj-16163038.pdf), ÖSYM ana sayfasındaki2026-DUS2 başvuru kılavuzu bağlantısından alındı. PDF §1.3 standart oturumu150 dakika olarak verir; Tablo1 (basılıs.40/PDF43) toplam120 soruyu,40 Temel Bilimler ve80 Klinik Bilimler olarak listeler. Ham net doğru−yanlış/4'tür. PDF resmi kaynaktan indirilip Poppler metin çıkarımı ve tablo sayfasının görsel incelemesiyle kontrol edildi; [kaynak hash/boyut kaydı](kanit_dus_2026-10-28/dus_primary_source.json) korunur. Soru kitapçığı veya kılavuzun tümü repoya kopyalanmadı.
+
+| Temel alan | Standart soru |
+|---|---:|
+| Anatomi |6|
+| Histoloji ve Embriyoloji |4|
+| Fizyoloji |6|
+| Tıbbi Biyokimya |6|
+| Tıbbi Mikrobiyoloji |6|
+| Tıbbi Patoloji |4|
+| Tıbbi Farmakoloji |4|
+| Tıbbi Biyoloji ve Genetik |4|
+
+Klinik alanların her biri10 sorudur: Restoratif Diş Tedavisi; Protetik Diş Tedavisi; Ağız, Diş ve Çene Cerrahisi; Ağız, Diş ve Çene Radyolojisi; Periodontoloji; Ortodonti; Endodonti; Çocuk Diş Hekimliği (Pedodonti).
+
+Tablo **yaklaşık kapsamdır**; kılavuz, dağılımın test planına göre değişebileceğini belirtir. Uygulama bu standart deneme planını kullanır; gelecek her kitapçığın aynı dağılımda olacağını garanti etmez. Net ve odak puanı, ÖSYM'nin standartlaştırılmış yerleştirme puanı olarak sunulmaz. Özel ek süre/muafiyetler standart150 dakikaya otomatik eklenmez.

@@ -1,0 +1,662 @@
+{
+  "schema_version": 1,
+  "exams": [
+    {
+      "id": "tyt",
+      "name_tr": "TYT",
+      "name_en": "TYT",
+      "segment": "yks",
+      "group": "yks",
+      "duration_seconds": 9900,
+      "total_questions": 120,
+      "wrong_answer_divisor": 4,
+      "catalog_version": 1,
+      "reward_points": 33,
+      "reward_coins": 130,
+      "subjects": [
+        {
+          "id": "turkish",
+          "name_tr": "Türkçe",
+          "name_en": "Turkish",
+          "question_count": 40,
+          "category_keys": [
+            "Türkçe"
+          ]
+        },
+        {
+          "id": "mathematics",
+          "name_tr": "Temel Matematik",
+          "name_en": "Basic Mathematics",
+          "question_count": 40,
+          "category_keys": [
+            "Matematik"
+          ]
+        },
+        {
+          "id": "history",
+          "name_tr": "Tarih",
+          "name_en": "History",
+          "question_count": 5,
+          "category_keys": [
+            "Tarih"
+          ]
+        },
+        {
+          "id": "geography",
+          "name_tr": "Coğrafya",
+          "name_en": "Geography",
+          "question_count": 5,
+          "category_keys": [
+            "Coğrafya"
+          ]
+        },
+        {
+          "id": "philosophy",
+          "name_tr": "Felsefe",
+          "name_en": "Philosophy",
+          "question_count": 5,
+          "category_keys": [
+            "Felsefe"
+          ]
+        },
+        {
+          "id": "religion",
+          "name_tr": "Din Kültürü / İlave Felsefe",
+          "name_en": "Religious Culture / Additional Philosophy",
+          "question_count": 5,
+          "category_keys": [
+            "Din Kültürü"
+          ]
+        },
+        {
+          "id": "physics",
+          "name_tr": "Fizik",
+          "name_en": "Physics",
+          "question_count": 7,
+          "category_keys": [
+            "Fizik"
+          ]
+        },
+        {
+          "id": "chemistry",
+          "name_tr": "Kimya",
+          "name_en": "Chemistry",
+          "question_count": 7,
+          "category_keys": [
+            "Kimya"
+          ]
+        },
+        {
+          "id": "biology",
+          "name_tr": "Biyoloji",
+          "name_en": "Biology",
+          "question_count": 6,
+          "category_keys": [
+            "Biyoloji"
+          ]
+        }
+      ],
+      "reward_policy_version": 2
+    },
+    {
+      "id": "ayt",
+      "name_tr": "AYT",
+      "name_en": "AYT",
+      "segment": "yks",
+      "group": "yks",
+      "duration_seconds": 10800,
+      "total_questions": 160,
+      "wrong_answer_divisor": 4,
+      "catalog_version": 1,
+      "reward_points": 36,
+      "reward_coins": 145,
+      "subjects": [
+        {
+          "id": "literature",
+          "name_tr": "Türk Dili ve Edebiyatı",
+          "name_en": "Turkish Language and Literature",
+          "question_count": 24,
+          "category_keys": [
+            "Edebiyat",
+            "Türkçe"
+          ]
+        },
+        {
+          "id": "history_1",
+          "name_tr": "Tarih-1",
+          "name_en": "History-1",
+          "question_count": 10,
+          "category_keys": [
+            "Tarih"
+          ]
+        },
+        {
+          "id": "geography_1",
+          "name_tr": "Coğrafya-1",
+          "name_en": "Geography-1",
+          "question_count": 6,
+          "category_keys": [
+            "Coğrafya"
+          ]
+        },
+        {
+          "id": "history_2",
+          "name_tr": "Tarih-2",
+          "name_en": "History-2",
+          "question_count": 11,
+          "category_keys": [
+            "Tarih"
+          ]
+        },
+        {
+          "id": "geography_2",
+          "name_tr": "Coğrafya-2",
+          "name_en": "Geography-2",
+          "question_count": 11,
+          "category_keys": [
+            "Coğrafya"
+          ]
+        },
+        {
+          "id": "philosophy_group",
+          "name_tr": "Felsefe Grubu",
+          "name_en": "Philosophy Group",
+          "question_count": 12,
+          "category_keys": [
+            "Felsefe"
+          ]
+        },
+        {
+          "id": "religion",
+          "name_tr": "Din Kültürü / İlave Felsefe",
+          "name_en": "Religious Culture / Additional Philosophy",
+          "question_count": 6,
+          "category_keys": [
+            "Din Kültürü"
+          ]
+        },
+        {
+          "id": "mathematics",
+          "name_tr": "Matematik",
+          "name_en": "Mathematics",
+          "question_count": 40,
+          "category_keys": [
+            "Matematik"
+          ]
+        },
+        {
+          "id": "physics",
+          "name_tr": "Fizik",
+          "name_en": "Physics",
+          "question_count": 14,
+          "category_keys": [
+            "Fizik"
+          ]
+        },
+        {
+          "id": "chemistry",
+          "name_tr": "Kimya",
+          "name_en": "Chemistry",
+          "question_count": 13,
+          "category_keys": [
+            "Kimya"
+          ]
+        },
+        {
+          "id": "biology",
+          "name_tr": "Biyoloji",
+          "name_en": "Biology",
+          "question_count": 13,
+          "category_keys": [
+            "Biyoloji"
+          ]
+        }
+      ],
+      "reward_policy_version": 2,
+      "modules": [
+        {
+          "id": "turkish_social_1",
+          "name_tr": "Türk Dili ve Edebiyatı–Sosyal Bilimler-1",
+          "name_en": "Turkish Language and Literature–Social Sciences-1",
+          "subject_ids": [
+            "literature",
+            "history_1",
+            "geography_1"
+          ]
+        },
+        {
+          "id": "social_2",
+          "name_tr": "Sosyal Bilimler-2",
+          "name_en": "Social Sciences-2",
+          "subject_ids": [
+            "history_2",
+            "geography_2",
+            "philosophy_group",
+            "religion"
+          ]
+        },
+        {
+          "id": "mathematics",
+          "name_tr": "Matematik",
+          "name_en": "Mathematics",
+          "subject_ids": [
+            "mathematics"
+          ]
+        },
+        {
+          "id": "science",
+          "name_tr": "Fen Bilimleri",
+          "name_en": "Science",
+          "subject_ids": [
+            "physics",
+            "chemistry",
+            "biology"
+          ]
+        }
+      ],
+      "modules_version": 1
+    },
+    {
+      "id": "ydt",
+      "name_tr": "YDT",
+      "name_en": "YDT",
+      "segment": "yks",
+      "group": "yks",
+      "duration_seconds": 7200,
+      "total_questions": 80,
+      "wrong_answer_divisor": 4,
+      "catalog_version": 1,
+      "reward_points": 24,
+      "reward_coins": 95,
+      "subjects": [
+        {
+          "id": "foreign_language",
+          "name_tr": "Yabancı Dil",
+          "name_en": "Foreign Language",
+          "question_count": 80,
+          "category_keys": [
+            "İngilizce"
+          ]
+        }
+      ],
+      "reward_policy_version": 2
+    },
+    {
+      "id": "lgs_verbal",
+      "name_tr": "LGS Sözel",
+      "name_en": "LGS Verbal",
+      "segment": "lgs",
+      "group": "lgs",
+      "duration_seconds": 4500,
+      "total_questions": 50,
+      "wrong_answer_divisor": 3,
+      "catalog_version": 1,
+      "reward_points": 15,
+      "reward_coins": 60,
+      "subjects": [
+        {
+          "id": "turkish",
+          "name_tr": "Türkçe",
+          "name_en": "Turkish",
+          "question_count": 20,
+          "category_keys": [
+            "Türkçe"
+          ]
+        },
+        {
+          "id": "revolution_history",
+          "name_tr": "T.C. İnkılap Tarihi",
+          "name_en": "Turkish Revolution History",
+          "question_count": 10,
+          "category_keys": [
+            "T.C. İnkılap Tarihi"
+          ]
+        },
+        {
+          "id": "religion",
+          "name_tr": "Din Kültürü",
+          "name_en": "Religious Culture",
+          "question_count": 10,
+          "category_keys": [
+            "Din Kültürü"
+          ]
+        },
+        {
+          "id": "foreign_language",
+          "name_tr": "Yabancı Dil",
+          "name_en": "Foreign Language",
+          "question_count": 10,
+          "category_keys": [
+            "İngilizce"
+          ]
+        }
+      ],
+      "reward_policy_version": 2
+    },
+    {
+      "id": "lgs_quantitative",
+      "name_tr": "LGS Sayısal",
+      "name_en": "LGS Quantitative",
+      "segment": "lgs",
+      "group": "lgs",
+      "duration_seconds": 4800,
+      "total_questions": 40,
+      "wrong_answer_divisor": 3,
+      "catalog_version": 1,
+      "reward_points": 16,
+      "reward_coins": 70,
+      "subjects": [
+        {
+          "id": "mathematics",
+          "name_tr": "Matematik",
+          "name_en": "Mathematics",
+          "question_count": 20,
+          "category_keys": [
+            "Matematik"
+          ]
+        },
+        {
+          "id": "science",
+          "name_tr": "Fen Bilimleri",
+          "name_en": "Science",
+          "question_count": 20,
+          "category_keys": [
+            "Fen Bilimleri"
+          ]
+        }
+      ],
+      "reward_policy_version": 2
+    },
+    {
+      "id": "tus_basic",
+      "name_tr": "TUS Temel Tıp",
+      "name_en": "TUS Basic Medicine",
+      "segment": "tus",
+      "group": "tus",
+      "duration_seconds": 8100,
+      "total_questions": 100,
+      "wrong_answer_divisor": 4,
+      "catalog_version": 1,
+      "reward_points": 27,
+      "reward_coins": 110,
+      "subjects": [
+        {
+          "id": "anatomy",
+          "name_tr": "Anatomi",
+          "name_en": "Anatomy",
+          "question_count": 13,
+          "category_keys": [
+            "Anatomi"
+          ]
+        },
+        {
+          "id": "histology_embryology",
+          "name_tr": "Histoloji ve Embriyoloji",
+          "name_en": "Histology and Embryology",
+          "question_count": 7,
+          "category_keys": [
+            "Fizyoloji, Histoloji ve Embriyoloji"
+          ]
+        },
+        {
+          "id": "physiology",
+          "name_tr": "Fizyoloji",
+          "name_en": "Physiology",
+          "question_count": 8,
+          "category_keys": [
+            "Fizyoloji, Histoloji ve Embriyoloji"
+          ]
+        },
+        {
+          "id": "biochemistry",
+          "name_tr": "Biyokimya",
+          "name_en": "Biochemistry",
+          "question_count": 18,
+          "category_keys": [
+            "Biyokimya"
+          ]
+        },
+        {
+          "id": "microbiology",
+          "name_tr": "Mikrobiyoloji",
+          "name_en": "Microbiology",
+          "question_count": 18,
+          "category_keys": [
+            "Mikrobiyoloji"
+          ]
+        },
+        {
+          "id": "pathology",
+          "name_tr": "Patoloji",
+          "name_en": "Pathology",
+          "question_count": 18,
+          "category_keys": [
+            "Patoloji"
+          ]
+        },
+        {
+          "id": "pharmacology",
+          "name_tr": "Farmakoloji",
+          "name_en": "Pharmacology",
+          "question_count": 18,
+          "category_keys": [
+            "Farmakoloji"
+          ]
+        }
+      ],
+      "reward_policy_version": 2
+    },
+    {
+      "id": "tus_clinical",
+      "name_tr": "TUS Klinik Tıp",
+      "name_en": "TUS Clinical Medicine",
+      "segment": "tus",
+      "group": "tus",
+      "duration_seconds": 8100,
+      "total_questions": 100,
+      "wrong_answer_divisor": 4,
+      "catalog_version": 1,
+      "reward_points": 27,
+      "reward_coins": 110,
+      "subjects": [
+        {
+          "id": "internal_medicine_group",
+          "name_tr": "Dahiliye Grubu",
+          "name_en": "Internal Medicine Group",
+          "question_count": 35,
+          "category_keys": [
+            "Dahiliye"
+          ]
+        },
+        {
+          "id": "pediatrics",
+          "name_tr": "Pediatri",
+          "name_en": "Pediatrics",
+          "question_count": 25,
+          "category_keys": [
+            "Pediatri"
+          ]
+        },
+        {
+          "id": "surgery_group",
+          "name_tr": "Cerrahi Grubu",
+          "name_en": "Surgery Group",
+          "question_count": 30,
+          "category_keys": [
+            "Genel Cerrahi"
+          ]
+        },
+        {
+          "id": "obstetrics_gynecology",
+          "name_tr": "Kadın Hastalıkları ve Doğum",
+          "name_en": "Obstetrics and Gynecology",
+          "question_count": 10,
+          "category_keys": [
+            "Kadın Hastalıkları ve Doğum"
+          ]
+        }
+      ],
+      "reward_policy_version": 2
+    },
+    {
+      "id": "dus",
+      "name_tr": "DUS",
+      "name_en": "DUS",
+      "segment": "dus",
+      "group": "dus",
+      "duration_seconds": 9000,
+      "total_questions": 120,
+      "wrong_answer_divisor": 4,
+      "catalog_version": 1,
+      "reward_points": 30,
+      "reward_coins": 120,
+      "subjects": [
+        {
+          "id": "anatomy",
+          "name_tr": "Anatomi",
+          "name_en": "Anatomy",
+          "question_count": 6,
+          "category_keys": [
+            "Anatomi"
+          ]
+        },
+        {
+          "id": "histology_embryology",
+          "name_tr": "Histoloji ve Embriyoloji",
+          "name_en": "Histology and Embryology",
+          "question_count": 4,
+          "category_keys": [
+            "Histoloji ve Embriyoloji"
+          ]
+        },
+        {
+          "id": "physiology",
+          "name_tr": "Fizyoloji",
+          "name_en": "Physiology",
+          "question_count": 6,
+          "category_keys": [
+            "Fizyoloji"
+          ]
+        },
+        {
+          "id": "biochemistry",
+          "name_tr": "Tıbbi Biyokimya",
+          "name_en": "Medical Biochemistry",
+          "question_count": 6,
+          "category_keys": [
+            "Biyokimya"
+          ]
+        },
+        {
+          "id": "microbiology",
+          "name_tr": "Tıbbi Mikrobiyoloji",
+          "name_en": "Medical Microbiology",
+          "question_count": 6,
+          "category_keys": [
+            "Mikrobiyoloji"
+          ]
+        },
+        {
+          "id": "pathology",
+          "name_tr": "Tıbbi Patoloji",
+          "name_en": "Medical Pathology",
+          "question_count": 4,
+          "category_keys": [
+            "Patoloji"
+          ]
+        },
+        {
+          "id": "pharmacology",
+          "name_tr": "Tıbbi Farmakoloji",
+          "name_en": "Medical Pharmacology",
+          "question_count": 4,
+          "category_keys": [
+            "Farmakoloji"
+          ]
+        },
+        {
+          "id": "medical_biology_genetics",
+          "name_tr": "Tıbbi Biyoloji ve Genetik",
+          "name_en": "Medical Biology and Genetics",
+          "question_count": 4,
+          "category_keys": [
+            "Tıbbi Biyoloji ve Genetik"
+          ]
+        },
+        {
+          "id": "restorative_dentistry",
+          "name_tr": "Restoratif Diş Tedavisi",
+          "name_en": "Restorative Dentistry",
+          "question_count": 10,
+          "category_keys": [
+            "Restoratif Diş Tedavisi"
+          ]
+        },
+        {
+          "id": "prosthetic_dentistry",
+          "name_tr": "Protetik Diş Tedavisi",
+          "name_en": "Prosthodontics",
+          "question_count": 10,
+          "category_keys": [
+            "Protetik Diş Tedavisi"
+          ]
+        },
+        {
+          "id": "oral_maxillofacial_surgery",
+          "name_tr": "Ağız, Diş ve Çene Cerrahisi",
+          "name_en": "Oral and Maxillofacial Surgery",
+          "question_count": 10,
+          "category_keys": [
+            "Ağız, Diş ve Çene Cerrahisi"
+          ]
+        },
+        {
+          "id": "oral_maxillofacial_radiology",
+          "name_tr": "Ağız, Diş ve Çene Radyolojisi",
+          "name_en": "Oral and Maxillofacial Radiology",
+          "question_count": 10,
+          "category_keys": [
+            "Ağız, Diş ve Çene Radyolojisi"
+          ]
+        },
+        {
+          "id": "periodontology",
+          "name_tr": "Periodontoloji",
+          "name_en": "Periodontology",
+          "question_count": 10,
+          "category_keys": [
+            "Periodontoloji"
+          ]
+        },
+        {
+          "id": "orthodontics",
+          "name_tr": "Ortodonti",
+          "name_en": "Orthodontics",
+          "question_count": 10,
+          "category_keys": [
+            "Ortodonti"
+          ]
+        },
+        {
+          "id": "endodontics",
+          "name_tr": "Endodonti",
+          "name_en": "Endodontics",
+          "question_count": 10,
+          "category_keys": [
+            "Endodonti"
+          ]
+        },
+        {
+          "id": "pediatric_dentistry",
+          "name_tr": "Çocuk Diş Hekimliği",
+          "name_en": "Pediatric Dentistry",
+          "question_count": 10,
+          "category_keys": [
+            "Çocuk Diş Hekimliği"
+          ]
+        }
+      ],
+      "reward_policy_version": 2
+    }
+  ]
+}

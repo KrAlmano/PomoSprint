@@ -1730,5 +1730,81 @@
   "leagueTargetSave": "Hedefi kaydet",
   "leagueTargetSaveError": "Hedef kaydedilemedi. Bağlantını kontrol edip tekrar dene.",
   "leagueTargetOther": "Diğer",
-  "leagueGlobalScopeBody": "Tüm hedeflerdeki kullanıcıların bu ay kazandığı normal odak puanları. Deneme puanları ayrı ligdedir; global görünüm ek ödül vermez."
+  "leagueGlobalScopeBody": "Tüm hedeflerdeki kullanıcıların bu ay kazandığı normal odak puanları. Deneme puanları ayrı ligdedir; global görünüm ek ödül vermez.",
+  "examFinishEarly": "AYT'yi bitir",
+  "examFinishEarlyTitle": "AYT'yi erken bitirmek istiyor musun?",
+  "examFinishEarlyBody": "Bitirme isteğin sunucu tarafından kabul edildiğinde süre ve ödül kesinleşir. Ardından çözdüğün testleri seçip netlerini, başlığını ve notunu kaydedebilirsin.",
+  "examEarlyPendingTitle": "Erken bitirme onayı bekleniyor",
+  "examEarlyPendingBody": "İsteğin bu cihazda saklandı. Süre ve ödül sunucu kabul ettiğinde kesinleşir; bağlantı geldiğinde tekrar gönderilir. O zamana kadar planlanan süre dolarsa tam süre kuralları uygulanır.",
+  "examEarlyUnavailable": "Bu sunucuda erken bitirme şu anda kullanılamıyor. Kaydın silinmedi; yeniden deneyebilir veya bağlantı durumunu kontrol edebilirsin.",
+  "examEarlyTooSoon": "Bitirmeden önce en az bir saniye geçmeli. Yeniden deneyebilirsin.",
+  "examCompletedEarly": "Erken tamamlandı",
+  "examActualPlanned": "Gerçek süre: {actual} · Planlanan: {planned}",
+  "examCreditedMinutes": "Rapora eklenen: {minutes} dk",
+  "examSeconds": "{seconds} sn",
+  "examDetailsTitle": "Deneme ayrıntıları ve netler",
+  "examTitleLabel": "Deneme başlığı",
+  "examNoteLabel": "Not",
+  "examSelectModules": "Çözdüğün AYT testlerini seç",
+  "examModuleHint": "Net girmek için en az bir test seç. Başlık ve notunu net girmeden de kaydedebilirsin.",
+  "examModuleUnknown": "Bu kayıtta AYT test seçimi henüz yok.",
+  "examSelectedQuestions": "Seçilen kapsam: {selected} / {total} soru",
+  "examReligionAlternativeInfo": "Sosyal Bilimler-2'de Din Kültürü / ek felsefe alanı toplam 6 sorudur; aynı alan iki kez sayılmaz.",
+  "examDetailsEdit": "Ayrıntıları ve netleri düzenle",
+  "examDetailsSaved": "Deneme ayrıntıların ve netlerin kaydedildi.",
+  "examDetailsQueued": "Ayrıntıların ve netlerin bu cihazda saklandı; bağlantı geldiğinde aynı istek gönderilecek.",
+  "examDetailsConflict": "Bu deneme başka bir yerde düzenlenmiş. Güncel kaydı yükle, değişikliklerini kontrol et ve tekrar kaydet.",
+  "examScopeConflict": "Sonuçları kaydedilmiş bir testi seçimin dışına çıkaramazsın. Test seçimini ve girdiğin dersleri kontrol et.",
+  "examDetailsInvalid": "Başlık en fazla 120, not en fazla 2000 karakter olabilir. Başlık tek satır olmalı; test seçimini ve sonuçlarını da kontrol et.",
+  "examDetailsReload": "Güncel kaydı yükle",
+  "examDetailsPending": "Önceki kayıt isteğinin sonucu bekleniyor. Yeniden gönderebilir, sonucu aldıktan sonra düzenlemeye devam edebilirsin.",
+  "examDefinitionUnsupported": "Bu AYT kaydının test yapısı tanınmıyor. Kaydın korundu; güncel sınav bilgisi için bağlantını kontrol et.",
+  "examDetailsUnavailable": "Bu sunucuda başlık, not ve test seçimi düzenleme henüz kullanılamıyor.",
+  "@examActualPlanned": {
+    "placeholders": {
+      "actual": {
+        "type": "String"
+      },
+      "planned": {
+        "type": "String"
+      }
+    }
+  },
+  "@examCreditedMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "@examSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "@examSelectedQuestions": {
+    "placeholders": {
+      "selected": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "examIntroEarly": "Sınavını seç ve çalışmaya başla. AYT'yi erken bitirebilir, ardından çözdüğün testleri ve netlerini kaydedebilirsin.",
+  "examCharacterCount": "{current} / {maximum} karakter",
+  "@examCharacterCount": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "maximum": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingSegmentDus": "DUS (Diş Hekimliğinde Uzmanlık)"
 }

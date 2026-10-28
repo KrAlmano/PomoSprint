@@ -10,6 +10,7 @@ String competitionTargetLabel(AppLocalizations l10n, String segment) =>
       'lgs' => l10n.onboardingSegmentLgs,
       'yks' => l10n.onboardingSegmentYks,
       'tus' => l10n.onboardingSegmentTus,
+      'dus' => l10n.onboardingSegmentDus,
       'kpss' => l10n.onboardingSegmentKpss,
       'language' => l10n.onboardingSegmentLanguage,
       'university' => l10n.onboardingSegmentUniversity,

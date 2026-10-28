@@ -1,0 +1,101 @@
+{
+  "status": "PASS",
+  "database": "pomosprint_review32_dus",
+  "read_only": true,
+  "mode": "official",
+  "owner": "bd25332d-3a65-4122-ada3-17debd409bb4",
+  "email": "e2e-sim-dus-dus-android-official-a1@pomosprint.local",
+  "checks": [
+    {
+      "name": "exactly two native attempts",
+      "pass": true
+    },
+    {
+      "name": "no active attempts",
+      "pass": true
+    },
+    {
+      "name": "DUS profile accepted",
+      "pass": true
+    },
+    {
+      "name": "both aborted without reward",
+      "pass": true
+    },
+    {
+      "name": "unchanged official metadata",
+      "pass": true
+    },
+    {
+      "name": "full snapshot30points120sand",
+      "pass": true
+    },
+    {
+      "name": "no result rows",
+      "pass": true
+    },
+    {
+      "name": "zero minutes",
+      "pass": true
+    },
+    {
+      "name": "zero points",
+      "pass": true
+    },
+    {
+      "name": "zero sand",
+      "pass": true
+    },
+    {
+      "name": "zero streak",
+      "pass": true
+    },
+    {
+      "name": "zero exam_points",
+      "pass": true
+    },
+    {
+      "name": "zero exam_sand",
+      "pass": true
+    },
+    {
+      "name": "zero normal_count",
+      "pass": true
+    }
+  ],
+  "profile": {
+    "sand": 0,
+    "points": 0,
+    "streak": 0,
+    "minutes": 0,
+    "segment": "dus",
+    "exam_sand": 0,
+    "exam_points": 0,
+    "normal_count": 0,
+    "result_count": 0
+  },
+  "attempts": [
+    {
+      "id": "4ccdb705-ae7f-4798-b384-b1c4109ba0c1",
+      "status": "abandoned",
+      "elapsed_seconds": 5,
+      "planned_seconds": 9000,
+      "full_reward_points": 30,
+      "full_reward_sand": 120,
+      "earned_points": 0,
+      "earned_sand": 0,
+      "details_revision": 0
+    },
+    {
+      "id": "f4d57367-b0dd-43e6-976a-439f7906584a",
+      "status": "abandoned",
+      "elapsed_seconds": 5,
+      "planned_seconds": 9000,
+      "full_reward_points": 30,
+      "full_reward_sand": 120,
+      "earned_points": 0,
+      "earned_sand": 0,
+      "details_revision": 0
+    }
+  ]
+}

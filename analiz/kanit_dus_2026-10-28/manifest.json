@@ -1,0 +1,379 @@
+{
+  "version": 1,
+  "created_at_utc": "2026-10-28T12:51:37.227626+00:00",
+  "scope": "Local DUS SQL, read-only independent oracle, fixed-stack transition evidence. No native/UI results in this archive.",
+  "artifacts": [
+    {
+      "file": "sql/results.json",
+      "output_sha256": "1e46e7eeb5f8950e29801e1fc8e4be64ed40b2ea023a0288d45caa99735920ff",
+      "bytes": 14573,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "<REPO>/build/isolated32_dus/20261028T123844Z-5d4d6b09/results.json",
+      "source_sha256": "1e46e7eeb5f8950e29801e1fc8e4be64ed40b2ea023a0288d45caa99735920ff",
+      "source_bytes": 14573,
+      "source_mtime_utc": "2026-10-28T12:38:57.970268+00:00"
+    },
+    {
+      "file": "sql/plan.json",
+      "output_sha256": "7c1a25d8ceee5a4de33b93f60da6dbd145f0c67ffa803e63a44d8785ee350cab",
+      "bytes": 2543,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "<REPO>/build/isolated32_dus/20261028T123844Z-5d4d6b09/plan.json",
+      "source_sha256": "2580f8145c77859075c442664102cdff1f297d8ff5892fbc3d58c295a200ba25",
+      "source_bytes": 2840,
+      "source_mtime_utc": "2026-10-28T12:38:44.113165+00:00"
+    },
+    {
+      "file": "sql/completed_fixture_summary.json",
+      "output_sha256": "93dab15314febafeadb91618260dc99a93a7e960ac1e26c168224d5f9ec92fc0",
+      "bytes": 405,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "<REPO>/build/isolated32_dus/20261028T123844Z-5d4d6b09/completed_fixture_summary.json",
+      "source_sha256": "93dab15314febafeadb91618260dc99a93a7e960ac1e26c168224d5f9ec92fc0",
+      "source_bytes": 405,
+      "source_mtime_utc": "2026-10-28T12:38:57.969799+00:00"
+    },
+    {
+      "file": "sql/run.log",
+      "output_sha256": "998b400b45a5d054c761df54dfda5e9aded03d665aaf980444c0b6ed864df8b7",
+      "bytes": 5270,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "/tmp/pomosprint32_dus.log",
+      "source_sha256": "998b400b45a5d054c761df54dfda5e9aded03d665aaf980444c0b6ed864df8b7",
+      "source_bytes": 5270,
+      "source_mtime_utc": "2026-10-28T12:38:57.969689+00:00"
+    },
+    {
+      "file": "sql/snapshot_comparisons.json",
+      "output_sha256": "17924e8d7a3480523dbd9005b07967dadd76155ea32624c1a2c139b7018999e8",
+      "bytes": 2483,
+      "transformation": "Derived equality of canonical schema and scoped row-count/hash snapshots; raw SQL omitted",
+      "source": "<REPO>/build/isolated32_dus/20261028T123844Z-5d4d6b09/snapshots.json",
+      "source_sha256": "c33fadb8060dbc51e19bb91169bd46fac989734374f0314ab33ced9c93dfa984",
+      "source_bytes": 7035660,
+      "source_mtime_utc": "2026-10-28T12:38:57.809277+00:00"
+    },
+    {
+      "file": "site_empty_bootstrap/results.json",
+      "output_sha256": "5cc79e015544411b534a9acb587006f6f6971e01949457dd9e8270ef9ba2e4fe",
+      "bytes": 2821,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "<REPO>/build/site32_dus_bootstrap/20261028T123920Z-1d17a758/results.json",
+      "source_sha256": "5cc79e015544411b534a9acb587006f6f6971e01949457dd9e8270ef9ba2e4fe",
+      "source_bytes": 2821,
+      "source_mtime_utc": "2026-10-28T12:39:22.295791+00:00"
+    },
+    {
+      "file": "site_empty_bootstrap/plan.json",
+      "output_sha256": "e09ef9a3e2f07c255d5b0d753a7954cc7b2fb28f94d59070a03f2336ab44ee43",
+      "bytes": 1067,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "<REPO>/build/site32_dus_bootstrap/20261028T123920Z-1d17a758/plan.json",
+      "source_sha256": "e09ef9a3e2f07c255d5b0d753a7954cc7b2fb28f94d59070a03f2336ab44ee43",
+      "source_bytes": 1067,
+      "source_mtime_utc": "2026-10-28T12:39:20.689177+00:00"
+    },
+    {
+      "file": "site_empty_bootstrap/run.log",
+      "output_sha256": "a5af79053d05961ab4cdbdf17f0289ff63ef12fdbffc3b27c555b7d42795dfa2",
+      "bytes": 1068,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "/tmp/pomosprint_site32_dus_bootstrap.log",
+      "source_sha256": "70e23498ad9734c2e9b19493d2d54cb68eec509be204dd87bf0e7ff8c822fc23",
+      "source_bytes": 1101,
+      "source_mtime_utc": "2026-10-28T12:39:22.295895+00:00"
+    },
+    {
+      "file": "checks/infrastructure36.log",
+      "output_sha256": "7cef658ae7b7ed539baa6d0759b6958ccfeae9e6ea294825607c74b771aa82ba",
+      "bytes": 5342,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "/tmp/pomosprint_dus_infrastructure_tests.log",
+      "source_sha256": "7cef658ae7b7ed539baa6d0759b6958ccfeae9e6ea294825607c74b771aa82ba",
+      "source_bytes": 5342,
+      "source_mtime_utc": "2026-10-28T12:51:11.001535+00:00"
+    },
+    {
+      "file": "checks/oracle34.log",
+      "output_sha256": "e89a16cd87f88d88e850d270d148584367cc1e349f1144288a9420c594e4aa1f",
+      "bytes": 6503,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "/tmp/pomosprint_dus_oracle_tests.log",
+      "source_sha256": "e89a16cd87f88d88e850d270d148584367cc1e349f1144288a9420c594e4aa1f",
+      "source_bytes": 6503,
+      "source_mtime_utc": "2026-10-28T12:51:10.320469+00:00"
+    },
+    {
+      "file": "checks/review_parity.log",
+      "output_sha256": "9846ca0309cf084100fa78369e9e7b3d1a1432db412cd7f9404ac63a66b60562",
+      "bytes": 126,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "/tmp/pomosprint_dus_review_parity.log",
+      "source_sha256": "9846ca0309cf084100fa78369e9e7b3d1a1432db412cd7f9404ac63a66b60562",
+      "source_bytes": 126,
+      "source_mtime_utc": "2026-10-28T12:51:11.362786+00:00"
+    },
+    {
+      "file": "checks/site_parity.log",
+      "output_sha256": "9846ca0309cf084100fa78369e9e7b3d1a1432db412cd7f9404ac63a66b60562",
+      "bytes": 126,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "/tmp/pomosprint_dus_site_parity.log",
+      "source_sha256": "9846ca0309cf084100fa78369e9e7b3d1a1432db412cd7f9404ac63a66b60562",
+      "source_bytes": 126,
+      "source_mtime_utc": "2026-10-28T12:51:11.646680+00:00"
+    },
+    {
+      "file": "oracle_actual/00405be5-c06b-45c5-8827-49c13027a256.json",
+      "output_sha256": "baa1da3403db12674c23e48e097a343e7c4682742f8ff87070793a6b75446359",
+      "bytes": 15809,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "<REPO>/build/verification_20261028/dus_oracles_final/00405be5-c06b-45c5-8827-49c13027a256.json",
+      "source_sha256": "baa1da3403db12674c23e48e097a343e7c4682742f8ff87070793a6b75446359",
+      "source_bytes": 15809,
+      "source_mtime_utc": "2026-10-28T12:50:49.817014+00:00"
+    },
+    {
+      "file": "oracle_actual/26d414b2-ea62-4920-bc97-e44249b57e31.json",
+      "output_sha256": "32b4b76511b39f8f496f9f46e3fc189c42f9c171ea75431f60d8eb564cf4b023",
+      "bytes": 15799,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "<REPO>/build/verification_20261028/dus_oracles_final/26d414b2-ea62-4920-bc97-e44249b57e31.json",
+      "source_sha256": "32b4b76511b39f8f496f9f46e3fc189c42f9c171ea75431f60d8eb564cf4b023",
+      "source_bytes": 15799,
+      "source_mtime_utc": "2026-10-28T12:50:49.850571+00:00"
+    },
+    {
+      "file": "oracle_actual/334ea36e-b88d-4ef3-a69c-0e6797ddeb76.json",
+      "output_sha256": "15018512a0cd30ddf56bddafe8e0ca3cfa57cb497e8a1cca8b23a76017c51c45",
+      "bytes": 13590,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "<REPO>/build/verification_20261028/dus_oracles_final/334ea36e-b88d-4ef3-a69c-0e6797ddeb76.json",
+      "source_sha256": "15018512a0cd30ddf56bddafe8e0ca3cfa57cb497e8a1cca8b23a76017c51c45",
+      "source_bytes": 13590,
+      "source_mtime_utc": "2026-10-28T12:50:49.889555+00:00"
+    },
+    {
+      "file": "oracle_actual/35cb1de7-99dc-4ca9-b797-6859f4b64cf2.json",
+      "output_sha256": "33fdfa3803ddc8d7fb9fcba5d0038067c5e07719a5fba864cd648bdc5839a426",
+      "bytes": 15831,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "<REPO>/build/verification_20261028/dus_oracles_final/35cb1de7-99dc-4ca9-b797-6859f4b64cf2.json",
+      "source_sha256": "33fdfa3803ddc8d7fb9fcba5d0038067c5e07719a5fba864cd648bdc5839a426",
+      "source_bytes": 15831,
+      "source_mtime_utc": "2026-10-28T12:50:49.939631+00:00"
+    },
+    {
+      "file": "oracle_actual/5e842475-ab0b-43d1-b5a6-3272a827169e.json",
+      "output_sha256": "0245ac98ad2968a3d6ca1e286da6e283fb83e1081ab348026650bd8d9d02b87f",
+      "bytes": 14969,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "<REPO>/build/verification_20261028/dus_oracles_final/5e842475-ab0b-43d1-b5a6-3272a827169e.json",
+      "source_sha256": "0245ac98ad2968a3d6ca1e286da6e283fb83e1081ab348026650bd8d9d02b87f",
+      "source_bytes": 14969,
+      "source_mtime_utc": "2026-10-28T12:50:49.973900+00:00"
+    },
+    {
+      "file": "oracle_actual/601e099c-cd0b-44c7-8775-885382cc6490.json",
+      "output_sha256": "8dc6c6fedd8f2dee1cb501f46669a644143f387a0cbb07f0606f5b1dc0437120",
+      "bytes": 15853,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "<REPO>/build/verification_20261028/dus_oracles_final/601e099c-cd0b-44c7-8775-885382cc6490.json",
+      "source_sha256": "8dc6c6fedd8f2dee1cb501f46669a644143f387a0cbb07f0606f5b1dc0437120",
+      "source_bytes": 15853,
+      "source_mtime_utc": "2026-10-28T12:50:50.005586+00:00"
+    },
+    {
+      "file": "oracle_actual/76493d9c-db55-4d2c-8e20-5900601e1fc4.json",
+      "output_sha256": "a701949913cc4210162b9e189333243aa03c7561c2a0e2c5ef5ab7dfe5d9cabb",
+      "bytes": 17922,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "<REPO>/build/verification_20261028/dus_oracles_final/76493d9c-db55-4d2c-8e20-5900601e1fc4.json",
+      "source_sha256": "a701949913cc4210162b9e189333243aa03c7561c2a0e2c5ef5ab7dfe5d9cabb",
+      "source_bytes": 17922,
+      "source_mtime_utc": "2026-10-28T12:50:50.037400+00:00"
+    },
+    {
+      "file": "oracle_actual/77fd5dbe-199a-4626-aed1-ee6b3aa463d6.json",
+      "output_sha256": "3c01e6d27bac83baaa8bf7bab3411214d5387eb4b98bb9f93a1e8a6a46837c4d",
+      "bytes": 13584,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "<REPO>/build/verification_20261028/dus_oracles_final/77fd5dbe-199a-4626-aed1-ee6b3aa463d6.json",
+      "source_sha256": "3c01e6d27bac83baaa8bf7bab3411214d5387eb4b98bb9f93a1e8a6a46837c4d",
+      "source_bytes": 13584,
+      "source_mtime_utc": "2026-10-28T12:50:50.067311+00:00"
+    },
+    {
+      "file": "oracle_actual/7984d0da-59a3-4818-9466-af30b87e0b88.json",
+      "output_sha256": "0e6e07237eeb777bd608850d285793c266a7a6e54be27728aa10ab870432b5e0",
+      "bytes": 15811,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "<REPO>/build/verification_20261028/dus_oracles_final/7984d0da-59a3-4818-9466-af30b87e0b88.json",
+      "source_sha256": "0e6e07237eeb777bd608850d285793c266a7a6e54be27728aa10ab870432b5e0",
+      "source_bytes": 15811,
+      "source_mtime_utc": "2026-10-28T12:50:50.097775+00:00"
+    },
+    {
+      "file": "oracle_actual/8eb15e59-4190-49ea-8717-cd36ce27941f.json",
+      "output_sha256": "85d194b837c84be4610514e01dcd6401deeb673fa1b0d4f80e6b22d3c291a3c1",
+      "bytes": 15821,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "<REPO>/build/verification_20261028/dus_oracles_final/8eb15e59-4190-49ea-8717-cd36ce27941f.json",
+      "source_sha256": "85d194b837c84be4610514e01dcd6401deeb673fa1b0d4f80e6b22d3c291a3c1",
+      "source_bytes": 15821,
+      "source_mtime_utc": "2026-10-28T12:50:50.131731+00:00"
+    },
+    {
+      "file": "oracle_actual/bca0077d-8420-4d1b-b3da-23dab212eedb.json",
+      "output_sha256": "354b60bf4047ca2efce1ddff74ecb81416b19ea72f5cc5cd0e43cc510fb6588f",
+      "bytes": 15829,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "<REPO>/build/verification_20261028/dus_oracles_final/bca0077d-8420-4d1b-b3da-23dab212eedb.json",
+      "source_sha256": "354b60bf4047ca2efce1ddff74ecb81416b19ea72f5cc5cd0e43cc510fb6588f",
+      "source_bytes": 15829,
+      "source_mtime_utc": "2026-10-28T12:50:50.162637+00:00"
+    },
+    {
+      "file": "oracle_actual/c2fb167e-1fd0-4b8c-ba7d-1d514459b20f.json",
+      "output_sha256": "8d71fcba00f40fb3c4da7c1ca85bd6e9d3265df8f4eadffcdcb4670407f75ff2",
+      "bytes": 15878,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "<REPO>/build/verification_20261028/dus_oracles_final/c2fb167e-1fd0-4b8c-ba7d-1d514459b20f.json",
+      "source_sha256": "8d71fcba00f40fb3c4da7c1ca85bd6e9d3265df8f4eadffcdcb4670407f75ff2",
+      "source_bytes": 15878,
+      "source_mtime_utc": "2026-10-28T12:50:50.198256+00:00"
+    },
+    {
+      "file": "oracle_actual/d19bf680-3ae0-4104-9277-803c7f1b7190.json",
+      "output_sha256": "1ab4ae02651477eb79ded2b9d346be318a99738efdce4c456a5342f62806500a",
+      "bytes": 15821,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "<REPO>/build/verification_20261028/dus_oracles_final/d19bf680-3ae0-4104-9277-803c7f1b7190.json",
+      "source_sha256": "1ab4ae02651477eb79ded2b9d346be318a99738efdce4c456a5342f62806500a",
+      "source_bytes": 15821,
+      "source_mtime_utc": "2026-10-28T12:50:50.230245+00:00"
+    },
+    {
+      "file": "oracle_actual/e263ede9-6940-4077-ab67-138faa6a08ce.json",
+      "output_sha256": "5749369edc6bf3a88b7c875bea6ba9f9755dffd88eab3314b9cb167c53202b41",
+      "bytes": 15815,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "<REPO>/build/verification_20261028/dus_oracles_final/e263ede9-6940-4077-ab67-138faa6a08ce.json",
+      "source_sha256": "5749369edc6bf3a88b7c875bea6ba9f9755dffd88eab3314b9cb167c53202b41",
+      "source_bytes": 15815,
+      "source_mtime_utc": "2026-10-28T12:50:50.264313+00:00"
+    },
+    {
+      "file": "oracle_actual/e44e2c6f-daf3-4c50-9e5d-f7c6b02a7b63.json",
+      "output_sha256": "81ebe9a6099d2c60b8fa735f61fa7a98aaf3c75e774e43db6abb310e6d8993d7",
+      "bytes": 15868,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "<REPO>/build/verification_20261028/dus_oracles_final/e44e2c6f-daf3-4c50-9e5d-f7c6b02a7b63.json",
+      "source_sha256": "81ebe9a6099d2c60b8fa735f61fa7a98aaf3c75e774e43db6abb310e6d8993d7",
+      "source_bytes": 15868,
+      "source_mtime_utc": "2026-10-28T12:50:50.301764+00:00"
+    },
+    {
+      "file": "oracle_actual/e9f79645-c9bd-4b62-8dd4-b7c762017a45.json",
+      "output_sha256": "5d835c84c5c905e269d09c72f9683283c08a3791c3bf3d41c6ec90c3a23d3d8a",
+      "bytes": 15831,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "<REPO>/build/verification_20261028/dus_oracles_final/e9f79645-c9bd-4b62-8dd4-b7c762017a45.json",
+      "source_sha256": "5d835c84c5c905e269d09c72f9683283c08a3791c3bf3d41c6ec90c3a23d3d8a",
+      "source_bytes": 15831,
+      "source_mtime_utc": "2026-10-28T12:50:50.334726+00:00"
+    },
+    {
+      "file": "oracle_actual/ffa14bbe-9b9e-46ab-8201-cff898f46ee4.json",
+      "output_sha256": "0b0dd335bc602b18d6d1bedd3c78b4321466645a82437b7b13e5d77c40a4d63c",
+      "bytes": 15835,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "<REPO>/build/verification_20261028/dus_oracles_final/ffa14bbe-9b9e-46ab-8201-cff898f46ee4.json",
+      "source_sha256": "0b0dd335bc602b18d6d1bedd3c78b4321466645a82437b7b13e5d77c40a4d63c",
+      "source_bytes": 15835,
+      "source_mtime_utc": "2026-10-28T12:50:50.365397+00:00"
+    },
+    {
+      "file": "oracle_actual/peer_rls.json",
+      "output_sha256": "75a3b4d5a5393399cb0c3edb08abacf8b345cdecabe7e49df6ed4da9e74674e1",
+      "bytes": 18293,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "<REPO>/build/verification_20261028/dus_oracles_final/peer_rls.json",
+      "source_sha256": "75a3b4d5a5393399cb0c3edb08abacf8b345cdecabe7e49df6ed4da9e74674e1",
+      "source_bytes": 18293,
+      "source_mtime_utc": "2026-10-28T12:50:50.489670+00:00"
+    },
+    {
+      "file": "oracle_actual/summary.json",
+      "output_sha256": "02bebd0e822475b424eb045f38056a187b2226fcdb965a34b1718a90d3682c58",
+      "bytes": 4195,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "<REPO>/build/verification_20261028/dus_oracles_final/summary.json",
+      "source_sha256": "02bebd0e822475b424eb045f38056a187b2226fcdb965a34b1718a90d3682c58",
+      "source_bytes": 4195,
+      "source_mtime_utc": "2026-10-28T12:50:50.365720+00:00"
+    },
+    {
+      "file": "transition/old_site_cleanup.json",
+      "output_sha256": "5969bb22e02337425c5dd9057e55f787dbcf58b3bbb656585ec25477a4e64db2",
+      "bytes": 6323,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "<REPO>/build/verification_20261028/site_demo_site-oct28_cleanup.json",
+      "source_sha256": "5969bb22e02337425c5dd9057e55f787dbcf58b3bbb656585ec25477a4e64db2",
+      "source_bytes": 6323,
+      "source_mtime_utc": "2026-10-28T12:45:15.271627+00:00"
+    },
+    {
+      "file": "transition/dus_stack_transition.json",
+      "output_sha256": "00ee497b6bff90f49551110a2ab233a6d628d6c87e7d9acc227a462d500c6096",
+      "bytes": 1532,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "<REPO>/build/verification_20261028/dus_stack_transition.json",
+      "source_sha256": "00ee497b6bff90f49551110a2ab233a6d628d6c87e7d9acc227a462d500c6096",
+      "source_bytes": 1532,
+      "source_mtime_utc": "2026-10-28T12:45:55.178480+00:00"
+    },
+    {
+      "file": "transition/isolated32_dus_stack_startup_state.json",
+      "output_sha256": "87148db0244c7953cf25d01478775855ca4fb52da99ba2b52985792552cbb66f",
+      "bytes": 1119,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "<REPO>/build/verification_20261028/isolated32_dus_stack/state.json",
+      "source_sha256": "87148db0244c7953cf25d01478775855ca4fb52da99ba2b52985792552cbb66f",
+      "source_bytes": 1119,
+      "source_mtime_utc": "2026-10-28T12:45:43.100770+00:00"
+    },
+    {
+      "file": "transition/site32_dus_stack_startup_state.json",
+      "output_sha256": "e90e89543766fceaa12790a6f1f765d9a9bd8f2eddcdb2aabc1b8ebc2466107a",
+      "bytes": 1103,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "<REPO>/build/verification_20261028/site32_dus_stack/state.json",
+      "source_sha256": "e90e89543766fceaa12790a6f1f765d9a9bd8f2eddcdb2aabc1b8ebc2466107a",
+      "source_bytes": 1103,
+      "source_mtime_utc": "2026-10-28T12:45:44.496697+00:00"
+    },
+    {
+      "file": "catalog/exam_catalog_32.json",
+      "output_sha256": "568e2aacc003405f8116874c7210b01a7ab8227e03f1906ddac15acc23a38cc2",
+      "bytes": 16765,
+      "transformation": "JSON reformat/root path -> <REPO>, or log text path substitution; values retained",
+      "source": "<REPO>/supabase/proposed/exam_catalog_32.json",
+      "source_sha256": "568e2aacc003405f8116874c7210b01a7ab8227e03f1906ddac15acc23a38cc2",
+      "source_bytes": 16765,
+      "source_mtime_utc": "2026-10-28T12:38:34.788942+00:00"
+    },
+    {
+      "file": "source_hashes.json",
+      "output_sha256": "6318ea88c7327e865c56c63b878e24072acd7a7219b32b7f66c1dc73cdd2c16e",
+      "bytes": 2862,
+      "transformation": "Derived summary"
+    },
+    {
+      "file": "official_source.json",
+      "output_sha256": "35826d476c8b47caa2a3ad0851664e85991ed49f200831de6d4218fb1658fc65",
+      "bytes": 486,
+      "transformation": "Derived summary"
+    }
+  ]
+}

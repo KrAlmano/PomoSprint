@@ -1,0 +1,251 @@
+{
+  "database": "pomosprint_review32",
+  "clone_created": true,
+  "clone_retained": true,
+  "error": "Expecting value: line 1 column 1 (char 0)",
+  "passed": 45,
+  "total": 45,
+  "checks": [
+    {
+      "name": "pomosprint_overnight_baseline:required_owner_tables",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "pomosprint_overnight_baseline:zero_users_and_user_tables",
+      "ok": true,
+      "detail": {}
+    },
+    {
+      "name": "pomosprint_overnight_baseline:no_proposed27_to32",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "new_clone_name_unused",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "pomosprint_review32:required_owner_tables",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "pomosprint_review32:zero_users_and_user_tables",
+      "ok": true,
+      "detail": {}
+    },
+    {
+      "name": "pomosprint_review32:no_proposed27_to32",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "clone_matches_empty_source",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "installed:27_tus_segment.sql",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "installed:28_exam_core.sql",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "installed:29_monthly_competitions.sql",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "installed:30_session_start_atomic.sql",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "31_absent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "expected_rejection:DRYRUN_RESULT",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "dryrun_all_true",
+      "ok": true,
+      "detail": {
+        "D12 helpers private": true,
+        "D04 exact full coins": true,
+        "D06 four AYT modules": true,
+        "D09 wallets unchanged": true,
+        "D13 owner RPC granted": true,
+        "D02 migration31 absent": true,
+        "D01 migration32 present": true,
+        "D14 columns owner-read only": true,
+        "D11 private backup and policy": true,
+        "D08 existing attempts unchanged": true,
+        "D10 competition events unchanged": true,
+        "D05 all question versions remain1": true,
+        "D03 seven exam definitions preserved": true,
+        "D07 existing profile count unchanged": true
+      }
+    },
+    {
+      "name": "dryrun_no_changes",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "empty_install_down_exact",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "old_active_raw_snapshot_unchanged",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "old_completed_ledger_unchanged",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "old_completed_full_reward7",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "exact_new_catalog",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "pending_capabilities_disabled",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "candidate_capability_enabled",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "full_reward:lgs_verbal",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "full_duplicate:lgs_verbal",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "full_reward:tyt",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "full_duplicate:tyt",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "full_reward:ayt",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "full_duplicate:ayt",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "full_reward:ydt",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "full_duplicate:ydt",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "full_reward:lgs_quantitative",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "full_duplicate:lgs_quantitative",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "full_reward:tus_basic",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "full_duplicate:tus_basic",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "full_reward:tus_clinical",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "full_duplicate:tus_clinical",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "expected_rejection:exam_not_elapsed",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "rejected_without_mutation:exam_not_elapsed",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "early90_actual_time_reward",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "early90_profile_minutes_streak",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "early90_event_uses_actual_finish",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "early_terminal_duplicate:finish_ayt_early",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "early_terminal_duplicate:complete_exam_attempt",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "early_terminal_duplicate:abandon_exam_attempt",
+      "ok": true,
+      "detail": null
+    }
+  ],
+  "scope": "Synthetic isolated SQL fixtures, not natural duration or native verification."
+}

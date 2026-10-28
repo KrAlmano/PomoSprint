@@ -1,0 +1,653 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "owner_id": "7984d0da-59a3-4818-9466-af30b87e0b88",
+  "captured_at": "2026-10-28T12:50:50.092430+00:00",
+  "as_of": "2026-10-28T12:50:50.092430+00:00",
+  "profile_time_zone": "Europe/Istanbul",
+  "study_day": "2026-10-28",
+  "scope": "fixed loopback read-only QA snapshot; accepted records only; pending device outbox is not in DB",
+  "database_profile": "review",
+  "server_contract": "exam32",
+  "expected": {
+    "economy": {
+      "total_minutes": 80,
+      "normal_points": 0,
+      "normal_coins": 0,
+      "exam_points": 16,
+      "exam_coins": 70
+    },
+    "reconstructed_streak": {
+      "current_streak": 1,
+      "longest_streak": 1,
+      "last_study_date": "2026-10-28"
+    },
+    "reports": {
+      "daily": {
+        "start": "2026-10-28",
+        "end": "2026-10-28",
+        "total_minutes": 80,
+        "focus_equivalents": 0,
+        "counts": {
+          "normal_sessions": 0,
+          "marathon_focus_sessions": 0,
+          "completed_marathons": 0,
+          "completed_exams": 1,
+          "unknown_sessions": 0,
+          "pending_sessions": 0
+        },
+        "categories": [
+          {
+            "category_id": "pomosprint:exam",
+            "name": "",
+            "minutes": 80,
+            "sessions": 1,
+            "focus_equivalents": 0,
+            "percentage": 100
+          }
+        ],
+        "category_minutes": {
+          "pomosprint:exam": 80
+        },
+        "category_percentages": {
+          "pomosprint:exam": 100
+        },
+        "days": [
+          {
+            "day": "2026-10-28",
+            "minutes": 80,
+            "focus_equivalents": 0
+          }
+        ],
+        "busiest_day": {
+          "day": "2026-10-28",
+          "minutes": 80,
+          "focus_equivalents": 0
+        },
+        "active_days": 1,
+        "goal_minutes": 200,
+        "goal_percentage": 40,
+        "goal_progress_percentage": 40,
+        "efficiency_percentage": 40,
+        "efficiency": 40
+      },
+      "weekly": {
+        "start": "2026-10-26",
+        "end": "2026-11-01",
+        "total_minutes": 80,
+        "focus_equivalents": 0,
+        "counts": {
+          "normal_sessions": 0,
+          "marathon_focus_sessions": 0,
+          "completed_marathons": 0,
+          "completed_exams": 1,
+          "unknown_sessions": 0,
+          "pending_sessions": 0
+        },
+        "categories": [
+          {
+            "category_id": "pomosprint:exam",
+            "name": "",
+            "minutes": 80,
+            "sessions": 1,
+            "focus_equivalents": 0,
+            "percentage": 100
+          }
+        ],
+        "category_minutes": {
+          "pomosprint:exam": 80
+        },
+        "category_percentages": {
+          "pomosprint:exam": 100
+        },
+        "days": [
+          {
+            "day": "2026-10-26",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-27",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-28",
+            "minutes": 80,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-29",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-30",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-31",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-11-01",
+            "minutes": 0,
+            "focus_equivalents": 0
+          }
+        ],
+        "busiest_day": {
+          "day": "2026-10-28",
+          "minutes": 80,
+          "focus_equivalents": 0
+        },
+        "active_days": 1,
+        "goal_minutes": 1400,
+        "goal_percentage": 5,
+        "goal_progress_percentage": 5,
+        "efficiency_percentage": 5,
+        "elapsed_pace_percentage": 13,
+        "efficiency_label_key": "eff_normal",
+        "efficiency": 5
+      },
+      "monthly": {
+        "start": "2026-10-01",
+        "end": "2026-10-31",
+        "total_minutes": 80,
+        "focus_equivalents": 0,
+        "counts": {
+          "normal_sessions": 0,
+          "marathon_focus_sessions": 0,
+          "completed_marathons": 0,
+          "completed_exams": 1,
+          "unknown_sessions": 0,
+          "pending_sessions": 0
+        },
+        "categories": [
+          {
+            "category_id": "pomosprint:exam",
+            "name": "",
+            "minutes": 80,
+            "sessions": 1,
+            "focus_equivalents": 0,
+            "percentage": 100
+          }
+        ],
+        "category_minutes": {
+          "pomosprint:exam": 80
+        },
+        "category_percentages": {
+          "pomosprint:exam": 100
+        },
+        "days": [
+          {
+            "day": "2026-10-01",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-02",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-03",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-04",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-05",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-06",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-07",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-08",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-09",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-10",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-11",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-12",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-13",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-14",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-15",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-16",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-17",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-18",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-19",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-20",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-21",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-22",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-23",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-24",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-25",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-26",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-27",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-28",
+            "minutes": 80,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-29",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-30",
+            "minutes": 0,
+            "focus_equivalents": 0
+          },
+          {
+            "day": "2026-10-31",
+            "minutes": 0,
+            "focus_equivalents": 0
+          }
+        ],
+        "busiest_day": {
+          "day": "2026-10-28",
+          "minutes": 80,
+          "focus_equivalents": 0
+        },
+        "active_days": 1,
+        "goal_minutes": 6200,
+        "goal_percentage": 1,
+        "goal_progress_percentage": 1,
+        "month_to_date_minutes": 80,
+        "previous_month_to_date_minutes": 0,
+        "month_to_date_growth_percentage": null,
+        "efficiency": 1
+      }
+    }
+  },
+  "actual": {
+    "profile": {
+      "id": "7984d0da-59a3-4818-9466-af30b87e0b88",
+      "coins": 0,
+      "timezone": "Europe/Istanbul",
+      "total_minutes": 80,
+      "current_streak": 1,
+      "longest_streak": 1,
+      "last_study_date": "2026-10-28",
+      "lifetime_points": 0,
+      "daily_goal_minutes": null
+    },
+    "exam_wallet": {
+      "coins": 70,
+      "lifetime_points": 16
+    },
+    "row_counts": {
+      "studies": 0,
+      "attempts": 1,
+      "results": 0,
+      "runs": 0,
+      "mappings": 0,
+      "events": 1,
+      "unlocks": 7
+    }
+  },
+  "checks": [
+    {
+      "control": "schema.required_27_30",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "control": "schema.package31_not_installed",
+      "expected": false,
+      "actual": false,
+      "passed": true
+    },
+    {
+      "control": "schema.marathon_before31",
+      "expected": "177a238a9aa8a4ffd3738b2865120568",
+      "actual": "177a238a9aa8a4ffd3738b2865120568",
+      "passed": true
+    },
+    {
+      "control": "study_client_uuid_unique",
+      "expected": 0,
+      "actual": 0,
+      "passed": true
+    },
+    {
+      "control": "exam_client_uuid_unique",
+      "expected": 1,
+      "actual": 1,
+      "passed": true
+    },
+    {
+      "control": "subject_result_unique",
+      "expected": 0,
+      "actual": 0,
+      "passed": true
+    },
+    {
+      "control": "competition_event_unique",
+      "expected": 1,
+      "actual": 1,
+      "passed": true
+    },
+    {
+      "control": "marathon_mapping_unique",
+      "expected": 0,
+      "actual": 0,
+      "passed": true
+    },
+    {
+      "control": "at_most_one_active_exam",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "control": "exam[0].definition_id",
+      "expected": "lgs_quantitative",
+      "actual": "lgs_quantitative",
+      "passed": true
+    },
+    {
+      "control": "exam[0].positive_planned_duration",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "control": "exam[0].exact_interval_seconds",
+      "expected": 4800,
+      "actual": 4800.0,
+      "passed": true
+    },
+    {
+      "control": "exam[0].status",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "control": "exam[0].known_snapshot_policy",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "control": "exam[0].finished_range",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "control": "exam[0].completion_not_future",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "control": "exam[0].finished_at",
+      "expected": "2026-10-28T12:38:48.055710+00:00",
+      "actual": "2026-10-28T12:38:48.055710+00:00",
+      "passed": true
+    },
+    {
+      "control": "exam[0].not_early",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "control": "exam[0].elapsed_seconds",
+      "expected": 4800,
+      "actual": 4800,
+      "passed": true
+    },
+    {
+      "control": "exam[0].points",
+      "expected": 16,
+      "actual": 16,
+      "passed": true
+    },
+    {
+      "control": "exam[0].coins",
+      "expected": 70,
+      "actual": 70,
+      "passed": true
+    },
+    {
+      "control": "attempt_payloads.exact_ids",
+      "expected": [
+        "6e797e95-fe3c-4986-8d97-c9dac50c2216"
+      ],
+      "actual": [
+        "6e797e95-fe3c-4986-8d97-c9dac50c2216"
+      ],
+      "passed": true
+    },
+    {
+      "control": "attempt_payloads.unique",
+      "expected": 1,
+      "actual": 1,
+      "passed": true
+    },
+    {
+      "control": "payload[6e797e95-fe3c-4986-8d97-c9dac50c2216].duration_seconds",
+      "expected": 4800,
+      "actual": 4800,
+      "passed": true
+    },
+    {
+      "control": "payload[6e797e95-fe3c-4986-8d97-c9dac50c2216].elapsed_seconds",
+      "expected": 4800,
+      "actual": 4800,
+      "passed": true
+    },
+    {
+      "control": "payload[6e797e95-fe3c-4986-8d97-c9dac50c2216].snapshot_coins",
+      "expected": 70,
+      "actual": 70,
+      "passed": true
+    },
+    {
+      "control": "payload[6e797e95-fe3c-4986-8d97-c9dac50c2216].snapshot_points",
+      "expected": 16,
+      "actual": 16,
+      "passed": true
+    },
+    {
+      "control": "payload[6e797e95-fe3c-4986-8d97-c9dac50c2216].planned_duration_seconds",
+      "expected": 4800,
+      "actual": 4800,
+      "passed": true
+    },
+    {
+      "control": "payload[6e797e95-fe3c-4986-8d97-c9dac50c2216].credited_minutes",
+      "expected": 80,
+      "actual": 80,
+      "passed": true
+    },
+    {
+      "control": "payload[6e797e95-fe3c-4986-8d97-c9dac50c2216].completion_kind",
+      "expected": "full",
+      "actual": "full",
+      "passed": true
+    },
+    {
+      "control": "payload[6e797e95-fe3c-4986-8d97-c9dac50c2216].details_revision",
+      "expected": 0,
+      "actual": 0,
+      "passed": true
+    },
+    {
+      "control": "payload[6e797e95-fe3c-4986-8d97-c9dac50c2216].private_metadata_preserved",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "control": "profile.total_minutes",
+      "expected": 80,
+      "actual": 80,
+      "passed": true
+    },
+    {
+      "control": "profile.lifetime_points",
+      "expected": 0,
+      "actual": 0,
+      "passed": true
+    },
+    {
+      "control": "profile.coins_after_avatar_spending",
+      "expected": 0,
+      "actual": 0,
+      "passed": true
+    },
+    {
+      "control": "exam_wallet.lifetime_points",
+      "expected": 16,
+      "actual": 16,
+      "passed": true
+    },
+    {
+      "control": "exam_wallet.coins",
+      "expected": 70,
+      "actual": 70,
+      "passed": true
+    },
+    {
+      "control": "profile.last_study_date",
+      "expected": "2026-10-28",
+      "actual": "2026-10-28",
+      "passed": true
+    },
+    {
+      "control": "profile.streak_bounds",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "control": "profile.completed_day_has_streak",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "control": "competition_events.exact_sources_and_accounting",
+      "expected": {
+        "('exam', '6e797e95-fe3c-4986-8d97-c9dac50c2216')": {
+          "points": 16,
+          "minutes": 80,
+          "completed_at": "2026-10-28T12:38:48.055710+00:00",
+          "period_month": "2026-10-01",
+          "study_day": "2026-10-28"
+        }
+      },
+      "actual": {
+        "('exam', '6e797e95-fe3c-4986-8d97-c9dac50c2216')": {
+          "points": 16,
+          "minutes": 80,
+          "completed_at": "2026-10-28T12:38:48.055710+00:00",
+          "period_month": "2026-10-01",
+          "study_day": "2026-10-28"
+        }
+      },
+      "passed": true
+    }
+  ],
+  "passed_checks": 41,
+  "total_checks": 41,
+  "warnings": []
+}

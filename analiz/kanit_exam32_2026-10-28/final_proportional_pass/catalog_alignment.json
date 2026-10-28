@@ -1,0 +1,26 @@
+{
+  "database": "pomosprint_review32_final",
+  "before": {
+    "profiles": "e9c2c49466eb1d814466fe9dd541922a",
+    "exam_wallets": "695088764357e29bcc1f17e9738630eb",
+    "exam_attempts": "e57d46bb8246e883153284d9fece5106",
+    "avatar_unlocks": "ae6d8612eccac6a1b4e961f200ff2c8b",
+    "study_sessions": "d751713988987e9331980363e24189ce",
+    "competition_events": "d6864603147c1debd6d3bf1ac610562c",
+    "exam_subject_results": "04158abdc23cd3924f8eab7c03a1f9ad"
+  },
+  "after": {
+    "profiles": "e9c2c49466eb1d814466fe9dd541922a",
+    "exam_wallets": "695088764357e29bcc1f17e9738630eb",
+    "exam_attempts": "e57d46bb8246e883153284d9fece5106",
+    "avatar_unlocks": "ae6d8612eccac6a1b4e961f200ff2c8b",
+    "study_sessions": "d751713988987e9331980363e24189ce",
+    "competition_events": "d6864603147c1debd6d3bf1ac610562c",
+    "exam_subject_results": "04158abdc23cd3924f8eab7c03a1f9ad"
+  },
+  "unchanged": true,
+  "sources_sha256": {
+    "supabase/migrations/20261009190000_special_avatar_catalog.sql": "e274d9cb00668d6f38a58f856f15c789a81073950cd21a67027f816a3b75354d",
+    "supabase/migrations/20261009233000_remove_unowned_ronin.sql": "112ed80b6e55cadf2ba9cbf0cff6138f3b3e601467d2c6cd9004547e2674074a"
+  }
+}

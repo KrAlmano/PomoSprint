@@ -1,12 +1,12 @@
--- CANLIYA UYGULANMADI. TUS kullanan profil varsa kayıpsız geri alma mümkün
+-- CANLIYA UYGULANMADI. TUS veya DUS kullanan profil varsa kayıpsız geri alma mümkün
 -- olmadığından bu betik reddeder; kullanıcı hedefini sessizce NULL yapmaz.
 \echo 'Öneri 27 down: önce README.'
 \quit
 BEGIN;
 DO $$ BEGIN
  IF to_regclass('public.exam_attempts') IS NOT NULL THEN RAISE EXCEPTION 'tus_rollback_requires_exam_down_first'; END IF;
- IF EXISTS(SELECT 1 FROM public.profiles WHERE user_segment='tus') THEN
-  RAISE EXCEPTION 'tus_segment_in_use';
+ IF EXISTS(SELECT 1 FROM public.profiles WHERE user_segment IN('tus','dus')) THEN
+  RAISE EXCEPTION 'tus_or_dus_segment_in_use';
  END IF;
 END $$;
 ALTER TABLE public.profiles DROP CONSTRAINT profiles_user_segment_check;

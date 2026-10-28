@@ -3,9 +3,19 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/exam_model.dart';
+import '../models/exam_details.dart';
 import '../utils/async_lock.dart';
 
-enum ExamPendingAction { start, complete, abandon, results }
+enum ExamPendingAction {
+  start,
+  complete,
+  abandon,
+  results,
+  completeEarly,
+  details,
+}
+
+const _keepExamField = Object();
 
 class ExamLocalRecord {
   const ExamLocalRecord({
@@ -16,6 +26,8 @@ class ExamLocalRecord {
     this.pendingAction,
     this.pendingResults,
     this.errorCode,
+    this.pendingDetails,
+    this.detailsDraft,
   });
   final String clientUuid;
   final ExamDefinition definition;
@@ -24,22 +36,34 @@ class ExamLocalRecord {
   final ExamPendingAction? pendingAction;
   final List<ExamSubjectResult>? pendingResults;
   final String? errorCode;
+  final ExamDetailsMutation? pendingDetails;
+  final ExamDetailsDraft? detailsDraft;
   bool get requiresAttention => pendingAction != null || errorCode != null;
   ExamLocalRecord copy({
     ExamAttempt? attempt,
     ExamPendingAction? action,
     List<ExamSubjectResult>? results,
     String? error,
+    ExamDefinition? definition,
+    Object? details = _keepExamField,
+    Object? draft = _keepExamField,
   }) => ExamLocalRecord(
     clientUuid: clientUuid,
-    definition: definition,
+    definition: definition ?? this.definition,
     createdAt: createdAt,
     attempt: attempt ?? this.attempt,
     pendingAction: action,
     pendingResults: results,
     errorCode: error,
+    pendingDetails: identical(details, _keepExamField)
+        ? pendingDetails
+        : details as ExamDetailsMutation?,
+    detailsDraft: identical(draft, _keepExamField)
+        ? detailsDraft
+        : draft as ExamDetailsDraft?,
   );
   Map<String, dynamic> toJson() => {
+    'schema_version': 2,
     'client_uuid': clientUuid,
     'definition': definition.toJson(),
     'created_at': createdAt.toUtc().toIso8601String(),
@@ -47,9 +71,16 @@ class ExamLocalRecord {
     'pending_action': pendingAction?.name,
     'pending_results': pendingResults?.map((r) => r.toJson()).toList(),
     'error_code': errorCode,
+    if (pendingDetails != null) 'pending_details': pendingDetails!.toJson(),
+    if (detailsDraft != null) 'details_draft': detailsDraft!.toJson(),
   };
   static ExamLocalRecord? fromJson(Object? value) {
     if (value is! Map) return null;
+    if (value['schema_version'] != null &&
+        value['schema_version'] != 1 &&
+        value['schema_version'] != 2) {
+      return null;
+    }
     final uuid = value['client_uuid']?.toString() ?? '';
     final definition = ExamDefinition.fromJson(value['definition']);
     final date = DateTime.tryParse(value['created_at']?.toString() ?? '');
@@ -82,6 +113,51 @@ class ExamLocalRecord {
       return null;
     }
     final results = parsedResults?.cast<ExamSubjectResult>();
+    final details = ExamDetailsMutation.fromJson(value['pending_details']);
+    final draft = ExamDetailsDraft.fromJson(value['details_draft']);
+    if ((value['pending_details'] != null && details == null) ||
+        (value['details_draft'] != null && draft == null) ||
+        (action == ExamPendingAction.details &&
+            (details == null || attempt?.isCompleted != true)) ||
+        (details != null && action != ExamPendingAction.details)) {
+      return null;
+    }
+    bool modulesValid(List<String> modules, {bool allowEmpty = false}) =>
+        definition.id == 'ayt' &&
+        (allowEmpty || modules.isNotEmpty) &&
+        modules.length <= 4 &&
+        modules.toSet().length == modules.length &&
+        modules.every(
+          (id) => definition.effectiveModules.any((m) => m.id == id),
+        );
+    if (details != null) {
+      final selected = details.patch.values.containsKey('selected_module_ids')
+          ? details.patch.values['selected_module_ids'] as List<String>
+          : attempt?.selectedModuleIds;
+      final allowed = selected == null
+          ? definition.subjects.map((s) => s.id).toSet()
+          : definition.subjectIdsForModules(selected);
+      if ((selected != null && !modulesValid(selected)) ||
+          (details.results != null &&
+              (details.results!.isEmpty ||
+                  !details.results!.every(
+                    (r) =>
+                        allowed.contains(r.subjectId) &&
+                        definition.subjects.any(r.isValidFor),
+                  )))) {
+        return null;
+      }
+    }
+    if (draft != null &&
+        ((draft.modules != null &&
+                !modulesValid(draft.modules!, allowEmpty: true)) ||
+            !definition.subjects
+                .map((s) => s.id)
+                .toSet()
+                .containsAll(draft.fields.keys) ||
+            !draft.fields.keys.toSet().containsAll(draft.dirtySubjects))) {
+      return null;
+    }
     if (action == ExamPendingAction.results &&
         (results == null ||
             results.isEmpty ||
@@ -99,6 +175,8 @@ class ExamLocalRecord {
       pendingAction: action,
       pendingResults: results == null ? null : List.unmodifiable(results),
       errorCode: value['error_code']?.toString(),
+      pendingDetails: details,
+      detailsDraft: draft,
     );
   }
 }
@@ -136,15 +214,19 @@ class ExamPersistence {
     if (_retired.contains(uid) || (canCommit != null && !canCommit())) {
       return false;
     }
+    // A locally constructed row must satisfy the same reader as a cold start.
+    // Reject before touching storage; never replace a valid journal with data
+    // that would make every record for this owner unreadable on restart.
+    final serialized = rows.map((r) => r.toJson()).toList();
+    if (serialized.any((row) => ExamLocalRecord.fromJson(row) == null)) {
+      throw const FormatException('exam_journal_invalid_write');
+    }
     final prefs = await SharedPreferences.getInstance();
     final key = keyFor(uid);
     final previous = prefs.getString(key);
     final bool saved;
     try {
-      saved = await prefs.setString(
-        key,
-        jsonEncode(rows.map((r) => r.toJson()).toList()),
-      );
+      saved = await prefs.setString(key, jsonEncode(serialized));
     } catch (_) {
       // SharedPreferences updates its in-process cache before native I/O.
       // Restore it as well when the platform write fails.

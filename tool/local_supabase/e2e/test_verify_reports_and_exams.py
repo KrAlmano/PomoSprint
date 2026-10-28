@@ -209,4 +209,132 @@ class ReportOracleTests(unittest.TestCase):
             self.assertNotIn('TOKEN-SENTINEL',str(error.exception))
 
 
+
+
+class Exam32OracleTests(unittest.TestCase):
+    def build(self, elapsed=5400, full_coins=145, policy=2, kind='ayt', planned=10800,
+              start='2026-10-28T08:00:00Z', captured='2026-10-28T12:00:00Z', zone='Europe/Istanbul'):
+        from datetime import timedelta
+        s=fixture();s['schema_versions'].append('20261028060000')
+        s.update(studies=[],results=[],runs=[],mappings=[],unlocks=[],events=[],captured_at=captured)
+        began=verifier.instant(start);finished=began+timedelta(seconds=elapsed);end=began+timedelta(seconds=planned)
+        early=elapsed<planned;points=min(elapsed//300,planned//300) if early else planned//300
+        coins=min(full_coins,full_coins*elapsed//planned) if early else full_coins
+        definition={'id':kind,'duration_seconds':planned,'reward_points':planned//300,'reward_coins':full_coins,
+                    'reward_policy_version':policy,'catalog_version':1,'wrong_answer_divisor':4,
+                    'subjects':[{'id':'mathematics','question_count':40}]}
+        attempt={'id':'a32','client_uuid':'client32','exam_id':kind,'definition':definition,'started_at':began.isoformat(),
+                 'ends_at':end.isoformat(),'finished_at':finished.isoformat(),'status':'completed','elapsed_seconds':elapsed,
+                 'points_earned':points,'exam_coins_earned':coins,'title':'PRIVATE-TITLE-SENTINEL','note':'PRIVATE-NOTE-SENTINEL',
+                 'selected_module_ids':None,'details_revision':0}
+        s['attempts']=[attempt];minutes=elapsed//60;day=verifier.workday(began,zone).isoformat()
+        s['profile'].update(total_minutes=minutes,lifetime_points=0,coins=0,current_streak=1 if minutes else 0,
+                            longest_streak=1 if minutes else 0,last_study_date=day if minutes else None,timezone=zone)
+        s['wallet']={'coins':coins,'lifetime_points':points}
+        if minutes:s['events']=[{'kind':'exam','source_id':'a32','points':points,'minutes':minutes,
+            'completed_at':finished.isoformat(),'period_month':verifier.month_of(finished),'study_day':day}]
+        s['attempt_payloads']=[dict(attempt,duration_seconds=elapsed,planned_duration_seconds=planned,
+            credited_minutes=minutes,completion_kind='early' if early else 'full')]
+        return s
+
+    def verify(self,s,**kwargs):return verifier.analyze_snapshot(s,**kwargs)
+    def failures(self,x):return [c['control'] for c in x['checks'] if not c['passed']]
+
+    def test_early90_actual_duration72coins18points(self):
+        x=self.verify(self.build())
+        self.assertEqual(x['status'],'PASS',self.failures(x))
+        self.assertEqual(x['server_contract'],'exam32')
+        self.assertEqual(x['expected']['economy'],{'total_minutes':90,'normal_points':0,'normal_coins':0,'exam_points':18,'exam_coins':72})
+        self.assertEqual(x['expected']['reports']['daily']['counts']['completed_exams'],1)
+        self.assertNotIn('PRIVATE-',json.dumps(verifier.json_safe(x)))
+
+    def test_prior7_and175_snapshots_are_not_rewritten_to145(self):
+        for full,policy,expected in [(7,1,3),(175,2,87)]:
+            with self.subTest(full=full):
+                x=self.verify(self.build(full_coins=full,policy=policy))
+                self.assertEqual(x['status'],'PASS',self.failures(x));self.assertEqual(x['expected']['economy']['exam_coins'],expected)
+
+    def test_all_eight_full_completions(self):
+        values={'lgs_verbal':(4500,60),'lgs_quantitative':(4800,70),'ydt':(7200,95),
+                'tus_basic':(8100,110),'tus_clinical':(8100,110),'dus':(9000,120),'tyt':(9900,130),'ayt':(10800,145)}
+        for kind,(seconds,coins) in values.items():
+            with self.subTest(kind=kind):
+                x=self.verify(self.build(elapsed=seconds,planned=seconds,full_coins=coins,kind=kind))
+                self.assertEqual(x['status'],'PASS',self.failures(x));self.assertEqual(x['expected']['economy']['exam_coins'],coins)
+
+    def test_one_second_counts_once_without_streak_time_or_event(self):
+        x=self.verify(self.build(elapsed=1))
+        self.assertEqual(x['status'],'PASS',self.failures(x));self.assertEqual(x['expected']['economy']['total_minutes'],0)
+        report=x['expected']['reports']['daily'];self.assertEqual(report['counts']['completed_exams'],1)
+        self.assertEqual(report['active_days'],0);self.assertEqual(x['expected']['reconstructed_streak']['current_streak'],0)
+
+    def test_zero_seconds_is_not_valid_early_completion(self):
+        self.assertIn('exam[0].early_minimum_one_second',self.failures(self.verify(self.build(elapsed=0))))
+
+    def test_zero_minute_event_is_rejected(self):
+        s=self.build(elapsed=1);s['events']=[{'kind':'exam','source_id':'a32','points':0,'minutes':0,
+            'completed_at':s['attempts'][0]['finished_at'],'period_month':'2026-10-01','study_day':'2026-10-28'}]
+        self.assertIn('competition_events.exact_sources_and_accounting',self.failures(self.verify(s)))
+
+    def test_early_requires32_and_ayt(self):
+        s=self.build();s['schema_versions'].remove('20261028060000')
+        self.assertIn('exam[0].early_requires32',self.failures(self.verify(s)))
+        self.assertIn('exam[0].early_ayt_only',self.failures(self.verify(self.build(kind='dus'))))
+
+    def test_elapsed_and_matching_forged_wallet_cannot_hide_wrong_reward(self):
+        s=self.build();s['attempts'][0]['elapsed_seconds']+=1
+        self.assertIn('exam[0].elapsed_seconds',self.failures(self.verify(s)))
+        s=self.build();s['attempts'][0]['exam_coins_earned']+=1;s['wallet']['coins']+=1
+        self.assertIn('exam[0].coins',self.failures(self.verify(s)))
+        self.assertIn('exam_wallet.coins',self.failures(self.verify(s)))
+
+    def test_wrong_planned_or_actual_projection_is_rejected(self):
+        s=self.build();s['attempt_payloads'][0]['duration_seconds']=10800
+        self.assertIn('payload[a32].duration_seconds',self.failures(self.verify(s)))
+        s=self.build();s['attempt_payloads'][0]['planned_duration_seconds']=5400
+        self.assertIn('payload[a32].planned_duration_seconds',self.failures(self.verify(s)))
+
+    def test_month_period_uses_actual_finish_but_reports_start04day(self):
+        s=self.build(start='2026-10-31T20:30:00Z',captured='2026-11-01T03:00:00Z')
+        x=self.verify(s,as_of='2026-11-01T00:59:59Z')
+        self.assertEqual(x['status'],'PASS',self.failures(x));self.assertEqual(x['study_day'],'2026-10-31')
+        self.assertEqual(x['expected']['reports']['daily']['total_minutes'],90)
+        self.assertEqual(s['events'][0]['period_month'],'2026-11-01')
+        x=self.verify(s,as_of='2026-11-01T01:00:00Z')
+        self.assertEqual(x['expected']['reports']['daily']['total_minutes'],0)
+        self.assertEqual(x['expected']['reports']['monthly']['total_minutes'],0)
+
+    def test_dst_real90minutes_uses_local_start_day(self):
+        s=self.build(start='2026-11-01T05:30:00Z',captured='2026-11-01T12:00:00Z',zone='America/New_York')
+        x=self.verify(s,as_of='2026-11-01T08:30:00Z')
+        self.assertEqual(x['status'],'PASS',self.failures(x));self.assertEqual(x['study_day'],'2026-10-31')
+        self.assertEqual(x['expected']['reports']['daily']['total_minutes'],90)
+
+    def test_fixed_review_site_profiles_do_not_open_generic_database(self):
+        for profile,db in [('review','pomosprint_review32_dus'),('site','pomosprint_site32_dus')]:
+            s=self.build();s['database']=db
+            self.assertEqual(self.verify(s,profile=profile)['status'],'PASS')
+            with self.assertRaises(verifier.VerificationError):self.verify(s)
+        with patch.object(verifier.subprocess,'run') as run,self.assertRaises(verifier.VerificationError):
+            verifier.verify_owner(OWNER,profile='remote')
+        run.assert_not_called()
+        with patch.dict(os.environ,{'LOCAL_DB_URL':'postgresql://remote/database'}),self.assertRaises(verifier.VerificationError):
+            verifier._local_guard('review')
+
+    def test_fractional_plan_corruption_is_not_truncated_away(self):
+        s=self.build(elapsed=10800)
+        s['attempts'][0]['ends_at']='2026-10-28T11:00:00.500000+00:00'
+        self.assertIn('exam[0].exact_interval_seconds',self.failures(self.verify(s)))
+
+    def test_boolean_policy_version_is_not_an_integer_version(self):
+        self.assertIn('exam[0].known_snapshot_policy',self.failures(self.verify(self.build(policy=True))))
+
+    def test_fixed_profile_reads_and_strips_pg_redirects(self):
+        s=self.build();s['database']='pomosprint_review32_dus'
+        with patch.object(verifier.subprocess,'run',return_value=SimpleNamespace(returncode=0,stdout=json.dumps(s))) as run:
+            with patch.dict(os.environ,{'PGHOSTADDR':'remote'}):verifier.read_snapshot(OWNER,profile='review')
+        args,kwargs=run.call_args;self.assertEqual(args[0][1],verifier.PROFILES['review'][0])
+        self.assertNotIn('PGHOSTADDR',kwargs['env']);self.assertIn('READ ONLY',kwargs['input'])
+
+
 if __name__=='__main__':unittest.main()

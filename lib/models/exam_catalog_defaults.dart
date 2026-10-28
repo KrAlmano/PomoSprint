@@ -1,4 +1,5 @@
 import 'exam_model.dart';
+import 'dus_catalog.dart';
 
 // Read-only offline reference. Availability is never inferred from this list.
 // Official 2026 source links and the approximate TUS distribution are recorded
@@ -348,5 +349,6 @@ const offlineExamCatalog = ExamCatalog(
         ),
       ],
     ),
+    dusExamDefinition,
   ],
 );

@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "platform": "ios",
+  "device": "PomoSprint QA iPhone 16 (18.6)",
+  "run": "ex32-ios-a2",
+  "status": "PASS",
+  "native_process_exit_code": 0,
+  "exit_code_provenance": "root tool session24677 completed with exit0; native log independently contains All tests passed",
+  "sql_checks": 21,
+  "database": "pomosprint_review32_final",
+  "api_port": 54351,
+  "host_port": 54359,
+  "source_hash_scope": "archive-time source equals frozen Android a3 hashes; hashes are not extracted from the installed binary",
+  "source": [
+    {
+      "path": "integration_test/ah_exam_details_early_test.dart",
+      "sha256": "1a3924448b200f17f1b831ee5c7ffa8d59afbcf9de8beab7b5a64dd9732aec20",
+      "bytes": 16031
+    },
+    {
+      "path": "lib/models/exam_model.dart",
+      "sha256": "6eb320498e557dec311059cafcd2403f3aad4dc30e2a1818650a09830d0ef140",
+      "bytes": 22636
+    },
+    {
+      "path": "lib/models/exam_details.dart",
+      "sha256": "00b72a04e07d2751ce3723c7fa2ec7e612317ccc30e2044f9ac42609cf96b957",
+      "bytes": 5913
+    },
+    {
+      "path": "lib/services/exam_service.dart",
+      "sha256": "8ff4e357771ec3780cf79f148bf54dbc4ff625d4d34210ac9c200b57d1f8f245",
+      "bytes": 33488
+    },
+    {
+      "path": "lib/services/exam_persistence.dart",
+      "sha256": "e56d503260551c7639a11f85fe91afc33cf59aceadf25916e8097f35cc600c37",
+      "bytes": 9219
+    },
+    {
+      "path": "lib/screens/exam_screen.dart",
+      "sha256": "efdc02e8a41bf1a0b8a98434789d22b32ea7cab5839bd461344d412cb16c44e2",
+      "bytes": 32117
+    },
+    {
+      "path": "lib/widgets/exam_results_dialog.dart",
+      "sha256": "7672ea1a3437d640c57e5d2e0c1bcdbec653378ccb730b0695a1a91769da19e3",
+      "bytes": 20956
+    },
+    {
+      "path": "lib/l10n/app_tr.arb",
+      "sha256": "a89c1f8528d3c54b7f63b46e568195192e5fcf48eb9479e2e7171fcef67a0774",
+      "bytes": 80646
+    },
+    {
+      "path": "lib/l10n/app_en.arb",
+      "sha256": "0917f3343b6d076ecd1f278717a67363d27854f0279e8f791a09df21b3431a4b",
+      "bytes": 70257
+    }
+  ],
+  "native_log": {
+    "path": "a2/native.log",
+    "source": "<TMP>/pomosprint_exam32_ios_a2.log",
+    "source_sha256": "5ce80be6b853e7f06cf76d3f06c03562bd6ee315352a47e32f08b74c861c231f",
+    "sha256": "07dc7f5046aee54c31365fe4a895788c3d9d76ae90d6fc1cb7d683ff3177ad4e",
+    "bytes": 1610,
+    "transformation": "portable paths and line breaks"
+  },
+  "independent_sql": {
+    "path": "a2/independent_sql.json",
+    "source": "<REPO>/build/verification_20261028/exam32/ios/independent-sql-a2.json",
+    "source_sha256": "42b50fa7c876cc276df9ed1b2d41ac0db53f42fb2f6ee98c8c8dbd7249546a65",
+    "sha256": "42b50fa7c876cc276df9ed1b2d41ac0db53f42fb2f6ee98c8c8dbd7249546a65",
+    "bytes": 2467,
+    "transformation": "exact"
+  },
+  "screenshots": [
+    {
+      "path": "a2/screenshots/e2e-ah32-details-en.png",
+      "source": "<REPO>/build/native_site_media/site-oct28/screenshots/e2e-ah32-details-en.png",
+      "source_sha256": "85f0af699d5144938e35d60516da87117ae8be2c370a0381070c673e189f5206",
+      "sha256": "85f0af699d5144938e35d60516da87117ae8be2c370a0381070c673e189f5206",
+      "bytes": 180508,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "a2/screenshots/e2e-ah32-details-tr.png",
+      "source": "<REPO>/build/native_site_media/site-oct28/screenshots/e2e-ah32-details-tr.png",
+      "source_sha256": "7597a8b5be4d1f559a0208dac49ace4e8a75b2d1ec77d68c46932dccb5edb1eb",
+      "sha256": "7597a8b5be4d1f559a0208dac49ace4e8a75b2d1ec77d68c46932dccb5edb1eb",
+      "bytes": 171323,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "a2/screenshots/e2e-ah32-history-en.png",
+      "source": "<REPO>/build/native_site_media/site-oct28/screenshots/e2e-ah32-history-en.png",
+      "source_sha256": "13a4b75e2ec58617add6249a6ac52aab07e121f72b2b9e5692bddf7d2198911d",
+      "sha256": "13a4b75e2ec58617add6249a6ac52aab07e121f72b2b9e5692bddf7d2198911d",
+      "bytes": 264906,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "a2/screenshots/e2e-ah32-history-tr.png",
+      "source": "<REPO>/build/native_site_media/site-oct28/screenshots/e2e-ah32-history-tr.png",
+      "source_sha256": "dc79170c2187fe921653729283080bf2fa4a32a5ba343cdb38821bca33033c35",
+      "sha256": "dc79170c2187fe921653729283080bf2fa4a32a5ba343cdb38821bca33033c35",
+      "bytes": 257335,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "a2/screenshots/e2e-ah32-report-en.png",
+      "source": "<REPO>/build/native_site_media/site-oct28/screenshots/e2e-ah32-report-en.png",
+      "source_sha256": "d4cda664c96372146f113e60474aa99fb139212bac7dd3e1bb534aa29900d001",
+      "sha256": "d4cda664c96372146f113e60474aa99fb139212bac7dd3e1bb534aa29900d001",
+      "bytes": 219451,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "a2/screenshots/e2e-ah32-report-tr.png",
+      "source": "<REPO>/build/native_site_media/site-oct28/screenshots/e2e-ah32-report-tr.png",
+      "source_sha256": "171876da2ce459d30e925d0c94b9d56c742fce3c67a8515039905338bdc8b454",
+      "sha256": "171876da2ce459d30e925d0c94b9d56c742fce3c67a8515039905338bdc8b454",
+      "bytes": 212101,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "a2/screenshots/e2e-ah32-running-en.png",
+      "source": "<REPO>/build/native_site_media/site-oct28/screenshots/e2e-ah32-running-en.png",
+      "source_sha256": "ab272bc25a15b40da07d9e0aee954ea549d82418bfd7fb7366d38af256322505",
+      "sha256": "ab272bc25a15b40da07d9e0aee954ea549d82418bfd7fb7366d38af256322505",
+      "bytes": 231984,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    },
+    {
+      "path": "a2/screenshots/e2e-ah32-running-tr.png",
+      "source": "<REPO>/build/native_site_media/site-oct28/screenshots/e2e-ah32-running-tr.png",
+      "source_sha256": "301539bc87cfdd48d3f0f338bc8ab67f6a1503bc116311e7e2327d70b57f6ccf",
+      "sha256": "301539bc87cfdd48d3f0f338bc8ab67f6a1503bc116311e7e2327d70b57f6ccf",
+      "bytes": 217679,
+      "transformation": "exact",
+      "width": 604,
+      "height": 1311
+    }
+  ],
+  "prior_run": {
+    "run": "ex32-ios-a1",
+    "status": "FAIL",
+    "reason": "normal focus start blocked by unacknowledged iOS notification permission prompt; TR/EN early/details/duplicate/report passed before final step",
+    "native_log": "a1/native.log",
+    "prompt_image": "a1/notification_prompt.png"
+  },
+  "device_actions_by_archivist": false
+}

@@ -34,6 +34,7 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
   int _tab = 0;
   String? _group;
   bool _starting = false;
+  bool _finishingEarly = false;
   List<StudySession> _studies = [];
   bool _studiesLoaded = false;
   bool _studiesStale = false;
@@ -231,6 +232,67 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
     if (accepted == true) await _service.abandon(record.clientUuid);
   }
 
+  Future<void> _finishEarly(ExamLocalRecord record) async {
+    if (_finishingEarly || !_service.canFinishEarly(record)) return;
+    final owner = _service.backend.ownerId;
+    final accepted = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        final l10n = AppLocalizations.of(context)!;
+        return AlertDialog(
+          scrollable: true,
+          title: Text(l10n.examFinishEarlyTitle),
+          content: Text(l10n.examFinishEarlyBody),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(l10n.cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(l10n.examFinishEarly),
+            ),
+          ],
+        );
+      },
+    );
+    if (!mounted || accepted != true || owner != _service.backend.ownerId) {
+      return;
+    }
+    setState(() => _finishingEarly = true);
+    try {
+      await _service.finishEarly(record.clientUuid);
+      if (!mounted ||
+          owner != _service.backend.ownerId ||
+          !_foreground ||
+          !TickerMode.valuesOf(context).enabled ||
+          ModalRoute.of(context)?.isCurrent != true) {
+        return;
+      }
+      final completed = _service.attempts
+          .where((a) => a.clientUuid == record.clientUuid && a.isCompleted)
+          .firstOrNull;
+      if (completed != null) {
+        await showExamResultsDialog(
+          context,
+          service: _service,
+          attempt: completed,
+        );
+      }
+    } catch (error) {
+      if (mounted && owner == _service.backend.ownerId) {
+        final l10n = AppLocalizations.of(context)!;
+        _message(
+          error is ExamFailure && error.code == 'exam_early_finish_too_soon'
+              ? l10n.examEarlyTooSoon
+              : l10n.examEarlyUnavailable,
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _finishingEarly = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -250,7 +312,11 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 const SizedBox(height: 8),
-                Text(l10n.examIntro),
+                Text(
+                  _service.catalog.capabilities.aytEarlyFinish
+                      ? l10n.examIntroEarly
+                      : l10n.examIntro,
+                ),
                 const SizedBox(height: 16),
                 if (active != null) _activeCard(active, l10n),
                 Wrap(
@@ -330,8 +396,9 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
           selected: _group == null,
           onSelected: (_) => setState(() => _group = null),
         ),
-        for (final group
-            in _service.catalog.exams.map((e) => e.segment).toSet())
+        for (final group in const ['yks', 'lgs', 'tus', 'dus'].where(
+          (group) => _service.catalog.exams.any((e) => e.segment == group),
+        ))
           ChoiceChip(
             label: Text(group.toUpperCase()),
             selected: _group == group,
@@ -388,6 +455,8 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
     final pending =
         record.pendingAction != null &&
         (record.pendingAction != ExamPendingAction.start || attempt == null);
+    final pendingEarly =
+        record.pendingAction == ExamPendingAction.completeEarly;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -398,7 +467,9 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
               style: Theme.of(context).textTheme.titleLarge,
             ),
             Text(
-              attempt == null
+              pendingEarly
+                  ? l10n.examEarlyPendingTitle
+                  : attempt == null
                   ? l10n.examStartPending
                   : pending && seconds == 0
                   ? l10n.examPending
@@ -420,7 +491,9 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
             const SizedBox(height: 12),
             if (pending)
               Text(
-                attempt == null
+                pendingEarly
+                    ? l10n.examEarlyPendingBody
+                    : attempt == null
                     ? l10n.examStartPendingBody
                     : l10n.examPendingBody,
               ),
@@ -431,9 +504,13 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
                     : () => _service.retry(record.clientUuid),
                 child: Text(l10n.examRetry),
               ),
-            if (attempt != null &&
-                seconds > 0 &&
-                record.pendingAction != ExamPendingAction.abandon)
+            if (_service.canFinishEarly(record))
+              FilledButton.tonal(
+                key: const ValueKey('exam-finish-early'),
+                onPressed: _finishingEarly ? null : () => _finishEarly(record),
+                child: Text(l10n.examFinishEarly),
+              ),
+            if (attempt != null && seconds > 0 && record.pendingAction == null)
               TextButton(
                 onPressed: _service.busy ? null : () => _abandon(record),
                 child: Text(l10n.examAbandon),
@@ -523,6 +600,11 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            if (attempt.title != null)
+              Text(
+                attempt.title!,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
             Text(
               exam?.name(_turkish) ?? l10n.examTitle,
               style: Theme.of(context).textTheme.titleMedium,
@@ -531,6 +613,38 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
             Text(
               '${l10n.examEndTime}: ${date(attempt.completedAt ?? attempt.endsAt)}',
             ),
+            if (attempt.finishedEarly) ...[
+              Text(l10n.examCompletedEarly),
+              Text(
+                l10n.examActualPlanned(
+                  attempt.actualSeconds < 60
+                      ? l10n.examSeconds(attempt.actualSeconds)
+                      : '${attempt.actualSeconds ~/ 60} ${l10n.minutesUnit}',
+                  '${attempt.plannedSeconds ~/ 60} ${l10n.minutesUnit}',
+                ),
+              ),
+              Text(l10n.examCreditedMinutes(attempt.reportMinutes)),
+            ],
+            if (attempt.note != null) Text(attempt.note!),
+            if (attempt.examId == 'ayt' && attempt.isCompleted) ...[
+              if (attempt.selectedModuleIds == null)
+                Text(l10n.examModuleUnknown)
+              else ...[
+                Text(
+                  (exam?.effectiveModules ?? [])
+                      .where((m) => attempt.selectedModuleIds!.contains(m.id))
+                      .map((m) => m.name(_turkish))
+                      .join(' · '),
+                ),
+                if (attempt.selectedQuestionCount != null)
+                  Text(
+                    l10n.examSelectedQuestions(
+                      attempt.selectedQuestionCount!,
+                      attempt.totalQuestions,
+                    ),
+                  ),
+              ],
+            ],
             Text(
               l10n.examQuestionsMinutes(
                 attempt.totalQuestions,
@@ -586,7 +700,9 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
                         attempt: attempt,
                       ),
                 child: Text(
-                  attempt.subjectResults.isEmpty
+                  _service.supportsDetails
+                      ? l10n.examDetailsEdit
+                      : attempt.subjectResults.isEmpty
                       ? l10n.examEnterResults
                       : l10n.examEditResults,
                 ),

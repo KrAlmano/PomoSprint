@@ -1,0 +1,12 @@
+{
+  "early_owner": "71e691b2-3af6-4446-a092-697b70b271d1",
+  "early_attempt": "fab19a72-8c54-409b-b4c3-7d0773d13d42",
+  "early_seconds": 5400,
+  "early_coins": 87,
+  "one_second_attempt": "bcd9cd38-db06-417f-86a4-0d1004494155",
+  "old_active_reward": 3,
+  "policy": "proportional",
+  "alternate_policy": "full",
+  "policy_status": "candidate_only",
+  "notice": "Synthetic local timestamps; no native or natural-duration claim."
+}

@@ -1,5 +1,7 @@
 # supabase/proposed — SQL paketleri ve uygulama tarihçesi
 
+> **28 Ekim bağımsız32:** [AYT erken bitiş, deneme başlığı/notu ve modül seçimi](32_exam_details_early_finish_README.md) yalnız izole yerel kopyada doğrulandı. 27–30 üstüne gelir;aynı27/28/29 paketleri DUS desteğini de taşır.31 gerektirmez ve31 kurulmadı. Sekiz sınavın tek ödül tablosu32 rehberindedir;erken AYT geçen süreyle orantılıdır. Canlıya uygulanmadı.
+
 > **28 Ekim gece hazırlığı:** 27 TUS → 28 Deneme → 29 birleşik aylık lig paketleri yalnız yerelde hazırlanıyor; **canlıya uygulanmadı**. [Yeni paket rehberi](NIGHT_20261028_README.md) ve [API sözleşmesi](EXAM_API_CONTRACT.md) geçerlidir. Aşağıdaki 5 Ekim kayıtları tarihçedir.
 
 > **Ek güvenlik adayı30:** [Başlangıç kotası/UUID atomikliği](30_session_start_atomic_README.md) ayrı ileri/down/DRYRUN paketidir;27–29'a veya offline ödül politikasına dokunmaz. İzole31/31 kontrol geçti; canlıya uygulanmadı.

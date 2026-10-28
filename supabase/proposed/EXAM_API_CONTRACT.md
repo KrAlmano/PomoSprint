@@ -1,6 +1,8 @@
 # Deneme ve aylık lig sözleşmesi — 28 Ekim 2026
 
-Bu sözleşme yalnız hazırlanmış yerel paket içindir; canlıya uygulanmadı. Sıra: **27 TUS → 28 deneme çekirdeği → 29 birleşik aylık lig**. Eski sunucuda bulunmayan RPC (`PGRST202`) yeni özelliği kapatır; ağ/yetki hatası başarı veya eski sunucu sayılmaz.
+Bu sözleşme yalnız hazırlanmış yerel paket içindir; canlıya uygulanmadı. Sıra: **27 TUS/DUS → 28 deneme çekirdeği → 29 birleşik aylık lig**. Eski sunucuda bulunmayan RPC (`PGRST202`) yeni özelliği kapatır; ağ/yetki hatası başarı veya eski sunucu sayılmaz.
+
+**Bağımsız32 eki:** [AYT erken bitiş ve deneme ayrıntıları](32_exam_details_early_finish_README.md) 27–30 üstünde,31 kurulmadan doğrulandı. Aşağıdaki çekirdek davranış korunur;32 varsa capability ile açılan yeni alan/işlemler aşağıda eklenir. Canlıda bulunmuş sayılmaz.
 
 ## Deneme
 
@@ -15,7 +17,7 @@ Bu sözleşme yalnız hazırlanmış yerel paket içindir; canlıya uygulanmadı
 
 Hata kodları PostgreSQL `P0001` mesajında sabittir: `exam_not_elapsed` geçici; `exam_overlap`, `exam_not_active`, `exam_not_found`, `exam_metadata_conflict`, `exam_result_invalid`, `exam_unavailable` kullanıcıya açıklanır. Auth hatası `not authenticated`; başka sahibin UUID'si `exam_not_found` ile ifşa edilmez.
 
-Katalog kimlikleri: `tyt`, `ayt`, `ydt`, `lgs_verbal`, `lgs_quantitative`, `tus_basic`, `tus_clinical`. TUS iki ayrı100soru/135dk oturumdur. LGS iki ayrı oturumdur;45dk ara çalışma veya ödül değildir. Katalogdaki standart sınav sayacı gerçek sınav puanını hesaplamaz.
+Katalog kimlikleri: `tyt`, `ayt`, `ydt`, `lgs_verbal`, `lgs_quantitative`, `tus_basic`, `tus_clinical`, `dus`. TUS iki ayrı100soru/135dk oturumdur. DUS tek120soru/150dk oturumdur;16ders,40temel/80klinik standart dağılım. LGS iki ayrı oturumdur;45dk ara çalışma veya ödül değildir. Katalogdaki standart sınav sayacı gerçek sınav puanını hesaplamaz.
 
 ## Aylık lig
 
@@ -25,13 +27,23 @@ Katalog kimlikleri: `tyt`, `ayt`, `ydt`, `lgs_verbal`, `lgs_quantitative`, `tus_
 - Satır: `id`, `name`, `avatar_id`, `is_me`, `is_blocked`, `points`, `rank`, `tier`, `promotion_eligible`, `award_eligible`, `demotion_eligible`, `has_league`, `member_count`, `active_member_count`, `end_date`. Eski normal V2 ek `weekly_points` eşdeğer alanını korur.
 - `get_competition_target()` → `{current_segment,pending_segment,effective_at}`; `set_competition_target(p_segment text)` aynı cevabı döndürür. Orta ay değişimi bir sonraki İstanbul takvim ayından etkilidir; mevcut puan ve üyelik taşınmaz. İlk seans öncesi onboarding hedefi hemen uygulanır.
 
-Normal lig puanı yalnız Pomodoro/Maraton; deneme ligi puanı yalnız tam süreli denemeden. Takvim ayı sınırı `Europe/Istanbul`00:00; çalışma günü/seri04:00. Düşük nüfusta hazırlık/ödülsüz durum; eksik deneme-avatar görseli gerçek ödül gibi gösterilmez.
+Normal lig puanı yalnız Pomodoro/Maraton; deneme ligi puanı tamamlanan denemeden gelir.32 öncesinde yalnız tam süreli;32 ile AYT erken bitişinde gerçek her5 dakikaya1 puan, en fazla snapshot tam puanı. Takvim ayı sınırı `Europe/Istanbul`00:00; çalışma günü/seri04:00. Düşük nüfusta hazırlık/ödülsüz durum; eksik deneme-avatar görseli gerçek ödül gibi gösterilmez.
 
 ## Sosyal ve toplamlar
 
 `get_live_friends_with_breaks()` eski sözleşmeye `status:exam`, `exam_type`, `exam_name_tr`, `exam_name_en` ekler. Görünürlük, arkadaşlık, engel filtresi korunur. Gecikmiş normal iptal deneme tablosuna dokunmaz.
 
-Tamamlanan denemeler profil toplam dakikasına ve04:00 serisine eklenir; normal puan/kum değişmez. Raporlar ayrı deneme listesini okur ve yalnız `completed` kayıtların tam süresini `Deneme` satırında birleştirir. Derslere süre paylaştırılmaz; netler yalnız kişisel rapor/içgörü girdisidir.
+Tamamlanan denemeler profil toplam dakikasına ve04:00 serisine eklenir; normal puan/kum değişmez. Raporlar ayrı deneme listesini okur ve yalnız `completed` kayıtları `Deneme` satırında birleştirir.32 öncesinde tam süre,32 erken AYT'de gerçek süre kullanılır.1–59 saniye tamamlanan deneme1 adet,0 dakika ve0 seri katkısı verir. Derslere süre paylaştırılmaz; netler yalnız kişisel rapor/içgörü girdisidir.
+
+## 32: Erken AYT ve özel deneme ayrıntıları
+
+- `get_exam_config().capabilities`: `exam_details`, `ayt_modules_version:1`, `ayt_early_finish`. Eski sunucuda bu alanlar yoktur; yeni düğmeler kapalı kalır.
+- `finish_ayt_early(p_attempt_id uuid)` aynı completion zarfını döndürür. Yalnız AYT; server zamanına göre en az1 tam saniye gerekir. Süre dolmuşsa normal tamamlama; mevcut terminal sonuç tekrar değiştirilmez. Kum `floor(snapshot_full_coins × elapsed / planned)` ve en fazla snapshot tam ödülüdür. Yeni AYT90 dk72 kum/18 puan; eski7 kumluk snapshot90 dk3,önceki175kumluk snapshot87kum alır.
+- `save_exam_details(p_attempt_id uuid,p_details jsonb,p_subject_results jsonb DEFAULT NULL,p_expected_revision integer DEFAULT NULL)` atomik metadata/net kaydıdır. Başlık120, not2000 Unicode karakter; başlık tek satır, not LF/TAB dışında kontrol karakteri içermez. Eksik alan korunur; title/note null temizler. AYT `selected_module_ids` verilmişse1–4 benzersiz test ID'sidir; null yeni girişte reddedilir. Kaydedilmiş sonucu olan modül çıkarılamaz. Aynı patch/sonuç duplicate; farklı içerikte eski revision conflict olur.
+- Attempt'e `planned_duration_seconds`, `credited_minutes`, `completion_kind`, `title`, `note`, `selected_module_ids`, `details_revision` eklenir. Tamamlanmış `duration_seconds` gerçekleşen saniyedir; `ends_at` planlanan, `finished_at` gerçek bitiştir. `definition` içindeki bilinen AYT modülleri görünümde genişletilebilir; saklı eski reward snapshot'ı değişmez.
+- Başlık/not owner-only alanlardır. Sosyal/lig payload'ına, kategori adına veya telemetriye eklenmez. Net kaydı/metadata güncellemesi ödül ve lig olayı üretmez. `save_exam_results` de varsa seçili modül kapsamını korur ve gerçek değişimde revision artırır.
+
+Tam ödüller: LGS Sözel60,LGS Sayısal70,YDT95,TUS Temel110,TUS Klinik110,DUS120,TYT130,AYT145;sekiz tanımda reward_policy_version2. Normal kum/puan/lig ve Deneme cüzdanı ayrı kalır. Ayrıntılı hata, rollback ve yerel test kanıtı [32 rehberindedir](32_exam_details_early_finish_README.md).
 
 ## Ders–çalışma kategorisi eşlemesi
 

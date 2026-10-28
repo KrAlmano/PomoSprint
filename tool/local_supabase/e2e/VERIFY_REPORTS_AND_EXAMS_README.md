@@ -4,14 +4,17 @@
 
 ## Çalıştırma
 
-Yerel veritabanı `127.0.0.1:54322/postgres` olmalıdır. 27–30 migration kayıtları ve 31 öncesi Maraton fonksiyon gövdesi kontrol edilir. 31 kuruluysa sonuç başarısızdır; araç şemayı düzeltmeye veya paketi uygulamaya çalışmaz.
+Varsayılan `--profile main`, mevcut `127.0.0.1:54322/postgres` bağlantısını korur. Yalnız açık `--profile review` (`pomosprint_review32_dus`, API54351) veya `--profile site` (`pomosprint_site32_dus`, API54361) seçilebilir. Serbest DB adı veya URL parametresi yoktur. 27–30 migration kayıtları ve 31 öncesi Maraton fonksiyon gövdesi kontrol edilir. 31 kuruluysa sonuç başarısızdır; araç şemayı düzeltmeye veya paketi uygulamaya çalışmaz.
 
 ```sh
 python3 tool/local_supabase/e2e/verify_reports_and_exams.py \
   --owner "$TASK_QA_OWNER"
+# Yeni DUS/32 kopyası için açık seçim:
+python3 tool/local_supabase/e2e/verify_reports_and_exams.py \
+  --profile review --owner "$TASK_QA_OWNER"
 ```
 
-Hesap UUID'si kanonik küçük harfli olmalı; veritabanındaki hesabın e-postası `e2e-sim-…@pomosprint.local` veya `qa-…@pomosprint.local` biçiminde olmalıdır. Gerçek hesap ve farklı DSN verilmesi reddedilir. Ortamda `LOCAL_DB_URL` / `LOCAL_SUPABASE_URL` varsa yalnız belgelenen loopback değerleri kabul edilir.
+Hesap UUID'si kanonik küçük harfli olmalı; veritabanındaki hesabın e-postası `e2e-sim-…@pomosprint.local` veya `qa-…@pomosprint.local` biçiminde olmalıdır. Gerçek hesap ve farklı DSN verilmesi reddedilir. Yalnız review profilinde ayrıca tam `review32-<aynı-owner-UUID>@pomosprint.local` SQL fixture adresi kabul edilir; bu istisna varsayılan main profiline açılmaz. Ortamda `LOCAL_DB_URL` / `LOCAL_SUPABASE_URL` varsa yalnız belgelenen loopback değerleri kabul edilir.
 
 Bir başka QA hesabının bu hesabın Deneme ve netlerini okuyamadığını doğrulamak için:
 
@@ -28,7 +31,7 @@ RLS kontrolünün boş veriyle yanlış güven vermemesi için kaynak hesabın e
 
 ## JSON sözleşmesi
 
-- `schema_version: 1`, `status: PASS | FAIL | ERROR`, `owner_id`, `captured_at`, `as_of`, `profile_time_zone`, `study_day`.
+- `schema_version: 1`, `database_profile: main|review|site`, `server_contract: exam28|exam32`, `status: PASS | FAIL | ERROR`, `owner_id`, `captured_at`, `as_of`, `profile_time_zone`, `study_day`.
 - `expected.economy`: ortak dakika, normal puan/kum ve ayrı Deneme puan/kumu. Normal kumda avatar satın alma harcamaları düşülür; günlük ödül tavanında taban puanı sıfır olan odak kum kazanmış sayılmaz.
 - `expected.reports.daily | weekly | monthly`: `start/end`, `total_minutes`, `focus_equivalents`, `counts`, kategori dakika/yüzde haritaları, kategori satırları, günler, aktif günler ve en yoğun gün. Normal seans, Maraton odağı, tamamlanmış Maraton planı ve tamamlanmış Deneme ayrı sayılır.
 - `counts`: `normal_sessions`, `marathon_focus_sessions`, `completed_marathons`, `completed_exams`, `unknown_sessions`, `pending_sessions`.
@@ -41,11 +44,12 @@ Kaynak kayıtlar tek `REPEATABLE READ READ ONLY` snapshot'ında alınır. Varsay
 
 ## Denetlenen sözleşmeler
 
-- Denemenin saklı katalog süresi, başlangıç/bitiş, tamamlanma/vazgeçme durumu, elapsed ve ödüller. Süre bitmeden tamamlanan kayıt reddedilir; aktif/vazgeçilen Deneme ödül veya rapor dakikası üretmez.
+- Denemenin saklı plan süresi, başlangıç/bitiş, tamamlanma/vazgeçme durumu, elapsed ve ödüller.28 sözleşmesinde erken tamamlanma hâlâ reddedilir.32 varsa yalnız AYT erken tamamlanabilir: gerçek bitişten tam saniye hesabı, her300saniyeye1puan ve dondurulmuş tam kuma orantılı/floor ödül. Eski7 veya175kum snapshot yeni145 ile değiştirilmez. Aktif/vazgeçilen Deneme ödül veya rapor dakikası üretmez.
+-32 erken tamamlanan1–59saniye1deneme adedi,0dakika,0seri katkısı ve0lig olayıdır. Tam kayıtlar ve8sınav türü aynı tamamlama muhasebesini korur. Server `_exam_payload` görünümündeki gerçek `duration_seconds`, `planned_duration_seconds`, `credited_minutes`, completion kind ve gizli metadata korunması da ayrı doğrulanır; özel başlık/not metni çıktıya yazılmaz.
 - Dersin kendi soru kotası, negatif olmayan tam sayılar, doğru+yanlış+boş toplamı ve saklı bölenle net. PostgreSQL `numeric` ölçeği korunarak üçüncül netler de ondalık kaybı olmadan karşılaştırılır; sonuç zaman damgası kontrol edilir. Eksik ders sonucu sıfır net diye uydurulmaz.
 - Hesap başına UUID ve olay tekliği, Maraton odağı/plan eşlemeleri; normal ve Deneme cüzdanlarının ayrımı, toplam çalışma dakikası.
 - Çalışma günü başlangıca göre profil IANA diliminde **04:00**; lig ayı bitişe göre **İstanbul 00:00**. Tamamlanan Maraton planı son odağın bitiş çalışma gününe; odak dakikaları kendi başlangıç günlerine yazılır.
-- Beklenen normal/Deneme lig olayı kaynakları, dakika, puan, çalışma günü ve dönem ayı. Vazgeçilen Deneme lig olayı üretmez.
+- Beklenen normal/Deneme lig olayı kaynakları, dakika, puan, çalışma günü ve dönem ayı.32 erken bitişte lig zamanı planlanan son değil gerçek bitiştir; rapor/seri günü yine profil dilimindeki başlangıcın04:00günüdür. Vazgeçilen veya0dakikalık Deneme lig olayı üretmez.
 
 ## Sınırlar
 
@@ -69,3 +73,7 @@ python3 -m unittest discover -s tool/local_supabase/e2e/sim \
 ```
 
 Model testleri karışık normal/Maraton/tamamlanmış-vazgeçilen Deneme, 04:00/ay/DST, negatif ve üçte bir net, avatar harcaması, mükerrer kimlik/olay, RLS farkı ve güvenli bağlantı hatalarını kapsar. Host testleri gerçek geçici HTTP sunucusunda çalışır; çocuk süreç, posta, SQL ve cihaz eylemleri mock'tur. Bu testler canlı servis veya gerçek doğal sınav süresi testi değildir.
+
+## 32 eki doğrulaması
+
+Eski 19 regresyon korunarak 15 yeni test eklendi: toplam 34 test. AYT90dakika72kum/18puan,eski7/175snapshot,8tam tür,1saniye sayısı/seri/olay ayrımı,yanlış gerçek/planlanan projection,ay sınırı veDST kapsamı vardır. `build/verification_20261028/dus_oracles_final/summary.json` içindeki17 gerçek kontrollü SQL fixture hesabı salt okunur olarak 712/712 kontrolden geçti; bu doğal 90 dakika veya native kanıtı değildir.

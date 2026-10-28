@@ -1,0 +1,12 @@
+{
+  "platform": "android",
+  "mode": "ayt",
+  "run": "ex32-dus-android-a1",
+  "source": "integration_test/ah_exam_details_early_test.dart",
+  "api_port": 54351,
+  "host_port": 54369,
+  "started_at": "2026-10-28T12:51:02.184951+00:00",
+  "log": "<TMP>/pomosprint_dus_android_ayt_a1.log",
+  "native_exit_code": 0,
+  "finished_at": "2026-10-28T12:52:47.483578+00:00"
+}

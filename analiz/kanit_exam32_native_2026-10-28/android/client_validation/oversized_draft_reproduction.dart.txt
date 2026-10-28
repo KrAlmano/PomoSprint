@@ -1,0 +1,29 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pomodoro/models/exam_catalog_defaults.dart';
+import 'package:pomodoro/models/exam_model.dart';
+import 'package:pomodoro/models/exam_details.dart';
+import 'package:pomodoro/services/exam_persistence.dart';
+
+void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  test('review proof: autosave accepts draft that its own reader rejects', () async {
+    SharedPreferences.setMockInitialValues({});
+    final definition = offlineExamCatalog.byId('ayt')!;
+    final start = DateTime.utc(2026, 10, 28, 8);
+    final attempt = ExamAttempt(id:'a',clientUuid:'c',examId:'ayt',startedAt:start,
+      endsAt:start.add(const Duration(hours:3)),durationSeconds:10800,totalQuestions:160,
+      status:ExamAttemptStatus.completed,definition:definition);
+    final draft = ExamDetailsDraft(revision:0,title:'x'*5001,note:'',dirtyKeys:{'title'},fields:{},dirtySubjects:{});
+    final record = ExamLocalRecord(clientUuid:'c',definition:definition,createdAt:start,attempt:attempt,detailsDraft:draft);
+    final store = ExamPersistence();
+    expect(await store.write('owner', [record]), isTrue);
+    expect(ExamDetailsDraft.fromJson(draft.toJson()),isNull);
+    await expectLater(store.read('owner'),throwsA(isA<FormatException>()));
+    expect((await SharedPreferences.getInstance()).getString(ExamPersistence.keyFor('owner')),contains('xxxxx'));
+  });
+  test('review proof: oversized note roundtrip is also rejected', () {
+    final draft = ExamDetailsDraft(revision:0,title:'',note:'x'*20001,dirtyKeys:{'note'},fields:{},dirtySubjects:{});
+    expect(ExamDetailsDraft.fromJson(draft.toJson()),isNull);
+  });
+}

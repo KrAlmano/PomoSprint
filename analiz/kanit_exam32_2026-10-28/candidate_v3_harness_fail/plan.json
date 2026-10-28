@@ -1,0 +1,42 @@
+{
+  "mode": "plan_only_no_connections",
+  "endpoint": "127.0.0.1:54322",
+  "source_database": "pomosprint_overnight_baseline",
+  "new_database": "pomosprint_review32_v3",
+  "clone_command": "CREATE DATABASE \"pomosprint_review32_v3\" WITH TEMPLATE \"pomosprint_overnight_baseline\";",
+  "retention": "keep clone and evidence; never drop/replace",
+  "ready": true,
+  "pending": [],
+  "sources_sha256": {
+    "<REPO>/supabase/proposed/27_tus_segment.sql": "5836949553fc20a72348bdb2370b44e8c8d4dd51d014f64474291b8acb818fa1",
+    "<REPO>/supabase/proposed/28_exam_core.sql": "420810cbc2d9d72c2c9695da09402a01429561b296088be5139c9dbc587d7c9c",
+    "<REPO>/supabase/proposed/29_monthly_competitions.sql": "6276e13aa1846302ac3f103aff1b84b5f45f67ace401b4cc0e33220e72e6cfd5",
+    "<REPO>/supabase/proposed/30_session_start_atomic.sql": "c10d8235eb6f6f22372f8ebddb473b7ace186e2504e741705c01b1c15e4c7d73",
+    "<REPO>/supabase/proposed/32_exam_details_early_finish.sql": "d83f0b14124f1b79b8e2a542e0140ba546974e7f8548d5c8289f007bccc22b83",
+    "<REPO>/supabase/proposed/32_exam_details_early_finish_dryrun.sql": "6df73617f58c8e9924a328ffe5ace4eb8f009cffd34ca17740b66f83b3013f79",
+    "<REPO>/supabase/proposed/32_exam_details_early_finish_down.sql": "2c61c379de8a97025dc174d4d1e5e2866e86cae9cb3d56ea2a7761819425d899"
+  },
+  "full_coins": {
+    "lgs_verbal": 60,
+    "tyt": 150,
+    "ayt": 175,
+    "ydt": 4,
+    "lgs_quantitative": 3,
+    "tus_basic": 5,
+    "tus_clinical": 5
+  },
+  "early_coins": "proportional",
+  "phases": [
+    "Read-only source/empty-table gate; refuse existing review32.",
+    "CREATE DATABASE TEMPLATE; empty-clone recheck; apply27 ->28 ->29 ->30.",
+    "Pre-data dryrun and exact down/schema/ACL roundtrip.",
+    "Seed only synthetic owners and v1 completed/active attempts in clone.",
+    "Install32; full7 rewards, old snapshots, early time/points/coins.",
+    "Duplicate/concurrent terminal calls, real-end overlap, partial scope/details/revision.",
+    "Private metadata/ACL/public payload checks and data-protecting rollback guards.",
+    "Keep clone and report row/schema hashes; source remains untouched."
+  ],
+  "limits": "No main DB, live service, .env, native or31. Historical SQL timestamps are fixtures.",
+  "policy_status": "candidate_only_not_user_decision",
+  "source_policy": "pending_disabled"
+}
