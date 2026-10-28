@@ -3153,8 +3153,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get examNetInfo =>
-      'YKS, TUS and DUS: 4 wrong answers cancel 1 correct answer; LGS: 3 cancel 1. Your net scores follow this rule.';
+      'YKS, TUS, DUS and KPSS: 4 wrong answers cancel 1 correct answer; LGS: 3 cancel 1. Your net scores follow this rule.';
 
   @override
   String get examAytTestCount => '4 tests';
+
+  @override
+  String get examKpssChooseTrack => 'Choose your KPSS exam';
+
+  @override
+  String get examKpssBachelor => 'Bachelor’s';
+
+  @override
+  String get examKpssAssociate => 'Associate degree';
+
+  @override
+  String get examKpssSecondary => 'Secondary education';
+
+  @override
+  String get examKpssField => 'Field knowledge';
 }

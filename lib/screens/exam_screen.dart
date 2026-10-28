@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../models/exam_insights.dart';
 import '../models/exam_model.dart';
+import '../models/kpss_catalog.dart';
 import '../models/study_session.dart';
 import '../services/exam_persistence.dart';
 import '../services/exam_service.dart';
@@ -33,6 +34,7 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
   ExamService get _service => widget.service ?? ExamService.instance;
   int _tab = 0;
   String? _group;
+  KpssExamTrack? _selectedKpssTrack;
   bool _starting = false;
   bool _finishingEarly = false;
   List<StudySession> _studies = [];
@@ -65,6 +67,7 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
     if (!mounted) return;
     if (_owner != _service.backend.ownerId) {
       _owner = _service.backend.ownerId;
+      _selectedKpssTrack = null;
       _studies = [];
       _studiesLoaded = false;
       _studiesStale = false;
@@ -346,6 +349,51 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
 
   bool get _turkish => Localizations.localeOf(context).languageCode == 'tr';
 
+  Iterable<ExamDefinition> get _visibleExams => _service.catalog.exams.where(
+    (exam) =>
+        (_group == null || exam.segment == _group) &&
+        (_group != 'kpss' ||
+            (_selectedKpssTrack != null &&
+                kpssTrackForExam(exam.id) == _selectedKpssTrack)),
+  );
+
+  String _kpssTrackLabel(KpssExamTrack track, AppLocalizations l10n) =>
+      switch (track) {
+        KpssExamTrack.bachelor => l10n.examKpssBachelor,
+        KpssExamTrack.associate => l10n.examKpssAssociate,
+        KpssExamTrack.secondary => l10n.examKpssSecondary,
+        KpssExamTrack.field => l10n.examKpssField,
+      };
+
+  Widget _kpssTrackPicker(AppLocalizations l10n) => Padding(
+    padding: const EdgeInsets.only(top: 12),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.examKpssChooseTrack,
+          style: Theme.of(context).textTheme.titleSmall,
+        ),
+        const SizedBox(height: 6),
+        Wrap(
+          spacing: 6,
+          runSpacing: 4,
+          children: [
+            for (final track in KpssExamTrack.values)
+              ChoiceChip(
+                key: ValueKey('exam-kpss-track-${track.name}'),
+                label: Text(_kpssTrackLabel(track, l10n)),
+                selected: _selectedKpssTrack == track,
+                onSelected: (_) => setState(() => _selectedKpssTrack = track),
+                showCheckmark: false,
+                materialTapTargetSize: MaterialTapTargetSize.padded,
+              ),
+          ],
+        ),
+      ],
+    ),
+  );
+
   Widget _tabs(AppLocalizations l10n) {
     final colors = Theme.of(context).colorScheme;
     final labels = [l10n.examTabNew, l10n.examTabHistory, l10n.examTabLeague];
@@ -500,7 +548,7 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
           selected: _group == null,
           onSelected: (_) => setState(() => _group = null),
         ),
-        for (final group in const ['yks', 'lgs', 'tus', 'dus'].where(
+        for (final group in const ['yks', 'lgs', 'tus', 'dus', 'kpss'].where(
           (group) => _service.catalog.exams.any((e) => e.segment == group),
         ))
           ChoiceChip(
@@ -514,9 +562,8 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
           ),
       ],
     ),
-    for (final exam in _service.catalog.exams.where(
-      (e) => _group == null || e.segment == _group,
-    ))
+    if (_group == 'kpss') _kpssTrackPicker(l10n),
+    for (final exam in _visibleExams)
       Card(
         key: ValueKey('exam-card-${exam.id}'),
         margin: const EdgeInsets.only(top: 10),

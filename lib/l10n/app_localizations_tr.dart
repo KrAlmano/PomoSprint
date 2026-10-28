@@ -3108,8 +3108,23 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get examNetInfo =>
-      'YKS, TUS ve DUS: 4 yanlış 1 doğruyu; LGS: 3 yanlış 1 doğruyu götürür. Netlerin bu kurala göre hesaplanır.';
+      'YKS, TUS, DUS ve KPSS: 4 yanlış 1 doğruyu; LGS: 3 yanlış 1 doğruyu götürür. Netlerin bu kurala göre hesaplanır.';
 
   @override
   String get examAytTestCount => '4 test';
+
+  @override
+  String get examKpssChooseTrack => 'KPSS türünü seç';
+
+  @override
+  String get examKpssBachelor => 'Lisans';
+
+  @override
+  String get examKpssAssociate => 'Ön Lisans';
+
+  @override
+  String get examKpssSecondary => 'Ortaöğretim';
+
+  @override
+  String get examKpssField => 'Alan Bilgisi';
 }

@@ -657,6 +657,351 @@
         }
       ],
       "reward_policy_version": 2
+    },
+    {
+      "id": "kpss_bachelor_gygk",
+      "name_tr": "KPSS Lisans · Genel Yetenek–Genel Kültür",
+      "name_en": "KPSS Bachelor’s · General Ability–General Knowledge",
+      "segment": "kpss",
+      "group": "kpss",
+      "duration_seconds": 7800,
+      "total_questions": 120,
+      "wrong_answer_divisor": 4,
+      "catalog_version": 1,
+      "reward_points": 26,
+      "reward_coins": 105,
+      "subjects": [
+        {
+          "id": "general_ability",
+          "name_tr": "Genel Yetenek",
+          "name_en": "General Ability",
+          "question_count": 60,
+          "category_keys": [
+            "Türkçe",
+            "Matematik",
+            "Genel Yetenek"
+          ]
+        },
+        {
+          "id": "general_knowledge",
+          "name_tr": "Genel Kültür",
+          "name_en": "General Knowledge",
+          "question_count": 60,
+          "category_keys": [
+            "Tarih",
+            "Coğrafya",
+            "Vatandaşlık",
+            "Güncel Bilgiler",
+            "Genel Kültür"
+          ]
+        }
+      ],
+      "reward_policy_version": 2
+    },
+    {
+      "id": "kpss_associate_gygk",
+      "name_tr": "KPSS Ön Lisans · Genel Yetenek–Genel Kültür",
+      "name_en": "KPSS Associate Degree · General Ability–General Knowledge",
+      "segment": "kpss",
+      "group": "kpss",
+      "duration_seconds": 7800,
+      "total_questions": 120,
+      "wrong_answer_divisor": 4,
+      "catalog_version": 1,
+      "reward_points": 26,
+      "reward_coins": 105,
+      "subjects": [
+        {
+          "id": "general_ability",
+          "name_tr": "Genel Yetenek",
+          "name_en": "General Ability",
+          "question_count": 60,
+          "category_keys": [
+            "Türkçe",
+            "Matematik",
+            "Genel Yetenek"
+          ]
+        },
+        {
+          "id": "general_knowledge",
+          "name_tr": "Genel Kültür",
+          "name_en": "General Knowledge",
+          "question_count": 60,
+          "category_keys": [
+            "Tarih",
+            "Coğrafya",
+            "Vatandaşlık",
+            "Güncel Bilgiler",
+            "Genel Kültür"
+          ]
+        }
+      ],
+      "reward_policy_version": 2
+    },
+    {
+      "id": "kpss_secondary_gygk",
+      "name_tr": "KPSS Ortaöğretim · Genel Yetenek–Genel Kültür",
+      "name_en": "KPSS Secondary Education · General Ability–General Knowledge",
+      "segment": "kpss",
+      "group": "kpss",
+      "duration_seconds": 7800,
+      "total_questions": 120,
+      "wrong_answer_divisor": 4,
+      "catalog_version": 1,
+      "reward_points": 26,
+      "reward_coins": 105,
+      "subjects": [
+        {
+          "id": "general_ability",
+          "name_tr": "Genel Yetenek",
+          "name_en": "General Ability",
+          "question_count": 60,
+          "category_keys": [
+            "Türkçe",
+            "Matematik",
+            "Genel Yetenek"
+          ]
+        },
+        {
+          "id": "general_knowledge",
+          "name_tr": "Genel Kültür",
+          "name_en": "General Knowledge",
+          "question_count": 60,
+          "category_keys": [
+            "Tarih",
+            "Coğrafya",
+            "Vatandaşlık",
+            "Güncel Bilgiler",
+            "Genel Kültür"
+          ]
+        }
+      ],
+      "reward_policy_version": 2
+    },
+    {
+      "id": "kpss_field_business",
+      "name_tr": "KPSS Alan Bilgisi · İşletme",
+      "name_en": "KPSS Field Knowledge · Business Administration",
+      "segment": "kpss",
+      "group": "kpss",
+      "duration_seconds": 3000,
+      "total_questions": 40,
+      "wrong_answer_divisor": 4,
+      "catalog_version": 1,
+      "reward_points": 10,
+      "reward_coins": 40,
+      "subjects": [
+        {
+          "id": "business",
+          "name_tr": "İşletme",
+          "name_en": "Business Administration",
+          "question_count": 40,
+          "category_keys": [
+            "İşletme"
+          ]
+        }
+      ],
+      "reward_policy_version": 2
+    },
+    {
+      "id": "kpss_field_accounting",
+      "name_tr": "KPSS Alan Bilgisi · Muhasebe",
+      "name_en": "KPSS Field Knowledge · Accounting",
+      "segment": "kpss",
+      "group": "kpss",
+      "duration_seconds": 3000,
+      "total_questions": 40,
+      "wrong_answer_divisor": 4,
+      "catalog_version": 1,
+      "reward_points": 10,
+      "reward_coins": 40,
+      "subjects": [
+        {
+          "id": "accounting",
+          "name_tr": "Muhasebe",
+          "name_en": "Accounting",
+          "question_count": 40,
+          "category_keys": [
+            "Muhasebe"
+          ]
+        }
+      ],
+      "reward_policy_version": 2
+    },
+    {
+      "id": "kpss_field_law",
+      "name_tr": "KPSS Alan Bilgisi · Hukuk",
+      "name_en": "KPSS Field Knowledge · Law",
+      "segment": "kpss",
+      "group": "kpss",
+      "duration_seconds": 3000,
+      "total_questions": 40,
+      "wrong_answer_divisor": 4,
+      "catalog_version": 1,
+      "reward_points": 10,
+      "reward_coins": 40,
+      "subjects": [
+        {
+          "id": "law",
+          "name_tr": "Hukuk",
+          "name_en": "Law",
+          "question_count": 40,
+          "category_keys": [
+            "Hukuk"
+          ]
+        }
+      ],
+      "reward_policy_version": 2
+    },
+    {
+      "id": "kpss_field_public_administration",
+      "name_tr": "KPSS Alan Bilgisi · Kamu Yönetimi",
+      "name_en": "KPSS Field Knowledge · Public Administration",
+      "segment": "kpss",
+      "group": "kpss",
+      "duration_seconds": 3000,
+      "total_questions": 40,
+      "wrong_answer_divisor": 4,
+      "catalog_version": 1,
+      "reward_points": 10,
+      "reward_coins": 40,
+      "subjects": [
+        {
+          "id": "public_administration",
+          "name_tr": "Kamu Yönetimi",
+          "name_en": "Public Administration",
+          "question_count": 40,
+          "category_keys": [
+            "Kamu Yönetimi"
+          ]
+        }
+      ],
+      "reward_policy_version": 2
+    },
+    {
+      "id": "kpss_field_economics",
+      "name_tr": "KPSS Alan Bilgisi · İktisat",
+      "name_en": "KPSS Field Knowledge · Economics",
+      "segment": "kpss",
+      "group": "kpss",
+      "duration_seconds": 3000,
+      "total_questions": 40,
+      "wrong_answer_divisor": 4,
+      "catalog_version": 1,
+      "reward_points": 10,
+      "reward_coins": 40,
+      "subjects": [
+        {
+          "id": "economics",
+          "name_tr": "İktisat",
+          "name_en": "Economics",
+          "question_count": 40,
+          "category_keys": [
+            "İktisat"
+          ]
+        }
+      ],
+      "reward_policy_version": 2
+    },
+    {
+      "id": "kpss_field_finance",
+      "name_tr": "KPSS Alan Bilgisi · Maliye",
+      "name_en": "KPSS Field Knowledge · Public Finance",
+      "segment": "kpss",
+      "group": "kpss",
+      "duration_seconds": 3000,
+      "total_questions": 40,
+      "wrong_answer_divisor": 4,
+      "catalog_version": 1,
+      "reward_points": 10,
+      "reward_coins": 40,
+      "subjects": [
+        {
+          "id": "finance",
+          "name_tr": "Maliye",
+          "name_en": "Public Finance",
+          "question_count": 40,
+          "category_keys": [
+            "Maliye"
+          ]
+        }
+      ],
+      "reward_policy_version": 2
+    },
+    {
+      "id": "kpss_field_international_relations",
+      "name_tr": "KPSS Alan Bilgisi · Uluslararası İlişkiler",
+      "name_en": "KPSS Field Knowledge · International Relations",
+      "segment": "kpss",
+      "group": "kpss",
+      "duration_seconds": 3000,
+      "total_questions": 40,
+      "wrong_answer_divisor": 4,
+      "catalog_version": 1,
+      "reward_points": 10,
+      "reward_coins": 40,
+      "subjects": [
+        {
+          "id": "international_relations",
+          "name_tr": "Uluslararası İlişkiler",
+          "name_en": "International Relations",
+          "question_count": 40,
+          "category_keys": [
+            "Uluslararası İlişkiler"
+          ]
+        }
+      ],
+      "reward_policy_version": 2
+    },
+    {
+      "id": "kpss_field_labour_economics",
+      "name_tr": "KPSS Alan Bilgisi · Çalışma Ekonomisi ve Endüstri İlişkileri",
+      "name_en": "KPSS Field Knowledge · Labour Economics and Industrial Relations",
+      "segment": "kpss",
+      "group": "kpss",
+      "duration_seconds": 3000,
+      "total_questions": 40,
+      "wrong_answer_divisor": 4,
+      "catalog_version": 1,
+      "reward_points": 10,
+      "reward_coins": 40,
+      "subjects": [
+        {
+          "id": "labour_economics",
+          "name_tr": "Çalışma Ekonomisi ve Endüstri İlişkileri",
+          "name_en": "Labour Economics and Industrial Relations",
+          "question_count": 40,
+          "category_keys": [
+            "Çalışma Ekonomisi ve Endüstri İlişkileri"
+          ]
+        }
+      ],
+      "reward_policy_version": 2
+    },
+    {
+      "id": "kpss_field_statistics",
+      "name_tr": "KPSS Alan Bilgisi · İstatistik",
+      "name_en": "KPSS Field Knowledge · Statistics",
+      "segment": "kpss",
+      "group": "kpss",
+      "duration_seconds": 3600,
+      "total_questions": 40,
+      "wrong_answer_divisor": 4,
+      "catalog_version": 1,
+      "reward_points": 12,
+      "reward_coins": 50,
+      "subjects": [
+        {
+          "id": "statistics",
+          "name_tr": "İstatistik",
+          "name_en": "Statistics",
+          "question_count": 40,
+          "category_keys": [
+            "İstatistik"
+          ]
+        }
+      ],
+      "reward_policy_version": 2
     }
   ]
 }

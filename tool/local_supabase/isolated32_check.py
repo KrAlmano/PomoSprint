@@ -3,7 +3,9 @@
 
 Default: print a plan, read local sources only, make no database connections.
 --apply-tests: reserved for the finalized package after coordinated approval.
-Only a NEW pomosprint_review32 database may receive package/fixture writes.
+Only a NEW fixed review database may receive package/fixture writes.
+--kpss selects a separate pomosprint_review32_kpss clone; existing DUS/site
+databases are never changed by that run.
 The source is read-only, existing databases are never replaced, and the clone
 is retained on success or failure. No .env, native tool or schema 31 is used.
 
@@ -49,6 +51,25 @@ EXPECTED_FULL_POINTS = {
     'lgs_verbal': 15, 'tyt': 33, 'ayt': 36,
     'ydt': 24, 'lgs_quantitative': 16, 'tus_basic': 27, 'tus_clinical': 27, 'dus': 30,
 }
+KPSS_GENERAL_IDS = ('kpss_bachelor_gygk', 'kpss_associate_gygk', 'kpss_secondary_gygk')
+KPSS_FIELD_IDS = tuple('kpss_field_' + name for name in (
+    'business', 'accounting', 'law', 'public_administration', 'economics',
+    'finance', 'international_relations', 'labour_economics', 'statistics',
+))
+EXPECTED_FULL_COINS.update({key: 105 for key in KPSS_GENERAL_IDS})
+EXPECTED_FULL_COINS.update({key: 50 if key.endswith('_statistics') else 40 for key in KPSS_FIELD_IDS})
+EXPECTED_FULL_POINTS.update({key: 26 for key in KPSS_GENERAL_IDS})
+EXPECTED_FULL_POINTS.update({key: 12 if key.endswith('_statistics') else 10 for key in KPSS_FIELD_IDS})
+
+
+def select_target(kpss: bool = False) -> None:
+    """Select one fixed, explicitly named clone; no arbitrary DB override."""
+    global CLONE_DB, CREATE_CLONE, OUTPUT
+    if type(kpss) is not bool:
+        raise ValueError('Only the fixed KPSS target flag is accepted')
+    CLONE_DB = 'pomosprint_review32_kpss' if kpss else 'pomosprint_review32_dus'
+    OUTPUT = ROOT / 'build' / ('isolated32_kpss' if kpss else 'isolated32_dus')
+    CREATE_CLONE = f'CREATE DATABASE "{CLONE_DB}" WITH TEMPLATE "{SOURCE_DB}";'
 BASELINE_NONEMPTY = {
     'public.avatars', 'public.app_config', 'public.blocked_name_terms',
     'public.league_competition_state', 'public.marathon_presence_settings',
@@ -83,7 +104,7 @@ PACKAGE: PackageSpec | None = PackageSpec(
     dryrun=ROOT / 'supabase/proposed/32_exam_details_early_finish_dryrun.sql',
     down=ROOT / 'supabase/proposed/32_exam_details_early_finish_down.sql',
     migration='20261028060000', early_coin_policy='proportional',
-    dryrun_check_count=15, rollback_data_error='exam32_rollback_would_lose_data',
+    dryrun_check_count=17, rollback_data_error='exam32_rollback_would_lose_data',
 )
 SCENARIOS_READY = True
 
@@ -219,7 +240,7 @@ def plan(package: PackageSpec | None = PACKAGE) -> dict:
             'CREATE DATABASE TEMPLATE; empty-clone recheck; apply27 ->28 ->29 ->30.',
             'Pre-data dryrun and exact down/schema/ACL roundtrip.',
             'Seed only synthetic owners and v1 completed/active attempts in clone.',
-            'Install32; full8 rewards, old snapshots, early time/points/coins.',
+            'Install32; full20 rewards, old snapshots, early time/points/coins.',
             'Duplicate/concurrent terminal calls, real-end overlap, partial scope/details/revision.',
             'Private metadata/ACL/public payload checks and data-protecting rollback guards.',
             'Keep clone and report row/schema hashes; source remains untouched.',
@@ -414,7 +435,7 @@ def run_scenarios(database: LocalDatabase, package: PackageSpec, manifest: dict)
             before_dry = db.snapshot('before_'+path.stem+'_dryrun')
             output = db.clone(strip_psql_guards(dry_path.read_text()), error='DRYRUN_RESULT')
             values = re.findall(r'T[0-9]+[^:]*: (true|false)', output)
-            expected_count = {'27':6,'28':18,'29':15,'30':10}[path.name[:2]]
+            expected_count = {'27':6,'28':20,'29':15,'30':10}[path.name[:2]]
             ev.check('prerequisite_dryrun:'+path.name, len(values)==expected_count and all(v=='true' for v in values), {'count':len(values),'expected':expected_count})
             ev.check('prerequisite_dryrun_rollback:'+path.name, before_dry==db.snapshot('after_'+path.stem+'_dryrun'))
         db.clone(strip_psql_guards(path.read_text()))
@@ -491,10 +512,17 @@ def run_scenarios(database: LocalDatabase, package: PackageSpec, manifest: dict)
     old_done_uid = owner('old completed')
     old_done = full(old_done_uid, start(old_done_uid))
     before_old_done = ledger(old_done_uid)
+    old_kpss_uid = owner('pre32 kpss active')
+    db.rpc(old_kpss_uid, 'set_competition_target', "'kpss'")
+    old_kpss_active = start(old_kpss_uid, 'kpss_bachelor_gygk')
+    old_kpss_snapshot = db.json('SELECT definition FROM public.exam_attempts WHERE id=' + literal(old_kpss_active['id']))
     db.clone(up)
     ev.check('old_active_raw_snapshot_unchanged', old_snapshot == db.json('SELECT definition FROM public.exam_attempts WHERE id=' + literal(old_active['id'])))
     ev.check('old_completed_ledger_unchanged', before_old_done == ledger(old_done_uid))
     ev.check('old_completed_full_reward7', old_done['exam_coins_earned'] == 7)
+    ev.check('pre32_kpss_raw_snapshot_unchanged', old_kpss_snapshot == db.json('SELECT definition FROM public.exam_attempts WHERE id=' + literal(old_kpss_active['id'])))
+    old_kpss_done = full(old_kpss_uid, old_kpss_active)
+    ev.check('pre32_kpss_reward5_not_rewritten_to105', old_kpss_done['exam_coins_earned'] == 5 and old_kpss_done['points_earned'] == 26)
     expected_catalog = json.loads((ROOT / 'supabase/proposed/exam_catalog_32.json').read_text())['exams']
     actual_catalog = db.json('SELECT jsonb_agg(definition ORDER BY id) FROM public.exam_catalog')
     ev.check('exact_new_catalog', actual_catalog == sorted(expected_catalog, key=lambda row: row['id']))
@@ -513,7 +541,12 @@ def run_scenarios(database: LocalDatabase, package: PackageSpec, manifest: dict)
         if exam == 'dus':
             target=db.rpc(uid,'set_competition_target',"'dus'")
             ev.check('dus_target_before_first_session',target['current_segment']=='dus')
+        if exam.startswith('kpss_'):
+            target = db.rpc(uid, 'set_competition_target', "'kpss'")
+            ev.check('kpss_target:' + exam, target['current_segment'] == 'kpss')
         attempt = start(uid, exam)
+        if exam.startswith('kpss_'):
+            rejection(uid, 'finish_ayt_early', literal(attempt['id']), 'exam_early_finish_not_supported')
         done = full(uid, attempt)
         completed_by_exam[exam]=(uid,done)
         ev.check('full_reward:' + exam, done['status'] == 'completed' and done['exam_coins_earned'] == coins
@@ -522,6 +555,49 @@ def run_scenarios(database: LocalDatabase, package: PackageSpec, manifest: dict)
         before = ledger(uid)
         duplicate = db.rpc(uid, 'complete_exam_attempt', literal(done['id']))
         ev.check('full_duplicate:' + exam, duplicate['duplicate'] and duplicate['attempt'] == done and before == ledger(uid))
+        if exam.startswith('kpss_'):
+            subject = done['subjects'][0]
+            result = {'subject_id': subject['id'], 'correct': subject['question_count'] - 5,
+                      'wrong': 4, 'blank': 1}
+            saved = details(uid, done, {'title': 'KPSS denemem', 'note': 'Özel sonuç notu'}, [result], 0)['attempt']
+            ev.check('kpss_net_and_details:' + exam,
+                     len(saved['subject_results']) == 1
+                     and float(saved['subject_results'][0]['net']) == subject['question_count'] - 6
+                     and saved['title'] == 'KPSS denemem' and saved['details_revision'] == 1
+                     and ledger(uid) == before)
+            invalid = [dict(result, correct=subject['question_count'])]
+            rejection(uid, 'save_exam_results', literal(done['id']) + ',' + literal(json.dumps(invalid)) + '::jsonb', 'exam_result_invalid')
+            claims = literal(json.dumps({'sub': old_uid, 'role': 'authenticated'}))
+            hidden = db.clone('BEGIN; SET LOCAL request.jwt.claims=' + claims
+                              + '; SET LOCAL ROLE authenticated; SELECT count(*) FROM public.exam_subject_results WHERE attempt_id='
+                              + literal(done['id']) + '; COMMIT;')
+            ev.check('kpss_result_owner_rls:' + exam, hidden == '0')
+
+    kpss_uid, _ = completed_by_exam['kpss_bachelor_gygk']
+    kpss_rank = db.rpc(kpss_uid, 'get_my_exam_league_ranking', "'segment'")
+    kpss_owners = {uid for exam, (uid, _) in completed_by_exam.items() if exam.startswith('kpss_')}
+    kpss_owners.add(old_kpss_uid)
+    member_ids = db.json("SELECT jsonb_agg(m.user_id ORDER BY m.user_id) FROM public.competition_memberships m JOIN public.competition_rooms r ON r.id=m.room_id WHERE r.segment='kpss' AND r.kind='exam' AND r.period_month=public._competition_month(now())")
+    ev.check('kpss_category_room_has_only_kpss_owners',
+             kpss_rank['segment'] == 'kpss' and kpss_rank['room_capacity'] == 25
+             and set(member_ids) == kpss_owners)
+    ev.check('kpss_private_peers_are_masked_in_ranking',
+             len(kpss_rank['rows']) == len(kpss_owners)
+             and {row['id'] for row in kpss_rank['rows']} == {kpss_uid, None})
+    # Explicitly opt only these synthetic owners into visibility, then verify
+    # the public projection independently of private membership storage.
+    visible_owners = kpss_owners | {completed_by_exam['dus'][0]}
+    db.clone('UPDATE public.profiles SET show_in_social_feed=true WHERE id IN ('
+             + ','.join(literal(uid) + '::uuid' for uid in sorted(visible_owners)) + ');')
+    global_rank = db.rpc(kpss_uid, 'get_my_exam_league_ranking', "'global'")
+    ev.check('kpss_global_ranking_keeps_other_targets',
+             global_rank['scope'] == 'global' and kpss_owners <= {row['id'] for row in global_rank['rows']}
+             and completed_by_exam['dus'][0] in {row['id'] for row in global_rank['rows']})
+    kpss_before = ledger(kpss_uid)
+    kpss_target = db.rpc(kpss_uid, 'set_competition_target', "'yks'")
+    ev.check('kpss_mid_month_change_preserves_current_segment_and_wallet',
+             kpss_target['current_segment'] == 'kpss' and kpss_target['pending_segment'] == 'yks'
+             and ledger(kpss_uid) == kpss_before)
 
     dus_uid,dus_done=completed_by_exam['dus']
     dus_before=ledger(dus_uid)
@@ -669,7 +745,10 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--apply-tests', action='store_true',
                         help='After coordinated approval only: create local clone and execute final scenarios.')
+    parser.add_argument('--kpss', action='store_true',
+                        help='Use only the new fixed KPSS clone; preserve all existing DUS/site databases.')
     args = parser.parse_args(argv)
+    select_target(args.kpss)
     selected_package = PACKAGE
     manifest = plan(selected_package)
     if not args.apply_tests:

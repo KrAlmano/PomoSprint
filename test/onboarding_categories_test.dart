@@ -87,7 +87,7 @@ void main() {
   group('Yeni hedefler: KPSS ve dil sınavı', () {
     test('öneriler ve kategorisiz hesabın varsayılanı', () {
       expect(recommendedCategoryNames('kpss'),
-          ['Türkçe', 'Matematik', 'Tarih', 'Coğrafya', 'Vatandaşlık', 'Güncel Bilgiler', 'Eğitim Bilimleri']);
+          ['Türkçe', 'Matematik', 'Tarih', 'Coğrafya', 'Vatandaşlık', 'Güncel Bilgiler']);
       expect(recommendedCategoryNames('language'), ['Kelime', 'Okuma', 'Dilbilgisi', 'Dinleme', 'Yazma', 'Konuşma']);
       expect(_names(defaultCategorySeed(segment: 'kpss', turkish: false)),
           ['Turkish', 'Mathematics', 'History', 'Geography', 'Citizenship']);
@@ -134,14 +134,14 @@ void main() {
     });
 
     test('elle seçilenler korunur, limite sayılır ve aynı kategori iki kez seçilmez', () {
-      // Elle seçilen 'Felsefe' + KPSS'nin 7 önerisi = 8.
+      // Elle seçilen Felsefe, KPSS’nin altı genel önerisiyle korunur.
       expect(autoSelectedCategoryNames('kpss', kept: ['Felsefe'], limit: 8), recommendedCategoryNames('kpss'));
       // İki elle seçim: KPSS'nin ilk 6'sı.
       expect(autoSelectedCategoryNames('kpss', kept: ['Felsefe', 'Kendi'], limit: 8),
           recommendedCategoryNames('kpss').take(6).toList());
       // 'Mathematics' (İngilizce özel ad) = 'Matematik': yeniden seçilmez.
       expect(autoSelectedCategoryNames('kpss', kept: ['Mathematics'], limit: 8),
-          ['Türkçe', 'Tarih', 'Coğrafya', 'Vatandaşlık', 'Güncel Bilgiler', 'Eğitim Bilimleri']);
+          ['Türkçe', 'Tarih', 'Coğrafya', 'Vatandaşlık', 'Güncel Bilgiler']);
       expect(autoSelectedCategoryNames('language', kept: List.generate(8, (i) => 'K$i'), limit: 8), isEmpty);
     });
   });

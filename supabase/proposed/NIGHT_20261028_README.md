@@ -1,8 +1,8 @@
-# 28 Ekim 2026 — TUS/DUS, Deneme ve birleşik aylık lig paketleri
+# 28 Ekim 2026 — TUS/DUS/KPSS, Deneme ve birleşik aylık lig paketleri
 
 **Durum: yalnız yerelde hazırlanmıştır; canlıya uygulanmadı.** Gece boyunca canlı Supabase'e okuma/yazma isteği yapılmaz. Yeni uygulama eski sunucuda Deneme için güvenli hazırlık/kapalı görünümünü kullanır; eski normal seans/Maraton sürer.
 
-Güncel yerel sözleşme aynı 27/28/29 paketlerinde DUS içerir; yeni bir paket numarası açılmadı. Sekiz sınavın tek ödül tablosu ve AYT erken bitiş/ayrıntılar için [32 rehberi](32_exam_details_early_finish_README.md) geçerlidir. Eski yedi sınavlı yerel veritabanları değiştirilmedi; yeni kaynak zinciri temiz `pomosprint_review32_dus` ve `pomosprint_site32_dus` kopyalarında kurulur. **31 bu akışta yoktur.**
+Güncel yerel sözleşme aynı paketler içinde DUS ve KPSS içerir; yeni bir paket numarası açılmadı. Yirmi sınav/testin tek ödül tablosu ve AYT erken bitiş/ayrıntılar için [32 rehberi](32_exam_details_early_finish_README.md) geçerlidir. KPSS üç130dk GY–GK ve dokuz ayrı Alan Bilgisi testidir;27/29 zaten `kpss` içerdiği için yeniden değiştirilmez. Önceki yedi/sekiz sınavlı yerel veritabanları korunur. KPSS zinciri yeni ve boş `pomosprint_review32_kpss` üzerinde kurulur; DUS'un `review` ve `site` hedefleri otomatik taşınmaz. **31 bu akışta yoktur.**
 
 ## Uygulama sırası
 
@@ -24,7 +24,7 @@ Tam API: [EXAM_API_CONTRACT.md](EXAM_API_CONTRACT.md). Katalog: [exam_catalog_v1
 
 - Her denemenin sunucu başlangıcı, bitişi ve tam katalog sürümü değişmez snapshot'tır. Başlangıçtan önce 3-2-1 istemcide; başlangıç isteği aynı kalıcı UUID ile yeniden denenir.
 - Normal tamamlama RPC’sinde erken bitirme, başkasının denemesi, üst üste seans ve tekrar ödül reddedilir.32’nin ayrı AYT erken bitiş RPC’si gerçek süreyi kabul eder; diğer türler tam süre ister. Normal başlangıç/deneme başlangıcı/tamamlama aynı profil satırını kilitler. Normal tamamlamanın INSERT trigger'ı deneme aralığıyla çakışırsa bütün ekonomik transaction geri alınır.
-- Puan: her **5 dakika için 1 deneme puanı**.32 ile kum tek tabloda LGS Sözel60, LGS Sayısal70, YDT95, TUS Temel110, TUS Klinik110, DUS120, TYT130, AYT145 olur; sekiz katalog satırında reward_policy_version2. AYT erken bitiş kumu gerçek sürenin dondurulmuş tam ödüle oranıdır. Bunlar katalog snapshot’ındadır. Normal puan/kum cüzdanına eklenmez; netler sonucu değiştirmez.
+- Puan: her **5 dakika için 1 deneme puanı**.32 ile kum tek tabloda LGS Sözel60, LGS Sayısal70, YDT95, TUS Temel110, TUS Klinik110, DUS120, TYT130, AYT145; KPSS GY–GK105,50dk Alan Bilgisi40,60dk İstatistik50 olur. Yirmi katalog satırında reward_policy_version2. AYT erken bitiş kumu gerçek sürenin dondurulmuş tam ödüle oranıdır. Bunlar katalog snapshot’ındadır. Normal puan/kum cüzdanına eklenmez; netler sonucu değiştirmez.
 - Vazgeçme `abandoned` ve sunucunun ölçtüğü `elapsed_seconds` ile geçmişte saklanır. Sayı, toplam çalışma süresi, seri veya ekonomi kazandırmaz. Tam süre dolmuşsa vazgeçme isteği güvenli/idempotent tamamlamaya döner.
 - Kapanma ve arka plan süreyi durdurmaz; uygulama açıldığında aynı sunucu zamanlarıyla devam edilir. Bu, kullanıcının fiziksel dikkatini ölçen bir cihaz tasdiki değildir.
 - D-05: Yeni başlangıç aynı sahibin süresi dolmuş aktif denemesini önce normal tamamlama yoluyla bir kez kapatır. Süresi dolmuş aynı UUID tekrarında da yeni kayıt açmadan tamamlanmış makbuz döner. Orijinal süre/bitiş/ödül snapshot'ı korunur; henüz dolmamış deneme yine çakışma hatası verir.

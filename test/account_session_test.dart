@@ -728,7 +728,7 @@ void main() {
       await tester.pumpAndSettle();
       final prefs = await SharedPreferences.getInstance();
       final saved = OnboardingDraft.fromJson(jsonDecode(prefs.getString(OnboardingDraftStore.keyFor('uid-1'))!))!;
-      const kpss = ['Türkçe', 'Matematik', 'Tarih', 'Coğrafya', 'Vatandaşlık', 'Güncel Bilgiler', 'Eğitim Bilimleri'];
+      const kpss = ['Türkçe', 'Matematik', 'Tarih', 'Coğrafya', 'Vatandaşlık', 'Güncel Bilgiler'];
       expect(saved.segment, 'kpss');
       expect(saved.selectedCategories, ['Felsefe', ...kpss], reason: "'Fizik' otomatikti, 'Felsefe' elle seçilmişti");
       expect(saved.autoCategories, kpss);
@@ -741,7 +741,23 @@ void main() {
       );
       expect(find.text('2/7'), findsOneWidget, reason: 'adım korunur');
       expect(saved.selectedCategories, saved.autoCategories);
-      expect(saved.autoCategories, ['Türkçe', 'Matematik', 'Tarih', 'Coğrafya', 'Vatandaşlık', 'Güncel Bilgiler', 'Eğitim Bilimleri']);
+      expect(saved.autoCategories, ['Türkçe', 'Matematik', 'Tarih', 'Coğrafya', 'Vatandaşlık', 'Güncel Bilgiler']);
+    });
+
+    testWidgets('eski KPSS Eğitim Bilimleri seçimi taslakta korunur', (tester) async {
+      final saved = await restore(
+        tester,
+        const OnboardingDraft(
+          step: 2,
+          birthYear: 2000,
+          segment: 'kpss',
+          selectedCategories: ['Türkçe', 'Eğitim Bilimleri'],
+          autoCategories: ['Türkçe', 'Eğitim Bilimleri'],
+          dailyGoalMinutes: 60,
+        ),
+      );
+      expect(saved.selectedCategories, ['Türkçe', 'Eğitim Bilimleri']);
+      expect(saved.autoCategories, ['Türkçe', 'Eğitim Bilimleri']);
     });
 
     testWidgets('kullanıcının boşalttığı seçim (yeni sürüm taslağı) yeniden doldurulmaz', (tester) async {

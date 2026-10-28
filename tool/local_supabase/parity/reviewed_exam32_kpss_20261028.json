@@ -1,0 +1,113 @@
+{
+  "reference_id": "reviewed-isolated-exam32-kpss-20261028-proportional",
+  "database": "pomosprint_review32_kpss",
+  "scope": "KPSS242/242 fresh source-chain SQL verification; old DUS references remain historical. No capture CLI.",
+  "evidence": "build/isolated32_kpss/20261028T195601Z-416360a4/results.json",
+  "sources_sha256": {
+    "supabase/proposed/27_tus_segment.sql": "9bd539da18f402b09ca8416dab485a8956a686c42847517862cc3552c958d7fd",
+    "supabase/proposed/27_tus_segment_down.sql": "8517884cf07df0ae81d28fc1b5ec4ea21276764fa90d70921c0b3b60901af27f",
+    "supabase/proposed/27_tus_segment_dryrun.sql": "6bcd7561824cc7458df21a844d67e350cd9d20fea8306b4b7a32dc62d6526058",
+    "supabase/proposed/28_exam_core.sql": "ec98009e6d5652608d88e4f6661079b6ed5c1d19e346446b35b479f2b90b71d6",
+    "supabase/proposed/28_exam_core_down.sql": "14855e6af72b96367703dba7b72594b7540dc98eb49de652739e4431ec626cee",
+    "supabase/proposed/28_exam_core_dryrun.sql": "de4284d3ac302ce2d90ed54d940fc8bede2cbbe0a52f6aa6cfe7cfdf7ca345ca",
+    "supabase/proposed/29_monthly_competitions.sql": "408da466d17267bea6dbbd0527fc57e57399cc84289bde607f9ffdc92cc88a1f",
+    "supabase/proposed/29_monthly_competitions_down.sql": "aba18d29f4245f196ed636c30456ca1e0a651a9c03d45aacf7d61fac9f905dd7",
+    "supabase/proposed/29_monthly_competitions_dryrun.sql": "eb59f814651311c1bbc6b09401ad2b41739b1d099cd207028139ba0e1d9d33df",
+    "supabase/proposed/exam_catalog_v1.json": "b7e2f9400a263cce3c9ebd1473d3cb4dcd2912cb7c291b88ae347ab65d21bace",
+    "tool/local_supabase/parity/fingerprint_lines.sql": "625593a088175b2a30e6ac48fc134834451206100f582977b1a5ebcc5cb1c4ca",
+    "supabase/proposed/30_session_start_atomic.sql": "c10d8235eb6f6f22372f8ebddb473b7ace186e2504e741705c01b1c15e4c7d73",
+    "supabase/proposed/30_session_start_atomic_down.sql": "c6308def8c42da3056dbc84eb576d12734b0f599836a3afd9b006f59a4bc1d12",
+    "supabase/proposed/30_session_start_atomic_dryrun.sql": "bb3058823571c80fb382c936c1b5440ecddc8ee010cd3a0654817e0c25747908",
+    "supabase/proposed/32_exam_details_early_finish.sql": "21b0e5df5c94d0980129bcb611afa46ed9fab80b985cbf8726c21723a530abcc",
+    "supabase/proposed/32_exam_details_early_finish_down.sql": "3450b823445899814b56062d9e0958e36d50b7fd7541e5c1dafa19ab714afb7c",
+    "supabase/proposed/32_exam_details_early_finish_dryrun.sql": "7c85aba50d02f849c253bd02dff8d6f3101d1f65c6e931b59b650f3118280f2c",
+    "supabase/proposed/exam_catalog_32.json": "78b47ad95cc29bfaef3c891a1b5cb489eb8e3aed3aa3f7223326d8c8a573b9cc"
+  },
+  "expected": {
+    "schema": {
+      "col": [
+        "257",
+        "aa9aed96b49834c12e3c2f1487732d74"
+      ],
+      "con": [
+        "160",
+        "546e3cc927ec895f13e304a7f6b6cf4a"
+      ],
+      "cron": [
+        "3",
+        "fefadd57a7e0f9a7fba62d26214e6050"
+      ],
+      "defacl": [
+        "6",
+        "d257813ad5c72bd659fec221c1ed34f8"
+      ],
+      "ext": [
+        "4",
+        "2b8b22fab036282a91f3c85fd208f6db"
+      ],
+      "extver": [
+        "4",
+        "8a02433da75920eb84bb24126b84df17"
+      ],
+      "func": [
+        "118",
+        "082b35989d361790323abea21359b61f"
+      ],
+      "idx": [
+        "77",
+        "d93faf09b2b5a75275822e5a3c26c69e"
+      ],
+      "pol": [
+        "20",
+        "182c4cbfe09d2fd9ac55481c8e758c66"
+      ],
+      "rel": [
+        "43",
+        "973c20b6630162a5a59a876363b47a55"
+      ],
+      "schema": [
+        "1",
+        "6ae3d56d282d7fbcf093eae1da2f4491"
+      ],
+      "trg": [
+        "27",
+        "23e72fcf0b37305d3f80fa22fd882547"
+      ]
+    },
+    "migrations": [
+      "20261003180000|monthly_leaderboard_study_month",
+      "20261003181000|categories_order_and_privileges",
+      "20261003194000|privacy_social",
+      "20261004120000|live_snapshot",
+      "20261005120000|lig_donemi",
+      "20261005121000|seans_kilit_gec_bonus",
+      "20261005122000|avatar_satin_alma",
+      "20261005123000|kategori_butunluk",
+      "20261005124000|onboarding_profil",
+      "20261005125000|sosyal_erisim",
+      "20261005126000|segment_genisletme",
+      "20261007110000|report_submission_lock",
+      "20261007150000|marathon_break_presence",
+      "20261007160000|marathon_rewards",
+      "20261007170000|marathon_presence_confirmation",
+      "20261008190000|league_launch_policy",
+      "20261009190000|special_avatar_catalog",
+      "20261009233000|remove_unowned_ronin",
+      "20261028010000|tus_segment",
+      "20261028020000|exam_core",
+      "20261028030000|monthly_competitions",
+      "20261028040000|session_start_atomic",
+      "20261028060000|exam_details_early_finish"
+    ],
+    "catalog": {
+      "avatars": "48|3e88f75541a31ec3c8a9f83816ec40bd",
+      "exam_catalog": "20|56eb74bb8497f8bfcff4cad72fdf9f2f",
+      "competition_avatar_rewards": "30|ca20b98cdfd6c50d8c441d7334aa7472"
+    },
+    "mail_trigger": "D",
+    "policy": [
+      true,
+      "proportional"
+    ]
+  }
+}

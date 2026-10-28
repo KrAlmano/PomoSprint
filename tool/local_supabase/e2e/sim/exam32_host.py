@@ -13,10 +13,10 @@ import urllib.parse
 import e2e_host as host
 
 ROOT = Path(__file__).resolve().parents[4]
-DATABASES = {'review': 'pomosprint_review32_dus', 'site': 'pomosprint_site32_dus'}
+DATABASES = {'review': 'pomosprint_review32_dus', 'site': 'pomosprint_site32_dus', 'kpss': 'pomosprint_review32_kpss'}
 IOS_UDID = '8D0EFF44-5AF3-42E6-9F59-92CDFF8C9E5C'
 ANDROID_SERIAL = 'emulator-5554'
-PORTS = {'review': {'ios': 54359, 'android': 54369}, 'site': {'ios': 54379}}
+PORTS = {'review': {'ios': 54359, 'android': 54369}, 'site': {'ios': 54379}, 'kpss': {'ios': 54409}}
 
 
 class Handler(host.Handler):

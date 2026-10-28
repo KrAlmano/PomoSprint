@@ -17,6 +17,14 @@ REFERENCE = HERE / 'parity/reviewed_exam32_dus_20261028.json'
 DATABASE = 'pomosprint_review32_dus'
 PROFILE_DATABASES = {'review': 'pomosprint_review32_dus', 'site': 'pomosprint_site32_dus'}
 REFERENCE_ID = 'reviewed-isolated-exam32-dus-20261028-proportional'
+PROFILE_DATABASES['kpss'] = 'pomosprint_review32_kpss'
+PROFILE_REFERENCES = {
+    'review': (REFERENCE, REFERENCE_ID, 'pomosprint_review32_dus'),
+    'site': (REFERENCE, REFERENCE_ID, 'pomosprint_review32_dus'),
+    'kpss': (HERE / 'parity/reviewed_exam32_kpss_20261028.json',
+             'reviewed-isolated-exam32-kpss-20261028-proportional',
+             'pomosprint_review32_kpss'),
+}
 
 
 def sql(statement):
@@ -75,10 +83,11 @@ def main(arguments=None):
     elif len(arguments)==2 and arguments[0]=='--profile' and arguments[1] in PROFILE_DATABASES:
         profile = arguments[1]
     else:
-        raise ValueError('isolated32 parity accepts only explicit review/site profiles')
+        raise ValueError('isolated32 parity accepts only explicit review/site/kpss profiles')
     DATABASE = PROFILE_DATABASES[profile]
-    reference = json.loads(REFERENCE.read_text())
-    if reference.get('reference_id') != REFERENCE_ID or reference.get('database') != PROFILE_DATABASES['review']:
+    reference_path, reference_id, reference_database = PROFILE_REFERENCES[profile]
+    reference = json.loads(reference_path.read_text())
+    if reference.get('reference_id') != reference_id or reference.get('database') != reference_database:
         raise ValueError('unrecognized isolated32 reference')
     changed = verify_sources(reference)
     if changed:

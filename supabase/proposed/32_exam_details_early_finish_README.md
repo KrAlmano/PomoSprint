@@ -4,9 +4,9 @@
 
 ## Davranış
 
-- Tek tamamlama ödül tablosu: LGS Sözel60, LGS Sayısal70, YDT95, TUS Temel110, TUS Klinik110, DUS120, TYT130, AYT145 Deneme kumu. Sekiz tanımda reward_policy_version2 kullanılır.
-- Ödül politikası soru kataloğundan ayrıdır. Sekiz tanımda `reward_policy_version=2`; `catalog_version=1`, soru kotaları ve net bölenleri korunur. Önceden başlayan veya biten kayıtların saklı tanımları ve kazanımları değiştirilmez.
-- AYT için ayrı `finish_ayt_early(uuid)` vardır. Eski `complete_exam_attempt(uuid)` süre dolmadan hâlâ reddeder. Diğer yedi sınav erken bitirilemez.
+- Tek tamamlama ödül tablosu: LGS Sözel60, LGS Sayısal70, YDT95, TUS Temel110, TUS Klinik110, DUS120, TYT130, AYT145 Deneme kumu. KPSS Lisans/Ön Lisans/Ortaöğretim GY–GK105; sekiz50dk Alan Bilgisi testi40;60dk İstatistik50 kum verir. Yirmi tanımda reward_policy_version2 kullanılır.
+- Ödül politikası soru kataloğundan ayrıdır. Yirmi tanımda `reward_policy_version=2`; `catalog_version=1`, soru kotaları ve net bölenleri korunur. Önceden başlayan veya biten kayıtların saklı tanımları ve kazanımları değiştirilmez.
+- AYT için ayrı `finish_ayt_early(uuid)` vardır. Eski `complete_exam_attempt(uuid)` süre dolmadan hâlâ reddeder. Diğer19 sınav erken bitirilemez; buna bütün KPSS testleri dahildir.
 - Erken bitişte server saati kullanılır. Bir tam saniyeden önce ret; puan `min(snapshot_full_points, floor(elapsed_seconds/300))`. Tamamlanan1–59 saniyelik deneme1 adet sayılır,0 dakika/0 puan/0 seri katkısı/0 lig olayı verir.
 - Saklı `ends_at` ve `definition.duration_seconds` planlanan değerdir. Gerçek `finished_at`, `elapsed_seconds` ve `credited_minutes` ayrıca döner. Eski rapor tüketicilerinin doğru sayması için tamamlanmış kaydın DTO `duration_seconds` alanı gerçek saniyedir.
 - Erken tamamlanan kayıt normal/Maraton başlangıcını planlanan180 dakikanın sonuna kadar engellemez. Çakışma kontrolü tamamlanmış kayıtta gerçek `finished_at` kullanır.
@@ -60,7 +60,34 @@ python3 tool/local_supabase/isolated32_check.py --apply-tests
 
 Boş tarihî template'te eksik olabilen iki mevcut avatar paketi de runner önkoşuludur: `20261009190000_special_avatar_catalog` ve `20261009233000_remove_unowned_ronin`. Aradaki sabit katalog tarihi mevcut `prepare_overnight_backend.py` ile aynıdır; Ronin'in sahipsiz olma ve katalog hash kontrolleri gevşetilmez. Bu adım yeni32 özelliği değildir.
 
-DRYRUN, ileri gövdenin birebir kopyasını transaction içinde çalıştırır;15 yapısal kontrolü `DRYRUN_RESULT` hatasıyla bildirip tamamını geri alır. Gerçek davranış kontrolleri, ayrı klonda owner izolasyonu, eski/yeni snapshot,8 tam ödül, erken zaman/puan, tekrar/terk/deadline, metadata-only/partial net, Unicode, scope/revision, normal ekonomi ve rollback korumasını kapsamalıdır. Henüz tamamlanmamış testler başarı sayılmaz. İlk yedi sınavlı aday ve nihai turlar tarihsel kanıttır; DUS ekli yeni tur sekiz sınavı ve güncel tek ödül tablosunu kurar.
+DRYRUN, ileri gövdenin birebir kopyasını transaction içinde çalıştırır;17 yapısal kontrolü `DRYRUN_RESULT` hatasıyla bildirip tamamını geri alır. Güncel28 DRYRUN20 kontrol içerir. Gerçek davranış kontrolleri, ayrı klonda owner izolasyonu, eski/yeni snapshot,20 tam ödül, erken zaman/puan, tekrar/terk/deadline, metadata-only/partial net, Unicode, scope/revision, normal ekonomi ve rollback korumasını kapsamalıdır. Henüz tamamlanmamış testler başarı sayılmaz. İlk yedi sınavlı ve DUS ekli sekiz sınavlı turlar aşağıda tarihsel kanıt olarak korunur.
+
+## KPSS ekli kaynak ve izole çalışma
+
+KPSS aynı28/32 paketleri ve JSON kataloglarında yer alır; yeni migration numarası yoktur.27/29 zaten `kpss` hedefini destekler ve değiştirilmez. Lisans, Ön Lisans ve Ortaöğretim130dk/120 soru, iki60 soruluk resmî test olarak tutulur; yaklaşık alt ders oranları kesin soru kotası olarak sunulmaz. Alan Bilgisi dokuz ayrı40 soruluk testtir; İstatistik60dk, diğerleri50dk. Her testin neti `doğru − yanlış/4` olur; resmî standardize KPSS P3/P93/P94 puanı hesaplanmaz. MEB-AGS/ÖABT bu kataloğun parçası değildir. Kaynaklar [sınav kaynakları raporunda](../../analiz/SINAV_KAYNAKLARI_2026-10-28.md) yer alır.
+
+| KPSS denemesi | Dakika | Soru | Kum | Deneme puanı |
+|---|---:|---:|---:|---:|
+| Lisans GY–GK |130|120|105|26|
+| Ön Lisans GY–GK |130|120|105|26|
+| Ortaöğretim GY–GK |130|120|105|26|
+| İşletme / Muhasebe / Hukuk / Kamu Yönetimi / İktisat / Maliye / Uluslararası İlişkiler / Çalışma Ekonomisi ve Endüstri İlişkileri (her biri ayrı) |50|40|40|10|
+| İstatistik |60|40|50|12|
+
+GY/GK sonuçları ilgili genel çalışma kategorilerine; her Alan Bilgisi sonucu kendi ders kategorisine bağlanır. Kategori anahtarları ve TR/EN adları JSON ile istemcide birebir eşleşir. `segment=kpss`, kategori odalarını bütün KPSS adayları için kullanır; global sıralama diğer hedeflerle ortak görünür. Daha önce başlamış veya tamamlanmış denemelerin snapshot ödülleri korunur.
+
+```sh
+# Plan ağsızdır. --apply-tests yalnız yeni, boş, sabit KPSS klonunu kurar.
+python3 tool/local_supabase/isolated32_check.py --kpss
+python3 tool/local_supabase/isolated32_check.py --kpss --apply-tests
+# Başarılı SQL kanıtı ve incelenmiş KPSS parite referansından sonra:
+python3 tool/local_supabase/parity_check_exam32.py --profile kpss
+python3 tool/local_supabase/e2e/isolated32_stack.py start --profile kpss
+```
+
+KPSS hedefi `pomosprint_review32_kpss`, kanıt kökü `build/isolated32_kpss/`tır. Sabit gateway/REST/Auth portları54401/54402/54403, iOS yardımcı host portu54409'dur. `review` ve `site` hâlâ tarihsel DUS veritabanlarını seçer; referansları yeni kaynaklarla eşleşmezse güvenli olarak reddedilir, sessizce KPSS'e geçirilmez. Mevcut veritabanı ezilmez veya silinmez. Bu profil yalnız yerel sentetik hesaplar içindir; canlı SQL veya31 kurulumu yapmaz.
+
+28 Ekim KPSS turu **242/242 SQL**, **74/74 ağsız altyapı/parite/oracle/host** ve **5/5 salt okunur parite** kontrolünden geçti. Kanıt: [KPSS sunucu raporu](../../analiz/QA_KPSS_SUNUCU_2026-10-28.md), [taşınabilir SQL sonuçları](../../analiz/kanit_kpss_2026-10-28/sql-results.json), yerel ayrıntılar `build/isolated32_kpss/20261028T195601Z-416360a4/`. İlk turdaki test varsayımı, gizli profillerin sıralamada kimliklerini maskelemesini hatalı değerlendirmişti; ürünün gizlilik filtresi korunarak test düzeltildi. Başarısız tur ve klonu arşivlendi, temiz kaynaktan yeniden çalışıldı. Bu sayılar native veya gerçek130dakika testi olarak sunulmaz.
 
 ## Geri alma
 
@@ -129,7 +156,7 @@ python3 tool/local_supabase/e2e/isolated32_stack.py start --profile site
 python3 tool/local_supabase/e2e/isolated32_stack.py stop --profile site
 ```
 
-Site profili gateway `54361`, REST `54362`, Auth `54363` kullanır. Yalnız `review` ve `site` adları kabul edilir; serbest DB/URL seçimi yoktur. Review ve site stack'i aynı anda çalışabilir. Güncel site hazırlama kanıtları `build/site32_dus_bootstrap/`, stack durumu `build/verification_20261028/site32_dus_stack/` altındadır. İlk kurulumda son kanıt export'undaki Python varsayılan-DB bağlama hatası veri değiştirmeden reddedildi; hata düzeltilip boş kopya salt okunur yeniden doğrulandı.
+Site profili gateway `54361`, REST `54362`, Auth `54363` kullanır. Yalnız sabit `review`, `site` ve `kpss` adları kabul edilir; serbest DB/URL seçimi yoktur. Profiller aynı anda çalışabilir. DUS site hazırlama kanıtları `build/site32_dus_bootstrap/`, stack durumu `build/verification_20261028/site32_dus_stack/` altındadır. İlk kurulumda son kanıt export'undaki Python varsayılan-DB bağlama hatası veri değiştirmeden reddedildi; hata düzeltilip boş kopya salt okunur yeniden doğrulandı.
 
 ### Eski servislerden DUS profillerine geçiş kanıtı
 

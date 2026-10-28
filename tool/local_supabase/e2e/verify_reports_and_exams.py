@@ -27,6 +27,7 @@ PROFILES = {
     'main': (DB, 'http://127.0.0.1:54321', 'postgres'),
     'review': ('postgresql://postgres:postgres@127.0.0.1:54322/pomosprint_review32_dus', 'http://127.0.0.1:54351', 'pomosprint_review32_dus'),
     'site': ('postgresql://postgres:postgres@127.0.0.1:54322/pomosprint_site32_dus', 'http://127.0.0.1:54361', 'pomosprint_site32_dus'),
+    'kpss': ('postgresql://postgres:postgres@127.0.0.1:54322/pomosprint_review32_kpss', 'http://127.0.0.1:54401', 'pomosprint_review32_kpss'),
 }
 MAX_ROWS = 10000
 EXAM_CATEGORY = 'pomosprint:exam'
@@ -74,7 +75,7 @@ def _profile(value):
 
 def _qa_email(email, owner, profile):
     return bool(QA_EMAIL.fullmatch(email or '')) or (
-        profile == 'review' and email == f'review32-{owner}@pomosprint.local')
+        profile in {'review', 'kpss'} and email == f'review32-{owner}@pomosprint.local')
 
 
 def _local_guard(profile='main'):

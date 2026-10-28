@@ -51,7 +51,6 @@ const Map<String, List<String>> kRecommendedCategoriesBySegment = {
     'Coğrafya',
     'Vatandaşlık',
     'Güncel Bilgiler',
-    'Eğitim Bilimleri',
   ],
   'language': ['Kelime', 'Okuma', 'Dilbilgisi', 'Dinleme', 'Yazma', 'Konuşma'],
   'university': ['Ders Çalışma', 'Ödev', 'Proje', 'Sınav Hazırlık'],
@@ -72,7 +71,15 @@ List<String> recommendedCategoryNames(String? segment) =>
 
 /// [name] herhangi bir segmentin (ya da genel listenin) önerisi mi? Segment
 /// değişince elle seçilip korunan öneri de taslaktan geri gelebilsin diye.
+// Retired recommendations remain accepted when restoring an existing draft.
+// They are not automatically suggested to new KPSS users.
+const _legacyRecommendedCategoryNames = {
+  'Eğitim Bilimleri',
+  'Educational Sciences',
+};
+
 bool isRecommendedCategoryName(String name) =>
+    _legacyRecommendedCategoryNames.contains(name) ||
     kGeneralCategoryRecommendations.contains(name) ||
     kRecommendedCategoriesBySegment.values.any((names) => names.contains(name));
 

@@ -41,12 +41,13 @@ PROFILE = 'review'
 PROFILES = {
     'review': ('pomosprint_review32_dus',54351,54352,54353,'exam32-dus-20261028-final','isolated32_dus_stack','pomosprint-verify32-dus'),
     'site': ('pomosprint_site32_dus',54361,54362,54363,'site32-dus-20261028-final','site32_dus_stack','pomosprint-site32-dus'),
+    'kpss': ('pomosprint_review32_kpss',54401,54402,54403,'exam32-kpss-20261028-final','isolated32_kpss_stack','pomosprint-verify32-kpss'),
 }
 
 def select_profile(profile):
     global PROFILE,CLONE,API_PORT,REST_PORT,AUTH_PORT,LABEL,OUT,STATE,AUTH_NAME,REST_NAME
     if profile not in PROFILES:
-        raise GuardError('Only review/site profiles are accepted')
+        raise GuardError('Only review/site/kpss profiles are accepted')
     PROFILE = profile
     CLONE,API_PORT,REST_PORT,AUTH_PORT,LABEL,out,prefix = PROFILES[profile]
     OUT = ROOT / 'build/verification_20261028' / out

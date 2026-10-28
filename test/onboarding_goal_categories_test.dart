@@ -139,10 +139,10 @@ void main() {
 
       const kpssFirst6 = ['Türkçe', 'Matematik', 'Tarih', 'Coğrafya', 'Vatandaşlık', 'Güncel Bilgiler'];
       expect(_chips(tester, selectedOnly: true).toSet(), {...kpssFirst6, 'İngilizce', 'Robotik'});
-      expect(_chips(tester), containsAll(['Eğitim Bilimleri', 'Robotik', 'İngilizce']),
+      expect(_chips(tester), containsAll(['Robotik', 'İngilizce']),
           reason: 'korunan elle seçim KPSS önerisi olmasa da görünür kalır');
       expect(_chips(tester), isNot(contains('Fizik')));
-      expect(_chips(tester, selectedOnly: true), isNot(contains('Eğitim Bilimleri')), reason: 'limit 8');
+      expect(_chips(tester, selectedOnly: true), isNot(contains('Eğitim Bilimleri')), reason: 'KPSS önerisi öğretmenlik alanı içermez');
 
       final draft = await _savedDraft();
       expect(draft.segment, 'kpss');

@@ -15,9 +15,11 @@ class StackGuards(unittest.TestCase):
     def tearDown(self):
         stack.select_profile('review')
 
-    def test_only_two_fixed_profiles(self):
+    def test_only_named_fixed_profiles(self):
         stack.select_profile('site')
         self.assertEqual((stack.CLONE,stack.API_PORT,stack.REST_PORT,stack.AUTH_PORT),('pomosprint_site32_dus',54361,54362,54363))
+        stack.select_profile('kpss')
+        self.assertEqual((stack.CLONE,stack.API_PORT,stack.REST_PORT,stack.AUTH_PORT),('pomosprint_review32_kpss',54401,54402,54403))
         for profile in ['production','postgres','http://remote','review;DROP']:
             with self.subTest(profile=profile),self.assertRaises(stack.GuardError):
                 stack.select_profile(profile)

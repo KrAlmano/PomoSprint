@@ -1811,6 +1811,11 @@
   "examTabHistory": "Geçmiş",
   "examTabLeague": "Lig",
   "examFilterAll": "Tümü",
-  "examNetInfo": "YKS, TUS ve DUS: 4 yanlış 1 doğruyu; LGS: 3 yanlış 1 doğruyu götürür. Netlerin bu kurala göre hesaplanır.",
-  "examAytTestCount": "4 test"
+  "examNetInfo": "YKS, TUS, DUS ve KPSS: 4 yanlış 1 doğruyu; LGS: 3 yanlış 1 doğruyu götürür. Netlerin bu kurala göre hesaplanır.",
+  "examAytTestCount": "4 test",
+  "examKpssChooseTrack": "KPSS türünü seç",
+  "examKpssBachelor": "Lisans",
+  "examKpssAssociate": "Ön Lisans",
+  "examKpssSecondary": "Ortaöğretim",
+  "examKpssField": "Alan Bilgisi"
 }

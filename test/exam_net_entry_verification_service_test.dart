@@ -189,7 +189,7 @@ void main() {
     },
   );
   test(
-    'all eight exam types use the intended divisor and decimal separator',
+    'all twenty exam types use the intended divisor and decimal separator',
     () {
       const expected = {
         'tyt': (4, '1.75', '1,75'),
@@ -200,6 +200,18 @@ void main() {
         'tus_basic': (4, '1.75', '1,75'),
         'tus_clinical': (4, '1.75', '1,75'),
         'dus': (4, '1.75', '1,75'),
+        'kpss_bachelor_gygk': (4, '1.75', '1,75'),
+        'kpss_associate_gygk': (4, '1.75', '1,75'),
+        'kpss_secondary_gygk': (4, '1.75', '1,75'),
+        'kpss_field_business': (4, '1.75', '1,75'),
+        'kpss_field_accounting': (4, '1.75', '1,75'),
+        'kpss_field_law': (4, '1.75', '1,75'),
+        'kpss_field_public_administration': (4, '1.75', '1,75'),
+        'kpss_field_economics': (4, '1.75', '1,75'),
+        'kpss_field_finance': (4, '1.75', '1,75'),
+        'kpss_field_international_relations': (4, '1.75', '1,75'),
+        'kpss_field_labour_economics': (4, '1.75', '1,75'),
+        'kpss_field_statistics': (4, '1.75', '1,75'),
       };
       expect(
         offlineExamCatalog.exams.map((e) => e.id).toSet(),

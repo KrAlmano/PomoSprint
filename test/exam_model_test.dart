@@ -7,7 +7,7 @@ import 'package:pomodoro/models/exam_model.dart';
 
 void main() {
   test(
-    'offline reference preserves eight official question structures and current32 reward policy',
+    'offline reference preserves twenty official question structures and current32 reward policy',
     () {
       final json = jsonDecode(
         File('supabase/proposed/exam_catalog_v1.json').readAsStringSync(),
@@ -44,7 +44,7 @@ void main() {
     () {
       expect(offlineExamCatalog.available, isFalse);
       expect(offlineExamCatalog.fromServer, isFalse);
-      expect(offlineExamCatalog.exams, hasLength(8));
+      expect(offlineExamCatalog.exams, hasLength(20));
       for (final exam in offlineExamCatalog.exams) {
         expect(exam.isValid, isTrue, reason: exam.id);
         expect(ExamDefinition.fromJson(exam.toJson())?.toJson(), exam.toJson());

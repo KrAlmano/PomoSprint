@@ -254,13 +254,24 @@ class Exam32OracleTests(unittest.TestCase):
                 x=self.verify(self.build(full_coins=full,policy=policy))
                 self.assertEqual(x['status'],'PASS',self.failures(x));self.assertEqual(x['expected']['economy']['exam_coins'],expected)
 
-    def test_all_eight_full_completions(self):
+    def test_all_twenty_full_completions(self):
         values={'lgs_verbal':(4500,60),'lgs_quantitative':(4800,70),'ydt':(7200,95),
                 'tus_basic':(8100,110),'tus_clinical':(8100,110),'dus':(9000,120),'tyt':(9900,130),'ayt':(10800,145)}
+        for level in ('bachelor', 'associate', 'secondary'):
+            values[f'kpss_{level}_gygk'] = (7800, 105)
+        for field in ('business', 'accounting', 'law', 'public_administration', 'economics',
+                      'finance', 'international_relations', 'labour_economics', 'statistics'):
+            values[f'kpss_field_{field}'] = (3600, 50) if field == 'statistics' else (3000, 40)
         for kind,(seconds,coins) in values.items():
             with self.subTest(kind=kind):
                 x=self.verify(self.build(elapsed=seconds,planned=seconds,full_coins=coins,kind=kind))
                 self.assertEqual(x['status'],'PASS',self.failures(x));self.assertEqual(x['expected']['economy']['exam_coins'],coins)
+
+    def test_pre32_kpss_reward_snapshot_stays_five_after_policy_change(self):
+        result=self.verify(self.build(elapsed=7800,planned=7800,full_coins=5,policy=1,kind='kpss_bachelor_gygk'))
+        self.assertEqual(result['status'],'PASS',self.failures(result))
+        self.assertEqual(result['expected']['economy']['exam_coins'],5)
+        self.assertEqual(result['expected']['economy']['exam_points'],26)
 
     def test_one_second_counts_once_without_streak_time_or_event(self):
         x=self.verify(self.build(elapsed=1))
@@ -311,7 +322,7 @@ class Exam32OracleTests(unittest.TestCase):
         self.assertEqual(x['expected']['reports']['daily']['total_minutes'],90)
 
     def test_fixed_review_site_profiles_do_not_open_generic_database(self):
-        for profile,db in [('review','pomosprint_review32_dus'),('site','pomosprint_site32_dus')]:
+        for profile,db in [('review','pomosprint_review32_dus'),('site','pomosprint_site32_dus'),('kpss','pomosprint_review32_kpss')]:
             s=self.build();s['database']=db
             self.assertEqual(self.verify(s,profile=profile)['status'],'PASS')
             with self.assertRaises(verifier.VerificationError):self.verify(s)

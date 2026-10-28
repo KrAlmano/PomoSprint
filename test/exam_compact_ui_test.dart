@@ -84,7 +84,7 @@ void main() {
         expect(find.byKey(const ValueKey('exam-net-info')), findsOneWidget);
 
         final filterRects = <Rect>[];
-        for (final id in ['all', 'yks', 'lgs', 'tus', 'dus']) {
+        for (final id in ['all', 'yks', 'lgs', 'tus', 'dus', 'kpss']) {
           final filter = find.byKey(ValueKey('exam-filter-$id'));
           await tester.ensureVisible(filter);
           final size = tester.getSize(filter);

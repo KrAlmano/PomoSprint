@@ -1,4 +1,5 @@
 import '../models/dus_catalog.dart';
+import '../models/kpss_catalog.dart';
 
 /// Hazır kategori adlarının Türkçe/İngilizce eşleri. Ad DB'de çoğunlukla
 /// Türkçe saklanır; İngilizce arayüzle onboarding yapan kullanıcıda
@@ -51,6 +52,7 @@ const List<(String tr, String en)> kKnownCategoryNames = [
   ('Yazma', 'Writing'),
   ('Konuşma', 'Speaking'),
   ...dusAdditionalCategoryLabels,
+  ...kpssAdditionalCategoryLabels,
 ];
 
 // Dart'ın toLowerCase()'i Türkçeye özgü değil: 'İ' → 'i' + U+0307 (birleşik

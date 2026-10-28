@@ -16,12 +16,45 @@ SPEC.loader.exec_module(runner)
 
 
 class GuardTests(unittest.TestCase):
-    def test_eight_central_rewards_and_policy_version(self):
+    def tearDown(self):
+        runner.select_target(False)
+
+    def test_twenty_central_rewards_and_policy_version(self):
         path=runner.ROOT/'supabase/proposed/exam_catalog_32.json'
         rows=json.loads(path.read_text())['exams']
         expected={'lgs_verbal':60,'lgs_quantitative':70,'ydt':95,'tus_basic':110,'tus_clinical':110,'dus':120,'tyt':130,'ayt':145}
+        expected.update({key:105 for key in runner.KPSS_GENERAL_IDS})
+        expected.update({key:50 if key.endswith('_statistics') else 40 for key in runner.KPSS_FIELD_IDS})
         self.assertEqual({r['id']:r['reward_coins'] for r in rows},expected)
         self.assertTrue(all(r['reward_policy_version']==2 and r['catalog_version']==1 for r in rows))
+
+    def test_kpss_official_tests_are_separate_and_totals_are_exact(self):
+        rows=json.loads((runner.ROOT/'supabase/proposed/exam_catalog_32.json').read_text())['exams']
+        kpss={row['id']:row for row in rows if row['segment']=='kpss'}
+        self.assertEqual(set(kpss),set(runner.KPSS_GENERAL_IDS+runner.KPSS_FIELD_IDS))
+        for name,row in kpss.items():
+            self.assertEqual(row['wrong_answer_divisor'],4)
+            self.assertEqual(sum(s['question_count'] for s in row['subjects']),row['total_questions'])
+            self.assertEqual(row['reward_points'],row['duration_seconds']//300)
+            self.assertNotIn('modules',row)
+            if name in runner.KPSS_GENERAL_IDS:
+                self.assertEqual((row['duration_seconds'],row['total_questions']),(7800,120))
+                self.assertEqual([(s['id'],s['question_count']) for s in row['subjects']],
+                                 [('general_ability',60),('general_knowledge',60)])
+            else:
+                self.assertEqual((row['duration_seconds'],row['total_questions']),
+                                 (3600 if name.endswith('_statistics') else 3000,40))
+                self.assertEqual(len(row['subjects']),1)
+
+    def test_kpss_flag_is_fixed_and_default_plan_remains_connection_free(self):
+        with patch.object(runner.subprocess,'run') as call, contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(runner.main(['--kpss']),0)
+        call.assert_not_called()
+        self.assertEqual(runner.CLONE_DB,'pomosprint_review32_kpss')
+        self.assertEqual(runner.OUTPUT.name,'isolated32_kpss')
+        self.assertNotIn('pomosprint_review32_dus',runner.CREATE_CLONE)
+        with self.assertRaises(ValueError):
+            runner.select_target('production')
 
     def test_dus_official_standard_distribution_and_separate_categories(self):
         rows=json.loads((runner.ROOT/'supabase/proposed/exam_catalog_32.json').read_text())['exams']

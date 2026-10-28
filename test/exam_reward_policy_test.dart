@@ -4,7 +4,7 @@ import 'package:pomodoro/models/exam_model.dart';
 import 'package:pomodoro/models/exam_reward_policy.dart';
 
 void main() {
-  test('eight exam reward policies have the exact requested full amounts', () {
+  test('twenty exam reward policies have the exact requested full amounts', () {
     const expected = {
       'lgs_verbal': 60,
       'lgs_quantitative': 70,
@@ -14,6 +14,18 @@ void main() {
       'dus': 120,
       'tyt': 130,
       'ayt': 145,
+      'kpss_bachelor_gygk': 105,
+      'kpss_associate_gygk': 105,
+      'kpss_secondary_gygk': 105,
+      'kpss_field_business': 40,
+      'kpss_field_accounting': 40,
+      'kpss_field_law': 40,
+      'kpss_field_public_administration': 40,
+      'kpss_field_economics': 40,
+      'kpss_field_finance': 40,
+      'kpss_field_international_relations': 40,
+      'kpss_field_labour_economics': 40,
+      'kpss_field_statistics': 50,
     };
     expect(ExamRewardPolicy.byExam.keys, unorderedEquals(expected.keys));
     for (final entry in expected.entries) {

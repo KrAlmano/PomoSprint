@@ -115,7 +115,7 @@ void main() {
     },
   );
   for (final code in ['tr', 'en']) {
-    testWidgets('four exam filters and DUS social label stay localized $code', (
+    testWidgets('five exam filters and DUS social label stay localized $code', (
       tester,
     ) async {
       final b = DetailsExamBackend();
@@ -136,7 +136,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      final expected = [l10n.examFilterAll, 'YKS', 'LGS', 'TUS', 'DUS'];
+      final expected = [l10n.examFilterAll, 'YKS', 'LGS', 'TUS', 'DUS', 'KPSS'];
       final filters = tester
           .widgetList<ChoiceChip>(find.byType(ChoiceChip))
           .map((c) => (c.label as Text).data)

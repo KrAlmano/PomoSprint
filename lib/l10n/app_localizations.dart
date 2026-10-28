@@ -5306,7 +5306,7 @@ abstract class AppLocalizations {
   /// No description provided for @examNetInfo.
   ///
   /// In tr, this message translates to:
-  /// **'YKS, TUS ve DUS: 4 yanlış 1 doğruyu; LGS: 3 yanlış 1 doğruyu götürür. Netlerin bu kurala göre hesaplanır.'**
+  /// **'YKS, TUS, DUS ve KPSS: 4 yanlış 1 doğruyu; LGS: 3 yanlış 1 doğruyu götürür. Netlerin bu kurala göre hesaplanır.'**
   String get examNetInfo;
 
   /// No description provided for @examAytTestCount.
@@ -5314,6 +5314,36 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'4 test'**
   String get examAytTestCount;
+
+  /// No description provided for @examKpssChooseTrack.
+  ///
+  /// In tr, this message translates to:
+  /// **'KPSS türünü seç'**
+  String get examKpssChooseTrack;
+
+  /// No description provided for @examKpssBachelor.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lisans'**
+  String get examKpssBachelor;
+
+  /// No description provided for @examKpssAssociate.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ön Lisans'**
+  String get examKpssAssociate;
+
+  /// No description provided for @examKpssSecondary.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ortaöğretim'**
+  String get examKpssSecondary;
+
+  /// No description provided for @examKpssField.
+  ///
+  /// In tr, this message translates to:
+  /// **'Alan Bilgisi'**
+  String get examKpssField;
 }
 
 class _AppLocalizationsDelegate

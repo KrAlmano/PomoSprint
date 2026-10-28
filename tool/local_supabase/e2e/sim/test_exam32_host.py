@@ -39,10 +39,12 @@ class Exam32HostTests(unittest.TestCase):
         response = connection.getresponse()
         return response.status, response.read().decode()
 
-    def test_only_two_fixed_profiles_and_named_devices(self):
+    def test_only_named_fixed_profiles_and_devices(self):
         self.assertEqual(adapter.DATABASES, {
-            'review': 'pomosprint_review32_dus', 'site': 'pomosprint_site32_dus'})
+            'review': 'pomosprint_review32_dus', 'site': 'pomosprint_site32_dus',
+            'kpss': 'pomosprint_review32_kpss'})
         self.assertEqual(adapter.PORTS['site'], {'ios': 54379})
+        self.assertEqual(adapter.PORTS['kpss'], {'ios': 54409})
 
     def test_main_database_or_mail_routes_cannot_be_called(self):
         for method, path in [('GET', '/verify-reports?owner=anything'),

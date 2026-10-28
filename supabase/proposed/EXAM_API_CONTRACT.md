@@ -17,7 +17,7 @@ Bu sözleşme yalnız hazırlanmış yerel paket içindir; canlıya uygulanmadı
 
 Hata kodları PostgreSQL `P0001` mesajında sabittir: `exam_not_elapsed` geçici; `exam_overlap`, `exam_not_active`, `exam_not_found`, `exam_metadata_conflict`, `exam_result_invalid`, `exam_unavailable` kullanıcıya açıklanır. Auth hatası `not authenticated`; başka sahibin UUID'si `exam_not_found` ile ifşa edilmez.
 
-Katalog kimlikleri: `tyt`, `ayt`, `ydt`, `lgs_verbal`, `lgs_quantitative`, `tus_basic`, `tus_clinical`, `dus`. TUS iki ayrı100soru/135dk oturumdur. DUS tek120soru/150dk oturumdur;16ders,40temel/80klinik standart dağılım. LGS iki ayrı oturumdur;45dk ara çalışma veya ödül değildir. Katalogdaki standart sınav sayacı gerçek sınav puanını hesaplamaz.
+Katalog kimlikleri: `tyt`, `ayt`, `ydt`, `lgs_verbal`, `lgs_quantitative`, `tus_basic`, `tus_clinical`, `dus`; KPSS GY–GK için `kpss_bachelor_gygk`, `kpss_associate_gygk`, `kpss_secondary_gygk`; Alan Bilgisi için `kpss_field_business`, `kpss_field_accounting`, `kpss_field_law`, `kpss_field_public_administration`, `kpss_field_economics`, `kpss_field_finance`, `kpss_field_international_relations`, `kpss_field_labour_economics`, `kpss_field_statistics`. TUS iki ayrı100soru/135dk oturumdur. DUS tek120soru/150dk oturumdur;16ders,40temel/80klinik standart dağılım. LGS iki ayrı oturumdur;45dk ara çalışma veya ödül değildir. KPSS GY–GK130dk/120 sorudur;60 Genel Yetenek ve60 Genel Kültür sonucu girilir. Alan Bilgisi dokuz ayrı40 soruluk testtir; İstatistik60dk, diğerleri50dk. KPSS net böleni4, hedef/grup `kpss`tir. Yaklaşık alt ders ağırlıkları sabit soru kotasına çevrilmez. Katalogdaki standart sınav sayacı resmî standardize sınav puanını hesaplamaz; AGS/ÖABT eklenmez.
 
 ## Aylık lig
 
@@ -43,7 +43,7 @@ Tamamlanan denemeler profil toplam dakikasına ve04:00 serisine eklenir; normal 
 - Attempt'e `planned_duration_seconds`, `credited_minutes`, `completion_kind`, `title`, `note`, `selected_module_ids`, `details_revision` eklenir. Tamamlanmış `duration_seconds` gerçekleşen saniyedir; `ends_at` planlanan, `finished_at` gerçek bitiştir. `definition` içindeki bilinen AYT modülleri görünümde genişletilebilir; saklı eski reward snapshot'ı değişmez.
 - Başlık/not owner-only alanlardır. Sosyal/lig payload'ına, kategori adına veya telemetriye eklenmez. Net kaydı/metadata güncellemesi ödül ve lig olayı üretmez. `save_exam_results` de varsa seçili modül kapsamını korur ve gerçek değişimde revision artırır.
 
-Tam ödüller: LGS Sözel60,LGS Sayısal70,YDT95,TUS Temel110,TUS Klinik110,DUS120,TYT130,AYT145;sekiz tanımda reward_policy_version2. Normal kum/puan/lig ve Deneme cüzdanı ayrı kalır. Ayrıntılı hata, rollback ve yerel test kanıtı [32 rehberindedir](32_exam_details_early_finish_README.md).
+Tam ödüller: LGS Sözel60,LGS Sayısal70,YDT95,TUS Temel110,TUS Klinik110,DUS120,TYT130,AYT145; üç KPSS GY–GK105, sekiz50dk Alan Bilgisi40,60dk İstatistik50. Yirmi tanımda reward_policy_version2. KPSS puanları sırasıyla26/10/12; erken bitişi yoktur. Normal kum/puan/lig ve Deneme cüzdanı ayrı kalır. Önceden başlayan veya tamamlanan denemelerin ödül snapshot'ı değiştirilmez. Ayrıntılı hata, rollback ve yerel test kanıtı [32 rehberindedir](32_exam_details_early_finish_README.md).
 
 ## Ders–çalışma kategorisi eşlemesi
 
