@@ -1,12 +1,12 @@
 # pomosprint.app — TR/EN site
 
-Bu klasör PomoSprint'in statik pazarlama, destek, yasal ve Auth yardımcı sayfaları ile önündeki küçük Worker'ı içerir. Uygulama `../lib/`, sunucu kaynakları `../supabase/` altındadır. Ana geliştirme dalı [`codex/gece-2026-10-27`](https://github.com/KrAlmano/PomoSprint/tree/codex/gece-2026-10-27); repo özeldir. Son yetki yalnız bu dala normal Git push içindir. `main` merge/push, force push ve canlı site/Supabase deploy yoktur.
+Bu klasör PomoSprint'in statik pazarlama, destek, yasal ve Auth yardımcı sayfaları ile önündeki küçük Worker'ı içerir. Uygulama `../lib/`, sunucu kaynakları `../supabase/` altındadır. Ana geliştirme dalı [`codex/gece-2026-10-27`](https://github.com/KrAlmano/PomoSprint/tree/codex/gece-2026-10-27); repo özeldir. 28 Ekim son kullanıcı isteği, güncel siteyi mevcut `pomosprint-website` Worker’ına yayımlamayı kapsar. Git işlemleri yalnız bu daldadır; `main` merge/push, force push ve Supabase/App Store dağıtımı yoktur.
 
 ## Durum ve doğruluk
 
 28 Ekim B çalışmasının HTML/CSS, son Deneme arayüzünden alınan 30 ekran ve 4 videosu bu dalda hazırdır. Safari 72/72 ve dört videonun manuel kontrolü geçti; Chrome ortam engeli nedeniyle doğrulanamadı. Güncel site ve medya için gerçek sonuçlar [nihai doğrulama raporunda](../analiz/DOGRULAMA_RAPORU_2026-10-28.md), ilerleme [CODEX_ILERLEME](../analiz/CODEX_ILERLEME.md), kaynak/çıktı görseller [ekran listesinde](screenshots/README.md) tutulur. Eski 8/27 Ekim dosya ve tarayıcı sayıları yeni B paketinin kanıtı olarak taşınmaz.
 
-Yeni ürün içeriğinin yayın sırası: incelenmiş 27 TUS/DUS → 28 Deneme → 29 aylık lig sunucu paketleri, ardından yeni uygulama, ardından site. Bağımsız 30 başlangıç kotası ayrı değerlendirilir. **31 kullanıcı kararı bekliyor; bu doğrulama ortamına kurulmaz.** Yeni SQL'in canlıya uygulanmadığı durumda web metnini güncellemek uygulamadaki özelliği canlıya açmaz.
+Site, son kullanıcı isteğiyle yeni uygulamanın yayın öncesi tanıtımını içerir. Bu tanıtımın yayımlanması uygulamanın mağazalarda veya yeni sunucu paketlerinin canlıda olduğu anlamına gelmez. Uygulama yayını için 27 TUS/DUS → 28 Deneme → 29 aylık lig ve 32 paketleri ayrıca değerlendirilir. Bağımsız 30 başlangıç kotası ayrı değerlendirilir. **31 kullanıcı kararı bekliyor; bu doğrulama ortamına kurulmaz.** Yeni SQL'in canlıya uygulanmadığı durumda web metnini güncellemek uygulamadaki özelliği canlıya açmaz.
 
 29 için tarih uyarısı: resmî aylık yarış kurulum ayından sonraki ayın 1'inde 00:00 Europe/Istanbul'da etkinleşir. 31 Ekim 23:59'dan önce kurulum 1 Kasım; 1 Kasım veya sonrası kurulum 1 Aralık aktivasyonu demektir. Günlük rapor/seri sınırı profil saat diliminde 04:00 olarak kalır.
 
@@ -104,9 +104,9 @@ Bu kontroller görsel içeriği OCR ile tercüme etmez; gerçek native dil ve bo
 - Mağaza ve uygulamanın bağlı olduğu yasal/destek URL'leri korunur. Veri sorumlusu kimliği/adresi ve gönderen kimliği kullanıcı tarafından en son verilecektir; `data-fill-in="KVKK-15"` yer tutucuları gerçek bilgi gelmeden tamamlandı sayılmaz. Tasarım çalışması bu bilgileri uydurmaz.
 - Hukuki metin değişikliği iki dilde sürüm/tarih ve uygulama onay sürümleriyle koordine edilir; bu B medya/özellik güncellemesi hukuki kimlik onayı değildir.
 
-Deploy komutu bu çalışma için verilmez/çalıştırılmaz. Branch push, yerel preview veya yeni medya commit'i canlı site yayını değildir.
+Yetkili site yayını mevcut `landing/wrangler.jsonc` üzerinden `wrangler deploy --keep-vars` ile yapılır. Önce `wrangler deploy --dry-run --keep-vars`, Node testleri ve ortak parça kontrolü çalışır. Dağıtım sürümü ve canlı doğrulaması tarihli yayın raporuna kaydedilir. Canlı veritabanı, DNS veya hesap ayarı bu adımda değiştirilmez.
 
-Yeni32 AYT erken bitiş, dört test seçimi ve özel deneme adı/notu metinleri de iki dilde bulunur.32 sunucu paketi ayrıca incelenip kurulmadan ve yeni uygulama yayımlanmadan bu açıklamalar canlıya deploy edilmez. Site verisi ayrı `pomosprint_site32_dus` DB/API54361 üzerinde yedi kurgu hesapla hazırlanır; review SQL test kişilerinin verisi kopyalanmaz. Gerçek sosyal kullanıcı adı/kullanım sayısı iddiası yoktur.
+Yeni32 AYT erken bitiş, dört test seçimi ve özel deneme adı/notu metinleri de iki dilde bulunur. Bu özellikler yayın hazırlığındaki uygulamayı anlatır;32 paketinin veya uygulamanın canlıda etkinleştirildiği iddia edilmez. Site verisi ayrı `pomosprint_site32_dus` DB/API54361 üzerinde yedi kurgu hesapla hazırlanır; review SQL test kişilerinin verisi kopyalanmaz. Gerçek sosyal kullanıcı adı/kullanım sayısı iddiası yoktur.
 
 
 ## Tekrar çalıştırılabilir güvenli önizleme
