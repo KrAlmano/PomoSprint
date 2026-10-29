@@ -1,0 +1,18 @@
+{
+  "normal_entrypoint": "lib/main.dart",
+  "normal_bundle": "com.pomosprint.app",
+  "backend": "http://127.0.0.1:54361",
+  "install_preserved_preferences": true,
+  "unsaved_draft_count": 1,
+  "unsaved_draft_hashes_before": [
+    "366952d954c82df3a9df69eac813852d922a9b84796bd398810d0abc646c2cd5"
+  ],
+  "unsaved_draft_hashes_after_install": [
+    "366952d954c82df3a9df69eac813852d922a9b84796bd398810d0abc646c2cd5"
+  ],
+  "normal_build_exit_code": 0,
+  "unsaved_draft_hashes_after_launch": [
+    "366952d954c82df3a9df69eac813852d922a9b84796bd398810d0abc646c2cd5"
+  ],
+  "draft_preserved_after_launch": true
+}

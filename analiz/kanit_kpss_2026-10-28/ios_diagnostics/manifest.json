@@ -1,0 +1,259 @@
+{
+  "schema_version": 1,
+  "created_at_utc": "2026-10-28T20:31:07.324366+00:00",
+  "status": "INCOMPLETE",
+  "verification": "NATIVE_NOT_VERIFIED",
+  "both_languages_verified": false,
+  "completed_native_suite": false,
+  "notice": "Diagnostic evidence only. No successful end-to-end native KPSS result is claimed. Zero exit codes and folder names do not imply success.",
+  "runs": [
+    {
+      "run": "original",
+      "source_directory": "build/verification_20261028/kpss-native",
+      "result": "original/result.json",
+      "log": "original/native.log",
+      "status": "INCOMPLETE",
+      "verification": "NATIVE_NOT_VERIFIED",
+      "reported_status": "not recorded",
+      "reported_exit_code": 1,
+      "source_test_sha256": null,
+      "source_hash_provenance": "not recorded; not inferred",
+      "reason": "Unsaved original application draft triggered the preservation guard."
+    },
+    {
+      "run": "isolated-v2",
+      "source_directory": "build/verification_20261028/kpss-native-isolated",
+      "result": "isolated-v2/result.json",
+      "log": "isolated-v2/native.log",
+      "status": "INCOMPLETE",
+      "verification": "NATIVE_NOT_VERIFIED",
+      "reported_status": "FAIL",
+      "reported_exit_code": 0,
+      "source_test_sha256": null,
+      "source_hash_provenance": "not recorded; not inferred",
+      "reason": "Wrong test bootstrap waited for another test protocol; aborted."
+    },
+    {
+      "run": "direct",
+      "source_directory": "build/verification_20261028/kpss-native-direct",
+      "result": "direct/result.json",
+      "log": "direct/native.log",
+      "status": "INCOMPLETE",
+      "verification": "NATIVE_NOT_VERIFIED",
+      "reported_status": "FAIL",
+      "reported_exit_code": 1,
+      "source_test_sha256": "0ebea94fbb6da7c7790ef2b09507ed5af583eb8f73229009a0cf2b5febb197a1",
+      "source_hash_provenance": "run result",
+      "reason": "Direct-entrypoint run stopped at countdown rounding assertion."
+    },
+    {
+      "run": "final",
+      "source_directory": "build/verification_20261028/kpss-native-final",
+      "result": "final/result.json",
+      "log": "final/native.log",
+      "status": "INCOMPLETE",
+      "verification": "NATIVE_NOT_VERIFIED",
+      "reported_status": "FAIL",
+      "reported_exit_code": 1,
+      "source_test_sha256": "497b32669d08ddd96f9c798a63a039f088765497494f4deab786d95d339d9e86",
+      "source_hash_provenance": "run result",
+      "reason": "System notification permission sheet interrupted normal timer interaction."
+    },
+    {
+      "run": "pass-named-but-failed",
+      "source_directory": "build/verification_20261028/kpss-native-pass",
+      "result": "pass-named-but-failed/result.json",
+      "log": "pass-named-but-failed/native.log",
+      "status": "INCOMPLETE",
+      "verification": "NATIVE_NOT_VERIFIED",
+      "reported_status": "FAIL",
+      "reported_exit_code": 1,
+      "source_test_sha256": "497b32669d08ddd96f9c798a63a039f088765497494f4deab786d95d339d9e86",
+      "source_hash_provenance": "run result",
+      "reason": "Folder name is historical; run FAILED at reset target hidden by snackbar."
+    },
+    {
+      "run": "complete-named-but-incomplete",
+      "source_directory": "build/verification_20261028/kpss-native-complete",
+      "result": "complete-named-but-incomplete/result.json",
+      "log": "complete-named-but-incomplete/native.log",
+      "status": "INCOMPLETE",
+      "verification": "NATIVE_NOT_VERIFIED",
+      "reported_status": "FAIL",
+      "reported_exit_code": 0,
+      "source_test_sha256": "86c2fe1ec6bafe7fcb912e56ed1d91771d0b68a174ee3514877cc6940d4c931d",
+      "source_hash_provenance": "run result",
+      "reason": "No native test execution verified; device control stalled."
+    },
+    {
+      "run": "retry",
+      "source_directory": "build/verification_20261028/kpss-native-retry",
+      "result": "retry/result.json",
+      "log": null,
+      "status": "INCOMPLETE",
+      "verification": "NATIVE_NOT_VERIFIED",
+      "reported_status": "BLOCKED_BEFORE_TEST_EXECUTION",
+      "reported_exit_code": null,
+      "source_test_sha256": null,
+      "source_hash_provenance": "not recorded; not inferred",
+      "reason": "Blocked before test execution by simulator boot/control timeout."
+    }
+  ],
+  "device_restart": "device-restart.json",
+  "screenshots": [
+    {
+      "file": "partial-tr/e2e-kpss-bachelor-tr.png",
+      "source": "build/verification_20261028/kpss-native/screenshots/e2e-kpss-bachelor-tr.png",
+      "status": "PARTIAL",
+      "language": "tr",
+      "run": "pass-named-but-failed",
+      "capture_provenance": "Exact path recorded in pass-named-but-failed/native.log",
+      "width": 604,
+      "height": 1311,
+      "bytes": 222440,
+      "sha256": "693d6d5ac827e5994962b0cc060b93a8d928fdd0424ccea65f6e3930f659ef98"
+    },
+    {
+      "file": "partial-tr/e2e-kpss-field-tr.png",
+      "source": "build/verification_20261028/kpss-native/screenshots/e2e-kpss-field-tr.png",
+      "status": "PARTIAL",
+      "language": "tr",
+      "run": "pass-named-but-failed",
+      "capture_provenance": "Exact path recorded in pass-named-but-failed/native.log",
+      "width": 604,
+      "height": 1311,
+      "bytes": 217635,
+      "sha256": "652d8e039a9a2f5514a537725e88deb4551e8a729e44eba91b351e8439248dd2"
+    },
+    {
+      "file": "partial-tr/e2e-kpss-running-tr.png",
+      "source": "build/verification_20261028/kpss-native/screenshots/e2e-kpss-running-tr.png",
+      "status": "PARTIAL",
+      "language": "tr",
+      "run": "pass-named-but-failed",
+      "capture_provenance": "Exact path recorded in pass-named-but-failed/native.log",
+      "width": 604,
+      "height": 1311,
+      "bytes": 226627,
+      "sha256": "4ea22b46f0ed36d8773f724182022abde8d27971958c45d1e4f89c3145dc0d26"
+    },
+    {
+      "file": "partial-tr/e2e-kpss-abandoned-tr.png",
+      "source": "build/verification_20261028/kpss-native/screenshots/e2e-kpss-abandoned-tr.png",
+      "status": "PARTIAL",
+      "language": "tr",
+      "run": "pass-named-but-failed",
+      "capture_provenance": "Exact path recorded in pass-named-but-failed/native.log",
+      "width": 604,
+      "height": 1311,
+      "bytes": 204470,
+      "sha256": "44107df59d22240f952a903a49f6717f674ec9dc8733070a1230c4c521f602a4"
+    }
+  ],
+  "current_source": {
+    "path": "integration_test/aj_kpss_native_test.dart",
+    "sha256": "86c2fe1ec6bafe7fcb912e56ed1d91771d0b68a174ee3514877cc6940d4c931d",
+    "meaning": "Source at archive time; run-specific hashes above come only from each result."
+  },
+  "files": [
+    {
+      "file": "complete-named-but-incomplete/native.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "complete-named-but-incomplete/result.json",
+      "bytes": 610,
+      "sha256": "356ec7f7376473b026aa66a76a937aae563a45bfbe39a2e25c7592a6207469a1"
+    },
+    {
+      "file": "device-restart.json",
+      "bytes": 302,
+      "sha256": "763b2034942608d1de0ae115702a0cd5c64a0cc071163d29156d5701fad25935"
+    },
+    {
+      "file": "direct/native.log",
+      "bytes": 4745,
+      "sha256": "5247cdce5b4ddde6f5d54005f7e48db983b949c251a69fc485f37f6f41b8221a"
+    },
+    {
+      "file": "direct/result.json",
+      "bytes": 610,
+      "sha256": "599e042abcff0e3161a3574723e5c8dea0ac9f60bb191403a0dc6c04015bfe30"
+    },
+    {
+      "file": "final/native.log",
+      "bytes": 5003,
+      "sha256": "4ccab6e061b21e8a3b0039953a3772daba170ff2f143632f1d4e56f521cfb288"
+    },
+    {
+      "file": "final/result.json",
+      "bytes": 610,
+      "sha256": "e911e84688dd469c2539f7fea2734011c6bfcf5c88e7f0d09384258c0c80a76b"
+    },
+    {
+      "file": "isolated-v2/native.log",
+      "bytes": 595,
+      "sha256": "98f11b956c1a8bdd3d304ee714802a3c48f1dfdc4480ed035e20ea59aaaa8611"
+    },
+    {
+      "file": "isolated-v2/result.json",
+      "bytes": 538,
+      "sha256": "79685a374147e955b2f719befc61d39407ed720bf2126d66a80c8dc6c940713e"
+    },
+    {
+      "file": "original/native.log",
+      "bytes": 3146,
+      "sha256": "5731a109eddb5b92a4868734daafbd7199df97d11793dee3612632e649329c01"
+    },
+    {
+      "file": "original/result.json",
+      "bytes": 144,
+      "sha256": "a265be61c1b228ea6802e5eecc4a804189ab27ff9fd33366d519dcf8e61ed9d3"
+    },
+    {
+      "file": "partial-tr/e2e-kpss-abandoned-tr.png",
+      "bytes": 204470,
+      "sha256": "44107df59d22240f952a903a49f6717f674ec9dc8733070a1230c4c521f602a4"
+    },
+    {
+      "file": "partial-tr/e2e-kpss-bachelor-tr.png",
+      "bytes": 222440,
+      "sha256": "693d6d5ac827e5994962b0cc060b93a8d928fdd0424ccea65f6e3930f659ef98"
+    },
+    {
+      "file": "partial-tr/e2e-kpss-field-tr.png",
+      "bytes": 217635,
+      "sha256": "652d8e039a9a2f5514a537725e88deb4551e8a729e44eba91b351e8439248dd2"
+    },
+    {
+      "file": "partial-tr/e2e-kpss-running-tr.png",
+      "bytes": 226627,
+      "sha256": "4ea22b46f0ed36d8773f724182022abde8d27971958c45d1e4f89c3145dc0d26"
+    },
+    {
+      "file": "pass-named-but-failed/native.log",
+      "bytes": 7395,
+      "sha256": "4042c433f405f2a2edc10926f6fe3ac165228cc43a8c3483a183cd9b56fc0096"
+    },
+    {
+      "file": "pass-named-but-failed/result.json",
+      "bytes": 775,
+      "sha256": "d5351ddf8b44fd7b98745059e210ab9a9b5e4a5500f513fb982f14c170abeb2d"
+    },
+    {
+      "file": "retry/result.json",
+      "bytes": 248,
+      "sha256": "c6fbfe6a523f7c8cbbe23c3c30d953107e4ca3f9975bf7f0056473b9c9cfdae1"
+    }
+  ],
+  "excluded": [
+    "defines",
+    "environment files",
+    "plists",
+    "private authentication responses",
+    "application bundles",
+    "all non-allowlisted files",
+    "English screenshots"
+  ]
+}

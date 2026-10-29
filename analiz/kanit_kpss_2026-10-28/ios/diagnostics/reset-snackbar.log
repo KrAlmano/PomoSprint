@@ -1,0 +1,108 @@
+VMServiceFlutterDriver: Connecting to Flutter application at http://127.0.0.1:57020/1DObNQYxEHc=/
+VMServiceFlutterDriver: Isolate found with number: 2457645877203607
+VMServiceFlutterDriver: Isolate 2457645877203607 is runnable.
+VMServiceFlutterDriver: Isolate is paused at start.
+VMServiceFlutterDriver: Attempting to resume isolate
+flutter: 00:00 +0: KPSS official catalog, explicit selections, start and abandon TR EN
+VMServiceFlutterDriver: Connected to Flutter application.
+flutter: supabase.supabase_flutter: INFO: ***** Supabase init completed *****
+flutter: [INIT] Supabase bağlandı.
+flutter: [AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+flutter: [E2E] ekran görüntüsü: build/verification_20261028/kpss-native/screenshots/e2e-kpss-bachelor-tr.png
+flutter: [E2E] ekran görüntüsü: build/verification_20261028/kpss-native/screenshots/e2e-kpss-field-tr.png
+flutter: [E2E] ekran görüntüsü: build/verification_20261028/kpss-native/screenshots/e2e-kpss-running-tr.png
+flutter: [E2E] ekran görüntüsü: build/verification_20261028/kpss-native/screenshots/e2e-kpss-abandoned-tr.png
+flutter: ══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+flutter: The following TestFailure was thrown running a test:
+flutter: Koşul gerçekleşmedi (15 sn): dokunulacak öğe görünür ve hit-test hedefi olmalı: Found 1 widget with
+flutter: type "TextButton" that are ancestors of widget with text "Sıfırla": [
+flutter:   TextButton(style: ButtonStyle#04513(foregroundColor:
+flutter: WidgetStateMapper<Color?>({WidgetState.disabled: null, WidgetState.any: Color(alpha: 1.0000, red:
+flutter: 0.3529, green: 0.2510, blue: 0.2392, colorSpace: ColorSpace.sRGB)}), overlayColor:
+flutter: WidgetStateMapper<Color?>({WidgetState.pressed: Color(alpha: 0.1020, red: 0.3529, green: 0.2510,
+flutter: blue: 0.2392, colorSpace: ColorSpace.sRGB), WidgetState.hovered: Color(alpha: 0.0784, red: 0.3529,
+flutter: green: 0.2510, blue: 0.2392, colorSpace: ColorSpace.sRGB), WidgetState.focused: Color(alpha: 0.1020,
+flutter: red: 0.3529, green: 0.2510, blue: 0.2392, colorSpace: ColorSpace.sRGB)}), mouseCursor:
+flutter: WidgetStateMapper<MouseCursor?>({WidgetState.disabled: null, WidgetState.any: null})), dependencies:
+flutter: [IconTheme, InheritedCupertinoTheme, MediaQuery, _InheritedTheme,
+flutter: _LocalizationsScope-[GlobalKey#15356], _ScrollableScope], state: _ButtonStyleState#fbf16),
+flutter: ]
+flutter:
+flutter: When the exception was thrown, this was the stack:
+flutter: #0      fail (package:matcher/src/expect/expect.dart:187:31)
+flutter: #1      pumpUntilTrue (file:///Users/almano/Desktop/Projects/Pomodoro/integration_test/support/e2e.dart:157:3)
+flutter: <asynchronous suspension>
+flutter: #2      tapOn (file:///Users/almano/Desktop/Projects/Pomodoro/integration_test/support/e2e.dart:178:3)
+flutter: <asynchronous suspension>
+flutter: #3      _normalStartAndCancel (file:///Users/almano/Desktop/Projects/Pomodoro/integration_test/aj_kpss_native_test.dart:298:3)
+flutter: <asynchronous suspension>
+flutter: #4      main.<anonymous closure> (file:///Users/almano/Desktop/Projects/Pomodoro/integration_test/aj_kpss_native_test.dart:353:9)
+flutter: <asynchronous suspension>
+flutter: #5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+flutter: <asynchronous suspension>
+flutter: #6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+flutter: <asynchronous suspension>
+flutter: #7      TestWidgetsFlutterBinding._createTestCompletionHandler.<anonymous closure> (package:flutter_test/src/binding.dart:1706:12)
+flutter: <asynchronous suspension>
+flutter:
+flutter: The test description was:
+flutter:   KPSS official catalog, explicit selections, start and abandon TR EN
+flutter: ════════════════════════════════════════════════════════════════════════════════════════════════════
+flutter: 00:50 +0: KPSS official catalog, explicit selections, start and abandon TR EN [E]
+flutter:   Test failed. See exception logs above.
+  The test description was: KPSS official catalog, explicit selections, start and abandon TR EN
+flutter:
+flutter: 00:50 +0 -1: (tearDownAll)
+flutter: 00:50 +1 -1: Some tests failed.
+Failure Details:
+Failure in method: KPSS official catalog, explicit selections, start and abandon TR EN
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞═════════════════
+The following TestFailure was thrown running a test:
+Koşul gerçekleşmedi (15 sn): dokunulacak öğe görünür ve hit-test
+hedefi olmalı: Found 1 widget with type "TextButton" that are
+ancestors of widget with text "Sıfırla": [
+  TextButton(style: ButtonStyle#04513(foregroundColor:
+WidgetStateMapper<Color?>({WidgetState.disabled: null,
+WidgetState.any: Color(alpha: 1.0000, red: 0.3529, green: 0.2510,
+blue: 0.2392, colorSpace: ColorSpace.sRGB)}), overlayColor:
+WidgetStateMapper<Color?>({WidgetState.pressed: Color(alpha:
+0.1020, red: 0.3529, green: 0.2510, blue: 0.2392, colorSpace:
+ColorSpace.sRGB), WidgetState.hovered: Color(alpha: 0.0784, red:
+0.3529, green: 0.2510, blue: 0.2392, colorSpace:
+ColorSpace.sRGB), WidgetState.focused: Color(alpha: 0.1020, red:
+0.3529, green: 0.2510, blue: 0.2392, colorSpace:
+ColorSpace.sRGB)}), mouseCursor:
+WidgetStateMapper<MouseCursor?>({WidgetState.disabled: null,
+WidgetState.any: null})), dependencies: [IconTheme,
+InheritedCupertinoTheme, MediaQuery, _InheritedTheme,
+_LocalizationsScope-[GlobalKey#15356], _ScrollableScope], state:
+_ButtonStyleState#fbf16),
+]
+
+When the exception was thrown, this was the stack:
+#0      fail (package:matcher/src/expect/expect.dart:187:31)
+#1      pumpUntilTrue (file:///Users/almano/Desktop/Projects/Pomodoro/integration_test/support/e2e.dart:157:3)
+<asynchronous suspension>
+#2      tapOn (file:///Users/almano/Desktop/Projects/Pomodoro/integration_test/support/e2e.dart:178:3)
+<asynchronous suspension>
+#3      _normalStartAndCancel (file:///Users/almano/Desktop/Projects/Pomodoro/integration_test/aj_kpss_native_test.dart:298:3)
+<asynchronous suspension>
+#4      main.<anonymous closure> (file:///Users/almano/Desktop/Projects/Pomodoro/integration_test/aj_kpss_native_test.dart:353:9)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+#7      TestWidgetsFlutterBinding._createTestCompletionHandler.<anonymous closure> (package:flutter_test/src/binding.dart:1706:12)
+<asynchronous suspension>
+
+The test description was:
+  KPSS official catalog, explicit selections, start and abandon
+  TR EN
+═════════════════════════════════════════════════════════════════
+
+end of failure 1
+
+
+
+Leaving the application running.

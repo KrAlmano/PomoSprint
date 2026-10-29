@@ -1,0 +1,24 @@
+VMServiceFlutterDriver: Connecting to Flutter application at http://127.0.0.1:58912/XTciHQacUU0=/
+VMServiceFlutterDriver: Isolate found with number: 2118961783770127
+VMServiceFlutterDriver: Isolate 2118961783770127 is runnable.
+VMServiceFlutterDriver: Isolate is paused at start.
+VMServiceFlutterDriver: Attempting to resume isolate
+flutter: 00:00 +0: KPSS official catalog, explicit selections, start and abandon TR EN
+VMServiceFlutterDriver: Connected to Flutter application.
+flutter: supabase.supabase_flutter: INFO: ***** Supabase init completed *****
+flutter: [INIT] Supabase bağlandı.
+flutter: [AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+flutter: [E2E] ekran görüntüsü: build/verification_20261028/kpss-native/screenshots/e2e-kpss-bachelor-tr.png
+flutter: [E2E] ekran görüntüsü: build/verification_20261028/kpss-native/screenshots/e2e-kpss-field-tr.png
+flutter: [E2E] ekran görüntüsü: build/verification_20261028/kpss-native/screenshots/e2e-kpss-running-tr.png
+flutter: [E2E] ekran görüntüsü: build/verification_20261028/kpss-native/screenshots/e2e-kpss-abandoned-tr.png
+flutter: [KPSS_NATIVE] tr official catalog12 tracks4 subjects120/40 durations130/50/60 TR-EN cards PASS; real3s start-abandon zeroRewards; normalFocusReleased PASS
+flutter: [E2E] ekran görüntüsü: build/verification_20261028/kpss-native/screenshots/e2e-kpss-bachelor-en.png
+flutter: [E2E] ekran görüntüsü: build/verification_20261028/kpss-native/screenshots/e2e-kpss-field-en.png
+flutter: [E2E] ekran görüntüsü: build/verification_20261028/kpss-native/screenshots/e2e-kpss-running-en.png
+flutter: [E2E] ekran görüntüsü: build/verification_20261028/kpss-native/screenshots/e2e-kpss-abandoned-en.png
+flutter: [KPSS_NATIVE] en official catalog12 tracks4 subjects120/40 durations130/50/60 TR-EN cards PASS; real3s start-abandon zeroRewards; normalFocusReleased PASS
+flutter: 01:21 +1: (tearDownAll)
+flutter: 01:21 +2: All tests passed!
+All tests passed.
+Leaving the application running.

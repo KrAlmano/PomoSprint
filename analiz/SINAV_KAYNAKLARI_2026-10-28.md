@@ -75,3 +75,14 @@ TUS Fizyoloji ile Histoloji/Embriyoloji, `Fizyoloji, Histoloji ve Embriyoloji` �
 Klinik alanların her biri10 sorudur: Restoratif Diş Tedavisi; Protetik Diş Tedavisi; Ağız, Diş ve Çene Cerrahisi; Ağız, Diş ve Çene Radyolojisi; Periodontoloji; Ortodonti; Endodonti; Çocuk Diş Hekimliği (Pedodonti).
 
 Tablo **yaklaşık kapsamdır**; kılavuz, dağılımın test planına göre değişebileceğini belirtir. Uygulama bu standart deneme planını kullanır; gelecek her kitapçığın aynı dağılımda olacağını garanti etmez. Net ve odak puanı, ÖSYM'nin standartlaştırılmış yerleştirme puanı olarak sunulmaz. Özel ek süre/muafiyetler standart150 dakikaya otomatik eklenmez.
+
+
+## KPSS — 28 Ekim ek doğrulaması
+
+[Lisans 2026 kılavuzu](https://dokuman.osym.gov.tr/pdfdokuman/2026/KPSS/LISANS/kilavuz_Ld01072026.pdf): §3.1 PDF18–19 (basılı16–17) ve §3.10 PDF25 (basılı22). Genel Yetenek60 + Genel Kültür60, tek120soruluk/130dakikalık oturumdur. Alan Bilgisi testleri ayrı kitapçık ve sürelere sahiptir; her biri40soru, İstatistik60dakika, diğerleri50dakikadır. Alanlar: İşletme, Muhasebe, Hukuk, Kamu Yönetimi, İktisat, Maliye, Uluslararası İlişkiler, Çalışma Ekonomisi ve Endüstri İlişkileri, İstatistik. Üç alanı serbest kullanılabilen ortak150dakika gibi sunmuyoruz. Net doğru−yanlış/4; resmî yerleştirme puanı hesaplanmıyor.
+
+[Ön Lisans 2026 kılavuzu](https://dokuman.osym.gov.tr/web/2026/8/basvuru-kilavuzu-fqs59p-13083438.pdf): PDF16 süre/soru,PDF21net,PDF33kapsam. [Ortaöğretim 2026 kılavuzu](https://dokuman.osym.gov.tr/web/2026/8/basvuru-kilavuzu-ci4pae-27090228.pdf): PDF16süre/soru,PDF22net,PDF34kapsam. İkisi de GY60+GK60,130dakika ve doğru−yanlış/4 kullanır. Üç öğrenim düzeyinin kategori ve kayıtları farklı sınav kimliklerinde tutulur.
+
+Konu dağılımları yaklaşık ağırlıklardır: GY sözel/sayısal eşit; GK tarih45%,coğrafya30%,yurttaşlık15%,güncel/genel konular10%. Kesin alt ders kotası uydurmak yerine net girişinde resmî60+60test toplamları kullanılır. İlgili çalışma kategorileri bu iki kişisel net içgörüsüne bağlanır.
+
+Öğretmenlik ÖABT, KPSS A Grubu alan sınavı değildir. [2026MEB-AGS kılavuzu](https://dokuman.osym.gov.tr/web/2026/7/basvuru-kilavuzu-p9djhk-30105733.pdf), PDF16ve22 bunu ayrı yapı olarak açıklar. Bu istekte AGS/ÖABT/DHBT eklenmedi. Adayın kurumunun istediği sınav ve puan türünü kendisi seçmesi gerekir; uygulama mesleğe göre sınav atamaz. Uygulama odak puanı ve kumları ÖSYM puanı değildir.

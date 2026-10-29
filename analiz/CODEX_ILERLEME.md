@@ -527,3 +527,23 @@ Canlı Safari turu tamam:18/18 sayfa/genişlik,4video oynama+pause/resume,menü/
 KullanıcıweeklyENgörselindeeskidençizilmişadaolduğunubuldu. AynıyerelDenizhesabında İngilizcehaftalıkrapor doğrudansimctl ile tekrarçekildi;ham1179×2556→native604×1311→web540×1170;düzboyama/kırpma yok. Capturemetaeskihashleriyenisiniayırıyor,30PNGadamerkezianaliziPASS.3authyardımcıHTMLCSSa→c. Node172/172,partials0;buiki düzeltmehenüzdeployedilmedi.
 
 AyrıaktifistekKPSS:resmî2026kılavuzlarıincelendi;3GY-GKdüzeyi120soru130dk,9alan40soru(İstatistik60dk,diğerleri50dk),netD-Y/4. AGS/ÖABTKPSSalanınakarıştırılmayacak. Uygulama/sunucuajanlarıplanladı;webfixpushbitince uygulama yazımı başlayacak.
+
+### 28 Ekim son devam — onaylı site düzeltmesi ve KPSS hazırlığı
+
+Kullanıcının açık onayıyla yalnız `6cfd9b5` kaynağı geçici ayrı klasörden yayımlandı: Worker `ad2fc988-4462-40ae-9333-ab0107e2138b`. Adasız EN haftalık PNG ve üç yardımcı sayfanın CSS sürümü dahil 6/6 canlı kontrol geçti. KPSS bu yayında yoktur; yeni deploy ayrıca onay gerektirir.
+
+KPSS kodu/site hazırlığı: 3 öğrenim düzeyinde GY–GK 120 soru/130 dk/105 kum/26 puan; 8 alan testi 40 soru/50 dk/40 kum/10 puan; İstatistik 40 soru/60 dk/50 kum/12 puan. TR/EN, açık tür seçimi, 20 kayıt/5 aile. Eski 8 türün ödülleri ve snapshot'ları değişmedi. ÖSYM kaynakları ve ayrıntılar `QA_KPSS_2026-10-28.md` içindedir. 27/29 zaten KPSS destekler; 28/32 aynı proposed paketlerinde güncellendi, 31 yok. Canlı DB, ana ve eski DUS/site kopyaları korunur.
+
+Tam ürün kapısı: analyze temiz, Flutter 1493 PASS + 5 isteğe bağlı PNG atlaması, Node 173/173, partial check temiz. İzole KPSS DB: SQL 242/242, ağsız Python 74/74, parite 5/5. Taşınabilir kanıt `analiz/kanit_kpss_2026-10-28/`.
+
+**Native son tur tamamlanmadı.** İlk normal-bundle testinde bekleyen sonuç taslağı guard tarafından korundu; ardından ayrı `com.pomosprint.qa.kpss` kullanıldı. Saniye yuvarlaması ve bildirim snackbar'ının Sıfırla'yı örtmesi için yalnız test sürücüsü düzeltildi. Asıl uygulamanın tercih SHA'sı ara kontrollerde aynıydı. Başarısız yeni QA seansları kendi public vazgeç/iptal çağrılarıyla kapatıldı; kendi timer anahtarı dışında tercihe dokunulmadı. Son test paketi derlendi, ancak Mac yük ortalaması 430'u aştı; simülatör komutları yanıt vermedi. Tek QA iPhone'a veri silmeyen shutdown/boot uygulandı; bootstatus 70 saniye, sonraki terminate 45 saniye yanıt vermedi. Ek test/analiz süreçleri kapatıldı. Boşta duran QA Android kapatıldı, AVD/verisi silinmedi.
+
+4 TR görüntü ve başarısız/tamamlanmamış kayıtlar `ios_diagnostics` altında açıkça NATIVE_NOT_VERIFIED işaretli; EN/native PASS iddiası yoktur. Kullanıcıya Mac kilidini/Simulator'ü kontrol etmesi soruldu. **Bir sonraki iş:** Mac/Simulator düzeldikten sonra ayrı QA kimliğiyle son native tur; ardından asıl uygulamayı `lib/main.dart` ile yeniden kurma ve mevcut taslağı doğrulama. İlk test asıl uygulamanın çalıştırma paketini değiştirdiği için normal paket geri kurulmadan simülatör kullanıcı incelemesine hazır sayılmaz. Kaynak, veri ve taslak korunur. Main/merge/force veya yeni canlı deploy yoktur.
+
+### 29 Ekim — engel çözüldü, son native ve normal uygulama tamamlandı
+
+Kullanıcı Mac'in açık olduğunu belirtti; Simulator uygulamasını kapatıp yeniden açtı. Kişisel `HocamMacVar · iPhone 17` cihazı değiştirilmeden QA iPhone 16 açıldı; bootstatus11,15sn ve iki yerel servisHTTP200. Aynı derlenmiş paketin son koşusu **TR/EN PASS**, 8PNG, resmî12KPSS türü/4seçim/süre-soru-ödül eşliği, doğal kısa başlangıç→vazgeç→0ödül, normal25dk başlat→Sıfırla ve iki vazgeçilmiş kayıt/sıfır cüzdan kazanımı doğrulandı. `ios/manifest.json` nihai başarıdır; önceki `ios_diagnostics` tarihsel başarısız girişimlerdir.
+
+Son native dosya analizi temiz; Node173/173 ve partial check tekrar geçti. Ürün kodu önceki1493Flutter/5opsiyonelPNG turundan sonra değişmedi; son düzeltmeler yalnız native test sürücüsündedir ve bu son koşuda doğrulandı. Normal `lib/main.dart` debugsim paketi yeniden derlendi (47,6sn), aynı `com.pomosprint.app` kimliğiyle kuruldu/açıldı. Kurulumda bütün tercihler korundu; bir adet bekleyen taslağın hash'i açılıştan sonra da aynıydı. 25:00 ana ekranı,29puan/80kum görüldü. Normal uygulama hâlâ yerel site54361’e bağlıdır; yeniKPSS test ortamı54401 ayrıdır.
+
+Geçici `com.pomosprint.qa.kpss` uygulaması, dört kopya QA app paketi ve iki özel kurtarma yedeği kaldırıldı. Normal uygulama/cihaz verileri, test logları ve kanıtlar korundu. QA Android kapalı; AVD silinmedi. Normal QA iPhone penceresi öne getirildi. Git kaynak kontrol noktaları210afe9 ve3cd6bc0; kapanış doküman/kanıt commit’i bunların üzerine gelir. Son onaylı web yayını6cfd9b5/ad2fc988… ve KPSS içermez; yeni deploy, canlıSQL,31,main/merge/force yok.

@@ -1,0 +1,73 @@
+VMServiceFlutterDriver: Connecting to Flutter application at http://127.0.0.1:56756/AWzy4ae9fMI=/
+VMServiceFlutterDriver: Isolate found with number: 2692285748227371
+VMServiceFlutterDriver: Isolate 2692285748227371 is runnable.
+VMServiceFlutterDriver: Isolate is paused at start.
+VMServiceFlutterDriver: Attempting to resume isolate
+flutter: 00:00 +0: KPSS official catalog, explicit selections, start and abandon TR EN
+VMServiceFlutterDriver: Connected to Flutter application.
+flutter: supabase.supabase_flutter: INFO: ***** Supabase init completed *****
+flutter: [INIT] Supabase bağlandı.
+flutter: [AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+flutter: [E2E] ekran görüntüsü: build/verification_20261028/kpss-native/screenshots/e2e-kpss-bachelor-tr.png
+flutter: [E2E] ekran görüntüsü: build/verification_20261028/kpss-native/screenshots/e2e-kpss-field-tr.png
+flutter: [E2E] ekran görüntüsü: build/verification_20261028/kpss-native/screenshots/e2e-kpss-running-tr.png
+flutter: [E2E] ekran görüntüsü: build/verification_20261028/kpss-native/screenshots/e2e-kpss-abandoned-tr.png
+flutter: ══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+flutter: The following TestFailure was thrown running a test:
+flutter: Normal focus must start after an abandoned KPSS attempt
+flutter:
+flutter: When the exception was thrown, this was the stack:
+flutter: #0      fail (package:matcher/src/expect/expect.dart:187:31)
+flutter: #1      _until (file:///Users/almano/Desktop/Projects/Pomodoro/integration_test/aj_kpss_native_test.dart:115:3)
+flutter: <asynchronous suspension>
+flutter: #2      _normalStartAndCancel (file:///Users/almano/Desktop/Projects/Pomodoro/integration_test/aj_kpss_native_test.dart:291:3)
+flutter: <asynchronous suspension>
+flutter: #3      main.<anonymous closure> (file:///Users/almano/Desktop/Projects/Pomodoro/integration_test/aj_kpss_native_test.dart:353:9)
+flutter: <asynchronous suspension>
+flutter: #4      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+flutter: <asynchronous suspension>
+flutter: #5      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+flutter: <asynchronous suspension>
+flutter: #6      TestWidgetsFlutterBinding._createTestCompletionHandler.<anonymous closure> (package:flutter_test/src/binding.dart:1706:12)
+flutter: <asynchronous suspension>
+flutter:
+flutter: The test description was:
+flutter:   KPSS official catalog, explicit selections, start and abandon TR EN
+flutter: ════════════════════════════════════════════════════════════════════════════════════════════════════
+flutter: 01:02 +0: KPSS official catalog, explicit selections, start and abandon TR EN [E]
+flutter:   Test failed. See exception logs above.
+  The test description was: KPSS official catalog, explicit selections, start and abandon TR EN
+flutter:
+flutter: 01:02 +0 -1: (tearDownAll)
+flutter: 01:02 +1 -1: Some tests failed.
+Failure Details:
+Failure in method: KPSS official catalog, explicit selections, start and abandon TR EN
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞═════════════════
+The following TestFailure was thrown running a test:
+Normal focus must start after an abandoned KPSS attempt
+
+When the exception was thrown, this was the stack:
+#0      fail (package:matcher/src/expect/expect.dart:187:31)
+#1      _until (file:///Users/almano/Desktop/Projects/Pomodoro/integration_test/aj_kpss_native_test.dart:115:3)
+<asynchronous suspension>
+#2      _normalStartAndCancel (file:///Users/almano/Desktop/Projects/Pomodoro/integration_test/aj_kpss_native_test.dart:291:3)
+<asynchronous suspension>
+#3      main.<anonymous closure> (file:///Users/almano/Desktop/Projects/Pomodoro/integration_test/aj_kpss_native_test.dart:353:9)
+<asynchronous suspension>
+#4      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#5      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._createTestCompletionHandler.<anonymous closure> (package:flutter_test/src/binding.dart:1706:12)
+<asynchronous suspension>
+
+The test description was:
+  KPSS official catalog, explicit selections, start and abandon
+  TR EN
+═════════════════════════════════════════════════════════════════
+
+end of failure 1
+
+
+
+Leaving the application running.

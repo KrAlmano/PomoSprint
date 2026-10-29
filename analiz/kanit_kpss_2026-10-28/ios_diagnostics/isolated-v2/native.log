@@ -1,0 +1,6 @@
+VMServiceFlutterDriver: Connecting to Flutter application at http://127.0.0.1:55975/NfCqDUKfkqw=/
+VMServiceFlutterDriver: Isolate found with number: 5707006119593311
+VMServiceFlutterDriver: Isolate 5707006119593311 is runnable.
+VMServiceFlutterDriver: Isolate is paused at start.
+VMServiceFlutterDriver: Attempting to resume isolate
+VMServiceFlutterDriver: Flutter Driver extension is taking a long time to become available. Ensure your test app (often "lib/main.dart") imports "package:flutter_driver/driver_extension.dart" and calls enableFlutterDriverExtension() as the first call in main().

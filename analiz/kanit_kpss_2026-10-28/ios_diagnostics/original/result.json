@@ -1,0 +1,8 @@
+{
+  "exit_code": 1,
+  "seconds": 103.22,
+  "test": "aj_kpss_native_test.dart",
+  "api": 54401,
+  "host": 54409,
+  "clock_acceleration": false
+}

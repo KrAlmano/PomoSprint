@@ -1,0 +1,43 @@
+{
+  "version": "ad2fc988-4462-40ae-9333-ab0107e2138b",
+  "approved_source": "6cfd9b5",
+  "kpss_included": false,
+  "checks": [
+    {
+      "path": "/screenshots/20261028/reports-weekly-en.png",
+      "status": 200,
+      "approved_snapshot_match": true,
+      "sha256": "8759d28f386c8f491f657177abee5de92be3b8c8c2c1adde7b0e92dd909f7c85"
+    },
+    {
+      "path": "/screenshots/manifest-20261028.json",
+      "status": 200,
+      "approved_snapshot_match": true,
+      "sha256": "091ce7838db549e828e271ea35344422e1a427c7789e9fafba8670cf2aa94e15"
+    },
+    {
+      "path": "/confirmed",
+      "status": 200,
+      "approved_snapshot_match": true,
+      "sha256": "132212e549b9f1386464a75f0f62fe389f7ac785bf0268dc3d2f13cf06d3e2dc"
+    },
+    {
+      "path": "/reset-password",
+      "status": 200,
+      "approved_snapshot_match": true,
+      "sha256": "4f7b4a0f44730d959abba224d1fe8fd1c404bdc021b3e99d28fd0e05abe7d2cf"
+    },
+    {
+      "path": "/unsubscribe",
+      "status": 200,
+      "approved_snapshot_match": true,
+      "sha256": "5795e35df0b0f5775cbe5ed9214d6d62a53f5fb548fe6027f183f078a5346bef"
+    },
+    {
+      "path": "/features",
+      "status": 200,
+      "approved_snapshot_match": true,
+      "sha256": "902af83cf4540d920fa7e36f7ca5b7188a1d1803922fe9d61e150df66ee393f4"
+    }
+  ]
+}

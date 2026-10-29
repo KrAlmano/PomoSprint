@@ -1,5 +1,7 @@
 # PomoSprint — proje ve AI oturum devir belgesi
 
+> **28 Ekim en yeni devam noktası — KPSS / §42:** Uygulama, site metni ve proposed SQL yerelde 20 sınav/test ve YKS/LGS/TUS/DUS/KPSS olmak üzere 5 aileye genişletildi; KPSS **canlıya uygulanmadı**. Son onaylı site `6cfd9b5` / Worker `ad2fc988-4462-40ae-9333-ab0107e2138b` olup KPSS içermez. Bundan sonraki deploy için yeniden açık kullanıcı onayı gerekir. [KPSS raporu](analiz/QA_KPSS_2026-10-28.md). Aşağıdaki gece/DUS/yayın notları tarihsel kanıttır; yeni KPSS native testi bu not yazılırken henüz tamamlanmadı.
+
 > **Güncel çalışma — 27/28 Ekim 2026 gece / §39:** `codex/gece-2026-10-27` dalında TUS, Deneme, birleşik raporlar ve aylık kategori/global lig geliştiriliyor. Yeni sunucu paketleri ve site **yalnız yereldedir; canlıya uygulanmadı, push/deploy yapılmadı**. Aşağıdaki 9 Ekim devam noktası tarihsel kayıttır. Önce [istek listesi](analiz/ISTEKLER.md), [ilerleme](analiz/CODEX_ILERLEME.md), [yeni API](supabase/proposed/EXAM_API_CONTRACT.md) ve [paket sırası](supabase/proposed/NIGHT_20261028_README.md) okunmalı. Güncel test sayıları ve cihaz kanıtları ilerleme kaydındadır; geçmiş sonuçları yeni test gibi aktarma.
 
 **Tarihsel devam noktası — 9 Ekim 2026 / §37:** Proje kökü `/Users/almano/Desktop/Projects/Pomodoro`. Ronin kaldırıldı; 21 özel avatarın her biri 500 kum. Canlı SQL kullanıcı tarafından uygulandı ve 20/20 salt okuma kontrolüyle doğrulandı. Dört hesap ve dokuz seans korundu. Tüm simülatörler ve yerel Docker test verisi silindi; açık uygulama veya hazır QA hesabı yok. Eski QUICK/demo/gece komutlarını çalıştırma. Son sonuç 1291 PASS, isteğe bağlı 5 ekran görüntüsü testi atlaması ve temiz analizdir; güncel kapsam [temizlik QA](analiz/QA_RELEASE_CLEANUP_2026-10-09.md) raporundadır. Önceki ham kanıtlar kullanıcı talebiyle kaldırıldı; aşağıdaki tarihli sonuçlar geçmişin kaydıdır. §33 güvenlik/operasyon ve mağaza/fiziksel cihaz işleri halen açıktır.
@@ -1362,3 +1364,26 @@ Kapanış ikinci kapısı da1482/172temizdir. Geçici build/rawmedia temizliği~
 Kullanıcı canlıda eski ekranları görünce tüm siteyi Deneme/DUS ile güncellememizi istedi. Bu yeni yetki yalnız web sitesi için önceki no-deploy sınırını kaldırdı. `1a58014` kaynakları mevcut `pomosprint-website` Worker’ına yayımlandı: `e1bb6541-5794-4241-ab5e-66ded59a9298`, trafik %100, İstanbul21:19:31. Ana sayfa/Özellikler/SSS TR+EN,30ekran/4video,AYT/net/özelnot/Deneme/cüzdan/lig içerikleri artık webde. Ayrıca destek ve gizlilik verienvanteri düzeltilip yanlış yayında/Apple/duraklatma cümleleri temizlendi. Hukukisebep/onaysürümü/kimlik değiştirilmedi.
 
 Node172/172 ve canlı156/156 HTTP kontrolü geçti; 20 HTML’de mevcutCloudflarebeacon+tekLF çıkarılınca içerikbirebir,111statikdosya hamhashbirebir. İlkhamHTMLfarkları korundu. [Nihai yayın raporu](analiz/SITE_YAYIN_RAPORU_2026-10-28.md). DB/31/mobilstore/main/merge/force değişmedi. Uygulama hâlâ yayın hazırlığında; webyayını sunucupaketlerinin kurulduğunu göstermez.
+
+
+## 42. KPSS hazırlığı — 28 Ekim 2026
+
+Bu bölüm §39–41’in üzerine gelen yerel geliştirmeyi anlatır; yeni canlı kurulum değildir. Son onaylı iki web düzeltmesi `6cfd9b5` kaynağından `ad2fc988-4462-40ae-9333-ab0107e2138b` Worker sürümüne alındı: İngilizce haftalık rapor görüntüsü adasız yeniden çekildi ve üç Auth yardımcı sayfası ortak CSS sürümüne hizalandı. [Dağıtım kanıtı](analiz/iphone_cerceve_2026-10-28/approved-fix-deployment.json). Bu dondurulmuş kaynak KPSS içermez. Kullanıcı yeniden deploy öncesi açık onay istedi; sonraki site/uygulama/proposed değişiklikler yalnız yereldedir.
+
+### Yeni kapsam ve değişmeyen kayıtlar
+
+Önceki 8 sınava 12 KPSS seçeneği eklendi; katalog toplam 20, aile sayısı 5 (YKS/LGS/TUS/DUS/KPSS). Üç GY–GK seçeneği öğrenim düzeyine göre ayrıdır: Lisans, Ön Lisans, Ortaöğretim. Her biri 60 Genel Yetenek + 60 Genel Kültür, toplam 120 soru / 130 dakika / 105 kum / 26 Deneme puanıdır. Dokuz Alan Bilgisi testi ayrı 40 soruluk denemedir: İşletme, Muhasebe, Hukuk, Kamu Yönetimi, İktisat, Maliye, Uluslararası İlişkiler, Çalışma Ekonomisi ve Endüstri İlişkileri, İstatistik. İlk sekizi 50 dakika / 40 kum / 10 puan, İstatistik 60 dakika / 50 kum / 12 puandır.
+
+Öğrenim düzeyi/alan kullanıcıdan açık seçimle alınır; mesleğe göre otomatik atanmaz. AGS, ÖABT ve DHBT eklenmedi. Eğitim Bilimleri’nin eski kategori/taslak verisi silinmez; yeni öneride yoktur. Yaş adımı ve 13 yaş altı engeli değişmez. KPSS neti doğru − yanlış/4’tür; resmî KPSS yerleştirme puanı değildir. Bu 12 yeni türde erken bitirme yoktur. Yalnız AYT erken bitişi sürer. Önceki 8 katalog satırı ve eski active/completed ödül snapshot’ları değiştirilmez; net/başlık/not düzenlemesi ödül vermez.
+
+İstemci tanımları `lib/models/kpss_catalog.dart`, iki dilde metinler ARB, ortak ödül yedeği `exam_reward_policy.dart` içindedir. Sunucuda 28 katalog ve 32 ödül ileri/down/DRYRUN/JSON kaynakları güncellendi; yeni paket numarası açılmadı. 27/29 zaten KPSS hedefini destekler, 31 yoktur. Ayrı KPSS DB `pomosprint_review32_kpss`, API 54401 / REST 54402 / Auth 54403, iOS host 54409; DUS review/site ve ana veri korunur. Guard’ları kaldırıp genel DB override ekleme veya mevcut ortamı yeniden oluşturma.
+
+### Tamamlanan kontroller ve 29 Ekim native kapanışı
+
+Bu not yazılırken analiz 0 hata, Flutter 1493 PASS ve yalnız 5 isteğe bağlı PNG atlaması, Node 173/173 ve ortak parça kontrolü geçti. [Sunucu raporu](analiz/QA_KPSS_SUNUCU_2026-10-28.md): SQL 242/242, ağsız guard/oracle/host/parite 74/74, salt okuma şema paritesi 5/5. Bunlar uzun gerçek 130 dakika bekleme kanıtı değildir. 29 Ekim’de Simulator yeniden açıldıktan sonra son native TR/EN turu geçti; 8 ekran arşivlendi. İki dilde resmî katalog/seçimler, doğal kısa başlangıç/vazgeçme, sıfır ödül ve normal odak başlatma/Sıfırla doğrulandı. Normal `lib/main.dart` yeniden kuruldu; ana ekran ve bir adet bekleyen taslağın aynı hash’i doğrulandı. Önceki başarısız girişimler ayrı tanı arşivinde korunur. Güncel tamamlanma ve kanıtlar [KPSS raporunda](analiz/QA_KPSS_2026-10-28.md) tutulacak.
+
+### Site ve sonraki adım
+
+TR/EN ana sayfa/Özellikler/SSS/meta/JSON-LD, beşinci aile KPSS’yi ve 3 ödül grubunu anlatır. Önceki 8 satırlı ödül tablosu korunur. 14 görünür SSS cevabı JSON-LD ile aynıdır. 30 gerçek PNG / 4 video değişmedi, KPSS screenshot’ı çekildi iddiası yoktur. Yeni KPSS metnine ait ayrı Safari turu yapılmadı; eski DUS/çerçeve kanıtları bu turun yerine geçmez.
+
+Sonraki ajan önce KPSS raporundaki ortam ayrımını ve `git status`/dalı kontrol etmeli. Normal uygulama yerel site54361 hesabıyla açık; KPSS ayrı54401 ortamında doğrulandı. Geçici QA uygulaması ve test paketleri kaldırıldı. Mevcut kullanıcı taslağı silinmez. Site deploy, uygulama mağazası veya proposed SQL canlı kurulumu için ilgili açık kullanıcı onayını beklemeli. Stage/commit/push yetkisini oturumun en son talimatından okumalı; main/merge/force yapılmaz.

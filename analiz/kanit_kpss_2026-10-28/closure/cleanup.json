@@ -1,0 +1,14 @@
+{
+  "removed_qa_bundle": "com.pomosprint.qa.kpss",
+  "normal_bundle_preserved": "com.pomosprint.app",
+  "removed_own_temporary_artifacts": [
+    "kpss-native-direct/Runner.app",
+    "kpss-native-final/Runner.app",
+    "kpss-native-complete/Runner.app",
+    "kpss-native-isolated/Runner.app",
+    "kpss-native-direct/recovery_response_private.json",
+    "kpss-native-pass/recovery_preferences_private.plist"
+  ],
+  "device_data_erased": false,
+  "personal_device_touched": false
+}

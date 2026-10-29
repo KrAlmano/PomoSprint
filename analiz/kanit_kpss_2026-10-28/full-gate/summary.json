@@ -1,0 +1,18 @@
+{
+  "analyze": {
+    "exit_code": 0,
+    "seconds": 6.44
+  },
+  "flutter": {
+    "exit_code": 0,
+    "seconds": 126.99
+  },
+  "node": {
+    "exit_code": 0,
+    "seconds": 0.56
+  },
+  "partials": {
+    "exit_code": 0,
+    "seconds": 0.04
+  }
+}

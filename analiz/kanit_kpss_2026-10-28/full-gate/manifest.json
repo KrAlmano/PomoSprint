@@ -1,0 +1,34 @@
+{
+  "status": "PASS",
+  "flutter_passed": 1493,
+  "optional_png_skipped": 5,
+  "node_passed": 173,
+  "scope": "Full application gate before final native-harness timing and snackbar changes. Product sources were unchanged afterward. Subsequent TR/EN native PASS is archived separately in ../ios/; final test-file analysis and normal restoration are in ../closure/.",
+  "files": [
+    {
+      "file": "summary.json",
+      "bytes": 243,
+      "sha256": "a024574bdafb86c869596a1935bd91305f6d3b16e1aa4cdf36b0c860a595b88e"
+    },
+    {
+      "file": "analyze.log",
+      "bytes": 96,
+      "sha256": "3e6057a2a8a540d44ee5067ccb576c434068f204ed802337441dd38946958557"
+    },
+    {
+      "file": "flutter.log",
+      "bytes": 274939,
+      "sha256": "37ae7b444d95891a950fafe2c49726b777fa39aa56f22bc1ee2353c00c85dcde"
+    },
+    {
+      "file": "node.log",
+      "bytes": 16597,
+      "sha256": "3cf53e28b54dd9c7bfc39635023bf66725e474f9deca6a445966c6b9436c0734"
+    },
+    {
+      "file": "partials.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

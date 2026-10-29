@@ -335,3 +335,13 @@ Son gönderim kapsamı yalnız `codex/gece-2026-10-27` dalıdır. Ana dal `5f99f
 ### GitHub yedeği doğrulandı
 
 B/site kontrol noktası **`635a89df7cd8bf45b6dc16e21e95e4210dc0a465`** uzak `codex/gece-2026-10-27` dalından okunarak doğrulandı. İlk toplu aktarım HTTP408, ikinci aktarım bağlantı kesilmesiyle başarısızdı; yayınlanmamış B paketi içerik değişmeden küçük commit’lere bölününce yedi kontrol noktası başarıyla ulaştı. [Aktarım kanıtı](kanit_son_kapilar_2026-10-28/compact-final/push-checkpoints.json) kayıtlıdır. Kapanış notu bu yedek üzerine ayrı küçük doküman commit’i olarak eklenir. Main `5f99f90` korunur; merge/force/deploy yok.
+
+## Son ek: KPSS ve onaylı web düzeltmeleri
+
+Onaylanan web düzeltmeleri `6cfd9b5` kaynağından yayımlandı; Worker `ad2fc988-4462-40ae-9333-ab0107e2138b`, canlı kontrol 6/6. KPSS bu pakette değildir.
+
+KPSS için 12 yeni seçenek, toplam20 katalog kaydı; GY–GK 130dk/105kum/26puan, 8 alan 50dk/40kum/10puan, İstatistik60dk/50kum/12puan. Kaynaklar ve sınırlar [KPSS raporunda](QA_KPSS_2026-10-28.md). Tam ürün kapısı1493Flutter/173Node, SQL242, Python74 ve parite5 geçti. Son iOS turu host/simülatör yanıt vermediği için **tamamlanamadı**. Kısmi TR ekranları ve başarısız testler başarı sayılmadı; normal uygulama paketinin geri kurulması bekliyor. Bu ek önceki DUS native sonuçlarını değiştirmez ve onlardan KPSS başarısı çıkarmaz.
+
+### 29 Ekim tamamlanma eki
+
+Yukarıdaki son iOS engeli kullanıcı Simulator'ü yeniden açınca çözüldü. Nihai KPSS native turu **TR/EN PASS**,8ekran; [başarı manifesti](kanit_kpss_2026-10-28/ios/manifest.json). Normal uygulama yeniden derlenip kuruldu ve açıldı; eski taslak korundu. Son native dosya analizi, Node173 ve partials geçti; [kapanış kanıtı](kanit_kpss_2026-10-28/closure/manifest.json). Önceki tamamlanmamış girişimler tarihsel tanı olarak korunur. KPSS uygulama/site/SQL canlıya yayımlanmadı; onaylanan iki web düzeltmesi yayındadır.

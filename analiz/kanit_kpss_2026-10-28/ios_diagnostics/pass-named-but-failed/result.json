@@ -1,0 +1,18 @@
+{
+  "exit_code": 1,
+  "status": "FAIL",
+  "real_tr_en_markers": false,
+  "seconds": 56.37,
+  "separate_bundle": "com.pomosprint.qa.kpss",
+  "original_preferences_hashes_before": {
+    "com.pomosprint.app.plist": "22994df075a2ea96ec8fe4187c219831ec70c6fccaf79044cb7d1162ba0d35a8"
+  },
+  "original_preferences_hashes_after": {
+    "com.pomosprint.app.plist": "22994df075a2ea96ec8fe4187c219831ec70c6fccaf79044cb7d1162ba0d35a8"
+  },
+  "original_preferences_unchanged": true,
+  "reused_direct_entrypoint_binary": true,
+  "official_durations_unchanged": true,
+  "source_test_sha256": "497b32669d08ddd96f9c798a63a039f088765497494f4deab786d95d339d9e86",
+  "notification_permission": "Previously denied through iOS system sheet for this QA bundle only; no further prompt expected."
+}

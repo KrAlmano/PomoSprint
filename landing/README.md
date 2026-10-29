@@ -1,10 +1,10 @@
 # pomosprint.app — TR/EN site
 
-Bu klasör PomoSprint'in statik pazarlama, destek, yasal ve Auth yardımcı sayfaları ile önündeki küçük Worker'ı içerir. Uygulama `../lib/`, sunucu kaynakları `../supabase/` altındadır. Ana geliştirme dalı [`codex/gece-2026-10-27`](https://github.com/KrAlmano/PomoSprint/tree/codex/gece-2026-10-27); repo özeldir. 28 Ekim son kullanıcı isteği, güncel siteyi mevcut `pomosprint-website` Worker’ına yayımlamayı kapsar. Git işlemleri yalnız bu daldadır; `main` merge/push, force push ve Supabase/App Store dağıtımı yoktur.
+Bu klasör PomoSprint'in statik pazarlama, destek, yasal ve Auth yardımcı sayfaları ile önündeki küçük Worker'ı içerir. Uygulama `../lib/`, sunucu kaynakları `../supabase/` altındadır. Ana geliştirme dalı [`codex/gece-2026-10-27`](https://github.com/KrAlmano/PomoSprint/tree/codex/gece-2026-10-27); repo özeldir. Önceki kullanıcı onayıyla site mevcut `pomosprint-website` Worker’ına yayımlandı; son talimata göre bundan sonraki her deploy öncesi yeniden açık kullanıcı onayı gerekir. Git işlemleri yalnız bu daldadır; `main` merge/push, force push ve Supabase/App Store dağıtımı yoktur.
 
 ## Durum ve doğruluk
 
-Son canlı sürüm `e1bb6541-5794-4241-ab5e-66ded59a9298`; 28 Ekim 2026’da kullanıcı yetkisiyle yayımlandı. [Yayın raporu](../analiz/SITE_YAYIN_RAPORU_2026-10-28.md). Önceki yalnız yerel/GitHub doğrulama kayıtları tarihsel kanıttır.
+Son onaylı canlı sürüm `ad2fc988-4462-40ae-9333-ab0107e2138b`, kaynak `6cfd9b5`'tir: adasız İngilizce haftalık ekranın yeniden çekimi ve Auth yardımcı sayfalarında ortak CSS sürümü. [Onaylı düzeltme kanıtı](../analiz/iphone_cerceve_2026-10-28/approved-fix-deployment.json). Önceki `e1bb6541-5794-4241-ab5e-66ded59a9298` sürümünün [yayın raporu](../analiz/SITE_YAYIN_RAPORU_2026-10-28.md) tarihsel kayıttır. **KPSS metinleri yalnız yerel hazırlıktır; son canlı sürümde yoktur ve yeniden deploy için kullanıcı onayı bekler.**
 
 28 Ekim B çalışmasının HTML/CSS, son Deneme arayüzünden alınan 30 ekran ve 4 videosu bu dalda hazırdır. Safari 72/72 ve dört videonun manuel kontrolü geçti; Chrome ortam engeli nedeniyle doğrulanamadı. Güncel site ve medya için gerçek sonuçlar [nihai doğrulama raporunda](../analiz/DOGRULAMA_RAPORU_2026-10-28.md), ilerleme [CODEX_ILERLEME](../analiz/CODEX_ILERLEME.md), kaynak/çıktı görseller [ekran listesinde](screenshots/README.md) tutulur. Eski 8/27 Ekim dosya ve tarayıcı sayıları yeni B paketinin kanıtı olarak taşınmaz.
 
@@ -25,7 +25,21 @@ Site, son kullanıcı isteğiyle yeni uygulamanın yayın öncesi tanıtımını
 | `/kvkk` | `/en/kvkk` | KVKK aydınlatma |
 | `/hesap-silme` | `/en/delete-account` | Mağazaların hesap silme bağlantısı |
 
-Ana sayfaya bütün özellikler yığılmaz; ayrıntılı katalog, net, içgörü, rapor ve lig ekranları Özellikler'de kalır. İki dilde bölüm ve konu eşliği korunur. TUS ve DUS hedef kitle ve sınav listesinde bulunur. Aylık kategori/global ligler, ayrı normal/Deneme ekonomisi ve İstanbul 00:00 sınırı açıkça anlatılır.
+Ana sayfaya bütün özellikler yığılmaz; ayrıntılı katalog, net, içgörü, rapor ve lig ekranları Özellikler'de kalır. İki dilde bölüm ve konu eşliği korunur. Hedef kitle ve sınav listesi yerel kaynakta YKS/LGS/TUS/DUS/KPSS olmak üzere beş aileyi kapsar. Aylık kategori/global ligler, ayrı normal/Deneme ekonomisi ve İstanbul 00:00 sınırı açıkça anlatılır.
+
+### KPSS içerik hazırlığı — 28 Ekim 2026
+
+Ana sayfa, Özellikler ve SSS’nin TR/EN karşılıkları ile meta/JSON-LD alanları KPSS için güncellendi. Toplam katalog 20 sınav/testtir; önceki 8 sınavın değerleri değiştirilmedi. Özellikler’deki açılır KPSS bölümü 12 yeni seçeneği üç ödül grubunda açıklar:
+
+| Grup | Soru / dakika | Kum / Deneme puanı |
+|---|---|---|
+| Lisans, Ön Lisans, Ortaöğretim GY–GK (3 ayrı seçenek) |120 (60 + 60) / 130|105 / 26|
+| İstatistik dışındaki 8 ayrı Alan Bilgisi testi |40 / 50|40 / 10|
+| İstatistik |40 / 60|50 / 12|
+
+Dokuz alanın adları Türkçe ve İngilizce metinde bulunur. KPSS neti doğru − yanlış/4’tür; erken bitirme yoktur. Öğrenim düzeyi/alan kullanıcı seçimiyle belirlenir; mesleğe göre otomatik atama, AGS/ÖABT/DHBT iddiası yoktur. Eski Eğitim Bilimleri kategori/taslak kaydı silinmez; yeni öneride yer almaz.
+
+Yeni KPSS görüntüsü üretilmedi: mevcut 30 PNG ve 4 video önceki sekiz sınavı içeren gerçek çekimlerdir. Alt yazılar/alt metinler görüntüde KPSS varmış gibi değiştirilmedi. CSS ve telefon çerçevesi bu içerik işinde değişmedi. `landing_release_content.test.mjs`, önceki sekiz ödülü ve yeni 12 kaydın süre/soru/net/ödül sözleşmesini ayrı doğrular; TR/EN SSS’nin 14 görünür cevabı JSON-LD ile aynıdır. Hedefli 20/20 ve tüm Node 173/173, ortak parça kontrolü geçti. Bu yeni KPSS metinleri için ayrı Safari turu yapılmadı. [KPSS raporu](../analiz/QA_KPSS_2026-10-28.md).
 
 Net girişi metni güncel A2 davranışına uyar: doğru/yanlışa göre otomatik fakat elle düzenlenebilir boş sayısı; yalnız girilen derslerin kaydı; sonradan düzenleme; negatif/taşan giriş engeli. Netler puan/kum/lig değiştirmez. Tamamlanan Deneme ortak çalışma süresine katılır, ayrı satırdır; vazgeçilen Deneme ödül, çalışma süresi veya tamamlama sayısı üretmez. İçgörüler ilişkili süre ve net değişimini gösterir, nedensellik veya puan artışı vaat etmez.
 
@@ -106,7 +120,7 @@ Bu kontroller görsel içeriği OCR ile tercüme etmez; gerçek native dil ve bo
 - Mağaza ve uygulamanın bağlı olduğu yasal/destek URL'leri korunur. Veri sorumlusu kimliği/adresi ve gönderen kimliği kullanıcı tarafından en son verilecektir; `data-fill-in="KVKK-15"` yer tutucuları gerçek bilgi gelmeden tamamlandı sayılmaz. Tasarım çalışması bu bilgileri uydurmaz.
 - Hukuki metin değişikliği iki dilde sürüm/tarih ve uygulama onay sürümleriyle koordine edilir; bu B medya/özellik güncellemesi hukuki kimlik onayı değildir.
 
-Yetkili site yayını mevcut `landing/wrangler.jsonc` üzerinden `wrangler deploy --keep-vars` ile yapılır. Önce `wrangler deploy --dry-run --keep-vars`, Node testleri ve ortak parça kontrolü çalışır. Dağıtım sürümü ve canlı doğrulaması tarihli yayın raporuna kaydedilir. Canlı veritabanı, DNS veya hesap ayarı bu adımda değiştirilmez.
+Yalnız yeni kullanıcı onayından sonra site yayını mevcut `landing/wrangler.jsonc` üzerinden `wrangler deploy --keep-vars` ile yapılır. Önce `wrangler deploy --dry-run --keep-vars`, Node testleri ve ortak parça kontrolü çalışır. Dağıtım sürümü ve canlı doğrulaması tarihli yayın raporuna kaydedilir. Canlı veritabanı, DNS veya hesap ayarı bu adımda değiştirilmez.
 
 Yeni32 AYT erken bitiş, dört test seçimi ve özel deneme adı/notu metinleri de iki dilde bulunur. Bu özellikler yayın hazırlığındaki uygulamayı anlatır;32 paketinin veya uygulamanın canlıda etkinleştirildiği iddia edilmez. Site verisi ayrı `pomosprint_site32_dus` DB/API54361 üzerinde yedi kurgu hesapla hazırlanır; review SQL test kişilerinin verisi kopyalanmaz. Gerçek sosyal kullanıcı adı/kullanım sayısı iddiası yoktur.
 

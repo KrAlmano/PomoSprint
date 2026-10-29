@@ -1,0 +1,21 @@
+[
+  {
+    "action": "shutdown",
+    "exit_code": 0,
+    "seconds": 5.63,
+    "output": "",
+    "error": ""
+  },
+  {
+    "action": "boot",
+    "exit_code": 0,
+    "seconds": 7.96,
+    "output": "",
+    "error": ""
+  },
+  {
+    "action": "bootstatus",
+    "status": "timeout",
+    "seconds": 70.06
+  }
+]

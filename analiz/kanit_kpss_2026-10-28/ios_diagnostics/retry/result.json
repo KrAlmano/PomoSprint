@@ -1,0 +1,6 @@
+{
+  "status": "BLOCKED_BEFORE_TEST_EXECUTION",
+  "reason": "QA simulator bootstatus exceeded70s; simctl terminate exceeded45s after nondestructive device reboot.",
+  "tests_executed": false,
+  "original_preferences_preserved_at_last_check": true
+}

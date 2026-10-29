@@ -1,0 +1,16 @@
+{
+  "exit_code": 0,
+  "status": "FAIL",
+  "real_tr_en_markers": false,
+  "seconds": 134.72,
+  "separate_bundle": "com.pomosprint.qa.kpss",
+  "original_preferences_hashes_before": {
+    "com.pomosprint.app.plist": "22994df075a2ea96ec8fe4187c219831ec70c6fccaf79044cb7d1162ba0d35a8"
+  },
+  "original_preferences_hashes_after": {
+    "com.pomosprint.app.plist": "22994df075a2ea96ec8fe4187c219831ec70c6fccaf79044cb7d1162ba0d35a8"
+  },
+  "original_preferences_unchanged": true,
+  "binary_reused": true,
+  "official_durations_unchanged": true
+}

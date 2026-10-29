@@ -1,0 +1,265 @@
+{
+  "schema_version": 1,
+  "created_at_utc": "2026-10-29T10:31:26.368748+00:00",
+  "status": "PASS",
+  "both_languages_executed": true,
+  "proof": {
+    "result": "result.json",
+    "log": "native.log",
+    "language_markers": {
+      "tr": [
+        "[KPSS_NATIVE] tr official catalog12 tracks4 subjects120/40 durations130/50/60 TR-EN cards PASS; real3s start-abandon zeroRewards; normalFocusReleased PASS"
+      ],
+      "en": [
+        "[KPSS_NATIVE] en official catalog12 tracks4 subjects120/40 durations130/50/60 TR-EN cards PASS; real3s start-abandon zeroRewards; normalFocusReleased PASS"
+      ]
+    },
+    "all_tests_passed": true
+  },
+  "screenshots": [
+    {
+      "file": "screenshots/e2e-kpss-bachelor-tr.png",
+      "source": "build/verification_20261028/kpss-native/screenshots/e2e-kpss-bachelor-tr.png",
+      "width": 604,
+      "height": 1311,
+      "bytes": 222722,
+      "sha256": "b4a811939ff864e880aa3515cbfe693b55de8e82ffe2cc4865b849f8d5918403"
+    },
+    {
+      "file": "screenshots/e2e-kpss-field-tr.png",
+      "source": "build/verification_20261028/kpss-native/screenshots/e2e-kpss-field-tr.png",
+      "width": 604,
+      "height": 1311,
+      "bytes": 217924,
+      "sha256": "1fb43687a4dbe3d844624fa037bf13720b958c7e87e5d4563a7d867c64efc6ca"
+    },
+    {
+      "file": "screenshots/e2e-kpss-running-tr.png",
+      "source": "build/verification_20261028/kpss-native/screenshots/e2e-kpss-running-tr.png",
+      "width": 604,
+      "height": 1311,
+      "bytes": 226939,
+      "sha256": "83396545ea0c371fc78224782ba70d1846b00bb05cb3b277a9f9caca71cb031f"
+    },
+    {
+      "file": "screenshots/e2e-kpss-abandoned-tr.png",
+      "source": "build/verification_20261028/kpss-native/screenshots/e2e-kpss-abandoned-tr.png",
+      "width": 604,
+      "height": 1311,
+      "bytes": 205039,
+      "sha256": "bc62b7ccaa542243a424bd581c36cecc8e018681c20f7f109eeda7c087d4fd31"
+    },
+    {
+      "file": "screenshots/e2e-kpss-bachelor-en.png",
+      "source": "build/verification_20261028/kpss-native/screenshots/e2e-kpss-bachelor-en.png",
+      "width": 604,
+      "height": 1311,
+      "bytes": 247382,
+      "sha256": "d72422d9b94c808bfe3382b87ff7b5eda6f48a581908919fb0a3d931363d3507"
+    },
+    {
+      "file": "screenshots/e2e-kpss-field-en.png",
+      "source": "build/verification_20261028/kpss-native/screenshots/e2e-kpss-field-en.png",
+      "width": 604,
+      "height": 1311,
+      "bytes": 239911,
+      "sha256": "9a2c93089eb69e41845cb8f6ebbaa50950a31d51a410f245fa4993c2ef8f4589"
+    },
+    {
+      "file": "screenshots/e2e-kpss-running-en.png",
+      "source": "build/verification_20261028/kpss-native/screenshots/e2e-kpss-running-en.png",
+      "width": 604,
+      "height": 1311,
+      "bytes": 244973,
+      "sha256": "0f02aa8010b9a386104cf5289d85747e793dfa0dddc0c59a38e20efea2380e01"
+    },
+    {
+      "file": "screenshots/e2e-kpss-abandoned-en.png",
+      "source": "build/verification_20261028/kpss-native/screenshots/e2e-kpss-abandoned-en.png",
+      "width": 604,
+      "height": 1311,
+      "bytes": 284571,
+      "sha256": "e67d0464e16efca8e5d34cf2e0d3665b6671234609a58fdbbb691801442dd0aa"
+    }
+  ],
+  "diagnostics": [
+    {
+      "file": "diagnostics/original-guard.log",
+      "source": "build/verification_20261028/kpss-native/native.log",
+      "diagnostic_only": true,
+      "description": "Unsaved original-app draft: guard refused reset; not a passing run."
+    },
+    {
+      "file": "diagnostics/wrong-bootstrap.log",
+      "source": "build/verification_20261028/kpss-native-isolated/native-v2.log",
+      "diagnostic_only": true,
+      "description": "Flutter-test bootstrap awaited a different protocol; aborted, not a pass."
+    },
+    {
+      "file": "diagnostics/rounding.log",
+      "source": "build/verification_20261028/kpss-native-direct/native.log",
+      "diagnostic_only": true,
+      "description": "Native countdown rounding assertion failure; not a passing run."
+    },
+    {
+      "file": "diagnostics/notification-prompt.log",
+      "source": "build/verification_20261028/kpss-native-final/native.log",
+      "diagnostic_only": true,
+      "description": "System notification sheet interrupted the normal-timer step; not a pass."
+    },
+    {
+      "file": "diagnostics/reset-snackbar.log",
+      "source": "build/verification_20261028/kpss-native-pass/native.log",
+      "diagnostic_only": true,
+      "description": "Reset hit target was covered by notification-denied snackbar; not a pass."
+    }
+  ],
+  "source_hashes": [
+    {
+      "source": "integration_test/aj_kpss_native_test.dart",
+      "bytes": 14274,
+      "sha256": "86c2fe1ec6bafe7fcb912e56ed1d91771d0b68a174ee3514877cc6940d4c931d"
+    },
+    {
+      "source": "integration_test/support/e2e.dart",
+      "bytes": 21204,
+      "sha256": "d89863f3dea520438398fb3a41c1fcb15ccf12bc01c239aff01b2a779aa6fdda"
+    },
+    {
+      "source": "lib/models/kpss_catalog.dart",
+      "bytes": 7089,
+      "sha256": "a0f7e7b8a7ae3cfccd3319ac40f01468e734b0b898f2a17cad1932c8e520c64f"
+    },
+    {
+      "source": "lib/models/exam_catalog_defaults.dart",
+      "bytes": 9731,
+      "sha256": "bc4eb481eb8586d826d8f552c0300b6048952cce701f438594c7d2bbdfb78069"
+    },
+    {
+      "source": "lib/models/exam_reward_policy.dart",
+      "bytes": 1364,
+      "sha256": "29306071a79bdfe879c0e9dead7864a7f213346c0655ace85fb7c499c657eae2"
+    },
+    {
+      "source": "lib/screens/exam_screen.dart",
+      "bytes": 38095,
+      "sha256": "25429f38db0f565ea34213fbc1ff4160f9f723ce3d129b96cd0e3abd7a5fa9a6"
+    },
+    {
+      "source": "lib/services/onboarding_categories.dart",
+      "bytes": 11311,
+      "sha256": "1fd8c8ec68488e9e69716d7581f581f6da61f56ec1e7f395e31fedcfb88d628b"
+    },
+    {
+      "source": "lib/utils/category_names.dart",
+      "bytes": 3111,
+      "sha256": "7064c4434583058f9f9b382700dfa9d71bfe7658f9ef8f082e7b64436f351e1a"
+    },
+    {
+      "source": "lib/l10n/app_tr.arb",
+      "bytes": 81188,
+      "sha256": "91dbe55dad2721dab2be374931db6cad0a096bf230a6716b0683a6397b9a3acc"
+    },
+    {
+      "source": "lib/l10n/app_en.arb",
+      "bytes": 70807,
+      "sha256": "852f8797c6a65912c6589796272db0c7de21b52ce53bb5c06f992d292342acf4"
+    },
+    {
+      "source": "supabase/proposed/exam_catalog_v1.json",
+      "bytes": 24567,
+      "sha256": "b7e2f9400a263cce3c9ebd1473d3cb4dcd2912cb7c291b88ae347ab65d21bace"
+    },
+    {
+      "source": "supabase/proposed/exam_catalog_32.json",
+      "bytes": 26341,
+      "sha256": "78b47ad95cc29bfaef3c891a1b5cb489eb8e3aed3aa3f7223326d8c8a573b9cc"
+    }
+  ],
+  "source_hash_note": "Hashes describe source files at archive time, not an independent binary/source attestation.",
+  "files": [
+    {
+      "file": "diagnostics/notification-prompt.log",
+      "bytes": 5003,
+      "sha256": "4ccab6e061b21e8a3b0039953a3772daba170ff2f143632f1d4e56f521cfb288"
+    },
+    {
+      "file": "diagnostics/original-guard.log",
+      "bytes": 3146,
+      "sha256": "5731a109eddb5b92a4868734daafbd7199df97d11793dee3612632e649329c01"
+    },
+    {
+      "file": "diagnostics/reset-snackbar.log",
+      "bytes": 7395,
+      "sha256": "4042c433f405f2a2edc10926f6fe3ac165228cc43a8c3483a183cd9b56fc0096"
+    },
+    {
+      "file": "diagnostics/rounding.log",
+      "bytes": 4745,
+      "sha256": "5247cdce5b4ddde6f5d54005f7e48db983b949c251a69fc485f37f6f41b8221a"
+    },
+    {
+      "file": "diagnostics/wrong-bootstrap.log",
+      "bytes": 595,
+      "sha256": "98f11b956c1a8bdd3d304ee714802a3c48f1dfdc4480ed035e20ea59aaaa8611"
+    },
+    {
+      "file": "native.log",
+      "bytes": 2040,
+      "sha256": "9e92736c0765926a6cbfee18477a1b8ad0a0d0ba80787456531977c0b31e4abc"
+    },
+    {
+      "file": "result.json",
+      "bytes": 780,
+      "sha256": "4f89cc0d21ddba289e315c8790aeaa272bb3684e666680e9cc9fc0002251c007"
+    },
+    {
+      "file": "screenshots/e2e-kpss-abandoned-en.png",
+      "bytes": 284571,
+      "sha256": "e67d0464e16efca8e5d34cf2e0d3665b6671234609a58fdbbb691801442dd0aa"
+    },
+    {
+      "file": "screenshots/e2e-kpss-abandoned-tr.png",
+      "bytes": 205039,
+      "sha256": "bc62b7ccaa542243a424bd581c36cecc8e018681c20f7f109eeda7c087d4fd31"
+    },
+    {
+      "file": "screenshots/e2e-kpss-bachelor-en.png",
+      "bytes": 247382,
+      "sha256": "d72422d9b94c808bfe3382b87ff7b5eda6f48a581908919fb0a3d931363d3507"
+    },
+    {
+      "file": "screenshots/e2e-kpss-bachelor-tr.png",
+      "bytes": 222722,
+      "sha256": "b4a811939ff864e880aa3515cbfe693b55de8e82ffe2cc4865b849f8d5918403"
+    },
+    {
+      "file": "screenshots/e2e-kpss-field-en.png",
+      "bytes": 239911,
+      "sha256": "9a2c93089eb69e41845cb8f6ebbaa50950a31d51a410f245fa4993c2ef8f4589"
+    },
+    {
+      "file": "screenshots/e2e-kpss-field-tr.png",
+      "bytes": 217924,
+      "sha256": "1fb43687a4dbe3d844624fa037bf13720b958c7e87e5d4563a7d867c64efc6ca"
+    },
+    {
+      "file": "screenshots/e2e-kpss-running-en.png",
+      "bytes": 244973,
+      "sha256": "0f02aa8010b9a386104cf5289d85747e793dfa0dddc0c59a38e20efea2380e01"
+    },
+    {
+      "file": "screenshots/e2e-kpss-running-tr.png",
+      "bytes": 226939,
+      "sha256": "83396545ea0c371fc78224782ba70d1846b00bb05cb3b277a9f9caca71cb031f"
+    }
+  ],
+  "exclusions": [
+    "defines and environment files",
+    "property lists",
+    "auth material",
+    "private responses",
+    "application bundles",
+    "all non-allowlisted files"
+  ]
+}

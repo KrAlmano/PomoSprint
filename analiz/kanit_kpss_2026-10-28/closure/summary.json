@@ -1,0 +1,14 @@
+{
+  "analyze": {
+    "exit_code": 0,
+    "seconds": 8.19
+  },
+  "node": {
+    "exit_code": 0,
+    "seconds": 3.83
+  },
+  "partials": {
+    "exit_code": 0,
+    "seconds": 0.14
+  }
+}

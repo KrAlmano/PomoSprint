@@ -1,6 +1,8 @@
 # PomoSprint
 
-> **28 Ekim site yayını:** Güncel Deneme/DUS tanıtımı ve uygulama ekranları [pomosprint.app](https://pomosprint.app) üzerinde yayımlandı. [Yayın ve canlı doğrulama raporu](analiz/SITE_YAYIN_RAPORU_2026-10-28.md). Mobil uygulama/Supabase paketleri bu dağıtımla canlıya alınmadı.
+> **29 Ekim yerel kapanış:** KPSS native TR/EN geçti. Normal uygulama yerel `site` backend’iyle tekrar açıldı; mevcut taslak korundu. [Kanıt ve ortam ayrımı](analiz/QA_KPSS_2026-10-28.md).
+
+> **28 Ekim güncel durum — KPSS yerel hazırlık:** Katalog artık 20 sınav/test ve 5 aileyi (YKS, LGS, TUS, DUS, KPSS) kapsar. KPSS uygulama/site/proposed değişiklikleri **yalnız yereldedir; canlıya uygulanmadı ve yayımlanması için yeni kullanıcı onayı gerekir**. [KPSS raporu](analiz/QA_KPSS_2026-10-28.md). Son onaylı web sürümü `ad2fc988-4462-40ae-9333-ab0107e2138b`, dondurulmuş kaynak `6cfd9b5` olup KPSS içermez; [onaylı iki web düzeltmesinin kanıtı](analiz/iphone_cerceve_2026-10-28/approved-fix-deployment.json). Önceki [Deneme/DUS yayın raporu](analiz/SITE_YAYIN_RAPORU_2026-10-28.md) tarihsel kayıttır. Mobil uygulama ve Supabase bu web yayınlarıyla canlıya alınmadı.
 
 PomoSprint, iOS ve Android için odaklanma ve sınava hazırlık uygulamasıdır. Gerçek 25/50 dakikalık Pomodoro, 2/3/4 seanslık Maraton, Deneme, günlük/haftalık/aylık raporlar, hedefe göre ligler, avatarlar ve arkadaş durumlarını bir araya getirir. Puan, kum ve lig sonuçları sunucuda hesaplanır; istemcinin girdiği netler ödül üretmez.
 
@@ -8,7 +10,7 @@ PomoSprint, iOS ve Android için odaklanma ve sınava hazırlık uygulamasıdır
 
 Geliştirme dalı [`codex/gece-2026-10-27`](https://github.com/KrAlmano/PomoSprint/tree/codex/gece-2026-10-27); repo özeldir. Kullanıcının son yetkisi yalnız bu dalı normal push ile yedeklemektir. `main` push/merge, force push ve canlıya deploy yapılmaz. Yeni 27–30 ve 32 SQL paketleri yerel inceleme içindir; canlıya uygulanmış sayılmaz. **31 Maraton paketi kullanıcı kararı bekliyor ve bu doğrulama ortamına kurulmaz.**
 
-Tek güncel sonuç kaynağı [doğrulama raporu](analiz/DOGRULAMA_RAPORU_2026-10-28.md) ile [ilerleme kaydıdır](analiz/CODEX_ILERLEME.md). Her yeni çalışmada [AGENTS.md](AGENTS.md), [PROJE_DEVIR.md](PROJE_DEVIR.md) ve bu kayıtlar okunur. Eski raporların sayıları, başlatılmış bir uzun koşu veya kontrollü geçmiş, yeni doğal süre/native başarı olarak sunulmaz. README son kapı sayılarını tekrar ederek ikinci bir çelişkili durum tablosu tutmaz.
+KPSS için güncel sonuç kaynağı [KPSS raporu](analiz/QA_KPSS_2026-10-28.md); önceki DUS/A/B çalışması için [doğrulama raporu](analiz/DOGRULAMA_RAPORU_2026-10-28.md) ile [ilerleme kaydıdır](analiz/CODEX_ILERLEME.md). Her yeni çalışmada [AGENTS.md](AGENTS.md), [PROJE_DEVIR.md](PROJE_DEVIR.md) ve bu kayıtlar okunur. Eski raporların sayıları, başlatılmış bir uzun koşu veya kontrollü geçmiş, yeni doğal süre/native başarı olarak sunulmaz. README son kapı sayılarını tekrar ederek ikinci bir çelişkili durum tablosu tutmaz.
 
 A2 düzeltmeleri: kısmi ders sonuçları ve çevrimdışı kalıcı kuyruk `11ea62c`; otomatik/düzenlenebilir boş sayısı ve yalnız düzenlenen derslerin kaydı `8446eff`. Bunlar kayıtlı kod düzeltmeleridir; bütün platform/dil matrisi ve B site tarayıcı kontrolünün final sonucu ayrıca rapordan okunur. Bu dal genel mağaza yayın onayı değildir.
 
@@ -18,9 +20,9 @@ A2 düzeltmeleri: kısmi ders sonuçları ve çevrimdışı kalıcı kuyruk `11e
 |---|---|
 | Pomodoro | 25 veya 50 dakika; bir duraklatma hakkı. Ödüllendirilen 25 dk odak 5, 50 dk odak 12 temel puan ve seans başına 20 kum. Normal derlemede hızlandırılmış sayaç veya test etiketi yok. |
 | Maraton | 2/3/4 odak; aralarda 5 dk mola ve ardından 1 dk içinde ön planda “Buradayım” ile sunucu onayı. Erken ayrılınca bitmiş odaklar normal puanlarıyla korunur. Tam plan bonusu 25 dk için +2/+3/+5, 50 dk için +4/+6/+10; sunucu yalnız bir kez verir. |
-| Deneme | TYT, AYT, YDT, LGS Sözel/Sayısal, TUS Temel/Klinik, DUS; 3-2-1 sonrası duraklatma/mola yok. Sunucu başlangıç/bitişi kapanma ve arka plandan etkilenmez. Çakışan Pomodoro/Maraton/Deneme başlatılamaz. |
-| AYT erken bitiş / ayrıntılar | Yeni32 sözleşmesinde yalnız AYT erken tamamlanabilir. Gerçek süre raporlanır; kum sunucuda `floor(snapshot_kumu × gerçek_saniye / planlanan_saniye)` ile hesaplanır. Yeni tam ödüller LGS Sözel60, LGS Sayısal70, YDT95, TUS Temel/Klinik110, DUS120, TYT130, AYT145; bütün yeni denemeler bu tabloyu kullanır; eski active/completed kayıtların ödülleri korunur. Dört40 soruluk AYT testinden çözülen1–4 seçilir. Tüm tamamlanmış denemelere120 karakter başlık ve2000 karakter özel not eklenebilir. Eski kayıtların ödülü değişmez; net/başlık düzenleme ödül üretmez. |
-| Net girişi | Doğru/yanlış değişince boş otomatik hesaplanır, yine de elle düzenlenir. Kısmi ders sonucu kaydedilir; dokunulmayan ders için sıfır sonuç uydurulmaz. Doğru/yanlış/boş için negatif, tam sayı olmayan veya soru kotasını aşan giriş engellenir; hesaplanan net negatif olabilir. YKS/TUS/DUS doğru−yanlış/4, LGS doğru−yanlış/3; TR virgül, EN nokta. Netler puan/kum/lig değiştirmez. |
+| Deneme | YKS (TYT/AYT/YDT), LGS Sözel/Sayısal, TUS Temel/Klinik, DUS ve 12 KPSS seçeneği; toplam 20 sınav/test ve 5 aile; 3-2-1 sonrası duraklatma/mola yok. Sunucu başlangıç/bitişi kapanma ve arka plandan etkilenmez. Çakışan Pomodoro/Maraton/Deneme başlatılamaz. |
+| AYT erken bitiş / ayrıntılar | Yeni32 sözleşmesinde yalnız AYT erken tamamlanabilir. Gerçek süre raporlanır; kum sunucuda `floor(snapshot_kumu × gerçek_saniye / planlanan_saniye)` ile hesaplanır. Yeni tam ödüller LGS Sözel60, LGS Sayısal70, YDT95, TUS Temel/Klinik110, DUS120, TYT130, AYT145; KPSS tam ödülleri aşağıdaki tabloda ayrı gösterilir; eski active/completed kayıtların ödülleri korunur. Dört40 soruluk AYT testinden çözülen1–4 seçilir. Tüm tamamlanmış denemelere120 karakter başlık ve2000 karakter özel not eklenebilir. Eski kayıtların ödülü değişmez; net/başlık düzenleme ödül üretmez. |
+| Net girişi | Doğru/yanlış değişince boş otomatik hesaplanır, yine de elle düzenlenir. Kısmi ders sonucu kaydedilir; dokunulmayan ders için sıfır sonuç uydurulmaz. Doğru/yanlış/boş için negatif, tam sayı olmayan veya soru kotasını aşan giriş engellenir; hesaplanan net negatif olabilir. YKS/TUS/DUS/KPSS doğru−yanlış/4, LGS doğru−yanlış/3; TR virgül, EN nokta. Netler puan/kum/lig değiştirmez. |
 | Raporlar | Pomodoro+Maraton+tamamlanan Deneme süreleri ortak toplamdır. Deneme ayrı satırdır, derslere paylaştırılmaz. Vazgeçilen deneme geçmişte kalır fakat süre/seri/ödül/tamamlama sayısına katkı vermez. Gün sınırı profil IANA saat diliminde 04:00. |
 | İçgörüler | Son 3 haftadaki yeterli karşılaştırılabilir denemede ders netindeki değişim ve ilişkili kategori çalışma süresi birlikte gösterilir; neden–sonuç iddiası yapılmaz. Netler kişiseldir. |
 | Ligler | Normal ve Deneme ekonomisi ayrı. Hedef kategorisi odaları en fazla 25 kişi; ilk puanlı aktiviteyle yerleşme ve ek global görünüm. Ay sınırı Europe/Istanbul ayın 1'i 00:00; ay içi hedef değişimi sonraki ay geçerli, puan korunur. Terfi/ödül için aktivite şartları vardır. |
@@ -103,7 +105,7 @@ DRYRUN sonunda kasıtlı`DRYRUN_RESULT`exception/rollback vardır; yalnız hata 
 python3 -c 'from pathlib import Path; import sys; s=Path(sys.argv[1]).read_text(); print("\n".join(x for x in s.splitlines() if not x.startswith(("\\echo", "\\quit"))))' supabase/proposed/27_tus_segment.sql | docker exec -i supabase_db_pomosprint-local psql -U postgres -d postgres -X -v ON_ERROR_STOP=1
 ```
 
-Aynı inceleme 28/29/30 için öncülü kurulduktan sonra tekrarlanır. Repo 27–30 için tek komut otomatik fresh bootstrap sunmaz. Kurulum tamamlanınca:
+Aynı inceleme 28/29/30 için öncülü kurulduktan sonra tekrarlanır. Bu bölüm tarihsel 27–30 tabanını anlatır; güncel Deneme/KPSS sürümü burada bırakılmaz: aşağıdaki ayrı ortam rehberine göre 32 de uygulanır. Repo 27–30 için tek komut otomatik fresh bootstrap sunmaz. Taban kurulum tamamlanınca:
 
 ```sh
 bash tool/local_supabase/parity_check.sh --reviewed-night-20261028-with-start-atomic
@@ -126,7 +128,7 @@ flutter run -d <qa-ios-simulator-id> \
 
 Android emülatöründe aynı define'larla URL`http://10.0.2.2:54321` olur. Alternatif `adb reverse tcp:54321 tcp:54321` ile loopback kullanılabilir; native runner reverse/cleanup'ı yönetir. HTTP cleartext izni debug kaynağına özeldir; local HTTP debug örneğini release bağlantısı diye kullanma. Normal süreler 25/50 dk; Maraton 300+60 sn'dir.
 
-### DUS ve güncel32 için ayrı inceleme ve site ortamı
+### DUS, KPSS ve güncel32 için ayrı yerel ortamlar
 
 [32 rehberi](supabase/proposed/32_exam_details_early_finish_README.md) ileri/down/DRYRUN ve gerçek süre/ödül sözleşmesini açıklar.32,31'e bağlı değildir. Yeni32 kaydı veya kişisel not oluştuktan sonra veri kaybettirecek tam rollback reddedilir; kazanılmış ödül geri alınmaz.
 
@@ -137,10 +139,13 @@ Bu oturumun ayrı, sabit yerel hedefleri:
 | Normal A |54321|postgres|Önceki7sınavlı27–30 snapshot doğrulaması; güncelDUS kaynaklarıyla karıştırma|
 | review |54351 /54352 /54353|pomosprint_review32_dus|32 SQL/native testleri|
 | site |54361 /54362 /54363|pomosprint_site32_dus|Başlangıçta sıfır kullanıcıdan oluşturulan yedi kurgu kişi|
+| kpss |54401 /54402 /54403|pomosprint_review32_kpss|Ayrı, yerel KPSS SQL/native incelemesi; DUS verilerini değiştirmez|
 
-İzole servisler yalnız loopback'te ve auto-confirm ile çalışır; shared Mailpit veya gerçek mail teslimi kullanılmaz. `isolated32_stack.py --profile review|site` ve `parity_check_exam32.py --profile review|site` yalnız bu sabit profilleri kabul eder. Site kurucusu `tool/local_supabase/e2e/site_demo_fixture.py` varsayılan olarak çevrimdışı plan üretir; açık `setup --apply --allow-historical` yalnız yeni, işaretli yerel hesaplar oluşturur. Bu kontrollü geçmiş,455 dakika doğal bekleme kanıtı değildir. Hazır bir ortamı yeniden kurma/silme; yeni klon hazırlığı için32 rehberinin guard'larını izle.
+İzole servisler yalnız loopback'te ve auto-confirm ile çalışır; shared Mailpit veya gerçek mail teslimi kullanılmaz. `isolated32_stack.py --profile review|site|kpss` ve `parity_check_exam32.py --profile review|site|kpss` yalnız bu sabit profilleri kabul eder. KPSS iOS test host’u `54409` kullanır; bir sonraki çalışmada mevcut süreç/durum doğrulanmadan bu servisler yeniden kurulmaz. Site kurucusu `tool/local_supabase/e2e/site_demo_fixture.py` varsayılan olarak çevrimdışı plan üretir; açık `setup --apply --allow-historical` yalnız yeni, işaretli yerel hesaplar oluşturur. Bu kontrollü geçmiş,455 dakika doğal bekleme kanıtı değildir. Hazır bir ortamı yeniden kurma/silme; yeni klon hazırlığı için32 rehberinin guard'larını izle.
 
 İzoleAPI için Android'de `adb reverse tcp:54351 tcp:54351` ve `http://127.0.0.1:54351` kullanılır; gateway'in Host koruması gevşetilmez. Normal canlı bağlantılı derleme ile yerel QA bağlantılı derlemeyi karıştırma. Yeni32 sunucu henüz canlıya uygulanmadı.
+
+KPSS’yi incelemek için yalnız kurulu `kpss` ortamı sağlıklıyken aynı normal `flutter run` komutunda URL’yi `http://127.0.0.1:54401` seç. Eski `site`/`review` ortamı 8 sınavlık tarihsel veriyi korur; bu ortama bağlanmak KPSS’yi açmaz. Normal uygulamada taslak varsa önce koru; test amacıyla onun tercihlerini veya oturumunu sıfırlama. Bu turdaki native doğrulama bu nedenle ayrı `com.pomosprint.qa.kpss` uygulama kimliğiyle yapıldı.
 
 ### Deneme ödül tablosu
 
@@ -154,10 +159,15 @@ Bu oturumun ayrı, sabit yerel hedefleri:
 | DUS |150|120|30|
 | TYT |165|130|33|
 | AYT |180|145|36|
+| KPSS Lisans / Ön Lisans / Ortaöğretim GY–GK (3 ayrı seçenek) |130|105|26|
+| KPSS Alan Bilgisi — İstatistik dışındaki 8 ayrı alan |50|40|10|
+| KPSS Alan Bilgisi — İstatistik |60|50|12|
 
 Kural dakika başına0,8 kumun en yakın5katına yuvarlanmasıdır; LGS Sayısal70 kullanıcı tarafından belirlenen istisnadır. AYT90dk erken bitiş72kum/18puan,1–59sn0; diğer sınavlar erken bitirilemez. Eski başlamış/bitmiş snapshot ödülleri değişmez. İstemcide `ExamRewardPolicy` tek çevrimdışı referanstır; gerçek makbuzda sunucunun snapshot/earned alanları üstün gelir. Bütün yeni katalog tanımları reward_policy_version2 kullanır. Deneme cüzdanı/ligi normal cüzdan/ligden ayrıdır.
 
-DUS'un16alanı resmi yaklaşık kapsam tablosuna bağlıdır. Onboarding hedefi,UID'ye bağlı sunucuya henüz yazılamamış seçim,ders-kategori içgörü eşlemesi veDUS kategori/global ligi TUS ile aynı iş akışındadır. Normal hedeflerdeki diğer seçenekler silinmez; dört sınav ailesi YKS/LGS/TUS/DUS'tur.
+KPSS GY–GK, 60 Genel Yetenek + 60 Genel Kültür olmak üzere 120 soruluk tek oturumdur. Alan Bilgisi testlerinin her biri 40 sorudur: İşletme, Muhasebe, Hukuk, Kamu Yönetimi, İktisat, Maliye, Uluslararası İlişkiler, Çalışma Ekonomisi ve Endüstri İlişkileri, İstatistik. Bu 12 KPSS seçeneği erken bitirilemez; net doğru − yanlış/4'tür, resmî standart KPSS yerleştirme puanı hesaplanmaz. Öğrenim düzeyi ve alan kullanıcı tarafından açıkça seçilir; mesleğe göre otomatik sınav ataması yapılmaz. AGS, ÖABT ve DHBT bu kapsamda yoktur. Önceki Eğitim Bilimleri kategori/taslak verisi korunur, yeni KPSS ders önerilerine eklenmez.
+
+DUS'un16alanı resmi yaklaşık kapsam tablosuna bağlıdır. Onboarding hedefi,UID'ye bağlı sunucuya henüz yazılamamış seçim,ders-kategori içgörü eşlemesi veDUS kategori/global ligi TUS ile aynı iş akışındadır. Normal hedeflerdeki diğer seçenekler silinmez; beş sınav ailesi YKS/LGS/TUS/DUS/KPSS'tir.
 
 ## Doğrulama
 
@@ -189,7 +199,7 @@ Gerçek doğal süreli deneme, kısa yerel katalog deneyi, kontrollü tarihli fi
 
 ## Site, derleme ve yayın sınırı
 
-TR/EN site `landing/`; [site rehberi](landing/README.md), [güncel medya listesi](landing/screenshots/README.md). Site yalnız yeni backend ve uygulama hazırlandıktan sonra yayınlanabilir. Bu çalışma yerel hazırlık/QA ve yetkili geliştirme dalı push'udur; deploy değildir. Safari kullanıcı tercihi olarak korunur; kişisel Chrome sekmeleri kontrol edilmez/değiştirilmez.
+TR/EN site `landing/`; [site rehberi](landing/README.md), [güncel medya listesi](landing/screenshots/README.md). Son onaylı web sürümü yukarıda belirtilmiştir. Yeni KPSS site değişiklikleri yerel hazırlık/QA kapsamındadır; yeniden deploy öncesi açık kullanıcı onayı gerekir. Siteyi yayımlamak yeni uygulamayı veya proposed SQL paketlerini canlıya kurmaz. Safari kullanıcı tercihi olarak korunur; kişisel Chrome sekmeleri kontrol edilmez/değiştirilmez.
 
 - `flutter build ios --release --no-codesign`: imzasız fiziksel cihaz release paketi; Simulator kurulumu veya TestFlight dağıtımı değildir.
 - Simulator: `flutter build ios --simulator` / açık local define'lı `flutter run` ayrı adımlardır.

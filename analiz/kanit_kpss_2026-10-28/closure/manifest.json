@@ -1,0 +1,52 @@
+{
+  "date": "2026-10-29",
+  "status": "PASS",
+  "scope": "Post-native test-file analysis, Node173, partials, normal main build/install/launch, preserved original draft, cleanup of QA app only. Earlier full Flutter1493 gate is separate.",
+  "files": [
+    {
+      "file": "after-user-restart.json",
+      "bytes": 573,
+      "sha256": "61683a1c26e0052992c1eb577c2ff87f35b63c561313a77370daa140c6533fa4"
+    },
+    {
+      "file": "analyze.log",
+      "bytes": 96,
+      "sha256": "a4d5284693b2d4807e7f5c950772e2073fc9e84596fde955a9e8714943368ebc"
+    },
+    {
+      "file": "cleanup.json",
+      "bytes": 480,
+      "sha256": "74ac9ecc2b75941fa249c946decb76b29717a5c022339a29af0226f17665ee76"
+    },
+    {
+      "file": "node.log",
+      "bytes": 16854,
+      "sha256": "fa38c2bfa922b0197013eec64c1f38a51f92434fed2fa9674299252075a3ee48"
+    },
+    {
+      "file": "normal-build.log",
+      "bytes": 229,
+      "sha256": "e68e48ebb2fb40476b7e82f7d3a3bdb14cc88fafe92ef7c06e6472e3461d69f6"
+    },
+    {
+      "file": "normal-main.png",
+      "bytes": 241214,
+      "sha256": "e812b9dbecf26ec586423d271bbc9257b469bbe76e4e3935aad18c4960d119ad"
+    },
+    {
+      "file": "normal-restore.json",
+      "bytes": 609,
+      "sha256": "ac64e6f7cf0823d23a370d7f03c2ad973a0771ba61da42e148af2317c50a960e"
+    },
+    {
+      "file": "partials.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "summary.json",
+      "bytes": 181,
+      "sha256": "ee3cbdcf5eadf6cb9901c394c0ac95b52cf65f61335ac33a22c9ccb095bcc312"
+    }
+  ]
+}

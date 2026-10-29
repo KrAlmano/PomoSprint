@@ -1,0 +1,46 @@
+00:00 +0: loading /Users/almano/Desktop/Projects/Pomodoro/integration_test/aj_kpss_native_test.dart
+Xcode is fetching Swift Package Manager dependencies. This may take several minutes...
+  Fetching from https://github.com/google/gtm-session-fetcher.git (cached)...     
+  Fetching from https://github.com/google/GoogleUtilities.git (cached)...     
+  Fetching from https://github.com/google/promises.git (cached)...     
+  Fetching from https://github.com/google/interop-ios-for-google-sdks.git (cached)...     
+  Fetching from https://github.com/getsentry/sentry-cocoa (cached)...     
+  Fetching from https://github.com/google/app-check.git (cached)...     
+  Fetching from https://github.com/openid/AppAuth-iOS.git (cached)...     
+  Fetching from https://github.com/google/GTMAppAuth.git (cached)...     
+  Fetching from https://github.com/google/GoogleSignIn-iOS.git (cached)...     
+Running Xcode build...                                          
+Xcode build done.                                           43.5s
+00:00 +0: KPSS official catalog, explicit selections, start and abandon TR EN
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: null
+  Actual: <Instance of 'ExamDetailsDraft'>
+Preserve unsaved results
+
+When the exception was thrown, this was the stack:
+#4      _guardExistingWork (file:///Users/almano/Desktop/Projects/Pomodoro/integration_test/aj_kpss_native_test.dart:61:9)
+<asynchronous suspension>
+#5      main.<anonymous closure> (file:///Users/almano/Desktop/Projects/Pomodoro/integration_test/aj_kpss_native_test.dart:320:7)
+<asynchronous suspension>
+#6      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#7      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///Users/almano/Desktop/Projects/Pomodoro/integration_test/aj_kpss_native_test.dart line 61
+The test description was:
+  KPSS official catalog, explicit selections, start and abandon TR EN
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:00 +0 -1: KPSS official catalog, explicit selections, start and abandon TR EN [E]
+  Test failed. See exception logs above.
+  The test description was: KPSS official catalog, explicit selections, start and abandon TR EN
+  
+00:00 +0 -1: (tearDownAll)
+00:00 +0 -1: Some tests failed.
+
+Failing tests:
+  /Users/almano/Desktop/Projects/Pomodoro/integration_test/aj_kpss_native_test.dart: KPSS official catalog, explicit selections, start and abandon TR EN
