@@ -1,3 +1,5 @@
+> **Güncel cihazlar (29 Ekim):** HocamMacVar ve PomoSprint aynı iPhone 17 / iOS 27.0 simülatöründe; ayrıca tek Android `PomoSprint_QA_API36` bulunur. [Temizlik ve taşıma raporu](analiz/TEMIZLIK_2026-10-29.md).
+
 # PomoSprint
 
 > **29 Ekim yerel kapanış:** KPSS native TR/EN geçti. Normal uygulama yerel `site` backend’iyle tekrar açıldı; mevcut taslak korundu. [Kanıt ve ortam ayrımı](analiz/QA_KPSS_2026-10-28.md).
@@ -48,9 +50,9 @@ npm --prefix scripts ci
 
 Bu çalışmada kullanılan sürümler: Flutter 3.44.8 stable, Dart 3.12.2, Node 26.8.2, Python 3.13.3, Supabase CLI 2.119.0, Docker 29.8.2, Xcode 27.0. Bunlar her makinede güncel sürüm veya hepsi için minimum sürüm iddiası değildir. Kaynak `pubspec.yaml` Dart `^3.12.2` ister. Android JVM/source/target 17, Gradle 8.14 / AGP 8.11.1 / Kotlin 2.2.20, SDK 36 / min 24 ve NDK 28.2.13676358 kullanır. Node minimumu paket tarafından sabitlenmemiştir. [Kurulum ayrıntıları](tool/local_supabase/README.md).
 
-- macOS/iOS: Xcode seçili olmalı; **iOS 18.6 Simulator runtime** ayrıca kurulur. Xcode SDK sürümü ile runtime aynı şey değildir. Runner minimum iOS 16.2'dir. Native eklentiler Swift Package Manager ile bağlanır; projede Podfile olmadığı için kör `pod install` adımı yoktur.
+- macOS/iOS: Xcode seçili olmalı. 29 Ekim temizliği sonrası bu makinede **iOS 27.0 runtime ve tek paylaşılan iPhone 17** kullanılır; eski raporlardaki iOS 18.6 gerçek test/çekim geçmişidir, güncel kurulum şartı değildir. Yeni runtime otomatik indirilmez. Xcode SDK sürümü ile runtime aynı şey değildir. Runner minimum iOS 16.2'dir. Native eklentiler Swift Package Manager ile bağlanır; projede Podfile olmadığı için kör `pod install` adımı yoktur.
 - Android: JDK 17 ve Android SDK 36 gerekir. Flutter'ın Java seçimini `flutter doctor -v` ile kontrol et; gerekirse `flutter config --jdk-dir <kendi-jdk17-yolun>` kullan. Makineye özgü JDK veya eski cihaz UUID'si kopyalama.
-- QA cihazları açıkça `flutter devices`, `xcrun simctl list devices available` ve `adb devices` ile seçilir. Bu işin sınırı bir QA iPhone 18.6 ve bir QA Android API 36'dır; başka kişisel cihazlar silinmez/değiştirilmez.
+- Cihazlar açıkça `flutter devices`, `xcrun simctl list devices available` ve `adb devices` ile seçilir. Bu makinede yalnız **HocamMacVar · iPhone 17 (iOS 27.0)** ve **PomoSprint_QA_API36** Android emülatörü tutulur. Paylaşılan iPhone'un mevcut PomoSprint/Hocam uygulamaları ve verileri korunur; tercih/hesap sıfırlayan native testler aynı cihazda **ayrı QA uygulama kimliğiyle** çalıştırılır, normal uygulama veya cihaz sıfırlanmaz.
 
 ### Ortam ve sırlar
 

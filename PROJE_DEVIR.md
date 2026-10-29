@@ -1387,3 +1387,8 @@ Bu not yazılırken analiz 0 hata, Flutter 1493 PASS ve yalnız 5 isteğe bağl�
 TR/EN ana sayfa/Özellikler/SSS/meta/JSON-LD, beşinci aile KPSS’yi ve 3 ödül grubunu anlatır. Önceki 8 satırlı ödül tablosu korunur. 14 görünür SSS cevabı JSON-LD ile aynıdır. 30 gerçek PNG / 4 video değişmedi, KPSS screenshot’ı çekildi iddiası yoktur. Yeni KPSS metnine ait ayrı Safari turu yapılmadı; eski DUS/çerçeve kanıtları bu turun yerine geçmez.
 
 Sonraki ajan önce KPSS raporundaki ortam ayrımını ve `git status`/dalı kontrol etmeli. Normal uygulama yerel site54361 hesabıyla açık; KPSS ayrı54401 ortamında doğrulandı. Geçici QA uygulaması ve test paketleri kaldırıldı. Mevcut kullanıcı taslağı silinmez. Site deploy, uygulama mağazası veya proposed SQL canlı kurulumu için ilgili açık kullanıcı onayını beklemeli. Stage/commit/push yetkisini oturumun en son talimatından okumalı; main/merge/force yapılmaz.
+
+
+## 43. 29 Ekim cihaz birleştirme ve temizlik
+
+[Temizlik raporu](analiz/TEMIZLIK_2026-10-29.md) güncel cihaz/araç durumudur. Kullanıcı 1 iOS + 1 Android istedi. PomoSprint’in veri/taslak/seansı iPhone16’dan mevcut HocamMacVar iPhone17’ye taşındı; iki uygulama açıldıktan sonra eski cihaz silindi. iOS27.0 ve AndroidAPI36 kalır;18.1/18.6 runtime’ları kaldırıldı. Yaklaşık22,2GB net alan açıldı. Derleme önbellekleri ve iki eski tekseferlik yardımcı kaldırıldı; gerekli SDK’lar, regresyon/SQL kaynakları, yerel DB ve çalışan site54361 korundu. Review/KPSS yardımcı servisleri kapalı. Native host yeni iPhone17ID’sini kullanır,6/6test geçti. Eski28Ekim medya kayıtları gerçek18.6kaynağını korur. Yeni runtime indirme; iki uygulamanın verisini sıfırlama.

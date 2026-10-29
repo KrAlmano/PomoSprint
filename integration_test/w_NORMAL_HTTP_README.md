@@ -38,6 +38,8 @@ Başka normal/Maraton fixture'ları kullanılacaksa bunlar yalnız bu yeni QA he
 
 28 Ekim `night-w-ios18` için `extend_w_mixed_fixture.py` yalnız açık UID/e-posta eşleşmesinde bir normal25, iki25 dakikalık tamamlanmış Maraton odağı ve bir vazgeçilmiş TYT ekledi. İlk işlem ROLLBACK ile doğrulandı; sonra aynı kontrollerle commit edildi. Ödüller authenticated public tamamlama fonksiyonları tarafından hesaplandı; yalnız yeni Maratonun mola/onay zamanları ve yeni vazgeçilen denemenin zamanları tarihsel fixture olarak yazıldı. **Bu sentetik onay kaydı, gerçek5 dakika mola veya Buradayım tıklaması kanıtı değildir.** Gerçek mola/onay `s`/`v` koşularının konusudur. Eski iki TYT ve netlerinin tam hashleri korundu. Başlangıç405dk / normal17puan60kum / deneme66puan12kum; gerçek25 sonrası430dk / normal22puan80kum beklenir. Tekrar hazırlama girişimi reddedildi ve hesap değişmedi. Ayrıntı: `build/overnight_backend/w_mixed_fixture_71ffd38f-84db-4003-b785-840ea83bb477.json`.
 
+Bu tamamlanmış tek kullanımlık yardımcı, 29 Ekim 2026 temizliğinde aktif kaynaklardan kaldırıldı; tarihsel kaynak `889cab0` commit'inde korunur. Yukarıdaki kayıt geçmiş doğrulamayı anlatır, yeniden çalıştırma talimatı değildir. Yeni karışık veri senaryoları desteklenen `w_normal_http_restart_test.dart` ve `ad_verify_reports_exams_test.dart` akışları için yeni, ayrı bir QA kurulumu ile hazırlanır; eski UID/baseline yeniden kullanılmaz.
+
 ## Kanıt kapsamı
 
 - Gerçek 25 dakika: monotonic geçen süre, değişmeyen başlangıç/bitiş, normal uygulama sayacı ve son kuyruk kaydı.

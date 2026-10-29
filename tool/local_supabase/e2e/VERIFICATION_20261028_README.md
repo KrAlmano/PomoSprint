@@ -18,9 +18,11 @@ Yalnız yerel Supabase ve uydurma QA hesapları kullanılır. Canlıya bağlant�
 
 Kurulumun eski snapshot→27–30 sırası için [yerel altyapı rehberi](../README.md) ve [paket rehberi](../../../supabase/proposed/NIGHT_20261028_README.md) okunmalı. `supabase start` tek başına 27–30 kurmaz. Mevcut QA veritabanında `db reset`, toplu `db push`, Auth temizliği veya guard kaldırma yapılmaz.
 
-- Flutter/Dart bağımlılıkları ve yerelleştirme (`l10n`) çıktıları hazır olmalı; iOS için Xcode ve iOS 18.6 runtime, Android için SDK 36 ve JDK 17 gerekir.
-- iOS: **PomoSprint QA iPhone 16 (18.6)**. Android: **PomoSprint_QA_API36**. Fiziksel/kullanıcı cihazı kullanılmaz.
+- Flutter/Dart bağımlılıkları ve yerelleştirme (`l10n`) çıktıları hazır olmalı; bu makinedeki güncel iOS ortamı Xcode ve iOS 27.0 runtime, Android ortamı SDK 36 ve JDK 17'dir. 28 Ekim'e ait iOS 18.6 sonuçları tarihsel kanıttır.
+- 29 Ekim temizliği sonrası yalnız paylaşılan **HocamMacVar · iPhone 17 (iOS 27.0)** (`2CFDB5C8-6CA6-457C-8A6E-864B1849C681`) ve **PomoSprint_QA_API36** Android emülatörü tutulur. Fiziksel cihaz kullanılmaz. Paylaşılan iPhone'daki mevcut PomoSprint/Hocam uygulamaları, hesaplar ve taslaklar korunur; reset/hesap değiştiren testler **ayrı QA uygulama kimliğiyle** çalıştırılır, normal uygulama veya cihaz silinmez.
 - Aynı anda tek Flutter derleme/test komutu çalıştırın. Aynı cihazdaki bitmemiş probe sırasında başka hesap açan/reset yapan senaryo başlatmayın.
+
+`tool/local_supabase/e2e/sim/build_site_media_20261028.py` ve ilgili kaynak manifestleri, gerçek iOS 18.6 çekiminin tarihli tarifidir; güncel cihaz yapılandırması değildir. Bu dosyalardaki eski cihazı yeni çekim için doğrudan kullanmayın. Güncel sabit host hedefi `exam32_host.py` içindedir; tarihsel çekim bilgileri değiştirilmez.
 
 | Hizmet | Host loopback portu |
 |---|---:|
@@ -35,7 +37,7 @@ Repo kökünden cihazları açıkça seçin. UUID/serial yeni makinede farklı o
 ```sh
 xcrun simctl list devices available
 adb devices
-export SIM_UDID='QA-iPhone-16-18.6-UUID-buraya'
+export SIM_UDID='2CFDB5C8-6CA6-457C-8A6E-864B1849C681' # Önce bu makinedeki cihaz listesiyle doğrula.
 export ANDROID_SERIAL='emulator-5554'
 TASK_QA_RUN="verify-$(date +%m%d%H%M%S)"
 ```
@@ -125,7 +127,7 @@ ANDROID_SERIAL="$ANDROID_SERIAL" E2E_HOST_PORT=54398 E2E_REVIEWED_NIGHT=2 \
   bash tool/local_supabase/e2e/sim/run_android_e2e.sh ad
 ```
 
-E-posta yer tutucusunu manifestteki gerçek yerel QA e-postasıyla değiştirin. Bu koşunun eski karmaW hesabı yeni veritabanında otomatik oluşmaz. `extend_w_mixed_fixture.py` tek tarihsel UID/baseline'a bağlıdır; yeni kullanıcı için genel importer değildir ve tamamlanmış hesaba tekrar uygulanmaz.
+E-posta yer tutucusunu manifestteki gerçek yerel QA e-postasıyla değiştirin. Bu koşunun eski karmaW hesabı yeni veritabanında otomatik oluşmaz. Tek tarihsel UID/baseline'a bağlı `extend_w_mixed_fixture.py`, tamamlanmış bir kerelik hazırlık olduğu için 29 Ekim 2026 temizliğinde aktif kaynaklardan kaldırıldı; kaynak `889cab0` commit'inde korunur. Yeni fixture'lar desteklenen `w_normal_http_restart_test.dart` ve `ad_verify_reports_exams_test.dart` akışları için ayrı QA kurulumunda hazırlanır; eski hesap veya baseline tekrar kullanılmaz.
 
 ## R: gerçek süre ve OS/offline süreçleri
 
@@ -300,7 +302,7 @@ Wrapper logları `build/e2e_sim` / `build/e2e_android` altındadır; sonraki ko�
 
 ### AH hakkında
 
-`integration_test/ah_pending_exam_recovery_test.dart`, bu koşuda diskte kalmış **exact owner/attempt** için tek seferlik kısa YDT kurtarma kanıtıdır. Yeni hesap açmaz veya reset yapmaz; recent owner, aynı journal ve süreyi doğrular. `E2E_RECOVERY_OWNER/ATTEMPT/EMAIL` ister, normal wrapper senaryo listesinde yoktur. Genel suite veya her checkout'ta çalıştırılacak test diye önerilmez; yeni başarısız attempt'i bunun sabit varsayımlarına zorlamayın.
+`integration_test/ah_pending_exam_recovery_test.dart`, bu koşuda diskte kalmış **exact owner/attempt** için tamamlanmış tek seferlik kısa YDT kurtarmasıydı. 29 Ekim 2026 temizliğinde aktif kaynaklardan kaldırıldı; tarihsel kaynak ve doğrulama kayıtları Git geçmişinde korunur. Bu eski senaryonun 60 saniyelik YDT ve sahip varsayımları yeni kayıtlara uygulanmaz. Yeni kurtarma incelemeleri, desteklenen `u_exam_http_recovery_test.dart` ve `r_real_duration_probe_test.dart` akışlarının ilgili sahip/journal korumalarıyla yürütülür; bekleyen kullanıcı verisi sıfırlanmaz.
 
 ## Son kapı
 

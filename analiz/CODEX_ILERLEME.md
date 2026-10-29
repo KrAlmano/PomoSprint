@@ -547,3 +547,8 @@ Kullanıcı Mac'in açık olduğunu belirtti; Simulator uygulamasını kapatıp 
 Son native dosya analizi temiz; Node173/173 ve partial check tekrar geçti. Ürün kodu önceki1493Flutter/5opsiyonelPNG turundan sonra değişmedi; son düzeltmeler yalnız native test sürücüsündedir ve bu son koşuda doğrulandı. Normal `lib/main.dart` debugsim paketi yeniden derlendi (47,6sn), aynı `com.pomosprint.app` kimliğiyle kuruldu/açıldı. Kurulumda bütün tercihler korundu; bir adet bekleyen taslağın hash'i açılıştan sonra da aynıydı. 25:00 ana ekranı,29puan/80kum görüldü. Normal uygulama hâlâ yerel site54361’e bağlıdır; yeniKPSS test ortamı54401 ayrıdır.
 
 Geçici `com.pomosprint.qa.kpss` uygulaması, dört kopya QA app paketi ve iki özel kurtarma yedeği kaldırıldı. Normal uygulama/cihaz verileri, test logları ve kanıtlar korundu. QA Android kapalı; AVD silinmedi. Normal QA iPhone penceresi öne getirildi. Git kaynak kontrol noktaları210afe9 ve3cd6bc0; kapanış doküman/kanıt commit’i bunların üzerine gelir. Son onaylı web yayını6cfd9b5/ad2fc988… ve KPSS içermez; yeni deploy, canlıSQL,31,main/merge/force yok.
+
+
+### 29 Ekim — kullanıcı isteğiyle tek iOS + tek Android ve temizlik
+
+PomoSprint, mevcut hesap/taslak/seans korunarak HocamMacVar iPhone17’ye taşındı. İki uygulama açıldı; sonra iPhone16 ve iOS18.1/18.6 silindi. iOS27.0 + tekPomoSprint_QA_API36 kaldı. Derleme/cache/iki doğru DerivedData ve eski tekseferlikAH/extend yardımcıları kaldırıldı; net22.152.802.304bayt (~22,2GB) alan açıldı. Ana kod, anlamlı testler, canlı servisler ve yerel DB verisi korunur. Güncel host cihazID’si değişti; Python6/6geçti. [Rapor](TEMIZLIK_2026-10-29.md).
