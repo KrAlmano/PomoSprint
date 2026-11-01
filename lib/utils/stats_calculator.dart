@@ -1,6 +1,7 @@
 import '../models/category_model.dart';
 import '../models/study_session.dart';
 import '../models/exam_model.dart';
+import '../models/exam_catalog_defaults.dart';
 import '../services/server_clock.dart';
 import '../services/session_queue.dart'
     show PendingSession, SessionReason, isUuidCategoryId;
@@ -42,6 +43,9 @@ class StatSession {
     this.recordId,
     this.marathonUuid,
     this.marathonCompletedAt,
+    this.examId,
+    this.examNameTr,
+    this.examNameEn,
   });
 
   factory StatSession.fromStudySession(StudySession s) => StatSession(
@@ -91,12 +95,18 @@ class StatSession {
   final String? marathonUuid;
   final DateTime? marathonCompletedAt;
 
+  /// Optional catalog identity and frozen labels for the exam breakdown.
+  final String? examId;
+  final String? examNameTr;
+  final String? examNameEn;
+
   int get pomodoros =>
       kind == StudySessionKind.exam ? 0 : minutes ~/ kPomodoroMinutes;
 
   /// Exam time is admitted only from a completed server snapshot.
   static StatSession? fromExamAttempt(ExamAttempt attempt, {String? timeZone}) {
     if (!attempt.isCompleted || attempt.durationSeconds <= 0) return null;
+    final exam = attempt.definition ?? offlineExamCatalog.byId(attempt.examId);
     return StatSession(
       day: studyDayOf(attempt.startedAt, timeZone: timeZone),
       minutes: attempt.durationSeconds ~/ 60,
@@ -107,6 +117,9 @@ class StatSession {
       clientUuid: attempt.clientUuid,
       recordId: attempt.id,
       kind: StudySessionKind.exam,
+      examId: attempt.examId,
+      examNameTr: exam?.nameTr,
+      examNameEn: exam?.nameEn,
     );
   }
 
@@ -129,6 +142,9 @@ class StatSession {
     recordId: recordId,
     marathonUuid: marathonUuid,
     marathonCompletedAt: marathonCompletedAt,
+    examId: examId,
+    examNameTr: examNameTr,
+    examNameEn: examNameEn,
   );
 }
 
@@ -409,6 +425,7 @@ class CategoryStat {
     this.categoryId,
     this.colorHex,
     this.iconName,
+    this.examTypes = const [],
   });
 
   /// Gruplama anahtarı ([statGroupKey]).
@@ -421,6 +438,49 @@ class CategoryStat {
   final int sessions;
   final int pomodoros;
   final int pendingSessions;
+
+  /// Breakdown only: these minutes are already included in [minutes].
+  final List<ExamTypeStat> examTypes;
+}
+
+class ExamTypeStat {
+  const ExamTypeStat({
+    required this.id,
+    required this.nameTr,
+    required this.nameEn,
+    required this.minutes,
+  });
+  final String id;
+  final String nameTr;
+  final String nameEn;
+  final int minutes;
+  String name(bool turkish) => turkish ? nameTr : nameEn;
+}
+
+List<ExamTypeStat> _examTypeTotals(List<StatSession> sessions) {
+  final groups = <String, List<StatSession>>{};
+  for (final session in sessions) {
+    if (session.kind == StudySessionKind.exam && session.examId != null) {
+      groups.putIfAbsent(session.examId!, () => []).add(session);
+    }
+  }
+  return groups.entries.map((entry) {
+    final rows = entry.value;
+    final fallback = entry.key.replaceAll('_', ' ').toUpperCase();
+    return ExamTypeStat(
+      id: entry.key,
+      nameTr:
+          rows.map((s) => s.examNameTr).whereType<String>().firstOrNull ??
+          fallback,
+      nameEn:
+          rows.map((s) => s.examNameEn).whereType<String>().firstOrNull ??
+          fallback,
+      minutes: sumMinutes(rows),
+    );
+  }).toList()..sort((a, b) {
+    final order = b.minutes.compareTo(a.minutes);
+    return order == 0 ? a.id.compareTo(b.id) : order;
+  });
 }
 
 /// Preserve an explicit exam row when the screen condenses minor subjects.
@@ -469,6 +529,7 @@ List<CategoryStat> totalsByCategory(Iterable<StatSession> sessions) {
           sessions: list.length,
           pomodoros: list.fold(0, (sum, s) => sum + s.pomodoros),
           pendingSessions: list.where((s) => s.pending).length,
+          examTypes: _examTypeTotals(list),
         );
       }).toList()..sort((a, b) {
         final byMinutes = b.minutes.compareTo(a.minutes);

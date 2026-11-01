@@ -1,5 +1,7 @@
 # Alan denemesi prototipi — 1 Kasım 2026
 
+> **Tarihsel kayıt:** Kullanıcının sonraki isteği üzerine prototip kodu ve ayrı simülatör uygulaması kaldırıldı. Aşağıdaki anlatım geçmiş önizlemeye aittir; şu anda çalıştırılabilir bir özellik değildir.
+
 Kullanıcı özelliği önce prototip olarak görmek istiyor. Bu çalışma gerçek özellik veya yayın onayı değildir. `lib/prototypes/branch_preview_main.dart` bağımsız bir önizleme girişidir; normal `lib/main.dart` akışına bağlanmaz. Sınav ve ders seçeneklerini uygulamanın yerel varsayılan kataloğundan okur; hesap, ağ, Supabase, kum cüzdanı veya rapor servisini başlatmaz. Veriler bellektedir, uygulama kapatılınca kaybolur.
 
 - Taslak seçenekler: 25/50/75 dakika için sırasıyla örnek 20/40/60 deneme kumu; lig puanı yok. Bunlar gerçek ödül değildir.

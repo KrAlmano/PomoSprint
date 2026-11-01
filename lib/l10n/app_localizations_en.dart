@@ -2535,87 +2535,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get examTitle => 'Practice exams';
 
   @override
-  String get branchExamTitle => 'Subject practice';
-
-  @override
-  String get branchExamIntro =>
-      'Choose an exam and subject, then set the questions and duration.';
-
-  @override
-  String get branchExamSource => 'Exam';
-
-  @override
-  String get branchExamSubject => 'Subject';
-
-  @override
-  String get branchExamQuestions => 'Number of questions';
-
-  @override
-  String get branchExamQuestionsInvalid => 'Enter a number between 1 and 200.';
-
-  @override
-  String get branchExamDuration => 'Duration';
-
-  @override
-  String branchExamReward(int sand) {
-    return 'Example reward: $sand practice sand';
-  }
-
-  @override
-  String get branchPrototypeBadge => 'PROTOTYPE';
-
-  @override
-  String get branchPrototypeNotice =>
-      'This is a preview. No real attempt, record or sand is created.';
-
-  @override
-  String get branchPrototypeConfigure => 'Plan subject practice';
-
-  @override
-  String get branchPrototypeOverviewTitle => 'Focus on one subject';
-
-  @override
-  String get branchPrototypeDurationOptions => 'Duration and sample sand';
-
-  @override
-  String branchPrototypeSand(int sand) {
-    return '$sand sand';
-  }
-
-  @override
-  String get branchPrototypePlanContinue => 'Preview plan';
-
-  @override
-  String get branchPrototypeStart => 'Start sample timer';
-
-  @override
-  String get branchPrototypeRunning =>
-      'This sample timer lasts 5 seconds; no real study time is recorded.';
-
-  @override
-  String get branchPrototypeResults => 'Enter sample results';
-
-  @override
-  String get branchPrototypeResultAction => 'Show sample result';
-
-  @override
-  String get branchPrototypeResultInvalid =>
-      'Correct and wrong answers cannot exceed the number of questions.';
-
-  @override
-  String get branchPrototypeResultTitle => 'Sample result';
-
-  @override
-  String get branchPrototypeNoSave =>
-      'This result and sand are only a preview; nothing was saved to your account.';
-
-  @override
-  String get branchPrototypeNoLeague => 'No league points';
-
-  @override
-  String get branchPrototypeReset => 'Create another plan';
-
-  @override
   String get examNew => 'New practice exam';
 
   @override
@@ -2764,7 +2683,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get examLeagueEmpty =>
-      'You join the league after your first completed practice exam.';
+      'You join the league after your first point-earning practice exam.';
 
   @override
   String get examLeaguePreparing =>
@@ -3160,6 +3079,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get examModuleUnknown =>
       'AYT tests have not been selected for this record yet.';
+
+  @override
+  String get examScopeUnavailable =>
+      'The selected scope could not be determined.';
 
   @override
   String examSelectedQuestions(int selected, int total) {

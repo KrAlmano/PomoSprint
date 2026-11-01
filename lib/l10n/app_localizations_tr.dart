@@ -2493,87 +2493,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get examTitle => 'Denemeler';
 
   @override
-  String get branchExamTitle => 'Branş denemesi';
-
-  @override
-  String get branchExamIntro =>
-      'Sınavını ve dersini seç, soru sayısını ve süreyi belirle.';
-
-  @override
-  String get branchExamSource => 'Sınav';
-
-  @override
-  String get branchExamSubject => 'Ders';
-
-  @override
-  String get branchExamQuestions => 'Soru sayısı';
-
-  @override
-  String get branchExamQuestionsInvalid => '1 ile 200 arasında bir sayı gir.';
-
-  @override
-  String get branchExamDuration => 'Süre';
-
-  @override
-  String branchExamReward(int sand) {
-    return 'Örnek ödül: $sand deneme kumu';
-  }
-
-  @override
-  String get branchPrototypeBadge => 'PROTOTİP';
-
-  @override
-  String get branchPrototypeNotice =>
-      'Bu bir örnektir. Gerçek deneme, kayıt veya kum kazanımı oluşturmaz.';
-
-  @override
-  String get branchPrototypeConfigure => 'Branş denemesini planla';
-
-  @override
-  String get branchPrototypeOverviewTitle => 'Bir derse odaklan';
-
-  @override
-  String get branchPrototypeDurationOptions => 'Süre ve örnek kum';
-
-  @override
-  String branchPrototypeSand(int sand) {
-    return '$sand kum';
-  }
-
-  @override
-  String get branchPrototypePlanContinue => 'Planı önizle';
-
-  @override
-  String get branchPrototypeStart => 'Örnek sayacı başlat';
-
-  @override
-  String get branchPrototypeRunning =>
-      'Bu temsili sayaç 5 saniyedir; gerçek çalışma süresi tutulmaz.';
-
-  @override
-  String get branchPrototypeResults => 'Örnek sonuçlarını gir';
-
-  @override
-  String get branchPrototypeResultAction => 'Örnek sonucu göster';
-
-  @override
-  String get branchPrototypeResultInvalid =>
-      'Doğru ve yanlış sayılarının toplamı soru sayısını aşamaz.';
-
-  @override
-  String get branchPrototypeResultTitle => 'Örnek sonuç';
-
-  @override
-  String get branchPrototypeNoSave =>
-      'Bu sonuç ve kum yalnızca önizlemedir; hesabına kaydedilmedi.';
-
-  @override
-  String get branchPrototypeNoLeague => 'Lig puanı yok';
-
-  @override
-  String get branchPrototypeReset => 'Yeni plan oluştur';
-
-  @override
   String get examNew => 'Yeni deneme';
 
   @override
@@ -2721,7 +2640,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get examLeagueEmpty =>
-      'İlk tamamlanmış denemenden sonra ligde yerini alırsın.';
+      'İlk puan kazandığın denemeden sonra ligde yerini alırsın.';
 
   @override
   String get examLeaguePreparing =>
@@ -3116,6 +3035,9 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get examModuleUnknown => 'Bu kayıtta AYT test seçimi henüz yok.';
+
+  @override
+  String get examScopeUnavailable => 'Seçilen kapsam hesaplanamadı.';
 
   @override
   String examSelectedQuestions(int selected, int total) {

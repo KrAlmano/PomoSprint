@@ -85,7 +85,9 @@ class ExamService extends ChangeNotifier {
   String? _initializationOwner;
   bool _restoringJournal = false;
   bool _foreground = true;
-  bool _refreshing = false;
+  Future<void>? _refreshFuture;
+  String? _refreshOwner;
+  int? _refreshEpoch;
   bool _historyLoaded = false;
   bool _historyKnownUnavailable = false;
   bool _historyRefreshFailed = false;
@@ -217,7 +219,6 @@ class ExamService extends ChangeNotifier {
     errorCode = null;
     _catalog = offlineExamCatalog;
     busy = false;
-    _refreshing = false;
     _historyLoaded = false;
     _historyKnownUnavailable = false;
     _historyRefreshFailed = false;
@@ -329,22 +330,55 @@ class ExamService extends ChangeNotifier {
     return false;
   }
 
-  Future<void> refresh() async {
+  Future<void> refresh() {
     if (!_initialized || _restoringJournal) {
       // _switchOwner calls refresh only after local restoration has finished.
       // External refresh/lifecycle calls must not merge an empty snapshot
       // while the durable journal is still being read.
-      await initialize();
-      return;
+      return initialize();
     }
     final owner = _owner, epoch = _epoch;
-    if (owner == null || _refreshing) return;
+    if (owner == null) return Future.value();
+    final running = _refreshFuture;
+    if (running != null && _refreshOwner == owner && _refreshEpoch == epoch) {
+      return running;
+    }
+    // Publish before invoking work so listeners re-entering during _emit()
+    // also wait for this owner's same complete history snapshot.
+    final completion = Completer<void>();
+    final future = completion.future;
+    _refreshFuture = future;
+    _refreshOwner = owner;
+    _refreshEpoch = epoch;
+    void settled() {
+      if (identical(_refreshFuture, future)) {
+        _refreshFuture = null;
+        _refreshOwner = null;
+        _refreshEpoch = null;
+      }
+    }
+
+    unawaited(
+      _refreshOwned(owner, epoch).then<void>(
+        (_) {
+          settled();
+          completion.complete();
+        },
+        onError: (Object error, StackTrace stack) {
+          settled();
+          completion.completeError(error, stack);
+        },
+      ),
+    );
+    return future;
+  }
+
+  Future<void> _refreshOwned(String owner, int epoch) async {
     if (!backend.isAvailable) {
       _historyRefreshFailed = true;
       _emit();
       return;
     }
-    _refreshing = true;
     try {
       final raw = await backend.rpc('get_exam_config', {});
       if (!_current(owner, epoch)) return;
@@ -461,7 +495,6 @@ class ExamService extends ChangeNotifier {
       }
     } finally {
       if (_current(owner, epoch)) {
-        _refreshing = false;
         _emit();
       }
     }

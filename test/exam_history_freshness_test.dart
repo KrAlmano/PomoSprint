@@ -89,11 +89,62 @@ void main() {
       };
       final initial = service.initialize();
       await requested.future;
-      await service.refresh();
+      var returned = false;
+      final concurrent = service.refresh().then<void>((_) {
+        returned = true;
+      });
+      await Future<void>.delayed(Duration.zero);
+      expect(returned, isFalse);
       expect(service.historyIsStale, isTrue);
       gate.complete(backend.defaultRpc('get_my_exam_attempts', {}));
-      await initial;
+      await Future.wait([initial, concurrent]);
       expect(service.historyIsStale, isFalse);
+    },
+  );
+
+  test(
+    'concurrent report refresh waits for the new complete snapshot',
+    () async {
+      seedCompleted();
+      await service.initialize();
+      final exam = offlineExamCatalog.exams.first;
+      backend.rows['new'] = ExamAttempt(
+        id: 'new',
+        clientUuid: 'new',
+        examId: exam.id,
+        startedAt: backend.clock.subtract(const Duration(hours: 3)),
+        endsAt: backend.clock.subtract(const Duration(hours: 1)),
+        durationSeconds: exam.durationSeconds,
+        totalQuestions: exam.totalQuestions,
+        status: ExamAttemptStatus.completed,
+        definition: exam,
+      );
+      final requested = Completer<void>();
+      final gate = Completer<Object?>();
+      backend.handler = (name, params) async {
+        if (name == 'get_my_exam_attempts') {
+          if (!requested.isCompleted) requested.complete();
+          return gate.future;
+        }
+        return backend.defaultRpc(name, params);
+      };
+      final refresh = service.refresh();
+      await requested.future;
+      var returned = false;
+      final reportsRead = service.refresh().then((_) {
+        returned = true;
+        return service.attempts.map((e) => e.id).toSet();
+      });
+      await Future<void>.delayed(Duration.zero);
+      expect(returned, isFalse);
+      gate.complete(backend.defaultRpc('get_my_exam_attempts', {}));
+      await refresh;
+      expect(await reportsRead, {'done', 'new'});
+      expect(service.historyIsStale, isFalse);
+      expect(
+        backend.calls.where((call) => call.$1 == 'get_my_exam_attempts').length,
+        2, // initial + one shared refresh
+      );
     },
   );
 

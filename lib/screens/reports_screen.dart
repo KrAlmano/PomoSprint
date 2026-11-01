@@ -7,6 +7,8 @@ import 'package:intl/date_symbol_data_local.dart';
 import '../l10n/app_localizations.dart';
 import '../models/category_model.dart';
 import '../models/exam_model.dart';
+import '../models/study_session.dart';
+import '../services/exam_service.dart';
 import '../services/language_service.dart';
 import '../services/server_clock.dart';
 import '../services/supabase_service.dart';
@@ -23,6 +25,7 @@ import '../widgets/stats/stats_load_state.dart';
 import '../widgets/stats/stats_text.dart';
 import '../widgets/stats/session_type_summary.dart';
 import 'history_screen.dart';
+import 'exam_screen.dart';
 import 'monthly_tracking_screen.dart';
 import 'rejected_sessions_screen.dart';
 
@@ -34,6 +37,8 @@ class ReportsScreen extends StatefulWidget {
   final VoidCallback? onOpenExams;
   final Future<List<ExamAttempt>> Function()? loadExamAttempts;
   final bool Function()? isExamHistoryStale;
+  final ExamService? examService;
+  final Future<List<StudySession>> Function()? loadExamStudySessions;
 
   /// Testte sahte servis verilir; uygulamada [SupabaseService.instance].
   @visibleForTesting
@@ -46,6 +51,8 @@ class ReportsScreen extends StatefulWidget {
     this.onOpenExams,
     this.loadExamAttempts,
     this.isExamHistoryStale,
+    this.examService,
+    this.loadExamStudySessions,
     this.service,
   });
 
@@ -71,6 +78,7 @@ class _ReportsScreenState extends State<ReportsScreen>
   }
 
   int _activeTab = 0; // 0: Günlük Çalışma, 1: Haftalık Çalışma, 2: Aylık Takip
+  final _tabKeys = List.generate(4, (_) => GlobalKey());
   bool _showDistributionPercent = false;
 
   List<StatSession> _remoteSessions = const [];
@@ -161,12 +169,34 @@ class _ReportsScreenState extends State<ReportsScreen>
   }
 
   void _onBecameVisible() {
+    _ensureSelectedTabVisible();
     _syncToday();
     _scheduleDayRollover();
     final loadedAt = _loadedAt;
     final stale =
         loadedAt == null || DateTime.now().difference(loadedAt) > _staleAfter;
     if (_dirty || stale || _loadError != null) unawaited(_refresh());
+  }
+
+  void _ensureSelectedTabVisible() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_visible) return;
+      final selected = _tabKeys[_activeTab].currentContext;
+      if (selected == null) return;
+      unawaited(
+        Scrollable.ensureVisible(
+          selected,
+          alignment: .5,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+        ),
+      );
+    });
+  }
+
+  void _selectTab(int index) {
+    setState(() => _activeTab = index);
+    _ensureSelectedTabVisible();
   }
 
   void _syncToday() {
@@ -448,13 +478,20 @@ class _ReportsScreenState extends State<ReportsScreen>
                 if (_hasLoaded && _loadError != null && !_isLoading)
                   ContentWidth(
                     maxWidth: ContentWidth.dashboard,
-                    child: StatsStaleBanner(
-                      onRetry: _refresh,
-                      message: _remoteLoaded
-                          ? null
-                          : AppLocalizations.of(
-                              context,
-                            )!.statsOfflinePendingOnly,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.sizeOf(context).height * .25,
+                      ),
+                      child: SingleChildScrollView(
+                        child: StatsStaleBanner(
+                          onRetry: _refresh,
+                          message: _remoteLoaded
+                              ? null
+                              : AppLocalizations.of(
+                                  context,
+                                )!.statsOfflinePendingOnly,
+                        ),
+                      ),
                     ),
                   ),
                 Expanded(child: _buildTabContent(lang)),
@@ -468,6 +505,14 @@ class _ReportsScreenState extends State<ReportsScreen>
 
   Widget _buildTabContent(LanguageService lang) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    if (_activeTab == 3 && widget.examService != null) {
+      return ExamScreen(
+        key: const ValueKey('exam-reports-inside-reports'),
+        service: widget.examService,
+        loadStudySessions: widget.loadExamStudySessions,
+        historyOnly: true,
+      );
+    }
     if (!_hasLoaded) {
       final error = _loadError;
       if (error != null && !_isLoading) {
@@ -493,6 +538,9 @@ class _ReportsScreenState extends State<ReportsScreen>
       exams: _examAttempts,
     );
     final goalMinutes = _dailyGoalMinutes;
+    final openExamReports = widget.examService == null
+        ? widget.onOpenExams
+        : () => _selectTab(3);
     return switch (_activeTab) {
       0 => DailyReportView(
         sessions: sessions,
@@ -507,9 +555,9 @@ class _ReportsScreenState extends State<ReportsScreen>
         showDistributionPercent: _showDistributionPercent,
         onDistributionModeChanged: (percent) =>
             setState(() => _showDistributionPercent = percent),
-        onShowDetails: () => setState(() => _activeTab = 1),
+        onShowDetails: () => _selectTab(1),
         onStartTimer: widget.onStartTimer,
-        onOpenExams: widget.onOpenExams,
+        onOpenExams: openExamReports,
       ),
       1 => HistoryScreen(
         sessions: sessions,
@@ -518,16 +566,22 @@ class _ReportsScreenState extends State<ReportsScreen>
         categories: widget.categories,
         onRefresh: _refresh,
         onStartTimer: widget.onStartTimer,
-        onOpenExams: widget.onOpenExams,
+        onOpenExams: openExamReports,
         rejectedSessionCount: _rejectedCount,
         onShowRejectedSessions: () => openRejectedSessions(context),
       ),
-      _ => MonthlyTrackingScreen(
+      2 => MonthlyTrackingScreen(
         sessions: sessions,
         today: _today,
         categories: widget.categories,
         onRefresh: _refresh,
-        onOpenExams: widget.onOpenExams,
+        onOpenExams: openExamReports,
+      ),
+      _ => ExamScreen(
+        key: const ValueKey('exam-reports-inside-reports'),
+        service: widget.examService,
+        loadStudySessions: widget.loadExamStudySessions,
+        historyOnly: true,
       ),
     };
   }
@@ -548,6 +602,7 @@ class _ReportsScreenState extends State<ReportsScreen>
       // Sekmeler sığıyorsa ortalanır (geniş ekran), sığmıyorsa yatay kaydırılır.
       child: LayoutBuilder(
         builder: (context, constraints) => SingleChildScrollView(
+          key: const ValueKey('reports-tab-scroll'),
           scrollDirection: Axis.horizontal,
           physics: const BouncingScrollPhysics(),
           child: ConstrainedBox(
@@ -556,25 +611,38 @@ class _ReportsScreenState extends State<ReportsScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 _buildTabItem(
+                  key: _tabKeys[0],
                   label: lang.translate('reports_tab_subject'),
                   isActive: _activeTab == 0,
                   short: short,
-                  onTap: () => setState(() => _activeTab = 0),
+                  onTap: () => _selectTab(0),
                 ),
                 const SizedBox(width: 4),
                 _buildTabItem(
+                  key: _tabKeys[1],
                   label: lang.translate('reports_tab_history'),
                   isActive: _activeTab == 1,
                   short: short,
-                  onTap: () => setState(() => _activeTab = 1),
+                  onTap: () => _selectTab(1),
                 ),
                 const SizedBox(width: 4),
                 _buildTabItem(
+                  key: _tabKeys[2],
                   label: lang.translate('reports_tab_monthly'),
                   isActive: _activeTab == 2,
                   short: short,
-                  onTap: () => setState(() => _activeTab = 2),
+                  onTap: () => _selectTab(2),
                 ),
+                if (widget.examService != null) ...[
+                  const SizedBox(width: 4),
+                  _buildTabItem(
+                    key: _tabKeys[3],
+                    label: AppLocalizations.of(context)!.examTitle,
+                    isActive: _activeTab == 3,
+                    short: short,
+                    onTap: () => _selectTab(3),
+                  ),
+                ],
               ],
             ),
           ),
@@ -584,6 +652,7 @@ class _ReportsScreenState extends State<ReportsScreen>
   }
 
   Widget _buildTabItem({
+    required Key key,
     required String label,
     required bool isActive,
     required bool short,
@@ -592,6 +661,7 @@ class _ReportsScreenState extends State<ReportsScreen>
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final accent = isDark ? AppColors.darkPrimary : AppColors.primary;
     return Semantics(
+      key: key,
       button: true,
       selected: isActive,
       child: GestureDetector(

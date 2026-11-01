@@ -637,6 +637,8 @@ class _MainNavigationShellState extends State<MainNavigationShell>
       ),
       ReportsScreen(
         categories: _categories,
+        examService: _exams,
+        loadExamStudySessions: _service.fetchStudySessions,
         onStartTimer: () => setState(() => _currentIndex = 0),
         loadExamAttempts: () async {
           await _exams.refresh();

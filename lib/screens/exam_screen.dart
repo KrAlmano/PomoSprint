@@ -14,6 +14,8 @@ import '../utils/responsive.dart';
 import '../utils/exam_format.dart';
 import '../widgets/exam_results_dialog.dart';
 import '../widgets/social/league_tiers.dart';
+import '../widgets/social/ranking_models.dart';
+import '../widgets/social/ranking_widgets.dart';
 
 class ExamScreen extends StatefulWidget {
   const ExamScreen({
@@ -24,6 +26,7 @@ class ExamScreen extends StatefulWidget {
     this.loadStudySessions,
     this.userSegment,
     this.openHistoryRequest = 0,
+    this.historyOnly = false,
   });
   final ExamService? service;
   final bool Function()? canStart;
@@ -35,6 +38,9 @@ class ExamScreen extends StatefulWidget {
 
   /// A new request opens history even when this screen is already mounted.
   final int openHistoryRequest;
+
+  /// Renders the shared history inside Reports without starting another exam.
+  final bool historyOnly;
   @override
   State<ExamScreen> createState() => _ExamScreenState();
 }
@@ -58,6 +64,7 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
   String? _previousActiveUuid;
   int _leagueRefreshRevision = 0;
   bool _foreground = true;
+  bool? _historyVisible;
   @override
   void initState() {
     super.initState();
@@ -72,6 +79,20 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
   }
 
   static const _examSegments = ['yks', 'lgs', 'tus', 'dus', 'kpss'];
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!widget.historyOnly) return;
+    final visible = TickerMode.valuesOf(context).enabled;
+    final wasVisible = _historyVisible;
+    _historyVisible = visible;
+    if (wasVisible == false && visible) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _historyVisible == true) unawaited(_loadStudies());
+      });
+    }
+  }
 
   String? get _goalSegment =>
       _examSegments.contains(widget.userSegment) ? widget.userSegment : null;
@@ -107,6 +128,7 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
       _studiesStale = false;
       _studyLoadRevision++;
       _leagueRefreshRevision++;
+      if (widget.historyOnly && _owner != null) unawaited(_loadStudies());
     }
     final previous = _previousActiveUuid;
     _previousActiveUuid = _service.activeRecord?.clientUuid;
@@ -124,7 +146,9 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    _service.setForeground(state == AppLifecycleState.resumed);
+    if (!widget.historyOnly) {
+      _service.setForeground(state == AppLifecycleState.resumed);
+    }
     if (mounted) {
       setState(() {
         _foreground = state == AppLifecycleState.resumed;
@@ -333,6 +357,33 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    if (widget.historyOnly) {
+      return RefreshIndicator(
+        onRefresh: _refresh,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: EdgeInsets.all(Responsive.of(context).pagePadding),
+          child: ContentWidth(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (_service.errorCode != null)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Text(
+                      l10n.examError,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                  ),
+                ..._history(l10n),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
     final active = _service.activeRecord;
     return SafeArea(
       child: RefreshIndicator(
@@ -344,13 +395,6 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  l10n.examTitle,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 16),
                 if (active != null) _activeCard(active, l10n),
                 _tabs(l10n),
                 const SizedBox(height: 16),
@@ -913,160 +957,237 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
 
   Widget _historyCard(ExamAttempt attempt, AppLocalizations l10n) {
     final exam = _service.definitionFor(attempt);
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
     final localizations = MaterialLocalizations.of(context);
     String date(DateTime at) {
       final local = at.toLocal();
       return '${localizations.formatShortDate(local)} ${localizations.formatTimeOfDay(TimeOfDay.fromDateTime(local))}';
     }
 
+    final status = switch (attempt.status) {
+      ExamAttemptStatus.completed => l10n.examCompleted,
+      ExamAttemptStatus.abandoned => l10n.examAbandoned,
+      ExamAttemptStatus.active => l10n.examRunning,
+    };
+    final net = exam == null || attempt.subjectResults.isEmpty
+        ? null
+        : attempt.subjectResults.fold<double>(
+            0,
+            (sum, result) => sum + result.net(exam.wrongAnswerDivisor),
+          );
+    final selected = attempt.selectedModuleIds;
+    final modules = exam?.effectiveModules ?? const <ExamModule>[];
+    final scopeKnown =
+        selected != null &&
+        modules.isNotEmpty &&
+        selected.every((id) => modules.any((module) => module.id == id));
+    final selectedScopeQuestions = scopeKnown && exam != null
+        ? exam.subjects
+              .where(
+                (subject) =>
+                    exam.subjectIdsForModules(selected).contains(subject.id),
+              )
+              .fold<int>(0, (sum, subject) => sum + subject.questionCount)
+        : null;
     return Card(
-      margin: const EdgeInsets.only(bottom: 10),
+      key: ValueKey('exam-history-card-${attempt.clientUuid}'),
+      margin: const EdgeInsets.only(bottom: 12),
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
         side: BorderSide(color: _outlineColor),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (attempt.title != null)
-              Text(
-                attempt.title!,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-            Text(
-              exam?.name(_turkish) ?? l10n.examTitle,
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 8),
             Wrap(
-              spacing: 6,
+              spacing: 8,
               runSpacing: 6,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                _metadata(
-                  Icons.event_outlined,
-                  '${l10n.examStartTime}: ${date(attempt.startedAt)}',
+                Text(
+                  attempt.title ?? exam?.name(_turkish) ?? l10n.examTitle,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-                _metadata(Icons.info_outline_rounded, switch (attempt.status) {
-                  ExamAttemptStatus.completed => l10n.examCompleted,
-                  ExamAttemptStatus.abandoned => l10n.examAbandoned,
-                  ExamAttemptStatus.active => l10n.examRunning,
-                }),
+                if (attempt.title != null && exam != null)
+                  Text(exam.name(_turkish), style: theme.textTheme.bodyMedium),
+                _metadata(Icons.check_circle_outline_rounded, status),
+                if (attempt.finishedEarly)
+                  _metadata(Icons.schedule_rounded, l10n.examCompletedEarly),
               ],
             ),
-            const SizedBox(height: 8),
-            if (attempt.finishedEarly) ...[
-              Text(l10n.examCompletedEarly),
-              Text(
-                l10n.examActualPlanned(
-                  attempt.actualSeconds < 60
-                      ? l10n.examSeconds(attempt.actualSeconds)
-                      : '${attempt.actualSeconds ~/ 60} ${l10n.minutesUnit}',
-                  '${attempt.plannedSeconds ~/ 60} ${l10n.minutesUnit}',
-                ),
-              ),
-              Text(l10n.examCreditedMinutes(attempt.reportMinutes)),
-            ],
+            const SizedBox(height: 10),
             Text(
-              l10n.examQuestionsMinutes(
-                attempt.totalQuestions,
-                attempt.durationSeconds ~/ 60,
+              date(attempt.startedAt),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colors.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: colors.surfaceContainerHighest.withValues(alpha: .42),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Wrap(
+                spacing: 18,
+                runSpacing: 8,
+                children: [
+                  if (attempt.examId == 'ayt') ...[
+                    Text(
+                      selectedScopeQuestions != null
+                          ? l10n.examSelectedQuestions(
+                              selectedScopeQuestions,
+                              attempt.totalQuestions,
+                            )
+                          : selected == null
+                          ? l10n.examModuleUnknown
+                          : l10n.examScopeUnavailable,
+                    ),
+                    if (attempt.isCompleted)
+                      Text(l10n.examCreditedMinutes(attempt.reportMinutes)),
+                  ] else
+                    Text(
+                      attempt.isCompleted
+                          ? l10n.examQuestionsMinutes(
+                              attempt.totalQuestions,
+                              attempt.reportMinutes,
+                            )
+                          : l10n.examSubjectQuestions(attempt.totalQuestions),
+                    ),
+                  if (net != null)
+                    Text(
+                      '${l10n.examNet}: ${formatExamNet(net, l10n.localeName)}',
+                      style: const TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                  if (attempt.isCompleted)
+                    Text(
+                      l10n.examRewardSummary(
+                        attempt.pointsEarned,
+                        attempt.examCoinsEarned,
+                      ),
+                    ),
+                  if (attempt.status == ExamAttemptStatus.abandoned)
+                    Text(l10n.examNoAward),
+                ],
               ),
             ),
             if (attempt.isCompleted) ...[
-              const SizedBox(height: 6),
-              Text(
-                l10n.examRewardSummary(
-                  attempt.pointsEarned,
-                  attempt.examCoinsEarned,
+              if (attempt.subjectResults.isEmpty) ...[
+                const SizedBox(height: 8),
+                Text(
+                  l10n.examFinishedNoResults,
+                  style: theme.textTheme.bodySmall,
                 ),
-              ),
-              if (attempt.subjectResults.isEmpty)
-                Text(l10n.examFinishedNoResults),
+              ],
               if (attempt.subjectResults.isNotEmpty && exam != null)
                 ExpansionTile(
+                  tilePadding: EdgeInsets.zero,
                   title: Text(l10n.examResultsTitle),
                   children: [
                     for (final subject in exam.subjects)
                       if (attempt.subjectResults.any(
                         (r) => r.subjectId == subject.id,
                       ))
-                        ListTile(
-                          title: Text(subject.name(_turkish)),
-                          subtitle: Text(
-                            '${l10n.examCorrect}: ${attempt.subjectResults.firstWhere((r) => r.subjectId == subject.id).correct} · '
-                            '${l10n.examWrong}: ${attempt.subjectResults.firstWhere((r) => r.subjectId == subject.id).wrong} · '
-                            '${l10n.examBlank}: ${attempt.subjectResults.firstWhere((r) => r.subjectId == subject.id).blank}',
-                          ),
-                          trailing: Text(
-                            formatExamNet(
-                              attempt.subjectResults
-                                  .firstWhere((r) => r.subjectId == subject.id)
-                                  .net(exam.wrongAnswerDivisor),
-                              l10n.localeName,
-                            ),
-                          ),
+                        Builder(
+                          builder: (context) {
+                            final result = attempt.subjectResults.firstWhere(
+                              (r) => r.subjectId == subject.id,
+                            );
+                            return ListTile(
+                              title: Text(subject.name(_turkish)),
+                              subtitle: Text(
+                                '${l10n.examCorrect}: ${result.correct} · ${l10n.examWrong}: ${result.wrong} · ${l10n.examBlank}: ${result.blank}',
+                              ),
+                              trailing: Text(
+                                formatExamNet(
+                                  result.net(exam.wrongAnswerDivisor),
+                                  l10n.localeName,
+                                ),
+                              ),
+                            );
+                          },
                         ),
                   ],
                 ),
-              TextButton(
-                onPressed: exam == null
-                    ? null
-                    : () => showExamResultsDialog(
-                        context,
-                        service: _service,
-                        attempt: attempt,
-                      ),
-                child: Text(
-                  _service.supportsDetails
-                      ? l10n.examDetailsEdit
-                      : attempt.subjectResults.isEmpty
-                      ? l10n.examEnterResults
-                      : l10n.examEditResults,
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton(
+                  onPressed: exam == null
+                      ? null
+                      : () => showExamResultsDialog(
+                          context,
+                          service: _service,
+                          attempt: attempt,
+                        ),
+                  child: Text(
+                    _service.supportsDetails
+                        ? l10n.examDetailsEdit
+                        : attempt.subjectResults.isEmpty
+                        ? l10n.examEnterResults
+                        : l10n.examEditResults,
+                  ),
                 ),
               ),
-            ] else if (attempt.status == ExamAttemptStatus.abandoned)
-              Text(l10n.examNoAward),
+            ],
             ExpansionTile(
               key: ValueKey('exam-history-details-${attempt.clientUuid}'),
               tilePadding: EdgeInsets.zero,
-              title: Text(l10n.examHistoryDetails),
+              title: Text(
+                l10n.examHistoryDetails,
+                style: theme.textTheme.bodyMedium,
+              ),
               children: [
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Text('${l10n.examStartTime}: ${date(attempt.startedAt)}'),
                       Text(
                         '${l10n.examEndTime}: ${date(attempt.completedAt ?? attempt.endsAt)}',
                       ),
+                      if (attempt.finishedEarly) ...[
+                        Text(
+                          l10n.examActualPlanned(
+                            attempt.actualSeconds < 60
+                                ? l10n.examSeconds(attempt.actualSeconds)
+                                : '${attempt.actualSeconds ~/ 60} ${l10n.minutesUnit}',
+                            '${attempt.plannedSeconds ~/ 60} ${l10n.minutesUnit}',
+                          ),
+                        ),
+                        Text(l10n.examCreditedMinutes(attempt.reportMinutes)),
+                      ],
                       if (attempt.note != null) Text(attempt.note!),
                       if (attempt.examId == 'ayt' && attempt.isCompleted) ...[
                         if (attempt.selectedModuleIds == null)
                           Text(l10n.examModuleUnknown)
                         else ...[
-                          Text(
-                            (exam?.effectiveModules ?? [])
-                                .where(
-                                  (m) =>
-                                      attempt.selectedModuleIds!.contains(m.id),
-                                )
-                                .map((m) => m.name(_turkish))
-                                .join(' · '),
-                          ),
-                          if (attempt.selectedQuestionCount != null)
+                          if (selectedScopeQuestions == null)
+                            Text(l10n.examScopeUnavailable)
+                          else ...[
+                            Text(
+                              modules
+                                  .where((m) => selected!.contains(m.id))
+                                  .map((m) => m.name(_turkish))
+                                  .join(' · '),
+                            ),
                             Text(
                               l10n.examSelectedQuestions(
-                                attempt.selectedQuestionCount!,
+                                selectedScopeQuestions,
                                 attempt.totalQuestions,
                               ),
                             ),
+                          ],
                         ],
                       ],
+                      const SizedBox(height: 8),
                     ],
                   ),
                 ),
@@ -1280,56 +1401,152 @@ class _ExamLeagueViewState extends State<_ExamLeagueView>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final league = _league;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    // The server uses one synthetic is_me/has_league:false row when no room
+    // or global standings exist. It is not an actual first-place result.
+    final placeholder =
+        league != null &&
+        league.rows.length == 1 &&
+        league.rows.single['is_me'] == true &&
+        league.rows.single['has_league'] == false;
+    final entries =
+        league?.rows
+            .map((row) {
+              // Segment standings can redact identity even when is_blocked is
+              // false (a user has disabled social visibility).
+              final redacted =
+                  row.containsKey('id') &&
+                  row['id'] == null &&
+                  row['name'] == null &&
+                  row['is_me'] != true;
+              return RankingEntry.fromRow(
+                redacted ? {...row, 'is_blocked': true} : row,
+                pointsKey: 'points',
+              );
+            })
+            .toList(growable: false) ??
+        const <RankingEntry>[];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Wrap(
-          spacing: 8,
-          children: [
-            for (final scope in ['segment', 'global'])
-              ChoiceChip(
-                label: Text(
-                  scope == 'global' ? l10n.examGlobal : l10n.examTargetGroup,
+        Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: isDark
+                ? AppColors.darkSurfaceContainerHigh
+                : AppColors.surfaceContainerHigh,
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Row(
+            children: [
+              for (final scope in ['segment', 'global'])
+                Expanded(
+                  child: Semantics(
+                    button: true,
+                    selected: scope == _scope,
+                    child: InkWell(
+                      key: ValueKey('exam-league-scope-$scope'),
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: () {
+                        if (scope == _scope) return;
+                        setState(() {
+                          _scope = scope;
+                          _league = null;
+                        });
+                        unawaited(_load());
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        constraints: const BoxConstraints(minHeight: 40),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 10,
+                        ),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: scope == _scope
+                              ? AppColors.primaryContainer
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          scope == 'global'
+                              ? l10n.examGlobal
+                              : l10n.examTargetGroup,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: scope == _scope
+                                ? Colors.white
+                                : (isDark
+                                      ? AppColors.darkOnSurfaceVariant
+                                      : AppColors.onSurfaceVariant),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-                selected: scope == _scope,
-                onSelected: (_) {
-                  setState(() {
-                    _scope = scope;
-                    _league = null;
-                  });
-                  unawaited(_load());
-                },
-              ),
-          ],
+            ],
+          ),
         ),
+        const SizedBox(height: 16),
         if (_loading) const LinearProgressIndicator(),
         if (!widget.available) Text(l10n.examUnavailableBody),
-        if (_failed) TextButton(onPressed: _load, child: Text(l10n.examRetry)),
-        if (league != null) ...[
+        if (_failed) ...[
           Text(
-            leagueTitle(l10n, league.tier),
-            style: Theme.of(context).textTheme.titleLarge,
+            l10n.examError,
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
           ),
+          TextButton(onPressed: _load, child: Text(l10n.examRetry)),
+        ],
+        if (league != null) ...[
+          RankingCountdownBanner(
+            title: _scope == 'global'
+                ? l10n.examGlobal
+                : leagueTitle(l10n, league.tier),
+            target: league.periodEnd,
+            now: widget.service.now,
+            message: league.phase == 'active' ? null : l10n.examLeaguePreparing,
+          ),
+          const SizedBox(height: 12),
           Text('${l10n.examPracticeSand}: ${league.examCoins}'),
-          if (league.periodEnd != null)
-            Text(
-              l10n.examMonthlyReset(
-                MaterialLocalizations.of(
-                  context,
-                ).formatShortDate(league.periodEnd!.toLocal()),
+          const SizedBox(height: 16),
+          if ((entries.isEmpty || placeholder) && _scope == 'global')
+            const RankingEmptyView()
+          else if (entries.isEmpty || placeholder)
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Text(l10n.examLeagueEmpty, textAlign: TextAlign.center),
               ),
+            )
+          else ...[
+            RankingPodium(
+              top: entries.take(3).toList(),
+              compact: Responsive.of(context).isShortHeight,
+              // Exam avatars are not ready; do not imply an awarded medal.
+              showMedal: (_, _) => false,
             ),
-          if (league.phase != 'active') Text(l10n.examLeaguePreparing),
-          if (league.rows.isEmpty) Text(l10n.examLeagueEmpty),
-          for (var i = 0; i < league.rows.length; i++)
-            ListTile(
-              leading: Text('${league.rows[i]['rank'] ?? i + 1}'),
-              title: Text(
-                league.rows[i]['name']?.toString() ?? l10n.userDefault,
+            if (entries.length > 3) ...[
+              const SizedBox(height: 20),
+              Container(
+                clipBehavior: Clip.antiAlias,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? AppColors.darkSurfaceContainerLowest
+                      : AppColors.surfaceContainerLowest,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  children: [
+                    for (var i = 3; i < entries.length; i++)
+                      RankingRow(entry: entries[i], rank: i + 1),
+                  ],
+                ),
               ),
-              trailing: Text('${league.rows[i]['points'] ?? 0}'),
-              selected: league.rows[i]['is_me'] == true,
-            ),
+            ],
+          ],
         ],
         const Divider(height: 32),
         Text(

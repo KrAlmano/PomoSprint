@@ -865,6 +865,36 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         ),
                       ),
                     ),
+                    if (sub.examTypes.isNotEmpty) ...[
+                      const SizedBox(height: 10),
+                      for (final exam in sub.examTypes)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4, left: 8),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  exam.name(
+                                    Localizations.localeOf(
+                                          context,
+                                        ).languageCode ==
+                                        'tr',
+                                  ),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: variant,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                StatsText.duration(exam.minutes),
+                                style: TextStyle(fontSize: 12, color: variant),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
                   ],
                 ),
               ),

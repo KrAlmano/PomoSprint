@@ -9,6 +9,7 @@ import 'package:pomodoro/screens/exam_screen.dart';
 import 'package:pomodoro/screens/ranking_screen.dart';
 import 'package:pomodoro/services/exam_service.dart';
 import 'package:pomodoro/widgets/social/countdown_text.dart';
+import 'package:pomodoro/widgets/social/ranking_widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'support/fake_exam_backend.dart';
@@ -125,6 +126,115 @@ void main() {
     await tester.pumpAndSettle();
     expect(loads, 2);
     expect(find.text('Deneme kumu: 17'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox.shrink());
+    service.dispose();
+    backend.owner.dispose();
+  });
+
+  testWidgets('exam league uses ranking presentation and preserves scopes', (
+    tester,
+  ) async {
+    final backend = FakeExamBackend();
+    final scopes = <String>[];
+    backend.handler = (name, params) async {
+      if (name == 'get_my_exam_league_ranking') {
+        final scope = params['p_scope'] as String;
+        scopes.add(scope);
+        return {
+          'scope': scope,
+          'competition_phase': 'active',
+          'rows': [
+            {'name': scope == 'segment' ? 'Ada' : 'Ece', 'points': 27},
+            {'name': 'Mert', 'points': 15},
+            {'name': 'Deniz', 'points': 11},
+            {'name': 'Private name', 'points': 4, 'is_blocked': true},
+          ],
+        };
+      }
+      return backend.defaultRpc(name, params);
+    };
+    final service = ExamService(backend: backend);
+    await tester.pumpWidget(app(ExamScreen(service: service)));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('exam-tab-league')));
+    await tester.pumpAndSettle();
+    expect(find.byType(RankingPodium), findsOneWidget);
+    expect(find.byType(RankingRow), findsOneWidget);
+    expect(find.text('Ada'), findsOneWidget);
+    expect(find.text('Private name'), findsNothing);
+    expect(find.byKey(const ValueKey('podium-medal-1')), findsNothing);
+    await tester.tap(find.byKey(const ValueKey('exam-league-scope-global')));
+    await tester.pumpAndSettle();
+    expect(scopes, ['segment', 'global']);
+    expect(find.text('Ece'), findsOneWidget);
+    expect(find.text('Ada'), findsNothing);
+    await tester.pumpWidget(const SizedBox.shrink());
+    service.dispose();
+    backend.owner.dispose();
+  });
+
+  testWidgets('exam league does not treat a placeholder as first place', (
+    tester,
+  ) async {
+    final backend = FakeExamBackend();
+    backend.handler = (name, params) async {
+      if (name == 'get_my_exam_league_ranking') {
+        return {
+          'scope': params['p_scope'],
+          'rows': [
+            {'name': 'Me', 'is_me': true, 'has_league': false, 'points': 0},
+          ],
+        };
+      }
+      return backend.defaultRpc(name, params);
+    };
+    final service = ExamService(backend: backend);
+    await tester.pumpWidget(app(ExamScreen(service: service)));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('exam-tab-league')));
+    await tester.pumpAndSettle();
+    expect(find.byType(RankingPodium), findsNothing);
+    expect(find.text('Me'), findsNothing);
+    await tester.tap(find.byKey(const ValueKey('exam-league-scope-global')));
+    await tester.pumpAndSettle();
+    expect(find.byType(RankingPodium), findsNothing);
+    expect(find.byType(RankingEmptyView), findsOneWidget);
+    await tester.pumpWidget(const SizedBox.shrink());
+    service.dispose();
+    backend.owner.dispose();
+  });
+
+  testWidgets('exam league preserves rank when identities are redacted', (
+    tester,
+  ) async {
+    final backend = FakeExamBackend();
+    backend.handler = (name, params) async {
+      if (name == 'get_my_exam_league_ranking') {
+        return {
+          'scope': params['p_scope'],
+          'rows': [
+            {'id': null, 'name': null, 'points': 20, 'is_blocked': false},
+            {'id': '2', 'name': 'Ada', 'points': 15},
+            {'id': '3', 'name': 'Mert', 'points': 10},
+            {'id': '4', 'name': 'Ece', 'points': 5},
+            {'id': '5', 'name': 'Deniz', 'points': 1},
+          ],
+        };
+      }
+      return backend.defaultRpc(name, params);
+    };
+    final service = ExamService(backend: backend);
+    await tester.pumpWidget(app(ExamScreen(service: service)));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('exam-tab-league')));
+    await tester.pumpAndSettle();
+    final podium = tester.widget<RankingPodium>(find.byType(RankingPodium));
+    expect(podium.top.first.hidden, isTrue);
+    expect(podium.top.first.points, 20);
+    expect(
+      tester.widgetList<RankingRow>(find.byType(RankingRow)).map((r) => r.rank),
+      [4, 5],
+    );
     await tester.pumpWidget(const SizedBox.shrink());
     service.dispose();
     backend.owner.dispose();
