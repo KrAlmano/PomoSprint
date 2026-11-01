@@ -1,0 +1,20 @@
+00:00 +0: loading /private/tmp/pomosprint-android-onboarding-20261101/integration_test/a_register_onboarding_test.dart
+Running Gradle task 'assembleDebug'...                             30.9s
+✓ Built build/app/outputs/flutter-apk/app-debug.apk
+Installing build/app/outputs/flutter-apk/app-debug.apk...           4.4s
+00:00 +0: a1 · kayıt + onboarding (YKS): otomatik ders seçimi, kabuk, sunucu kaydı
+[INIT] .env okunamadı: Instance of 'EmptyEnvFileError'
+supabase.supabase_flutter: INFO: ***** Supabase init completed *****
+[INIT] Supabase bağlandı.
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+[E2E] ekran görüntüsü: build/e2e_android/screenshots/e2e-kayit.png
+[E2E] ekran görüntüsü: build/e2e_android/screenshots/e2e-onboarding-kategoriler.png
+[E2E] ekran görüntüsü: build/e2e_android/screenshots/e2e-onboarding-ekran-rehberi.png
+[ONBOARD_QA][e2e] finish tap begin
+[ONBOARD_QA][e2e] finish tap returned
+[ONBOARD_QA][tr] shell wait begin
+[ONBOARD_QA][tr] shell found; timer wait begin
+[ONBOARD_QA][tr] timer found
+[E2E] ekran görüntüsü: build/e2e_android/screenshots/e2e-sayac-yks.png
+01:21 +1: (tearDownAll)
+01:22 +1: All tests passed!

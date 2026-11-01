@@ -1,5 +1,7 @@
 # Android yerel doğrulama kanıtı — 1 Kasım 2026
 
+Kapanışta yalnız bu turun `nov1r50`, `nov1android` ve `nov1onboarding` QA uygulamaları emülatörden kaldırıldı; normal `com.pomosprint.app` korundu. Bu turun yerel QA hesapları, hesap silme tetikleyicilerinin yan etkileri tam incelenmediğinden korunmuştur.
+
 Cihaz `PomoSprint_QA_API36`. Her iki native tur ayrı geçici `com.pomosprint.qa.nov1android` uygulamasında, yerel Supabase ve açıkça etiketli QA hesaplarıyla koşuldu. Canlı kullanıcı veya veritabanına yazılmadı. Normal `com.pomosprint.app` uygulamasının SharedPreferences SHA-256 değeri öncesi ve sonrası aynı kaldı. Bildirimler native testte kapatıldı; bu tur bildirim teslimini doğrulamaz.
 
 ## Hedef ve Deneme ekranı
@@ -17,9 +19,13 @@ Android native tur **PASS**: Raporlar’daki Deneme ayrıntıları bağlantısı
 
 İlk fixture iki denemeyi 7 ve 3 saat önceye yerleştirdi. Uygulamanın en az 1 gün aralık kuralı nedeniyle içgörü oluşturulmadı ve beklenen içgörü bulunamadığı için bu deneme **FAIL** oldu ([günlük](icgoru-ilk-fixture-fail.txt)). Bu sonuç gizlenmedi; güvenlik kontrolleri gevşetilmeden yeni bir QA hesabı ve 25 saat aralıklı fixture ile yukarıdaki başarılı tur yapıldı.
 
-## Gerçek 50 dakika — devam ediyor
+## Gerçek 50 dakika — tamamlandı
 
-Ayrı `com.pomosprint.qa.nov1r50` kimliğiyle 15:32:27’de gerçek 3000 saniyelik normal odak başlatıldı; cihaz ve sunucu rezervasyonu eşleşti, başlangıç native testi PASS. Planlı bitiş 16:22:27 (İstanbul). Başlamış kullanıcı/marker korunuyor; henüz final sonucu değildir. Başlangıçtan sonra salt okunur sorguda 0 seans/0 puan/0 kum bulundu. Gerçek emülatör kapanıp açıldıktan sonra [ara restore native testi](r50-ara-restore-pass.txt) PASS: aynı marker ve süre korundu, kalan zaman azaldı ve bitmeden ödül oluşmadı ([ekran](r50-ara-restore.png)). Test komutunun sonraki tarihsel 27–29 kaynak-hash parite adımı değişmiş öneri dosyaları nedeniyle FAIL/çıkış 1 verdi; native başlangıç sonucu bundan ayrı değerlendirilmelidir. Ayrı salt okunur DB parmak izi kontrolünde tarihsel 27/28/29+30 referansının şema, migration, katalog ve mail-trigger bölümleri 4/4 eşleşti; bu kaynak guard’ı geçen resmî parite sonucu değildir. Tamamlanma ve tekrar gönderim ancak aynı marker ile son kontrol geçerse raporlanabilir.
+Ayrı `com.pomosprint.qa.nov1r50` kimliğiyle 15:32:27’de gerçek 3000 saniyelik normal odak başlatıldı; cihaz ve sunucu rezervasyonu eşleşti ([başlangıç](r50-baslangic-pass.txt)). 16:22:27’de doğal süre doldu ve aynı marker ile final testi **PASS** oldu ([günlük](r50-final-pass.txt), [ekran](r50-final.png)). Salt okunur sunucu sorgusu tek 50 dakikalık seans, 12 temel puan, 0 bonus, 20 normal kum ve tek lig olayı doğruladı. Aynı işlemi tekrar gönderme ikinci puan/kum üretmedi; seansın başlama/bitiş zamanı, çalışma günü ve lig dönemi atfı kontrol edildi. Bu, cihaz bildirim teslimi testi değildir.
+
+Başlangıçtan sonra salt okunur sorguda 0 seans/0 puan/0 kum bulundu. Gerçek emülatör kapanıp açıldıktan sonra [ara restore native testi](r50-ara-restore-pass.txt) PASS: aynı marker ve süre korundu, kalan zaman azaldı ve bitmeden ödül oluşmadı ([ekran](r50-ara-restore.png)). Normal Android uygulamasının SharedPreferences özeti test öncesi ve sonrası aynı kaldı.
+
+Başlangıç, ara ve final native testleri PASS; her sarmalayıcının sonraki tarihsel 27–29 kaynak-hash parite adımı değişmiş öneri dosyaları nedeniyle **FAIL/çıkış 1** verdi. Native sonuçlar bu guard başarısızlığından ayrı değerlendirilmelidir. Ayrı salt okunur DB parmak izi kontrolünde tarihsel 27/28/29+30 referansının şema, migration, katalog ve mail-trigger bölümleri 4/4 eşleşti; bu kaynak guard’ı geçen resmî parite sonucu değildir.
 
 ## Android release derlemesi
 
@@ -27,4 +33,8 @@ Ayrı QA kopyasında `flutter build apk --release --dart-define=SENTRY_DSN=` ba�
 
 ## Yerel QA hesabı temizliği
 
-Bu tura ait üç ana yerel QA hesabı (iki kontrollü içgörü fixture'ı ve R50) ile iki izole KPSS QA hesabı korundu. `auth.users` silinmesi profil üzerinden lig politikası tetikleyicisini çalıştırıyor ve onay kayıtlarını anonimleştiriyor; yan etkiler tam belirlenmediği için hiçbir hesapta silme veya rollback silme denemesi yapılmadı. Eski fixture'lara ve canlı hesaplara dokunulmadı.
+Ana yereldeki iki kontrollü içgörü fixture hesabı, R50 hesabı ve daha sonra oluşturulan onboarding hesabı ile izole KPSS veritabanındaki iki QA hesabı korundu. `auth.users` silinmesi profil üzerinden lig politikası tetikleyicisini çalıştırıyor ve onay kayıtlarını anonimleştiriyor; yan etkiler tam belirlenmediği için hiçbir hesapta silme veya rollback silme denemesi yapılmadı. Eski fixture'lara ve canlı hesaplara dokunulmadı.
+
+## Android kayıt ve YKS onboarding
+
+Ayrı `com.pomosprint.qa.nov1onboarding` uygulamasıyla yalnız `a1` native senaryosu **PASS**: yeni yerel QA kaydı, zorunlu/isteğe bağlı onaylar, yerel Mailpit doğrulaması, giriş, yaş ve YKS hedefi, önerilen kategoriler, sosyal görünürlük, kurallar, günlük hedef, ekran rehberi, sayaç ve sunucudaki profil/kategori kayıtları doğrulandı. [Günlük](onboarding-a1-pass.txt), [kategoriler](onboarding-yks-kategoriler.png), [rehber](onboarding-rehber.png), [sayaç](onboarding-sayac.png). Mailpit yerel test hizmetidir; gerçek Resend e-posta teslimi denenmedi. Testten sonra eskimiş tarihsel 27–29 kaynak-hash guard’ı FAIL olduğundan wrapper çıkış kodu 1’dir; başarılı native test ile bu uyarı farklı sonuçlardır. Bu yeni yerel QA hesabı da korunur; canlıya veya diğer hesaplara dokunulmadı.

@@ -18,6 +18,8 @@ Her üç aşamada Flutter native testi **All tests passed** dedi. Ancak çalış
 
 QA başlangıcından sonra iki normal uygulama açılmadan, yalnız container içindeki `Documents`, `Library/Preferences` ve `Library/Application Support` dosyalarının bütünlük özeti alındı ve hem ara hem son turdan sonra karşılaştırıldı. PomoSprint'te kapsamdaki bir dosya aynı kaldı; HocamMacVar'da bu üç konumda dosya yoktu. Bu karşılaştırma QA başlangıcından **önceki** durumu, Keychain'i veya diğer dizinleri kapsamaz. Dosya içerikleri, kişisel bilgiler ve hash değerleri bu kanıta kaydedilmedi.
 
+Daha sonra iOS QA bildirim izni penceresini kapatmak için simülatör veriler silinmeden yeniden başlatıldı. İki normal uygulama açılmadan aynı üç konum tekrar okundu; aynı bir PomoSprint dosyası değişmemişti ve HocamMacVar'da bu konumlarda yine dosya yoktu. Aynı kapsam ve başlangıç zamanı sınırlamaları geçerlidir.
+
 Gerçek 25 dakikalık çevrimdışı/yeniden eşitleme turu bu koşuda başlatılmadı: ilk faz uzun süre Flutter test sürecini tutuyor ve diğer gerçek süreli testlerin zamanlamasıyla çakışıyordu. Mevcut kayıtların veya uygulama verilerinin silinmesi gerekmez.
 
 ## İmzasız iOS release derlemesi

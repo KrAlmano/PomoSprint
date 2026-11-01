@@ -1,0 +1,18 @@
+Kaynak: 1 Kasım iPhone 17 simulator, YKS a1 kayıt/onboarding.
+Ayrı QA app bundle ve yalnız yerel Supabase/Mailpit kullanıldı.
+
+Flutter günlüğünden seçilmiş, kimlik bilgisi içermeyen satırlar:
+Xcode build done. 29.1s
+00:00 +0: a1 · kayıt + onboarding (YKS): otomatik ders seçimi, kabuk, sunucu kaydı
+[INIT] Supabase bağlandı.
+03:17 +0: a1 · kayıt + onboarding (YKS): ... - did not complete [E]
+03:17 +0: (tearDownAll) - did not complete [E]
+03:17 +0: Some tests failed.
+Çıkış: 1; yalnız bu QA test süreci bilinçli olarak kesildi.
+
+İki süreç örneği: FlutterTextInputPlugin handleMethodCall, iOS
+RTIInputSystemClient _configureConnection, ayrı Sentry SDK sınıf taraması ve
+dyld_image_path_containing_address bekleyişleri gözlendi. Kesin kök neden değil.
+Son kontrol: QA bundle/veri alanı mevcut; oluşturulması hedeflenen yeni QA
+Auth hesabı 0. Kayıt ve Mailpit doğrulaması bu koşuda gerçekleşmedi.
+Kapsam ve sınırlamalar: ../../QA_IOS_KAYIT_2026-11-01.md
