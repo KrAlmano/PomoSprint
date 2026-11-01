@@ -584,6 +584,45 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
     );
   }
 
+  Widget _historyStatus(ExamAttemptStatus status, String label) {
+    final theme = Theme.of(context);
+    final isCompleted = status == ExamAttemptStatus.completed;
+    final isDark = theme.brightness == Brightness.dark;
+    final color = isCompleted
+        ? (isDark ? const Color(0xFF8ED9AA) : const Color(0xFF167443))
+        : theme.colorScheme.onSurfaceVariant;
+    return Container(
+      key: ValueKey('exam-history-status-${status.name}'),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+      decoration: BoxDecoration(
+        color: isCompleted
+            ? color.withValues(alpha: isDark ? .16 : .10)
+            : theme.colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            isCompleted ? Icons.check_circle_rounded : Icons.info_outline,
+            size: 16,
+            color: color,
+          ),
+          const SizedBox(width: 5),
+          Flexible(
+            child: Text(
+              label,
+              style: theme.textTheme.labelMedium?.copyWith(
+                color: color,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _goalTabs(AppLocalizations l10n) {
     Widget choice({
       required Key key,
@@ -880,6 +919,9 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
 
   List<Widget> _history(AppLocalizations l10n) {
     final attempts = _service.attempts;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     final insights = _studiesLoaded
         ? buildExamTimeInsights(
                 attempts: attempts,
@@ -894,30 +936,80 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
               .toList()
         : const <ExamTimeInsight>[];
     return [
-      Text(l10n.examInsights, style: Theme.of(context).textTheme.titleLarge),
-      const SizedBox(height: 8),
-      if (_studiesStale) ...[
-        Text(
-          _studiesLoaded ? l10n.statsStaleNotice : l10n.statsLoadErrorGeneric,
+      Container(
+        key: const ValueKey('exam-insights-section'),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isDark
+              ? AppColors.darkSurfaceContainerLow
+              : AppColors.surfaceContainerLowest,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: _outlineColor.withValues(alpha: .65)),
         ),
-        TextButton(onPressed: _loadStudies, child: Text(l10n.examRetry)),
-      ],
-      if (_studiesLoaded && insights.isEmpty) Text(l10n.examInsightsEmpty),
-      for (final insight in insights)
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(
-              l10n.examInsightsChange(
-                insight.subject.name(_turkish),
-                insight.studyMinutes,
-                formatExamNet(insight.before, l10n.localeName),
-                formatExamNet(insight.after, l10n.localeName),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              l10n.examInsights,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
               ),
             ),
-          ),
+            const SizedBox(height: 10),
+            if (_studiesStale) ...[
+              Text(
+                _studiesLoaded
+                    ? l10n.statsStaleNotice
+                    : l10n.statsLoadErrorGeneric,
+                style: theme.textTheme.bodyMedium,
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton(
+                  onPressed: _loadStudies,
+                  child: Text(l10n.examRetry),
+                ),
+              ),
+            ],
+            if (_studiesLoaded && insights.isEmpty)
+              Text(
+                l10n.examInsightsEmpty,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colors.onSurfaceVariant,
+                  height: 1.4,
+                ),
+              ),
+            for (final insight in insights)
+              Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? AppColors.darkSurfaceContainerHigh
+                      : AppColors.surfaceContainerLow,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  l10n.examInsightsChange(
+                    insight.subject.name(_turkish),
+                    insight.studyMinutes,
+                    formatExamNet(insight.before, l10n.localeName),
+                    formatExamNet(insight.after, l10n.localeName),
+                  ),
+                  style: theme.textTheme.bodyMedium?.copyWith(height: 1.35),
+                ),
+              ),
+            if (insights.isNotEmpty)
+              Text(
+                l10n.examInsightsDisclaimer,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colors.onSurfaceVariant,
+                  height: 1.35,
+                ),
+              ),
+          ],
         ),
-      if (insights.isNotEmpty) Text(l10n.examInsightsDisclaimer),
+      ),
       const SizedBox(height: 20),
       if (attempts.isNotEmpty) ...[
         Text(
@@ -959,6 +1051,7 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
     final exam = _service.definitionFor(attempt);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     final localizations = MaterialLocalizations.of(context);
     String date(DateTime at) {
       final local = at.toLocal();
@@ -1016,7 +1109,7 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
                 ),
                 if (attempt.title != null && exam != null)
                   Text(exam.name(_turkish), style: theme.textTheme.bodyMedium),
-                _metadata(Icons.check_circle_outline_rounded, status),
+                _historyStatus(attempt.status, status),
                 if (attempt.finishedEarly)
                   _metadata(Icons.schedule_rounded, l10n.examCompletedEarly),
               ],
@@ -1032,50 +1125,56 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: colors.surfaceContainerHighest.withValues(alpha: .42),
+                color: isDark
+                    ? AppColors.darkSurfaceContainerHigh
+                    : AppColors.surfaceContainerLow,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Wrap(
-                spacing: 18,
-                runSpacing: 8,
-                children: [
-                  if (attempt.examId == 'ayt') ...[
-                    Text(
-                      selectedScopeQuestions != null
-                          ? l10n.examSelectedQuestions(
-                              selectedScopeQuestions,
-                              attempt.totalQuestions,
-                            )
-                          : selected == null
-                          ? l10n.examModuleUnknown
-                          : l10n.examScopeUnavailable,
-                    ),
-                    if (attempt.isCompleted)
-                      Text(l10n.examCreditedMinutes(attempt.reportMinutes)),
-                  ] else
-                    Text(
-                      attempt.isCompleted
-                          ? l10n.examQuestionsMinutes(
-                              attempt.totalQuestions,
-                              attempt.reportMinutes,
-                            )
-                          : l10n.examSubjectQuestions(attempt.totalQuestions),
-                    ),
-                  if (net != null)
-                    Text(
-                      '${l10n.examNet}: ${formatExamNet(net, l10n.localeName)}',
-                      style: const TextStyle(fontWeight: FontWeight.w700),
-                    ),
-                  if (attempt.isCompleted)
-                    Text(
-                      l10n.examRewardSummary(
-                        attempt.pointsEarned,
-                        attempt.examCoinsEarned,
+              child: DefaultTextStyle.merge(
+                style: theme.textTheme.bodyMedium?.copyWith(height: 1.35),
+                child: Wrap(
+                  spacing: 18,
+                  runSpacing: 8,
+                  children: [
+                    if (attempt.examId == 'ayt') ...[
+                      Text(
+                        selectedScopeQuestions != null
+                            ? l10n.examSelectedQuestions(
+                                selectedScopeQuestions,
+                                attempt.totalQuestions,
+                              )
+                            : selected == null
+                            ? l10n.examModuleUnknown
+                            : l10n.examScopeUnavailable,
                       ),
-                    ),
-                  if (attempt.status == ExamAttemptStatus.abandoned)
-                    Text(l10n.examNoAward),
-                ],
+                      if (attempt.isCompleted)
+                        Text(l10n.examCreditedMinutes(attempt.reportMinutes)),
+                    ] else
+                      Text(
+                        attempt.isCompleted
+                            ? l10n.examQuestionsMinutes(
+                                attempt.totalQuestions,
+                                attempt.reportMinutes,
+                              )
+                            : l10n.examSubjectQuestions(attempt.totalQuestions),
+                      ),
+                    if (net != null)
+                      Text(
+                        '${l10n.examNet}: ${formatExamNet(net, l10n.localeName)}',
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                    if (attempt.isCompleted)
+                      Text(
+                        l10n.examRewardSummary(
+                          attempt.pointsEarned,
+                          attempt.examCoinsEarned,
+                        ),
+                        style: TextStyle(color: colors.primary),
+                      ),
+                    if (attempt.status == ExamAttemptStatus.abandoned)
+                      Text(l10n.examNoAward),
+                  ],
+                ),
               ),
             ),
             if (attempt.isCompleted) ...[

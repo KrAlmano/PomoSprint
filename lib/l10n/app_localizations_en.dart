@@ -2888,6 +2888,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportsDailyTab => 'Daily Focus';
 
   @override
+  String get reportsTabDailyShort => 'Daily';
+
+  @override
+  String get reportsTabWeeklyShort => 'Weekly';
+
+  @override
+  String get reportsTabMonthlyShort => 'Monthly';
+
+  @override
+  String get reportsTabExamsShort => 'Exams';
+
+  @override
   String get topSubjectsLabel => 'Most Studied Subjects';
 
   @override

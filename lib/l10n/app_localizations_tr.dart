@@ -2844,6 +2844,18 @@ class AppLocalizationsTr extends AppLocalizations {
   String get reportsDailyTab => 'Günlük Çalışma';
 
   @override
+  String get reportsTabDailyShort => 'Günlük';
+
+  @override
+  String get reportsTabWeeklyShort => 'Haftalık';
+
+  @override
+  String get reportsTabMonthlyShort => 'Aylık';
+
+  @override
+  String get reportsTabExamsShort => 'Deneme';
+
+  @override
   String get topSubjectsLabel => 'En Çok Çalışılan Dersler';
 
   @override

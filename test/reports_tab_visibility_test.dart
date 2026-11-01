@@ -16,6 +16,91 @@ void main() {
   });
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
+  for (final language in ['tr', 'en']) {
+    testWidgets('report tabs share the available width at 320pt ($language)', (
+      tester,
+    ) async {
+      final backend = DetailsExamBackend();
+      final exams = ExamService(backend: backend);
+      final reports = FakeSupabaseService();
+      final semantics = tester.ensureSemantics();
+      addTearDown(exams.dispose);
+      addTearDown(backend.owner.dispose);
+      await exams.initialize();
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(320, 750);
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: Locale(language),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: ReportsScreen(
+            categories: const [],
+            service: reports,
+            examService: exams,
+            loadExamAttempts: () async => exams.attempts,
+            loadExamStudySessions: () async => [],
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final scroll = find.byKey(const ValueKey('reports-tab-scroll'));
+      final inner = find.descendant(
+        of: scroll,
+        matching: find.byType(Scrollable),
+      );
+      expect(tester.state<ScrollableState>(inner).position.maxScrollExtent, 0);
+      final widths = [
+        for (var i = 0; i < 4; i++)
+          tester.getSize(find.byKey(ValueKey('reports-tab-cell-$i'))).width,
+      ];
+      for (final width in widths) {
+        expect(width, closeTo(widths.first, .01));
+        expect(width, greaterThanOrEqualTo(44));
+      }
+      final l10n = lookupAppLocalizations(Locale(language));
+      final labels = [
+        l10n.reportsTabDailyShort,
+        l10n.reportsTabWeeklyShort,
+        l10n.reportsTabMonthlyShort,
+        l10n.reportsTabExamsShort,
+      ];
+      final fullLabels = [
+        l10n.reportsDailyTab,
+        l10n.reportsWeeklyTab,
+        l10n.reportsMonthlyTab,
+        l10n.examTitle,
+      ];
+      for (var i = 0; i < labels.length; i++) {
+        final label = labels[i];
+        final text = find.descendant(of: scroll, matching: find.text(label));
+        final rect = tester.getRect(text);
+        final viewport = tester.getRect(scroll);
+        expect(rect.left, greaterThanOrEqualTo(viewport.left));
+        expect(rect.right, lessThanOrEqualTo(viewport.right));
+        await tester.tap(text);
+        await tester.pumpAndSettle();
+        final accessible = find.descendant(
+          of: scroll,
+          matching: find.bySemanticsLabel(fullLabels[i]),
+        );
+        expect(
+          tester.getSemantics(accessible),
+          matchesSemantics(
+            label: fullLabels[i],
+            isButton: true,
+            hasTapAction: true,
+            hasSelectedState: true,
+            isSelected: true,
+          ),
+        );
+        expect(tester.takeException(), isNull);
+      }
+      semantics.dispose();
+    });
+  }
+
   testWidgets(
     'selected report tab stays visible after in-page navigation and return at large text',
     (tester) async {
@@ -71,7 +156,7 @@ void main() {
       final details = find.text(l10n.statsOpenExamDetails);
       final tab = find.descendant(
         of: scroller,
-        matching: find.text(l10n.examTitle),
+        matching: find.text(l10n.reportsTabExamsShort),
       );
       expect(
         tester.getTopLeft(tab).dx,

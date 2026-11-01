@@ -4865,6 +4865,30 @@ abstract class AppLocalizations {
   /// **'Günlük Çalışma'**
   String get reportsDailyTab;
 
+  /// No description provided for @reportsTabDailyShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'Günlük'**
+  String get reportsTabDailyShort;
+
+  /// No description provided for @reportsTabWeeklyShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'Haftalık'**
+  String get reportsTabWeeklyShort;
+
+  /// No description provided for @reportsTabMonthlyShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aylık'**
+  String get reportsTabMonthlyShort;
+
+  /// No description provided for @reportsTabExamsShort.
+  ///
+  /// In tr, this message translates to:
+  /// **'Deneme'**
+  String get reportsTabExamsShort;
+
   /// No description provided for @topSubjectsLabel.
   ///
   /// In tr, this message translates to:

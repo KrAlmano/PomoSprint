@@ -1,5 +1,7 @@
 # PomoSprint — proje ve AI oturum devir belgesi
 
+> **1 Kasım son görsel düzenleme:** Rapor sekmeleri eşit ve kısa etiketli, tamamlanan deneme yeşil onaylı; içgörü ve metrik kartları sadeleştirildi. Test ve yayın sınırları [rapor QA kaydında](analiz/QA_RAPORLAR_2026-11-01.md).
+
 > **1 Kasım son rapor çalışması:** Deneme raporları ve net düzenleme Raporlar içine alındı, haftalık analiz sınav türüne göre ayrıntılandırıldı, Deneme ligi Sıralama tasarımına uyarlandı ve rapor yenileme hataları düzeltildi. [QA ve canlı ortam sınırı](analiz/QA_RAPORLAR_2026-11-01.md). Kullanıcı alan denemesini daha sonra planlamak üzere kaldırdı; [önizleme raporu](analiz/BRANS_PROTOTIP_2026-11-01.md) tarihseldir. Gerçek alan denemesi, ödülü veya yeni canlı Deneme şeması uygulanmış değildir.
 
 > **1 Kasım en yeni devam noktası:** [Deneme/rapor/bağlantı QA](analiz/QA_2026-11-01.md), [canlı ve yerel sunucu kontrolü](analiz/SUNUCU_RAPORU_2026-11-01.md) ve [çevrimdışı ödül güvenliği](analiz/OFFLINE_ODUL_GUVENLIK_NOTU_2026-11-01.md) güncel kaynaktır. Canlıda Deneme şeması yok; yeni arayüz ve SQL yereldedir. Canlı doğrulanmamış seans ödül riski sürer, 30 bunu tek başına çözmez ve 31 kullanıcı kararı bekler. Etkinlik planlayıcı/bölüm denemeleri yalnız öneri olarak belgelendi. Yerel testleri ve yayın sınırlarını geçmişteki sonuçlarla karıştırma.

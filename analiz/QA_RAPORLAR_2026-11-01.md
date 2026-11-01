@@ -1,5 +1,11 @@
 # Raporlar ve deneme ligi — 1 Kasım 2026
 
+## Rapor görünümü — sonraki düzenleme
+
+Raporların dört sekmesi Türkçe/İngilizce kısa etiketlerle eşit alanlara yerleşir; dar alanda iki sıra, büyük erişilebilirlik yazısında kaydırma kullanılır. Seçili durum, ekran okuyucu adı ve dokunma eylemi korunur. Deneme geçmişinde tamamlanma yeşil onay ve metinle, vazgeçme nötr biçimde gösterilir; içgörü ve metrikler kartlarla düzenlenir. Hesap, süre ve ödül formülleri değiştirilmedi.
+
+Son `flutter analyze` temiz; tam `flutter test --concurrency=2` **1527 başarılı, 5 isteğe bağlı ekran görüntüsü atlaması**. TR/EN, açık/koyu, 320 pt, büyük yazı, sekme görünürlüğü ve durum simgeleri hedefli testlerle kontrol edildi. İlk tam turda eski sekme metnine bağlı iki test başarısız oldu; testler sabit sekme anahtarına taşınarak tekrarda geçti. Ayrı iPhone 17 QA uygulaması örnek kayıtlarla tekrar açıldı; dört sekme ve yeşil tamamlanma etiketi görsel olarak kontrol edildi.
+
 ## Kapsam
 
 - Kullanıcının daha sonra planlama isteği doğrultusunda bağımsız alan denemesi prototipi, testleri ve ayrı simülatör uygulaması kaldırıldı. Gerçek bir alan denemesi sunulmadı.

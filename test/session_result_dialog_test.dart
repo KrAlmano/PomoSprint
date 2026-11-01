@@ -343,7 +343,7 @@ void main() {
         home: ReportsScreen(categories: const [], service: service),
       ));
       await tester.pumpAndSettle();
-      await tester.tap(find.text(LanguageService.instance.translate('reports_tab_history')));
+      await tester.tap(find.byKey(const ValueKey('reports-tab-cell-1')));
       await tester.pumpAndSettle();
       expect(find.text(l10n.rejectedSessionsLink(1)), findsOneWidget);
       // Gün dönümü zamanlayıcısı test bitmeden iptal edilsin.

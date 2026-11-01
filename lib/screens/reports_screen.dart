@@ -455,7 +455,7 @@ class _ReportsScreenState extends State<ReportsScreen>
                 // genişliğinde ortalanır.
                 ContentWidth(
                   maxWidth: ContentWidth.dashboard,
-                  child: _buildTabBar(lang),
+                  child: _buildTabBar(),
                 ),
                 ContentWidth(
                   maxWidth: ContentWidth.dashboard,
@@ -586,12 +586,20 @@ class _ReportsScreenState extends State<ReportsScreen>
     };
   }
 
-  Widget _buildTabBar(LanguageService lang) {
+  Widget _buildTabBar() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     // Yatay telefonda dikey alan kıt: çubuk daha az yer kaplar.
     final short = Responsive.of(context).isShortHeight;
+    final l10n = AppLocalizations.of(context)!;
+    final tabs = [
+      (l10n.reportsTabDailyShort, l10n.reportsDailyTab),
+      (l10n.reportsTabWeeklyShort, l10n.reportsWeeklyTab),
+      (l10n.reportsTabMonthlyShort, l10n.reportsMonthlyTab),
+      if (widget.examService != null)
+        (l10n.reportsTabExamsShort, l10n.examTitle),
+    ];
     return Container(
-      margin: EdgeInsets.fromLTRB(24, short ? 4 : 12, 24, short ? 4 : 8),
+      margin: EdgeInsets.fromLTRB(16, short ? 4 : 12, 16, short ? 4 : 8),
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: isDark
@@ -599,61 +607,89 @@ class _ReportsScreenState extends State<ReportsScreen>
             : AppColors.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(16),
       ),
-      // Sekmeler sığıyorsa ortalanır (geniş ekran), sığmıyorsa yatay kaydırılır.
+      // At regular text sizes all tabs share the width. Larger accessibility
+      // text keeps its real size and can be scrolled instead of being clipped.
       child: LayoutBuilder(
-        builder: (context, constraints) => SingleChildScrollView(
-          key: const ValueKey('reports-tab-scroll'),
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minWidth: constraints.maxWidth),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _buildTabItem(
-                  key: _tabKeys[0],
-                  label: lang.translate('reports_tab_subject'),
-                  isActive: _activeTab == 0,
-                  short: short,
-                  onTap: () => _selectTab(0),
-                ),
-                const SizedBox(width: 4),
-                _buildTabItem(
-                  key: _tabKeys[1],
-                  label: lang.translate('reports_tab_history'),
-                  isActive: _activeTab == 1,
-                  short: short,
-                  onTap: () => _selectTab(1),
-                ),
-                const SizedBox(width: 4),
-                _buildTabItem(
-                  key: _tabKeys[2],
-                  label: lang.translate('reports_tab_monthly'),
-                  isActive: _activeTab == 2,
-                  short: short,
-                  onTap: () => _selectTab(2),
-                ),
-                if (widget.examService != null) ...[
-                  const SizedBox(width: 4),
-                  _buildTabItem(
-                    key: _tabKeys[3],
-                    label: AppLocalizations.of(context)!.examTitle,
-                    isActive: _activeTab == 3,
-                    short: short,
-                    onTap: () => _selectTab(3),
-                  ),
-                ],
+        builder: (context, constraints) {
+          var widest = 44.0;
+          for (final tab in tabs) {
+            final painter = TextPainter(
+              text: TextSpan(
+                text: tab.$1,
+                style: DefaultTextStyle.of(
+                  context,
+                ).style.copyWith(fontSize: 14, fontWeight: FontWeight.w600),
+              ),
+              textDirection: Directionality.of(context),
+              textScaler: MediaQuery.textScalerOf(context),
+              maxLines: 1,
+            )..layout();
+            widest = max(widest, painter.width + 12);
+            painter.dispose();
+          }
+          final fits =
+              widest * tabs.length + (tabs.length - 1) * 4 <=
+              constraints.maxWidth;
+          final twoRows =
+              !fits &&
+              tabs.length == 4 &&
+              MediaQuery.textScalerOf(context).scale(14) <= 16.1 &&
+              widest * 2 + 4 <= constraints.maxWidth;
+          Widget item(int i) => _buildTabItem(
+            key: _tabKeys[i],
+            index: i,
+            label: tabs[i].$1,
+            semanticsLabel: tabs[i].$2,
+            isActive: _activeTab == i,
+            short: short,
+            onTap: () => _selectTab(i),
+          );
+          Widget equalRow(int first, int last) => Row(
+            children: [
+              for (var i = first; i < last; i++) ...[
+                if (i > first) const SizedBox(width: 4),
+                Expanded(child: item(i)),
               ],
-            ),
-          ),
-        ),
+            ],
+          );
+          return SingleChildScrollView(
+            key: const ValueKey('reports-tab-scroll'),
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            child: fits || twoRows
+                ? SizedBox(
+                    width: constraints.maxWidth,
+                    child: twoRows
+                        ? Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              equalRow(0, 2),
+                              const SizedBox(height: 4),
+                              equalRow(2, 4),
+                            ],
+                          )
+                        : equalRow(0, tabs.length),
+                  )
+                : Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      for (var i = 0; i < tabs.length; i++) ...[
+                        if (i > 0) const SizedBox(width: 4),
+                        item(i),
+                      ],
+                    ],
+                  ),
+          );
+        },
       ),
     );
   }
 
   Widget _buildTabItem({
     required Key key,
+    required int index,
     required String label,
+    required String semanticsLabel,
     required bool isActive,
     required bool short,
     required VoidCallback onTap,
@@ -664,15 +700,16 @@ class _ReportsScreenState extends State<ReportsScreen>
       key: key,
       button: true,
       selected: isActive,
+      label: semanticsLabel,
+      onTap: onTap,
+      excludeSemantics: true,
       child: GestureDetector(
         onTap: onTap,
         child: Container(
+          key: ValueKey('reports-tab-cell-$index'),
           constraints: const BoxConstraints(minHeight: 44),
           alignment: Alignment.center,
-          padding: EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: short ? 6 : 8,
-          ),
+          padding: EdgeInsets.symmetric(horizontal: 6, vertical: short ? 6 : 8),
           decoration: BoxDecoration(
             color: isActive
                 ? accent.withValues(alpha: 0.13)

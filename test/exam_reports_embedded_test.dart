@@ -60,7 +60,7 @@ void main() {
       );
       await tester.pumpAndSettle();
       final l10n = lookupAppLocalizations(Locale(language));
-      final tab = find.text(l10n.examTitle);
+      final tab = find.text(l10n.reportsTabExamsShort);
       await tester.ensureVisible(tab);
       await tester.tap(tab);
       await tester.pumpAndSettle();
@@ -136,7 +136,7 @@ void main() {
         await tester.pumpAndSettle();
         expect(tester.takeException(), isNull, reason: 'initial error view');
         final tab = find.text(
-          lookupAppLocalizations(Locale(language)).examTitle,
+          lookupAppLocalizations(Locale(language)).reportsTabExamsShort,
         );
         await tester.ensureVisible(tab);
         await tester.tap(tab);

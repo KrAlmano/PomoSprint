@@ -436,12 +436,12 @@ void main() {
     expect(find.text('${_d(75)} / ${_d(_goal)}'), findsOneWidget);
     expect(find.text(l10n.statsPendingSessions(1)), findsOneWidget);
 
-    await tester.tap(find.text(_lang.translate('reports_tab_history')));
+    await tester.tap(find.byKey(const ValueKey('reports-tab-cell-1')));
     await tester.pumpAndSettle();
     final total = _lang.translate('total_focus_label').replaceAll('\n', ' ');
     expect(_semantics('$total: ${_d(75)}'), findsOneWidget);
 
-    await tester.tap(find.text(_lang.translate('reports_tab_monthly')));
+    await tester.tap(find.byKey(const ValueKey('reports-tab-cell-2')));
     await tester.pumpAndSettle();
     expect(_semantics('${DateFormat('d MMMM', 'tr_TR').format(today)}: ${_d(75)}'), findsOneWidget);
 
