@@ -234,6 +234,15 @@ void main() {
   });
 
   group('Hesap silme yardımcıları', () {
+    test('yalnız deleted:true Edge yanıtı kesin silme makbuzudur', () {
+      expect(SupabaseService.deleteEdgeResponseConfirmed({'deleted': true}), isTrue);
+      expect(SupabaseService.deleteEdgeResponseConfirmed({'deleted': false}), isFalse);
+      expect(SupabaseService.deleteEdgeResponseConfirmed({'deleted': 'true'}), isFalse);
+      expect(SupabaseService.deleteEdgeResponseConfirmed({'ok': true}), isFalse);
+      expect(SupabaseService.deleteEdgeResponseConfirmed(null), isFalse);
+      expect(SupabaseService.deleteEdgeResponseConfirmed(''), isFalse);
+    });
+
     test('Apple iptal durumu Edge Function yanıtından okunur', () {
       expect(appleRevocationFromResponse({'apple': {'status': 'revoked'}}, hasAppleIdentity: true), AppleRevocation.revoked);
       expect(
@@ -271,7 +280,15 @@ void main() {
         ),
         isTrue,
       );
-      expect(SupabaseService.authErrorMeansUserGone(const AuthException('not found', statusCode: '404')), isTrue);
+      expect(
+        SupabaseService.authErrorMeansUserGone(const AuthException('route not found', statusCode: '404')),
+        isFalse,
+        reason: 'genel 404 hesap kaybının kanıtı değildir',
+      );
+      expect(
+        SupabaseService.authErrorMeansUserGone(const AuthException('user not found', statusCode: '404', code: 'user_not_found')),
+        isTrue,
+      );
       expect(
         SupabaseService.authErrorMeansUserGone(const AuthException('expired', statusCode: '401', code: 'bad_jwt')),
         isFalse,

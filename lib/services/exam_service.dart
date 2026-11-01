@@ -960,6 +960,7 @@ class ExamService extends ChangeNotifier {
             'exam_not_found',
             'exam_unavailable',
             'exam_metadata_conflict',
+            'exam_start_rate_limited',
           }.contains(code);
       await _replace(
         owner,
@@ -1000,6 +1001,7 @@ class ExamService extends ChangeNotifier {
         'exam_overlap',
         'exam_not_found',
         'exam_unavailable',
+        'exam_start_rate_limited',
         'exam_early_finish_too_soon',
         'exam_early_finish_not_supported',
         'exam_early_finish_unavailable',

@@ -104,6 +104,26 @@ void main() {
     },
   );
 
+  test('confirmation time is exposed only for a valid matching receipt', () async {
+    DateTime? captured;
+    Future<bool> request() => requestMarathonPresence(
+      marathonUuid: plan,
+      completedSessionIndex: 1,
+      previousClientUuid: previous,
+      nextClientUuid: next,
+      rpc: (name, params) => rpc(name, params),
+      isCurrent: () => current,
+      serverNow: () => now,
+      onConfirmed: (at) => captured = at,
+    );
+    expect(await request(), isTrue);
+    expect(captured, confirmedAt);
+    captured = null;
+    receipt = {...receipt, 'next_client_uuid': previous};
+    expect(await request(), isFalse);
+    expect(captured, isNull);
+  });
+
   test(
     'account switch during gate read never sends confirmation for new owner',
     () async {

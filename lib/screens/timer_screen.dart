@@ -60,6 +60,9 @@ class TimerScreen extends StatefulWidget {
   )?
   onConfirmMarathonPresence;
 
+  /// Recheck the server confirmation's immutable start window after network I/O.
+  final bool Function(String nextClientUuid)? marathonPresenceStillValid;
+
   /// Kabuk sunucudaki Maraton desteğini salt okunarak doğrular. Yarım
   /// planlar bu bayrak değişse de kurtarılır; yeni planlar kapalıdır.
   final bool marathonAvailable;
@@ -73,6 +76,11 @@ class TimerScreen extends StatefulWidget {
   /// çalışma moduyla çakışmayı denetler. Çevrimdışı normal seans korunur.
   final Future<bool> Function(String categoryName, int minutesLeft)?
   authorizeStart;
+
+  /// A new focus UUID is registered once before its timer starts. Resuming an
+  /// existing session must not turn an offline start into a verified one.
+  final Future<bool> Function(String clientUuid, int durationMinutes)?
+  registerNewFocus;
   final VoidCallback? onStartAborted;
   final String? userSegment;
 
@@ -98,10 +106,12 @@ class TimerScreen extends StatefulWidget {
     this.onTimerStateChanged,
     this.onMarathonBreakChanged,
     this.onConfirmMarathonPresence,
+    this.marathonPresenceStillValid,
     this.marathonAvailable = true,
     this.marathonBonuses,
     this.isSessionActive,
     this.authorizeStart,
+    this.registerNewFocus,
     this.onStartAborted,
     this.userSegment,
     this.lockScreenTimer,
@@ -1065,6 +1075,50 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
       );
       return;
     }
+    if (!testOnly && widget.marathonPresenceStillValid?.call(nextUuid) == false) {
+      widget.onStartAborted?.call();
+      setState(() => _isStarting = false);
+      await _expireMarathonPresence();
+      return;
+    }
+    bool? registeredStart;
+    if (!testOnly) {
+      try {
+        registeredStart = await widget.registerNewFocus?.call(nextUuid, previous.durationMinutes);
+      } catch (error) {
+        registeredStart = false;
+        debugPrint('[TIMER] Sunucu başlangıcı alınamadı: ${error.runtimeType}');
+      }
+      if (!canStartNext()) {
+        if (_sameOwner(owner)) widget.onStartAborted?.call();
+        if (_sameOwner(owner) && _session?.clientUuid == previous.clientUuid && _isResting) {
+          setState(() => _isStarting = false);
+          _tickBreak();
+        }
+        return;
+      }
+      if (widget.marathonPresenceStillValid?.call(nextUuid) == false) {
+        widget.onStartAborted?.call();
+        setState(() => _isStarting = false);
+        await _expireMarathonPresence();
+        return;
+      }
+      if (widget.registerNewFocus != null && registeredStart != true) {
+        // Presence binds the next UUID. Keep it persisted for an idempotent
+        // retry, but never begin focus without the server start receipt.
+        widget.onStartAborted?.call();
+        setState(() {
+          _isStarting = false;
+          _presenceRequestFailed = true;
+        });
+        if (mounted) {
+          _showMarathonFeedback(
+            AppLocalizations.of(context)!.marathonPresenceConnectionNeeded,
+          );
+        }
+        return;
+      }
+    }
     // Sunucu ACK öncesine tarihlenmiş odak oluşturulmaz. UUID aynı
     // penceredeki retry'larda sabit; başlangıç yalnız şimdi verilir.
     final now = _now();
@@ -1082,6 +1136,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     bool canCommitStartedFocus() {
       final elapsed = _now().difference(now);
       return canStartNext() &&
+          (widget.marathonPresenceStillValid?.call(nextUuid) ?? true) &&
           !elapsed.isNegative &&
           elapsed <= const Duration(seconds: 2);
     }
@@ -1102,7 +1157,9 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
           _session?.clientUuid == previous.clientUuid &&
           _isResting) {
         setState(() => _isStarting = false);
-        if (_marathon?.isPresenceExpiredAt(_now()) ?? false) {
+        if (widget.marathonPresenceStillValid?.call(nextUuid) == false) {
+          await _expireMarathonPresence();
+        } else if (_marathon?.isPresenceExpiredAt(_now()) ?? false) {
           _tickBreak();
         } else if (canStartNext()) {
           await _handleMarathonWriteFailure(
@@ -1137,7 +1194,11 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
       );
       if (_sameOwner(owner) && _session?.clientUuid == previous.clientUuid) {
         setState(() => _isStarting = false);
-        _tickBreak();
+        if (widget.marathonPresenceStillValid?.call(nextUuid) == false) {
+          await _expireMarathonPresence();
+        } else {
+          _tickBreak();
+        }
       }
       return;
     }
@@ -1149,6 +1210,9 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     loggedMinutes = next.durationMinutes;
     totalSeconds = next.totalSeconds;
     _runSession(storedNext, now, persist: false);
+    if (registeredStart == false && mounted) {
+      _showMarathonFeedback(AppLocalizations.of(context)!.sessionStartUnverified);
+    }
   }
 
   void _showMarathonCompletedDialog(
@@ -1584,7 +1648,24 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
       }
       if (!_sameOwner(owner)) return;
       if (allowed && _isStarting && _isInForeground) {
-        _startOrResume();
+        var freshUuid = _session == null ? const Uuid().v4() : null;
+        bool? registeredStart;
+        if (freshUuid != null && !widget.quickTimer) {
+          try {
+            registeredStart = await widget.registerNewFocus?.call(freshUuid, loggedMinutes);
+          } catch (error) {
+            registeredStart = false;
+            debugPrint('[TIMER] Sunucu başlangıcı alınamadı: ${error.runtimeType}');
+          }
+        }
+        if (registeredStart == false) {
+          // A timed-out request can still reach the server. Never reuse its
+          // UUID for an offline start, even if that request later succeeds.
+          freshUuid = const Uuid().v4();
+        }
+        if (_sameOwner(owner) && _isStarting && _isInForeground) {
+          _startOrResume(freshClientUuid: freshUuid, startUnverified: registeredStart == false);
+        }
       } else if (mounted) {
         _showMarathonFeedback(AppLocalizations.of(context)!.examConflict);
       }
@@ -1602,7 +1683,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     }
   }
 
-  void _startOrResume() {
+  void _startOrResume({String? freshClientUuid, bool startUnverified = false}) {
     if (!mounted || !_sessionIsActive) return;
     final now = _now();
     final current = _session;
@@ -1625,7 +1706,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     _lastMarathonRejected = false;
     _lastMarathonValidationFailed = false;
     final fresh = ActiveTimerSession.start(
-      clientUuid: const Uuid().v4(),
+      clientUuid: freshClientUuid ?? const Uuid().v4(),
       categoryId: category?.id ?? selectedCategoryId,
       categoryName: category?.name ?? selectedCategoryName,
       categoryColorHex: category?.colorHex,
@@ -1642,15 +1723,20 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     );
     if (fresh.marathon == null) {
       _runSession(fresh, now);
+      if (startUnverified && mounted) {
+        _showMarathonFeedback(AppLocalizations.of(context)!.sessionStartUnverified);
+      }
     } else {
       _persistingMarathonStart = true;
-      unawaited(_startMarathonAfterPersisting(fresh, now));
+      unawaited(_startMarathonAfterPersisting(fresh, now, startUnverified: startUnverified));
     }
   }
 
   Future<void> _startMarathonAfterPersisting(
     ActiveTimerSession fresh,
-    DateTime now,
+    DateTime now, {
+    bool startUnverified = false,
+  }
   ) async {
     final owner = widget.sessionOwnerKey;
     bool canStart() =>
@@ -1681,9 +1767,9 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
         ..showSnackBar(
           SnackBar(
             key: const ValueKey('marathon-started-message'),
-            content: Text(
-              AppLocalizations.of(context)!.marathonStartingWelcome,
-            ),
+            content: Text(startUnverified
+                ? AppLocalizations.of(context)!.sessionStartUnverified
+                : AppLocalizations.of(context)!.marathonStartingWelcome),
             behavior: SnackBarBehavior.floating,
             duration: const Duration(seconds: 3),
           ),
@@ -3196,6 +3282,7 @@ class _SessionCompletedDialogState extends State<SessionCompletedDialog> {
         :final coinsEarned,
         :final streak,
         :final dailyLimitReached,
+        :final unverifiedLimitReached,
       ) =>
         [
           Wrap(
@@ -3234,6 +3321,14 @@ class _SessionCompletedDialogState extends State<SessionCompletedDialog> {
             const SizedBox(height: 10),
             message(
               l10n.sessionDailyLimitReached(sessionDailyLimit()),
+              Icons.info_outline_rounded,
+              accent,
+            ),
+          ],
+          if (unverifiedLimitReached) ...[
+            const SizedBox(height: 10),
+            message(
+              l10n.sessionUnverifiedNoRewards,
               Icons.info_outline_rounded,
               accent,
             ),

@@ -1,0 +1,40 @@
+--- a/landing/js/main.js
++++ b/landing/js/main.js
+@@ -96,5 +96,6 @@
+     var MSG_EMPTY = text("E-posta adresini yazar mısın?", "Enter your email address.");
+     var MSG_INVALID = text("Geçerli bir e-posta adresi girer misin?", "Enter a valid email address.");
++    var MSG_RATE = text("Şu anda çok fazla istek var. Lütfen daha sonra tekrar dene.", "Too many requests right now. Please try again later.");
+     var MSG_FAILED = text("Bir şeyler ters gitti, tekrar dener misin?", "Something went wrong. Please try again.");
+     var MSG_CONSENT = text("Sana haber verebilmemiz için onay kutusunu işaretlemen gerekiyor.", "Select the consent checkbox so we can notify you.");
+     var EMAIL_RE = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+@@ -176,20 +177,21 @@
+         showStatus(MSG_FAILED);
+         return;
+       }
+-      api.request("/rest/v1/waitlist", {
++      api.request("/rest/v1/rpc/submit_waitlist", {
+         body: {
+-          email: email,
+-          marketing_consent: true,
+-          consent_text_version: CONSENT_TEXT_VERSION
+-        },
+-        prefer: "return=minimal"
++          p_email: email,
++          p_marketing_consent: true,
++          p_consent_text_version: CONSENT_TEXT_VERSION
++        }
+       }).then(function (res) {
+-        var code = api.errorCode(res.data);
+-        if (res.ok || res.status === 409 || code === "23505") {
++        if (res.ok && res.data && res.data.accepted === true) {
+           showSuccess();
+-        } else if (code === "23514" || code === "22001") {
++        } else if (res.ok && res.data && res.data.reason === "invalid_input") {
+           setBusy(false);
+           showError(MSG_INVALID);
++        } else if (res.ok && res.data && res.data.reason === "rate_limited") {
++          setBusy(false);
++          showStatus(MSG_RATE);
+         } else {
+           setBusy(false);
+           showStatus(MSG_FAILED);

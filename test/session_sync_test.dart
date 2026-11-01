@@ -163,7 +163,15 @@ void main() {
   group('classifySessionResponse', () {
     test('normal yanıt kabul edilmiştir', () {
       expect(classifySessionResponse({'total_points': 5}), isNull);
-      expect(classifySessionResponse(null), isNull);
+      expect(classifySessionResponse({'total_points': 0, 'duplicate': true}), isNull);
+    });
+
+    test('geçersiz makbuz geçicidir, başarılı sayılmaz', () {
+      for (final value in [null, <String, Object?>{}, <Object?>[], {'total_points': '5'}, {'total_points': -1}, {'total_points': 1.5}]) {
+        final failure = classifySessionResponse(value);
+        expect(failure?.kind, SessionFailureKind.transient);
+        expect(failure?.reasonCode, SessionReason.serverError);
+      }
     });
 
     test("{'error': 'overlap'} sessizce silinmez, çakışma sayılır", () {

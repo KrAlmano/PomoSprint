@@ -66,7 +66,13 @@ class RealBackend implements SessionQueueBackend {
   String? get signedInUserId => client.auth.currentUser?.id;
 
   @override
-  Future<Object?> completeSession(PendingSession session, {required String categoryId, required DateTime startedAtForServer}) {
+  Future<Object?> completeSession(
+    PendingSession session, {
+    required String expectedUserId,
+    required String categoryId,
+    required DateTime startedAtForServer,
+  }) {
+    final auth = _ownerAuthorization(expectedUserId);
     final params = {
       'p_client_uuid': session.clientUuid,
       'p_category_id': categoryId,
@@ -76,26 +82,55 @@ class RealBackend implements SessionQueueBackend {
       'p_started_at': startedAtForServer.toUtc().toIso8601String(),
     };
     calls.add(params);
-    return client.rpc('complete_study_session', params: params);
+    return client
+        .rpc('complete_study_session', params: params)
+        .setHeader('Authorization', auth);
   }
 
   @override
-  Future<List<CategoryRef>> fetchCategories() async {
+  Future<List<CategoryRef>> fetchCategories(String expectedUserId) async {
+    final auth = _ownerAuthorization(expectedUserId);
     // SupabaseService.fetchUserCategories(includeArchived: true) ile aynı sorgu.
     final rows = await client
         .from('categories')
         .select('id, name, color_hex, icon_name, sort_order, is_archived')
-        .eq('user_id', client.auth.currentUser!.id)
+        .eq('user_id', expectedUserId)
         .order('sort_order', ascending: true)
         .order('created_at', ascending: true)
-        .order('id', ascending: true);
-    return [for (final r in rows) (id: r['id'] as String, name: r['name'] as String, isArchived: r['is_archived'] == true)];
+        .order('id', ascending: true)
+        .setHeader('Authorization', auth);
+    return [
+      for (final r in rows)
+        (
+          id: r['id'] as String,
+          name: r['name'] as String,
+          isArchived: r['is_archived'] == true,
+        ),
+    ];
   }
 
   @override
-  Future<void> createDefaultCategories() => client.rpc('setup_onboarding_categories', params: {
-        'p_categories': [for (final c in CourseCategory.initialCategories()) c.toServerJson()],
-      });
+  Future<void> createDefaultCategories(String expectedUserId) => client
+      .rpc(
+        'setup_onboarding_categories',
+        params: {
+          'p_categories': [
+            for (final c in CourseCategory.initialCategories())
+              c.toServerJson(),
+          ],
+        },
+      )
+      .setHeader('Authorization', _ownerAuthorization(expectedUserId));
+
+  String _ownerAuthorization(String userId) {
+    final session = client.auth.currentSession;
+    if (session == null ||
+        session.user.id != userId ||
+        client.auth.currentUser?.id != userId) {
+      throw StateError('Queue owner changed');
+    }
+    return 'Bearer ${session.accessToken}';
+  }
 }
 
 PendingSession pending({

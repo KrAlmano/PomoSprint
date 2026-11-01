@@ -79,6 +79,8 @@ class _MainNavigationShellState extends State<MainNavigationShell>
   bool _focusWasReserved = false;
   final AsyncLock _presenceLock = AsyncLock();
   int _presenceRevision = 0;
+  DateTime? _marathonConfirmedAt;
+  String? _marathonConfirmedUuid;
   bool _marathonAvailable = false;
   bool _loadingMarathonConfig = false;
   Map<int, Map<int, int>>? _marathonBonuses;
@@ -442,6 +444,16 @@ class _MainNavigationShellState extends State<MainNavigationShell>
     _queuePresence(_service.cancelStudySession);
   }
 
+  Future<bool> _registerNewFocus(String clientUuid, int durationMinutes) async {
+    final owner = _user.id;
+    if (owner == null || !_ownsCurrentSession || !_canStartInForeground) return false;
+    return _service.registerFocusSessionStart(
+      expectedUserId: owner,
+      clientUuid: clientUuid,
+      durationMinutes: durationMinutes,
+    );
+  }
+
   /// Odak/mola/iptal istekleri sırayla gider. Geç kalan bir iptal, yeni
   /// molayı ya da Pomodoro'yu sunucuda silemez; eski hesap da yeni hesaba
   /// durum yazamaz. Henüz başlamamış bayat istekler atlanır.
@@ -522,12 +534,18 @@ class _MainNavigationShellState extends State<MainNavigationShell>
     final plan = previous.marathon;
     if (!_ownsCurrentSession || plan == null || !_isInForeground) return false;
     final owner = _user.id;
+    _marathonConfirmedAt = null;
+    _marathonConfirmedUuid = null;
     if (_exams.blocksOtherSessions.value) return false;
     final confirmed = await _service.confirmMarathonPresence(
       marathonUuid: plan.marathonUuid,
       completedSessionIndex: plan.completedSessions,
       previousClientUuid: previous.clientUuid,
       nextClientUuid: nextUuid,
+      onConfirmed: (at) {
+        _marathonConfirmedAt = at;
+        _marathonConfirmedUuid = nextUuid;
+      },
     );
     if (!confirmed || !mounted || !_ownsCurrentSession || !_isInForeground) {
       return false;
@@ -541,6 +559,16 @@ class _MainNavigationShellState extends State<MainNavigationShell>
         _ownsCurrentSession &&
         _user.id == owner &&
         _isInForeground;
+  }
+
+  bool _marathonPresenceStillValid(String uuid) {
+    final confirmedAt = _marathonConfirmedAt;
+    if (confirmedAt == null || _marathonConfirmedUuid != uuid ||
+        !_ownsCurrentSession || !_isInForeground) {
+      return false;
+    }
+    final elapsed = _service.marathonServerNow.difference(confirmedAt);
+    return !elapsed.isNegative && elapsed < const Duration(seconds: 10);
   }
 
   Future<void> _logout() async {
@@ -625,11 +653,13 @@ class _MainNavigationShellState extends State<MainNavigationShell>
         legacySessionOwnerKey: ownerEmail,
         isSessionActive: () => _ownsCurrentSession,
         authorizeStart: _authorizeTimerStart,
+        registerNewFocus: _registerNewFocus,
         onStartAborted: _onTimerStartAborted,
         onOpenSettings: _openProfile,
         onTimerStateChanged: _onTimerStateChanged,
         onMarathonBreakChanged: _onMarathonBreakChanged,
         onConfirmMarathonPresence: _onConfirmMarathonPresence,
+        marathonPresenceStillValid: _marathonPresenceStillValid,
         marathonAvailable: _marathonAvailable,
         marathonBonuses: _marathonBonuses,
         onSessionCompleted: _onSessionCompleted,

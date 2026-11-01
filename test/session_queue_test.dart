@@ -25,6 +25,7 @@ class FakeBackend implements SessionQueueBackend {
   List<CategoryRef> categories = const [];
   int createDefaultsCalls = 0;
   int fetchCategoriesCalls = 0;
+  Future<List<CategoryRef>> Function()? categoryHandler;
 
   /// Her istekte (yanıt dönmeden önce) çağrılır; testler sunucu saatini
   /// ('date' başlığı) buradan besler.
@@ -37,6 +38,7 @@ class FakeBackend implements SessionQueueBackend {
   @override
   Future<Object?> completeSession(
     PendingSession session, {
+    required String expectedUserId,
     required String categoryId,
     required DateTime startedAtForServer,
   }) async {
@@ -46,14 +48,16 @@ class FakeBackend implements SessionQueueBackend {
   }
 
   @override
-  Future<List<CategoryRef>> fetchCategories() async {
+  Future<List<CategoryRef>> fetchCategories(String expectedUserId) async {
     fetchCategoriesCalls++;
     onRequest?.call();
+    final handler = categoryHandler;
+    if (handler != null) return handler();
     return categories;
   }
 
   @override
-  Future<void> createDefaultCategories() async {
+  Future<void> createDefaultCategories(String expectedUserId) async {
     createDefaultsCalls++;
     categories = const [
       (id: _catA, name: 'Matematik', isArchived: false),
@@ -434,6 +438,27 @@ void main() {
     expect(backend.sent.length, 1);
   });
 
+  test('sunucu başlangıcı henüz dolmamışsa aynı seans bekler ve yeniden gönderilir', () async {
+    clock.recordSample(serverTime: DateTime.now().toUtc(), sentAt: DateTime.now(), receivedAt: DateTime.now());
+    var requests = 0;
+    backend.handler = (s, c, t) async {
+      requests++;
+      if (requests == 1) {
+        throw const PostgrestException(message: 'verified_start_not_elapsed', code: 'P0001');
+      }
+      return {'total_points': 5, 'coins_earned': 20, 'duplicate': false};
+    };
+    final result = await queue.submit('u1', _session('a', startedAt: now.subtract(const Duration(minutes: 25)), clockOffsetMs: 0));
+    expect(result, isA<SessionSubmitQueued>());
+    expect((result as SessionSubmitQueued).reasonCode, SessionReason.notElapsed);
+    expect(await queue.pendingCount('u1'), 1);
+    expect(await queue.rejectedSessions('u1'), isEmpty);
+    await queue.sync('u1');
+    expect(await queue.pendingCount('u1'), 0);
+    expect(backend.sent.map((call) => call.uuid), ['a', 'a']);
+    expect(accepted, ['a']);
+  });
+
   test("saat farkı ölçülemezse (yanıtta 'date' yok) süre dolmamış seans bekletilir, saat suçlanmaz", () async {
     // Hiçbir yanıt saat örneği vermiyor (onRequest yok): fark bilinmiyor.
     backend.handler = (s, c, t) async => throw const PostgrestException(message: 'session_not_finished', code: 'P0001');
@@ -555,9 +580,130 @@ void main() {
     await queue.clearUser('u1');
     expect(await queue.pendingCount('u1'), 0);
   });
+  test(
+    'bozuk sunucu makbuzu seansı silmez, geçerli tekrar idempotent tamamlar',
+    () async {
+      await queue.enqueue(
+        'u1',
+        _session(
+          'malformed',
+          startedAt: now.subtract(const Duration(hours: 1)),
+        ),
+      );
+      backend.handler = (s, c, t) async => null;
+      final first = await queue.sync('u1');
+      expect(first.sent, 0);
+      expect((await queue.pending('u1')).map((e) => e.clientUuid), [
+        'malformed',
+      ]);
+      expect(accepted, isEmpty);
+      backend.handler = (s, c, t) async => {
+        'total_points': 5,
+        'duplicate': true,
+      };
+      final second = await queue.sync('u1');
+      expect(second.sent, 1);
+      expect(await queue.pending('u1'), isEmpty);
+      expect(
+        (second.outcomes['malformed'] as SessionSubmitSuccess).duplicate,
+        isTrue,
+      );
+    },
+  );
+
+  test(
+    'kategori okunurken hesap değişirse diğer hesaba varsayılan kategori açılmaz',
+    () async {
+      final requested = Completer<void>();
+      final gate = Completer<List<CategoryRef>>();
+      backend.categoryHandler = () {
+        if (!requested.isCompleted) requested.complete();
+        return gate.future;
+      };
+      await queue.enqueue(
+        'u1',
+        _session(
+          'account-switch',
+          startedAt: now.subtract(const Duration(hours: 1)),
+          categoryId: '1',
+          clockOffsetMs: 0,
+        ),
+      );
+      final sync = queue.sync('u1');
+      await requested.future;
+      backend.signedInUserId = 'u2';
+      gate.complete([]);
+      final report = await sync;
+      expect(report.sent, 0);
+      expect(backend.createDefaultsCalls, 0);
+      expect(backend.sent, isEmpty);
+      expect((await queue.pending('u1')).map((e) => e.clientUuid), [
+        'account-switch',
+      ]);
+    },
+  );
+
+  test(
+    'hesap silinirken geç gelen kalıcı hata silinmiş ret geçmişini oluşturmaz',
+    () async {
+      final requested = Completer<void>();
+      final gate = Completer<void>();
+      backend.handler = (s, c, t) async {
+        requested.complete();
+        await gate.future;
+        throw const PostgrestException(
+          message: 'invalid duration',
+          code: 'P0001',
+        );
+      };
+      await queue.enqueue(
+        'u1',
+        _session(
+          'deleted',
+          startedAt: now.subtract(const Duration(hours: 1)),
+          clockOffsetMs: 0,
+        ),
+      );
+      final sync = queue.sync('u1');
+      await requested.future;
+      await queue.clearUser('u1');
+      gate.complete();
+      await sync;
+      expect(await queue.pending('u1'), isEmpty);
+      expect(await queue.rejectedSessions('u1'), isEmpty);
+      expect(await queue.takeRejectedNoticeCount('u1'), 0);
+    },
+  );
+
+  test('aynı istemci UUID farklı hesapların sonuçlarını karıştırmaz', () async {
+    final requested = Completer<void>();
+    final gate = Completer<void>();
+    backend.handler = (s, c, t) async {
+      requested.complete();
+      await gate.future;
+      return {'total_points': 5};
+    };
+    final entry = _session(
+      'shared-uuid',
+      startedAt: now.subtract(const Duration(hours: 1)),
+      clockOffsetMs: 0,
+    );
+    await queue.enqueue('u1', entry);
+    final first = queue.sync('u1');
+    await requested.future;
+    backend.signedInUserId = 'u2';
+    final second = queue.submit('u2', entry);
+    while (await queue.pendingCount('u2') == 0) {
+      await Future<void>.delayed(Duration.zero);
+    }
+    await queue.clearUser('u2');
+    gate.complete();
+    await first;
+    expect(await second, isA<SessionSubmitQueued>());
+  });
 }
 
 class _FailingCategoriesBackend extends FakeBackend {
   @override
-  Future<List<CategoryRef>> fetchCategories() async => throw Exception('SocketException: Failed host lookup');
+  Future<List<CategoryRef>> fetchCategories(String expectedUserId) async => throw Exception('SocketException: Failed host lookup');
 }

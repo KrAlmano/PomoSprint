@@ -881,8 +881,20 @@ abstract class AppLocalizations {
   /// No description provided for @sessionResultDuplicate.
   ///
   /// In tr, this message translates to:
-  /// **'Bu seans zaten kaydedilmişti; puanların daha önce eklendi.'**
+  /// **'Bu seans daha önce kaydedilmişti.'**
   String get sessionResultDuplicate;
+
+  /// No description provided for @sessionStartUnverified.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sunucu başlangıcı doğrulayamadı. Seansın kaydedilir; puan ve kum kazanımı sunucu kurallarına bağlıdır.'**
+  String get sessionStartUnverified;
+
+  /// No description provided for @sessionUnverifiedNoRewards.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sunucu başlangıcı doğrulayamadığı için seansın kaydedildi; bu seanstan puan ve kum kazanılmadı.'**
+  String get sessionUnverifiedNoRewards;
 
   /// No description provided for @sessionResultTestNotSaved.
   ///
@@ -4391,6 +4403,12 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Deneme bilgileri alınamadı. Bağlantını kontrol edip tekrar dene.'**
   String get examError;
+
+  /// No description provided for @examStartRateLimited.
+  ///
+  /// In tr, this message translates to:
+  /// **'Son 24 saatte çok fazla deneme başlattın. Bir süre sonra tekrar deneyebilirsin.'**
+  String get examStartRateLimited;
 
   /// No description provided for @examConflict.
   ///

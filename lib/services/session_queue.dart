@@ -276,6 +276,8 @@ final class SessionSubmitSuccess extends SessionSubmitResult {
     this.coinsEarned = 0,
     this.streak,
     this.dailyLimitReached = false,
+    this.startVerified,
+    this.unverifiedLimitReached = false,
     this.duplicate = false,
     this.marathonBonusPoints = 0,
     this.marathonInvalid = false,
@@ -305,6 +307,10 @@ final class SessionSubmitSuccess extends SessionSubmitResult {
   /// Sunucunun hesapladığı güncel seri (yanıtta yoksa null).
   final int? streak;
   final bool dailyLimitReached;
+
+  /// Null means an older/duplicate receipt did not include this field.
+  final bool? startVerified;
+  final bool unverifiedLimitReached;
 
   /// Seans zaten kayıtlıydı (önceki denemenin yanıtı kaybolmuş). Deltalar
   /// kullanıcıya ikinci kez eklenmemelidir.
@@ -339,6 +345,8 @@ final class SessionSubmitSuccess extends SessionSubmitResult {
           : total,
       streak: map['streak'] is num ? (map['streak'] as num).toInt() : null,
       dailyLimitReached: map['daily_limit_reached'] == true,
+      startVerified: map['start_verified'] is bool ? map['start_verified'] as bool : null,
+      unverifiedLimitReached: map['unverified_limit_reached'] == true,
       duplicate: map['duplicate'] == true,
       marathonBonusPoints: asInt(map['marathon_bonus_points']),
       marathonInvalid:
@@ -477,6 +485,15 @@ SessionFailure classifySessionError(
       );
     }
     if (code == 'P0001') {
+      // The start was registered on the server but its full duration has not
+      // elapsed yet. Preserve the session for an idempotent retry regardless
+      // of clock offset; treating it as a permanent timing error loses it.
+      if (msg.contains('verified_start_not_elapsed')) {
+        return const SessionFailure(
+          SessionFailureKind.transient,
+          SessionReason.notElapsed,
+        );
+      }
       if (msg.contains('session_overlap') || msg.contains('overlap')) {
         return const SessionFailure(
           SessionFailureKind.overlap,
@@ -578,7 +595,28 @@ SessionFailure classifySessionError(
 /// `{'error': 'overlap'}` olarak döndürür; bilinmeyen diğer `{'error': ...}`
 /// yanıtları kalıcı sayılır.
 SessionFailure? classifySessionResponse(Object? response) {
-  if (response is! Map || response['error'] == null) return null;
+  if (response is! Map) {
+    return const SessionFailure(
+      SessionFailureKind.transient,
+      SessionReason.serverError,
+    );
+  }
+  if (response['error'] == null) {
+    final total = response['total_points'];
+    if (total is num &&
+        total.isFinite &&
+        total >= 0 &&
+        total == total.truncateToDouble()) {
+      return null;
+    }
+    // A successful HTTP response without a valid receipt is not proof that
+    // the server saved the session. Keep the outbox entry for an idempotent
+    // retry instead of deleting it.
+    return const SessionFailure(
+      SessionFailureKind.transient,
+      SessionReason.serverError,
+    );
+  }
   final raw = response['error'].toString().toLowerCase();
   if (raw.contains('overlap')) {
     return const SessionFailure(
@@ -629,15 +667,16 @@ abstract class SessionQueueBackend {
   /// complete_study_session RPC'si.
   Future<Object?> completeSession(
     PendingSession session, {
+    required String expectedUserId,
     required String categoryId,
     required DateTime startedAtForServer,
   });
 
   /// Kullanıcının arşivlenmişler dahil tüm kategorileri.
-  Future<List<CategoryRef>> fetchCategories();
+  Future<List<CategoryRef>> fetchCategories(String expectedUserId);
 
   /// Hiç kategorisi olmayan kullanıcı için varsayılan kategorileri oluşturur.
-  Future<void> createDefaultCategories();
+  Future<void> createDefaultCategories(String expectedUserId);
 }
 
 /// Bir senkron turunun özeti.
@@ -808,7 +847,7 @@ class SessionQueue {
     PendingSession session,
   ) async {
     // Yalnızca bu yazımdan sonra çalışan turların sonucu geçerli.
-    _settledOutcomes.remove(session.clientUuid);
+    _settledOutcomes.remove((userId, session.clientUuid));
     await enqueue(userId, session);
     if (session.recordAccelerated) {
       // Önce diske yazılan eski QA girdisini, bağlantı ya da oturum olmasa
@@ -830,7 +869,10 @@ class SessionQueue {
     );
     // Seansı bu turdan önce başka bir tur (ör. kabuğun açılış senkronu)
     // göndermiş olabilir: bu turun anlık görüntüsünde yoktu, sonucu o turdan.
-    final settledElsewhere = _settledOutcomes.remove(session.clientUuid);
+    final settledElsewhere = _settledOutcomes.remove((
+      userId,
+      session.clientUuid,
+    ));
     return report.outcomes[session.clientUuid] ??
         settledElsewhere ??
         SessionSubmitQueued(
@@ -844,15 +886,18 @@ class SessionQueue {
   // kabuğun açılış senkronu ile sayacın submit'i yarışıyor; seansı açılış
   // senkronu gönderince submit'in turunda seans yoktu ve sonuç diyaloğu,
   // sunucu puanı yazmışken "bağlantı gelince gönderilecek" diyordu.
-  final Map<String, SessionSubmitResult> _settledOutcomes = {};
+  final Map<(String, String), SessionSubmitResult> _settledOutcomes = {};
   static const int _settledOutcomeLimit = 50;
 
-  void _rememberSettled(Map<String, SessionSubmitResult> outcomes) {
+  void _rememberSettled(
+    String userId,
+    Map<String, SessionSubmitResult> outcomes,
+  ) {
     for (final entry in outcomes.entries) {
       if (entry.value is SessionSubmitQueued) continue;
       _settledOutcomes
-        ..remove(entry.key)
-        ..[entry.key] = entry.value;
+        ..remove((userId, entry.key))
+        ..[(userId, entry.key)] = entry.value;
     }
     while (_settledOutcomes.length > _settledOutcomeLimit) {
       _settledOutcomes.remove(_settledOutcomes.keys.first);
@@ -956,12 +1001,20 @@ class SessionQueue {
             .toList();
         if (needsMapping.isNotEmpty) {
           try {
-            var categories = await backend.fetchCategories().timeout(
-              rpcTimeout,
-            );
-            if (categories.isEmpty) {
-              await backend.createDefaultCategories().timeout(rpcTimeout);
-              categories = await backend.fetchCategories().timeout(rpcTimeout);
+            var categories = await backend
+                .fetchCategories(userId)
+                .timeout(rpcTimeout);
+            if (backend.signedInUserId != userId) {
+              stopReason = SessionReason.offline;
+            } else if (categories.isEmpty) {
+              await backend.createDefaultCategories(userId).timeout(rpcTimeout);
+              if (backend.signedInUserId != userId) {
+                stopReason = SessionReason.offline;
+              } else {
+                categories = await backend
+                    .fetchCategories(userId)
+                    .timeout(rpcTimeout);
+              }
             }
             for (final e in needsMapping) {
               final id = resolveCategoryId(e.categoryName, categories);
@@ -983,13 +1036,14 @@ class SessionQueue {
         // öğretir. İstek başarısızsa tur durur; hiçbir seans gönderilmez.
         // (İstek başarılı olup başlık yine de okunamadıysa düzeltmesiz
         // gönderilir: başka bir yol yok.)
-        if (clock.offset == null &&
+        if (stopReason == null &&
+            clock.offset == null &&
             entries.any((e) => e.clockOffsetMs == null)) {
           if (categoryFailure != null) {
             stopReason = categoryFailure.reasonCode;
           } else {
             try {
-              await backend.fetchCategories().timeout(rpcTimeout);
+              await backend.fetchCategories(userId).timeout(rpcTimeout);
             } catch (e) {
               stopReason = classifySessionError(e).reasonCode;
               debugPrint(
@@ -1057,6 +1111,7 @@ class SessionQueue {
                 final response = await backend
                     .completeSession(
                       entry,
+                      expectedUserId: userId,
                       categoryId: categoryId,
                       startedAtForServer: entry.startedAt.add(correction),
                     )
@@ -1200,7 +1255,7 @@ class SessionQueue {
       },
       stopReason: stopReason,
     );
-    _rememberSettled(report.outcomes);
+    _rememberSettled(userId, report.outcomes);
     if (remapRequested && allowRemapRetry && stopReason == null) {
       return report._merge(
         await _runPass(
@@ -1288,7 +1343,14 @@ class SessionQueue {
     required bool notify,
   }) => _storageLock.synchronized(() async {
     final prefs = await SharedPreferences.getInstance();
-    await _remove(queueKey(userId), entry.clientUuid);
+    final key = queueKey(userId);
+    final pending = _decode(prefs, key);
+    final before = pending.length;
+    pending.removeWhere((e) => e['client_uuid'] == entry.clientUuid);
+    // Account deletion may have cleared the queue while its request was in
+    // flight. Never recreate deleted personal history from that late result.
+    if (pending.length == before) return;
+    await _write(prefs, key, pending);
     await _appendRejected(
       prefs,
       userId,

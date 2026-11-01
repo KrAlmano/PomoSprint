@@ -1,3 +1,5 @@
+> **1 Kasım güvenlik düzeltmesi:** Deneme başlatma sınırı (33) ve bekleme listesi onay/yetki koruması `20261101223000` canlıya kuruldu. 34 çevrimdışı seans ödül koruması kurulmadı, `unverified_session_daily_cap` null; çevrimdışı çalışmaya ödül vermeme tercihi henüz canlıda etkin değildir. 31 kurulmadı. Hesap/geç gelen yanıt/seans kuyruğu istemci düzeltmeleri bu dalda, dağıtılmış mobil sürüm değildir. [Doğrulama ve açık riskler](analiz/GUVENLIK_RAPORU_2026-11-01.md).
+
 # PomoSprint — proje ve AI oturum devir belgesi
 
 > **1 Kasım canlı geçişi ve sonuç diyaloğu:** Kullanıcının “sen yap” talimatıyla 27/28/29/30/32 Safari SQL Editor'de tek işlem halinde kuruldu; canlı DRYRUN ve kurulum 14/14, bağımsız postflight ve anonim katalog API doğrulaması geçti. 31 kurulmadı. Yeni aylık lig 1 Aralık 00.00 İstanbul'da açılır; doğal cron ve gerçek kullanıcı Deneme turu bu çalışmada sınanmadı. [Canlı kanıt](analiz/ATOMIK_DENEME_ADAYI_2026-11-01.md). Net giriş ekranı [yerelde](analiz/QA_RAPORLAR_2026-11-01.md) güncellendi; son mobil arayüzler için imzalı dağıtım hâlâ gerekir.

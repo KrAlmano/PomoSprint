@@ -520,8 +520,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get sessionResultDuplicate =>
-      'This session was already saved; its points were added earlier.';
+  String get sessionResultDuplicate => 'This session was already saved.';
+
+  @override
+  String get sessionStartUnverified =>
+      'The server could not verify this start. Your session will be saved; points and sand depend on server rules.';
+
+  @override
+  String get sessionUnverifiedNoRewards =>
+      'Your session was saved, but no points or sand were awarded because the server could not verify its start.';
 
   @override
   String get sessionResultTestNotSaved => 'Test session — not saved';
@@ -2613,6 +2620,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get examError =>
       'Could not load practice exam data. Check your connection and try again.';
+
+  @override
+  String get examStartRateLimited =>
+      'You have started too many practice exams in the last 24 hours. Please try again later.';
 
   @override
   String get examConflict =>

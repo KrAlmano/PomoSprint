@@ -428,7 +428,9 @@
       }
     }
   },
-  "sessionResultDuplicate": "Bu seans zaten kaydedilmişti; puanların daha önce eklendi.",
+  "sessionResultDuplicate": "Bu seans daha önce kaydedilmişti.",
+  "sessionStartUnverified": "Sunucu başlangıcı doğrulayamadı. Seansın kaydedilir; puan ve kum kazanımı sunucu kurallarına bağlıdır.",
+  "sessionUnverifiedNoRewards": "Sunucu başlangıcı doğrulayamadığı için seansın kaydedildi; bu seanstan puan ve kum kazanılmadı.",
   "sessionResultTestNotSaved": "Test seansı — kaydedilmez",
   "sessionResultOk": "Tamam",
   "sessionNotSavedTitle": "Seans kaydedilemedi",
@@ -1504,6 +1506,7 @@
   "examStartPending": "Başlatma sonucu bekleniyor",
   "examStartPendingBody": "Başlatma isteğinin sonucu henüz bilinmiyor. Tekrar denemek yeni bir deneme oluşturmaz.",
   "examError": "Deneme bilgileri alınamadı. Bağlantını kontrol edip tekrar dene.",
+  "examStartRateLimited": "Son 24 saatte çok fazla deneme başlattın. Bir süre sonra tekrar deneyebilirsin.",
   "examConflict": "Önce devam eden çalışma veya denemeni tamamla.",
   "examRetry": "Tekrar dene",
   "examEnterResults": "Netlerini gir",

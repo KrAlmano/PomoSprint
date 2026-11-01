@@ -22,6 +22,7 @@ class _Backend implements SessionQueueBackend {
   @override
   Future<Object?> completeSession(
     PendingSession session, {
+    required String expectedUserId,
     required String categoryId,
     required DateTime startedAtForServer,
   }) async {
@@ -30,13 +31,13 @@ class _Backend implements SessionQueueBackend {
   }
 
   @override
-  Future<List<CategoryRef>> fetchCategories() async {
+  Future<List<CategoryRef>> fetchCategories(String expectedUserId) async {
     categoryRequests++;
     return [(id: _categoryId, name: 'Matematik', isArchived: false)];
   }
 
   @override
-  Future<void> createDefaultCategories() async => categoryCreations++;
+  Future<void> createDefaultCategories(String expectedUserId) async => categoryCreations++;
 }
 
 PendingSession _entry(

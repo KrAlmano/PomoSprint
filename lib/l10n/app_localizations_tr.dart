@@ -510,8 +510,15 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
-  String get sessionResultDuplicate =>
-      'Bu seans zaten kaydedilmişti; puanların daha önce eklendi.';
+  String get sessionResultDuplicate => 'Bu seans daha önce kaydedilmişti.';
+
+  @override
+  String get sessionStartUnverified =>
+      'Sunucu başlangıcı doğrulayamadı. Seansın kaydedilir; puan ve kum kazanımı sunucu kurallarına bağlıdır.';
+
+  @override
+  String get sessionUnverifiedNoRewards =>
+      'Sunucu başlangıcı doğrulayamadığı için seansın kaydedildi; bu seanstan puan ve kum kazanılmadı.';
 
   @override
   String get sessionResultTestNotSaved => 'Test seansı — kaydedilmez';
@@ -2571,6 +2578,10 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get examError =>
       'Deneme bilgileri alınamadı. Bağlantını kontrol edip tekrar dene.';
+
+  @override
+  String get examStartRateLimited =>
+      'Son 24 saatte çok fazla deneme başlattın. Bir süre sonra tekrar deneyebilirsin.';
 
   @override
   String get examConflict => 'Önce devam eden çalışma veya denemeni tamamla.';

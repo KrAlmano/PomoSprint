@@ -174,7 +174,9 @@
       }
     }
   },
-  "sessionResultDuplicate": "This session was already saved; its points were added earlier.",
+  "sessionResultDuplicate": "This session was already saved.",
+  "sessionStartUnverified": "The server could not verify this start. Your session will be saved; points and sand depend on server rules.",
+  "sessionUnverifiedNoRewards": "Your session was saved, but no points or sand were awarded because the server could not verify its start.",
   "sessionResultTestNotSaved": "Test session — not saved",
   "sessionResultOk": "OK",
   "sessionNotSavedTitle": "Session not saved",
@@ -949,6 +951,7 @@
   "examStartPending": "Waiting for start confirmation",
   "examStartPendingBody": "The start request has not been confirmed yet. Retrying will not create another attempt.",
   "examError": "Could not load practice exam data. Check your connection and try again.",
+  "examStartRateLimited": "You have started too many practice exams in the last 24 hours. Please try again later.",
   "examConflict": "Finish your current study session or practice exam first.",
   "examRetry": "Try again",
   "examEnterResults": "Enter your scores",

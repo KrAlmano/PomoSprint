@@ -1025,6 +1025,12 @@ class SupabaseService {
                 },
               )
               .timeout(_deleteAccountTimeout);
+          // A successful HTTP status is not a deletion receipt. A gateway or
+          // misconfigured Edge Function may return an empty/invalid 2xx body;
+          // keep the account and local data unless deletion is confirmed.
+          if (!deleteEdgeResponseConfirmed(response.data)) {
+            throw const ServiceException(ServiceErrorCode.server);
+          }
           apple = appleRevocationFromResponse(
             response.data,
             hasAppleIdentity: hasApple,
@@ -1067,6 +1073,11 @@ class SupabaseService {
   static bool shouldFallBackToDeleteRpc(FunctionException e) =>
       e.status == 404 || e.status >= 500;
 
+  /// A 2xx Edge response is valid only with an explicit deletion receipt.
+  @visibleForTesting
+  static bool deleteEdgeResponseConfirmed(Object? data) =>
+      data is Map && data['deleted'] == true;
+
   /// Silme yanıtı kaybolduğunda hesabın sunucuda artık olmadığını doğrular.
   Future<bool> _accountNoLongerExists() async {
     try {
@@ -1083,7 +1094,7 @@ class SupabaseService {
   /// (Süresi dolmuş JWT'nin 401'i silinme sayılmaz.)
   @visibleForTesting
   static bool authErrorMeansUserGone(AuthException e) =>
-      e.code == 'user_not_found' || e.statusCode == '404';
+      e.code == 'user_not_found';
 
   /// Silinen hesabın Google erişimini kaldırır (yalnızca cihazdaki Google
   /// hesabı silinen hesabın e-postasıysa). Hata yutulur.
@@ -1946,11 +1957,14 @@ class SupabaseService {
 
   /// Only an explicit UI tap calls this. Pending prior focus is synchronized
   /// first; server confirmation is never queued to run after the deadline.
+  DateTime get marathonServerNow => _clock.serverNow();
+
   Future<bool> confirmMarathonPresence({
     required String marathonUuid,
     required int completedSessionIndex,
     required String previousClientUuid,
     required String nextClientUuid,
+    void Function(DateTime confirmedAt)? onConfirmed,
   }) async {
     if (!_isCloudActive || isDeviceSessionEnding) return false;
     final uid = _client.auth.currentUser?.id;
@@ -1965,9 +1979,17 @@ class SupabaseService {
       nextClientUuid: nextClientUuid,
       isCurrent: isCurrent,
       serverNow: _clock.serverNow,
-      rpc: (name, params) => _guard(
-        () => _client.rpc(name, params: params).timeout(_requestTimeout),
-      ),
+      onConfirmed: onConfirmed,
+      rpc: (name, params) {
+        if (!isCurrent()) {
+          throw const ServiceException(ServiceErrorCode.notSignedIn);
+        }
+        final authorization = _SupabaseQueueBackend(this)._ownerAuthorization(uid);
+        return _guard(
+          () => _client.rpc(name, params: params)
+              .setHeader('Authorization', authorization).timeout(_requestTimeout),
+        );
+      },
     );
   }
 
@@ -2102,6 +2124,7 @@ class SupabaseService {
       return;
     }
     try {
+      final authorization = _SupabaseQueueBackend(this)._ownerAuthorization(uid);
       await _client
           .rpc(
             'start_study_session',
@@ -2110,6 +2133,7 @@ class SupabaseService {
               'p_category_name': categoryName,
             },
           )
+          .setHeader('Authorization', authorization)
           .timeout(_requestTimeout);
     } catch (e) {
       debugPrint('[SOCIAL] startStudySession hatası: $e');
@@ -2129,10 +2153,11 @@ class SupabaseService {
     final epoch = _userEpoch;
     if (uid == null) return (allowed: false, reserved: false);
     try {
+      final authorization = _SupabaseQueueBackend(this)._ownerAuthorization(uid);
       await _client.rpc('start_study_session', params: {
         'p_duration_minutes': durationMinutes,
         'p_category_name': categoryName,
-      }).timeout(const Duration(seconds: 5));
+      }).setHeader('Authorization', authorization).timeout(const Duration(seconds: 5));
       final current = _isCurrentSession(uid, epoch) && !isDeviceSessionEnding;
       return (allowed: current, reserved: current);
     } catch (error) {
@@ -2147,10 +2172,45 @@ class SupabaseService {
     }
   }
 
-  Future<void> cancelStudySession() async {
-    if (!_isCloudActive || _client.auth.currentUser == null) return;
+  /// Bind a newly starting focus session to a server timestamp and its UUID.
+  /// Offline or older servers do not block the local timer; only the server's
+  /// completion receipt determines whether rewards can be granted.
+  Future<bool> registerFocusSessionStart({
+    required String expectedUserId,
+    required String clientUuid,
+    required int durationMinutes,
+  }) async {
+    if (!_isCloudActive || isDeviceSessionEnding ||
+        _client.auth.currentUser?.id != expectedUserId) {
+      return false;
+    }
+    final epoch = _userEpoch;
     try {
-      await _client.rpc('cancel_study_session').timeout(_requestTimeout);
+      final authorization = _SupabaseQueueBackend(this)._ownerAuthorization(expectedUserId);
+      final raw = await _client.rpc('register_session_start', params: {
+        'p_client_uuid': clientUuid,
+        'p_duration_minutes': durationMinutes,
+      }).setHeader('Authorization', authorization).timeout(const Duration(seconds: 5));
+      if (!_isCurrentSession(expectedUserId, epoch) || isDeviceSessionEnding) return false;
+      return raw is Map && raw['client_uuid'] == clientUuid &&
+          raw['server_started_at'] is String &&
+          DateTime.tryParse(raw['server_started_at'] as String) != null;
+    } catch (error) {
+      // A lost ACK may still have created the server row. Do not retry after a
+      // timer has started: the server alone verifies the immutable timestamp.
+      debugPrint('[TIMER] Sunucu başlangıcı doğrulanamadı: ${error.runtimeType}');
+      return false;
+    }
+  }
+
+  Future<void> cancelStudySession() async {
+    if (!_isCloudActive) return;
+    final uid = _client.auth.currentUser?.id;
+    if (uid == null) return;
+    try {
+      final authorization = _SupabaseQueueBackend(this)._ownerAuthorization(uid);
+      await _client.rpc('cancel_study_session')
+          .setHeader('Authorization', authorization).timeout(_requestTimeout);
     } catch (e) {
       debugPrint('[SOCIAL] cancelStudySession hatası: $e');
     }
@@ -2174,11 +2234,13 @@ class SupabaseService {
         .toUtc();
     if (!serverEnd.isAfter(_clock.serverNow())) return false;
     try {
+      final authorization = _SupabaseQueueBackend(this)._ownerAuthorization(uid);
       await _client
           .rpc(
             'start_study_break',
             params: {'p_ends_at': serverEnd.toIso8601String()},
           )
+          .setHeader('Authorization', authorization)
           .timeout(_requestTimeout);
       return _isCurrentSession(uid, epoch);
     } catch (e) {
@@ -2831,6 +2893,22 @@ class _SupabaseQueueBackend implements SessionQueueBackend {
 
   final SupabaseService _service;
 
+  /// Pin every outbox request to its owner's current access token. The
+  /// Supabase HTTP client otherwise obtains the current token asynchronously,
+  /// which can belong to a different account by the time the request is sent.
+  String _ownerAuthorization(String expectedUserId) {
+    if (!_service._isCloudActive) {
+      throw const ServiceException(ServiceErrorCode.cloudUnavailable);
+    }
+    final session = _service._client.auth.currentSession;
+    if (session == null ||
+        session.user.id != expectedUserId ||
+        _service._client.auth.currentUser?.id != expectedUserId) {
+      throw const ServiceException(ServiceErrorCode.notSignedIn);
+    }
+    return 'Bearer ${session.accessToken}';
+  }
+
   @override
   String? get signedInUserId =>
       _service._isCloudActive ? _service._client.auth.currentUser?.id : null;
@@ -2838,40 +2916,75 @@ class _SupabaseQueueBackend implements SessionQueueBackend {
   @override
   Future<Object?> completeSession(
     PendingSession session, {
+    required String expectedUserId,
     required String categoryId,
     required DateTime startedAtForServer,
   }) {
     if (session.recordAccelerated) {
       return Future.value({'error': SessionReason.invalidData});
     }
-    return _service._client.rpc(
-      session.isMarathon
-          ? 'complete_marathon_study_session'
-          : 'complete_study_session',
-      params: {
-        'p_client_uuid': session.clientUuid,
-        'p_category_id': categoryId,
-        'p_duration_minutes': session.minutes,
-        'p_was_paused': session.wasPaused,
-        'p_is_verified': session.foregroundSeconds,
-        'p_started_at': startedAtForServer.toUtc().toIso8601String(),
-        if (session.isMarathon) ...{
-          'p_marathon_uuid': session.marathonUuid,
-          'p_target_sessions': session.marathonTargetSessions,
-          'p_session_index': session.marathonSessionIndex,
-        },
-      },
-    );
+    final authorization = _ownerAuthorization(expectedUserId);
+    return _service._client
+        .rpc(
+          session.isMarathon
+              ? 'complete_marathon_study_session'
+              : 'complete_study_session',
+          params: {
+            'p_client_uuid': session.clientUuid,
+            'p_category_id': categoryId,
+            'p_duration_minutes': session.minutes,
+            'p_was_paused': session.wasPaused,
+            'p_is_verified': session.foregroundSeconds,
+            'p_started_at': startedAtForServer.toUtc().toIso8601String(),
+            if (session.isMarathon) ...{
+              'p_marathon_uuid': session.marathonUuid,
+              'p_target_sessions': session.marathonTargetSessions,
+              'p_session_index': session.marathonSessionIndex,
+            },
+          },
+        )
+        .setHeader('Authorization', authorization);
   }
 
   @override
-  Future<List<CategoryRef>> fetchCategories() async => [
-    for (final c in await _service.fetchUserCategories(includeArchived: true))
-      (id: c.id, name: c.name, isArchived: c.isArchived),
-  ];
+  Future<List<CategoryRef>> fetchCategories(String expectedUserId) async {
+    final authorization = _ownerAuthorization(expectedUserId);
+    final rows = await _service._guard(
+      () => _service._client
+          .from('categories')
+          .select('id, name, color_hex, icon_name, sort_order, is_archived')
+          .eq('user_id', expectedUserId)
+          .order('sort_order', ascending: true)
+          .order('created_at', ascending: true)
+          .order('id', ascending: true)
+          .setHeader('Authorization', authorization),
+    );
+    return rows
+        .map((row) {
+          final category = CourseCategory.fromServerRow(row);
+          return (
+            id: category.id,
+            name: category.name,
+            isArchived: category.isArchived,
+          );
+        })
+        .toList(growable: false);
+  }
 
   @override
-  Future<void> createDefaultCategories() => _service.setupOnboardingCategories(
-    _service.defaultCategorySeedForCurrentUser(),
-  );
+  Future<void> createDefaultCategories(String expectedUserId) async {
+    final authorization = _ownerAuthorization(expectedUserId);
+    // The local profile is used to choose the correct segment's defaults.
+    // If it hasn't caught up with auth, defer instead of seeding from another
+    // account's profile.
+    if (_service.currentUser.value?.id != expectedUserId) {
+      throw const ServiceException(ServiceErrorCode.notSignedIn);
+    }
+    final seed = _service.defaultCategorySeedForCurrentUser();
+    await _service._client
+        .rpc('setup_onboarding_categories', params: {'p_categories': seed})
+        .setHeader('Authorization', authorization)
+        .timeout(SupabaseService._requestTimeout);
+    if (signedInUserId == expectedUserId) _service._bumpCategories();
+  }
 }

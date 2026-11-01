@@ -58,6 +58,18 @@ android/app/src/main/assets/sentry-debug-meta.properties
 # Signing
 *.keystore
 *.jks
+*.p8
+*.p12
+*.pfx
+*.pem
+*.key
+*.mobileprovision
+*.cer
+*.crt
+*.der
+service-account*.json
+serviceAccountKey*.json
+*firebase-adminsdk*.json
 android/key.properties
 ios/Runner.xcodeproj/project.pbxproj.orig
 

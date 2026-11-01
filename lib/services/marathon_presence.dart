@@ -20,6 +20,7 @@ Future<bool> requestMarathonPresence({
   rpc,
   required bool Function() isCurrent,
   required DateTime Function() serverNow,
+  void Function(DateTime confirmedAt)? onConfirmed,
 }) async {
   if (!isUuidCategoryId(marathonUuid) ||
       !isUuidCategoryId(previousClientUuid) ||
@@ -47,7 +48,7 @@ Future<bool> requestMarathonPresence({
   if (!isCurrent() || receipt is! Map || receipt['error'] != null) return false;
   final confirmed = _date(receipt['confirmed_at']);
   final now = serverNow().toUtc();
-  return receipt['confirmed'] == true &&
+  final valid = receipt['confirmed'] == true &&
       receipt['next_client_uuid'] == nextClientUuid &&
       _date(receipt['break_ends_at']) == end &&
       _date(receipt['confirmation_deadline']) == deadline &&
@@ -57,6 +58,8 @@ Future<bool> requestMarathonPresence({
       now.isBefore(deadline) &&
       !now.isBefore(confirmed.subtract(const Duration(seconds: 2))) &&
       !now.isAfter(confirmed.add(const Duration(seconds: 10)));
+  if (valid) onConfirmed?.call(confirmed);
+  return valid;
 }
 
 DateTime? _date(Object? value) =>

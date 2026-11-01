@@ -49,6 +49,10 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
   Color get _outlineColor => Theme.of(context).brightness == Brightness.dark
       ? AppColors.darkOutlineVariant
       : AppColors.outlineVariant;
+  String _errorMessage(AppLocalizations l10n, String? code) =>
+      code == 'exam_start_rate_limited'
+      ? l10n.examStartRateLimited
+      : l10n.examError;
   ExamService get _service => widget.service ?? ExamService.instance;
   int _tab = 0;
   String? _group;
@@ -371,7 +375,7 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 12),
                     child: Text(
-                      l10n.examError,
+                      _errorMessage(l10n, _service.errorCode),
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.error,
                       ),
@@ -402,7 +406,7 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 12),
                     child: Text(
-                      l10n.examError,
+                      _errorMessage(l10n, _service.errorCode),
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.error,
                       ),
@@ -1041,7 +1045,7 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
         Card(
           child: ListTile(
             title: Text(record.definition.name(_turkish)),
-            subtitle: Text(l10n.examError),
+            subtitle: Text(_errorMessage(l10n, record.errorCode)),
           ),
         ),
     ];

@@ -68,6 +68,27 @@ void main() {
   setUp(() => LanguageService.instance.setLanguage(AppLanguage.tr));
 
   group('Seans sonu diyaloğu', () {
+    testWidgets('yalnız sunucunun doğrulanmamış limit bayrağı ödülsüz nedeni gösterir', (tester) async {
+      await _pumpDialog(tester, Future.value(SessionSubmitSuccess.fromResponse({
+        'total_points': 0,
+        'coins_earned': 0,
+        'start_verified': false,
+        'unverified_limit_reached': true,
+      }, minutes: 25)));
+      await tester.pumpAndSettle();
+      expect(find.text(l10n.sessionUnverifiedNoRewards), findsOneWidget);
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+      await _pumpDialog(tester, Future.value(SessionSubmitSuccess.fromResponse({
+        'total_points': 0,
+        'coins_earned': 0,
+        'daily_limit_reached': true,
+      }, minutes: 25)));
+      await tester.pumpAndSettle();
+      expect(find.text(l10n.sessionUnverifiedNoRewards), findsNothing);
+      expect(find.text(l10n.sessionDailyLimitReached(sessionDailyLimit())), findsOneWidget);
+    });
+
     testWidgets('önce kaydediliyor, sonra RPC sonucundaki puan, kum ve seri', (tester) async {
       final submission = Completer<SessionSubmitResult?>();
       await _pumpDialog(tester, submission.future);
