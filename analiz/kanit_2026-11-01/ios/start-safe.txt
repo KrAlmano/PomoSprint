@@ -1,0 +1,13 @@
+mode=normal25_start duration_seconds=1500 started_at=2026-11-01T12:26:21.047364Z ends_at=2026-11-01T12:51:21.047364Z
+native_flutter_test=PASS
+wrapper_exit=1; reviewed_source_hash_guard=FAIL; schema_comparison=not_run
+FAIL reviewed SQL/source hash: supabase/proposed/27_tus_segment.sql
+FAIL reviewed SQL/source hash: supabase/proposed/27_tus_segment_down.sql
+FAIL reviewed SQL/source hash: supabase/proposed/27_tus_segment_dryrun.sql
+FAIL reviewed SQL/source hash: supabase/proposed/28_exam_core.sql
+FAIL reviewed SQL/source hash: supabase/proposed/28_exam_core_down.sql
+FAIL reviewed SQL/source hash: supabase/proposed/28_exam_core_dryrun.sql
+FAIL reviewed SQL/source hash: supabase/proposed/29_monthly_competitions.sql
+FAIL reviewed SQL/source hash: supabase/proposed/29_monthly_competitions_down.sql
+FAIL reviewed SQL/source hash: supabase/proposed/29_monthly_competitions_dryrun.sql
+FAIL reviewed SQL/source hash: supabase/proposed/exam_catalog_v1.json

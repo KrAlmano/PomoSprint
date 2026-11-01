@@ -1,0 +1,9 @@
+target=ios-device-arm64
+mode=release
+codesigning=disabled
+bundle=com.pomosprint.qa.nov1exam
+xcode_build=PASS duration_seconds=53.1
+app_size_reported_mb=55.2
+codesign_inspection=not_signed
+installed_on_device=false
+app_store_ipa=false

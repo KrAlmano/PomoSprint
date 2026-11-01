@@ -27,6 +27,18 @@ void _seedResults(FakeExamBackend backend) {
       status: ExamAttemptStatus.completed,
       definition: exam,
       subjectResults: [
+        const ExamSubjectResult(
+          subjectId: 'chemistry',
+          correct: 0,
+          wrong: 0,
+          blank: 7,
+        ),
+        const ExamSubjectResult(
+          subjectId: 'history',
+          correct: 1,
+          wrong: 4,
+          blank: 0,
+        ),
         ExamSubjectResult(
           subjectId: 'physics',
           correct: correct,
@@ -129,6 +141,16 @@ void main() {
       expect(
         find.text(tr.examInsightsChange('Fizik', 100, '3,00', '6,00')),
         findsOneWidget,
+      );
+      expect(
+        find.text(tr.examInsightsChange('Kimya', 0, '0,00', '0,00')),
+        findsNothing,
+        reason: 'An unchanged zero without study adds no useful insight',
+      );
+      expect(
+        find.text(tr.examInsightsChange('Tarih', 0, '0,00', '0,00')),
+        findsOneWidget,
+        reason: 'A zero net with answered questions is still meaningful',
       );
 
       firstRead.complete([_study(backend, 50)]);

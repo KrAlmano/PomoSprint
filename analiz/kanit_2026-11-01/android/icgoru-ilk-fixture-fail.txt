@@ -1,0 +1,41 @@
+00:00 +0: loading /private/tmp/pomosprint-android-qa-20261101/integration_test/aa_exam_insights_test.dart
+Running Gradle task 'assembleDebug'...                             18.7s
+✓ Built build/app/outputs/flutter-apk/app-debug.apk
+Installing build/app/outputs/flutter-apk/app-debug.apk...        1,750ms
+00:00 +0: aa/o3 · positive Turkish study–net insight in TR and EN
+[INIT] .env okunamadı: Instance of 'EmptyEnvFileError'
+supabase.supabase_flutter: INFO: ***** Supabase init completed *****
+[INIT] Supabase bağlandı.
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Bulunamadı (30 sn): widgets with text "İlişkili çalışma kategorilerinde 25 dk; Türkçe neti: 19,25 →
+27,50." descending from widgets with type "ExamScreen"
+
+When the exception was thrown, this was the stack:
+#0      fail (package:matcher/src/expect/expect.dart:187:31)
+#1      pumpUntil (file:///private/tmp/pomosprint-android-qa-20261101/integration_test/support/e2e.dart:125:3)
+<asynchronous suspension>
+#2      _assertVisibleParagraph (file:///private/tmp/pomosprint-android-qa-20261101/integration_test/aa_exam_insights_test.dart:115:3)
+<asynchronous suspension>
+#3      main.<anonymous closure> (file:///private/tmp/pomosprint-android-qa-20261101/integration_test/aa_exam_insights_test.dart:231:7)
+<asynchronous suspension>
+#4      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#5      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+The test description was:
+  aa/o3 · positive Turkish study–net insight in TR and EN
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:43 +0 -1: aa/o3 · positive Turkish study–net insight in TR and EN [E]
+  Test failed. See exception logs above.
+  The test description was: aa/o3 · positive Turkish study–net insight in TR and EN
+
+00:43 +0 -1: (tearDownAll)
+00:43 +0 -1: Some tests failed.
+
+Failing tests:
+  /private/tmp/pomosprint-android-qa-20261101/integration_test/aa_exam_insights_test.dart: aa/o3 · positive Turkish study–net insight in TR and EN

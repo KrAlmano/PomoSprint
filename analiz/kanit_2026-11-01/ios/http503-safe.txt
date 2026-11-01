@@ -1,0 +1,19 @@
+Kaynak: 1 Kasım iOS simulator, integration_test/u_exam_http_recovery_test.dart
+Kapsam: ayrı yerel QA bundle; 54325 loopback HTTP503 → bağlantı geri gelir.
+
+İlk tur Flutter günlüğünden, kimlik bilgisi içermeyen seçilmiş satırlar:
+Xcode build done. 53.4s
+[EXAM_HTTP_RECOVERY] PASS durable pending -> one abandoned row; all rewards/time remain zero
+00:21 +1: (tearDownAll)
+00:21 +1: All tests passed!
+Dış komutun test sonrası çıkışı: 1 (zsh'de salt okunur status değişkenine atama hatası).
+
+İkinci tur Flutter günlüğünden seçilmiş satırlar:
+Xcode build done. 30.7s
+[EXAM_HTTP_RECOVERY] PASS durable pending -> one abandoned row; all rewards/time remain zero
+00:22 +1: (tearDownAll)
+00:22 +1: All tests passed!
+İkinci doğrudan Flutter komutunun çıkışı: 0.
+
+İki tur sonunda proxy available=true, toplam 46 istek, 2 kasıtlı ret, 0 aktif bağlantı.
+Kapsam ve sınırlar: ../../QA_IOS_HTTP503_2026-11-01.md

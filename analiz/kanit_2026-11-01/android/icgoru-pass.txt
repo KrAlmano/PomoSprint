@@ -1,0 +1,16 @@
+00:00 +0: loading /private/tmp/pomosprint-android-qa-20261101/integration_test/aa_exam_insights_test.dart
+Running Gradle task 'assembleDebug'...                             18.4s
+✓ Built build/app/outputs/flutter-apk/app-debug.apk
+Installing build/app/outputs/flutter-apk/app-debug.apk...        2,669ms
+00:00 +0: aa/o3 · positive Turkish study–net insight in TR and EN
+[INIT] .env okunamadı: Instance of 'EmptyEnvFileError'
+supabase.supabase_flutter: INFO: ***** Supabase init completed *****
+[INIT] Supabase bağlandı.
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+[E2E] ekran görüntüsü: build/nov1_android_insight/shots/e2e-insight-positive-tr.png
+[E2E] ekran görüntüsü: build/nov1_android_insight/shots/e2e-insight-disclaimer-tr.png
+[E2E] ekran görüntüsü: build/nov1_android_insight/shots/e2e-insight-positive-en.png
+[E2E] ekran görüntüsü: build/nov1_android_insight/shots/e2e-insight-disclaimer-en.png
+[EXAM_INSIGHT_NATIVE] PASS: explicit historical fixtures, 25 matching minutes, 19.25→27.50, TR/EN visible text and disclaimer. This is not a real-duration exam/focus test.
+00:55 +1: (tearDownAll)
+00:56 +1: All tests passed!

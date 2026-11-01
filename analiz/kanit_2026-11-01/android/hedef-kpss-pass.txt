@@ -1,0 +1,25 @@
+00:00 +0: loading /private/tmp/pomosprint-android-qa-20261101/integration_test/aj_kpss_native_test.dart
+Running Gradle task 'assembleDebug'...                             19.4s
+✓ Built build/app/outputs/flutter-apk/app-debug.apk
+Installing build/app/outputs/flutter-apk/app-debug.apk...          622ms
+00:00 +0: KPSS official catalog, explicit selections, start and abandon TR EN
+[INIT] .env okunamadı: Instance of 'EmptyEnvFileError'
+supabase.supabase_flutter: INFO: ***** Supabase init completed *****
+[INIT] Supabase bağlandı.
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+[E2E] ekran görüntüsü: build/nov1_android/shots/e2e-android-extra-yks-tr.png
+[E2E] ekran görüntüsü: build/nov1_android/shots/e2e-kpss-bachelor-tr.png
+[E2E] ekran görüntüsü: build/nov1_android/shots/e2e-kpss-field-tr.png
+[E2E] ekran görüntüsü: build/nov1_android/shots/e2e-kpss-running-tr.png
+[E2E] ekran görüntüsü: build/nov1_android/shots/e2e-kpss-abandoned-tr.png
+[E2E] ekran görüntüsü: build/nov1_android/shots/e2e-android-reports-tr.png
+[KPSS_NATIVE] tr official catalog12 tracks4 subjects120/40 durations130/50/60 TR-EN cards PASS; real3s start-abandon zeroRewards; normalFocusReleased PASS
+[E2E] ekran görüntüsü: build/nov1_android/shots/e2e-android-extra-yks-en.png
+[E2E] ekran görüntüsü: build/nov1_android/shots/e2e-kpss-bachelor-en.png
+[E2E] ekran görüntüsü: build/nov1_android/shots/e2e-kpss-field-en.png
+[E2E] ekran görüntüsü: build/nov1_android/shots/e2e-kpss-running-en.png
+[E2E] ekran görüntüsü: build/nov1_android/shots/e2e-kpss-abandoned-en.png
+[E2E] ekran görüntüsü: build/nov1_android/shots/e2e-android-reports-en.png
+[KPSS_NATIVE] en official catalog12 tracks4 subjects120/40 durations130/50/60 TR-EN cards PASS; real3s start-abandon zeroRewards; normalFocusReleased PASS
+01:22 +1: (tearDownAll)
+01:22 +1: All tests passed!

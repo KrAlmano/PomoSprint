@@ -1241,7 +1241,7 @@ abstract class AppLocalizations {
   /// No description provided for @statsMonthEmptyDesc.
   ///
   /// In tr, this message translates to:
-  /// **'Bu ay ilk Pomodoro\'nu tamamladığında aylık takip burada görünecek.'**
+  /// **'Bu ay bir Pomodoro veya deneme tamamladığında aylık takip burada görünecek.'**
   String get statsMonthEmptyDesc;
 
   /// No description provided for @statsOtherCategory.
@@ -2057,7 +2057,7 @@ abstract class AppLocalizations {
   /// No description provided for @noDataDesc.
   ///
   /// In tr, this message translates to:
-  /// **'Zamanlayıcıyı başlatıp ilk Pomodoro seansını tamamladığında ders dağılımın ve raporların burada görünecek.'**
+  /// **'Bir Pomodoro veya deneme tamamladığında raporların burada görünecek.'**
   String get noDataDesc;
 
   /// No description provided for @startStudyingBtn.
@@ -4503,7 +4503,7 @@ abstract class AppLocalizations {
   /// No description provided for @examInsightsEmpty.
   ///
   /// In tr, this message translates to:
-  /// **'Karşılaştırma için aynı dersin en az iki deneme sonucu gerekir. Çalışma sürenle netlerini burada birlikte göreceksin.'**
+  /// **'Henüz gösterilecek bir süre–net içgörüsü yok. Aynı dersten en az iki sonuç kaydettiğinde burada karşılaştırabilirsin.'**
   String get examInsightsEmpty;
 
   /// No description provided for @examInsightsDisclaimer.
@@ -4826,7 +4826,7 @@ abstract class AppLocalizations {
   /// No description provided for @noReportsDesc.
   ///
   /// In tr, this message translates to:
-  /// **'Zamanlayıcıyı başlatıp ilk Pomodoro seansını tamamladığında ders dağılımın ve raporların burada görünecek.'**
+  /// **'Bir Pomodoro veya deneme tamamladığında ders dağılımın ve raporların burada görünecek.'**
   String get noReportsDesc;
 
   /// No description provided for @noStudyThisDay.
@@ -5302,6 +5302,30 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Tümü'**
   String get examFilterAll;
+
+  /// No description provided for @examMyGoal.
+  ///
+  /// In tr, this message translates to:
+  /// **'{goal} sınavlarım'**
+  String examMyGoal(String goal);
+
+  /// No description provided for @examExtraExams.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ek sınavlar'**
+  String get examExtraExams;
+
+  /// No description provided for @examEmptyFilter.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu seçim için henüz deneme bulunmuyor.'**
+  String get examEmptyFilter;
+
+  /// No description provided for @examHistoryDetails.
+  ///
+  /// In tr, this message translates to:
+  /// **'Deneme ayrıntıları'**
+  String get examHistoryDetails;
 
   /// No description provided for @examNetInfo.
   ///

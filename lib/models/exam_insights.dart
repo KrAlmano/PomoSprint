@@ -11,6 +11,7 @@ class ExamTimeInsight {
     required this.lastAt,
     required this.before,
     required this.after,
+    required this.hasAnsweredQuestions,
   });
   final ExamSubject subject;
   final int studyMinutes;
@@ -18,6 +19,8 @@ class ExamTimeInsight {
   final DateTime lastAt;
   final double before;
   final double after;
+  /// Distinguishes entirely blank results from attempted zero-net results.
+  final bool hasAnsweredQuestions;
 }
 
 List<ExamTimeInsight> buildExamTimeInsights({
@@ -98,6 +101,9 @@ List<ExamTimeInsight> buildExamTimeInsights({
         lastAt: last.attempt.startedAt,
         before: first.result.net(first.exam.wrongAnswerDivisor),
         after: last.result.net(last.exam.wrongAnswerDivisor),
+        hasAnsweredQuestions: group.any(
+          (entry) => entry.result.correct + entry.result.wrong > 0,
+        ),
       ),
     );
   }

@@ -15,6 +15,7 @@ import 'package:pomodoro/screens/timer_screen.dart';
 import 'package:pomodoro/services/exam_persistence.dart';
 import 'package:pomodoro/services/exam_service.dart';
 import 'package:pomodoro/services/language_service.dart';
+import 'package:pomodoro/services/notification_service.dart';
 import 'package:pomodoro/services/supabase_service.dart';
 import 'package:pomodoro/services/timer_persistence.dart';
 import 'package:pomodoro/widgets/avatar_widget.dart';
@@ -341,6 +342,9 @@ void main() {
         segment: 'kpss',
       );
       expect(SupabaseService.instance.currentUser.value?.id, account.id);
+      // This test checks catalog/timer behavior, not system notification UI.
+      // Keep the OS permission prompt from blocking a headless QA run.
+      await NotificationService.instance.setEnabled(false);
       final service = ExamService.instance;
       for (final code in ['tr', 'en']) {
         await _language(tester, code);
@@ -349,7 +353,12 @@ void main() {
         await service.refresh();
         _verifyCatalog(service);
         await tapOn(tester, find.byKey(const ValueKey('exam-tab-new')));
-        await tapOn(tester, find.byKey(const ValueKey('exam-filter-kpss')));
+        expect(SupabaseService.instance.currentUser.value?.userSegment, 'kpss');
+        final goal = find.byKey(const ValueKey('exam-goal-tab'));
+        expect(goal, findsOneWidget);
+        await tapOn(tester, goal);
+        expect(tester.widget<ChoiceChip>(goal).selected, isTrue);
+        expect(find.byKey(const ValueKey('exam-filter-kpss')), findsNothing);
         if (code == 'tr') {
           expect(
             _kpssCards,

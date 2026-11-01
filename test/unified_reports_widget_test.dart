@@ -228,6 +228,47 @@ void main() {
     },
   );
   testWidgets(
+    'summary presents separate counts and opens exam details in both languages',
+    (tester) async {
+      var opens = 0;
+      for (final locale in const [Locale('tr'), Locale('en')]) {
+        await tester.pumpWidget(
+          _app(
+            SingleChildScrollView(
+              child: SessionTypeSummary(
+                counts: const SessionTypeCounts(
+                  normalSessions: 12,
+                  marathonFocusSessions: 6,
+                  completedMarathons: 2,
+                  completedExams: 3,
+                  unknownSessions: 0,
+                  pendingSessions: 0,
+                  focusEquivalents: 12,
+                ),
+                onOpenExams: () => opens++,
+              ),
+            ),
+            locale: locale,
+          ),
+        );
+        await tester.pumpAndSettle();
+        final normal = locale.languageCode == 'tr'
+            ? 'Normal seans'
+            : 'Regular sessions';
+        final exam = locale.languageCode == 'tr'
+            ? 'Tamamlanan deneme'
+            : 'Completed practice exams';
+        expect(find.text(normal), findsOneWidget);
+        expect(find.text(exam), findsOneWidget);
+        expect(find.text('2'), findsOneWidget);
+        expect(find.text('3'), findsOneWidget);
+        await tester.tap(find.byIcon(Icons.arrow_forward_rounded));
+        expect(opens, locale.languageCode == 'tr' ? 1 : 2);
+        expect(tester.takeException(), isNull);
+      }
+    },
+  );
+  testWidgets(
     'mixed count summary fits all screen sizes and both languages at 2x text',
     (tester) async {
       tester.view.devicePixelRatio = 1;

@@ -71,6 +71,7 @@ class _MainNavigationShellState extends State<MainNavigationShell>
   final SupabaseService _service = SupabaseService.instance;
   final ExamService _exams = ExamService.instance;
   int _currentIndex = 0;
+  int _examHistoryRequest = 0;
   late List<CourseCategory> _categories;
   bool _isTimerRunning = false;
   bool _isMarathonBreak = false;
@@ -642,12 +643,17 @@ class _MainNavigationShellState extends State<MainNavigationShell>
           return _exams.attempts;
         },
         isExamHistoryStale: () => _exams.historyIsStale,
-        onOpenExams: () => setState(() => _currentIndex = 4),
+        onOpenExams: () => setState(() {
+          _examHistoryRequest++;
+          _currentIndex = 4;
+        }),
       ),
       RankingScreen(currentUser: user),
       const SocialScreen(),
       ExamScreen(
         service: _exams,
+        userSegment: user.userSegment,
+        openHistoryRequest: _examHistoryRequest,
         canStart: () =>
             !_isTimerRunning && !_isMarathonBreak && _ownsCurrentSession,
         canStartAsync: _canStartExam,

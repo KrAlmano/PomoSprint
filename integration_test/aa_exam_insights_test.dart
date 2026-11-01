@@ -232,6 +232,11 @@ void main() {
         trParagraph,
         'e2e-insight-positive-tr',
       );
+      expect(
+        find.text(trL10n.examInsightsChange('Temel Matematik', 0, '0,00', '0,00')),
+        findsNothing,
+        reason: 'Entirely blank subjects do not crowd the insight list',
+      );
       await _assertVisibleParagraph(
         tester,
         trL10n.examInsightsDisclaimer,
@@ -251,6 +256,10 @@ void main() {
         tester,
         enParagraph,
         'e2e-insight-positive-en',
+      );
+      expect(
+        find.text(en.examInsightsChange('Basic Mathematics', 0, '0.00', '0.00')),
+        findsNothing,
       );
       await _assertVisibleParagraph(
         tester,

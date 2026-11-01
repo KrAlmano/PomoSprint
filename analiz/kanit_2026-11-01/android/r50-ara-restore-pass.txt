@@ -1,0 +1,13 @@
+00:00 +0: loading /private/tmp/pomosprint-android-r50-20261101/integration_test/r_real_duration_probe_test.dart
+Running Gradle task 'assembleDebug'...                             21.2s
+✓ Built build/app/outputs/flutter-apk/app-debug.apk
+Installing build/app/outputs/flutter-apk/app-debug.apk...          678ms
+00:00 +0: r · real duration resume without changing dates or speed
+[INIT] .env okunamadı: Instance of 'EmptyEnvFileError'
+supabase.supabase_flutter: INFO: ***** Supabase init completed *****
+[INIT] Supabase bağlandı.
+[AUTH] Splash: currentSession VAR (expiresAt=2026-11-01T16:32:18.000)
+[E2E] ekran görüntüsü: ../../../tmp/pomosprint-android-r50-20261101/build/e2e_android/screenshots/e2e-real-probe-resume.png
+[REAL_PROBE_RESUME] run=nov1-android-r50 mode=normal50_start owner=e40bf6c8-30af-4d04-8cda-a587084d3dc3 completed=false evidence=intermediate-resume-only
+00:05 +1: (tearDownAll)
+00:05 +1: All tests passed!

@@ -21,11 +21,19 @@ class ExamScreen extends StatefulWidget {
     this.canStart,
     this.canStartAsync,
     this.loadStudySessions,
+    this.userSegment,
+    this.openHistoryRequest = 0,
   });
   final ExamService? service;
   final bool Function()? canStart;
   final Future<bool> Function()? canStartAsync;
   final Future<List<StudySession>> Function()? loadStudySessions;
+
+  /// Current profile goal, independent of the league's next-period target.
+  final String? userSegment;
+
+  /// A new request opens history even when this screen is already mounted.
+  final int openHistoryRequest;
   @override
   State<ExamScreen> createState() => _ExamScreenState();
 }
@@ -34,6 +42,7 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
   ExamService get _service => widget.service ?? ExamService.instance;
   int _tab = 0;
   String? _group;
+  bool _extraExams = false;
   KpssExamTrack? _selectedKpssTrack;
   bool _starting = false;
   bool _finishingEarly = false;
@@ -48,12 +57,33 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    _group = _goalSegment;
+    if (widget.openHistoryRequest > 0) _tab = 1;
     WidgetsBinding.instance.addObserver(this);
     final lifecycle = WidgetsBinding.instance.lifecycleState;
     _foreground = lifecycle == null || lifecycle == AppLifecycleState.resumed;
     _owner = _service.backend.ownerId;
     _service.addListener(_changed);
     unawaited(_load());
+  }
+
+  static const _examSegments = ['yks', 'lgs', 'tus', 'dus', 'kpss'];
+
+  String? get _goalSegment =>
+      _examSegments.contains(widget.userSegment) ? widget.userSegment : null;
+
+  @override
+  void didUpdateWidget(covariant ExamScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.userSegment != widget.userSegment) {
+      _group = _goalSegment;
+      _extraExams = false;
+      _selectedKpssTrack = null;
+    }
+    if (oldWidget.openHistoryRequest != widget.openHistoryRequest) {
+      _tab = 1;
+      unawaited(_loadStudies());
+    }
   }
 
   @override
@@ -352,6 +382,8 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
   Iterable<ExamDefinition> get _visibleExams => _service.catalog.exams.where(
     (exam) =>
         (_group == null || exam.segment == _group) &&
+        (!(_extraExams && _goalSegment != null) ||
+            exam.segment != _goalSegment) &&
         (_group != 'kpss' ||
             (_selectedKpssTrack != null &&
                 kpssTrackForExam(exam.id) == _selectedKpssTrack)),
@@ -384,6 +416,10 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
                 key: ValueKey('exam-kpss-track-${track.name}'),
                 label: Text(_kpssTrackLabel(track, l10n)),
                 selected: _selectedKpssTrack == track,
+                selectedColor: Theme.of(context).colorScheme.primary,
+                labelStyle: _selectedKpssTrack == track
+                    ? TextStyle(color: Theme.of(context).colorScheme.onPrimary)
+                    : null,
                 onSelected: (_) => setState(() => _selectedKpssTrack = track),
                 showCheckmark: false,
                 materialTapTargetSize: MaterialTapTargetSize.padded,
@@ -484,6 +520,67 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
     );
   }
 
+  Widget _goalTabs(AppLocalizations l10n) {
+    Widget choice({
+      required Key key,
+      required String label,
+      required bool selected,
+      required VoidCallback onTap,
+    }) => SizedBox(
+      width: double.infinity,
+      child: ChoiceChip(
+        key: key,
+        label: Text(label, textAlign: TextAlign.center),
+        selected: selected,
+        selectedColor: Theme.of(context).colorScheme.primary,
+        labelStyle: selected
+            ? TextStyle(color: Theme.of(context).colorScheme.onPrimary)
+            : null,
+        showCheckmark: false,
+        materialTapTargetSize: MaterialTapTargetSize.padded,
+        onSelected: (_) => onTap(),
+      ),
+    );
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final stacked =
+            constraints.maxWidth < 320 ||
+            MediaQuery.textScalerOf(context).scale(14) > 18;
+        final goal = choice(
+          key: const ValueKey('exam-goal-tab'),
+          label: l10n.examMyGoal(widget.userSegment!.toUpperCase()),
+          selected: !_extraExams,
+          onTap: () => setState(() {
+            _extraExams = false;
+            _group = _goalSegment;
+            _selectedKpssTrack = null;
+          }),
+        );
+        final extra = choice(
+          key: const ValueKey('exam-extra-tab'),
+          label: l10n.examExtraExams,
+          selected: _extraExams,
+          onTap: () => setState(() {
+            _extraExams = true;
+            _group = null;
+            _selectedKpssTrack = null;
+          }),
+        );
+        if (stacked) {
+          return Column(children: [goal, const SizedBox(height: 8), extra]);
+        }
+        return Row(
+          children: [
+            Expanded(child: goal),
+            const SizedBox(width: 8),
+            Expanded(child: extra),
+          ],
+        );
+      },
+    );
+  }
+
   List<Widget> _catalog(AppLocalizations l10n) => [
     Container(
       key: const ValueKey('exam-net-info'),
@@ -535,34 +632,53 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
           ),
         ),
       ),
-    Wrap(
-      spacing: 6,
-      runSpacing: 4,
-      children: [
-        ChoiceChip(
-          key: const ValueKey('exam-filter-all'),
-          label: Text(l10n.examFilterAll),
-          showCheckmark: false,
-          visualDensity: const VisualDensity(horizontal: -2, vertical: -1),
-          materialTapTargetSize: MaterialTapTargetSize.padded,
-          selected: _group == null,
-          onSelected: (_) => setState(() => _group = null),
-        ),
-        for (final group in const ['yks', 'lgs', 'tus', 'dus', 'kpss'].where(
-          (group) => _service.catalog.exams.any((e) => e.segment == group),
-        ))
+    if (_goalSegment != null) ...[_goalTabs(l10n), const SizedBox(height: 8)],
+    if (_goalSegment == null || _extraExams)
+      Wrap(
+        spacing: 6,
+        runSpacing: 4,
+        children: [
           ChoiceChip(
-            key: ValueKey('exam-filter-$group'),
-            label: Text(group.toUpperCase()),
+            key: const ValueKey('exam-filter-all'),
+            label: Text(l10n.examFilterAll),
             showCheckmark: false,
             visualDensity: const VisualDensity(horizontal: -2, vertical: -1),
             materialTapTargetSize: MaterialTapTargetSize.padded,
-            selected: _group == group,
-            onSelected: (_) => setState(() => _group = group),
+            selected: _group == null,
+            selectedColor: Theme.of(context).colorScheme.primary,
+            labelStyle: _group == null
+                ? TextStyle(color: Theme.of(context).colorScheme.onPrimary)
+                : null,
+            onSelected: (_) => setState(() => _group = null),
           ),
-      ],
-    ),
+          for (final group in _examSegments.where(
+            (group) =>
+                (!_extraExams || group != _goalSegment) &&
+                _service.catalog.exams.any((e) => e.segment == group),
+          ))
+            ChoiceChip(
+              key: ValueKey('exam-filter-$group'),
+              label: Text(group.toUpperCase()),
+              showCheckmark: false,
+              visualDensity: const VisualDensity(horizontal: -2, vertical: -1),
+              materialTapTargetSize: MaterialTapTargetSize.padded,
+              selected: _group == group,
+              selectedColor: Theme.of(context).colorScheme.primary,
+              labelStyle: _group == group
+                  ? TextStyle(color: Theme.of(context).colorScheme.onPrimary)
+                  : null,
+              onSelected: (_) => setState(() => _group = group),
+            ),
+        ],
+      ),
     if (_group == 'kpss') _kpssTrackPicker(l10n),
+    if (_service.catalog.available &&
+        _visibleExams.isEmpty &&
+        (_group != 'kpss' || _selectedKpssTrack != null))
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: Text(l10n.examEmptyFilter),
+      ),
     for (final exam in _visibleExams)
       Card(
         key: ValueKey('exam-card-${exam.id}'),
@@ -626,6 +742,12 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
     final pendingEarly =
         record.pendingAction == ExamPendingAction.completeEarly;
     return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -693,13 +815,50 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
     final attempts = _service.attempts;
     final insights = _studiesLoaded
         ? buildExamTimeInsights(
-            attempts: attempts,
-            studySessions: _studies,
-            definitionFor: _service.definitionFor,
-            now: _service.now(),
-          )
+                attempts: attempts,
+                studySessions: _studies,
+                definitionFor: _service.definitionFor,
+                now: _service.now(),
+              )
+              .where(
+                (insight) =>
+                insight.studyMinutes != 0 || insight.hasAnsweredQuestions,
+              )
+              .toList()
         : const <ExamTimeInsight>[];
     return [
+      Text(l10n.examInsights, style: Theme.of(context).textTheme.titleLarge),
+      const SizedBox(height: 8),
+      if (_studiesStale) ...[
+        Text(
+          _studiesLoaded ? l10n.statsStaleNotice : l10n.statsLoadErrorGeneric,
+        ),
+        TextButton(onPressed: _loadStudies, child: Text(l10n.examRetry)),
+      ],
+      if (_studiesLoaded && insights.isEmpty) Text(l10n.examInsightsEmpty),
+      for (final insight in insights)
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              l10n.examInsightsChange(
+                insight.subject.name(_turkish),
+                insight.studyMinutes,
+                formatExamNet(insight.before, l10n.localeName),
+                formatExamNet(insight.after, l10n.localeName),
+              ),
+            ),
+          ),
+        ),
+      if (insights.isNotEmpty) Text(l10n.examInsightsDisclaimer),
+      const SizedBox(height: 20),
+      if (attempts.isNotEmpty) ...[
+        Text(
+          l10n.examTabHistory,
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        const SizedBox(height: 8),
+      ],
       if (attempts.isEmpty)
         Card(
           child: Padding(
@@ -726,31 +885,6 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
             subtitle: Text(l10n.examError),
           ),
         ),
-      const SizedBox(height: 20),
-      Text(l10n.examInsights, style: Theme.of(context).textTheme.titleLarge),
-      const SizedBox(height: 8),
-      if (_studiesStale) ...[
-        Text(
-          _studiesLoaded ? l10n.statsStaleNotice : l10n.statsLoadErrorGeneric,
-        ),
-        TextButton(onPressed: _loadStudies, child: Text(l10n.examRetry)),
-      ],
-      if (_studiesLoaded && insights.isEmpty) Text(l10n.examInsightsEmpty),
-      for (final insight in insights)
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(
-              l10n.examInsightsChange(
-                insight.subject.name(_turkish),
-                insight.studyMinutes,
-                formatExamNet(insight.before, l10n.localeName),
-                formatExamNet(insight.after, l10n.localeName),
-              ),
-            ),
-          ),
-        ),
-      if (insights.isNotEmpty) Text(l10n.examInsightsDisclaimer),
     ];
   }
 
@@ -763,6 +897,12 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
     }
 
     return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -775,12 +915,27 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
               ),
             Text(
               exam?.name(_turkish) ?? l10n.examTitle,
-              style: Theme.of(context).textTheme.titleMedium,
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
             ),
-            Text('${l10n.examStartTime}: ${date(attempt.startedAt)}'),
-            Text(
-              '${l10n.examEndTime}: ${date(attempt.completedAt ?? attempt.endsAt)}',
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                _metadata(
+                  Icons.event_outlined,
+                  '${l10n.examStartTime}: ${date(attempt.startedAt)}',
+                ),
+                _metadata(Icons.info_outline_rounded, switch (attempt.status) {
+                  ExamAttemptStatus.completed => l10n.examCompleted,
+                  ExamAttemptStatus.abandoned => l10n.examAbandoned,
+                  ExamAttemptStatus.active => l10n.examRunning,
+                }),
+              ],
             ),
+            const SizedBox(height: 8),
             if (attempt.finishedEarly) ...[
               Text(l10n.examCompletedEarly),
               Text(
@@ -793,38 +948,14 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
               ),
               Text(l10n.examCreditedMinutes(attempt.reportMinutes)),
             ],
-            if (attempt.note != null) Text(attempt.note!),
-            if (attempt.examId == 'ayt' && attempt.isCompleted) ...[
-              if (attempt.selectedModuleIds == null)
-                Text(l10n.examModuleUnknown)
-              else ...[
-                Text(
-                  (exam?.effectiveModules ?? [])
-                      .where((m) => attempt.selectedModuleIds!.contains(m.id))
-                      .map((m) => m.name(_turkish))
-                      .join(' · '),
-                ),
-                if (attempt.selectedQuestionCount != null)
-                  Text(
-                    l10n.examSelectedQuestions(
-                      attempt.selectedQuestionCount!,
-                      attempt.totalQuestions,
-                    ),
-                  ),
-              ],
-            ],
             Text(
               l10n.examQuestionsMinutes(
                 attempt.totalQuestions,
                 attempt.durationSeconds ~/ 60,
               ),
             ),
-            Text(switch (attempt.status) {
-              ExamAttemptStatus.completed => l10n.examCompleted,
-              ExamAttemptStatus.abandoned => l10n.examAbandoned,
-              ExamAttemptStatus.active => l10n.examRunning,
-            }),
             if (attempt.isCompleted) ...[
+              const SizedBox(height: 6),
               Text(
                 l10n.examRewardSummary(
                   attempt.pointsEarned,
@@ -877,6 +1008,47 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
               ),
             ] else if (attempt.status == ExamAttemptStatus.abandoned)
               Text(l10n.examNoAward),
+            ExpansionTile(
+              key: ValueKey('exam-history-details-${attempt.clientUuid}'),
+              tilePadding: EdgeInsets.zero,
+              title: Text(l10n.examHistoryDetails),
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${l10n.examEndTime}: ${date(attempt.completedAt ?? attempt.endsAt)}',
+                      ),
+                      if (attempt.note != null) Text(attempt.note!),
+                      if (attempt.examId == 'ayt' && attempt.isCompleted) ...[
+                        if (attempt.selectedModuleIds == null)
+                          Text(l10n.examModuleUnknown)
+                        else ...[
+                          Text(
+                            (exam?.effectiveModules ?? [])
+                                .where(
+                                  (m) =>
+                                      attempt.selectedModuleIds!.contains(m.id),
+                                )
+                                .map((m) => m.name(_turkish))
+                                .join(' · '),
+                          ),
+                          if (attempt.selectedQuestionCount != null)
+                            Text(
+                              l10n.examSelectedQuestions(
+                                attempt.selectedQuestionCount!,
+                                attempt.totalQuestions,
+                              ),
+                            ),
+                        ],
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),

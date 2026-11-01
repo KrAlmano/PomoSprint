@@ -766,7 +766,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statsMonthEmptyDesc =>
-      'Your monthly tracking will appear here once you complete your first Pomodoro this month.';
+      'Your monthly tracking will appear here after you complete a Pomodoro or practice exam this month.';
 
   @override
   String get statsOtherCategory => 'Other';
@@ -1223,7 +1223,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noDataDesc =>
-      'When you start the timer and complete your first Pomodoro, your reports will appear here.';
+      'Your reports will appear here after you complete a Pomodoro or practice exam.';
 
   @override
   String get startStudyingBtn => 'Start Studying Now';
@@ -2675,7 +2675,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get examInsightsEmpty =>
-      'At least two results for the same subject are needed for a comparison. Your study time and scores will appear together here.';
+      'There are no study time and score insights to show yet. Record at least two results for the same subject to compare them here.';
 
   @override
   String get examInsightsDisclaimer =>
@@ -2867,7 +2867,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noReportsDesc =>
-      'When you start the timer and complete your first Pomodoro session, your breakdown and reports will appear here.';
+      'Your breakdown and reports will appear here after you complete a Pomodoro or practice exam.';
 
   @override
   String get noStudyThisDay => 'No study this day';
@@ -3150,6 +3150,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get examFilterAll => 'All';
+
+  @override
+  String examMyGoal(String goal) {
+    return 'My $goal exams';
+  }
+
+  @override
+  String get examExtraExams => 'Other exams';
+
+  @override
+  String get examEmptyFilter =>
+      'There are no practice exams for this selection yet.';
+
+  @override
+  String get examHistoryDetails => 'Exam details';
 
   @override
   String get examNetInfo =>

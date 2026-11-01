@@ -743,7 +743,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get statsMonthEmptyDesc =>
-      'Bu ay ilk Pomodoro\'nu tamamladığında aylık takip burada görünecek.';
+      'Bu ay bir Pomodoro veya deneme tamamladığında aylık takip burada görünecek.';
 
   @override
   String get statsOtherCategory => 'Diğer';
@@ -1190,7 +1190,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get noDataDesc =>
-      'Zamanlayıcıyı başlatıp ilk Pomodoro seansını tamamladığında ders dağılımın ve raporların burada görünecek.';
+      'Bir Pomodoro veya deneme tamamladığında raporların burada görünecek.';
 
   @override
   String get startStudyingBtn => 'Hemen Çalışmaya Başla';
@@ -2632,7 +2632,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get examInsightsEmpty =>
-      'Karşılaştırma için aynı dersin en az iki deneme sonucu gerekir. Çalışma sürenle netlerini burada birlikte göreceksin.';
+      'Henüz gösterilecek bir süre–net içgörüsü yok. Aynı dersten en az iki sonuç kaydettiğinde burada karşılaştırabilirsin.';
 
   @override
   String get examInsightsDisclaimer =>
@@ -2823,7 +2823,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get noReportsDesc =>
-      'Zamanlayıcıyı başlatıp ilk Pomodoro seansını tamamladığında ders dağılımın ve raporların burada görünecek.';
+      'Bir Pomodoro veya deneme tamamladığında ders dağılımın ve raporların burada görünecek.';
 
   @override
   String get noStudyThisDay => 'Bu gün çalışma yok';
@@ -3105,6 +3105,20 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get examFilterAll => 'Tümü';
+
+  @override
+  String examMyGoal(String goal) {
+    return '$goal sınavlarım';
+  }
+
+  @override
+  String get examExtraExams => 'Ek sınavlar';
+
+  @override
+  String get examEmptyFilter => 'Bu seçim için henüz deneme bulunmuyor.';
+
+  @override
+  String get examHistoryDetails => 'Deneme ayrıntıları';
 
   @override
   String get examNetInfo =>

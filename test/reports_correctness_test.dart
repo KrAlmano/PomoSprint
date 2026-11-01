@@ -217,7 +217,7 @@ void main() {
     testWidgets('ders kartları: sıra, süre, renk, ikon, bekleyen işareti', (tester) async {
       await _pump(tester, _daily());
       final durations = tester
-          .widgetList<Text>(find.byWidgetPredicate((w) => w is Text && w.style?.fontSize == 22))
+          .widgetList<Text>(find.byWidgetPredicate((w) => w is Text && w.style?.fontSize == 22 && w.style?.fontWeight == FontWeight.w600))
           .map((t) => t.data)
           .toList();
       expect(durations, [_d(75), _d(25), _d(25)]);

@@ -1,0 +1,15 @@
+Kaynak: 1 Kasım iOS simulator, integration_test/q_social_eight_accounts_test.dart
+Kapsam: bir yeni yerel QA gözlemcisi ve API ile yönetilen sekiz yeni arkadaş.
+
+Fixture kurulum çıktısı: PASS: 8 accepted friends, 4 focus + 2 break + 2 exam.
+Native Flutter günlüğünden seçilmiş satırlar:
+Xcode build done. 30.1s
+00:00 +0: q · eight local friends, TR/EN rows and natural presence polling
+00:44 +1: (tearDownAll)
+00:44 +1: All tests passed!
+Doğrudan Flutter komutunun çıkışı: 0.
+
+Temizlik öncesi: manifestte 9 benzersiz hesap; DB'de 9/9 doğru koşu etiketi ve yeni hesap.
+Temizlik: yalnız fixture manifestindeki kesin UID/e-posta/koşu etiketi eşleşmeleri silindi.
+Son salt okuma: bu fixture'dan kalan 0; ayrı Android R50 QA hesabı mevcut 1.
+Kapsam ve sınırlar: ../../QA_IOS_SOSYAL_2026-11-01.md

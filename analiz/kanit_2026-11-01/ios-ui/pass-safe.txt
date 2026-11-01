@@ -1,0 +1,3 @@
+[KPSS_NATIVE] tr official catalog12 tracks4 subjects120/40 durations130/50/60 TR-EN cards PASS; real3s start-abandon zeroRewards; normalFocusReleased PASS
+[KPSS_NATIVE] en official catalog12 tracks4 subjects120/40 durations130/50/60 TR-EN cards PASS; real3s start-abandon zeroRewards; normalFocusReleased PASS
+01:12 +1: All tests passed!

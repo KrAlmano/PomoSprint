@@ -1,0 +1,15 @@
+00:00 +0: loading /private/tmp/pomosprint-android-r50-20261101/integration_test/r_real_duration_probe_test.dart
+Running Gradle task 'assembleDebug'...
+Warning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.
+Running Gradle task 'assembleDebug'...                            112.4s
+✓ Built build/app/outputs/flutter-apk/app-debug.apk
+Installing build/app/outputs/flutter-apk/app-debug.apk...        1,504ms
+00:00 +0: r · real duration normal50_start without changing dates or speed
+[INIT] .env okunamadı: Instance of 'EmptyEnvFileError'
+supabase.supabase_flutter: INFO: ***** Supabase init completed *****
+[INIT] Supabase bağlandı.
+[AUTH] Splash: currentSession NULL — kayıtlı oturum yok, giriş ekranına düşülecek
+[E2E] ekran görüntüsü: ../../../tmp/pomosprint-android-r50-20261101/build/e2e_android/screenshots/e2e-real-probe-normal50-start.png
+[REAL_PROBE_START] {"run_id":"nov1-android-r50","mode":"normal50_start","owner_id":"e40bf6c8-30af-4d04-8cda-a587084d3dc3","email":"e2e-sim-probe-normal50-start-nov1-android-r50@pomosprint.local","baseline":{"total_minutes":0,"lifetime_points":0,"coins":0,"current_streak":0,"last_study_date":null,"timezone":"Europe/Istanbul","exam_coins":0,"exam_points":0},"scope":"real UI start, untouched wall-clock duration","notification_delivery_tested":false,"client_uuid":"63e74f36-7797-4d4e-ae72-cfa2c9ea53e8","category_id":"bc42651f-0937-490a-b01b-38c7f96271d6","duration_seconds":3000,"started_at":"2026-11-01T12:32:27.147945Z","ends_at":"2026-11-01T13:22:27.147945Z","remaining_at_start":3000,"clock_offset_at_start_ms":553,"observed_at":"2026-11-01T12:32:27.773232Z"}
+00:21 +1: (tearDownAll)
+00:21 +1: All tests passed!
