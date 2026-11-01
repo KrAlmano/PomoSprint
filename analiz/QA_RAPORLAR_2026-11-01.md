@@ -1,5 +1,9 @@
 # Raporlar ve deneme ligi — 1 Kasım 2026
 
+## Deneme sonuç penceresi — canlı geçiş hazırlığı
+
+Doğru/yanlış/boş alanları ders kartlarına alındı; net ve soru toplamı belirginleştirildi. Gerçek hesaplama, otomatik boş, taslak, sonuç kaydı ve ödül davranışı değiştirilmedi. Alanların ekran okuyucu etiketleri ders ve alan adını içerir. `flutter analyze` temiz; tam `flutter test --concurrency=2`: **1529 başarılı, 5 isteğe bağlı ekran görüntüsü atlaması**. Dar/yatay ekran, 2× yazı, TR/EN, alan semantiği, AYT ve çevrimdışı/taslak akışlarına yönelik hedefli 24/24 test geçti. iPhone 17'de sahte servis ve örnek TYT kaydıyla ayrı QA uygulamasında diyalog görsel olarak incelendi; test sırasında normal uygulama veya canlı veritabanına yazılmadı. Son kaynakla `flutter build ios --release --no-codesign` başarılı: Runner.app 55,2 MB; bu imzasız çıktı mağaza paketi, indirme boyutu veya dağıtım değildir.
+
 ## Rapor görünümü — sonraki düzenleme
 
 Raporların dört sekmesi Türkçe/İngilizce kısa etiketlerle eşit alanlara yerleşir; dar alanda iki sıra, büyük erişilebilirlik yazısında kaydırma kullanılır. Seçili durum, ekran okuyucu adı ve dokunma eylemi korunur. Deneme geçmişinde tamamlanma yeşil onay ve metinle, vazgeçme nötr biçimde gösterilir; içgörü ve metrikler kartlarla düzenlenir. Hesap, süre ve ödül formülleri değiştirilmedi.
@@ -16,7 +20,7 @@ Son `flutter analyze` temiz; tam `flutter test --concurrency=2` **1527 başarıl
 
 ## Canlı ortam sınırı
 
-Bu değişiklikler yalnız çalışma dalındadır; canlı veritabanına migration uygulanmadı, site veya uygulama yayımlanmadı. Önceki salt okunur kontrolde canlı Deneme RPC/tablosu yoktu; bu koşulda yeni Deneme raporlarının canlıda çalıştığı söylenemez. Önceki cihaz devrinde normal simülatör uygulaması durdurulmuş bir yerel QA sunucusuna bağlıydı; bağlantı uyarısının nedeni çalıştırılan yapılandırmaya göre farklı olabilir. [Sunucu raporu](SUNUCU_RAPORU_2026-11-01.md) ve [önceki QA](QA_2026-11-01.md) başvuru kaynağıdır.
+1 Kasım akşamı 27/28/29/30/32 atomik paketi canlıya uygulandı; 31 uygulanmadı. Salt okunur postflight ve anonim katalog API kontrolü geçti; [canlı geçiş raporuna](ATOMIK_DENEME_ADAYI_2026-11-01.md) bak. Gerçek kullanıcıyla Deneme/rapor uçtan uca akışı ve imzalı mobil dağıtım doğrulanmadı; son UI değişiklikleri mağazaya yayımlanmadı. Önceki cihaz devrinde normal simülatör uygulaması durdurulmuş bir yerel QA sunucusuna bağlıydı; bağlantı uyarısının nedeni çalıştırılan yapılandırmaya göre farklı olabilir. [Önceki sunucu raporu](SUNUCU_RAPORU_2026-11-01.md) ve [önceki QA](QA_2026-11-01.md) kurulumdan öncedir.
 
 ## Doğrulama
 

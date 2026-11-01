@@ -1,6 +1,6 @@
 # Supabase çalışma rehberi
 
-> **28 Ekim 2026:** Yeni TUS/Deneme/aylık kategori ligleri [27→28→29 rehberi](proposed/NIGHT_20261028_README.md) altında proposed olarak hazırlanmıştır. Canlıya uygulama yok; aşağıdaki canlı14gün bilgisi sunucu değişikliği onaylanana kadar tarihsel mevcut davranıştır.
+> **1 Kasım 2026:** 27/28/29/30/32 Deneme/lig paketi kullanıcının açık talimatıyla tek transaction'da canlıya kuruldu; 31 kurulmadı. Canlı DRYRUN 14/14, kurulum sonrası şema/yetki doğrulaması ve anonim katalog kontrolü geçti; [kanıt](../analiz/ATOMIK_DENEME_ADAYI_2026-11-01.md). Bu migration'ları tekrar uygulama. Mobil UI dağıtımı ve gerçek hesapla Deneme akışı ayrıca bekler.
 
 Bu klasör, PomoSprint'in Supabase SQL kaynaklarını, geri almalarını, dryrun'larını, Edge Functions'larını ve Auth e-posta şablonlarını içerir. **Git deposundaki migration sırası canlı Supabase migration geçmişinin aynısı değildir.** Yeni bir veritabanı kurmak veya canlıyı değiştirmek için bu klasörü körlemesine `db push` ile çalıştırma.
 
@@ -23,6 +23,7 @@ Aşağıdaki zincir geçmişi 5 Ekim kaydından gelir. **8 Ekim'de Maraton için
 
 | Paket | Kayıtlı durum (Maraton/rapor:8 Ekim 2026; diğer zincir:5 Ekim) |
 |---|---|
+| `20261101210000_atomic_exam_release` | **1 Kasım canlıda**; 27/28/29/30/32 ve atomik marker tek işlemde. [Çalıştırılan tam kaynak](migrations/20261101210000_atomic_exam_release.sql) tarihsel kanıttır; yeniden uygulamayın. [Korumalı ters işlem](rollbacks/20261101210000_atomic_exam_release_down.sql) veri bulunursa reddedebilir. Aylık lig 1 Aralık'ta etkinleşir, 31 ayrı bekler. [Postflight](../analiz/ATOMIK_DENEME_ADAYI_2026-11-01.md). |
 | `20261009233000_remove_unowned_ronin` | **9 Ekim canlıda; kullanıcı SQL Editor’de uyguladı.** Kurulum sonrası20/20saltokuma: Ronin0,48toplam/47aktif/21özel/7ücretsiz. DörtAuth/profil,dokuzseans,11kategori,42unlock ve ekonomi/seans hash’leri korundu. BeşavatarRPC+silmeRPC/RLS/ACL/FK/triggerler aynı; katalogMD5 `9ad12fc8edb016c69eb45a24f4ac1e11`. İzole24/24veDRYRUN12/12 ayrı kapsamdır. [Rehber](tests/20261009_remove_unowned_ronin_README.md), [QA](../analiz/QA_RELEASE_CLEANUP_2026-10-09.md). İleri paketi yeniden çalıştırma; sahiplik/kuşanma guard’ını gevşetme |
 | `20261009190000_special_avatar_catalog` | **9 Ekim canlıda; kullanıcı SQL Editor'de uyguladı.** Kurulum sonrası tarihsel salt okuma16/16 ve public katalog25/25:49 toplam/48 aktif/22 özel/7 aktif ücretsiz, her özel500kum. Ronin kaldırıldıktan sonra güncel48/47/21/7 yukarıdaki pakettedir. Önceki27 avatar ve5RPC/ACL/RLS aynı; MD5 `5e80e532aa71a325edd1d76e96183fb5`. Önceki izole118/118 ve10/10 DRYRUN ayrı kanıttır; ileri/DRYRUN dosyalarını yeniden çalıştırma. Kullanılmış/kuşanılmış avatar varsa down reddeder. [SQL rehberi](tests/20261009_special_avatar_catalog_README.md), [QA](../analiz/QA_SPECIAL_AVATARS_2026-10-09.md), [devir §35](../PROJE_DEVIR.md) |
 | `migrations/20260809*`, `20260928120000_security_hardening_up` | Canlı migration geçmişinin kopyası değil; bazı fonksiyon gövdeleri canlıda farklı. Bunları yeni canlı/staging ortamına sıradan güncel migration gibi uygulama |

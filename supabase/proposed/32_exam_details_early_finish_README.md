@@ -1,5 +1,7 @@
 # Öneri32: Deneme ayrıntıları ve AYT erken bitiş
 
+> **1 Kasım güncellemesi:** 32, 27/28/29/30 ile tek işlemde canlıya kuruldu; 31 kurulmadı. Aşağıdaki metin kurulum öncesi tarihsel bilgidir. [Canlı doğrulama](../../analiz/ATOMIK_DENEME_ADAYI_2026-11-01.md).
+
 **Öneri — canlıya ve ana yerel veritabanına uygulanmadı.** Bu paket 27 → 28 → 29 ve bağımsız30 üstüne hazırlanır. **31 kurulmaz.** Kullanıcı erken AYT kumunu geçen süreyle orantılı ve dondurulmuş tam ödüle kadar orantılı olarak seçti: `floor(snapshot_full_coins × elapsed_seconds / planned_seconds)`, dondurulmuş tam ödüle kadar. Yeni AYT90 dakika72 kum, tam süre145 kum verir; eski7 kumluk aktif AYT90 dakikada3, önceki175kumluk snapshot87kum verir. Kaynakta `early_coin_mode=proportional`, `early_enabled=true` vardır.
 
 ## Davranış

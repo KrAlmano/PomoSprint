@@ -1,5 +1,7 @@
 # 28 Ekim 2026 — TUS/DUS/KPSS, Deneme ve birleşik aylık lig paketleri
 
+> **1 Kasım güncellemesi:** 27/28/29/30/32 canlıya atomik kuruldu; 31 kurulmadı. Aşağıdaki metin kurulum öncesi tarihsel hazırlıktır ve paketleri tekrar çalıştırma talimatı değildir. [Canlı doğrulama](../../analiz/ATOMIK_DENEME_ADAYI_2026-11-01.md).
+
 **Durum: yalnız yerelde hazırlanmıştır; canlıya uygulanmadı.** Gece boyunca canlı Supabase'e okuma/yazma isteği yapılmaz. Yeni uygulama eski sunucuda Deneme için güvenli hazırlık/kapalı görünümünü kullanır; eski normal seans/Maraton sürer.
 
 Güncel yerel sözleşme aynı paketler içinde DUS ve KPSS içerir; yeni bir paket numarası açılmadı. Yirmi sınav/testin tek ödül tablosu ve AYT erken bitiş/ayrıntılar için [32 rehberi](32_exam_details_early_finish_README.md) geçerlidir. KPSS üç130dk GY–GK ve dokuz ayrı Alan Bilgisi testidir;27/29 zaten `kpss` içerdiği için yeniden değiştirilmez. Önceki yedi/sekiz sınavlı yerel veritabanları korunur. KPSS zinciri yeni ve boş `pomosprint_review32_kpss` üzerinde kurulur; DUS'un `review` ve `site` hedefleri otomatik taşınmaz. **31 bu akışta yoktur.**
