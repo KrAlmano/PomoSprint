@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro/l10n/app_localizations.dart';
@@ -92,6 +94,66 @@ void main() {
   });
 
   for (final language in ['tr', 'en']) {
+    testWidgets(
+      'result cards preserve readable fields and calculated blanks at large text ($language)',
+      (tester) async {
+        prepare();
+        final semantics = tester.ensureSemantics();
+        addTearDown(tester.view.reset);
+        final attempt = detailsCompletedAttempt(id: 'tyt', seconds: 9900);
+        backend.rows[attempt.clientUuid] = attempt;
+        await service.initialize();
+        for (final size in [const Size(320, 568), const Size(568, 320)]) {
+          final l10n = await open(
+            tester,
+            service,
+            attempt,
+            language,
+            size: size,
+            scale: 2,
+          );
+          final card = find.byKey(const ValueKey('exam-result-card-turkish'));
+          expect(card, findsOneWidget);
+          for (final (index, label) in [
+            (0, l10n.examCorrect),
+            (1, l10n.examWrong),
+            (2, l10n.examBlank),
+          ]) {
+            await tester.ensureVisible(field('turkish', index));
+            await tester.pumpAndSettle();
+            await tester.tap(field('turkish', index));
+            await tester.pumpAndSettle();
+            final node = tester.getSemantics(field('turkish', index));
+            expect(node.label, contains(label));
+            expect(
+              node.getSemanticsData().hasAction(ui.SemanticsAction.setText),
+              isTrue,
+            );
+          }
+          expect(
+            find.descendant(of: card, matching: find.byType(FittedBox)),
+            findsNothing,
+            reason: 'Accessibility text must not be shrunk to fit',
+          );
+          await enter(tester, field('turkish', 0), '30');
+          await enter(tester, field('turkish', 1), '4');
+          expect(
+            tester.widget<TextField>(field('turkish', 2)).controller!.text,
+            '6',
+          );
+          expect(
+            find.text(
+              '${l10n.examNet}: ${language == 'tr' ? '29,00' : '29.00'}',
+            ),
+            findsOneWidget,
+          );
+          expect(tester.takeException(), isNull);
+          await tester.pumpWidget(const SizedBox.shrink());
+          await tester.pumpAndSettle();
+        }
+        semantics.dispose();
+      },
+    );
     testWidgets(
       'AYT selects modules before scores and saves one atomic patch ($language)',
       (tester) async {
@@ -566,7 +628,7 @@ void main() {
     },
   );
   testWidgets(
-    'TR EN answer labels remain single line with aligned input tops on narrow screens',
+    'TR EN answer labels remain readable and inputs fit on narrow screens',
     (tester) async {
       prepare();
       addTearDown(tester.view.reset);
@@ -585,16 +647,20 @@ void main() {
           );
           final fields = [for (var i = 0; i < 3; i++) field('turkish', i)];
           final tops = fields.map((f) => tester.getRect(f).top).toList();
-          expect(tops[1], closeTo(tops[0], .01));
-          expect(tops[2], closeTo(tops[0], .01));
+          if (scale == 1) {
+            expect(tops[1], closeTo(tops[0], .01));
+            expect(tops[2], closeTo(tops[0], .01));
+          } else {
+            expect(tops[1], greaterThan(tops[0]));
+            expect(tops[2], greaterThan(tops[1]));
+          }
           for (final label in [
             l10n.examCorrect,
             l10n.examWrong,
             l10n.examBlank,
           ]) {
             final text = tester.widget<Text>(find.text(label).first);
-            expect(text.maxLines, 1);
-            expect(text.softWrap, isFalse);
+            expect(text.data, label);
           }
           expect(tester.takeException(), isNull, reason: '$language $scale');
           await tester.tap(find.widgetWithText(TextButton, l10n.cancel));

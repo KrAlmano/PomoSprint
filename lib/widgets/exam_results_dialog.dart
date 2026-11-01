@@ -7,6 +7,7 @@ import '../l10n/app_localizations.dart';
 import '../models/exam_details.dart';
 import '../models/exam_model.dart';
 import '../services/exam_service.dart';
+import '../theme.dart';
 import '../utils/responsive.dart';
 import '../utils/exam_format.dart';
 
@@ -344,17 +345,182 @@ class _ResultsDialogState extends State<_ResultsDialog> {
     _ => l10n.examResultsSaveError,
   };
 
+  Widget _subjectCard(
+    BuildContext context,
+    ExamSubject subject,
+    AppLocalizations l10n, {
+    required bool enabled,
+    required bool turkish,
+  }) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final result = _result(subject);
+    final labels = [l10n.examCorrect, l10n.examWrong, l10n.examBlank];
+    final stackFields =
+        MediaQuery.textScalerOf(context).scale(1) >= 1.5 ||
+        MediaQuery.sizeOf(context).width < 280;
+    Widget input(int index) => Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (stackFields)
+          Text(
+            labels[index],
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: colors.onSurfaceVariant,
+              fontWeight: FontWeight.w600,
+            ),
+          )
+        else
+          SizedBox(
+            height: MediaQuery.textScalerOf(context).scale(32),
+            child: Align(
+              alignment: Alignment.bottomLeft,
+              child: Text(
+                labels[index],
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: colors.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        const SizedBox(height: 5),
+        MergeSemantics(
+          child: Semantics(
+            label: '${subject.name(turkish)}, ${labels[index]}',
+            child: TextField(
+              key: ValueKey('exam-result-${subject.id}-$index'),
+              controller: _fields[subject.id]![index],
+              enabled: enabled,
+              keyboardType: const TextInputType.numberWithOptions(signed: true),
+              inputFormatters: [
+                TextInputFormatter.withFunction(
+                  (oldValue, newValue) =>
+                      RegExp(r'^-?\d{0,3}$').hasMatch(newValue.text)
+                      ? newValue
+                      : oldValue,
+                ),
+              ],
+              decoration: InputDecoration(
+                isDense: true,
+                filled: true,
+                fillColor: isDark
+                    ? AppColors.darkSurfaceContainerHigh
+                    : AppColors.surfaceContainerLow,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 13,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              onChanged: (_) => _changed(subject, index),
+            ),
+          ),
+        ),
+      ],
+    );
+    return Container(
+      key: ValueKey('exam-result-card-${subject.id}'),
+      margin: const EdgeInsets.only(top: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppColors.darkSurfaceContainerLow
+            : AppColors.surfaceContainerLowest,
+        border: Border.all(
+          color: isDark
+              ? AppColors.darkOutlineVariant
+              : AppColors.outlineVariant,
+        ),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            subject.name(turkish),
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            l10n.examSubjectQuestions(subject.questionCount),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colors.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 12),
+          if (stackFields)
+            Column(
+              children: [
+                for (var index = 0; index < 3; index++) ...[
+                  if (index > 0) const SizedBox(height: 10),
+                  input(index),
+                ],
+              ],
+            )
+          else
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (var index = 0; index < 3; index++) ...[
+                  if (index > 0) const SizedBox(width: 8),
+                  Expanded(child: input(index)),
+                ],
+              ],
+            ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 12,
+            runSpacing: 4,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Text(
+                '${l10n.examNet}: ${formatExamNet(result.net(_definition.wrongAnswerDivisor), l10n.localeName)}',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colors.primary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              Text(
+                l10n.examResultsQuestionTotal(
+                  result.answeredTotal,
+                  subject.questionCount,
+                ),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colors.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final turkish = Localizations.localeOf(context).languageCode == 'tr';
     final enabled = !_saving && !_pending;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     return PopScope(
       canPop: !_saving,
       child: AlertDialog(
         scrollable: true,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
         title: Text(
           _detailsMode ? l10n.examDetailsTitle : l10n.examResultsTitle,
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
         ),
         content: SizedBox(
           width: ContentWidth.form,
@@ -362,7 +528,32 @@ class _ResultsDialogState extends State<_ResultsDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(l10n.examResultsInfo),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? AppColors.darkSurfaceContainerHigh
+                      : AppColors.surfaceContainerLow,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.examResultsInfo,
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      l10n.examNetRule(_definition.wrongAnswerDivisor),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colors.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               if (_moduleMode) ...[
                 const SizedBox(height: 12),
                 Text(
@@ -386,94 +577,14 @@ class _ResultsDialogState extends State<_ResultsDialog> {
                   ),
                 Text(l10n.examReligionAlternativeInfo),
               ],
-              const SizedBox(height: 12),
-              Text(l10n.examNetRule(_definition.wrongAnswerDivisor)),
-              for (final subject in _subjects) ...[
-                const Divider(height: 28),
-                Text(
-                  subject.name(turkish),
-                  style: Theme.of(context).textTheme.titleSmall,
+              for (final subject in _subjects)
+                _subjectCard(
+                  context,
+                  subject,
+                  l10n,
+                  enabled: enabled,
+                  turkish: turkish,
                 ),
-                Text(l10n.examSubjectQuestions(subject.questionCount)),
-                const SizedBox(height: 8),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    for (var index = 0; index < 3; index++) ...[
-                      if (index > 0) const SizedBox(width: 8),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              height: MediaQuery.textScalerOf(
-                                context,
-                              ).scale(20),
-                              child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    [
-                                      l10n.examCorrect,
-                                      l10n.examWrong,
-                                      l10n.examBlank,
-                                    ][index],
-                                    maxLines: 1,
-                                    softWrap: false,
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.bodyMedium,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            TextField(
-                              key: ValueKey('exam-result-${subject.id}-$index'),
-                              controller: _fields[subject.id]![index],
-                              enabled: enabled,
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    signed: true,
-                                  ),
-                              inputFormatters: [
-                                TextInputFormatter.withFunction(
-                                  (oldValue, newValue) =>
-                                      RegExp(
-                                        r'^-?\d{0,3}$',
-                                      ).hasMatch(newValue.text)
-                                      ? newValue
-                                      : oldValue,
-                                ),
-                              ],
-                              decoration: InputDecoration(
-                                border: const OutlineInputBorder(),
-                                semanticCounterText: [
-                                  l10n.examCorrect,
-                                  l10n.examWrong,
-                                  l10n.examBlank,
-                                ][index],
-                              ),
-                              onChanged: (_) => _changed(subject, index),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${l10n.examNet}: ${formatExamNet(_result(subject).net(_definition.wrongAnswerDivisor), l10n.localeName)}',
-                ),
-                Text(
-                  l10n.examResultsQuestionTotal(
-                    _result(subject).answeredTotal,
-                    subject.questionCount,
-                  ),
-                ),
-              ],
               if (_detailsMode) ...[
                 const Divider(height: 28),
                 TextField(
