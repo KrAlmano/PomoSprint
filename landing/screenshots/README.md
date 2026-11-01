@@ -1,4 +1,17 @@
-# Güncel uygulama medyası — 28 Ekim2026
+# Güncel ekran güncellemesi — 1 Kasım 2026
+
+Deneme geçmişi ve net girişi artık Raporlar ekranındaki güncel arayüzü gösterir. Bu dört kare **iPhone 17 / iOS 27.0 simülatöründe**, `com.pomosprint.qa.reportpreview` QA uygulamasının gerçek Raporlar/kabuk bileşenleri ve kurgu TYT/AYT verileriyle çekildi; canlı kullanıcı veya sunucu testi değildir. Durum çubuğu 09:41 ve dolu pil/Wi-Fi/hat değerlerine geçici olarak ayarlandı; işlem sonunda override temizlendi. iOS 27 bu ayarda pili yeşil şarj simgesiyle gösterebilir.
+
+Ham 1206×2622 ekranlar `analiz/site_qa_2026-11-01/native/` altında tutulur. Web çıktıları `sips` ile orantılı 538×1170’e küçültülüp iki yana birer piksel eklenerek 540×1170 yapılır; kırpma veya arayüzü yeniden çizme yoktur. Kaynak ve çıktı ölçüleri ile SHA-256 değerleri [yeni manifestte](manifest-20261101.json) kayıtlıdır. Dynamic Island diğer ekranlar gibi CSS tarafından eklenir.
+
+| Sahne | Türkçe | English |
+|---|---|---|
+|Raporlar / Deneme geçmişi|[PNG](20261101/exam-history-tr.png)|[PNG](20261101/exam-history-en.png)|
+|Net girişi|[PNG](20261101/exam-results-tr.png)|[PNG](20261101/exam-results-en.png)|
+
+Aşağıdaki 28 Ekim manifesti ve 30 kare tarihsel kanıt olarak değiştirilmeden korunur. Eski Deneme geçmişi/net girişine ait dört dosya yayın paketinden hariçtir; diğer 26 kare ve dört video kullanılmaya devam eder.
+
+# Tarihsel uygulama medyası — 28 Ekim 2026
 
 Bu set tek iOS18.6 cihazından, **PomoSprint QA iPhone16 (18.6)** simülatöründen alındı. Uygulama güncel beş sekmelidir. Durum çubuğu09:41, pil100%, Wi-Fi3/hat4 olarak simctl ile sabitlendi ve çekim sonunda geri alındı. Bütün web görselleri **540×1170**; kullanılan iPhone çerçevesi iki dilde aynıdır. Dynamic Island, sitede fotoğraf ve videoların üzerine aynı oranda yerleşen dekoratif CSS katmanıdır; orijinal ekran dosyalarına eklenmez.
 

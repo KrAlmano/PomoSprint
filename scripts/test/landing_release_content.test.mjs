@@ -87,7 +87,10 @@ test("Güncel native ekranlar her sayfanın kendi diliyle ve ortak telefon oran�
       const media = [...html.matchAll(/<img\b[^>]*src="(\/screenshots\/[^"]+)"[^>]*>/g)];
       assert.ok(media.length > 0);
       for (const [tag, source] of media) {
-        assert.match(source, new RegExp(`^/screenshots/20261028/[a-z-]+-${lang}\\.png$`));
+        const match = source.match(new RegExp(`^/screenshots/(20261028|20261101)/([a-z-]+)-${lang}\\.png$`));
+        assert.ok(match, `${source}: expected locale-specific screenshot path`);
+        const expectedDate = ["exam-history", "exam-results"].includes(match[2]) ? "20261101" : "20261028";
+        assert.equal(match[1], expectedDate, `${source}: incorrect capture version`);
         assert.match(tag, /width="540" height="1170"/);
         assert.match(tag, /alt="[^"]+"/);
       }

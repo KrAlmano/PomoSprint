@@ -2,6 +2,12 @@
 
 Bu klasör PomoSprint'in statik pazarlama, destek, yasal ve Auth yardımcı sayfaları ile önündeki küçük Worker'ı içerir. Uygulama `../lib/`, sunucu kaynakları `../supabase/` altındadır. Ana geliştirme dalı [`codex/gece-2026-10-27`](https://github.com/KrAlmano/PomoSprint/tree/codex/gece-2026-10-27); repo özeldir. Önceki kullanıcı onayıyla site mevcut `pomosprint-website` Worker’ına yayımlandı; son talimata göre bundan sonraki her deploy öncesi yeniden açık kullanıcı onayı gerekir. Git işlemleri yalnız bu daldadır; `main` merge/push, force push ve Supabase/App Store dağıtımı yoktur.
 
+## 1 Kasım telefon hizası ve erişilebilirlik hazırlığı
+
+Özellikler sayfasında telefonların yalnız ilkine uygulanan kaydırma parallax'ı ile telefon içeren galeri giriş hareketleri kaldırıldı. Eşli cihazlar aynı grid ölçüsünü kullanır; dar ekranda tek sütun korunur. Sistem hareket azaltma tercihi açık sayfada değiştiğinde GSAP animasyonları ve dinleyicileri temizlenir, tercih kaldırılınca tekrar kurulur. Deneme geçmişi metinleri Raporlar’daki güncel konumla eşleşir. Deneme geçmişi ve net girişi için TR/EN dört görsel, iPhone 17 üzerinde gerçek uygulama bileşenleri ve kurgu QA verileriyle yeniden çekildi; diğer önceki çekimlerin cihaz ve tarih manifesti korunur. Yeni ham ve web görüntülerinin kaynağı, ölçüsü ve SHA bilgileri [ayrı manifestte](screenshots/manifest-20261101.json) ve [çekim notunda](../analiz/site_qa_2026-11-01/README.md) tutulur.
+
+İzole Safari önizlemesinde TR/EN 24 sayfa × 375/1024/1440 piksel 72/72 geçti; dört eşli görsel masaüstünde 220×458 px ve eşit üst konumda, 375 px genişlikte tek sütunda 260×545 px ölçüldü. Görüntü yakalama macOS tarafından engellendiğinden sonuçlar piksel incelemesi değil, gerçek tarayıcı yerleşim ölçümüdür. `npm test` 177/177, ortak parçalar kontrolü ve Wrangler `deploy --dry-run --keep-vars` geçti. Bu hazırlık canlıya yayımlanmadı; kullanıcının önceki talimatı uyarınca yeni deploy öncesi kullanıcı onayı gerekir.
+
 ## Durum ve doğruluk
 
 Son onaylı canlı sürüm `ad2fc988-4462-40ae-9333-ab0107e2138b`, kaynak `6cfd9b5`'tir: adasız İngilizce haftalık ekranın yeniden çekimi ve Auth yardımcı sayfalarında ortak CSS sürümü. [Onaylı düzeltme kanıtı](../analiz/iphone_cerceve_2026-10-28/approved-fix-deployment.json). Önceki `e1bb6541-5794-4241-ab5e-66ded59a9298` sürümünün [yayın raporu](../analiz/SITE_YAYIN_RAPORU_2026-10-28.md) tarihsel kayıttır. **KPSS metinleri yalnız yerel hazırlıktır; son canlı sürümde yoktur ve yeniden deploy için kullanıcı onayı bekler.**
@@ -70,7 +76,7 @@ python3 landing/tools/sync_partials.py
 python3 landing/tools/sync_partials.py --check
 ```
 
-CSS/JS değişiminde cache sürümü ortak parçalarda ve Auth yardımcı sayfalarında birlikte güncellenir. Güncel CSS sürümü `20261028c`; ortak parça eşliği kontrol edildi. `_headers` CSP'si korunur; inline JS/style eklenmez, JSON-LD veri blokları istisnadır. Fontlar ve GSAP kendi alan adından sunulur; dış CDN geri eklenmez. `_partials/`, `tools/` ve Markdown dokümanlar `.assetsignore` ile yayın dışında kalır.
+CSS/JS değişiminde cache sürümü ortak parçalarda ve Auth yardımcı sayfalarında birlikte güncellenir. Yerel CSS ve ana JS sürümü `20261101a`; ortak parça eşliği kontrol edildi. `_headers` CSP'si korunur; inline JS/style eklenmez, JSON-LD veri blokları istisnadır. Fontlar ve GSAP kendi alan adından sunulur; dış CDN geri eklenmez. `_partials/`, `tools/` ve Markdown dokümanlar `.assetsignore` ile yayın dışında kalır.
 
 Bütün uygulama görselleri ve videoları ortak `.phone`/`.phone-screen` iPhone çerçevesini kullanır. Siyah Dynamic Island, ekranın oransal üst merkezinde dekoratif CSS katmanıdır; kaynak medya değiştirilmez ve katman tıklamaları engellemez. Aspect ratio ekran kutusunda 540/1170'dir; padding'li dış telefona sabit yükseklik veya oran verilmez. `object-fit: contain` ile ekran kırpılmaz. Eşli ekran grupları 960px altında metnin altına, 420px altında tek telefona iner. Küçük yazı/taşma ve dikey akış yine gerçek 375/1024/1440 tarayıcı görünümüyle değerlendirilir.
 

@@ -2330,7 +2330,8 @@ html.nav-lock { overflow: hidden; }
   width: 100%;
 }
 .feature-gallery .media-figure { min-width: 0; gap: 14px; }
-.feature-gallery .phone { width: min(100%, 220px); }
+/* Both screens use the same track width and remain level while scrolling. */
+.feature-gallery .phone { width: min(100%, 220px); align-self: start; }
 .feature-gallery .media-caption { font-size: 0.8rem; }
 .collection-preview-grid {
   display: grid;

@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-01",
+  "device": {
+    "model": "iPhone 17",
+    "ios": "27.0",
+    "kind": "simulator"
+  },
+  "capture": {
+    "status_bar_time": "09:41",
+    "status_bar_battery_state": "charged",
+    "status_bar_battery_level": 100,
+    "status_bar_wifi_bars": 3,
+    "status_bar_cellular_bars": 4,
+    "status_bar_override_cleared": true,
+    "bundle_id": "com.pomosprint.qa.reportpreview",
+    "scope": "Native iOS QA preview using real ReportsScreen/Shell components and fictional TYT/AYT data; no production user or backend test claim."
+  },
+  "scenes": [
+    {
+      "scene": "exam-history",
+      "locale": "tr",
+      "file": "20261101/exam-history-tr.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "b6eda828b5cdc179db9e2d5a436424483a1604c50086d2b2a6bad734f74f4e9b",
+      "source": {
+        "path": "analiz/site_qa_2026-11-01/native/reports-exam-history-tr.png",
+        "width": 1206,
+        "height": 2622,
+        "sha256": "a8cecb0aa3f1c9f5e2709a6c619e8db92c3174a45d4f2d05bc6b183cc66a4fb6",
+        "locale": "tr"
+      },
+      "transform": "sips proportional resize to 538×1170, then one-pixel side padding to 540×1170; no crop or UI edits"
+    },
+    {
+      "scene": "exam-history",
+      "locale": "en",
+      "file": "20261101/exam-history-en.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "9e2497e8bf0bd2a05cd87940d4da25bf8a05366f3f68d73848f5745256925f57",
+      "source": {
+        "path": "analiz/site_qa_2026-11-01/native/reports-exam-history-en.png",
+        "width": 1206,
+        "height": 2622,
+        "sha256": "9de4da96d75ac5e6710ac191b4d605b618c4485dc473ac9cb22a8af637fab51d",
+        "locale": "en"
+      },
+      "transform": "sips proportional resize to 538×1170, then one-pixel side padding to 540×1170; no crop or UI edits"
+    },
+    {
+      "scene": "exam-results",
+      "locale": "tr",
+      "file": "20261101/exam-results-tr.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "a133248320b522a77e8179bfa4e9c687481ae94f4aae2ad76cd0f9ba8d86ca2a",
+      "source": {
+        "path": "analiz/site_qa_2026-11-01/native/exam-results-tr.png",
+        "width": 1206,
+        "height": 2622,
+        "sha256": "23358d59a3a1521a17fc4f4681666eed7ab853112d2d4cd4b7d927fdda98c716",
+        "locale": "tr"
+      },
+      "transform": "sips proportional resize to 538×1170, then one-pixel side padding to 540×1170; no crop or UI edits"
+    },
+    {
+      "scene": "exam-results",
+      "locale": "en",
+      "file": "20261101/exam-results-en.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "2ab14134c1845f19979d67278aa21283da659b4d57377fd1703886abe235c7c0",
+      "source": {
+        "path": "analiz/site_qa_2026-11-01/native/exam-results-en.png",
+        "width": 1206,
+        "height": 2622,
+        "sha256": "a4f6fb3dbb5f012938a4ed06b1d8c434ad70c459994284c70e0c4ffe6a91b7a1",
+        "locale": "en"
+      },
+      "transform": "sips proportional resize to 538×1170, then one-pixel side padding to 540×1170; no crop or UI edits"
+    }
+  ]
+}

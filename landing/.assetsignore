@@ -21,3 +21,9 @@ videos/timer.mp4
 videos/timer.webp
 videos/languages.mp4
 videos/languages.webp
+
+# Tarihsel ekranlar manifest doğrulaması için korunur; yeni kareler yayınlanır.
+screenshots/20261028/exam-history-tr.png
+screenshots/20261028/exam-history-en.png
+screenshots/20261028/exam-results-tr.png
+screenshots/20261028/exam-results-en.png

@@ -7,7 +7,6 @@
   var isEnglish = document.documentElement.getAttribute("lang") === "en";
   var text = function (tr, en) { return isEnglish ? en : tr; };
   var motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
-  var prefersReduced = motionPreference.matches;
   var api = window.PomoSupabase || null;
 
   // boot.js'in gizlediği hero'yu görünür yap (animasyon yoksa ya da kurulduysa)
@@ -492,10 +491,16 @@
   }
 
   /* ---------- GSAP animasyonları ---------- */
-  if (prefersReduced || typeof gsap === "undefined") {
+  if (typeof gsap === "undefined") {
     revealHero();
     return;
   }
+
+  // GSAP reverts animations and ScrollTriggers if the OS preference changes
+  // while the page is open. Re-entering the query builds them once again.
+  var motionAnimations = gsap.matchMedia();
+  motionAnimations.add("(prefers-reduced-motion: no-preference)", function () {
+  var animationCleanup = [];
 
   if (typeof ScrollTrigger !== "undefined") {
     gsap.registerPlugin(ScrollTrigger);
@@ -534,6 +539,8 @@
     });
 
     document.querySelectorAll("[data-reveal-group]").forEach(function (group) {
+      // Ekran galerilerinde telefonlar ilk çizimden itibaren aynı hizada kalır.
+      if (group.querySelector(".phone")) return;
       gsap.from(group.children, revealOptions({
         y: 32,
         duration: 0.6,
@@ -638,7 +645,14 @@
       }
     });
 
-    window.addEventListener("load", function () { ScrollTrigger.refresh(); });
+    var refreshOnLoad = function () { ScrollTrigger.refresh(); };
+    window.addEventListener("load", refreshOnLoad);
+    animationCleanup.push(function () {
+      window.removeEventListener("load", refreshOnLoad);
+      if (stopFlowTimer) clearTimeout(stopFlowTimer);
+      stopFlow();
+      render(0);
+    });
 
     // İmleç eğimi: yalnızca hassas işaretçide (masaüstü)
     if (window.matchMedia("(pointer: fine)").matches) {
@@ -648,20 +662,21 @@
           x: gsap.quickTo(g, "x", { duration: 0.8, ease: "power2.out" })
         };
       });
-      window.addEventListener("pointermove", function (e) {
+      var tiltOnPointerMove = function (e) {
         var ratio = e.clientX / window.innerWidth - 0.5; // -0.5 .. 0.5
         tilts.forEach(function (t) {
           t.rot(ratio * 7);
           t.x(ratio * 12);
         });
-      });
+      };
+      window.addEventListener("pointermove", tiltOnPointerMove);
+      animationCleanup.push(function () { window.removeEventListener("pointermove", tiltOnPointerMove); });
     }
   }
 
   /* ---------- Özellik satırları (features.html) ----------
-     Satırlar normal akışta alt alta durur; görünüme girerken metin ve
-     telefon iki yandan yumuşakça süzülür, maddeler sırayla belirir.
-     Telefon ayrıca scroll'a bağlı hafif parallax ile yüzer. */
+     Telefonlar yerleşimlerini kaydırma sırasında korur; yalnız telefonsuz
+     dekoratif medya ve diğer sayfalardaki metinler hareket edebilir. */
   var rows = gsap.utils.toArray(document.querySelectorAll(".feature-row"));
   var rowsNarrow = window.matchMedia("(max-width: 720px)").matches;
   rows.forEach(function (row) {
@@ -669,6 +684,7 @@
     var text = row.querySelector(".feature-row-text");
     var media = row.querySelector(".feature-row-media");
     var items = row.querySelectorAll(".feature-row-text li");
+    var hasPhone = !!row.querySelector(".phone");
 
     var tl = gsap.timeline({
       scrollTrigger: { trigger: row, start: "top 80%", once: true }
@@ -679,22 +695,13 @@
         ? { y: 32, duration: 0.6, ease: "power2.out" }
         : { x: fromRight ? 56 : -56, duration: 0.7, ease: "power3.out" }), 0);
     }
-    if (media) {
+    if (media && !hasPhone) {
       tl.from(media, revealOptions(rowsNarrow
         ? { y: 36, duration: 0.65, ease: "power2.out" }
         : { x: fromRight ? -64 : 64, duration: 0.75, ease: "power3.out" }), 0.12);
     }
     if (items.length && !featuresPage) {
       tl.from(items, { y: 16, autoAlpha: 0, duration: 0.4, stagger: 0.09, ease: "power2.out" }, 0.4);
-    }
-
-    var phone = row.querySelector(".phone");
-    if (phone) {
-      gsap.fromTo(phone, { y: 26 }, {
-        y: -26,
-        ease: "none",
-        scrollTrigger: { trigger: row, start: "top bottom", end: "bottom top", scrub: 0.6 }
-      });
     }
   });
 
@@ -709,4 +716,6 @@
       scrollTrigger: { trigger: ".ptl", start: "top 75%", end: "bottom 60%", scrub: 0.5 }
     });
   }
+  return function () { animationCleanup.forEach(function (cleanup) { cleanup(); }); };
+  });
 })();

@@ -11,6 +11,8 @@ import { test } from 'node:test';
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const LANDING = path.join(REPO, 'landing');
 const DATE = '20261028';
+const REFRESH_DATE = '20261101';
+const REFRESH_SCENES = ['exam-history', 'exam-results'];
 const LANGS = ['tr', 'en'];
 const SCENES = ['timer', 'marathon-plan', 'exam-catalog', 'exam-running',
   'exam-history', 'exam-results', 'exam-insights', 'reports-daily',
@@ -19,6 +21,9 @@ const SCENES = ['timer', 'marathon-plan', 'exam-catalog', 'exam-running',
 const VIDEO_SCENES = ['timer', 'marathon'];
 const DIMENSIONS = { width: 540, height: 1170 };
 const SCREEN_FILES = SCENES.flatMap(scene => LANGS.map(lang => `${scene}-${lang}.png`));
+const REFRESH_FILES = REFRESH_SCENES.flatMap(scene => LANGS.map(lang => `${scene}-${lang}.png`));
+const ARCHIVED_PATHS = REFRESH_FILES.map(file => `screenshots/${DATE}/${file}`);
+const REFRESH_PATHS = REFRESH_FILES.map(file => `screenshots/${REFRESH_DATE}/${file}`);
 const VIDEO_FILES = VIDEO_SCENES.flatMap(scene => LANGS.flatMap(lang => [`${scene}-${lang}.mp4`, `${scene}-${lang}.webp`]));
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const read = file => fs.readFileSync(path.join(LANDING, file));
@@ -165,6 +170,7 @@ function mediaReferences(source) {
 const allHtml = () => walk(LANDING).filter(file => file.endsWith('.html') && !file.startsWith('_partials/'));
 const expectedAssetPaths = () => [
   ...SCREEN_FILES.map(file => `screenshots/${DATE}/${file}`),
+  ...REFRESH_PATHS,
   ...VIDEO_FILES.map(file => `videos/${DATE}/${file}`),
 ];
 
@@ -219,6 +225,40 @@ test('B screenshots: 30 same-size PNG files retain native provenance', () => {
   assert.deepEqual(sorted(seen), sorted(SCREEN_FILES));
 });
 
+// The 1 November capture is a separate simulator/fixture, never relabelled as
+// the historical 28 October set. Both raw and web bytes are checked.
+test('November report screenshots: TR/EN history and result entry have verified provenance', () => {
+  assert.deepEqual(sorted(walk(path.join(LANDING, 'screenshots', REFRESH_DATE)).filter(file => file.endsWith('.png'))), sorted(REFRESH_FILES));
+  const manifest = JSON.parse(text(`screenshots/manifest-${REFRESH_DATE}.json`));
+  assert.equal(manifest.schema_version, 1);
+  assert.equal(manifest.date, '2026-11-01');
+  assert.equal(manifest.device.model, 'iPhone 17');
+  assert.equal(manifest.device.ios, '27.0');
+  assert.equal(manifest.capture.status_bar_time, '09:41');
+  assert.equal(manifest.capture.bundle_id, 'com.pomosprint.qa.reportpreview');
+  const seen = new Set();
+  assert.equal(manifest.scenes.length, REFRESH_FILES.length);
+  for (const scene of manifest.scenes) {
+    assert.ok(REFRESH_SCENES.includes(scene.scene));
+    assert.ok(LANGS.includes(scene.locale));
+    const filename = `${scene.scene}-${scene.locale}.png`;
+    assert.equal(scene.file, `${REFRESH_DATE}/${filename}`);
+    assert.equal(seen.has(filename), false); seen.add(filename);
+    const output = read(`screenshots/${scene.file}`);
+    assert.deepEqual(pngDimensions(output), DIMENSIONS);
+    assert.deepEqual({width: scene.width, height: scene.height}, DIMENSIONS);
+    assert.equal(hash(output), scene.sha256);
+    const sourceScene = scene.scene === 'exam-history' ? 'reports-exam-history' : 'exam-results';
+    assert.equal(scene.source.path, `analiz/site_qa_2026-11-01/native/${sourceScene}-${scene.locale}.png`);
+    assert.equal(scene.source.width, 1206); assert.equal(scene.source.height, 2622);
+    const raw = safeSource(scene.source.path);
+    assert.deepEqual(pngDimensions(raw), {width: scene.source.width, height: scene.source.height});
+    assert.equal(hash(raw), scene.source.sha256);
+    assert.equal(scene.source.locale, scene.locale);
+  }
+  assert.deepEqual(sorted(seen), sorted(REFRESH_FILES));
+});
+
 test('B timer/Marathon: four silent MP4s and four static WebP posters share dimensions', () => {
   assert.deepEqual(sorted(walk(path.join(LANDING,'videos',DATE)).filter(file => /\.(mp4|webp)$/.test(file))), sorted(VIDEO_FILES));
   const manifest = JSON.parse(text(`videos/manifest-${DATE}.json`));
@@ -260,12 +300,15 @@ test('B published assets: no missing, stale or unused app screenshot/video files
     .filter(file => /\.(png|webp|mp4)$/.test(file)).map(file => `${folder}/${file}`));
   assert.deepEqual(sorted(actual), sorted(expected), 'Remove replaced/unused old app media; preserve raw proof under analiz');
   const used = new Set();
+  const published = expected.filter(asset => !ARCHIVED_PATHS.includes(asset));
+  const ignoreLines = new Set(text('.assetsignore').split(/\r?\n/).map(line => line.trim()));
+  for (const asset of ARCHIVED_PATHS) assert.ok(ignoreLines.has(asset), `historical image must be excluded from deploy: ${asset}`);
   for (const file of allHtml()) for (const ref of mediaReferences(text(file))) {
-    assert.ok(expected.includes(ref.path), `${file}: stale or unexpected ${ref.attribute}=${ref.path}`);
+    assert.ok(published.includes(ref.path), `${file}: stale or unexpected ${ref.attribute}=${ref.path}`);
     assert.ok(fs.existsSync(path.join(LANDING,ref.path)), `${file}: missing media ${ref.path}`);
     used.add(ref.path);
   }
-  assert.deepEqual(sorted(used), sorted(expected), 'Every published native media file is used');
+  assert.deepEqual(sorted(used), sorted(published), 'Every published native media file is used');
 });
 
 for (const locale of LANGS) {

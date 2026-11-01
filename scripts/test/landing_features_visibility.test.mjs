@@ -7,7 +7,7 @@ import vm from "node:vm";
 import { test } from "node:test";
 import { FakeElement, REPO } from "./helpers/fake_dom.mjs";
 
-function setup({ page = "features", reduced = false, narrow = false, animations = true } = {}) {
+function setup({ page = "features", reduced = false, narrow = false, animations = true, gallery = false, rowHasPhone = true, glass = false } = {}) {
   const node = (id) => new FakeElement(id, { style: {} });
   const root = node("html");
   root.classList.add("js-anim");
@@ -24,9 +24,14 @@ function setup({ page = "features", reduced = false, narrow = false, animations 
   const media = node("feature-media");
   const items = [node("first-rule"), node("second-rule")];
   const phone = node("phone");
+  const hourglass = node("hourglass");
+  hourglass.querySelectorAll = () => [];
+  const secondPhone = node("phone-2");
+  group.querySelector = (selector) => gallery && selector === ".phone" ? phone : null;
   const row = node("feature-row");
-  row.querySelector = (selector) => ({ ".feature-row-text": text, ".feature-row-media": media, ".phone": phone })[selector] || null;
-  row.querySelectorAll = (selector) => selector === ".feature-row-text li" ? items : [];
+  row.querySelector = (selector) => ({ ".feature-row-text": text, ".feature-row-media": media, ".phone": rowHasPhone ? phone : null })[selector] || null;
+  row.querySelectorAll = (selector) => selector === ".feature-row-text li" ? items :
+    selector === ".phone" && rowHasPhone ? [phone, secondPhone] : [];
   const content = [hero, title, heading, cta, ...cards, text, media, ...items];
   const document = {
     documentElement: root, body,
@@ -35,15 +40,25 @@ function setup({ page = "features", reduced = false, narrow = false, animations 
     querySelectorAll: (selector) => ({
       "[data-hero]": [hero], "[data-hero-title]": [title],
       "[data-reveal]": [heading, cta], "[data-reveal-group]": [group],
-      ".feature-row": [row],
+      ".feature-row": [row], ".hourglass": glass ? [hourglass] : [],
     })[selector] || [],
     addEventListener() {},
   };
+  const motionListeners = [];
+  const motion = {
+    matches: reduced,
+    addEventListener(type, callback) { if (type === "change") motionListeners.push(callback); },
+  };
+  const windowListeners = new Map();
   const window = {
-    matchMedia: (query) => ({ matches: query.includes("prefers-reduced-motion") ? reduced : query === "(max-width: 720px)" && narrow }),
-    addEventListener() {},
+    innerWidth: 1200,
+    matchMedia: (query) => query.includes("prefers-reduced-motion") ? motion :
+      { matches: (query === "(max-width: 720px)" && narrow) || (query === "(pointer: fine)" && glass) },
+    addEventListener(type, fn) { (windowListeners.get(type) ?? windowListeners.set(type, new Set()).get(type)).add(fn); },
+    removeEventListener(type, fn) { windowListeners.get(type)?.delete(fn); },
   };
   const calls = [];
+  let reverts = 0;
   const from = (targets, vars) => {
     const nodes = Array.isArray(targets) ? targets : [targets];
     calls.push({ targets: nodes, vars });
@@ -58,15 +73,40 @@ function setup({ page = "features", reduced = false, narrow = false, animations 
   };
   const globals = { window, document };
   if (animations) {
-    globals.ScrollTrigger = { refresh() {} };
+    globals.ScrollTrigger = { refresh() {}, create() {} };
     globals.gsap = {
       registerPlugin() {}, utils: { toArray: (targets) => Array.from(targets) },
+      matchMedia: () => ({ add(_query, setupAnimations) {
+        let cleanup = null;
+        let active = false;
+        const update = () => {
+          if (!motion.matches && !active) {
+            active = true;
+            cleanup = setupAnimations();
+          } else if (motion.matches && active) {
+            active = false;
+            if (cleanup) cleanup();
+            for (const target of [...content, phone, secondPhone]) target.style = {};
+            reverts += 1;
+          }
+        };
+        motion.addEventListener("change", update);
+        update();
+      } }),
       from, fromTo: (target, _before, after) => calls.push({ targets: [target], vars: after }),
-      timeline: () => ({ from(targets, vars) { from(targets, vars); return this; } }),
+      quickTo: () => () => {},
+      timeline: () => ({
+        from(targets, vars) { from(targets, vars); return this; },
+        fromTo() { return this; }, play() {}, pause() {},
+      }),
     };
   }
   vm.runInNewContext(fs.readFileSync(path.join(REPO, "landing/js/main.js"), "utf8"), globals);
-  return { root, content, hero, heading, cta, cards, text, media, items, calls };
+  return { root, content, hero, heading, cta, cards, text, media, items, phone, secondPhone, calls,
+    reverts: () => reverts,
+    listeners: (type) => windowListeners.get(type)?.size || 0,
+    reduced(value) { motion.matches = value; motionListeners.forEach((callback) => callback()); },
+  };
 }
 
 function readable(nodes) {
@@ -81,7 +121,7 @@ test("Features: geciken veya hiç çalışmayan kaydırma animasyonu içeriği g
     const page = setup({ narrow });
     readable(page.content);
     assert.equal(page.root.classList.contains("js-anim"), false);
-    assert.ok(page.calls.some(({ vars }) => vars.x !== undefined || vars.y !== undefined), "hafif konum animasyonu korunur");
+    assert.equal(page.calls.some(({ targets = [] }) => targets.includes(page.media) || targets.includes(page.phone)), false, "telefonlar kaydırılırken hareket etmez");
   }
 });
 
@@ -91,7 +131,7 @@ test("Features: anker başlıkları, açıklamalar, destek kartları ve CTA sonr
     for (const node of [page.heading, page.cta, ...page.cards, page.text, ...page.items]) {
       assert.equal(page.calls.some(({ targets = [] }) => targets.includes(node)), false, `${node.id}: konum ve görünürlük sabit kalmalı`);
     }
-    assert.ok(page.calls.some(({ targets = [] }) => targets.includes(page.media)), "medyanın hafif hareketi korunur");
+    assert.equal(page.calls.some(({ targets = [] }) => targets.includes(page.media) || targets.includes(page.phone)), false, "telefonların hizası sabit kalır");
   }
 });
 
@@ -112,8 +152,51 @@ test("Ana sayfanın kritik hero içeriği görünür kalır, alt kartların hafi
   const page = setup({ page: "home" });
   readable([page.hero]);
   assert.equal(page.calls.some(({ targets = [] }) => targets.includes(page.hero)), false);
-  for (const node of [page.heading, page.cta, ...page.cards, page.text, page.media, ...page.items]) {
+  for (const node of [page.heading, page.cta, ...page.cards, page.text, ...page.items]) {
     assert.equal(node.style.opacity, "0", node.id);
     assert.equal(node.style.visibility, "hidden", node.id);
   }
+});
+
+test("Telefon galerileri birlikte ve yerlerinde kalır; diğer kart animasyonları korunur", () => {
+  for (const narrow of [false, true]) {
+    const page = setup({ page: "home", narrow, gallery: true });
+    for (const node of [page.media, page.phone, page.secondPhone, ...page.cards]) {
+      assert.equal(page.calls.some(({ targets = [] }) => targets.includes(node)), false, `${node.id}: telefon galerisi hareket etmemeli`);
+      readable([node]);
+    }
+    assert.ok(page.calls.some(({ targets = [] }) => targets.includes(page.heading)), "telefonsuz öğelerin hareketi korunur");
+    const decoration = setup({ page: "home", narrow, rowHasPhone: false });
+    assert.ok(decoration.calls.some(({ targets = [] }) => targets.includes(decoration.media)), "telefonsuz medya canlandırılabilir");
+  }
+});
+
+
+test("hareket tercihi açık sayfada değişince GSAP temizlenir ve erişilebilir içerik kalır", () => {
+  const page = setup({ page: "home" });
+  assert.equal(page.heading.style.visibility, "hidden");
+  const before = page.calls.length;
+  page.reduced(true);
+  assert.equal(page.reverts(), 1);
+  readable(page.content);
+  page.reduced(true);
+  assert.equal(page.reverts(), 1, "aynı tercih tekrar bildirilince temizleme yinelenmez");
+  page.reduced(false);
+  assert.ok(page.calls.length > before, "animasyonlar tercih kapatıldığında yeniden kurulur");
+});
+
+
+test("hareket tercihi değişirken kum saati dinleyicileri birikmez", () => {
+  const page = setup({ page: "home", glass: true });
+  assert.equal(page.listeners("load"), 1);
+  assert.equal(page.listeners("pointermove"), 1);
+  page.reduced(true);
+  assert.equal(page.listeners("load"), 0);
+  assert.equal(page.listeners("pointermove"), 0);
+  page.reduced(false);
+  assert.equal(page.listeners("load"), 1);
+  assert.equal(page.listeners("pointermove"), 1);
+  page.reduced(true);
+  assert.equal(page.listeners("load"), 0);
+  assert.equal(page.listeners("pointermove"), 0);
 });

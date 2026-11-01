@@ -246,6 +246,7 @@ test("gerçek görüntü oranı iç ekrandadır; kayıtlar sessiz döngü ve sta
     assert.doesNotMatch(html, /phone-mock|data-shot=|Oynat düğmesi|oynat düğmesi/);
   }
   const css = fs.readFileSync(path.join(REPO, "landing/css/style.css"), "utf8");
+  assert.match(css, /\[hidden\]\s*\{\s*display:\s*none\s*!important\s*;?\s*\}/, "video yüklenemediğinde hidden yedek görseli açar");
   const outer = css.match(/\.phone \{([^}]+)\}/)[1];
   const screen = css.match(/\.phone-screen \{([^}]+)\}/)[1];
   assert.doesNotMatch(outer, /aspect-ratio|height:/);
