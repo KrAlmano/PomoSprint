@@ -4248,6 +4248,150 @@ abstract class AppLocalizations {
   /// **'Denemeler'**
   String get examTitle;
 
+  /// No description provided for @branchExamTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Branş denemesi'**
+  String get branchExamTitle;
+
+  /// No description provided for @branchExamIntro.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sınavını ve dersini seç, soru sayısını ve süreyi belirle.'**
+  String get branchExamIntro;
+
+  /// No description provided for @branchExamSource.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sınav'**
+  String get branchExamSource;
+
+  /// No description provided for @branchExamSubject.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ders'**
+  String get branchExamSubject;
+
+  /// No description provided for @branchExamQuestions.
+  ///
+  /// In tr, this message translates to:
+  /// **'Soru sayısı'**
+  String get branchExamQuestions;
+
+  /// No description provided for @branchExamQuestionsInvalid.
+  ///
+  /// In tr, this message translates to:
+  /// **'1 ile 200 arasında bir sayı gir.'**
+  String get branchExamQuestionsInvalid;
+
+  /// No description provided for @branchExamDuration.
+  ///
+  /// In tr, this message translates to:
+  /// **'Süre'**
+  String get branchExamDuration;
+
+  /// No description provided for @branchExamReward.
+  ///
+  /// In tr, this message translates to:
+  /// **'Örnek ödül: {sand} deneme kumu'**
+  String branchExamReward(int sand);
+
+  /// No description provided for @branchPrototypeBadge.
+  ///
+  /// In tr, this message translates to:
+  /// **'PROTOTİP'**
+  String get branchPrototypeBadge;
+
+  /// No description provided for @branchPrototypeNotice.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu bir örnektir. Gerçek deneme, kayıt veya kum kazanımı oluşturmaz.'**
+  String get branchPrototypeNotice;
+
+  /// No description provided for @branchPrototypeConfigure.
+  ///
+  /// In tr, this message translates to:
+  /// **'Branş denemesini planla'**
+  String get branchPrototypeConfigure;
+
+  /// No description provided for @branchPrototypeOverviewTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir derse odaklan'**
+  String get branchPrototypeOverviewTitle;
+
+  /// No description provided for @branchPrototypeDurationOptions.
+  ///
+  /// In tr, this message translates to:
+  /// **'Süre ve örnek kum'**
+  String get branchPrototypeDurationOptions;
+
+  /// No description provided for @branchPrototypeSand.
+  ///
+  /// In tr, this message translates to:
+  /// **'{sand} kum'**
+  String branchPrototypeSand(int sand);
+
+  /// No description provided for @branchPrototypePlanContinue.
+  ///
+  /// In tr, this message translates to:
+  /// **'Planı önizle'**
+  String get branchPrototypePlanContinue;
+
+  /// No description provided for @branchPrototypeStart.
+  ///
+  /// In tr, this message translates to:
+  /// **'Örnek sayacı başlat'**
+  String get branchPrototypeStart;
+
+  /// No description provided for @branchPrototypeRunning.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu temsili sayaç 5 saniyedir; gerçek çalışma süresi tutulmaz.'**
+  String get branchPrototypeRunning;
+
+  /// No description provided for @branchPrototypeResults.
+  ///
+  /// In tr, this message translates to:
+  /// **'Örnek sonuçlarını gir'**
+  String get branchPrototypeResults;
+
+  /// No description provided for @branchPrototypeResultAction.
+  ///
+  /// In tr, this message translates to:
+  /// **'Örnek sonucu göster'**
+  String get branchPrototypeResultAction;
+
+  /// No description provided for @branchPrototypeResultInvalid.
+  ///
+  /// In tr, this message translates to:
+  /// **'Doğru ve yanlış sayılarının toplamı soru sayısını aşamaz.'**
+  String get branchPrototypeResultInvalid;
+
+  /// No description provided for @branchPrototypeResultTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Örnek sonuç'**
+  String get branchPrototypeResultTitle;
+
+  /// No description provided for @branchPrototypeNoSave.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu sonuç ve kum yalnızca önizlemedir; hesabına kaydedilmedi.'**
+  String get branchPrototypeNoSave;
+
+  /// No description provided for @branchPrototypeNoLeague.
+  ///
+  /// In tr, this message translates to:
+  /// **'Lig puanı yok'**
+  String get branchPrototypeNoLeague;
+
+  /// No description provided for @branchPrototypeReset.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni plan oluştur'**
+  String get branchPrototypeReset;
+
   /// No description provided for @examNew.
   ///
   /// In tr, this message translates to:

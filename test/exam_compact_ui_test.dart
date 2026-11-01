@@ -62,8 +62,15 @@ void main() {
           final tab = find.byKey(ValueKey('exam-tab-$id'));
           expect(tester.getSize(tab).height, greaterThanOrEqualTo(44));
           expect(tester.getSize(tab).width, greaterThanOrEqualTo(44));
-          expect(tabRects[i].width, closeTo(tabRects.first.width, .01));
+          if (layout.scale == 1) {
+            expect(tabRects[i].width, closeTo(tabRects.first.width, .01));
+          }
           expect(tabRects[i].top, tabRects.first.top);
+          expect(
+            find.descendant(of: tab, matching: find.byType(FittedBox)),
+            findsNothing,
+            reason: 'System text must not be shrunk to fit the tab',
+          );
           expect(
             find.descendant(of: tab, matching: find.text(label)),
             findsOneWidget,
@@ -73,7 +80,9 @@ void main() {
           await tester.pumpAndSettle();
           expect(tester.takeException(), isNull);
         }
-        await tester.tap(find.byKey(const ValueKey('exam-tab-new')));
+        final newTab = find.byKey(const ValueKey('exam-tab-new'));
+        await tester.ensureVisible(newTab);
+        await tester.tap(newTab);
         await tester.pumpAndSettle();
 
         expect(find.text(l10n.examNetInfo), findsOneWidget);

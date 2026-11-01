@@ -538,17 +538,12 @@ class _ReportsScreenState extends State<ReportsScreen>
     final short = Responsive.of(context).isShortHeight;
     return Container(
       margin: EdgeInsets.fromLTRB(24, short ? 4 : 12, 24, short ? 4 : 8),
+      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color:
-                (isDark
-                        ? AppColors.darkOutlineVariant
-                        : AppColors.outlineVariant)
-                    .withValues(alpha: 0.3),
-            width: 1,
-          ),
-        ),
+        color: isDark
+            ? AppColors.darkSurfaceContainerHigh
+            : AppColors.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(16),
       ),
       // Sekmeler sığıyorsa ortalanır (geniş ekran), sığmıyorsa yatay kaydırılır.
       child: LayoutBuilder(
@@ -566,14 +561,14 @@ class _ReportsScreenState extends State<ReportsScreen>
                   short: short,
                   onTap: () => setState(() => _activeTab = 0),
                 ),
-                const SizedBox(width: 24),
+                const SizedBox(width: 4),
                 _buildTabItem(
                   label: lang.translate('reports_tab_history'),
                   isActive: _activeTab == 1,
                   short: short,
                   onTap: () => setState(() => _activeTab = 1),
                 ),
-                const SizedBox(width: 24),
+                const SizedBox(width: 4),
                 _buildTabItem(
                   label: lang.translate('reports_tab_monthly'),
                   isActive: _activeTab == 2,
@@ -602,14 +597,17 @@ class _ReportsScreenState extends State<ReportsScreen>
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: EdgeInsets.only(bottom: short ? 8 : 12),
+          constraints: const BoxConstraints(minHeight: 44),
+          alignment: Alignment.center,
+          padding: EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: short ? 6 : 8,
+          ),
           decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                color: isActive ? accent : Colors.transparent,
-                width: 2,
-              ),
-            ),
+            color: isActive
+                ? accent.withValues(alpha: 0.13)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
             label,

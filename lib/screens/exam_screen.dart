@@ -9,6 +9,7 @@ import '../models/kpss_catalog.dart';
 import '../models/study_session.dart';
 import '../services/exam_persistence.dart';
 import '../services/exam_service.dart';
+import '../theme.dart';
 import '../utils/responsive.dart';
 import '../utils/exam_format.dart';
 import '../widgets/exam_results_dialog.dart';
@@ -39,6 +40,9 @@ class ExamScreen extends StatefulWidget {
 }
 
 class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
+  Color get _outlineColor => Theme.of(context).brightness == Brightness.dark
+      ? AppColors.darkOutlineVariant
+      : AppColors.outlineVariant;
   ExamService get _service => widget.service ?? ExamService.instance;
   int _tab = 0;
   String? _group;
@@ -416,6 +420,7 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
                 key: ValueKey('exam-kpss-track-${track.name}'),
                 label: Text(_kpssTrackLabel(track, l10n)),
                 selected: _selectedKpssTrack == track,
+                side: BorderSide(color: _outlineColor),
                 selectedColor: Theme.of(context).colorScheme.primary,
                 labelStyle: _selectedKpssTrack == track
                     ? TextStyle(color: Theme.of(context).colorScheme.onPrimary)
@@ -434,64 +439,79 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
     final colors = Theme.of(context).colorScheme;
     final labels = [l10n.examTabNew, l10n.examTabHistory, l10n.examTabLeague];
     const ids = ['new', 'history', 'league'];
+    Widget tab(int index) => Semantics(
+      button: true,
+      selected: _tab == index,
+      child: Material(
+        color: _tab == index ? colors.primary : Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          key: ValueKey('exam-tab-${ids[index]}'),
+          borderRadius: BorderRadius.circular(12),
+          onTap: () {
+            setState(() => _tab = index);
+            if (index == 1) unawaited(_loadStudies());
+          },
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 48, minWidth: 72),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              child: Center(
+                child: Text(
+                  labels[index],
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: _tab == index
+                        ? colors.onPrimary
+                        : colors.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: colors.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16),
       ),
-      child: SizedBox(
-        height: 48,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            for (var i = 0; i < labels.length; i++) ...[
-              if (i != 0) const SizedBox(width: 4),
-              Expanded(
-                child: Semantics(
-                  button: true,
-                  selected: _tab == i,
-                  child: Material(
-                    color: _tab == i ? colors.primary : Colors.transparent,
-                    borderRadius: BorderRadius.circular(12),
-                    child: InkWell(
-                      key: ValueKey('exam-tab-${ids[i]}'),
-                      borderRadius: BorderRadius.circular(12),
-                      onTap: () {
-                        setState(() => _tab = i);
-                        if (i == 1) unawaited(_loadStudies());
-                      },
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(minHeight: 48),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 10,
-                          ),
-                          child: Center(
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                labels[i],
-                                maxLines: 1,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  color: _tab == i
-                                      ? colors.onPrimary
-                                      : colors.onSurfaceVariant,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final scroll =
+              constraints.maxWidth < 240 ||
+              MediaQuery.textScalerOf(context).scale(14) > 18;
+          if (scroll) {
+            return SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (var i = 0; i < labels.length; i++) ...[
+                      if (i != 0) const SizedBox(width: 4),
+                      tab(i),
+                    ],
+                  ],
                 ),
               ),
-            ],
-          ],
-        ),
+            );
+          }
+          return IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (var i = 0; i < labels.length; i++) ...[
+                  if (i != 0) const SizedBox(width: 4),
+                  Expanded(child: tab(i)),
+                ],
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -532,6 +552,7 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
         key: key,
         label: Text(label, textAlign: TextAlign.center),
         selected: selected,
+        side: BorderSide(color: _outlineColor),
         selectedColor: Theme.of(context).colorScheme.primary,
         labelStyle: selected
             ? TextStyle(color: Theme.of(context).colorScheme.onPrimary)
@@ -645,6 +666,7 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
             visualDensity: const VisualDensity(horizontal: -2, vertical: -1),
             materialTapTargetSize: MaterialTapTargetSize.padded,
             selected: _group == null,
+            side: BorderSide(color: _outlineColor),
             selectedColor: Theme.of(context).colorScheme.primary,
             labelStyle: _group == null
                 ? TextStyle(color: Theme.of(context).colorScheme.onPrimary)
@@ -663,6 +685,7 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
               visualDensity: const VisualDensity(horizontal: -2, vertical: -1),
               materialTapTargetSize: MaterialTapTargetSize.padded,
               selected: _group == group,
+              side: BorderSide(color: _outlineColor),
               selectedColor: Theme.of(context).colorScheme.primary,
               labelStyle: _group == group
                   ? TextStyle(color: Theme.of(context).colorScheme.onPrimary)
@@ -686,7 +709,7 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+          side: BorderSide(color: _outlineColor),
         ),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -746,7 +769,7 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+        side: BorderSide(color: _outlineColor),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -822,7 +845,7 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
               )
               .where(
                 (insight) =>
-                insight.studyMinutes != 0 || insight.hasAnsweredQuestions,
+                    insight.studyMinutes != 0 || insight.hasAnsweredQuestions,
               )
               .toList()
         : const <ExamTimeInsight>[];
@@ -901,7 +924,7 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+        side: BorderSide(color: _outlineColor),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),

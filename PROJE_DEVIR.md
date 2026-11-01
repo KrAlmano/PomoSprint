@@ -1,5 +1,7 @@
 # PomoSprint — proje ve AI oturum devir belgesi
 
+> **1 Kasım alan denemesi önizlemesi:** Kullanıcı özelliği önce incelemek istediğinden taslak bağımsız bir prototiptir; normal uygulamaya, canlıya, hesaba veya cüzdana bağlı değildir. Örnek süreler 25/50/75 dk, kumlar 20/40/60 ve lig puanı yoktur. [Prototip kapsamı ve cihaz sınırı](analiz/BRANS_PROTOTIP_2026-11-01.md). Normal uygulamanın bundle kimliği üzerine önizleme yükleme. Gerçek özellik için kullanıcı değerlendirmesi bekleniyor.
+
 > **1 Kasım en yeni devam noktası:** [Deneme/rapor/bağlantı QA](analiz/QA_2026-11-01.md), [canlı ve yerel sunucu kontrolü](analiz/SUNUCU_RAPORU_2026-11-01.md) ve [çevrimdışı ödül güvenliği](analiz/OFFLINE_ODUL_GUVENLIK_NOTU_2026-11-01.md) güncel kaynaktır. Canlıda Deneme şeması yok; yeni arayüz ve SQL yereldedir. Canlı doğrulanmamış seans ödül riski sürer, 30 bunu tek başına çözmez ve 31 kullanıcı kararı bekler. Etkinlik planlayıcı/bölüm denemeleri yalnız öneri olarak belgelendi. Yerel testleri ve yayın sınırlarını geçmişteki sonuçlarla karıştırma.
 
 > **28 Ekim en yeni devam noktası — KPSS / §42:** Uygulama, site metni ve proposed SQL yerelde 20 sınav/test ve YKS/LGS/TUS/DUS/KPSS olmak üzere 5 aileye genişletildi; KPSS **canlıya uygulanmadı**. Son onaylı site `6cfd9b5` / Worker `ad2fc988-4462-40ae-9333-ab0107e2138b` olup KPSS içermez. Bundan sonraki deploy için yeniden açık kullanıcı onayı gerekir. [KPSS raporu](analiz/QA_KPSS_2026-10-28.md). Aşağıdaki gece/DUS/yayın notları tarihsel kanıttır; yeni KPSS native testi bu not yazılırken henüz tamamlanmadı.
