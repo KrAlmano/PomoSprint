@@ -16,4 +16,6 @@
 
 ## Canlı durum
 
-Bu çalışma henüz canlıya yayımlanmadı. Kullanıcının önceki talimatına göre her yeni deploy öncesi onay gerekir. Hazır kaynakta daha önceki yerel KPSS metinleri de vardır; yayımlanacak bütün paketin kapsamı kullanıcıya belirtilmelidir. Bu çalışma uygulama dağıtımı veya yeni Supabase işlemi değildir.
+Kullanıcı, hazırlanan paket ve KPSS açıklamaları bildirildikten sonra “canliya al hadi hizlica” diyerek yayını onayladı. Kaynak commit `780fbce`, Worker sürümü `b5aada3b-348f-4f10-9334-e81b01a310d4` olarak `wrangler deploy --keep-vars` ile yayımlandı. Canlı ana sayfa, Özellikler TR/EN, sürümlü CSS/JS ve dört yeni PNG dosyası kaynakla birebir SHA-256 eşleşti. Öncesinde 177/177 test, ortak parçalar ve dry-run geçti. Bu yayın mobil uygulama dağıtımı veya Supabase işlemi değildir. Kullanıcının gelecekteki her ayrı site yayını için önceden onay isteği sürer.
+
+Canlı sonrası bağımsız kontrol: TR/EN ana sayfa, Özellikler, SSS; CSS/JS ve dört yeni PNG **12/12** HTTP 200 ve kaynakla SHA-256 eşleşti. Görünür Safari’de TR/EN Deneme çiftleri kaydırma sonrasında 220×458 px, aynı üst/alt koordinatta ve `transform=none` ölçüldü. 375 px EN görünümde yatay taşma yok, telefonlar tek sütun 260×545 px. Piksel ekran görüntüsü alınmadı; ölçümler canlı Safari DOM yerleşimidir. Gerçek form/hesap işlemi yapılmadı.

@@ -1,3 +1,5 @@
+> **1 Kasım canlı site:** Kullanıcının onayıyla `780fbce` web kaynağı, `b5aada3b-348f-4f10-9334-e81b01a310d4` Worker sürümüyle yayımlandı. Telefon hizası ve güncel Raporlar/Deneme ekranları ile KPSS site metinleri canlıdadır. Aşağıdaki 28 Ekim site yayınına ilişkin notlar tarihseldir. [Yayın doğrulaması](analiz/SITE_GORUNUM_KONTROLU_2026-11-01.md).
+
 > **Güncel cihazlar (29 Ekim):** HocamMacVar ve PomoSprint aynı iPhone 17 / iOS 27.0 simülatöründe; ayrıca tek Android `PomoSprint_QA_API36` bulunur. [Temizlik ve taşıma raporu](analiz/TEMIZLIK_2026-10-29.md).
 
 # PomoSprint
