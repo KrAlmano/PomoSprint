@@ -1402,3 +1402,7 @@ Sonraki ajan önce KPSS raporundaki ortam ayrımını ve `git status`/dalı kont
 ## 43. 29 Ekim cihaz birleştirme ve temizlik
 
 [Temizlik raporu](analiz/TEMIZLIK_2026-10-29.md) güncel cihaz/araç durumudur. Kullanıcı 1 iOS + 1 Android istedi. PomoSprint’in veri/taslak/seansı iPhone16’dan mevcut HocamMacVar iPhone17’ye taşındı; iki uygulama açıldıktan sonra eski cihaz silindi. iOS27.0 ve AndroidAPI36 kalır;18.1/18.6 runtime’ları kaldırıldı. Yaklaşık22,2GB net alan açıldı. Derleme önbellekleri ve iki eski tekseferlik yardımcı kaldırıldı; gerekli SDK’lar, regresyon/SQL kaynakları, yerel DB ve çalışan site54361 korundu. Review/KPSS yardımcı servisleri kapalı. Native host yeni iPhone17ID’sini kullanır,6/6test geçti. Eski28Ekim medya kayıtları gerçek18.6kaynağını korur. Yeni runtime indirme; iki uygulamanın verisini sıfırlama.
+
+## 44. 6 Kasım Deneme görünümü
+
+Katalog, aktif deneme, geçmiş içgörü ve lig bilgi kartları görsel olarak yenilendi; kısa animasyonlar hareketi azalt ayarına uyar. Sınav işleyişi ve sunucu değişmedi. Analiz temiz, ilgili 58 test geçti; sahte backendli ayrı iPhone QA'da Türkçe katalog ve aktif ekran açıldı. Görseller ve doğrulama sınırları [Deneme görünüm raporunda](analiz/deneme_gorunum_2026-11-06/README.md). Bu değişiklik mağazaya/siteye dağıtılmadı. Önceki [yayın hazırlığı](analiz/YAYIN_HAZIRLIK_RAPORU_2026-11-06.md) ve [hukuk](analiz/HUKUKI_VE_MAGAZA_KONTROLU_2026-11-06.md) raporlarındaki açık konular sürer.

@@ -486,13 +486,16 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
 
   Widget _tabs(AppLocalizations l10n) {
     final colors = Theme.of(context).colorScheme;
+    final duration = MediaQuery.disableAnimationsOf(context)
+        ? Duration.zero
+        : const Duration(milliseconds: 180);
     final labels = [l10n.examTabNew, l10n.examTabHistory, l10n.examTabLeague];
     const ids = ['new', 'history', 'league'];
     Widget tab(int index) => Semantics(
       button: true,
       selected: _tab == index,
       child: Material(
-        color: _tab == index ? colors.primary : Colors.transparent,
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(12),
         child: InkWell(
           key: ValueKey('exam-tab-${ids[index]}'),
@@ -501,8 +504,14 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
             setState(() => _tab = index);
             if (index == 1) unawaited(_loadStudies());
           },
-          child: ConstrainedBox(
+          child: AnimatedContainer(
+            duration: duration,
+            curve: Curves.easeOut,
             constraints: const BoxConstraints(minHeight: 48, minWidth: 72),
+            decoration: BoxDecoration(
+              color: _tab == index ? colors.primary : Colors.transparent,
+              borderRadius: BorderRadius.circular(12),
+            ),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               child: Center(
@@ -570,8 +579,8 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
       decoration: BoxDecoration(
-        color: colors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(8),
+        color: colors.surfaceContainerHighest.withValues(alpha: .65),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -581,7 +590,10 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
           Flexible(
             child: Text(
               text,
-              style: TextStyle(fontSize: 12, color: colors.onSurfaceVariant),
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                color: colors.onSurfaceVariant,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
@@ -791,104 +803,195 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
         child: Text(l10n.examEmptyFilter),
       ),
     for (final exam in _visibleExams)
-      Card(
-        key: ValueKey('exam-card-${exam.id}'),
-        margin: const EdgeInsets.only(top: 10),
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: _outlineColor),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                exam.name(_turkish),
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 6,
-                runSpacing: 6,
-                children: [
-                  _metadata(
-                    Icons.description_outlined,
-                    l10n.examSubjectQuestions(exam.totalQuestions),
-                  ),
-                  _metadata(
-                    Icons.schedule_rounded,
-                    '${exam.durationSeconds ~/ 60} ${l10n.minutesUnit}',
-                  ),
-                  if (exam.id == 'ayt')
-                    _metadata(Icons.layers_outlined, l10n.examAytTestCount),
-                ],
-              ),
-              const SizedBox(height: 12),
-              FilledButton(
-                key: ValueKey('exam-start-${exam.id}'),
-                style: FilledButton.styleFrom(minimumSize: const Size(0, 48)),
-                onPressed:
-                    _service.catalog.available &&
-                        !_starting &&
-                        _service.activeRecord == null
-                    ? () => _start(exam)
-                    : null,
-                child: Text(_starting ? l10n.examStarting : l10n.examStart),
-              ),
-            ],
-          ),
-        ),
+      _ExamCardEntrance(
+        key: ValueKey('exam-card-entrance-${exam.id}'),
+        child: _catalogCard(exam, l10n),
       ),
   ];
+
+  Widget _catalogCard(ExamDefinition exam, AppLocalizations l10n) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    // Use the exam's established identity, not arbitrary animated decoration.
+    final examIcon = switch (exam.id) {
+      'ayt' => Icons.layers_outlined,
+      'ydt' => Icons.translate_rounded,
+      _ => Icons.description_outlined,
+    };
+    return Card(
+      key: ValueKey('exam-card-${exam.id}'),
+      margin: const EdgeInsets.only(top: 12),
+      color: colors.surfaceContainerLowest,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: _outlineColor.withValues(alpha: .55)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                ExcludeSemantics(
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: colors.primary.withValues(alpha: .09),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Icon(examIcon, color: colors.primary, size: 22),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    exam.name(_turkish),
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                _metadata(
+                  Icons.description_outlined,
+                  l10n.examSubjectQuestions(exam.totalQuestions),
+                ),
+                _metadata(
+                  Icons.schedule_rounded,
+                  '${exam.durationSeconds ~/ 60} ${l10n.minutesUnit}',
+                ),
+                if (exam.id == 'ayt')
+                  _metadata(Icons.layers_outlined, l10n.examAytTestCount),
+              ],
+            ),
+            const SizedBox(height: 14),
+            FilledButton(
+              key: ValueKey('exam-start-${exam.id}'),
+              style: FilledButton.styleFrom(minimumSize: const Size(0, 48)),
+              onPressed:
+                  _service.catalog.available &&
+                      !_starting &&
+                      _service.activeRecord == null
+                  ? () => _start(exam)
+                  : null,
+              child: Text(_starting ? l10n.examStarting : l10n.examStart),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _activeCard(ExamLocalRecord record, AppLocalizations l10n) {
     final attempt = record.attempt;
     final seconds = attempt?.remainingSecondsAt(_service.now()) ?? 0;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final progress = attempt != null && attempt.plannedSeconds > 0
+        ? (1 - seconds / attempt.plannedSeconds).clamp(0.0, 1.0)
+        : null;
     final pending =
         record.pendingAction != null &&
         (record.pendingAction != ExamPendingAction.start || attempt == null);
     final pendingEarly =
         record.pendingAction == ExamPendingAction.completeEarly;
     return Card(
-      margin: const EdgeInsets.only(bottom: 10),
+      margin: const EdgeInsets.only(bottom: 16),
+      color: colors.surfaceContainerLowest,
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: _outlineColor),
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: _outlineColor.withValues(alpha: .55)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+              decoration: BoxDecoration(
+                color: colors.primary.withValues(alpha: .08),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                pendingEarly
+                    ? l10n.examEarlyPendingTitle
+                    : attempt == null
+                    ? l10n.examStartPending
+                    : pending && seconds == 0
+                    ? l10n.examPending
+                    : l10n.examRunning,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: colors.primary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
             Text(
               record.definition.name(_turkish),
-              style: Theme.of(context).textTheme.titleLarge,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
             ),
-            Text(
-              pendingEarly
-                  ? l10n.examEarlyPendingTitle
-                  : attempt == null
-                  ? l10n.examStartPending
-                  : pending && seconds == 0
-                  ? l10n.examPending
-                  : l10n.examRunning,
-            ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             if (attempt != null)
               FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(
                   _clock(seconds),
                   key: const ValueKey('exam-countdown'),
-                  style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                  style: theme.textTheme.displayLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
                     fontFeatures: const [FontFeature.tabularFigures()],
                   ),
                 ),
               ),
-            Text(l10n.examNoPause),
+            if (progress != null) ...[
+              const SizedBox(height: 12),
+              Semantics(
+                label: l10n.examRunning,
+                value: '${(progress * 100).round()}%',
+                child: ExcludeSemantics(
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween<double>(begin: 0, end: progress),
+                    duration: MediaQuery.disableAnimationsOf(context)
+                        ? Duration.zero
+                        : const Duration(milliseconds: 220),
+                    curve: Curves.easeOut,
+                    builder: (context, value, _) => ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: LinearProgressIndicator(
+                        value: value,
+                        minHeight: 7,
+                        backgroundColor: colors.primary.withValues(alpha: .10),
+                        color: colors.primary,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+            ],
+            Text(
+              l10n.examNoPause,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colors.onSurfaceVariant,
+              ),
+            ),
             const SizedBox(height: 12),
             if (pending)
               Text(
@@ -954,11 +1057,29 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              l10n.examInsights,
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
+            Row(
+              children: [
+                ExcludeSemantics(
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: colors.primary.withValues(alpha: .09),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(Icons.insights_rounded, color: colors.primary),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    l10n.examInsights,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 10),
             if (_studiesStale) ...[
@@ -1091,10 +1212,11 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
     return Card(
       key: ValueKey('exam-history-card-${attempt.clientUuid}'),
       margin: const EdgeInsets.only(bottom: 12),
+      color: colors.surfaceContainerLowest,
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-        side: BorderSide(color: _outlineColor),
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: _outlineColor.withValues(alpha: .55)),
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
@@ -1122,8 +1244,9 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
             const SizedBox(height: 10),
             Text(
               date(attempt.startedAt),
-              style: theme.textTheme.bodyMedium?.copyWith(
+              style: theme.textTheme.bodySmall?.copyWith(
                 color: colors.onSurfaceVariant,
+                fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(height: 12),
@@ -1305,6 +1428,31 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
 
   static String _clock(int seconds) =>
       '${(seconds ~/ 3600).toString().padLeft(2, '0')}:${((seconds % 3600) ~/ 60).toString().padLeft(2, '0')}:${(seconds % 60).toString().padLeft(2, '0')}';
+}
+
+/// A single, short entrance that respects the operating system motion setting.
+class _ExamCardEntrance extends StatelessWidget {
+  const _ExamCardEntrance({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context)) return child;
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 260),
+      curve: Curves.easeOutCubic,
+      child: child,
+      builder: (context, value, child) => Opacity(
+        opacity: .65 + value * .35,
+        child: Transform.translate(
+          offset: Offset(0, (1 - value) * 6),
+          child: child,
+        ),
+      ),
+    );
+  }
 }
 
 class _ExamCountdown extends StatefulWidget {
@@ -1652,12 +1800,59 @@ class _ExamLeagueViewState extends State<_ExamLeagueView>
             ],
           ],
         ],
-        const Divider(height: 32),
-        Text(
-          l10n.examRewardAvatars,
-          style: Theme.of(context).textTheme.titleMedium,
+        const SizedBox(height: 24),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: isDark
+                ? AppColors.darkSurfaceContainerLow
+                : AppColors.surfaceContainerLowest,
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ExcludeSemantics(
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: .09),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.emoji_events_outlined,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.examRewardAvatars,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      l10n.examRewardAvatarsPending,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        height: 1.35,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
-        Text(l10n.examRewardAvatarsPending),
       ],
     );
   }
