@@ -13,7 +13,7 @@ final RegExp _jwtPattern = RegExp(
   r'\beyJ[A-Za-z0-9_-]{5,}\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b',
 );
 final RegExp _credentialAssignment = RegExp(
-  r'''\b(password|passwd|access[_-]?token|refresh[_-]?token|id[_-]?token|api[_-]?key|client[_-]?secret|secret|token)\s*[=:]\s*["']?[^\s,;"'}]+''',
+  r'''\b(current[_-]?password|new[_-]?password|old[_-]?password|password|passwd|access[_-]?token|refresh[_-]?token|id[_-]?token|api[_-]?key|client[_-]?secret|secret|token)["']?\s*[=:]\s*(?:"[^"\r\n]*"|'[^'\r\n]*'|[^\s,;}\]]+)''',
   caseSensitive: false,
 );
 final RegExp _privateKey = RegExp(
@@ -34,9 +34,54 @@ String _safeUrl(String value) {
     return '[redacted-url]';
   }
   // Rebuild instead of replace(query: null): null would retain the old query.
-  String path;
+  List<String> pathSegments;
   try {
-    path = maskEmails(Uri.decodeFull(uri.path));
+    // Decode each segment before inspection: a credential separator or token
+    // may itself have been percent encoded. The request field is serialized
+    // separately and does not pass through _cleanText afterwards.
+    final segments = uri.pathSegments;
+    const sensitiveParents = {
+      'password',
+      'passwd',
+      'token',
+      'accesstoken',
+      'refreshtoken',
+      'idtoken',
+      'apikey',
+      'secret',
+      'credential',
+      'credentials',
+      'code',
+      'otp',
+      'session',
+      'sessionid',
+      'authorization',
+      'reset',
+      'recovery',
+      'verify',
+    };
+    pathSegments = [];
+    var previousSensitive = false;
+    for (final segment in segments) {
+      final normalized = segment.toLowerCase().replaceAll(
+        RegExp('[^a-z0-9]'),
+        '',
+      );
+      final containsCredential =
+          _credentialAssignment.hasMatch(segment) ||
+          _authorizationPattern.hasMatch(segment) ||
+          _jwtPattern.hasMatch(segment) ||
+          _privateKey.hasMatch(segment);
+      pathSegments.add(
+        previousSensitive || containsCredential
+            ? '[redacted]'
+            : maskEmails(segment),
+      );
+      // Empty segments must not let a following credential escape masking.
+      if (segment.isNotEmpty) {
+        previousSensitive = sensitiveParents.contains(normalized);
+      }
+    }
   } on FormatException {
     return '[redacted-url]';
   }
@@ -44,7 +89,7 @@ String _safeUrl(String value) {
     scheme: uri.scheme,
     host: uri.host,
     port: uri.hasPort ? uri.port : null,
-    path: path,
+    pathSegments: ['', ...pathSegments],
   ).toString();
 }
 

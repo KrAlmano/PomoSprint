@@ -2984,6 +2984,18 @@ abstract class AppLocalizations {
   /// **'Mevcut şifre hatalı.'**
   String get changePasswordWrongCurrent;
 
+  /// No description provided for @changePasswordReauthenticate.
+  ///
+  /// In tr, this message translates to:
+  /// **'Güvenliğin için çıkış yapıp yeniden giriş yaptıktan sonra tekrar dene.'**
+  String get changePasswordReauthenticate;
+
+  /// No description provided for @changePasswordOutcomeUnknown.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şifre değişikliği tamamlanmış olabilir. Tekrar denemeden önce işlemi başlattığın hesapta yeni şifrenle giriş yaparak kontrol et.'**
+  String get changePasswordOutcomeUnknown;
+
   /// No description provided for @changePasswordSave.
   ///
   /// In tr, this message translates to:

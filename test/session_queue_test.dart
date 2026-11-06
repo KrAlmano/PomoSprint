@@ -236,6 +236,32 @@ void main() {
     expect(await queue.pendingCount('u1'), 1);
   });
 
+  test('onboarding engelinde seans korunur ve sonraki denemede gönderilir', () async {
+    backend.handler = (s, c, t) async => throw const PostgrestException(
+      message: 'onboarding_required', code: '23514');
+    final result = await queue.submit(
+      'u1', _session('pending-onboarding', startedAt: now.subtract(const Duration(minutes: 30))));
+    expect(result, isA<SessionSubmitQueued>());
+    expect(await queue.pendingCount('u1'), 1);
+    expect(await queue.rejectedSessions('u1'), isEmpty);
+
+    backend.handler = (s, c, t) async => {'total_points': 5};
+    final report = await queue.sync('u1');
+    expect(report.sent, 1);
+    expect(await queue.pendingCount('u1'), 0);
+    expect(backend.sent.map((call) => call.uuid), ['pending-onboarding', 'pending-onboarding']);
+  });
+
+  test('başka check ihlalleri kalıcı ret davranışını korur', () async {
+    backend.handler = (s, c, t) async => throw const PostgrestException(
+      message: 'other_check_violation', code: '23514');
+    final result = await queue.submit(
+      'u1', _session('invalid', startedAt: now.subtract(const Duration(minutes: 30))));
+    expect(result, isA<SessionSubmitRejected>());
+    expect(await queue.pendingCount('u1'), 0);
+    expect(await queue.rejectedSessions('u1'), hasLength(1));
+  });
+
   test('kalıcı red: reddedilenlere taşınır, arka plandakiler bir kez bildirilir', () async {
     backend.handler = (s, c, t) async =>
         throw const PostgrestException(message: 'started_at is older than 24 hours', code: 'P0001');

@@ -55,6 +55,22 @@ export 'session_queue.dart'
         SessionSubmitResult,
         SessionSubmitSuccess;
 
+// gotrue-dart 2.26 does not expose `current_password`, but newer Supabase
+// Auth servers can require it when updating the password. The field is sent
+// only over the authenticated update request, never to logs or storage.
+class _PasswordUpdateAttributes extends UserAttributes {
+  _PasswordUpdateAttributes({required String password, required this.currentPassword})
+      : super(password: password);
+
+  final String currentPassword;
+
+  @override
+  Map<String, dynamic> toJson() => {
+    ...super.toJson(),
+    'current_password': currentPassword,
+  };
+}
+
 /// Uygulamanın tek veri erişim noktası (auth, profil, seans kuyruğu,
 /// kategoriler, sosyal, sıralama, avatarlar).
 ///
@@ -85,6 +101,9 @@ class SupabaseService {
 
   BackendConfig? _backendConfig;
   bool get isLocalBackend => _backendConfig?.isLocalBackend ?? false;
+
+  @visibleForTesting
+  set debugBackendConfig(BackendConfig? value) => _backendConfig = value;
 
   SupabaseClient get _client => Supabase.instance.client;
 
@@ -874,22 +893,130 @@ class SupabaseService {
     required String newPassword,
   }) async {
     await _ensureCloudForAuth();
-    final email = _client.auth.currentUser?.email;
-    if (email == null || email.isEmpty) {
+    // GoTrue 2.26 broadcasts auth events to every client on the same host on
+    // Web. This app targets iOS/Android; fail closed rather than allowing the
+    // temporary sign-in to replace the active Web session.
+    if (kIsWeb) throw const AuthFailure(AuthErrorCode.unknown);
+    final session = _client.auth.currentSession;
+    final user = _client.auth.currentUser;
+    final email = user?.email;
+    final config = _backendConfig;
+    if (session == null || user == null || email == null || email.isEmpty ||
+        config == null || config.supabaseUrl.isEmpty || config.supabaseAnonKey.isEmpty) {
       throw const AuthFailure(AuthErrorCode.unknown);
     }
     if (newPassword == currentPassword) {
       throw const AuthFailure(AuthErrorCode.samePassword);
     }
-    await runAuthRequest(
-      () => _client.auth.signInWithPassword(
-        email: email,
-        password: currentPassword,
-      ),
+    final epoch = _userEpoch;
+    String? sessionId(String token) {
+      // A refresh rotates the JWT but preserves Supabase's session_id claim.
+      // This is only a local race guard; the server still verifies each JWT.
+      if (token.length > 8192) return null;
+      try {
+        final parts = token.split('.');
+        if (parts.length != 3) return null;
+        final payload = jsonDecode(
+          utf8.decode(base64Url.decode(base64Url.normalize(parts[1]))),
+        );
+        if (payload is! Map) return null;
+        final id = payload['session_id'];
+        return id is String && id.isNotEmpty && id.length <= 128 ? id : null;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    bool stillCurrent() {
+      if (!_isCurrentSession(user.id, epoch)) return false;
+      final current = _client.auth.currentSession?.accessToken;
+      if (current == null) return false;
+      if (current == session.accessToken) return true;
+      final originalId = sessionId(session.accessToken);
+      return originalId != null && originalId == sessionId(current);
+    }
+    // GoTrue's sign-in and updateUser both mutate the client's current session
+    // after a network response. Use a separate in-memory client so a delayed
+    // response cannot replace or mix the active account on this device.
+    final isolated = GoTrueClient(
+      url: '${config.supabaseUrl}/auth/v1',
+      headers: {
+        'apikey': config.supabaseAnonKey,
+        'Authorization': 'Bearer ${config.supabaseAnonKey}',
+      },
+      autoRefreshToken: false,
     );
-    await runAuthRequest(
-      () => _client.auth.updateUser(UserAttributes(password: newPassword)),
-    );
+    var isolatedHoldsOriginalSession = false;
+    Future<void> revokeTemporarySession() async {
+      try {
+        if (isolated.currentSession != null) {
+          await isolated.signOut(scope: SignOutScope.local).timeout(
+            const Duration(seconds: 5),
+          );
+        }
+      } catch (_) {
+        // Revocation is best effort: no network operation can guarantee that
+        // an outstanding or timed-out login was revoked remotely.
+      }
+    }
+    try {
+      late final AuthResponse reauth;
+      try {
+        reauth = await runAuthRequest(
+          () => isolated.signInWithPassword(email: email, password: currentPassword),
+        );
+      } catch (_) {
+        // An error belonging to the previous user must not be shown as a
+        // password or account-specific error after switching accounts.
+        if (!stillCurrent()) throw const AuthFailure(AuthErrorCode.unknown);
+        rethrow;
+      }
+      if (!stillCurrent() || reauth.user?.id != user.id) {
+        throw const AuthFailure(AuthErrorCode.unknown);
+      }
+      // Auth revokes other sessions on password changes. Revoke the temporary
+      // login and perform the update using the device's original token, so it
+      // is not accidentally treated as an "other" session by the server.
+      await revokeTemporarySession();
+      final updateSession = _client.auth.currentSession;
+      if (!stillCurrent() || updateSession == null) {
+        throw const AuthFailure(AuthErrorCode.unknown);
+      }
+      isolatedHoldsOriginalSession = true;
+      // The access token may have rotated while temporary reauthentication was
+      // in flight. Use the latest snapshot of the same validated session.
+      await isolated.setInitialSession(jsonEncode(updateSession.toJson()));
+      if (!stillCurrent()) throw const AuthFailure(AuthErrorCode.unknown);
+      try {
+        await runAuthRequest(
+          () => isolated.updateUser(
+            _PasswordUpdateAttributes(
+              password: newPassword,
+              currentPassword: currentPassword,
+            ),
+          ),
+        );
+      } on AuthException catch (error) {
+        final status = int.tryParse(error.statusCode ?? '');
+        if (status != null && status >= 400 && status < 500 &&
+            status != 408 && status != 429) {
+          if (!stillCurrent()) throw const AuthFailure(AuthErrorCode.unknown);
+          rethrow;
+        }
+        throw const AuthFailure(AuthErrorCode.passwordChangeOutcomeUnknown);
+      } catch (_) {
+        // Once dispatched, a timeout or lost response cannot tell us whether
+        // the server committed the password change.
+        throw const AuthFailure(AuthErrorCode.passwordChangeOutcomeUnknown);
+      }
+      if (!stillCurrent()) {
+        throw const AuthFailure(AuthErrorCode.passwordChangeOutcomeUnknown);
+      }
+    } finally {
+      // Never sign out the original device session in cleanup.
+      if (!isolatedHoldsOriginalSession) await revokeTemporarySession();
+      isolated.dispose();
+    }
   }
 
   // ---- Sign in with Apple ----

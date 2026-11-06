@@ -919,6 +919,8 @@
   "changePasswordMismatch": "Yeni şifreler aynı değil.",
   "changePasswordSame": "Yeni şifre mevcut şifrenle aynı olamaz.",
   "changePasswordWrongCurrent": "Mevcut şifre hatalı.",
+  "changePasswordReauthenticate": "Güvenliğin için çıkış yapıp yeniden giriş yaptıktan sonra tekrar dene.",
+  "changePasswordOutcomeUnknown": "Şifre değişikliği tamamlanmış olabilir. Tekrar denemeden önce işlemi başlattığın hesapta yeni şifrenle giriş yaparak kontrol et.",
   "changePasswordSave": "Şifreyi güncelle",
   "changePasswordSuccess": "Şifren güncellendi. Diğer cihazlardaki oturumların kapanmış olabilir.",
   "registerShowPassword": "Şifreyi göster",

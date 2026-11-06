@@ -1406,3 +1406,7 @@ Sonraki ajan önce KPSS raporundaki ortam ayrımını ve `git status`/dalı kont
 ## 44. 6 Kasım Deneme görünümü
 
 Katalog, aktif deneme, geçmiş içgörü ve lig bilgi kartları görsel olarak yenilendi; kısa animasyonlar hareketi azalt ayarına uyar. Sınav işleyişi ve sunucu değişmedi. Analiz temiz, ilgili 58 test geçti; sahte backendli ayrı iPhone QA'da Türkçe katalog ve aktif ekran açıldı. Görseller ve doğrulama sınırları [Deneme görünüm raporunda](analiz/deneme_gorunum_2026-11-06/README.md). Bu değişiklik mağazaya/siteye dağıtılmadı. Önceki [yayın hazırlığı](analiz/YAYIN_HAZIRLIK_RAPORU_2026-11-06.md) ve [hukuk](analiz/HUKUKI_VE_MAGAZA_KONTROLU_2026-11-06.md) raporlarındaki açık konular sürer.
+
+## 45. 6 Kasım güvenlik devamı
+
+Şifre değiştirme hesap/oturum yarışı ve bazı Sentry/log gizlilik açıkları yerel istemcide giderildi; üretim mobil sürümüne dağıtılmadı. 35'e bağlı onboarding etkinlik koruması yalnız review-only SQL ve yerel testtir. 34 canlıda etkin değildir; eski istemciler ve kuyruklar için geçiş çözülmeden etkinleştirilmemeli. Analiz temiz, Flutter 1.617 başarılı/5 isteğe bağlı atlama ve Node 178/178; sentetik yerel GoTrue oturum davranışı ayrıca sınandı. Sonraki ajan [güvenlik düzeltme raporunu](analiz/GUVENLIK_DUZELTME_2026-11-06.md) ve [ödül geçişini](analiz/ODUL_GUVENLIK_DOGRULAMASI_2026-11-06.md) okusun; gerçek Auth ve Sentry uçtan uca/gerçek cihaz doğrulaması hâlâ bekler. 31 uygulanmadı.

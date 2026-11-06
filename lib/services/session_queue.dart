@@ -478,6 +478,15 @@ SessionFailure classifySessionError(
   if (error is PostgrestException) {
     final code = error.code ?? '';
     final msg = '${error.message} ${error.details ?? ''}'.toLowerCase();
+    // An account can finish onboarding and then retry the same saved session.
+    // Do not turn this specific server gate into a permanent invalid-data loss.
+    if (code == '23514' &&
+        error.message.trim().toLowerCase() == 'onboarding_required') {
+      return const SessionFailure(
+        SessionFailureKind.transient,
+        SessionReason.serverError,
+      );
+    }
     if (msg.contains('not authenticated')) {
       return const SessionFailure(
         SessionFailureKind.offline,

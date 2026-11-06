@@ -72,7 +72,8 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
       await widget.changePassword(currentPassword: _current.text, newPassword: _next.text);
       if (mounted) Navigator.pop(context, true);
     } catch (e) {
-      debugPrint('[PROFILE] Şifre değiştirilemedi: $e');
+      // Provider error messages may contain request data or credentials.
+      debugPrint('[PROFILE] Şifre değiştirilemedi: ${e.runtimeType}');
       if (!mounted) return;
       setState(() {
         _busy = false;

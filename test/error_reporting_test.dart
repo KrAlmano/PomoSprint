@@ -116,6 +116,30 @@ void main() {
     },
   );
 
+  test('request URLs do not leak credentials embedded in their path', () async {
+    final options = _options();
+    const jwt = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signature123';
+    for (final path in [
+      '/reset/token=SYNTHETIC_PATH_SECRET',
+      '/reset/access_token%3DSYNTHETIC_ENCODED_SECRET',
+      '/reset/current_password%3DSYNTHETIC_PASSWORD',
+      '/reset/token/SYNTHETIC_PATH_TOKEN',
+      '/otp//SYNTHETIC_OTP',
+      '/reset/$jwt',
+    ]) {
+      final clean = await options.beforeSend!(
+        SentryEvent(
+          request: SentryRequest(url: 'https://api.example.invalid$path'),
+        ),
+        Hint(),
+      );
+      final encoded = jsonEncode(clean!.toJson());
+      expect(encoded, isNot(contains('SYNTHETIC_')));
+      expect(encoded, isNot(contains(jwt)));
+      expect(clean.request!.url, contains('api.example.invalid'));
+    }
+  });
+
   test(
     'free text masks tokens and URLs while retaining stack line information',
     () async {
@@ -125,7 +149,10 @@ void main() {
       final clean = await options.beforeSend!(
         SentryEvent(
           message: SentryMessage(
-            'Bearer SYNTHETIC_AUTH access_token=SYNTHETIC_ASSIGN $jwt',
+            'Bearer SYNTHETIC_AUTH access_token=SYNTHETIC_ASSIGN '
+            'current_password=SYNTHETIC_OLD new-password=SYNTHETIC_NEW '
+            'currentPassword=SYNTHETIC_CAMEL '
+            '"current_password": "SYNTHETIC_JSON words" $jwt',
           ),
           exceptions: [
             SentryException.fromJson({
@@ -203,7 +230,7 @@ void main() {
       tracer,
       user: SentryUser(email: 'qa@example.invalid'),
       request: SentryRequest(
-        url: 'https://api.example.invalid/rpc?token=SYNTHETIC_REQUEST',
+        url: 'https://api.example.invalid/rpc/token/SYNTHETIC_REQUEST',
       ),
     );
     final clean = await options.beforeSendTransaction!(transaction, Hint());

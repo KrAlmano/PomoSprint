@@ -1708,6 +1708,14 @@ class AppLocalizationsTr extends AppLocalizations {
   String get changePasswordWrongCurrent => 'Mevcut şifre hatalı.';
 
   @override
+  String get changePasswordReauthenticate =>
+      'Güvenliğin için çıkış yapıp yeniden giriş yaptıktan sonra tekrar dene.';
+
+  @override
+  String get changePasswordOutcomeUnknown =>
+      'Şifre değişikliği tamamlanmış olabilir. Tekrar denemeden önce işlemi başlattığın hesapta yeni şifrenle giriş yaparak kontrol et.';
+
+  @override
   String get changePasswordSave => 'Şifreyi güncelle';
 
   @override

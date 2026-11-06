@@ -560,6 +560,8 @@
   "changePasswordMismatch": "The new passwords don't match.",
   "changePasswordSame": "Your new password must be different from your current one.",
   "changePasswordWrongCurrent": "Your current password is incorrect.",
+  "changePasswordReauthenticate": "For your security, sign out and sign in again, then try again.",
+  "changePasswordOutcomeUnknown": "The password change may have completed. Before retrying, sign in with your new password to the account where you started the change.",
   "changePasswordSave": "Update password",
   "changePasswordSuccess": "Your password was updated. You may have been signed out on your other devices.",
   "registerShowPassword": "Show password",

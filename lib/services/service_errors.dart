@@ -22,6 +22,10 @@ enum AuthErrorCode {
   signUpTimedOut,
   /// Yeni şifre mevcut şifreyle aynı (şifre değiştirme).
   samePassword,
+  /// Sunucu daha yeni bir oturum veya ayrıca doğrulama istiyor.
+  reauthenticationNeeded,
+  /// Sunucunun parola güncellemesini tamamlayıp tamamlamadığı belirsiz.
+  passwordChangeOutcomeUnknown,
   unknown,
 }
 
@@ -44,6 +48,13 @@ AuthErrorCode authErrorCodeOf(Object error) {
 
   final lower = error.toString().toLowerCase();
   final code = error is AuthException ? (error.code ?? '').toLowerCase() : '';
+
+  if (code == 'reauthentication_needed') {
+    return AuthErrorCode.reauthenticationNeeded;
+  }
+  if (code == 'current_password_mismatch') {
+    return AuthErrorCode.invalidCredentials;
+  }
 
   if (code == 'same_password' || lower.contains('same_password') || lower.contains('should be different from the old password')) {
     return AuthErrorCode.samePassword;

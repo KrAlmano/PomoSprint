@@ -1745,6 +1745,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your current password is incorrect.';
 
   @override
+  String get changePasswordReauthenticate =>
+      'For your security, sign out and sign in again, then try again.';
+
+  @override
+  String get changePasswordOutcomeUnknown =>
+      'The password change may have completed. Before retrying, sign in with your new password to the account where you started the change.';
+
+  @override
   String get changePasswordSave => 'Update password';
 
   @override
