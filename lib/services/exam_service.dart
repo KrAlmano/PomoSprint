@@ -17,7 +17,11 @@ abstract interface class ExamBackend {
   Listenable get ownerChanges;
   bool get isAvailable;
   DateTime now();
-  Future<Object?> rpc(String name, Map<String, dynamic> params);
+  Future<Object?> rpc(
+    String name,
+    Map<String, dynamic> params, {
+    required String expectedOwnerId,
+  });
   Future<void> didComplete();
 }
 
@@ -37,10 +41,26 @@ class SupabaseExamBackend implements ExamBackend {
   DateTime now() =>
       DateTime.now().add(ServerClock.correctionFor(_service.serverClockOffset));
   @override
-  Future<Object?> rpc(String name, Map<String, dynamic> params) {
-    if (!isAvailable) throw const ExamFailure('unavailable');
-    return Supabase.instance.client
+  Future<Object?> rpc(
+    String name,
+    Map<String, dynamic> params, {
+    required String expectedOwnerId,
+  }) {
+    if (!isAvailable || ownerId != expectedOwnerId) {
+      throw const ExamFailure('owner_changed');
+    }
+    final client = Supabase.instance.client;
+    final session = client.auth.currentSession;
+    if (session == null ||
+        session.user.id != expectedOwnerId ||
+        client.auth.currentUser?.id != expectedOwnerId) {
+      throw const ExamFailure('owner_changed');
+    }
+    // The SDK can resolve its access token asynchronously. Pin this request to
+    // the owner's current JWT before the user has a chance to switch accounts.
+    return client
         .rpc(name, params: params)
+        .setHeader('Authorization', 'Bearer ${session.accessToken}')
         .timeout(const Duration(seconds: 20));
   }
 
@@ -380,7 +400,7 @@ class ExamService extends ChangeNotifier {
       return;
     }
     try {
-      final raw = await backend.rpc('get_exam_config', {});
+      final raw = await backend.rpc('get_exam_config', {}, expectedOwnerId: owner);
       if (!_current(owner, epoch)) return;
       final catalog = ExamCatalog.fromJson(raw);
       _catalog = catalog ?? offlineExamCatalog;
@@ -401,12 +421,31 @@ class ExamService extends ChangeNotifier {
       final localAtRequest = {for (final row in _records) row.clientUuid: row};
       final fetched = <ExamAttempt>[];
       final cursors = <String>{};
-      String? cursor;
+      String? cursor, cursorId;
+      var legacyHistory = false;
+      var legacyHistoryMayBeIncomplete = false;
       do {
-        final history = await backend.rpc('get_my_exam_attempts', {
-          'p_limit': 100,
-          'p_before': ?cursor,
-        });
+        Object? history;
+        if (!legacyHistory) {
+          try {
+            history = await backend.rpc('get_my_exam_attempts_v2', {
+              'p_limit': 100,
+              'p_before_started_at': ?cursor,
+              'p_before_id': ?cursorId,
+            }, expectedOwnerId: owner);
+          } on PostgrestException catch (error) {
+            // Only a missing RPC permits the compatibility path. A failed
+            // request or access denial must not masquerade as an old server.
+            if (error.code != 'PGRST202' || cursor != null) rethrow;
+            legacyHistory = true;
+          }
+        }
+        if (legacyHistory) {
+          history = await backend.rpc('get_my_exam_attempts', {
+            'p_limit': 100,
+            'p_before': ?cursor,
+          }, expectedOwnerId: owner);
+        }
         if (!_current(owner, epoch)) return;
         if (history is! Map || history['attempts'] is! List) {
           throw const ExamFailure('invalid_response');
@@ -418,8 +457,33 @@ class ExamService extends ChangeNotifier {
           throw const ExamFailure('invalid_response');
         }
         fetched.addAll(parsed.cast<ExamAttempt>());
-        cursor = history['next_cursor'] as String?;
-        if (cursor != null && !cursors.add(cursor)) {
+        final next = history['next_cursor'];
+        if (legacyHistory) {
+          if (next != null && next is! String) {
+            throw const ExamFailure('invalid_response');
+          }
+          // The legacy server filters by timestamp alone. A full page may
+          // hide another record sharing its boundary timestamp. Keep the
+          // partial history, but do not present the totals as verified.
+          if (parsed.length >= 100) legacyHistoryMayBeIncomplete = true;
+          cursor = next as String?;
+          cursorId = null;
+        } else if (next == null) {
+          cursor = null;
+          cursorId = null;
+        } else {
+          if (next is! Map ||
+              next['started_at'] is! String ||
+              DateTime.tryParse(next['started_at'] as String) == null ||
+              next['id'] is! String ||
+              !RegExp(r'^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$')
+                  .hasMatch(next['id'] as String)) {
+            throw const ExamFailure('invalid_response');
+          }
+          cursor = next['started_at'] as String;
+          cursorId = next['id'] as String;
+        }
+        if (cursor != null && !cursors.add('$cursor|${cursorId ?? ''}')) {
           throw const ExamFailure('invalid_response');
         }
       } while (cursor != null);
@@ -477,8 +541,12 @@ class ExamService extends ChangeNotifier {
         await _save(owner, epoch, rows);
         if (_current(owner, epoch)) {
           _historyLoaded = true;
-          _historyRefreshFailed = false;
-          if (errorCode != 'journal_invalid') errorCode = null;
+          _historyRefreshFailed = legacyHistoryMayBeIncomplete;
+          if (errorCode != 'journal_invalid') {
+            errorCode = legacyHistoryMayBeIncomplete
+                ? 'exam_history_cursor_ambiguous'
+                : null;
+          }
         }
       });
     } catch (error) {
@@ -899,7 +967,9 @@ class ExamService extends ChangeNotifier {
           },
         ),
       };
-      final raw = await backend.rpc(name, params);
+      // A listener invoked by _emit may synchronously switch owners.
+      if (!_current(owner, epoch)) return;
+      final raw = await backend.rpc(name, params, expectedOwnerId: owner);
       if (!_current(owner, epoch)) return;
       final attempt = ExamAttempt.fromJson(raw is Map ? raw['attempt'] : null);
       if (attempt == null ||
@@ -983,9 +1053,10 @@ class ExamService extends ChangeNotifier {
   Future<ExamLeagueSnapshot> loadLeague({String scope = 'segment'}) async {
     final owner = _owner, epoch = _epoch;
     if (owner == null || !_catalog.available) return const ExamLeagueSnapshot();
+    if (!_current(owner, epoch)) throw const ExamFailure('owner_changed');
     final response = await backend.rpc('get_my_exam_league_ranking', {
       'p_scope': scope == 'global' ? 'global' : 'segment',
-    });
+    }, expectedOwnerId: owner);
     if (!_current(owner, epoch)) throw const ExamFailure('owner_changed');
     return ExamLeagueSnapshot.fromJson(response);
   }

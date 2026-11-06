@@ -1,0 +1,195 @@
+{
+  "source": "pomosprint_night_backend",
+  "clone": "pomosprint_night_global_scope",
+  "completed": true,
+  "copied_user_data": false,
+  "scope": "Local schema clone; four new accounts; historical standard-duration fixtures; no natural elapsed-time claim",
+  "checks": [
+    {
+      "name": "source_is_named_disposable_review_db",
+      "ok": true
+    },
+    {
+      "name": "fixed_local_clone_guard",
+      "ok": true
+    },
+    {
+      "name": "no_user_data_copied",
+      "ok": true
+    },
+    {
+      "name": "lgs_0_normal_fixture_accepted",
+      "ok": true
+    },
+    {
+      "name": "lgs_0_exam_fixture_accepted",
+      "ok": true
+    },
+    {
+      "name": "lgs_1_normal_fixture_accepted",
+      "ok": true
+    },
+    {
+      "name": "lgs_1_exam_fixture_accepted",
+      "ok": true
+    },
+    {
+      "name": "tus_0_normal_fixture_accepted",
+      "ok": true
+    },
+    {
+      "name": "tus_0_exam_fixture_accepted",
+      "ok": true
+    },
+    {
+      "name": "tus_1_normal_fixture_accepted",
+      "ok": true
+    },
+    {
+      "name": "tus_1_exam_fixture_accepted",
+      "ok": true
+    },
+    {
+      "name": "four_fresh_accounts_only",
+      "ok": true
+    },
+    {
+      "name": "study_lgs_0_segment_exact_owners",
+      "ok": true
+    },
+    {
+      "name": "study_lgs_0_global_contains_both_targets",
+      "ok": true
+    },
+    {
+      "name": "study_lgs_0_global_no_eligibility",
+      "ok": true
+    },
+    {
+      "name": "study_lgs_0_reads_do_not_mutate_economy",
+      "ok": true
+    },
+    {
+      "name": "study_lgs_1_segment_exact_owners",
+      "ok": true
+    },
+    {
+      "name": "study_lgs_1_global_contains_both_targets",
+      "ok": true
+    },
+    {
+      "name": "study_lgs_1_global_no_eligibility",
+      "ok": true
+    },
+    {
+      "name": "study_lgs_1_reads_do_not_mutate_economy",
+      "ok": true
+    },
+    {
+      "name": "study_tus_0_segment_exact_owners",
+      "ok": true
+    },
+    {
+      "name": "study_tus_0_global_contains_both_targets",
+      "ok": true
+    },
+    {
+      "name": "study_tus_0_global_no_eligibility",
+      "ok": true
+    },
+    {
+      "name": "study_tus_0_reads_do_not_mutate_economy",
+      "ok": true
+    },
+    {
+      "name": "study_tus_1_segment_exact_owners",
+      "ok": true
+    },
+    {
+      "name": "study_tus_1_global_contains_both_targets",
+      "ok": true
+    },
+    {
+      "name": "study_tus_1_global_no_eligibility",
+      "ok": true
+    },
+    {
+      "name": "study_tus_1_reads_do_not_mutate_economy",
+      "ok": true
+    },
+    {
+      "name": "exam_lgs_0_segment_exact_owners",
+      "ok": true
+    },
+    {
+      "name": "exam_lgs_0_global_contains_both_targets",
+      "ok": true
+    },
+    {
+      "name": "exam_lgs_0_global_no_eligibility",
+      "ok": true
+    },
+    {
+      "name": "exam_lgs_0_reads_do_not_mutate_economy",
+      "ok": true
+    },
+    {
+      "name": "exam_lgs_1_segment_exact_owners",
+      "ok": true
+    },
+    {
+      "name": "exam_lgs_1_global_contains_both_targets",
+      "ok": true
+    },
+    {
+      "name": "exam_lgs_1_global_no_eligibility",
+      "ok": true
+    },
+    {
+      "name": "exam_lgs_1_reads_do_not_mutate_economy",
+      "ok": true
+    },
+    {
+      "name": "exam_tus_0_segment_exact_owners",
+      "ok": true
+    },
+    {
+      "name": "exam_tus_0_global_contains_both_targets",
+      "ok": true
+    },
+    {
+      "name": "exam_tus_0_global_no_eligibility",
+      "ok": true
+    },
+    {
+      "name": "exam_tus_0_reads_do_not_mutate_economy",
+      "ok": true
+    },
+    {
+      "name": "exam_tus_1_segment_exact_owners",
+      "ok": true
+    },
+    {
+      "name": "exam_tus_1_global_contains_both_targets",
+      "ok": true
+    },
+    {
+      "name": "exam_tus_1_global_no_eligibility",
+      "ok": true
+    },
+    {
+      "name": "exam_tus_1_reads_do_not_mutate_economy",
+      "ok": true
+    },
+    {
+      "name": "all_reads_preserve_all_economy_and_competition_rows",
+      "ok": true
+    },
+    {
+      "name": "owned_clone_removed",
+      "ok": true
+    }
+  ],
+  "passed": 46,
+  "total": 46
+}

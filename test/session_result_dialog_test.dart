@@ -248,13 +248,14 @@ void main() {
       expect(find.text(l10n.sessionNotSavedTitle), findsNothing);
     });
 
-    testWidgets('zaman aşımında kuyruk mesajı; sonuç sonradan gelince güncellenir', (tester) async {
+    testWidgets('gecikmede sonuç beklenir; sonuç sonradan gelince güncellenir', (tester) async {
       final submission = Completer<SessionSubmitResult?>();
       await _pumpDialog(tester, submission.future, timeout: const Duration(seconds: 2));
       expect(find.text(l10n.sessionResultSaving), findsOneWidget);
       await tester.pump(const Duration(seconds: 3));
       expect(find.text(l10n.sessionResultSaving), findsNothing);
-      expect(find.text(l10n.sessionQueuedOffline), findsOneWidget);
+      expect(find.text(l10n.sessionSavePending), findsOneWidget);
+      expect(find.text(l10n.sessionQueuedOffline), findsNothing);
 
       submission.complete(const SessionSubmitSuccess(minutes: 25, basePoints: 5, totalPoints: 5, coinsEarned: 20));
       await tester.pumpAndSettle();
@@ -262,12 +263,13 @@ void main() {
       expect(find.text(l10n.sessionResultPoints(5)), findsOneWidget);
     });
 
-    testWidgets('gönderim hata verirse seans cihazda kalır mesajı', (tester) async {
+    testWidgets('gönderim hata verirse kaydedilemedi uyarısı', (tester) async {
       final submission = Completer<SessionSubmitResult?>();
       await _pumpDialog(tester, submission.future);
       submission.completeError(StateError('kayıt yazılamadı'));
       await tester.pumpAndSettle();
-      expect(find.text(l10n.sessionQueuedOffline), findsOneWidget);
+      expect(find.textContaining(l10n.sessionNotSavedTitle), findsOneWidget);
+      expect(find.text(l10n.sessionQueuedOffline), findsNothing);
     });
   });
 

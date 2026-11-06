@@ -1,0 +1,42 @@
+import 'package:flutter/material.dart';
+import 'package:pomodoro/l10n/app_localizations.dart';
+import 'package:pomodoro/models/avatar_model.dart';
+import 'package:pomodoro/models/exam_catalog_defaults.dart';
+import 'package:pomodoro/screens/exam_screen.dart';
+import 'package:pomodoro/services/exam_service.dart';
+import 'package:pomodoro/theme.dart';
+import 'package:pomodoro/widgets/avatar_widget.dart';
+import 'package:pomodoro/widgets/shell_app_bar.dart';
+import 'package:pomodoro/widgets/shell_navigation.dart';
+import 'site_audit_fake_backend.dart';
+
+const lang = String.fromEnvironment('QA_LANGUAGE', defaultValue: 'tr');
+const screen = String.fromEnvironment('QA_SCREEN', defaultValue: 'catalog');
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final service = ExamService(backend: FakeExamBackend());
+  await service.initialize();
+  if (screen == 'running') await service.start(offlineExamCatalog.byId('tyt')!);
+  runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
+    theme: AppTheme.lightTheme,
+    locale: const Locale(lang),
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    home: Builder(builder: (context) => ShellNavigationScaffold(
+      selectedIndex: 4,
+      onDestinationSelected: (_) {},
+      destinations: [
+        const ShellDestination(icon: Icons.timer_outlined, selectedIcon: Icons.timer, label: 'Pomo'),
+        ShellDestination(icon: Icons.analytics_outlined, selectedIcon: Icons.analytics, label: lang == 'tr' ? 'Raporlar' : 'Reports'),
+        ShellDestination(icon: Icons.leaderboard_outlined, selectedIcon: Icons.leaderboard, label: lang == 'tr' ? 'Sıralama' : 'Ranking'),
+        ShellDestination(icon: Icons.groups_outlined, selectedIcon: Icons.groups, label: lang == 'tr' ? 'Sosyal' : 'Social'),
+        ShellDestination(icon: Icons.assignment_outlined, selectedIcon: Icons.assignment, label: AppLocalizations.of(context)!.examTab),
+      ],
+      appBar: buildShellAppBar(context, streakDays: null, points: 29, coins: 80,
+        onStatsTap: () {}, onFriendsTap: () {}, onProfileTap: () {},
+        avatarBuilder: (size) => AvatarWidget(avatar: AvatarCharacter.byId(null), size: size)),
+      body: ExamScreen(service: service, userSegment: 'yks'),
+    )),
+  ));
+}

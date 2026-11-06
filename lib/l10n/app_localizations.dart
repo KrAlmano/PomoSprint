@@ -4398,6 +4398,24 @@ abstract class AppLocalizations {
   /// **'Başlatma isteğinin sonucu henüz bilinmiyor. Tekrar denemek yeni bir deneme oluşturmaz.'**
   String get examStartPendingBody;
 
+  /// No description provided for @timerPauseStorageError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Duraklatma cihazına kaydedilemedi. Sayaç çalışmaya devam ediyor; tekrar deneyebilirsin.'**
+  String get timerPauseStorageError;
+
+  /// No description provided for @timerStartStorageError.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sayaç cihazına kaydedilemedi. Lütfen tekrar dene.'**
+  String get timerStartStorageError;
+
+  /// No description provided for @examHistoryIncomplete.
+  ///
+  /// In tr, this message translates to:
+  /// **'Deneme geçmişinin tamamı doğrulanamadı. Bazı kayıtlar raporda eksik olabilir.'**
+  String get examHistoryIncomplete;
+
   /// No description provided for @examError.
   ///
   /// In tr, this message translates to:
@@ -5416,6 +5434,24 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Alan Bilgisi'**
   String get examKpssField;
+
+  /// No description provided for @timerRecordCorrupt.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cihazdaki sayaç kaydı güvenle yüklenemedi. Yeni seans başlatılamıyor; lütfen daha sonra tekrar dene.'**
+  String get timerRecordCorrupt;
+
+  /// No description provided for @sessionRecordsUnreadable.
+  ///
+  /// In tr, this message translates to:
+  /// **'Cihazdaki seans kayıtları okunamadı. Rapor eksik olabilir; kayıtlar korunuyor.'**
+  String get sessionRecordsUnreadable;
+
+  /// No description provided for @sessionSavePending.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydetme işlemi hâlâ sürüyor. Sonuç henüz doğrulanmadı.'**
+  String get sessionSavePending;
 }
 
 class _AppLocalizationsDelegate

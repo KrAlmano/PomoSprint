@@ -12,7 +12,14 @@ import 'package:supabase/src/auth_http_client.dart';
 
 void main() {
   test('pinned owner survives account switch while SDK resolves token', () async {
-    for (final rpc in ['start_study_session', 'start_marathon_break', 'confirm_marathon_presence']) {
+    for (final rpc in [
+      'start_study_session',
+      'start_marathon_break',
+      'confirm_marathon_presence',
+      'start_exam_attempt',
+      'save_exam_details',
+      'get_my_exam_attempts_v2',
+    ]) {
     final lookup = Completer<String?>();
     final seen = <String?>[];
     final inner = MockClient((request) async {

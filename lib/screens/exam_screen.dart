@@ -49,10 +49,11 @@ class _ExamScreenState extends State<ExamScreen> with WidgetsBindingObserver {
   Color get _outlineColor => Theme.of(context).brightness == Brightness.dark
       ? AppColors.darkOutlineVariant
       : AppColors.outlineVariant;
-  String _errorMessage(AppLocalizations l10n, String? code) =>
-      code == 'exam_start_rate_limited'
-      ? l10n.examStartRateLimited
-      : l10n.examError;
+  String _errorMessage(AppLocalizations l10n, String? code) => switch (code) {
+    'exam_start_rate_limited' => l10n.examStartRateLimited,
+    'exam_history_cursor_ambiguous' => l10n.examHistoryIncomplete,
+    _ => l10n.examError,
+  };
   ExamService get _service => widget.service ?? ExamService.instance;
   int _tab = 0;
   String? _group;

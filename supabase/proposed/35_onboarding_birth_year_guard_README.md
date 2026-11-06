@@ -1,0 +1,7 @@
+# 35 — Onboarding'de boş doğum yılı için yerel koruma adayı
+
+**Canlıya uygulanmadı.** 6 Kasım salt okunur canlı incelemesinde `enforce_minimum_age` işlevinin yalnız dolu `birth_year` için çalıştığı ve kullanıcının boş yılla onboarding'i tamamlayabildiği görüldü. Yerel sentetik PostgreSQL senaryosunda bu davranış yeniden üretildi. İleri/DRYRUN/geri alma dosyaları kaynak gövde ve trigger/ACL koşullarını kontrol eder, mevcut tamamlanmış ve yılı boş profilleri korur. Geçici `NULL` ACL enjeksiyonunda guard fail-closed sınandı.
+
+Bu **tam yaş güvencesi değildir**: ayrı yerel Supabase klonunda 35 kurulduktan sonra dahi onboarding tamamlanmamış ve doğum yılı boş bir Auth hesabı `register_session_start` ve `start_exam_attempt` çağırabildi. Çalıştırılabilir kanıt `tool/local_supabase/e2e/reproduce_onboarding_rpc_scope.py` içindedir. Doğum yılı beyana dayanır ve yalnız yıl almak tam doğum gününü göstermez. RPC erişimi için mevcut hesaplar, hesap silme ve onboarding sırasında kullanılan işlevleri bozmayan ayrı bir tasarım ve inceleme gerekir.
+
+Yerel denemeler: `python3 tool/local_supabase/e2e/onboarding_birth_year_guard_test.py` ve ayrı klon kapsam denemesi; üretim verileri kullanılmadı. SQL Editor örnekleri `supabase/tests/20261106_onboarding_age_35_*` altında, fakat bu dosyaların bulunması üretim dağıtımı için yeterli değildir. Canlı tanım/izin paritesi, güncel backup ve rollout yeniden değerlendirilmelidir. 31'e dokunulmamıştır.

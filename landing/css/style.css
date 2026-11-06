@@ -938,6 +938,9 @@ main { overflow-x: clip; }
   pointer-events: none;
 }
 
+/* This unmodified native capture already includes the Dynamic Island. */
+.phone-screen-native-island::after { content: none; }
+
 .shot-image,
 .shot-video {
   position: absolute;

@@ -13,6 +13,8 @@ const LANDING = path.join(REPO, 'landing');
 const DATE = '20261028';
 const REFRESH_DATE = '20261101';
 const REFRESH_SCENES = ['exam-history', 'exam-results'];
+const AUDIT_DATE = '20261106';
+const AUDIT_SCENES = ['exam-catalog', 'exam-running'];
 const LANGS = ['tr', 'en'];
 const SCENES = ['timer', 'marathon-plan', 'exam-catalog', 'exam-running',
   'exam-history', 'exam-results', 'exam-insights', 'reports-daily',
@@ -22,7 +24,8 @@ const VIDEO_SCENES = ['timer', 'marathon'];
 const DIMENSIONS = { width: 540, height: 1170 };
 const SCREEN_FILES = SCENES.flatMap(scene => LANGS.map(lang => `${scene}-${lang}.png`));
 const REFRESH_FILES = REFRESH_SCENES.flatMap(scene => LANGS.map(lang => `${scene}-${lang}.png`));
-const ARCHIVED_PATHS = REFRESH_FILES.map(file => `screenshots/${DATE}/${file}`);
+const AUDIT_FILES = AUDIT_SCENES.flatMap(scene => LANGS.map(lang => `${scene}-${lang}.png`));
+const ARCHIVED_PATHS = [...REFRESH_FILES, ...AUDIT_FILES].map(file => `screenshots/${DATE}/${file}`);
 const REFRESH_PATHS = REFRESH_FILES.map(file => `screenshots/${REFRESH_DATE}/${file}`);
 const VIDEO_FILES = VIDEO_SCENES.flatMap(scene => LANGS.flatMap(lang => [`${scene}-${lang}.mp4`, `${scene}-${lang}.webp`]));
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
@@ -171,6 +174,7 @@ const allHtml = () => walk(LANDING).filter(file => file.endsWith('.html') && !fi
 const expectedAssetPaths = () => [
   ...SCREEN_FILES.map(file => `screenshots/${DATE}/${file}`),
   ...REFRESH_PATHS,
+  ...AUDIT_FILES.map(file => `screenshots/${AUDIT_DATE}/${file}`),
   ...VIDEO_FILES.map(file => `videos/${DATE}/${file}`),
 ];
 
@@ -257,6 +261,34 @@ test('November report screenshots: TR/EN history and result entry have verified 
     assert.equal(scene.source.locale, scene.locale);
   }
   assert.deepEqual(sorted(seen), sorted(REFRESH_FILES));
+});
+
+test('November 6 exam screens: native and web bytes, locale and size agree', () => {
+  assert.deepEqual(sorted(walk(path.join(LANDING,'screenshots',AUDIT_DATE)).filter(file => file.endsWith('.png'))), sorted(AUDIT_FILES));
+  const manifest = JSON.parse(text(`screenshots/manifest-${AUDIT_DATE}.json`));
+  assert.equal(manifest.date, '2026-11-06');
+  assert.equal(manifest.capture.bundle_id, 'com.pomosprint.qa.siteaudit');
+  assert.equal(manifest.capture.fixture, 'in-memory synthetic data');
+  assert.equal(manifest.scenes.length, AUDIT_FILES.length);
+  const seen = new Set();
+  for (const scene of manifest.scenes) {
+    assert.ok(AUDIT_SCENES.includes(scene.scene)); assert.ok(LANGS.includes(scene.locale));
+    const filename = `${scene.scene}-${scene.locale}.png`;
+    assert.equal(scene.file, `${AUDIT_DATE}/${filename}`);
+    assert.equal(seen.has(filename), false); seen.add(filename);
+    const output = read(`screenshots/${scene.file}`);
+    assert.deepEqual(pngDimensions(output), DIMENSIONS); assert.equal(hash(output), scene.sha256);
+    assert.equal(scene.source.path, `analiz/site_qa_2026-11-06/native/${filename}`);
+    const source = safeSource(scene.source.path);
+    assert.deepEqual(pngDimensions(source), {width:1206,height:2622});
+    assert.equal(hash(source), scene.source.sha256);
+    assert.equal(scene.source.locale, scene.locale);
+    assert.equal(scene.native_island, scene.scene === 'exam-running' && scene.locale === 'en');
+  }
+  const englishFeature = text('en/features.html');
+  assert.match(englishFeature, /phone-screen-native-island[^>]*><img[^>]*src="\/screenshots\/20261106\/exam-running-en\.png"/);
+  assert.match(text('css/style.css'), /\.phone-screen-native-island::after\s*\{\s*content:\s*none;/);
+  assert.deepEqual(sorted(seen), sorted(AUDIT_FILES));
 });
 
 test('B timer/Marathon: four silent MP4s and four static WebP posters share dimensions', () => {

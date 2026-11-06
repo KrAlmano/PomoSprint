@@ -98,6 +98,7 @@ class _ReportsScreenState extends State<ReportsScreen>
   /// Sunucu verisi en az bir kez yüklendi.
   bool _remoteLoaded = false;
   ServiceErrorCode? _loadError;
+  bool _localSessionReadFailed = false;
   DateTime? _loadedAt;
   Future<void>? _inflight;
   bool _reloadQueued = false;
@@ -259,6 +260,7 @@ class _ReportsScreenState extends State<ReportsScreen>
       _hasLoaded = false;
       _remoteLoaded = false;
       _loadError = null;
+      _localSessionReadFailed = false;
       _loadedAt = null;
       _dirty = true;
       if (_visible) unawaited(_refresh());
@@ -302,8 +304,11 @@ class _ReportsScreenState extends State<ReportsScreen>
     // de bekleyen seanslar görünür; (2) bu arada gönderilen seans iki listede
     // birden olursa client_uuid ile tekilleşir, hiçbirinde olmama durumu
     // oluşmaz.
-    final queue = await _readQueue();
-    final rejectedCount = await _readRejectedCount();
+    final queueRead = await _readQueue();
+    final rejectedRead = await _readRejectedCount();
+    final queue = queueRead.value;
+    final rejectedCount = rejectedRead.value;
+    final localReadFailed = queueRead.failed || rejectedRead.failed;
     List<ExamAttempt>? nextExams;
     ServiceErrorCode? examError;
     final loadExams = widget.loadExamAttempts;
@@ -338,7 +343,8 @@ class _ReportsScreenState extends State<ReportsScreen>
         _rejectedCount = rejectedCount;
         _hasLoaded = true;
         _remoteLoaded = true;
-        _loadError = examError;
+        _localSessionReadFailed = localReadFailed;
+        _loadError = localReadFailed ? ServiceErrorCode.server : examError;
         _loadedAt = DateTime.now();
         _today = today;
       });
@@ -350,6 +356,7 @@ class _ReportsScreenState extends State<ReportsScreen>
       if (!mounted || userId != _userId || epoch != _ownerEpoch) return;
       setState(() {
         if (nextExams != null) _examAttempts = nextExams;
+        _localSessionReadFailed = localReadFailed;
         _loadError = serviceErrorCodeOf(e);
         _pendingQueue = queue;
         _rejectedCount = rejectedCount;
@@ -366,21 +373,21 @@ class _ReportsScreenState extends State<ReportsScreen>
     }
   }
 
-  Future<List<PendingSession>> _readQueue() async {
+  Future<({List<PendingSession> value, bool failed})> _readQueue() async {
     try {
-      return await _service.getPendingSessions();
+      return (value: await _service.getPendingSessions(), failed: false);
     } catch (e) {
       debugPrint('Bekleyen seanslar okunamadı: $e');
-      return _pendingQueue;
+      return (value: _pendingQueue, failed: true);
     }
   }
 
-  Future<int> _readRejectedCount() async {
+  Future<({int value, bool failed})> _readRejectedCount() async {
     try {
-      return (await _service.getRejectedSessions()).length;
+      return (value: (await _service.getRejectedSessions()).length, failed: false);
     } catch (e) {
       debugPrint('Reddedilen seanslar okunamadı: $e');
-      return _rejectedCount;
+      return (value: _rejectedCount, failed: true);
     }
   }
 
@@ -425,14 +432,26 @@ class _ReportsScreenState extends State<ReportsScreen>
   /// halde toplam önce düşüp uzak okuma bitince geri gelirdi.
   Future<void> _reloadPending() async {
     final userId = _userId;
-    final queue = await _readQueue();
+    final queueRead = await _readQueue();
     if (!mounted || userId != _userId) return;
+    if (queueRead.failed) {
+      setState(() {
+        _localSessionReadFailed = true;
+        _loadError ??= ServiceErrorCode.server;
+      });
+      return;
+    }
+    final queue = queueRead.value;
     final now = {for (final p in queue) p.clientUuid};
     if (_pendingQueue.any((p) => !now.contains(p.clientUuid))) {
       unawaited(_refresh());
       return;
     }
-    setState(() => _pendingQueue = queue);
+    if (_localSessionReadFailed) {
+      unawaited(_refresh());
+    } else {
+      setState(() => _pendingQueue = queue);
+    }
   }
 
   int get _dailyGoalMinutes =>
@@ -485,11 +504,16 @@ class _ReportsScreenState extends State<ReportsScreen>
                       child: SingleChildScrollView(
                         child: StatsStaleBanner(
                           onRetry: _refresh,
-                          message: _remoteLoaded
+                          message: _localSessionReadFailed
+                              ? AppLocalizations.of(context)!.sessionRecordsUnreadable
+                              : widget.examService?.errorCode ==
+                                  'exam_history_cursor_ambiguous'
+                              ? AppLocalizations.of(context)!
+                                    .examHistoryIncomplete
+                              : _remoteLoaded
                               ? null
-                              : AppLocalizations.of(
-                                  context,
-                                )!.statsOfflinePendingOnly,
+                              : AppLocalizations.of(context)!
+                                    .statsOfflinePendingOnly,
                         ),
                       ),
                     ),
@@ -516,6 +540,16 @@ class _ReportsScreenState extends State<ReportsScreen>
     if (!_hasLoaded) {
       final error = _loadError;
       if (error != null && !_isLoading) {
+        if (_localSessionReadFailed) {
+          return Center(child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Text(AppLocalizations.of(context)!.sessionRecordsUnreadable, textAlign: TextAlign.center),
+              const SizedBox(height: 12),
+              TextButton(onPressed: _refresh, child: Text(AppLocalizations.of(context)!.statsRetry)),
+            ]),
+          ));
+        }
         return StatsErrorView(code: error, onRetry: _refresh);
       }
       return Center(

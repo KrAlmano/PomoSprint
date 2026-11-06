@@ -1,3 +1,5 @@
+> **6 Kasım site hazırlığı:** Canlı lig yapılandırması aylık geçişi 1 Aralık 2026 00.00 İstanbul olarak gösteriyor; metinler TR/EN buna göre yerelde düzeltildi. Deneme kataloğu ve süren Deneme için güncel iPhone QA bileşenlerinden TR/EN dört yeni ekran hazırlandı. Bu değişiklikler henüz canlıya dağıtılmadı. [Çekim kanıtı](../analiz/site_qa_2026-11-06/README.md).
+
 > **1 Kasım canlı site:** Kullanıcının açık onayıyla kaynak `780fbce`, Worker `b5aada3b-348f-4f10-9334-e81b01a310d4` olarak yayımlandı; telefon hizası, TR/EN güncel Raporlar görüntüleri ve KPSS açıklamaları dahildir. Canlı HTML/CSS/JS ve dört yeni görselin kaynak hash eşliği doğrulandı. [Yayın kaydı](../analiz/SITE_GORUNUM_KONTROLU_2026-11-01.md). İlerideki yeni deploy öncesi kullanıcı onayı gerekir.
 
 # pomosprint.app — TR/EN site
@@ -78,7 +80,7 @@ python3 landing/tools/sync_partials.py
 python3 landing/tools/sync_partials.py --check
 ```
 
-CSS/JS değişiminde cache sürümü ortak parçalarda ve Auth yardımcı sayfalarında birlikte güncellenir. Yerel CSS ve ana JS sürümü `20261101a`; ortak parça eşliği kontrol edildi. `_headers` CSP'si korunur; inline JS/style eklenmez, JSON-LD veri blokları istisnadır. Fontlar ve GSAP kendi alan adından sunulur; dış CDN geri eklenmez. `_partials/`, `tools/` ve Markdown dokümanlar `.assetsignore` ile yayın dışında kalır.
+CSS/JS değişiminde cache sürümü ortak parçalarda ve Auth yardımcı sayfalarında birlikte güncellenir. Yerel CSS sürümü `20261106a`, ana JS sürümü `20261101a`; ortak parça eşliği kontrol edildi. `_headers` CSP'si korunur; inline JS/style eklenmez, JSON-LD veri blokları istisnadır. Fontlar ve GSAP kendi alan adından sunulur; dış CDN geri eklenmez. `_partials/`, `tools/` ve Markdown dokümanlar `.assetsignore` ile yayın dışında kalır.
 
 Bütün uygulama görselleri ve videoları ortak `.phone`/`.phone-screen` iPhone çerçevesini kullanır. Siyah Dynamic Island, ekranın oransal üst merkezinde dekoratif CSS katmanıdır; kaynak medya değiştirilmez ve katman tıklamaları engellemez. Aspect ratio ekran kutusunda 540/1170'dir; padding'li dış telefona sabit yükseklik veya oran verilmez. `object-fit: contain` ile ekran kırpılmaz. Eşli ekran grupları 960px altında metnin altına, 420px altında tek telefona iner. Küçük yazı/taşma ve dikey akış yine gerçek 375/1024/1440 tarayıcı görünümüyle değerlendirilir.
 

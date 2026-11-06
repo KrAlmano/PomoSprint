@@ -1282,16 +1282,17 @@ class SessionQueue {
 
   List<Map<String, dynamic>> _decode(SharedPreferences prefs, String key) {
     final raw = prefs.getString(key);
-    if (raw == null || raw.isEmpty) return [];
+    if (raw == null) return [];
     try {
       final decoded = jsonDecode(raw);
-      if (decoded is! List) return [];
-      return decoded
-          .whereType<Map>()
-          .map((e) => Map<String, dynamic>.from(e))
-          .toList();
+      if (decoded is! List || decoded.any((item) => item is! Map)) {
+        throw const FormatException('session_queue_invalid');
+      }
+      return decoded.map((e) => Map<String, dynamic>.from(e as Map)).toList();
     } catch (_) {
-      return [];
+      // A damaged journal is not an empty journal. Keeping the original bytes
+      // prevents the next enqueue or sync from silently overwriting sessions.
+      throw const FormatException('session_queue_invalid');
     }
   }
 
@@ -1300,10 +1301,29 @@ class SessionQueue {
     String key,
     List<Map<String, dynamic>> list,
   ) async {
-    if (list.isEmpty) {
-      await prefs.remove(key);
-    } else {
-      await prefs.setString(key, jsonEncode(list));
+    final previous = prefs.getString(key);
+    Future<void> restorePrevious() async {
+      if (previous == null) {
+        await prefs.remove(key);
+      } else {
+        await prefs.setString(key, previous);
+      }
+    }
+
+    try {
+      final saved = list.isEmpty
+          ? await prefs.remove(key)
+          : await prefs.setString(key, jsonEncode(list));
+      if (!saved) throw StateError('session_queue_write_failed');
+    } catch (_) {
+      // SharedPreferences changes its in-process cache before native I/O.
+      // Restore the old value if the platform rejects or loses the write.
+      try {
+        await restorePrevious();
+      } catch (error) {
+        debugPrint('[QUEUE] Yerel kayıt geri yüklenemedi: $error');
+      }
+      rethrow;
     }
   }
 
@@ -1350,7 +1370,6 @@ class SessionQueue {
     // Account deletion may have cleared the queue while its request was in
     // flight. Never recreate deleted personal history from that late result.
     if (pending.length == before) return;
-    await _write(prefs, key, pending);
     await _appendRejected(
       prefs,
       userId,
@@ -1364,6 +1383,9 @@ class SessionQueue {
       ),
       notify: notify,
     );
+    // Record the rejection first: if the second write fails the original
+    // pending entry remains available for a safe, idempotent retry.
+    await _write(prefs, key, pending);
   });
 
   Future<void> _appendRejected(
@@ -1372,7 +1394,11 @@ class SessionQueue {
     RejectedSession rejected, {
     required bool notify,
   }) async {
-    final list = _decode(prefs, rejectedKey(userId))..add(rejected.toJson());
+    final list = _decode(prefs, rejectedKey(userId));
+    // A previous attempt may have saved the rejection before queue removal
+    // failed. Avoid duplicate history entries and duplicate notifications.
+    if (list.any((row) => row['client_uuid'] == rejected.clientUuid)) return;
+    list.add(rejected.toJson());
     final trimmed = list.length > maxRejectedHistory
         ? list.sublist(list.length - maxRejectedHistory)
         : list;

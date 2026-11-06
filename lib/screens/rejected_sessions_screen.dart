@@ -54,6 +54,12 @@ class _RejectedSessionsScreenState extends State<RejectedSessionsScreen> {
             if (snapshot.connectionState != ConnectionState.done) {
               return const Center(child: CircularProgressIndicator());
             }
+            if (snapshot.hasError) {
+              return Center(child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Text(l10n.sessionRecordsUnreadable, textAlign: TextAlign.center),
+              ));
+            }
             final sessions = snapshot.data ?? const <RejectedSession>[];
             return ContentWidth(
               child: ListView(

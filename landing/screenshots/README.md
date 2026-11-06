@@ -1,3 +1,5 @@
+> **6 Kasım:** Deneme kataloğu ve süren Deneme TR/EN güncel QA çekimleri `20261106/`, kaynak ve hash bilgisi `manifest-20261106.json`; [ham kanıt ve sınırlamalar](../../analiz/site_qa_2026-11-06/README.md). Önceki 28 Ekim seti tarihsel arşivde korunur; dört eski katalog/süre görseli yayından dışlanır.
+
 # Güncel ekran güncellemesi — 1 Kasım 2026
 
 Deneme geçmişi ve net girişi artık Raporlar ekranındaki güncel arayüzü gösterir. Bu dört kare **iPhone 17 / iOS 27.0 simülatöründe**, `com.pomosprint.qa.reportpreview` QA uygulamasının gerçek Raporlar/kabuk bileşenleri ve kurgu TYT/AYT verileriyle çekildi; canlı kullanıcı veya sunucu testi değildir. Durum çubuğu 09:41 ve dolu pil/Wi-Fi/hat değerlerine geçici olarak ayarlandı; işlem sonunda override temizlendi. iOS 27 bu ayarda pili yeşil şarj simgesiyle gösterebilir.

@@ -2576,6 +2576,18 @@ class AppLocalizationsTr extends AppLocalizations {
       'Başlatma isteğinin sonucu henüz bilinmiyor. Tekrar denemek yeni bir deneme oluşturmaz.';
 
   @override
+  String get timerPauseStorageError =>
+      'Duraklatma cihazına kaydedilemedi. Sayaç çalışmaya devam ediyor; tekrar deneyebilirsin.';
+
+  @override
+  String get timerStartStorageError =>
+      'Sayaç cihazına kaydedilemedi. Lütfen tekrar dene.';
+
+  @override
+  String get examHistoryIncomplete =>
+      'Deneme geçmişinin tamamı doğrulanamadı. Bazı kayıtlar raporda eksik olabilir.';
+
+  @override
   String get examError =>
       'Deneme bilgileri alınamadı. Bağlantını kontrol edip tekrar dene.';
 
@@ -3167,4 +3179,16 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get examKpssField => 'Alan Bilgisi';
+
+  @override
+  String get timerRecordCorrupt =>
+      'Cihazdaki sayaç kaydı güvenle yüklenemedi. Yeni seans başlatılamıyor; lütfen daha sonra tekrar dene.';
+
+  @override
+  String get sessionRecordsUnreadable =>
+      'Cihazdaki seans kayıtları okunamadı. Rapor eksik olabilir; kayıtlar korunuyor.';
+
+  @override
+  String get sessionSavePending =>
+      'Kaydetme işlemi hâlâ sürüyor. Sonuç henüz doğrulanmadı.';
 }

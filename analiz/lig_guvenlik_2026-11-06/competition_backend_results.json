@@ -1,0 +1,91 @@
+{
+  "checks": [
+    {
+      "name": "26_concurrent_first_study_completions",
+      "ok": true
+    },
+    {
+      "name": "target_rooms_capacity_25",
+      "ok": true
+    },
+    {
+      "name": "26_users_use_two_rooms",
+      "ok": true
+    },
+    {
+      "name": "single_membership_per_owner_kind_month",
+      "ok": true
+    },
+    {
+      "name": "rooms_never_cross_targets",
+      "ok": true
+    },
+    {
+      "name": "midmonth_target_keeps_room_and_score",
+      "ok": true
+    },
+    {
+      "name": "target_changes_next_calendar_month",
+      "ok": true
+    },
+    {
+      "name": "global_has_other_target_rows",
+      "ok": true
+    },
+    {
+      "name": "global_does_not_award_again",
+      "ok": true
+    },
+    {
+      "name": "owner_cannot_supply_other_target",
+      "ok": true
+    },
+    {
+      "name": "monthly_both_kinds_settled_once",
+      "ok": true
+    },
+    {
+      "name": "study_top3_promoted",
+      "ok": true
+    },
+    {
+      "name": "study_bottom3_demoted",
+      "ok": true
+    },
+    {
+      "name": "study_qualified_top3_awarded",
+      "ok": true
+    },
+    {
+      "name": "exam_tier_independent",
+      "ok": true
+    },
+    {
+      "name": "exam_placeholder_no_fictional_awards",
+      "ok": true
+    },
+    {
+      "name": "rollover_idempotent_no_duplicate_awards",
+      "ok": true
+    },
+    {
+      "name": "rollover_no_normal_coins_for_exam",
+      "ok": true
+    },
+    {
+      "name": "new_month_01_belongs_prior_study_day",
+      "ok": true
+    },
+    {
+      "name": "leap_year_month_is_calendar",
+      "ok": true
+    },
+    {
+      "name": "rollover_private_rpc_not_callable",
+      "ok": true
+    }
+  ],
+  "passed": 21,
+  "total": 21,
+  "scope": "Concurrent normal RPC + historical month fixtures in isolated local DB"
+}

@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-06",
+  "device": {
+    "model": "iPhone 17",
+    "ios": "27.0"
+  },
+  "capture": {
+    "bundle_id": "com.pomosprint.qa.siteaudit",
+    "fixture": "in-memory synthetic data",
+    "source_commit": "c7d2b74",
+    "status_bar_time": "09:41"
+  },
+  "resize": "sips: 538x1170 then pad 1px each side to 540x1170",
+  "scenes": [
+    {
+      "scene": "exam-catalog",
+      "locale": "tr",
+      "file": "20261106/exam-catalog-tr.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "b7fdec683b49e637a445e1ba62164666266d4ac3fd49be0e558495e51a7d969f",
+      "source": {
+        "path": "analiz/site_qa_2026-11-06/native/exam-catalog-tr.png",
+        "width": 1206,
+        "height": 2622,
+        "sha256": "97d1514937f3e3f8c22d5758bc88fda090fd01806382caabe46006baac55b74c",
+        "locale": "tr"
+      },
+      "native_island": false
+    },
+    {
+      "scene": "exam-catalog",
+      "locale": "en",
+      "file": "20261106/exam-catalog-en.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "4a5b91744c1b1fb328e0afd849fcc60684db0436fc92118d97f719761682f16b",
+      "source": {
+        "path": "analiz/site_qa_2026-11-06/native/exam-catalog-en.png",
+        "width": 1206,
+        "height": 2622,
+        "sha256": "f5796e6452369d5c6b1a37978d3a6962ce9b50a3afcb100fb94b6d1a2a08a8ca",
+        "locale": "en"
+      },
+      "native_island": false
+    },
+    {
+      "scene": "exam-running",
+      "locale": "tr",
+      "file": "20261106/exam-running-tr.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "648f0e609f1cf267d0ad1ad080fc617c33e19bf5bfd437f5586bfb77a2b43e94",
+      "source": {
+        "path": "analiz/site_qa_2026-11-06/native/exam-running-tr.png",
+        "width": 1206,
+        "height": 2622,
+        "sha256": "8b77c7c8291477934044f1ff049c17e487b8a8d3bb140c9bb091ea51e0bb0260",
+        "locale": "tr"
+      },
+      "native_island": false
+    },
+    {
+      "scene": "exam-running",
+      "locale": "en",
+      "file": "20261106/exam-running-en.png",
+      "width": 540,
+      "height": 1170,
+      "sha256": "14958a7e4e8d36d567d618f7fbc8afc9721a8a16977f3f498cf3dd4617fa0774",
+      "source": {
+        "path": "analiz/site_qa_2026-11-06/native/exam-running-en.png",
+        "width": 1206,
+        "height": 2622,
+        "sha256": "c7a810131c1ea4eb20eb55845258025db201d38471ef7bc79d4ee3c328155213",
+        "locale": "en"
+      },
+      "native_island": true
+    }
+  ]
+}

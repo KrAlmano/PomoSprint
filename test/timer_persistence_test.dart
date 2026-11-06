@@ -155,7 +155,21 @@ void main() {
 
     test('bozuk JSON okunurken çökmez', () async {
       SharedPreferences.setMockInitialValues({TimerPersistence.keyFor('u1'): '{bozuk'});
-      expect(await TimerPersistence.instance.load('u1'), isNull);
+      final store = TimerPersistence.instance;
+      expect(await store.load('u1'), isNull);
+      expect(await store.hasInvalidRecord('u1'), isTrue);
+      expect(await store.saveChecked('u1', _start(t0)), isFalse);
+      await store.clear('u1', onlyClientUuid: 'uuid-1');
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getString(TimerPersistence.keyFor('u1')), '{bozuk');
+      await store.save('legacy', _start(t0));
+      expect(await store.load('u1', legacyOwnerKey: 'legacy'), isNull);
+      expect((await store.load('legacy'))?.clientUuid, 'uuid-1');
+      expect(prefs.getString(TimerPersistence.keyFor('u1')), '{bozuk');
+      await prefs.setString(TimerPersistence.keyFor('bad-legacy'), '{legacy-broken');
+      expect(await store.hasInvalidRecord('new-owner', legacyOwnerKey: 'bad-legacy'), isTrue);
+      expect(await store.load('new-owner', legacyOwnerKey: 'bad-legacy'), isNull);
+      expect(prefs.getString(TimerPersistence.keyFor('bad-legacy')), '{legacy-broken');
     });
   });
 }

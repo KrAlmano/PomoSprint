@@ -96,6 +96,7 @@ class _MainNavigationShellState extends State<MainNavigationShell>
   );
   Timer? _syncRetryTimer;
   int _syncRetryAttempt = 0;
+  String? _queueWarningOwner;
 
   UserModel get _user => widget.user;
 
@@ -297,9 +298,11 @@ class _MainNavigationShellState extends State<MainNavigationShell>
     }
     _cancelSyncRetry();
     var retry = false;
+    final owner = _user.id;
     try {
       final before = await _service.getPendingSessionCount();
       final result = await _service.syncPendingSessions();
+      if (owner == _user.id) _queueWarningOwner = null;
       // İlerleme olduysa (ya da kuyruk boşaldıysa) bekleme aralığı baştan başlar.
       if (result.remaining < before || result.remaining == 0) {
         _syncRetryAttempt = 0;
@@ -309,6 +312,13 @@ class _MainNavigationShellState extends State<MainNavigationShell>
       retry = result.retryable;
     } catch (e) {
       debugPrint('[SHELL] Bekleyen seanslar gönderilemedi: $e');
+      if (e is FormatException && mounted && owner == _user.id && _queueWarningOwner != owner) {
+        _queueWarningOwner = owner;
+        ScaffoldMessenger.maybeOf(context)?.showSnackBar(SnackBar(
+          content: Text(AppLocalizations.of(context)!.sessionRecordsUnreadable),
+          duration: const Duration(seconds: 8),
+        ));
+      }
       retry = _service.pendingSessionCount.value > 0;
     }
     if (retry) _scheduleSyncRetry();
@@ -339,8 +349,12 @@ class _MainNavigationShellState extends State<MainNavigationShell>
   }
 
   Future<void> _showRejectedNotices() async {
-    final count = await _service.takeRejectedSessionNoticeCount();
-    if (count > 0 && mounted) showRejectedSessionsNotice(context, count);
+    try {
+      final count = await _service.takeRejectedSessionNoticeCount();
+      if (count > 0 && mounted) showRejectedSessionsNotice(context, count);
+    } catch (e) {
+      debugPrint('[SHELL] Reddedilen seans bildirimleri okunamadı: $e');
+    }
   }
 
   /// Kategoriler: bulut asıl kaynak; erişilemezse cihazdaki önbellek, o da

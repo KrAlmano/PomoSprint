@@ -950,6 +950,9 @@
   "examPendingBody": "Your attempt is saved on this device. The same record will be retried when the connection returns.",
   "examStartPending": "Waiting for start confirmation",
   "examStartPendingBody": "The start request has not been confirmed yet. Retrying will not create another attempt.",
+  "timerPauseStorageError": "The pause could not be saved on this device. The timer continues; you can try again.",
+  "timerStartStorageError": "The timer could not be saved on this device. Please try again.",
+  "examHistoryIncomplete": "The complete mock exam history could not be verified. Some records may be missing from reports.",
   "examError": "Could not load practice exam data. Check your connection and try again.",
   "examStartRateLimited": "You have started too many practice exams in the last 24 hours. Please try again later.",
   "examConflict": "Finish your current study session or practice exam first.",
@@ -1275,5 +1278,8 @@
   "examKpssBachelor": "Bachelor’s",
   "examKpssAssociate": "Associate degree",
   "examKpssSecondary": "Secondary education",
-  "examKpssField": "Field knowledge"
+  "examKpssField": "Field knowledge",
+  "timerRecordCorrupt": "The timer record on this device could not be loaded safely. A new session cannot start; please try again later.",
+  "sessionRecordsUnreadable": "Session records on this device could not be read. The report may be incomplete; records are preserved.",
+  "sessionSavePending": "Saving is still in progress. The result has not yet been confirmed."
 }

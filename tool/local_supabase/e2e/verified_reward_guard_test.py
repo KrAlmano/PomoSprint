@@ -24,6 +24,10 @@ def cap(value):
               select id,least(last_study_date,((clock_timestamp() at time zone timezone)-interval '4 hours')::date),least(greatest(current_streak,0),14)
               from public.profiles where last_study_date is not null and current_streak>0
               on conflict(user_id) do nothing;
+              insert into public.verified_reward_legacy_session_anchor_34(session_id)
+              select s.id from public.study_sessions s
+              where s.completed_at >= least(clock_timestamp()-interval '14 days',coalesce((select coalesce(period_started_at,start_at) from public.league_competition_state where singleton),clock_timestamp()-interval '14 days'))
+              on conflict(session_id) do nothing;
               update public.app_config set value=to_jsonb(clock_timestamp()::text) where key='verified_reward_activation_at_34';
             end if;
           end $$;
@@ -31,7 +35,7 @@ def cap(value):
           commit;""")
     else:
         # Test reset in disposable clone only. Real rollback refuses anchors.
-        base.sql("begin; update public.app_config set value='null'::jsonb where key in ('unverified_session_daily_cap','verified_reward_activation_at_34'); delete from public.verified_reward_streak_anchor_34; commit;")
+        base.sql("begin; update public.app_config set value='null'::jsonb where key in ('unverified_session_daily_cap','verified_reward_activation_at_34'); delete from public.verified_reward_streak_anchor_34; delete from public.verified_reward_legacy_session_anchor_34; commit;")
 
 def count_event(owner):
     return int(base.sql(f"select count(*) from public.competition_events where user_id='{owner}' and kind='study'"))
@@ -48,7 +52,7 @@ def register(owner,client,duration=25,age="interval '26 minutes'"):
 
 def main():
     assert base.sql('select current_database()')==DB
-    assert base.sql("select count(*) from public.verified_reward_backup_34")=='6'
+    assert base.sql("select count(*) from public.verified_reward_backup_34")=='10'
     base.check('gate_off_by_default',base.sql("select value='null'::jsonb from public.app_config where key='unverified_session_daily_cap'")=='t')
     old,cat=base.user('yks','QA Policy Off')
     oldid=base.uid(); off=complete(old,cat,oldid)

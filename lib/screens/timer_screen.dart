@@ -152,9 +152,15 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
   final ValueNotifier<int> _marathonDialogRevision = ValueNotifier(0);
   DialogRoute<void>? _marathonProgressRoute;
   String? _completingUuid;
+  // A normal focus must not be replaced by a new timer until its durable
+  // queue/server submission succeeds. Keep the original UUID for retry.
+  ActiveTimerSession? _normalCompletion;
   bool _completionFailed = false;
   bool _confirmingDiscard = false;
-  bool _persistingMarathonStart = false;
+  bool _persistingTimerStart = false;
+  bool _timerRecordChecked = false;
+  bool _timerRecordInvalid = false;
+  bool _persistingPause = false;
   bool _transitioningPresence = false;
   bool _expiringPresence = false;
   String? _presenceCandidateUuid;
@@ -164,12 +170,13 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
   bool _lastMarathonRejected = false;
   bool _lastMarathonValidationFailed = false;
 
-  bool get _hasSession => _session != null;
+  bool get _hasSession => _session != null || _normalCompletion != null;
   MarathonProgress? get _marathon => _session?.marathon;
   bool get _isBreak => _marathon?.isOnBreak ?? false;
   bool get _isAwaitingPresence => _marathon?.isAwaitingPresence ?? false;
   bool get _isResting => _marathon?.isResting ?? false;
   bool get _isCompleting =>
+      _normalCompletion != null ||
       _marathon?.phase == MarathonPhase.completing ||
       (_marathon?.isFinished ?? false);
 
@@ -254,13 +261,17 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
       unawaited(NotificationService.instance.cancelMarathonBreakEnd());
       unawaited(_lockScreen.clear());
       _session = null;
+      _normalCompletion = null;
       _foregroundSeconds = 0;
       _marathonCount = 0;
       _lastPlannedMarathonCount = 2;
       _planningMarathon = false;
       _dismissMarathonProgress();
       _completionFailed = false;
-      _persistingMarathonStart = false;
+      _persistingTimerStart = false;
+      _timerRecordChecked = false;
+      _timerRecordInvalid = false;
+      _persistingPause = false;
       _transitioningPresence = false;
       _expiringPresence = false;
       _presenceCandidateUuid = null;
@@ -355,12 +366,17 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
       owner,
       legacyOwnerKey: widget.legacySessionOwnerKey,
     );
-    if (!mounted ||
-        owner != widget.sessionOwnerKey ||
-        _hasSession ||
-        _isStarting) {
+    final invalid = await _store.hasInvalidRecord(
+      owner, legacyOwnerKey: widget.legacySessionOwnerKey,
+    );
+    if (!mounted || owner != widget.sessionOwnerKey) return;
+    _timerRecordChecked = true;
+    _timerRecordInvalid = invalid;
+    if (invalid) {
+      _showMarathonFeedback(AppLocalizations.of(context)!.timerRecordCorrupt);
       return;
     }
+    if (_hasSession || _isStarting) return;
     await _restoreSavedSession(saved, owner);
   }
 
@@ -507,7 +523,9 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     if (_completingUuid == session.clientUuid) return;
     _completingUuid = session.clientUuid;
     _timer?.cancel();
-    final completed = session.withForegroundSeconds(_foregroundSeconds);
+    final completed = _normalCompletion?.clientUuid == session.clientUuid
+        ? session
+        : session.withForegroundSeconds(_foregroundSeconds);
     final owner = widget.sessionOwnerKey;
     if (completed.marathon != null) {
       try {
@@ -548,16 +566,36 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
       if (_completingUuid == completed.clientUuid) _completingUuid = null;
       return;
     }
+    if (_sameOwner(owner)) {
+      setState(() {
+        _normalCompletion = completed;
+        _completionFailed = false;
+      });
+    }
     // Diyalog gönderimin sonucunu bekler: kaydediliyor → puan/kum/seri,
     // kuyruk ya da ret nedeni.
-    final submission = widget.onSessionCompleted(completed);
+    final submission = widget.onSessionCompleted(completed).then((saved) {
+      if (saved == null) throw StateError('session_completion_not_saved');
+      return saved;
+    });
     _showSessionCompletedDialog(completed.durationMinutes, submission);
     try {
       await submission;
       await _store.clear(owner, onlyClientUuid: completed.clientUuid);
+      if (_sameOwner(owner) &&
+          _normalCompletion?.clientUuid == completed.clientUuid) {
+        setState(() {
+          _normalCompletion = null;
+          _completionFailed = false;
+        });
+      }
     } catch (e) {
       // Kayıt silinmez: sonraki açılışta süresi dolmuş seans olarak yeniden gönderilir.
       debugPrint('[TIMER] Seans gönderimi tamamlanamadı: $e');
+      if (_sameOwner(owner) &&
+          _normalCompletion?.clientUuid == completed.clientUuid) {
+        setState(() => _completionFailed = true);
+      }
     } finally {
       if (_completingUuid == completed.clientUuid) _completingUuid = null;
     }
@@ -1343,10 +1381,15 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
   }
 
   void _toggleTimer() {
-    if (!_sessionIsActive) return;
+    if (!_timerRecordChecked || _timerRecordInvalid) {
+      if (_timerRecordInvalid) _showMarathonFeedback(AppLocalizations.of(context)!.timerRecordCorrupt);
+      return;
+    }
+    if (!_sessionIsActive || _persistingPause) return;
     if (_isCompleting) {
-      if (_completionFailed && _session != null) {
-        unawaited(_completeSession(_session!));
+      final retry = _normalCompletion ?? _session;
+      if (_completionFailed && retry != null) {
+        unawaited(_completeSession(retry));
       }
       return;
     }
@@ -1364,7 +1407,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     }
     if (isRunning) {
       if (_pauseCreditsLeft > 0) {
-        _pause();
+        unawaited(_pause());
       } else {
         _showPauseLimitDialog();
       }
@@ -1377,25 +1420,77 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     }
   }
 
-  void _pause() {
+  Future<void> _pause() async {
     final session = _session;
-    if (session == null) return;
-    _timer?.cancel();
-    unawaited(NotificationService.instance.cancelSessionEndNotification());
+    if (session == null || _persistingPause) return;
+    final owner = widget.sessionOwnerKey;
     final now = _now();
-    final paused = session.pauseAt(now);
+    final paused = session.pauseAt(now).withForegroundSeconds(_foregroundSeconds);
+    setState(() => _persistingPause = true);
+    _timer?.cancel();
+    bool canPause() =>
+        _sameOwner(owner) &&
+        _isInForeground &&
+        _persistingPause &&
+        !_confirmingDiscard &&
+        identical(_session, session) &&
+        isRunning &&
+        !_isCompleting &&
+        !session.isFinishedAt(_now());
+    final plan = session.marathon;
+    final bool saved;
+    var savedSession = paused;
+    if (plan == null) {
+      saved = await _store.saveChecked(owner, paused, canCommit: canPause);
+    } else {
+      final updated = await _store.compareAndUpdateMarathon(
+        owner,
+        clientUuid: session.clientUuid,
+        completedSessions: plan.completedSessions,
+        phases: {plan.phase},
+        canCommit: canPause,
+        update: (stored) {
+          if (!stored.isRunning || stored.pauseUsedCount != session.pauseUsedCount) {
+            throw StateError('marathon_pause_changed');
+          }
+          var nextPlan = stored.marathon!.stopRequested
+              ? paused.marathon!.withStopRequested()
+              : paused.marathon!;
+          if (stored.marathon!.presenceClientUuid != null) {
+            nextPlan = nextPlan.withPresenceCandidate(stored.marathon!.presenceClientUuid!);
+          }
+          return paused.withMarathon(nextPlan);
+        },
+      );
+      saved = updated != null;
+      if (updated != null) savedSession = updated;
+    }
+    if (!_sameOwner(owner)) return;
+    setState(() => _persistingPause = false);
+    if (!saved) {
+      if (identical(_session, session) && isRunning && !_isCompleting) {
+        _timer = Timer.periodic(const Duration(seconds: 1), (_) => _tick());
+        _tick(countForeground: false);
+        if (mounted && _isInForeground && !_confirmingDiscard &&
+            !session.isFinishedAt(_now())) {
+          _showMarathonFeedback(AppLocalizations.of(context)!.timerPauseStorageError);
+        }
+      }
+      return;
+    }
+    unawaited(NotificationService.instance.cancelSessionEndNotification());
     setState(() {
-      _session = paused;
+      _session = savedSession;
       isRunning = false;
-      remaining = paused.remainingSecondsAt(now);
+      remaining = savedSession.remainingSecondsAt(now);
     });
-    _persistSession();
-    unawaited(_lockScreen.showPaused(paused));
+    unawaited(_lockScreen.showPaused(savedSession));
     widget.onTimerStateChanged?.call(
       false,
       paused.categoryName,
       _minutesLeft(remaining),
     );
+    if (!mounted) return;
     ScaffoldMessenger.of(context).clearSnackBars();
     // Yatay odak ekranındaki oynat kontrolünü, özellikle büyük yazıda,
     // alttan gelen bilgilendirme kutusuyla örtme. Durum simgede görünür.
@@ -1434,10 +1529,13 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     widget.onMarathonBreakChanged?.call(false, 0);
     final categoryName = _session?.categoryName ?? selectedCategoryName;
     final planUuid = _marathon?.marathonUuid;
+    final discardedUuid = _session?.clientUuid;
     _resetToIdle();
     unawaited(
       planUuid == null
-          ? _store.clear(widget.sessionOwnerKey)
+          ? (discardedUuid == null
+              ? Future<void>.value()
+              : _store.clear(widget.sessionOwnerKey, onlyClientUuid: discardedUuid))
           : _store.clearMarathon(
               widget.sessionOwnerKey,
               marathonUuid: planUuid,
@@ -1671,7 +1769,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
       }
     }
     // Geri tuşuyla kapatılan geri sayım BAŞLAT'ı kilitli bırakmaz.
-    if (_sameOwner(owner) && !isRunning && !_persistingMarathonStart) {
+    if (_sameOwner(owner) && !isRunning && !_persistingTimerStart) {
       widget.onStartAborted?.call();
       setState(() {
         _isStarting = false;
@@ -1690,7 +1788,14 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
     if (current != null) {
       // Geri sayım sırasında da sınır aşılmış olabilir.
       if (_expireStalePausedSession()) return;
-      _runSession(current.resumeAt(now), now);
+      final resumed = current.resumeAt(now);
+      if (current.marathon == null) {
+        _persistingTimerStart = true;
+        unawaited(_startNormalAfterPersisting(resumed, now, previous: current));
+      } else {
+        _persistingTimerStart = true;
+        unawaited(_resumeMarathonAfterPersisting(current, now));
+      }
       return;
     }
     if (_marathonCount > 0 && !widget.marathonAvailable) {
@@ -1722,14 +1827,74 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
       now: now,
     );
     if (fresh.marathon == null) {
-      _runSession(fresh, now);
-      if (startUnverified && mounted) {
-        _showMarathonFeedback(AppLocalizations.of(context)!.sessionStartUnverified);
-      }
+      _persistingTimerStart = true;
+      unawaited(_startNormalAfterPersisting(fresh, now, startUnverified: startUnverified));
     } else {
-      _persistingMarathonStart = true;
+      _persistingTimerStart = true;
       unawaited(_startMarathonAfterPersisting(fresh, now, startUnverified: startUnverified));
     }
+  }
+
+  Future<void> _startNormalAfterPersisting(
+    ActiveTimerSession next,
+    DateTime now, {
+    ActiveTimerSession? previous,
+    bool startUnverified = false,
+  }) async {
+    final owner = widget.sessionOwnerKey;
+    bool canStart() =>
+        _sameOwner(owner) &&
+        _isInForeground &&
+        _persistingTimerStart &&
+        (previous == null
+            ? !_hasSession
+            : _session?.clientUuid == previous.clientUuid && !_isCompleting);
+    final saved = await _store.saveChecked(owner, next, canCommit: canStart);
+    if (!_sameOwner(owner)) return;
+    _persistingTimerStart = false;
+    if (!saved) {
+      widget.onStartAborted?.call();
+      setState(() => _isStarting = false);
+      if (_isInForeground && mounted) {
+        _showMarathonFeedback(AppLocalizations.of(context)!.timerStartStorageError);
+      }
+      return;
+    }
+    _runSession(next, _now(), persist: false);
+    if (startUnverified && mounted) {
+      _showMarathonFeedback(AppLocalizations.of(context)!.sessionStartUnverified);
+    }
+  }
+
+  Future<void> _resumeMarathonAfterPersisting(ActiveTimerSession previous, DateTime now) async {
+    final owner = widget.sessionOwnerKey;
+    final plan = previous.marathon!;
+    bool canResume() => _sameOwner(owner) && _isInForeground &&
+        _persistingTimerStart && identical(_session, previous) && !_isCompleting;
+    final next = await _store.compareAndUpdateMarathon(
+      owner,
+      clientUuid: previous.clientUuid,
+      completedSessions: plan.completedSessions,
+      phases: {plan.phase},
+      canCommit: canResume,
+      update: (stored) {
+        if (stored.isRunning || stored.pauseUsedCount != previous.pauseUsedCount) {
+          throw StateError('marathon_resume_changed');
+        }
+        return stored.resumeAt(now);
+      },
+    );
+    if (!_sameOwner(owner)) return;
+    _persistingTimerStart = false;
+    if (next == null) {
+      widget.onStartAborted?.call();
+      setState(() => _isStarting = false);
+      if (_isInForeground && mounted) {
+        _showMarathonFeedback(AppLocalizations.of(context)!.timerStartStorageError);
+      }
+      return;
+    }
+    _runSession(next, _now(), persist: false);
   }
 
   Future<void> _startMarathonAfterPersisting(
@@ -1743,10 +1908,10 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
         _sameOwner(owner) &&
         _isInForeground &&
         !_hasSession &&
-        _persistingMarathonStart;
+        _persistingTimerStart;
     final saved = await _store.saveChecked(owner, fresh, canCommit: canStart);
     if (!_sameOwner(owner)) return;
-    _persistingMarathonStart = false;
+    _persistingTimerStart = false;
     if (!saved) {
       widget.onStartAborted?.call();
       setState(() {
@@ -2399,6 +2564,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                 Widget landscapeControls() {
                   final canToggle =
                       !_isStarting &&
+                      !_persistingPause &&
                       !_expiringPresence &&
                       !((_isCompleting || _isBreak) && !_completionFailed);
                   final label = _isAwaitingPresence
@@ -2498,7 +2664,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                                     ),
                             ),
                           ),
-                          if (_hasSession && !stop) ...[
+                          if (_session != null && !stop) ...[
                             const SizedBox(width: 12),
                             IconButton(
                               key: ValueKey(
@@ -2760,6 +2926,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                             ),
                             onPressed:
                                 _isStarting ||
+                                    _persistingPause ||
                                     _expiringPresence ||
                                     ((_isCompleting || _isBreak) &&
                                         !_completionFailed) ||
@@ -2818,7 +2985,7 @@ class _TimerScreenState extends State<TimerScreen> with WidgetsBindingObserver {
                             ),
                           ),
                           // Süren ya da duraklatılmış seansı onayla bırakma.
-                          if (_hasSession) ...[
+                          if (_session != null) ...[
                             SizedBox(height: gap(2, 2, 6)),
                             TextButton.icon(
                               key: _marathon == null
@@ -3123,8 +3290,8 @@ class _TimerLayout {
 /// Seans tamamlanınca gösterilen diyalog. [result] verilirse sunucunun
 /// sonucunu bekler: önce "kaydediliyor", sonra kazanılan puan, kum ve seri
 /// (yalnızca RPC sonucundan; istemcide formül yok), kuyruk ya da ret
-/// nedeni. Sonuç [resultTimeout] içinde gelmezse "cihazda kayıtlı, bağlantı
-/// gelince gönderilecek" gösterilir; sonuç sonradan gelirse güncellenir.
+/// nedeni. Sonuç gecikirse doğrulanmamış kaydı başarılı göstermeden bekler;
+/// sonuç sonradan gelirse güncellenir.
 class SessionCompletedDialog extends StatefulWidget {
   final int minutes;
 
@@ -3150,6 +3317,7 @@ class SessionCompletedDialog extends StatefulWidget {
 class _SessionCompletedDialogState extends State<SessionCompletedDialog> {
   bool _waiting = false;
   bool _timedOut = false;
+  bool _submissionFailed = false;
   SessionSubmitResult? _result;
   Timer? _timeoutTimer;
 
@@ -3166,7 +3334,10 @@ class _SessionCompletedDialogState extends State<SessionCompletedDialog> {
       _finish,
       // Gönderim hata verdiyse seans cihazda kalır ve sonra yeniden
       // gönderilir (bkz. TimerScreen._completeSession).
-      onError: (Object _) => _finish(null),
+      onError: (Object _) {
+        _submissionFailed = true;
+        _finish(null);
+      },
     );
   }
 
@@ -3175,6 +3346,7 @@ class _SessionCompletedDialogState extends State<SessionCompletedDialog> {
     if (!mounted) return;
     setState(() {
       _waiting = false;
+      _submissionFailed = _submissionFailed || result == null;
       _result = result;
     });
   }
@@ -3264,6 +3436,16 @@ class _SessionCompletedDialogState extends State<SessionCompletedDialog> {
               ),
             ),
           ],
+        ),
+      ],
+      _ when _waiting && _timedOut => [
+        message(l10n.sessionSavePending, Icons.hourglass_empty_rounded, muted),
+      ],
+      null when _submissionFailed => [
+        message(
+          '${l10n.sessionNotSavedTitle}. ${l10n.marathonRetrySave}.',
+          Icons.error_outline_rounded,
+          accent,
         ),
       ],
       null => [queuedOffline],

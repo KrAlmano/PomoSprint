@@ -2618,6 +2618,18 @@ class AppLocalizationsEn extends AppLocalizations {
       'The start request has not been confirmed yet. Retrying will not create another attempt.';
 
   @override
+  String get timerPauseStorageError =>
+      'The pause could not be saved on this device. The timer continues; you can try again.';
+
+  @override
+  String get timerStartStorageError =>
+      'The timer could not be saved on this device. Please try again.';
+
+  @override
+  String get examHistoryIncomplete =>
+      'The complete mock exam history could not be verified. Some records may be missing from reports.';
+
+  @override
   String get examError =>
       'Could not load practice exam data. Check your connection and try again.';
 
@@ -3214,4 +3226,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get examKpssField => 'Field knowledge';
+
+  @override
+  String get timerRecordCorrupt =>
+      'The timer record on this device could not be loaded safely. A new session cannot start; please try again later.';
+
+  @override
+  String get sessionRecordsUnreadable =>
+      'Session records on this device could not be read. The report may be incomplete; records are preserved.';
+
+  @override
+  String get sessionSavePending =>
+      'Saving is still in progress. The result has not yet been confirmed.';
 }

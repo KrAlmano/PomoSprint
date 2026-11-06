@@ -18,6 +18,39 @@ void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
   for (final language in ['tr', 'en']) {
+    testWidgets('legacy full history warns about potentially missing records ($language)', (tester) async {
+      final backend = DetailsExamBackend();
+      final exams = ExamService(backend: backend);
+      final reports = FakeSupabaseService();
+      addTearDown(exams.dispose);
+      addTearDown(backend.owner.dispose);
+      await exams.initialize();
+      exams.errorCode = 'exam_history_cursor_ambiguous';
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(430, 1000);
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(MaterialApp(
+        locale: Locale(language),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(body: ReportsScreen(
+          categories: const [], service: reports, examService: exams,
+          loadExamAttempts: () async => exams.attempts,
+          isExamHistoryStale: () => true,
+          loadExamStudySessions: () async => [],
+        )),
+      ));
+      await tester.pumpAndSettle();
+      final l10n = lookupAppLocalizations(Locale(language));
+      expect(find.text(l10n.examHistoryIncomplete), findsOneWidget);
+      final tab = find.text(l10n.reportsTabExamsShort);
+      await tester.ensureVisible(tab);
+      await tester.tap(tab);
+      await tester.pumpAndSettle();
+      expect(find.text(l10n.examHistoryIncomplete), findsWidgets);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('reports contain editable exam history ($language)', (
       tester,
     ) async {

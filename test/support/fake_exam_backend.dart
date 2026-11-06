@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show PostgrestException;
 
 import 'package:pomodoro/models/exam_catalog_defaults.dart';
 import 'package:pomodoro/models/exam_model.dart';
@@ -27,7 +28,10 @@ class FakeExamBackend implements ExamBackend {
   }
 
   @override
-  Future<Object?> rpc(String name, Map<String, dynamic> params) async {
+  Future<Object?> rpc(String name, Map<String, dynamic> params, {
+    required String expectedOwnerId,
+  }) async {
+    if (ownerId != expectedOwnerId) throw const ExamFailure('owner_changed');
     calls.add((name, params));
     if (handler != null) return handler!(name, params);
     return defaultRpc(name, params);
@@ -35,6 +39,9 @@ class FakeExamBackend implements ExamBackend {
 
   Object? defaultRpc(String name, Map<String, dynamic> params) {
     if (!isAvailable) throw const ExamFailure('connection');
+    if (name == 'get_my_exam_attempts_v2') {
+      throw const PostgrestException(message: 'missing', code: 'PGRST202');
+    }
     if (name == 'get_exam_config') {
       return {
         'schema_version': 1,

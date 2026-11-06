@@ -262,31 +262,84 @@ class TimerPersistence {
 
   final AsyncLock _lock = AsyncLock();
 
-  /// [ownerKey] altındaki kaydı okur. Bulunamazsa [legacyOwnerKey] altındaki
-  /// kayıt [ownerKey]'e taşınarak döndürülür (kimlik sonradan öğrenildiyse).
+  // An incomplete move must not be observed as an ordinary absence by a
+  // caller that does not know the legacy key.
+  final Set<String> _migrationIssues = {};
+
+  /// Read a session only after the legacy-to-UID move is complete. If both
+  /// keys exist, only identical records can be reconciled automatically.
   Future<ActiveTimerSession?> load(String ownerKey, {String? legacyOwnerKey}) {
     return _lock.synchronized(() async {
+      final hasLegacyKey = legacyOwnerKey != null &&
+          legacyOwnerKey.isNotEmpty && legacyOwnerKey != ownerKey;
+      if (!hasLegacyKey && _migrationIssues.contains(ownerKey)) return null;
       try {
         final prefs = await SharedPreferences.getInstance();
-        var session = _decode(prefs.getString(keyFor(ownerKey)));
-        if (session == null &&
-            legacyOwnerKey != null &&
-            legacyOwnerKey.isNotEmpty &&
-            legacyOwnerKey != ownerKey) {
+        final raw = prefs.getString(keyFor(ownerKey));
+        var session = _decode(raw);
+        if (raw != null && session == null) return null;
+        if (hasLegacyKey) {
           final legacyKey = keyFor(legacyOwnerKey);
-          session = _decode(prefs.getString(legacyKey));
-          if (session != null) {
-            await prefs.setString(
-              keyFor(ownerKey),
-              jsonEncode(session.toJson()),
-            );
-            await prefs.remove(legacyKey);
+          final legacyRaw = prefs.getString(legacyKey);
+          if (legacyRaw != null) {
+            final legacy = _decode(legacyRaw);
+            if (legacy == null || (session != null &&
+                jsonEncode(session.toJson()) != jsonEncode(legacy.toJson()))) {
+              _migrationIssues.add(ownerKey);
+              return null;
+            }
+            if (session == null) {
+              final migrated = await _writeIfAllowed(
+                prefs, ownerKey, jsonEncode(legacy.toJson()), null,
+              );
+              if (!migrated) {
+                _migrationIssues.add(ownerKey);
+                return null;
+              }
+              session = legacy;
+            }
+            try {
+              if (!await prefs.remove(legacyKey)) {
+                throw StateError('legacy_timer_remove_failed');
+              }
+            } catch (error) {
+              // SharedPreferences eagerly updates its cache before the native
+              // result; restore the source when deletion was not confirmed.
+              try {
+                await prefs.setString(legacyKey, legacyRaw);
+              } catch (_) {
+                // Both native removal and restoration may have failed; do not
+                // claim the move succeeded in this process.
+              }
+              _migrationIssues.add(ownerKey);
+              return null;
+            }
           }
         }
+        _migrationIssues.remove(ownerKey);
         return session;
       } catch (e) {
+        _migrationIssues.add(ownerKey);
         debugPrint('[TIMER] Kayıtlı seans okunamadı: $e');
         return null;
+      }
+    });
+  }
+
+  /// An unreadable or incompletely migrated record blocks new sessions.
+  Future<bool> hasInvalidRecord(String ownerKey, {String? legacyOwnerKey}) {
+    return _lock.synchronized(() async {
+      if (_migrationIssues.contains(ownerKey)) return true;
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final raw = prefs.getString(keyFor(ownerKey));
+        if (raw != null && _decode(raw) == null) return true;
+        if (legacyOwnerKey == null || legacyOwnerKey.isEmpty || legacyOwnerKey == ownerKey) return false;
+        // A successful load removes this source. Any surviving source means
+        // the move has not been acknowledged and must be retried first.
+        return prefs.getString(keyFor(legacyOwnerKey)) != null;
+      } catch (_) {
+        return true;
       }
     });
   }
@@ -316,7 +369,7 @@ class TimerPersistence {
   }) {
     if (_retiredOwners.contains(ownerKey)) return Future.value(false);
     return _lock.synchronized(() async {
-      if (_retiredOwners.contains(ownerKey)) return false;
+      if (_retiredOwners.contains(ownerKey) || _migrationIssues.contains(ownerKey)) return false;
       try {
         final prefs = await SharedPreferences.getInstance();
         return await _writeIfAllowed(
@@ -344,7 +397,7 @@ class TimerPersistence {
     bool Function()? canCommit,
   }) {
     return _lock.synchronized(() async {
-      if (_retiredOwners.contains(ownerKey)) return null;
+      if (_retiredOwners.contains(ownerKey) || _migrationIssues.contains(ownerKey)) return null;
       try {
         final prefs = await SharedPreferences.getInstance();
         final stored = _decode(prefs.getString(keyFor(ownerKey)));
@@ -388,6 +441,7 @@ class TimerPersistence {
     }
     final key = keyFor(ownerKey);
     final previousJson = prefs.getString(key);
+    if (previousJson != null && _decode(previousJson) == null) return false;
     Future<void> restorePrevious() async {
       if (previousJson == null || _retiredOwners.contains(ownerKey)) {
         await prefs.remove(key);
@@ -445,8 +499,9 @@ class TimerPersistence {
         final prefs = await SharedPreferences.getInstance();
         final key = keyFor(ownerKey);
         if (onlyClientUuid != null) {
+          if (_migrationIssues.contains(ownerKey)) return;
           final stored = _decode(prefs.getString(key));
-          if (stored != null && stored.clientUuid != onlyClientUuid) return;
+          if (stored == null || stored.clientUuid != onlyClientUuid) return;
         }
         await prefs.remove(key);
       } catch (e) {

@@ -109,8 +109,10 @@ void main() {
       );
       expect(service.records, hasLength(201));
       expect(await service.persistence.read(backend.ownerId!), hasLength(201));
-      expect(service.historyIsStale, isFalse);
-      expect(service.errorCode, isNull);
+      // Timestamp-only legacy pagination cannot prove a full boundary page
+      // did not omit another record at the same timestamp.
+      expect(service.historyIsStale, isTrue);
+      expect(service.errorCode, 'exam_history_cursor_ambiguous');
 
       final combined = combineStudyAndExamSessions(
         study: [
@@ -192,8 +194,10 @@ void main() {
           ? _page(history, params['p_before'] as String?)
           : backend.defaultRpc(name, params);
       await service.refresh();
-      expect(service.historyIsStale, isFalse);
-      expect(service.errorCode, isNull);
+      // Retry clears the network failure, but the legacy full-page cursor
+      // still cannot prove that no boundary record was skipped.
+      expect(service.historyIsStale, isTrue);
+      expect(service.errorCode, 'exam_history_cursor_ambiguous');
       expect(service.attempts, hasLength(201));
     },
   );
